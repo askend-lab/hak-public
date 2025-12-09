@@ -1,2 +1,10 @@
-читай ../devbox/packages/task-channel/README.md
-И продолжим в Slack!
+# HAK
+
+DevBox-powered project.
+
+## Quick Start
+
+```bash
+npm install
+npm run dx    # Full check: tests + hooks
+```

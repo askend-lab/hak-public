@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dx": "node devbox",
-    "dx:test": "node devbox test",
-    "dx:hooks": "node devbox hooks run",
+    "dx": "node devbox dx",
+    "dx:cli": "node devbox",
     "test": "jest --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
   },

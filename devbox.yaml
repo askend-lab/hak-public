@@ -18,7 +18,8 @@ test_modules:
   - name: hak
     path: .
     type: jest
-    min_coverage: 80
+    min_coverage_lines: 80
+    min_coverage_branches: 80
 
 # Global coverage settings
 coverage:
@@ -27,7 +28,7 @@ coverage:
 
 # Task Channel - Slack-based agent communication
 task_channel:
-  active: true
+  active: false
   channel_name: 'hak'
 
 # Hooks configuration - ALL parameters required
