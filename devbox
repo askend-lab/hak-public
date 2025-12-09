@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+// DevBox wrapper - 12 lines, never changes
+
+const { execSync } = require('child_process');
+const args = process.argv.slice(2).join(' ');
+
+if (process.env.DEVBOX) {
+  execSync(`node ${process.env.DEVBOX}/cli.js ${args}`, { stdio: 'inherit' });
+} else {
+  execSync(`npx @devbox/cli ${args}`, { stdio: 'inherit' });
+}

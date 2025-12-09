@@ -15,6 +15,10 @@ tdd:
 
 # Test modules with coverage requirements
 test_modules:
+  - name: hak
+    path: .
+    type: jest
+    min_coverage: 80
 
 # Global coverage settings
 coverage:
