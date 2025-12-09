@@ -1,0 +1,75 @@
+# DevBox Configuration
+# ALL parameters are REQUIRED - no hidden defaults
+
+project:
+  name: 'HAK'
+  iterations_dir: iterations
+  docs_dir: docs
+
+methodology: none
+
+# TDD enforcement
+tdd:
+  enabled: true
+  doc: 'docs/TDD.md'
+
+# Test modules with coverage requirements
+test_modules:
+
+# Global coverage settings
+coverage:
+  min_total: 75
+  fail_on_decrease: true
+
+# Task Channel - Slack-based agent communication
+task_channel:
+  active: true
+  channel_name: 'hak'
+
+# Hooks configuration - ALL parameters required
+hooks:
+  markdown-size:
+    active: true
+    max_lines: 200  # Temporarily raised - need to split large docs
+
+  complexity:
+    active: true
+    max_complexity: 40  # Some legacy code is complex
+    excludePaths:
+      - '**/task-channel/**'  # Legacy scripts with high complexity
+
+  language-check:
+    active: true
+    allowed_languages:
+      - en
+    excludePaths:
+
+  broken-links:
+    active: true  # TODO: Fix 18 broken links first
+    check_external: false
+
+  no-console:
+    active: true
+    allow_warn: true
+    allow_error: true
+
+  prettier-check:
+    active: false
+
+  test-required:
+    active: false
+    patterns:
+      - '*.test.js'
+      - '*.spec.js'
+
+  metrics-required:
+    active: false  # test-runner now handles coverage enforcement
+
+  run-tests:
+    active: true
+    command: 'npm test'
+
+  plan-validation:
+    active: false
+    strict: true
+# final
