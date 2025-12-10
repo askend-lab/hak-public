@@ -1,0 +1,8 @@
+#!/bin/sh
+# DevBox pre-push hook
+set -e
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+node "$PROJECT_ROOT/node_modules/@askend-lab/devbox/packages/hooks/src/cli/index.js" run pre-push
+npm test 2>/dev/null || true

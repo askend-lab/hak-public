@@ -6,12 +6,14 @@
     "dx": "node devbox dx",
     "dx:cli": "node devbox",
     "test": "jest --json --outputFile=jest-results.json",
-    "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
+    "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "devDependencies": {
+    "@askend-lab/devbox": "file:../devbox",
     "jest": "^29.7.0"
   }
 }
