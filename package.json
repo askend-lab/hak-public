@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@askend-lab/devbox": "file:../devbox",
+    "@askend-lab/devbox": "^0.2.1",
     "jest": "^29.7.0"
   }
 }
