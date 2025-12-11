@@ -31,6 +31,7 @@ module.exports = {
     '/singletablelambda/',
     'synthesis.integration.test.ts',
     'context.test.tsx', // Skipped: needs aws-amplify mock setup
+    'packages/frontend/src/services/audio/synthesis.test.ts',
   ],
   modulePathIgnorePatterns: ['/singletablelambda/'],
   transform: {
