@@ -6,9 +6,9 @@ locals {
   domain_name = var.env == "prod" ? "${local.app_name}.askend-lab.com" : "${local.app_name}-${var.env}.askend-lab.com"
 
   # Resource naming
-  website_bucket_name      = "${local.app_name}-${var.env}-website"
-  artifacts_bucket_name    = "askend-lab-artifacts" # Centralized bucket
-  artifacts_bucket_prefix  = "${local.app_name}"    # Our prefix: askend-lab-artifacts/hak/
+  website_bucket_name     = "${local.app_name}-${var.env}-website"
+  artifacts_bucket_name   = "askend-lab-artifacts" # Centralized bucket
+  artifacts_bucket_prefix = local.app_name         # Our prefix: askend-lab-artifacts/hak/
 
   # Tags
   common_tags = {
