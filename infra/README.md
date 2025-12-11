@@ -151,3 +151,4 @@ This error means you don't have write access to the state lock table. It's expec
 See `/drafts/Architecture.txt` for full architectural documentation.
 
 <!-- Infrastructure ready for deployment -->
+<!-- Trigger: Import existing resources into separate state files -->
