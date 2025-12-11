@@ -21,6 +21,11 @@ test_modules:
     type: jest
     min_coverage_lines: 80
     min_coverage_branches: 80
+  - name: singletablelambda
+    path: singletablelambda
+    type: jest
+    min_coverage_lines: 80
+    min_coverage_branches: 80
 
 # Global coverage settings
 coverage:
