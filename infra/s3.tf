@@ -47,32 +47,6 @@ resource "aws_s3_bucket_policy" "website" {
   depends_on = [aws_s3_bucket_public_access_block.website]
 }
 
-# S3 bucket for build artifacts (shared between environments)
-resource "aws_s3_bucket" "artifacts" {
-  bucket = local.artifacts_bucket_name
-
-  tags = merge(local.common_tags, {
-    Name = local.artifacts_bucket_name
-  })
-
-  # Only create in one environment to avoid conflict
-  count = var.env == "dev" ? 1 : 0
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
-  bucket = aws_s3_bucket.artifacts[0].id
-  count  = var.env == "dev" ? 1 : 0
-
-  rule {
-    id     = "cleanup-old-builds"
-    status = "Enabled"
-
-    expiration {
-      days = 30
-    }
-
-    filter {
-      prefix = "builds/"
-    }
-  }
-}
+# Note: Artifacts bucket is centralized in askend-lab infrastructure
+# Use: askend-lab-artifacts/hak/builds/...
+# See: /home/alex/users/sam/infra/terraform/artifacts.tf

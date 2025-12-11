@@ -120,11 +120,11 @@ jobs:
       
       - name: Upload to artifacts bucket
         run: |
-          aws s3 sync dist/ s3://hak-artifacts/builds/${{ steps.build.outputs.timestamp }}/ --delete
+          aws s3 sync dist/ s3://askend-lab-artifacts/hak/builds/${{ steps.build.outputs.timestamp }}/ --delete
       
       - name: Deploy to website bucket
         run: |
-          aws s3 sync s3://hak-artifacts/builds/${{ steps.build.outputs.timestamp }}/ s3://hak-${{ matrix.environment }}-website/ --delete
+          aws s3 sync s3://askend-lab-artifacts/hak/builds/${{ steps.build.outputs.timestamp }}/ s3://hak-${{ matrix.environment }}-website/ --delete
       
       - name: Get CloudFront distribution ID
         id: cloudfront
