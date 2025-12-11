@@ -2,3 +2,12 @@ node_modules/
 coverage/
 jest-results.json
 .test-runner-state.json
+dist/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+tfplan-*.out

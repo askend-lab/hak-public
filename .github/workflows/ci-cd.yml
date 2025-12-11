@@ -1,0 +1,146 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      build_timestamp:
+        description: 'Build timestamp to deploy (leave empty for new build)'
+        required: false
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Run tests
+        run: pnpm test
+      
+      - name: Build frontend
+        run: pnpm --filter @hak/frontend build
+      
+      - name: Generate build timestamp
+        id: timestamp
+        run: echo "timestamp=$(date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-${{ steps.timestamp.outputs.timestamp }}
+          path: packages/frontend/dist/
+          retention-days: 30
+    
+    outputs:
+      build_timestamp: ${{ steps.timestamp.outputs.timestamp }}
+
+  deploy-to-aws:
+    name: Deploy to AWS
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    
+    strategy:
+      matrix:
+        include:
+          - environment: dev
+            auto: ${{ github.event_name == 'push' }}
+          - environment: prod
+            auto: false
+    
+    environment: ${{ matrix.environment }}
+    
+    steps:
+      - name: Skip if not triggered
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.environment != matrix.environment) ||
+          (github.event_name == 'push' && !matrix.auto)
+        run: echo "Skipping deployment to ${{ matrix.environment }}" && exit 0
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Determine build timestamp
+        id: build
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.build_timestamp }}" ]; then
+            echo "timestamp=${{ github.event.inputs.build_timestamp }}" >> $GITHUB_OUTPUT
+          else
+            echo "timestamp=${{ needs.build-and-test.outputs.build_timestamp }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ steps.build.outputs.timestamp }}
+          path: dist/
+      
+      - name: Upload to artifacts bucket
+        run: |
+          aws s3 sync dist/ s3://hak-artifacts/builds/${{ steps.build.outputs.timestamp }}/ --delete
+      
+      - name: Deploy to website bucket
+        run: |
+          aws s3 sync s3://hak-artifacts/builds/${{ steps.build.outputs.timestamp }}/ s3://hak-${{ matrix.environment }}-website/ --delete
+      
+      - name: Get CloudFront distribution ID
+        id: cloudfront
+        run: |
+          DIST_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items[?contains(@, 'hak${{ matrix.environment == 'prod' && '' || format('-{0}', matrix.environment) }}.askend-lab.com')]].Id | [0]" \
+            --output text)
+          echo "distribution_id=$DIST_ID" >> $GITHUB_OUTPUT
+      
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.cloudfront.outputs.distribution_id }} \
+            --paths "/*"
+      
+      - name: Deployment summary
+        run: |
+          echo "✅ Deployed build ${{ steps.build.outputs.timestamp }} to ${{ matrix.environment }}"
+          echo "🌐 URL: https://hak${{ matrix.environment == 'prod' && '' || format('-{0}', matrix.environment) }}.askend-lab.com"

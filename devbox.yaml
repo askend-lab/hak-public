@@ -48,12 +48,14 @@ hooks:
     max_complexity: 40  # Some legacy code is complex
     excludePaths:
       - '**/task-channel/**'  # Legacy scripts with high complexity
+      - '**/dist/**'  # Build artifacts
 
   language-check:
     active: true
     allowed_languages:
       - en
     excludePaths:
+      - '**/drafts/**'
 
   broken-links:
     active: true  # TODO: Fix 18 broken links first
