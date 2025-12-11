@@ -149,3 +149,5 @@ This error means you don't have write access to the state lock table. It's expec
 - **Infrastructure reusability** via `env` variable
 
 See `/drafts/Architecture.txt` for full architectural documentation.
+
+<!-- Infrastructure ready for deployment -->
