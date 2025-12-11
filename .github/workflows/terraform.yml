@@ -133,6 +133,15 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
+      - name: Import existing resources (if any)
+        run: |
+          # Import existing S3 bucket resources if they exist, ignore errors
+          terraform import -var="env=${{ matrix.environment }}" aws_s3_bucket.website hak-${{ matrix.environment }}-website || true
+          terraform import -var="env=${{ matrix.environment }}" aws_s3_bucket_website_configuration.website hak-${{ matrix.environment }}-website || true
+          terraform import -var="env=${{ matrix.environment }}" aws_s3_bucket_public_access_block.website hak-${{ matrix.environment }}-website || true
+          terraform import -var="env=${{ matrix.environment }}" aws_s3_bucket_policy.website hak-${{ matrix.environment }}-website || true
+        continue-on-error: true
+
       - name: Terraform Apply (${{ matrix.environment }})
         run: terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
       
