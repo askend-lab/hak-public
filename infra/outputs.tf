@@ -14,8 +14,8 @@ output "website_bucket_name" {
 }
 
 output "artifacts_bucket_name" {
-  description = "S3 bucket name for build artifacts"
-  value       = var.env == "dev" ? aws_s3_bucket.artifacts[0].id : "${local.artifacts_bucket_name} (managed in dev)"
+  description = "S3 bucket name for build artifacts (centralized)"
+  value       = local.artifacts_bucket_name
 }
 
 output "domain_name" {
