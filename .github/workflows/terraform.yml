@@ -60,7 +60,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
       - name: Terraform Validate
         id: validate
@@ -131,7 +131,7 @@ jobs:
           terraform_version: 1.6.0
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
       - name: Terraform Apply (${{ matrix.environment }})
         run: terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
