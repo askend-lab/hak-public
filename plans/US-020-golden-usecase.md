@@ -58,13 +58,13 @@
 ## Phase 4: Authentication Layer
 
 ### 4.1 Cognito Setup
-- [ ] Configure Amplify Auth, create AuthContext
+- [x] Configure Amplify Auth, create AuthContext
 
 ### 4.2 Auth Hooks
-- [ ] Create useAuth (login/logout/refresh/userId)
+- [x] Create useAuth (login/logout/refresh/userId)
 
 ### 4.3 Protected Routes
-- [ ] Create ProtectedRoute, redirect logic, tests
+- [x] Create ProtectedRoute, redirect logic, useRequireAuth
 
 ---
 
@@ -72,10 +72,7 @@
 
 | Phase | Status |
 |-------|--------|
-| 0 | ✅ |
-| 1 | ✅ |
-| 2 | ✅ |
-| 3 | ✅ |
-| 4 | ⬜ |
+| 0-4 | ✅ |
+| 5-8 | ⬜ |
 
 **TDD:** Red → Green → Refactor
