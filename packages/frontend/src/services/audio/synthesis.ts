@@ -3,6 +3,7 @@ import { analyzeText, toPhoneticText } from './vabamorf';
 import { synthesize } from './merlin';
 import { getCachedAudio, cacheAudio, generateCacheKey } from './cache';
 import { selectVoiceModel, countWords } from '../../core/utils';
+import { withRetry } from '../../core/retry';
 
 export async function synthesizeText(text: string): Promise<SynthesisResult> {
   const wordCount = countWords(text);
@@ -45,22 +46,5 @@ export async function synthesizeWithRetry(
   text: string,
   maxRetries = 3
 ): Promise<SynthesisResult> {
-  let lastError: Error | null = null;
-
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      return await synthesizeText(text);
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-      if (attempt < maxRetries - 1) {
-        await delay(1000 * (attempt + 1));
-      }
-    }
-  }
-
-  throw lastError || new Error('Synthesis failed');
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return withRetry(() => synthesizeText(text), { maxRetries });
 }
