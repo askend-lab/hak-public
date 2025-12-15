@@ -29,12 +29,15 @@
 - [x] Export stores from features/index.ts
 
 ### 6.2 React Query Setup
-- [ ] Configure QueryClient (deferred to Phase 7)
+- [ ] Configure QueryClient (deferred - using direct API calls)
 - [ ] Create useTasks, useTask queries (deferred)
 - [ ] Create mutations (deferred)
 
 ### 6.3-6.5 UI Components
-- [ ] Components deferred to Phase 7 integration
+- [x] TextInput, AudioPlayer, StressedText
+- [x] AddToTaskButton, TaskSelectModal
+- [x] NotificationContainer
+- [x] SynthesisPage (full flow)
 
 ---
 
