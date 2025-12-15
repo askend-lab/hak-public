@@ -7,18 +7,18 @@
 ## Phase 5: Data Layer (SingleTableLambda)
 
 ### 5.1 Task API Endpoints
-- [ ] POST /save - Create/update task
-- [ ] GET /get - Get single task
-- [ ] GET /query - List user's tasks
-- [ ] DELETE /delete - Delete task
+- [x] POST /save - Create/update task
+- [x] GET /get - Get single task
+- [x] GET /query - List user's tasks
+- [x] DELETE /delete - Delete task
 
 ### 5.2 DynamoDB Key Design
-- [ ] Define PK: USER#{userId}, SK: TASK#{taskId}
-- [ ] Define task data JSON structure, TTL policy (1 year)
+- [x] Define PK: USER#{userId}, SK: TASK#{taskId}
+- [x] Define task data JSON structure, TTL policy (1 year)
 
 ### 5.3 API Client
-- [ ] Create tasks API client (create/get/list/update/delete)
-- [ ] Write integration tests
+- [x] Create tasks API client (create/get/list/update/delete)
+- [x] addEntryToTask helper function
 
 ---
 
@@ -82,7 +82,7 @@
 
 | Phase | Status |
 |-------|--------|
-| 5 | ⬜ |
+| 5 | ✅ |
 | 6 | ⬜ |
 | 7 | ⬜ |
 | 8 | ⬜ |
