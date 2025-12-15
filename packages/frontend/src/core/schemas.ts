@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export type VoiceModel = 'efm_s' | 'efm_l';
+
 export const SynthesisEntrySchema = z.object({
   id: z.string().uuid(),
   originalText: z.string().min(1),
@@ -49,3 +51,9 @@ export type TaskEntry = z.infer<typeof TaskEntrySchema>;
 export type Task = z.infer<typeof TaskSchema>;
 export type CreateTaskRequest = z.infer<typeof CreateTaskRequestSchema>;
 export type AddEntryRequest = z.infer<typeof AddEntryRequestSchema>;
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}

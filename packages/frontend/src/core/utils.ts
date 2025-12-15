@@ -1,8 +1,8 @@
-import type { SynthesisEntry, TaskEntry } from './schemas';
+import type { SynthesisEntry, TaskEntry, VoiceModel } from './schemas';
 
 export function generateAudioHash(
   text: string,
-  voiceModel: 'efm_s' | 'efm_l'
+  voiceModel: VoiceModel
 ): string {
   const normalized = normalizeText(text);
   const input = `${normalized}:${voiceModel}`;
@@ -17,7 +17,7 @@ export function normalizeText(text: string): string {
     .replace(/[^\p{L}\p{N}\s\-'`´+]/gu, '');
 }
 
-export function selectVoiceModel(wordCount: number): 'efm_s' | 'efm_l' {
+export function selectVoiceModel(wordCount: number): VoiceModel {
   return wordCount <= 3 ? 'efm_s' : 'efm_l';
 }
 
@@ -50,7 +50,7 @@ export function generateUUID(): string {
   });
 }
 
-function simpleHash(str: string): string {
+export function simpleHash(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
