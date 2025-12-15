@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test": "jest --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
   },
   "engines": {
     "node": ">=18.0.0"

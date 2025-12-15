@@ -7,6 +7,7 @@ module.exports = {
     'src/**/*.ts',
     '!src/**/*.d.ts'
   ],
+  coverageReporters: ['text', 'lcov', 'json-summary'],
   coverageThreshold: {
     global: {
       branches: 80,
