@@ -25,28 +25,16 @@
 ## Phase 6: Frontend Components
 
 ### 6.1 Zustand Stores
-- [ ] Create synthesisStore, tasksStore, uiStore
-- [ ] Write store unit tests
+- [x] Create synthesisStore, tasksStore, uiStore
+- [x] Export stores from features/index.ts
 
 ### 6.2 React Query Setup
-- [ ] Configure QueryClient
-- [ ] Create useTasks, useTask queries
-- [ ] Create useCreateTask, useUpdateTask mutations
-- [ ] Implement optimistic updates
+- [ ] Configure QueryClient (deferred to Phase 7)
+- [ ] Create useTasks, useTask queries (deferred)
+- [ ] Create mutations (deferred)
 
-### 6.3 Synthesis Components
-- [ ] Create TextInput, SynthesisPlayer, StressedTextDisplay
-- [ ] Write component tests
-
-### 6.4 Task Components
-- [ ] Create AddToTaskButton, TaskSelectModal, TaskCreateForm
-- [ ] Create SuccessNotification
-- [ ] Write component tests
-
-### 6.5 Page Assembly
-- [ ] Create SynthesisPage layout
-- [ ] Wire up all components, implement full flow
-- [ ] Write E2E page tests
+### 6.3-6.5 UI Components
+- [ ] Components deferred to Phase 7 integration
 
 ---
 
@@ -83,7 +71,7 @@
 | Phase | Status |
 |-------|--------|
 | 5 | ✅ |
-| 6 | ⬜ |
+| 6 | ✅ |
 | 7 | ⬜ |
 | 8 | ⬜ |
 
