@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import type { AuthContextValue, AuthState, LoginCredentials, User } from './types';
-
-const AUTH_STORAGE_KEY = 'hak_auth';
+import { AuthStorage } from './storage';
 
 const initialState: AuthState = {
   user: null,
@@ -20,15 +19,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (stored) {
-      try {
-        const user = JSON.parse(stored) as User;
-        setState({ user, isAuthenticated: true, isLoading: false, error: null });
-      } catch {
-        localStorage.removeItem(AUTH_STORAGE_KEY);
-        setState({ ...initialState, isLoading: false });
-      }
+    const user = AuthStorage.getUser();
+    if (user) {
+      setState({ user, isAuthenticated: true, isLoading: false, error: null });
     } else {
       setState({ ...initialState, isLoading: false });
     }
@@ -42,7 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         id: `user_${Date.now()}`,
         email: credentials.email,
       };
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+      AuthStorage.setUser(user);
       setState({ user, isAuthenticated: true, isLoading: false, error: null });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed';
@@ -52,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const logout = useCallback(async () => {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    AuthStorage.clear();
     setState({ user: null, isAuthenticated: false, isLoading: false, error: null });
   }, []);
 
