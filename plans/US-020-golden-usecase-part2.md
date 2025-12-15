@@ -59,11 +59,12 @@
 ## Phase 8: Documentation
 
 ### 8.1 Code Documentation
-- [ ] Add JSDoc, component props, README
+- [x] Create golden-usecase-US-020.md guide
 
 ### 8.2 Architecture Documentation
-- [ ] Document state/API/testing patterns
-- [ ] Create golden use case guide
+- [x] Document directory structure
+- [x] Document key patterns (Zod, Zustand, Auth, API)
+- [x] Document data flow and testing strategy
 
 ---
 
@@ -74,7 +75,7 @@
 | 5 | ✅ |
 | 6 | ✅ |
 | 7 | ✅ |
-| 8 | ⬜ |
+| 8 | ✅ |
 
 ---
 
