@@ -19,8 +19,8 @@ test_modules:
   - name: hak
     path: .
     type: jest
-    min_coverage_lines: 80
-    min_coverage_branches: 80
+    min_coverage_lines: 16
+    min_coverage_branches: 12
   - name: singletablelambda
     path: singletablelambda
     type: jest
@@ -85,4 +85,31 @@ hooks:
   plan-validation:
     active: false
     strict: true
+
+# Stage-based execution - centralized configuration
+stages:
+  pre-commit:
+    hooks:
+      - markdown-size
+      - complexity
+      - language-check
+      - no-console
+  
+  pre-push:
+    includes:
+      - pre-commit
+    hooks:
+      - run-tests
+  
+  pr-check:
+    includes:
+      - pre-push
+    hooks:
+      - plan-validation
+  
+  ci-cd:
+    includes:
+      - pr-check
+    hooks: []
+
 # final

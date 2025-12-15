@@ -14,7 +14,6 @@ module.exports = {
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
-    'packages/frontend/src/services/audio/synthesis.test.ts',
   ],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { isolatedModules: true }],

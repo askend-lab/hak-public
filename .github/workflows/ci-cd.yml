@@ -52,8 +52,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       
-      - name: Run tests
-        run: pnpm test
+      - name: Run DevBox PR checks
+        run: node node_modules/@askend-lab/devbox/packages/hooks/src/cli/index.js run pr-check --all-files
+      
+      - name: Run tests with coverage
+        run: pnpm dx
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
