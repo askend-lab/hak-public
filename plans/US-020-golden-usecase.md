@@ -18,13 +18,13 @@
 ## Phase 1: Gherkin Specifications (BDD First)
 
 ### 1.1 Feature Files
-- [ ] Create US-020-add-synthesis-to-task.feature
-- [ ] Define Background, Scenarios (add to existing, create new, unauth, errors)
+- [x] Create US-020-add-synthesis-to-task.feature
+- [x] Define Background, Scenarios (add to existing, create new, unauth, errors)
 
 ### 1.2 Step Definitions (Red Phase)
-- [ ] Create step definitions file
-- [ ] Implement auth/synthesis/task/action/assertion steps
-- [ ] Verify all tests fail (Red)
+- [x] Create step definitions file
+- [x] Implement auth/synthesis/task/action/assertion steps
+- [x] Verify all tests fail (Red)
 
 ---
 
@@ -73,6 +73,7 @@
 | Phase | Status |
 |-------|--------|
 | 0 | ✅ |
-| 1-4 | ⬜ |
+| 1 | ✅ |
+| 2-4 | ⬜ |
 
 **TDD:** Red → Green → Refactor
