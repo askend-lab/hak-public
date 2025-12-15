@@ -1,7 +1,7 @@
 # US-020 Golden Use Case - Part 1 (Phases 0-4)
 
 **Goal:** Implement "Add synthesis entries to task" as golden reference  
-**Status:** 🚧 In Progress | **Created:** 2025-12-15  
+**Status:** ✅ Complete | **Created:** 2025-12-15  
 **State:** Zustand (UI) + React Query (server)  
 **See also:** [Part 2](US-020-golden-usecase-part2.md)
 
@@ -73,6 +73,6 @@
 | Phase | Status |
 |-------|--------|
 | 0-4 | ✅ |
-| 5-8 | ⬜ |
+| 5-8 | ✅ |
 
 **TDD:** Red → Green → Refactor
