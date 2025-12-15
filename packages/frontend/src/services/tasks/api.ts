@@ -1,6 +1,7 @@
 import type { Task, TaskEntry, CreateTaskRequest, ApiResponse } from './types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+import { API_CONFIG } from '../config';
+import { buildUserPK, buildTaskSK, TASK_SK_PREFIX } from './keys';
+import { nowISO } from '../../core/utils';
 
 let authTokenGetter: (() => string | null) | null = null;
 
@@ -19,7 +20,7 @@ async function apiRequest<T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
     ...options,
     headers,
   });
@@ -40,15 +41,15 @@ export async function createTask(
     name: request.name,
     description: request.description,
     entries: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: nowISO(),
+    updatedAt: nowISO(),
   };
 
   return apiRequest<Task>('/save', {
     method: 'POST',
     body: JSON.stringify({
-      pk: `USER#${userId}`,
-      sk: `TASK#${Date.now()}`,
+      pk: buildUserPK(userId),
+      sk: buildTaskSK(String(Date.now())),
       data: task,
       type: 'private',
     }),
@@ -62,8 +63,8 @@ export async function getTask(
   return apiRequest<Task>('/get', {
     method: 'POST',
     body: JSON.stringify({
-      pk: `USER#${userId}`,
-      sk: `TASK#${taskId}`,
+      pk: buildUserPK(userId),
+      sk: buildTaskSK(taskId),
     }),
   });
 }
@@ -72,8 +73,8 @@ export async function listTasks(userId: string): Promise<ApiResponse<Task[]>> {
   return apiRequest<Task[]>('/query', {
     method: 'POST',
     body: JSON.stringify({
-      pk: `USER#${userId}`,
-      skPrefix: 'TASK#',
+      pk: buildUserPK(userId),
+      skPrefix: TASK_SK_PREFIX,
     }),
   });
 }
@@ -91,14 +92,14 @@ export async function updateTask(
   const updated = {
     ...existing.data,
     ...updates,
-    updatedAt: new Date().toISOString(),
+    updatedAt: nowISO(),
   };
 
   return apiRequest<Task>('/save', {
     method: 'POST',
     body: JSON.stringify({
-      pk: `USER#${userId}`,
-      sk: `TASK#${taskId}`,
+      pk: buildUserPK(userId),
+      sk: buildTaskSK(taskId),
       data: updated,
       type: 'private',
     }),
@@ -112,8 +113,8 @@ export async function deleteTask(
   return apiRequest<void>('/delete', {
     method: 'POST',
     body: JSON.stringify({
-      pk: `USER#${userId}`,
-      sk: `TASK#${taskId}`,
+      pk: buildUserPK(userId),
+      sk: buildTaskSK(taskId),
     }),
   });
 }

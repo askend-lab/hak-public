@@ -41,7 +41,7 @@ export function createSynthesisEntry(input: CreateSynthesisEntryInput): Synthesi
     phoneticText: input.phoneticText,
     audioHash: input.audioHash,
     voiceModel: input.voiceModel,
-    createdAt: new Date().toISOString(),
+    createdAt: nowISO(),
   };
 }
 
@@ -53,8 +53,12 @@ export function createTaskEntry(
     id: generateUUID(),
     synthesis,
     order,
-    addedAt: new Date().toISOString(),
+    addedAt: nowISO(),
   };
+}
+
+export function nowISO(): string {
+  return new Date().toISOString();
 }
 
 export function generateUUID(): string {

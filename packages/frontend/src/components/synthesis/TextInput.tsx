@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useSynthesisStore } from '../../features';
 
 interface TextInputProps {
@@ -13,21 +13,15 @@ export function TextInput({
   maxLength = 500,
 }: TextInputProps) {
   const { text, setText, isLoading } = useSynthesisStore();
-  const [localText, setLocalText] = useState(text);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.slice(0, maxLength);
-    setLocalText(value);
-  }, [maxLength]);
-
-  const handleBlur = useCallback(() => {
-    setText(localText);
-  }, [localText, setText]);
+    setText(value);
+  }, [maxLength, setText]);
 
   const handleSubmit = useCallback(() => {
-    setText(localText);
     onSynthesize?.();
-  }, [localText, setText, onSynthesize]);
+  }, [onSynthesize]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
@@ -38,9 +32,8 @@ export function TextInput({
   return (
     <div className="text-input">
       <textarea
-        value={localText}
+        value={text}
         onChange={handleChange}
-        onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         disabled={isLoading}
@@ -49,11 +42,11 @@ export function TextInput({
       />
       <div className="text-input__footer">
         <span className="text-input__count">
-          {localText.length}/{maxLength}
+          {text.length}/{maxLength}
         </span>
         <button
           onClick={handleSubmit}
-          disabled={isLoading || !localText.trim()}
+          disabled={isLoading || !text.trim()}
           className="text-input__button"
         >
           {isLoading ? 'Töötlen...' : 'Sünteesi'}

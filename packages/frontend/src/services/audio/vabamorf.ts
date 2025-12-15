@@ -1,10 +1,9 @@
 import type { VabamorfResponse } from './types';
 import { httpPost } from '../http';
-
-const VABAMORF_API_URL = import.meta.env.VITE_VABAMORF_URL || '/api/analyze';
+import { API_CONFIG } from '../config';
 
 export async function analyzeText(text: string): Promise<VabamorfResponse> {
-  return httpPost<VabamorfResponse>(VABAMORF_API_URL, { text });
+  return httpPost<VabamorfResponse>(API_CONFIG.vabamorfUrl, { text });
 }
 
 export function toPhoneticText(response: VabamorfResponse): string {
