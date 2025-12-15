@@ -27,6 +27,24 @@ export function countWords(text: string): number {
   return normalized.split(/\s+/).length;
 }
 
+export interface CreateSynthesisEntryInput {
+  originalText: string;
+  phoneticText: string;
+  audioHash: string;
+  voiceModel: VoiceModel;
+}
+
+export function createSynthesisEntry(input: CreateSynthesisEntryInput): SynthesisEntry {
+  return {
+    id: generateUUID(),
+    originalText: input.originalText,
+    phoneticText: input.phoneticText,
+    audioHash: input.audioHash,
+    voiceModel: input.voiceModel,
+    createdAt: new Date().toISOString(),
+  };
+}
+
 export function createTaskEntry(
   synthesis: SynthesisEntry,
   order: number
