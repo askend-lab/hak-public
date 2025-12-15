@@ -31,13 +31,13 @@
 ## Phase 2: Core Logic Layer
 
 ### 2.1 Type Definitions (Zod Schemas)
-- [ ] Define SynthesisEntry, Task, TaskEntry schemas
-- [ ] Define API request/response schemas
-- [ ] Export TypeScript types
+- [x] Define SynthesisEntry, Task, TaskEntry schemas
+- [x] Define API request/response schemas
+- [x] Export TypeScript types
 
 ### 2.2 Pure Logic Functions
-- [ ] Create audio hash (SHA-256), text normalization, task entry builder
-- [ ] Write unit tests (80% coverage)
+- [x] Create audio hash, text normalization, task entry builder
+- [x] Write unit tests (23 test cases)
 
 ---
 
@@ -74,6 +74,7 @@
 |-------|--------|
 | 0 | ✅ |
 | 1 | ✅ |
-| 2-4 | ⬜ |
+| 2 | ✅ |
+| 3-4 | ⬜ |
 
 **TDD:** Red → Green → Refactor
