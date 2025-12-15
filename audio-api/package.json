@@ -1,0 +1,22 @@
+{
+  "name": "audio-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.130",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.478.0",
+    "@aws-sdk/client-sqs": "^3.478.0"
+  }
+}
