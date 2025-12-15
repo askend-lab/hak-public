@@ -57,7 +57,7 @@ export function AudioPlayer({ className = '' }: AudioPlayerProps) {
         {isPlaying ? '⏸ Paus' : '▶ Mängi'}
       </button>
       <span className="audio-player__status">
-        {result.fromCache ? '(vahemälust)' : '(uus)'}
+        {result.cached ? '(vahemälust)' : '(uus)'}
       </span>
     </div>
   );
