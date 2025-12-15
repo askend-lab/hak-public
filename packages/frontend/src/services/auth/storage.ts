@@ -2,6 +2,10 @@ import type { User } from './types';
 
 const AUTH_STORAGE_KEY = 'hak_auth';
 
+function clearStorage(): void {
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+}
+
 export const AuthStorage = {
   getUser(): User | null {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -9,7 +13,7 @@ export const AuthStorage = {
     try {
       return JSON.parse(stored) as User;
     } catch {
-      this.clear();
+      clearStorage();
       return null;
     }
   },
@@ -18,7 +22,5 @@ export const AuthStorage = {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
   },
 
-  clear(): void {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-  },
+  clear: clearStorage,
 };

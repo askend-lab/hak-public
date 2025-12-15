@@ -65,3 +65,33 @@ export async function httpGet<T>(
     method: 'GET',
   });
 }
+
+export async function httpPostBlob(
+  url: string,
+  body: unknown,
+  options: HttpRequestOptions = {}
+): Promise<Blob> {
+  const { params, ...fetchOptions } = options;
+
+  let fullUrl = url;
+  if (params) {
+    const searchParams = new URLSearchParams(params);
+    fullUrl = `${url}?${searchParams.toString()}`;
+  }
+
+  const response = await fetch(fullUrl, {
+    ...fetchOptions,
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions.headers,
+    },
+  });
+
+  if (!response.ok) {
+    throw new HttpError(response.status, `HTTP error: ${response.status}`);
+  }
+
+  return response.blob();
+}

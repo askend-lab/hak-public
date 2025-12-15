@@ -1,5 +1,4 @@
-import type { Task, TaskEntry, CreateTaskRequest } from '../../core/schemas';
-import type { ApiResponse } from '../../core/schemas';
+import type { Task, TaskEntry, CreateTaskRequest, ApiResponse } from '../../core/schemas';
 
 export interface TasksApiConfig {
   baseUrl: string;

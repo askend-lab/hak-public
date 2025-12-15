@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useSynthesisStore, useTasksStore, useUIStore } from '../../features';
 import { useAuth } from '../../services/auth';
 import { addEntryToTask } from '../../services/tasks';
-import { createTaskEntry } from '../../core';
+import { createSynthesisEntry, createTaskEntry } from '../../core';
 import { Modal } from '../ui';
 
 interface TaskSelectModalProps {
@@ -27,11 +27,15 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
 
     setIsSubmitting(true);
     try {
-      const entry = createTaskEntry({
-        text,
-        audioUrl: result.audioUrl,
+      const synthesis = createSynthesisEntry({
+        originalText: text,
         phoneticText: result.phoneticText,
+        audioHash: result.audioHash,
+        voiceModel: result.voiceModel,
       });
+      const existingTask = tasks.find(t => t.id === selectedId);
+      const order = existingTask?.entries.length ?? 0;
+      const entry = createTaskEntry(synthesis, order);
       
       const response = await addEntryToTask(user.id, selectedId, entry);
       
