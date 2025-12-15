@@ -7,7 +7,11 @@
     "dx:cli": "node devbox",
     "test": "jest --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
-    "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true"
+    "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
+    "kill-ports": "fuser -k -9 5180/tcp 4000/tcp 3002/tcp 2>/dev/null; sleep 0.2; true",
+    "start:frontend": "pnpm --filter @hak/frontend dev",
+    "start:backend": "pnpm --filter single-table-lambda dev",
+    "start": "pnpm run kill-ports && (pnpm run start:backend & pnpm run start:frontend)"
   },
   "engines": {
     "node": ">=18.0.0"

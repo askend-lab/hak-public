@@ -1,3 +1,17 @@
+// Mock modules that use import.meta.env
+jest.mock('./cache', () => ({
+  generateCacheKey: (text: string, voice: string, version = 'v1') => 
+    `${version}:${voice}:${btoa(text)}`,
+  checkCache: jest.fn(),
+  saveToCache: jest.fn(),
+}));
+
+jest.mock('./vabamorf', () => ({
+  toPhoneticText: (response?: { analyses?: Array<{ root: string }> }) => 
+    response?.analyses?.map((a: { root: string }) => a.root).join(' ') || '',
+  analyzeText: jest.fn(),
+}));
+
 import { generateCacheKey } from './cache';
 import { toPhoneticText } from './vabamorf';
 import type { VabamorfResponse } from './types';

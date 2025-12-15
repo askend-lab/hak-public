@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "dev": "tsc && serverless offline --httpPort 4000 --host 0.0.0.0",
     "test": "jest --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
   },
@@ -11,6 +12,8 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0",
     "@types/aws-lambda": "^8.10.159",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",

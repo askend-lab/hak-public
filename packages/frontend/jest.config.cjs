@@ -3,10 +3,25 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   testMatch: ['<rootDir>/src/**/*.test.ts', '<rootDir>/src/**/*.test.tsx'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true }]
+    '^.+\\.tsx?$': ['ts-jest', { 
+      useESM: true,
+      tsconfig: {
+        jsx: 'react-jsx',
+        esModuleInterop: true,
+      }
+    }]
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'
+  },
+  globals: {
+    'import.meta': {
+      env: {
+        VITE_API_URL: '/api',
+        VITE_VABAMORF_URL: '/api/analyze',
+        VITE_MERLIN_URL: '/api/synthesize',
+      }
+    }
   },
   coverageDirectory: 'coverage',
   coverageReporters: ['json-summary', 'text', 'lcov'],
