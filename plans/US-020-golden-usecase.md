@@ -44,14 +44,14 @@
 ## Phase 3: Audio Pipeline
 
 ### 3.1 Vabamorf Integration
-- [ ] Define client interface, implement /api/analyze, write tests
+- [x] Define client interface, implement /api/analyze, write tests
 
 ### 3.2 Merlin TTS Integration
-- [ ] Define client interface, implement /api/synthesize
-- [ ] Implement voice model selection (efm_s/efm_l), write tests
+- [x] Define client interface, implement /api/synthesize
+- [x] Implement voice model selection (efm_s/efm_l), write tests
 
 ### 3.3 S3 Audio Cache
-- [ ] Define cache key format, implement GET/PUT, failover logic, tests
+- [x] Define cache key format, implement GET/PUT, failover logic, tests
 
 ---
 
@@ -75,6 +75,7 @@
 | 0 | ✅ |
 | 1 | ✅ |
 | 2 | ✅ |
-| 3-4 | ⬜ |
+| 3 | ✅ |
+| 4 | ⬜ |
 
 **TDD:** Red → Green → Refactor
