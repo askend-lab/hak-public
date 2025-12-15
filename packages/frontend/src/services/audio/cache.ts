@@ -1,4 +1,6 @@
 import type { AudioCacheEntry } from './types';
+import type { VoiceModel } from '../../core/schemas';
+import { simpleHash } from '../../core/utils';
 
 const CACHE_API_URL = import.meta.env.VITE_CACHE_URL || '/api/audio-cache';
 
@@ -35,18 +37,9 @@ export async function cacheAudio(
 
 export function generateCacheKey(
   text: string,
-  voiceModel: 'efm_s' | 'efm_l',
+  voiceModel: VoiceModel,
   version = 'v1'
 ): string {
   return `${version}:${voiceModel}:${simpleHash(text)}`;
 }
 
-function simpleHash(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(16).padStart(8, '0');
-}

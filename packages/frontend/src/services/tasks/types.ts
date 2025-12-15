@@ -1,4 +1,5 @@
 import type { Task, TaskEntry, CreateTaskRequest } from '../../core/schemas';
+import type { ApiResponse } from '../../core/schemas';
 
 export interface TasksApiConfig {
   baseUrl: string;
@@ -29,10 +30,4 @@ export interface DeleteTaskRequest {
   sk: string;
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-export type { Task, TaskEntry, CreateTaskRequest };
+export type { Task, TaskEntry, CreateTaskRequest, ApiResponse };

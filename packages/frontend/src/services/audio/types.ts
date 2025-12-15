@@ -1,3 +1,5 @@
+import type { VoiceModel } from '../../core/schemas';
+
 export interface VabamorfResponse {
   words: VabamorfWord[];
 }
@@ -17,7 +19,7 @@ export interface PhoneticVariant {
 
 export interface MerlinRequest {
   text: string;
-  voice: 'efm_s' | 'efm_l';
+  voice: VoiceModel;
 }
 
 export interface MerlinResponse {
@@ -37,6 +39,6 @@ export interface SynthesisResult {
   phoneticText: string;
   audioUrl: string;
   audioHash: string;
-  voiceModel: 'efm_s' | 'efm_l';
+  voiceModel: VoiceModel;
   cached: boolean;
 }
