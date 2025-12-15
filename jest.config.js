@@ -14,7 +14,9 @@ module.exports = {
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
+    '/singletablelambda/',
   ],
+  modulePathIgnorePatterns: ['/singletablelambda/'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { isolatedModules: true }],
   },
