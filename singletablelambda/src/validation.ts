@@ -1,5 +1,5 @@
 import { StoreRequest, DataType } from './types';
-import { config } from './config';
+import { validateTtl } from './keyBuilder';
 
 /**
  * Validation result with collected errors
@@ -46,10 +46,13 @@ export function validateStoreRequest(request: Partial<StoreRequest>): Validation
   validateString(request.sk, 'sk', errors);
   validateType(request.type, errors);
 
-  if (typeof request.ttl !== 'number' || request.ttl <= 0) {
-    errors.push('ttl must be a positive number');
-  } else if (request.ttl > config.maxTtlSeconds) {
-    errors.push(`ttl exceeds maximum of ${config.maxTtlSeconds} seconds (1 year)`);
+  if (typeof request.ttl !== 'number') {
+    errors.push('ttl must be a number');
+  } else {
+    const ttlValidation = validateTtl(request.ttl);
+    if (!ttlValidation.valid) {
+      errors.push(ttlValidation.error!);
+    }
   }
 
   if (request.data !== undefined && (typeof request.data !== 'object' || request.data === null)) {
