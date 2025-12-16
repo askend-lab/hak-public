@@ -7,8 +7,8 @@ jest.mock('./cache', () => ({
 }));
 
 jest.mock('./vabamorf', () => ({
-  toPhoneticText: (response?: { analyses?: Array<{ root: string }> }) => 
-    response?.analyses?.map((a: { root: string }) => a.root).join(' ') || '',
+  toPhoneticText: (response?: { words?: Array<{ phonetic: string }> }) => 
+    response?.words?.map((w: { phonetic: string }) => w.phonetic).join(' ') || '',
   analyzeText: jest.fn(),
 }));
 
