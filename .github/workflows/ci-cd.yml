@@ -66,6 +66,7 @@ jobs:
           pnpm --filter @hak/frontend test
           pnpm --filter singletablelambda test
           pnpm --filter hak test
+          cd audio-api && npm test
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
@@ -190,6 +191,95 @@ jobs:
       - name: Deployment summary
         run: |
           echo "✅ Deployed Vabamorf API to ${{ matrix.environment }}"
+
+  build-audio-api:
+    name: Build Audio API
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        working-directory: audio-api
+        run: npm ci
+      
+      - name: Run tests
+        working-directory: audio-api
+        run: npm test
+      
+      - name: Build TypeScript
+        working-directory: audio-api
+        run: npm run build
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: audio-api-dist
+          path: audio-api/dist/
+          retention-days: 30
+
+  deploy-audio-api:
+    name: Deploy Audio API
+    needs: [build-and-test, build-audio-api]
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    
+    strategy:
+      matrix:
+        include:
+          - environment: dev
+            auto: ${{ github.event_name == 'push' }}
+          - environment: prod
+            auto: false
+    
+    environment: ${{ matrix.environment }}
+    
+    steps:
+      - name: Skip if not triggered
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.environment != matrix.environment) ||
+          (github.event_name == 'push' && !matrix.auto)
+        run: echo "Skipping deployment to ${{ matrix.environment }}" && exit 0
+      
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: audio-api-dist
+          path: audio-api/dist/
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Setup Node.js for Serverless
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Serverless Framework
+        run: npm install -g serverless@3
+      
+      - name: Deploy with Serverless
+        working-directory: audio-api
+        run: |
+          serverless deploy --stage ${{ matrix.environment }} --region eu-west-1
+      
+      - name: Deployment summary
+        run: |
+          echo "✅ Deployed Audio API to ${{ matrix.environment }}"
 
   deploy-to-aws:
     name: Deploy to AWS
