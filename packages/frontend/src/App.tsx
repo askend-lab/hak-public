@@ -1,24 +1,26 @@
 import { useCallback } from 'react'
 import { TextInput, AudioPlayer, StressedText, AddToTaskButton, TaskSelectModal, NotificationContainer } from './components'
 import { useSynthesisStore } from './features'
+import { synthesizeText } from './services/audio'
 
 function App() {
-  const { result, setResult, setLoading, setError } = useSynthesisStore()
+  const { text, result, setResult, setLoading, setError } = useSynthesisStore()
 
   const handleSynthesize = useCallback(async () => {
+    if (!text.trim()) return
+    
     setLoading(true)
     setError(null)
     
-    // Mock synthesis for demo - in production this calls Vabamorf + Merlin
-    setTimeout(() => {
-      setResult({
-        audioUrl: 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
-        phoneticText: 'Tere päevast → [ˈtere ˈpæːvast]',
-        fromCache: false,
-      })
+    try {
+      const synthesisResult = await synthesizeText(text)
+      setResult(synthesisResult)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Synthesis failed')
+    } finally {
       setLoading(false)
-    }, 1000)
-  }, [setResult, setLoading, setError])
+    }
+  }, [text, setResult, setLoading, setError])
 
   return (
     <div style={{
