@@ -22,7 +22,7 @@ describe('App', () => {
       </AuthProvider>
     );
     
-    expect(screen.getByText('EKI Kõnesüntees')).toBeInTheDocument();
+    expect(screen.getByText('Eesti keele kõnesüntees')).toBeInTheDocument();
   });
 
   it('throws error when TaskSelectModal used without AuthProvider', () => {

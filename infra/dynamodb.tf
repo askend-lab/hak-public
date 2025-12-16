@@ -1,8 +1,32 @@
 # DynamoDB table for SingleTableLambda
-# Table is created by serverless.yml, this just manages access
+# Table created here, managed by Terraform
 
-data "aws_dynamodb_table" "single_table" {
-  name = "single-table-lambda-${var.env}"
+resource "aws_dynamodb_table" "single_table" {
+  name         = "single-table-lambda-${var.env}"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "PK"
+  range_key    = "SK"
+
+  attribute {
+    name = "PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "SK"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "ttl"
+    enabled        = true
+  }
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+    Service     = "singletablelambda"
+  }
 }
 
 # IAM policy for readonly agent to access DynamoDB
@@ -24,8 +48,8 @@ resource "aws_iam_user_policy" "agent_dynamodb_access" {
           "dynamodb:Scan"
         ]
         Resource = [
-          data.aws_dynamodb_table.single_table.arn,
-          "${data.aws_dynamodb_table.single_table.arn}/index/*"
+          aws_dynamodb_table.single_table.arn,
+          "${aws_dynamodb_table.single_table.arn}/index/*"
         ]
       }
     ]

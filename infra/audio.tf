@@ -236,3 +236,173 @@ output "audio_worker_role_arn" {
   description = "IAM role ARN for audio worker Fargate task"
   value       = aws_iam_role.audio_worker.arn
 }
+
+# ECS Cluster for audio worker
+resource "aws_ecs_cluster" "hak" {
+  name = "hak-${var.env}"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+  }
+}
+
+# ECS Task Execution Role (for pulling images, logs)
+resource "aws_iam_role" "ecs_task_execution" {
+  name = "hak-ecs-task-execution-${var.env}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# CloudWatch Log Group for audio worker
+resource "aws_cloudwatch_log_group" "audio_worker" {
+  name              = "/ecs/hak-audio-worker-${var.env}"
+  retention_in_days = 14
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+    Service     = "audio-worker"
+  }
+}
+
+# ECS Task Definition for audio worker
+resource "aws_ecs_task_definition" "audio_worker" {
+  family                   = "hak-audio-worker-${var.env}"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.audio_worker.arn
+
+  container_definitions = jsonencode([
+    {
+      name  = "audio-worker"
+      image = "465168436856.dkr.ecr.eu-west-1.amazonaws.com/askend-lab:audio-worker-${var.env}-latest"
+      
+      environment = [
+        {
+          name  = "QUEUE_URL"
+          value = aws_sqs_queue.audio_generation.url
+        },
+        {
+          name  = "BUCKET_NAME"
+          value = aws_s3_bucket.audio.bucket
+        },
+        {
+          name  = "MERLIN_URL"
+          value = "https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize"
+        }
+      ]
+      
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.audio_worker.name
+          "awslogs-region"        = "eu-west-1"
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
+    }
+  ])
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+    Service     = "audio-worker"
+  }
+}
+
+# Default VPC data source
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+# Security group for audio worker
+resource "aws_security_group" "audio_worker" {
+  name        = "hak-audio-worker-${var.env}"
+  description = "Security group for audio worker Fargate tasks"
+  vpc_id      = data.aws_vpc.default.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+    Service     = "audio-worker"
+  }
+}
+
+# ECS Service for audio worker
+resource "aws_ecs_service" "audio_worker" {
+  name            = "audio-worker"
+  cluster         = aws_ecs_cluster.hak.id
+  task_definition = aws_ecs_task_definition.audio_worker.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = data.aws_subnets.default.ids
+    security_groups  = [aws_security_group.audio_worker.id]
+    assign_public_ip = true
+  }
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+    Service     = "audio-worker"
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
+}
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = aws_ecs_cluster.hak.name
+}
+
+output "audio_worker_service_name" {
+  description = "Audio worker ECS service name"
+  value       = aws_ecs_service.audio_worker.name
+}

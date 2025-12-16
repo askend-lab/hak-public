@@ -9,7 +9,7 @@ interface AddToTaskButtonProps {
 export function AddToTaskButton({ className = '' }: AddToTaskButtonProps) {
   const { result } = useSynthesisStore();
   const { openModal } = useUIStore();
-  const { isAuthenticated } = useAuth();
+  useAuth(); // Keep hook for future auth check
 
   const handleClick = useCallback(() => {
     // TODO: Re-enable auth check after testing
