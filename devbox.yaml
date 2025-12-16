@@ -65,6 +65,8 @@ hooks:
     active: true
     allow_warn: true
     allow_error: true
+    excludePaths:
+      - '**/audio-worker/**'  # Fargate worker needs console for CloudWatch logs
 
   prettier-check:
     active: false
