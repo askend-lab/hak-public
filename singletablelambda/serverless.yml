@@ -9,7 +9,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-1'}
+  region: ${opt:region, 'eu-west-1'}
   
   environment:
     TABLE_NAME: ${self:service}-${self:provider.stage}

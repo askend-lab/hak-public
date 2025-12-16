@@ -12,12 +12,13 @@ export function AddToTaskButton({ className = '' }: AddToTaskButtonProps) {
   const { isAuthenticated } = useAuth();
 
   const handleClick = useCallback(() => {
-    if (!isAuthenticated) {
-      openModal('login');
-      return;
-    }
+    // TODO: Re-enable auth check after testing
+    // if (!isAuthenticated) {
+    //   openModal('login');
+    //   return;
+    // }
     openModal('taskSelect');
-  }, [isAuthenticated, openModal]);
+  }, [openModal]);
 
   if (!result?.audioUrl) {
     return null;

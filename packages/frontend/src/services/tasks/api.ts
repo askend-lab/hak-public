@@ -69,14 +69,32 @@ export async function getTask(
   });
 }
 
+interface QueryResponse {
+  items: Array<{ data: Task; SK: string }>;
+}
+
 export async function listTasks(userId: string): Promise<ApiResponse<Task[]>> {
-  return apiRequest<Task[]>('/query', {
-    method: 'POST',
-    body: JSON.stringify({
-      pk: buildUserPK(userId),
-      skPrefix: TASK_SK_PREFIX,
-    }),
+  const params = new URLSearchParams({
+    prefix: `${buildUserPK(userId)}#${TASK_SK_PREFIX}`,
+    type: 'private',
   });
+  const response = await apiRequest<QueryResponse>(`/query?${params.toString()}`);
+  
+  if (!response.success || !response.data) {
+    return { success: false, error: response.error };
+  }
+  
+  // Transform items: extract data and derive id from SK
+  const tasks = response.data.items.map(item => {
+    const skParts = item.SK.split('#');
+    const taskId = skParts[skParts.length - 1]; // Get last part after TASK#
+    return {
+      ...item.data,
+      id: item.data.id || taskId,
+    };
+  });
+  
+  return { success: true, data: tasks };
 }
 
 export async function updateTask(

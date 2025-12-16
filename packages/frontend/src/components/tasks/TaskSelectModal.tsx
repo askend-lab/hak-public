@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useSynthesisStore, useTasksStore, useUIStore } from '../../features';
 import { useAuth } from '../../services/auth';
-import { addEntryToTask } from '../../services/tasks';
+import { addEntryToTask, listTasks } from '../../services/tasks';
 import { createSynthesisEntry, createTaskEntry } from '../../core';
 import { Modal } from '../ui';
 
@@ -10,12 +10,28 @@ interface TaskSelectModalProps {
 }
 
 export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
-  const { activeModal, closeModal, addNotification } = useUIStore();
-  const { tasks } = useTasksStore();
+  const { activeModal, closeModal, openModal, addNotification } = useUIStore();
+  const { tasks, setTasks, setLoading, isLoading } = useTasksStore();
   const { text, result } = useSynthesisStore();
   const { user } = useAuth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Load tasks when modal opens
+  useEffect(() => {
+    if (activeModal === 'taskSelect') {
+      setLoading(true);
+      // For local dev, use test-user
+      const userId = user?.id || 'test-user';
+      listTasks(userId)
+        .then(response => {
+          if (response.success && response.data) {
+            setTasks(response.data);
+          }
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [activeModal, user, setTasks, setLoading]);
 
   const handleClose = useCallback(() => {
     closeModal();
@@ -23,7 +39,8 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
   }, [closeModal, onClose]);
 
   const handleSubmit = useCallback(async () => {
-    if (!selectedId || !user || !result) return;
+    if (!selectedId || !result) return;
+    const userId = user?.id || 'test-user';
 
     setIsSubmitting(true);
     try {
@@ -37,7 +54,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
       const order = existingTask?.entries.length ?? 0;
       const entry = createTaskEntry(synthesis, order);
       
-      const response = await addEntryToTask(user.id, selectedId, entry);
+      const response = await addEntryToTask(userId, selectedId, entry);
       
       if (response.success) {
         const task = tasks.find(t => t.id === selectedId);
@@ -51,7 +68,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedId, user, result, text, tasks, addEntryToTask, addNotification, handleClose]);
+  }, [selectedId, user, result, text, tasks, addNotification, handleClose]);
 
   const footer = (
     <>
@@ -75,8 +92,18 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
       title="Vali ülesanne"
       footer={footer}
     >
-      {tasks.length === 0 ? (
-        <p>Ülesandeid pole. Loo uus ülesanne.</p>
+      {isLoading ? (
+        <p>Laadin ülesandeid...</p>
+      ) : tasks.length === 0 ? (
+        <div>
+          <p>Ülesandeid pole.</p>
+          <button 
+            onClick={() => openModal('taskCreate')} 
+            className="btn btn--link"
+          >
+            + Loo uus ülesanne
+          </button>
+        </div>
       ) : (
         <ul className="task-list">
           {tasks.map(task => (

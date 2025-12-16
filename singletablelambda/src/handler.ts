@@ -47,9 +47,19 @@ interface RequestBody {
 
 /**
  * Extracts user ID from Cognito JWT claims
+ * In local dev (serverless-offline), uses header or default test user
  */
 function getUserIdFromEvent(event: APIGatewayProxyEvent): string | null {
-  return event.requestContext?.authorizer?.claims?.sub as string ?? null;
+  // Check Cognito claims first (production)
+  const cognitoUserId = event.requestContext?.authorizer?.claims?.sub as string;
+  if (cognitoUserId) return cognitoUserId;
+  
+  // Local dev: allow X-User-Id header or default test user
+  if (process.env.IS_OFFLINE === 'true') {
+    return event.headers?.['X-User-Id'] ?? event.headers?.['x-user-id'] ?? 'test-user';
+  }
+  
+  return null;
 }
 
 /**
