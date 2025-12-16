@@ -2,8 +2,24 @@ import type { VabamorfResponse } from './types';
 import { httpPost } from '../http';
 import { API_CONFIG } from '../config';
 
+interface EkiVabamorfResponse {
+  stressedText: string;
+  originalText: string;
+}
+
 export async function analyzeText(text: string): Promise<VabamorfResponse> {
-  return httpPost<VabamorfResponse>(API_CONFIG.vabamorfUrl, { text });
+  const ekiResponse = await httpPost<EkiVabamorfResponse>(API_CONFIG.vabamorfUrl, { text });
+  
+  const words = ekiResponse.originalText.split(/\s+/);
+  const phoneticWords = ekiResponse.stressedText.split(/\s+/);
+  
+  return {
+    words: words.map((word, i) => ({
+      text: word,
+      phonetic: phoneticWords[i] || word,
+      stress: 1,
+    })),
+  };
 }
 
 export function toPhoneticText(response: VabamorfResponse): string {

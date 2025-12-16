@@ -5,4 +5,11 @@ const DEFAULT_CONFIG = {
   cacheUrl: '/api/audio-cache',
 } as const;
 
-export const API_CONFIG = DEFAULT_CONFIG;
+const EKI_CONFIG = {
+  baseUrl: '/api',
+  vabamorfUrl: '/api/vabamorf/analyze',
+  merlinUrl: '/api/merlin/synthesize',
+  cacheUrl: '/api/audio-cache',
+} as const;
+
+export const API_CONFIG = EKI_CONFIG;
