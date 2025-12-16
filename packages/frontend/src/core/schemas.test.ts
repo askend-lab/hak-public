@@ -1,9 +1,6 @@
 import {
   SynthesisEntrySchema,
-  TaskEntrySchema,
-  TaskSchema,
   CreateTaskRequestSchema,
-  AddEntryRequestSchema,
   ApiResponseSchema,
 } from './schemas';
 import { z } from 'zod';
