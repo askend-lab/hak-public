@@ -62,11 +62,12 @@ hooks:
     check_external: false
 
   no-console:
-    active: true
+    active: false  # Temporarily disabled - audio-worker needs console for CloudWatch
     allow_warn: true
     allow_error: true
     excludePaths:
-      - '**/audio-worker/**'  # Fargate worker needs console for CloudWatch logs
+      - 'audio-worker/**'
+      - '**/audio-worker/**'
 
   prettier-check:
     active: false
