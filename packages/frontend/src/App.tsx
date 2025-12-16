@@ -3,6 +3,20 @@ import { TextInput, AudioPlayer, StressedText, AddToTaskButton, TaskSelectModal,
 import { useSynthesisStore } from './features'
 import { synthesizeText } from './services/audio'
 
+// EKI Design System Colors
+const colors = {
+  primary: '#173148',
+  secondary: '#D7E5F2',
+  softPrimaryBg: '#E3EFFB',
+  surfaceBg: '#FBFCFE',
+  softNeutralBg: '#F0F4F8',
+  textSecondary: '#32383E',
+  gray: '#636B74',
+  outlinedNeutral: '#CDD7E1',
+  outlinedPrimary: '#0B6BCB',
+  white: '#FFFFFF',
+}
+
 function App() {
   const { text, result, setResult, setLoading, setError } = useSynthesisStore()
 
@@ -25,73 +39,303 @@ function App() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      padding: '20px'
+      background: `linear-gradient(to bottom, ${colors.softPrimaryBg} 0%, ${colors.softNeutralBg} 100%)`,
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }}>
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: '24px',
-        padding: '40px 60px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-        maxWidth: '600px',
-        width: '100%'
+      {/* Header */}
+      <header style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '1.5rem 1rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
       }}>
-        <h1 style={{
-          fontSize: '48px',
-          margin: '0 0 10px 0',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          fontWeight: '800',
-          textAlign: 'center'
-        }}>
-          EKI Kõnesüntees
-        </h1>
-        
-        <p style={{
-          fontSize: '16px',
-          color: '#666',
-          margin: '0 0 30px 0',
-          textAlign: 'center'
-        }}>
-          Eesti keele häälduse õppimise platvorm
-        </p>
-
-        <TextInput onSynthesize={handleSynthesize} />
-
-        {result && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
-            marginTop: '20px',
-            padding: '20px',
-            background: '#f7fafc',
-            borderRadius: '12px'
+            width: '48px',
+            height: '48px',
+            backgroundColor: colors.primary,
+            color: colors.white,
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 700,
+            fontSize: '0.875rem',
+            letterSpacing: '0.5px',
           }}>
-            <StressedText />
-            <div style={{ 
-              display: 'flex', 
-              gap: '10px', 
-              marginTop: '15px',
-              alignItems: 'center'
+            HAK
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+            <span style={{
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              color: colors.primary,
+              letterSpacing: '0.5px',
             }}>
-              <AudioPlayer />
-              <AddToTaskButton />
+              EESTI KEELE
+            </span>
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              color: colors.primary,
+              letterSpacing: '0.25px',
+            }}>
+              KÕNESÜNTEES
+            </span>
+          </div>
+        </div>
+
+        <nav style={{ display: 'flex', gap: '0.5rem' }}>
+          <button style={{
+            padding: '0.75rem 1.5rem',
+            background: colors.primary,
+            border: '1px solid transparent',
+            borderRadius: '8px',
+            color: colors.white,
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            cursor: 'pointer',
+          }}>
+            Süntees
+          </button>
+          <button style={{
+            padding: '0.75rem 1.5rem',
+            background: 'transparent',
+            border: '1px solid transparent',
+            borderRadius: '8px',
+            color: colors.gray,
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            cursor: 'pointer',
+          }}>
+            Ülesanded
+          </button>
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '0 1rem 3rem',
+      }}>
+        {/* Hero Section */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: 700,
+            color: colors.primary,
+            margin: '0 0 0.5rem 0',
+          }}>
+            Eesti keele kõnesüntees
+          </h1>
+          <p style={{
+            fontSize: '1rem',
+            color: colors.textSecondary,
+            margin: 0,
+            lineHeight: 1.5,
+          }}>
+            Sisesta tekst ja kuula, kuidas seda hääldatakse
+          </p>
+        </div>
+
+        {/* Workspace Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1.4fr 1fr',
+          gap: '2rem',
+          alignItems: 'start',
+        }}>
+          {/* Primary Column - Input */}
+          <div>
+            <div style={{
+              background: colors.white,
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(23, 49, 72, 0.08)',
+              border: `1px solid rgba(23, 49, 72, 0.1)`,
+              overflow: 'hidden',
+            }}>
+              {/* Card Header */}
+              <div style={{
+                padding: '1.25rem 1.5rem',
+                borderBottom: `1px solid ${colors.outlinedNeutral}`,
+                background: `linear-gradient(to right, ${colors.softPrimaryBg} 0%, #f8fbff 100%)`,
+              }}>
+                <h2 style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  color: colors.primary,
+                  margin: 0,
+                }}>
+                  Teksti sisestamine
+                </h2>
+              </div>
+
+              {/* Card Body */}
+              <div style={{ padding: '2.25rem 1.5rem' }}>
+                <TextInput onSynthesize={handleSynthesize} />
+
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.875rem',
+                  marginTop: '1rem',
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.875rem',
+                  }}>
+                    <span style={{ color: colors.textSecondary, fontWeight: 500 }}>
+                      Näide:
+                    </span>
+                    <span style={{
+                      color: colors.primary,
+                      fontStyle: 'italic',
+                      background: colors.softPrimaryBg,
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '4px',
+                    }}>
+                      Tere päevast!
+                    </span>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.875rem',
+                    color: colors.textSecondary,
+                  }}>
+                    <span style={{ color: '#2E7D32' }}>✓</span>
+                    Vajuta Enter või nuppu kuulamiseks
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Footer - Buttons */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                padding: '0.5rem 1.5rem 2.25rem',
+              }}>
+                <button
+                  onClick={handleSynthesize}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    background: colors.primary,
+                    color: colors.white,
+                    border: 'none',
+                    borderRadius: '25px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🔊 Mängi
+                </button>
+                <button style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  background: colors.white,
+                  color: colors.primary,
+                  border: `2px solid ${colors.primary}`,
+                  borderRadius: '25px',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}>
+                  + Lisa ülesandesse
+                </button>
+              </div>
+            </div>
+
+            {/* Results Section */}
+            {result && (
+              <div style={{
+                marginTop: '1.5rem',
+                background: colors.white,
+                borderRadius: '12px',
+                padding: '1.5rem',
+                boxShadow: '0 2px 8px rgba(23, 49, 72, 0.08)',
+                border: `1px solid rgba(23, 49, 72, 0.1)`,
+              }}>
+                <h3 style={{
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  color: colors.primary,
+                  margin: '0 0 1rem 0',
+                }}>
+                  Tulemus
+                </h3>
+                <StressedText />
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '10px', 
+                  marginTop: '15px',
+                  alignItems: 'center'
+                }}>
+                  <AudioPlayer />
+                  <AddToTaskButton />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Secondary Column - Playlist */}
+          <div style={{
+            position: 'sticky',
+            top: '2rem',
+          }}>
+            <div style={{
+              background: colors.white,
+              borderRadius: '12px',
+              padding: '1.5rem',
+              boxShadow: '0 2px 8px rgba(23, 49, 72, 0.08)',
+              border: `1px solid rgba(23, 49, 72, 0.1)`,
+              minHeight: '300px',
+            }}>
+              <h3 style={{
+                fontSize: '1rem',
+                fontWeight: 600,
+                color: colors.primary,
+                margin: '0 0 1rem 0',
+              }}>
+                Kõnevoor
+              </h3>
+              <div style={{
+                color: colors.gray,
+                fontSize: '0.875rem',
+                textAlign: 'center',
+                padding: '2rem 0',
+              }}>
+                Lisa lausungeid kõnevooru
+              </div>
             </div>
           </div>
-        )}
-
-        <div style={{
-          marginTop: '30px',
-          fontSize: '12px',
-          color: '#a0aec0',
-          textAlign: 'center'
-        }}>
-          US-020 Golden Use Case • HAK Platform
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '1.5rem 1rem',
+        borderTop: `1px solid ${colors.outlinedNeutral}`,
+        textAlign: 'center',
+        fontSize: '0.75rem',
+        color: colors.gray,
+      }}>
+        HAK Platform • Eesti keele häälduse õppimise platvorm
+      </footer>
       
       <TaskSelectModal />
       <NotificationContainer />
