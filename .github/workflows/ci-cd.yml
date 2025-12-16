@@ -56,8 +56,13 @@ jobs:
         if: github.event_name == 'pull_request'
         run: node node_modules/@askend-lab/devbox/packages/hooks/src/cli/index.js run pr-check --all-files
       
-      - name: Run tests with coverage
+      - name: Run tests with coverage (PR)
+        if: github.event_name == 'pull_request'
         run: pnpm dx
+      
+      - name: Run tests with coverage (push)
+        if: github.event_name == 'push'
+        run: pnpm test
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
