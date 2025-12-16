@@ -1,0 +1,134 @@
+name: Serverless Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'singletablelambda/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'singletablelambda/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: singletablelambda
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+        working-directory: .
+      
+      - name: Run tests
+        run: pnpm test
+      
+      - name: Build
+        run: pnpm build
+
+  deploy:
+    name: Deploy to AWS
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    
+    strategy:
+      matrix:
+        include:
+          - environment: dev
+            auto: ${{ github.event_name == 'push' }}
+          - environment: prod
+            auto: false
+      max-parallel: 1
+    
+    environment: ${{ matrix.environment }}
+    
+    defaults:
+      run:
+        working-directory: singletablelambda
+    
+    steps:
+      - name: Skip if not triggered
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.environment != matrix.environment) ||
+          (github.event_name == 'push' && !matrix.auto)
+        run: echo "Skipping deployment to ${{ matrix.environment }}" && exit 0
+      
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+        working-directory: .
+      
+      - name: Build
+        run: pnpm build
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Deploy to AWS
+        run: npx serverless deploy --stage ${{ matrix.environment }} --region eu-west-1
+      
+      - name: Deployment summary
+        run: |
+          echo "✅ SingleTableLambda deployed to ${{ matrix.environment }}"
+          echo "📦 Table: single-table-lambda-${{ matrix.environment }}"
