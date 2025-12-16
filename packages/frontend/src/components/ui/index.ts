@@ -1,2 +1,2 @@
-export { NotificationContainer } from './NotificationContainer';
+export { NotificationContainer } from './Notification';
 export { Modal } from './Modal';
