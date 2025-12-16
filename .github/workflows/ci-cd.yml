@@ -164,13 +164,13 @@ jobs:
         working-directory: vabamorf-api
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: vabamorf-api
-          IMAGE_TAG: ${{ matrix.environment }}-${{ github.sha }}
+          ECR_REPOSITORY: askend-lab
+          IMAGE_TAG: vabamorf-api-${{ matrix.environment }}-${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:${{ matrix.environment }}-latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ matrix.environment }}-latest
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:vabamorf-api-${{ matrix.environment }}-latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:vabamorf-api-${{ matrix.environment }}-latest
       
       - name: Setup Node.js for Serverless
         uses: actions/setup-node@v4
