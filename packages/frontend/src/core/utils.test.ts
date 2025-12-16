@@ -4,7 +4,10 @@ import {
   selectVoiceModel,
   countWords,
   createTaskEntry,
+  createSynthesisEntry,
   generateUUID,
+  nowISO,
+  simpleHash,
 } from './utils';
 import type { SynthesisEntry } from './schemas';
 
@@ -146,5 +149,85 @@ describe('createTaskEntry', () => {
     const after = new Date().toISOString();
     expect(entry.addedAt >= before).toBe(true);
     expect(entry.addedAt <= after).toBe(true);
+  });
+});
+
+describe('createSynthesisEntry', () => {
+  it('creates synthesis entry with all fields', () => {
+    const input = {
+      originalText: 'Tere',
+      phoneticText: 'te`re',
+      audioHash: 'abc123',
+      voiceModel: 'efm_s' as const,
+    };
+    const entry = createSynthesisEntry(input);
+    expect(entry.originalText).toBe(input.originalText);
+    expect(entry.phoneticText).toBe(input.phoneticText);
+    expect(entry.audioHash).toBe(input.audioHash);
+    expect(entry.voiceModel).toBe(input.voiceModel);
+  });
+
+  it('generates unique id', () => {
+    const input = {
+      originalText: 'Tere',
+      phoneticText: 'te`re',
+      audioHash: 'abc123',
+      voiceModel: 'efm_s' as const,
+    };
+    const entry1 = createSynthesisEntry(input);
+    const entry2 = createSynthesisEntry(input);
+    expect(entry1.id).not.toBe(entry2.id);
+  });
+
+  it('sets createdAt timestamp', () => {
+    const before = new Date().toISOString();
+    const entry = createSynthesisEntry({
+      originalText: 'Test',
+      phoneticText: 'test',
+      audioHash: 'hash',
+      voiceModel: 'efm_l',
+    });
+    const after = new Date().toISOString();
+    expect(entry.createdAt >= before).toBe(true);
+    expect(entry.createdAt <= after).toBe(true);
+  });
+});
+
+describe('nowISO', () => {
+  it('returns ISO formatted date string', () => {
+    const result = nowISO();
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+  });
+
+  it('returns current time', () => {
+    const before = new Date().toISOString();
+    const result = nowISO();
+    const after = new Date().toISOString();
+    expect(result >= before).toBe(true);
+    expect(result <= after).toBe(true);
+  });
+});
+
+describe('simpleHash', () => {
+  it('generates consistent hash for same input', () => {
+    const hash1 = simpleHash('hello');
+    const hash2 = simpleHash('hello');
+    expect(hash1).toBe(hash2);
+  });
+
+  it('generates different hash for different input', () => {
+    const hash1 = simpleHash('hello');
+    const hash2 = simpleHash('world');
+    expect(hash1).not.toBe(hash2);
+  });
+
+  it('returns 8 character hex string', () => {
+    const hash = simpleHash('test');
+    expect(hash).toMatch(/^[0-9a-f]{8}$/);
+  });
+
+  it('handles empty string', () => {
+    const hash = simpleHash('');
+    expect(hash).toMatch(/^[0-9a-f]{8}$/);
   });
 });

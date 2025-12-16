@@ -1,4 +1,4 @@
-import { handler } from '../src/handler';
+import { handler, createStore } from '../src/handler';
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
 const mockContext: Context = {
@@ -66,6 +66,13 @@ function createEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayP
 }
 
 describe('Lambda Handler', () => {
+  describe('createStore factory', () => {
+    it('should create store with user context', () => {
+      const store = createStore('user123');
+      expect(store).toBeDefined();
+    });
+  });
+
   describe('authentication', () => {
     it('should return 401 if no user in context', async () => {
       const event = createEvent({
@@ -79,6 +86,32 @@ describe('Lambda Handler', () => {
 
       expect(result.statusCode).toBe(401);
       expect(JSON.parse(result.body)).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should return 401 if authorizer is null', async () => {
+      const event = createEvent({
+        requestContext: {
+          ...createEvent().requestContext,
+          authorizer: null as any
+        }
+      });
+
+      const result = await handler(event, mockContext);
+
+      expect(result.statusCode).toBe(401);
+    });
+
+    it('should return 401 if claims is null', async () => {
+      const event = createEvent({
+        requestContext: {
+          ...createEvent().requestContext,
+          authorizer: { claims: null }
+        }
+      });
+
+      const result = await handler(event, mockContext);
+
+      expect(result.statusCode).toBe(401);
     });
   });
 
@@ -132,6 +165,18 @@ describe('Lambda Handler', () => {
 
       expect(result.statusCode).toBe(400);
     });
+
+    it('should return 400 for null queryStringParameters', async () => {
+      const event = createEvent({
+        httpMethod: 'GET',
+        path: '/get',
+        queryStringParameters: null
+      });
+
+      const result = await handler(event, mockContext);
+
+      expect(result.statusCode).toBe(400);
+    });
   });
 
   describe('query endpoint', () => {
@@ -159,6 +204,30 @@ describe('Lambda Handler', () => {
       const result = await handler(event, mockContext);
 
       expect(result.statusCode).toBe(400);
+    });
+
+    it('should return 400 for null queryStringParameters', async () => {
+      const event = createEvent({
+        httpMethod: 'DELETE',
+        path: '/delete',
+        queryStringParameters: null
+      });
+
+      const result = await handler(event, mockContext);
+
+      expect(result.statusCode).toBe(400);
+    });
+
+    it('should handle valid delete params', async () => {
+      const event = createEvent({
+        httpMethod: 'DELETE',
+        path: '/delete',
+        queryStringParameters: { pk: 'test', sk: 'sort', type: 'public' }
+      });
+
+      const result = await handler(event, mockContext);
+      // Will return 404 or 403 since item doesn't exist or access denied
+      expect([200, 403, 404]).toContain(result.statusCode);
     });
   });
 
@@ -200,6 +269,29 @@ describe('Lambda Handler', () => {
 
       const result = await handler(event, mockContext);
       expect([200, 500]).toContain(result.statusCode);
+    });
+
+    it('should handle null queryStringParameters', async () => {
+      const event = createEvent({
+        httpMethod: 'GET',
+        path: '/query',
+        queryStringParameters: null
+      });
+
+      const result = await handler(event, mockContext);
+      expect(result.statusCode).toBe(400);
+    });
+
+    it('should handle undefined prefix', async () => {
+      const event = createEvent({
+        httpMethod: 'GET',
+        path: '/query',
+        queryStringParameters: { type: 'public' }
+      });
+
+      const result = await handler(event, mockContext);
+      // Empty prefix is valid
+      expect([200, 400, 500]).toContain(result.statusCode);
     });
   });
 

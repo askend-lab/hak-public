@@ -86,6 +86,20 @@ describe('Store', () => {
       expect(result.item?.createdAt).toBeDefined();
       expect(result.item?.updatedAt).toBeDefined();
     });
+
+    it('should default data to empty object when undefined', async () => {
+      const request: StoreRequest = {
+        pk: 'entity1',
+        sk: 'sort1',
+        type: 'public',
+        ttl: 3600
+      } as StoreRequest;
+
+      const result = await store.save(request);
+
+      expect(result.success).toBe(true);
+      expect(result.item?.data).toEqual({});
+    });
   });
 
   describe('get', () => {
