@@ -58,7 +58,7 @@ describe('Validation', () => {
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('ttl must be a positive number');
+      expect(result.errors).toContain('TTL must be positive');
     });
 
     it('should reject ttl exceeding max', () => {
