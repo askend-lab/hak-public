@@ -53,6 +53,7 @@ jobs:
         run: pnpm install
       
       - name: Run DevBox PR checks
+        if: github.event_name == 'pull_request'
         run: node node_modules/@askend-lab/devbox/packages/hooks/src/cli/index.js run pr-check --all-files
       
       - name: Run tests with coverage
