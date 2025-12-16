@@ -17,12 +17,12 @@ export class HttpError extends Error {
   }
 }
 
-export async function httpRequest<T>(
+async function doFetch(
   url: string,
   options: HttpRequestOptions = {}
-): Promise<T> {
+): Promise<Response> {
   const { params, ...fetchOptions } = options;
-  
+
   let fullUrl = url;
   if (params) {
     const searchParams = new URLSearchParams(params);
@@ -41,6 +41,14 @@ export async function httpRequest<T>(
     throw new HttpError(response.status, `HTTP error: ${response.status}`);
   }
 
+  return response;
+}
+
+export async function httpRequest<T>(
+  url: string,
+  options: HttpRequestOptions = {}
+): Promise<T> {
+  const response = await doFetch(url, options);
   return response.json();
 }
 
@@ -71,27 +79,10 @@ export async function httpPostBlob(
   body: unknown,
   options: HttpRequestOptions = {}
 ): Promise<Blob> {
-  const { params, ...fetchOptions } = options;
-
-  let fullUrl = url;
-  if (params) {
-    const searchParams = new URLSearchParams(params);
-    fullUrl = `${url}?${searchParams.toString()}`;
-  }
-
-  const response = await fetch(fullUrl, {
-    ...fetchOptions,
+  const response = await doFetch(url, {
+    ...options,
     method: 'POST',
     body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...fetchOptions.headers,
-    },
   });
-
-  if (!response.ok) {
-    throw new HttpError(response.status, `HTTP error: ${response.status}`);
-  }
-
   return response.blob();
 }
