@@ -8,7 +8,7 @@ data "aws_dynamodb_table" "single_table" {
 # IAM policy for readonly agent to access DynamoDB
 resource "aws_iam_user_policy" "agent_dynamodb_access" {
   name = "hak-dynamodb-${var.env}-access"
-  user = "agents/agent-readonly"
+  user = "agent-readonly"
 
   policy = jsonencode({
     Version = "2012-10-17"
