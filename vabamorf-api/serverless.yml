@@ -1,0 +1,58 @@
+service: vabamorf-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  
+  environment:
+    VMETAJSON_PATH: /var/task/vmetajson
+    DICT_PATH: /var/task
+
+  ecr:
+    images:
+      vabamorf:
+        path: ./
+
+functions:
+  analyze:
+    image:
+      name: vabamorf
+      command:
+        - dist/handler.analyzeHandler
+    events:
+      - http:
+          path: /analyze
+          method: post
+          cors: true
+
+  variants:
+    image:
+      name: vabamorf
+      command:
+        - dist/handler.variantsHandler
+    events:
+      - http:
+          path: /variants
+          method: post
+          cors: true
+
+  health:
+    image:
+      name: vabamorf
+      command:
+        - dist/handler.healthHandler
+    events:
+      - http:
+          path: /health
+          method: get
+          cors: true
+
+resources:
+  Outputs:
+    ApiEndpoint:
+      Description: Vabamorf API Gateway endpoint URL
+      Value: !Sub https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}
