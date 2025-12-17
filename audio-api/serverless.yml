@@ -12,7 +12,7 @@ provider:
   
   environment:
     BUCKET_NAME: hak-audio-${self:provider.stage}
-    QUEUE_URL: !Ref AudioGenerationQueue
+    QUEUE_URL: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:hak-audio-generation-${self:provider.stage}
 
   iam:
     role:
@@ -25,7 +25,7 @@ provider:
         - Effect: Allow
           Action:
             - sqs:SendMessage
-          Resource: !GetAtt AudioGenerationQueue.Arn
+          Resource: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:hak-audio-generation-${self:provider.stage}
 
 functions:
   generate:
@@ -45,28 +45,10 @@ functions:
           cors: true
 
 resources:
-  Resources:
-    AudioGenerationQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: hak-audio-generation-${self:provider.stage}
-        VisibilityTimeout: 300
-        MessageRetentionPeriod: 86400
-        ReceiveMessageWaitTimeSeconds: 20
-        RedrivePolicy:
-          deadLetterTargetArn: !GetAtt AudioGenerationDLQ.Arn
-          maxReceiveCount: 3
-
-    AudioGenerationDLQ:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: hak-audio-generation-dlq-${self:provider.stage}
-        MessageRetentionPeriod: 1209600
-
   Outputs:
     ApiEndpoint:
       Description: Audio API Gateway endpoint URL
       Value: !Sub https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}
     QueueUrl:
-      Description: SQS Queue URL for audio generation
-      Value: !Ref AudioGenerationQueue
+      Description: SQS Queue URL for audio generation (managed by Terraform)
+      Value: !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/hak-audio-generation-${self:provider.stage}
