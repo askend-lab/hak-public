@@ -281,6 +281,45 @@ jobs:
         run: |
           echo "✅ Deployed Audio API to ${{ matrix.environment }}"
 
+  test-audio-api-e2e:
+    name: Test Audio API E2E
+    needs: deploy-audio-api
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    
+    strategy:
+      matrix:
+        include:
+          - environment: dev
+            auto: ${{ github.event_name == 'push' }}
+          - environment: prod
+            auto: false
+    
+    steps:
+      - name: Skip if not triggered
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.environment != matrix.environment) ||
+          (github.event_name == 'push' && !matrix.auto)
+        run: echo "Skipping E2E tests for ${{ matrix.environment }}" && exit 0
+      
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        working-directory: audio-api
+        run: npm ci
+      
+      - name: Run E2E tests
+        working-directory: audio-api
+        run: npm run test:e2e
+
   build-audio-worker:
     name: Build Audio Worker
     runs-on: ubuntu-latest
