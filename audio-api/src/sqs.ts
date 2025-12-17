@@ -1,3 +1,5 @@
+import { SendMessageCommand } from '@aws-sdk/client-sqs';
+
 export async function publishToQueue(
   sqsClient: any,
   queueUrl: string,
@@ -10,8 +12,8 @@ export async function publishToQueue(
     timestamp: Date.now()
   });
 
-  await sqsClient.sendMessage({
+  await sqsClient.send(new SendMessageCommand({
     QueueUrl: queueUrl,
     MessageBody: messageBody
-  });
+  }));
 }

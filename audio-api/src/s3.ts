@@ -6,7 +6,7 @@ export async function checkFileExists(
   key: string
 ): Promise<boolean> {
   try {
-    await s3Client.headObject({ Bucket: bucket, Key: key });
+    await s3Client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
     return true;
   } catch (error: any) {
     if (error.name === 'NotFound') {
