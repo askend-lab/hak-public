@@ -11,6 +11,7 @@ jest.mock('./services/audio', () => ({
 }));
 
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import { AuthProvider } from './services/auth';
 import App from './App';
@@ -19,11 +20,13 @@ import i18n from './i18n-test';
 describe('App', () => {
   it('renders with AuthProvider without crashing', () => {
     render(
-      <AuthProvider>
-        <I18nextProvider i18n={i18n}>
-          <App />
-        </I18nextProvider>
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <I18nextProvider i18n={i18n}>
+            <App />
+          </I18nextProvider>
+        </AuthProvider>
+      </MemoryRouter>
     );
     
     expect(screen.getByText('Eesti keele kõnesüntees')).toBeInTheDocument();
@@ -34,7 +37,11 @@ describe('App', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     
     expect(() => {
-      render(<App />);
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
     }).toThrow('useAuth must be used within AuthProvider');
     
     consoleSpy.mockRestore();

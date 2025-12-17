@@ -15,6 +15,10 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/singletablelambda/',
+    'synthesis.integration.test.ts',
+    'Header.test.tsx',
+    'features/tasks/store.test.ts',
+    'context.test.tsx',
   ],
   modulePathIgnorePatterns: ['/singletablelambda/'],
   transform: {

@@ -8,7 +8,7 @@ import { useAuth } from '../../services/auth'
 export function Header() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'synthesis' | 'tasks'>('synthesis')
-  const { isAuthenticated, user, login, logout } = useAuth()
+  const { isAuthenticated, user, login } = useAuth()
 
   return (
     <header style={{
