@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TaskSelectModal, NotificationContainer, Header, Footer } from './components'
 import { colors } from './styles/colors'
+import { synthesizeText } from './services/audio'
 
 function App() {
   const { t } = useTranslation()
   const [sentences, setSentences] = useState<string[]>([''])
+  const [loadingIndex, setLoadingIndex] = useState<number | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const handleAddSentence = () => {
     setSentences([...sentences, ''])
@@ -15,6 +18,24 @@ function App() {
     const newSentences = [...sentences]
     newSentences[index] = value
     setSentences(newSentences)
+  }
+
+  const handlePlaySentence = async (index: number) => {
+    const text = sentences[index]
+    if (!text.trim()) return
+
+    setLoadingIndex(index)
+    try {
+      const result = await synthesizeText(text)
+      if (audioRef.current) {
+        audioRef.current.src = result.audioUrl
+        audioRef.current.play()
+      }
+    } catch (err) {
+      console.error('Synthesis failed:', err)
+    } finally {
+      setLoadingIndex(null)
+    }
   }
 
   return (
@@ -136,20 +157,24 @@ function App() {
               />
 
               {/* Play button */}
-              <button style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: '#4CAF50',
-                border: 'none',
-                color: colors.white,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.875rem',
-              }}>
-                ▶
+              <button
+                onClick={() => handlePlaySentence(index)}
+                disabled={loadingIndex === index}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: loadingIndex === index ? '#81C784' : '#4CAF50',
+                  border: 'none',
+                  color: colors.white,
+                  cursor: loadingIndex === index ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {loadingIndex === index ? '⏳' : '▶'}
               </button>
 
               {/* More menu */}
@@ -194,6 +219,9 @@ function App() {
       
       <TaskSelectModal />
       <NotificationContainer />
+      
+      {/* Hidden audio element for playback */}
+      <audio ref={audioRef} style={{ display: 'none' }} />
     </div>
   )
 }
