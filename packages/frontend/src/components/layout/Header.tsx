@@ -15,21 +15,10 @@ export function Header() {
       alignItems: 'center',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <div style={{
-          width: '48px',
-          height: '48px',
-          backgroundColor: colors.primary,
-          color: colors.white,
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 700,
-          fontSize: '0.875rem',
-          letterSpacing: '0.5px',
-        }}>
-          HAK
-        </div>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="48" rx="8" fill={colors.primary}/>
+          <path d="M34 8H14V28H26C25.8 32 24.8 34.5 23 36.2C21.2 37.9 18.2 38.9 14 39V44C26 43.6 34 37 34 24V8Z" fill={colors.white}/>
+        </svg>
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
           <span style={{
             fontSize: '0.875rem',

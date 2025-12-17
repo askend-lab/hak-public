@@ -21,20 +21,10 @@ export function Footer() {
         {/* Logo & Contact */}
         <div>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '1rem' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              backgroundColor: colors.primary,
-              color: colors.white,
-              borderRadius: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: '0.625rem',
-            }}>
-              HAK
-            </div>
+            <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="8" fill={colors.primary}/>
+              <path d="M34 8H14V28H26C25.8 32 24.8 34.5 23 36.2C21.2 37.9 18.2 38.9 14 39V44C26 43.6 34 37 34 24V8Z" fill={colors.white}/>
+            </svg>
             <div style={{ lineHeight: 1.2 }}>
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: colors.primary }}>
                 {t('header.title1')}
