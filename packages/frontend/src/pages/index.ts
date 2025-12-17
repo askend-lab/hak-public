@@ -1,1 +1,2 @@
-export { SynthesisPage } from './SynthesisPage';
+export { SynthesisPage } from './SynthesisPage'
+export { TestsPage } from './TestsPage';
