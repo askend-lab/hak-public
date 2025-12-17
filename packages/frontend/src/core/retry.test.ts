@@ -67,4 +67,15 @@ describe('withRetry', () => {
     const elapsed = Date.now() - start;
     expect(elapsed).toBeGreaterThanOrEqual(15);
   });
+
+  it('throws fallback error when lastError is null', async () => {
+    // This tests the edge case where lastError might be null
+    const fn = jest.fn().mockRejectedValue(null);
+    await expect(withRetry(fn, { maxRetries: 1, delayMs: 1 })).rejects.toThrow();
+  });
+
+  it('converts non-Error to Error', async () => {
+    const fn = jest.fn().mockRejectedValue('string error');
+    await expect(withRetry(fn, { maxRetries: 1, delayMs: 1 })).rejects.toThrow('string error');
+  });
 });
