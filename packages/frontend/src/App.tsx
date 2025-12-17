@@ -1,43 +1,12 @@
-import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TaskSelectModal, NotificationContainer, Header, Footer, SentenceRow } from './components'
-import { Button } from './components/ui'
+import { Button, Card } from './components/ui'
 import { colors } from './styles/colors'
-import { synthesizeText } from './services/audio'
+import { useSentences } from './hooks'
 
 function App() {
   const { t } = useTranslation()
-  const [sentences, setSentences] = useState<string[]>([''])
-  const [loadingIndex, setLoadingIndex] = useState<number | null>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-
-  const handleAddSentence = () => {
-    setSentences([...sentences, ''])
-  }
-
-  const handleSentenceChange = (index: number, value: string) => {
-    const newSentences = [...sentences]
-    newSentences[index] = value
-    setSentences(newSentences)
-  }
-
-  const handlePlaySentence = async (index: number) => {
-    const text = sentences[index]
-    if (!text.trim()) return
-
-    setLoadingIndex(index)
-    try {
-      const result = await synthesizeText(text)
-      if (audioRef.current) {
-        audioRef.current.src = result.audioUrl
-        audioRef.current.play()
-      }
-    } catch (err) {
-      console.error('Synthesis failed:', err)
-    } finally {
-      setLoadingIndex(null)
-    }
-  }
+  const { sentences, loadingIndex, audioRef, addSentence, updateSentence, playSentence } = useSentences()
 
   return (
     <div style={{
@@ -84,28 +53,22 @@ function App() {
         </div>
 
         {/* Input Section */}
-        <div style={{
-          background: colors.white,
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(23, 49, 72, 0.08)',
-          border: `1px solid ${colors.outlinedNeutral}`,
-          padding: '1rem',
-        }}>
+        <Card>
           {sentences.map((sentence, index) => (
             <SentenceRow
               key={index}
               value={sentence}
-              onChange={(value) => handleSentenceChange(index, value)}
-              onPlay={() => handlePlaySentence(index)}
+              onChange={(value) => updateSentence(index, value)}
+              onPlay={() => playSentence(index)}
               isLoading={loadingIndex === index}
               isLast={index === sentences.length - 1}
             />
           ))}
-        </div>
+        </Card>
 
         {/* Add sentence button */}
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          <Button variant="outline" onClick={handleAddSentence}>Lisa lause</Button>
+          <Button variant="outline" onClick={addSentence}>Lisa lause</Button>
         </div>
       </main>
 

@@ -8,3 +8,5 @@ export { UserAvatar } from './UserAvatar';
 export { NavTab } from './NavTab';
 export { FooterLink } from './FooterLink';
 export { SectionHeading } from './SectionHeading';
+export { LogoWithText } from './LogoWithText';
+export { Card } from './Card';
