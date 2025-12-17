@@ -5,3 +5,6 @@ export { Button } from './Button';
 export { SocialLink } from './SocialLink';
 export { WaffleMenu } from './WaffleMenu';
 export { UserAvatar } from './UserAvatar';
+export { NavTab } from './NavTab';
+export { FooterLink } from './FooterLink';
+export { SectionHeading } from './SectionHeading';
