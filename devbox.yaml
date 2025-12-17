@@ -19,15 +19,19 @@ test_modules:
   - name: hak
     path: .
     type: jest
-    min_coverage_lines: 16
-    min_coverage_branches: 12
+    min_coverage_lines: 0
+    min_coverage_branches: 0
     suites:
       - name: unit
         command: 'pnpm test:unit'
         results_file: 'jest-results-unit.json'
+        min_coverage_lines: 80
+        min_coverage_branches: 80
       - name: features
         command: 'pnpm test:features'
         results_file: 'jest-results-features.json'
+        min_coverage_lines: 50
+        min_coverage_branches: 50
   - name: singletablelambda
     path: singletablelambda
     type: jest
