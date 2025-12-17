@@ -1,6 +1,26 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import type { AuthContextValue, AuthState, LoginCredentials, User } from './types';
-import { AuthStorage } from './storage';
+import { Amplify } from 'aws-amplify';
+import { getCurrentUser, signInWithRedirect, signOut } from 'aws-amplify/auth';
+import type { AuthContextValue, AuthState, User } from './types';
+import { cognitoConfig } from './config';
+
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: cognitoConfig.userPoolId,
+      userPoolClientId: cognitoConfig.userPoolWebClientId,
+      loginWith: {
+        oauth: {
+          domain: 'askend-lab-auth.auth.eu-west-1.amazoncognito.com',
+          scopes: ['email', 'openid'],
+          redirectSignIn: ['http://localhost:5180'],
+          redirectSignOut: ['http://localhost:5180'],
+          responseType: 'code',
+        }
+      }
+    }
+  }
+});
 
 const initialState: AuthState = {
   user: null,
@@ -19,34 +39,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
-    const user = AuthStorage.getUser();
-    if (user) {
-      setState({ user, isAuthenticated: true, isLoading: false, error: null });
-    } else {
-      setState({ ...initialState, isLoading: false });
-    }
+    const checkUser = async () => {
+      try {
+        const { userId, username } = await getCurrentUser();
+        const user: User = {
+          id: userId,
+          email: username,
+        };
+        setState({ user, isAuthenticated: true, isLoading: false, error: null });
+      } catch (error) {
+        setState({ ...initialState, isLoading: false });
+      }
+    };
+
+    checkUser();
   }, []);
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    setState((s) => ({ ...s, isLoading: true, error: null }));
+  const login = useCallback(async () => {
     try {
-      // TODO: Replace with actual Cognito auth
-      const user: User = {
-        id: `user_${Date.now()}`,
-        email: credentials.email,
-      };
-      AuthStorage.setUser(user);
-      setState({ user, isAuthenticated: true, isLoading: false, error: null });
+      await signInWithRedirect();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login failed';
-      setState((s) => ({ ...s, isLoading: false, error: message }));
-      throw error;
+      console.error('Error during sign in:', error);
     }
   }, []);
 
   const logout = useCallback(async () => {
-    AuthStorage.clear();
-    setState({ user: null, isAuthenticated: false, isLoading: false, error: null });
+    try {
+      await signOut();
+      setState({ user: null, isAuthenticated: false, isLoading: false, error: null });
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
   }, []);
 
   const refreshSession = useCallback(async () => {

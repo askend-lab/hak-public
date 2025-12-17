@@ -2,19 +2,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { colors } from '../../styles/colors'
 import { Logo, Button } from '../ui'
+import { useAuth } from '../../services/auth'
 
-interface HeaderProps {
-  isLoggedIn?: boolean
-  user?: {
-    name: string
-    id: string
-    initials: string
-  }
-}
-
-export function Header({ isLoggedIn = false, user }: HeaderProps) {
+export function Header() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'synthesis' | 'tasks'>('synthesis')
+  const { isAuthenticated, user, login, logout } = useAuth()
 
   return (
     <header style={{
@@ -83,7 +76,7 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
 
       {/* Right side - Auth & Menu */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {isLoggedIn && user ? (
+        {isAuthenticated && user ? (
           /* Logged in - User profile */
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
@@ -98,7 +91,7 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
               fontSize: '0.875rem',
               fontWeight: 600,
             }}>
-              {user.initials}
+              {user.email?.substring(0, 2).toUpperCase() || 'U'}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.3 }}>
               <span style={{
@@ -106,18 +99,26 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
                 fontWeight: 600,
                 color: colors.primary,
               }}>
-                {user.name}
+                {user.email}
               </span>
-              <span style={{
-                fontSize: '0.75rem',
-                color: colors.gray,
-              }}>
-                {user.id}
-              </span>
+              <button
+                onClick={logout}
+                style={{
+                  fontSize: '0.75rem',
+                  color: colors.gray,
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                Logi välja
+              </button>
             </div>
           </div>
         ) : (
-          <Button variant="primary">Logi sisse</Button>
+          <Button variant="primary" onClick={login}>Logi sisse</Button>
         )}
 
         {/* Waffle menu */}
