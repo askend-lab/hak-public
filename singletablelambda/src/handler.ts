@@ -1,42 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { Store, ERRORS } from './store';
+import { Store } from './store';
 import { DynamoDBAdapter } from './dynamoClient';
-import { DataType, StoreResult, ServerContext } from './types';
+import { DataType, ServerContext } from './types';
 import { validateStoreRequest, validateGetRequest, validateQueryRequest } from './validation';
 import { config } from './config';
+import { HTTP_ERRORS, createResponse, createErrorResponse, isResponse } from './response';
+import { getUserIdFromEvent } from './auth';
 
-/** HTTP error messages (DRY - single source) */
-const HTTP_ERRORS = {
-  UNAUTHORIZED: 'Unauthorized',
-  NOT_FOUND: 'Not found',
-  INTERNAL: 'Internal server error',
-  INVALID_JSON: 'Invalid JSON body'
-} as const;
-
-/** Error messages to HTTP status code mapping (uses ERRORS constants) */
-const ERROR_STATUS_MAP: Record<string, number> = {
-  [ERRORS.NOT_FOUND]: 404,
-  [ERRORS.ACCESS_DENIED]: 403
-};
-
-/**
- * Maps store error to appropriate HTTP status code
- */
-function getErrorStatusCode(error: string | undefined, defaultStatus = 500): number {
-  if (!error) return defaultStatus;
-  return ERROR_STATUS_MAP[error] ?? defaultStatus;
-}
-
-/**
- * Creates error response from StoreResult
- */
-function createErrorResponse(result: StoreResult, defaultStatus = 500): APIGatewayProxyResult {
-  return createResponse(getErrorStatusCode(result.error, defaultStatus), { error: result.error });
-}
-
-/**
- * Request body structure for save operations
- */
 interface RequestBody {
   pk?: string;
   sk?: string;
@@ -46,46 +16,11 @@ interface RequestBody {
 }
 
 /**
- * Extracts user ID from Cognito JWT claims
- * In local dev (serverless-offline), uses header or default test user
- */
-function getUserIdFromEvent(event: APIGatewayProxyEvent): string | null {
-  // Check Cognito claims first (production)
-  const cognitoUserId = event.requestContext?.authorizer?.claims?.sub as string;
-  if (cognitoUserId) return cognitoUserId;
-  
-  // Local dev: allow X-User-Id header or default test user
-  if (process.env.IS_OFFLINE === 'true') {
-    return event.headers?.['X-User-Id'] ?? event.headers?.['x-user-id'] ?? 'test-user';
-  }
-  
-  return null;
-}
-
-/**
- * Creates standardized API Gateway response with CORS headers
- */
-function createResponse(statusCode: number, body: unknown): APIGatewayProxyResult {
-  return {
-    statusCode,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: JSON.stringify(body)
-  };
-}
-
-/**
  * Safely parses JSON request body
  */
 function parseBody(event: APIGatewayProxyEvent): RequestBody | null {
   if (!event.body) return null;
-  try {
-    return JSON.parse(event.body);
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(event.body); } catch { return null; }
 }
 
 /**
@@ -159,26 +94,13 @@ async function handleSave(
   store: Store
 ): Promise<APIGatewayProxyResult> {
   const body = parseBody(event);
-  if (!body) {
-    return createResponse(400, { error: HTTP_ERRORS.INVALID_JSON });
-  }
+  if (!body) return createResponse(400, { error: HTTP_ERRORS.INVALID_JSON });
 
   const validation = validateStoreRequest(body);
-  if (!validation.valid) {
-    return createResponse(400, { errors: validation.errors });
-  }
+  if (!validation.valid) return createResponse(400, { errors: validation.errors });
 
-  const result = await store.save({
-    pk: body.pk!,
-    sk: body.sk!,
-    type: body.type!,
-    ttl: body.ttl!,
-    data: body.data
-  });
-
-  return result.success
-    ? createResponse(200, { item: result.item })
-    : createErrorResponse(result, 400);
+  const result = await store.save({ pk: body.pk!, sk: body.sk!, type: body.type!, ttl: body.ttl!, data: body.data });
+  return result.success ? createResponse(200, { item: result.item }) : createErrorResponse(result, 400);
 }
 
 /**
@@ -186,17 +108,9 @@ async function handleSave(
  */
 function extractKeyParams(event: APIGatewayProxyEvent): { pk: string; sk: string; type: DataType } | APIGatewayProxyResult {
   const { pk, sk, type } = event.queryStringParameters || {};
-  
   const validation = validateGetRequest(pk, sk, type);
-  if (!validation.valid) {
-    return createResponse(400, { errors: validation.errors });
-  }
-  
+  if (!validation.valid) return createResponse(400, { errors: validation.errors });
   return { pk: pk!, sk: sk!, type: type as DataType };
-}
-
-function isResponse(result: unknown): result is APIGatewayProxyResult {
-  return typeof result === 'object' && result !== null && 'statusCode' in result;
 }
 
 async function handleGet(
@@ -207,9 +121,7 @@ async function handleGet(
   if (isResponse(params)) return params;
 
   const result = await store.get(params.pk, params.sk, params.type);
-  return result.success
-    ? createResponse(200, { item: result.item })
-    : createErrorResponse(result, 404);
+  return result.success ? createResponse(200, { item: result.item }) : createErrorResponse(result, 404);
 }
 
 async function handleDelete(
@@ -220,9 +132,7 @@ async function handleDelete(
   if (isResponse(params)) return params;
 
   const result = await store.delete(params.pk, params.sk, params.type);
-  return result.success
-    ? createResponse(200, { success: true })
-    : createErrorResponse(result, 404);
+  return result.success ? createResponse(200, { success: true }) : createErrorResponse(result, 404);
 }
 
 async function handleQuery(
@@ -230,15 +140,9 @@ async function handleQuery(
   store: Store
 ): Promise<APIGatewayProxyResult> {
   const { prefix, type } = event.queryStringParameters || {};
-
   const validation = validateQueryRequest(prefix, type);
-  if (!validation.valid) {
-    return createResponse(400, { errors: validation.errors });
-  }
+  if (!validation.valid) return createResponse(400, { errors: validation.errors });
 
   const result = await store.query(prefix!, type as DataType);
-
-  return result.success
-    ? createResponse(200, { items: result.items })
-    : createErrorResponse(result, 500);
+  return result.success ? createResponse(200, { items: result.items }) : createErrorResponse(result, 500);
 }
