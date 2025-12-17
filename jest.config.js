@@ -18,7 +18,7 @@ module.exports = {
     'synthesis.integration.test.ts',
     'Header.test.tsx',
     'features/tasks/store.test.ts',
-    'context.test.tsx',
+    'context.test.tsx', // Skipped: needs aws-amplify mock setup
   ],
   modulePathIgnorePatterns: ['/singletablelambda/'],
   transform: {
