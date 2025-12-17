@@ -9,9 +9,18 @@ export async function checkFileExists(
     await s3Client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
     return true;
   } catch (error: any) {
-    if (error.name === 'NotFound' || error.name === 'NoSuchKey' || error.$metadata?.httpStatusCode === 404) {
+    const statusCode = error.$metadata?.httpStatusCode;
+    if (error.name === 'NotFound' || error.name === 'NoSuchKey' || statusCode === 404) {
       return false;
     }
-    throw new Error(`S3 error: ${error.name || 'Unknown'} - ${error.message || 'No message'}`);
+    const errorDetails = JSON.stringify({
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      statusCode,
+      bucket,
+      key
+    });
+    throw new Error(`S3 error: ${errorDetails}`);
   }
 }
