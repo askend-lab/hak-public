@@ -29,6 +29,11 @@ export default defineConfig({
           });
         },
       },
+      '/api/audio': {
+        target: 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/audio/, '/dev'),
+      },
       '/api': {
         target: 'http://localhost:4000',
         changeOrigin: true,

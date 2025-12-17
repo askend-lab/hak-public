@@ -8,6 +8,8 @@ const DEV_CONFIG = {
   vabamorfUrl: '/api/vabamorf/analyze',
   merlinUrl: '/api/merlin/synthesize',
   cacheUrl: '/api/audio-cache',
+  audioApiUrl: '/api/audio/generate',
+  audioBucketUrl: 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
 } as const;
 
 const PROD_CONFIG = {
@@ -18,6 +20,8 @@ const PROD_CONFIG = {
   merlinUrl: 'https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize',
   // This should point to the production audio cache endpoint.
   cacheUrl: `${import.meta.env.VITE_API_BASE_URL || ''}/audio-cache`,
+  audioApiUrl: 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/dev/generate',
+  audioBucketUrl: 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
 } as const;
 
 export const API_CONFIG = isProd ? PROD_CONFIG : DEV_CONFIG;
