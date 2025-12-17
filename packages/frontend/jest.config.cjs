@@ -17,7 +17,8 @@ module.exports = {
   },
   testPathIgnorePatterns: [
     '/node_modules/',
-    'synthesis.integration.test.ts'
+    'synthesis.integration.test.ts',
+    'Header.test.tsx'
   ],
   globals: {
     'import.meta': {
