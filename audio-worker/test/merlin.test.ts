@@ -28,7 +28,7 @@ describe('Merlin TTS', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             text: 'tere päevast',
-            voice: 'mari',
+            voice: 'efm_s',
             returnBase64: true,
           }),
         })

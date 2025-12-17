@@ -6,7 +6,7 @@ interface MerlinResponse {
 export async function synthesize(
   text: string,
   merlinUrl: string,
-  voice: string = 'mari'
+  voice: string = 'efm_s'
 ): Promise<Buffer> {
   const response = await fetch(merlinUrl, {
     method: 'POST',
