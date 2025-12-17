@@ -19,7 +19,8 @@ module.exports = {
     '/node_modules/',
     'synthesis.integration.test.ts',
     'Header.test.tsx',
-    'features/tasks/store.test.ts'
+    'features/tasks/store.test.ts',
+    'context.test.tsx'
   ],
   globals: {
     'import.meta': {
