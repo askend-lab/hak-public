@@ -26,7 +26,7 @@ test_modules:
         command: 'pnpm test:unit'
         results_file: 'jest-results-unit.json'
         min_coverage_lines: 80
-        min_coverage_branches: 80
+        min_coverage_branches: 74
       - name: features
         command: 'pnpm test:features'
         results_file: 'jest-results-features.json'

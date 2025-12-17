@@ -115,6 +115,18 @@ describe('generateUUID', () => {
     const uuid2 = generateUUID();
     expect(uuid1).not.toBe(uuid2);
   });
+
+  it('uses fallback when crypto.randomUUID is not available', () => {
+    const originalCrypto = global.crypto;
+    // @ts-ignore - testing fallback
+    global.crypto = { randomUUID: undefined };
+    
+    const uuid = generateUUID();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(uuid).toMatch(uuidRegex);
+    
+    global.crypto = originalCrypto;
+  });
 });
 
 describe('createTaskEntry', () => {
