@@ -1,0 +1,17 @@
+{
+  "header.title1": "ESTONIAN LANGUAGE",
+  "header.title2": "SPEECH SYNTHESIS",
+  "nav.synthesis": "Synthesis",
+  "nav.tasks": "Tasks",
+  "hero.title": "Estonian Speech Synthesis",
+  "hero.subtitle": "Enter text and listen to how it is pronounced",
+  "inputCard.title": "Text Input",
+  "inputCard.example": "Example:",
+  "inputCard.helpText": "Press Enter or the button to listen",
+  "inputCard.playButton": "Play",
+  "inputCard.addTaskButton": "Add to task",
+  "resultsCard.title": "Result",
+  "playlistCard.title": "Speech queue",
+  "playlistCard.empty": "Add utterances to the speech queue",
+  "footer.text": "HAK Platform • A platform for learning Estonian pronunciation"
+}

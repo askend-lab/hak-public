@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { TextInput, AudioPlayer, StressedText, AddToTaskButton, TaskSelectModal, NotificationContainer } from './components'
+import { useTranslation } from 'react-i18next'
+import { TextInput, AudioPlayer, StressedText, AddToTaskButton, TaskSelectModal, NotificationContainer, LanguageSwitcher } from './components'
 import { useSynthesisStore } from './features'
 import { synthesizeText } from './services/audio'
 
@@ -18,6 +19,7 @@ const colors = {
 }
 
 function App() {
+  const { t } = useTranslation()
   const { text, result, setResult, setLoading, setError } = useSynthesisStore()
 
   const handleSynthesize = useCallback(async () => {
@@ -74,7 +76,7 @@ function App() {
               color: colors.primary,
               letterSpacing: '0.5px',
             }}>
-              EESTI KEELE
+              {t('header.title1')}
             </span>
             <span style={{
               fontSize: '0.75rem',
@@ -82,37 +84,40 @@ function App() {
               color: colors.primary,
               letterSpacing: '0.25px',
             }}>
-              KÕNESÜNTEES
+              {t('header.title2')}
             </span>
           </div>
         </div>
 
-        <nav style={{ display: 'flex', gap: '0.5rem' }}>
-          <button style={{
-            padding: '0.75rem 1.5rem',
-            background: colors.primary,
-            border: '1px solid transparent',
-            borderRadius: '8px',
-            color: colors.white,
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}>
-            Süntees
-          </button>
-          <button style={{
-            padding: '0.75rem 1.5rem',
-            background: 'transparent',
-            border: '1px solid transparent',
-            borderRadius: '8px',
-            color: colors.gray,
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}>
-            Ülesanded
-          </button>
-        </nav>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <nav style={{ display: 'flex', gap: '0.5rem' }}>
+            <button style={{
+              padding: '0.75rem 1.5rem',
+              background: colors.primary,
+              border: '1px solid transparent',
+              borderRadius: '8px',
+              color: colors.white,
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}>
+              {t('nav.synthesis')}
+            </button>
+            <button style={{
+              padding: '0.75rem 1.5rem',
+              background: 'transparent',
+              border: '1px solid transparent',
+              borderRadius: '8px',
+              color: colors.gray,
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}>
+              {t('nav.tasks')}
+            </button>
+          </nav>
+          <LanguageSwitcher />
+        </div>
       </header>
 
       {/* Main Content */}
@@ -129,7 +134,7 @@ function App() {
             color: colors.primary,
             margin: '0 0 0.5rem 0',
           }}>
-            Eesti keele kõnesüntees
+            {t('hero.title')}
           </h1>
           <p style={{
             fontSize: '1rem',
@@ -137,7 +142,7 @@ function App() {
             margin: 0,
             lineHeight: 1.5,
           }}>
-            Sisesta tekst ja kuula, kuidas seda hääldatakse
+            {t('hero.subtitle')}
           </p>
         </div>
 
@@ -169,7 +174,7 @@ function App() {
                   color: colors.primary,
                   margin: 0,
                 }}>
-                  Teksti sisestamine
+                  {t('inputCard.title')}
                 </h2>
               </div>
 
@@ -190,7 +195,7 @@ function App() {
                     fontSize: '0.875rem',
                   }}>
                     <span style={{ color: colors.textSecondary, fontWeight: 500 }}>
-                      Näide:
+                      {t('inputCard.example')}
                     </span>
                     <span style={{
                       color: colors.primary,
@@ -210,7 +215,7 @@ function App() {
                     color: colors.textSecondary,
                   }}>
                     <span style={{ color: '#2E7D32' }}>✓</span>
-                    Vajuta Enter või nuppu kuulamiseks
+                    {t('inputCard.helpText')}
                   </div>
                 </div>
               </div>
@@ -238,7 +243,7 @@ function App() {
                     cursor: 'pointer',
                   }}
                 >
-                  🔊 Mängi
+                  🔊 {t('inputCard.playButton')}
                 </button>
                 <button style={{
                   display: 'flex',
@@ -253,7 +258,7 @@ function App() {
                   fontWeight: 500,
                   cursor: 'pointer',
                 }}>
-                  + Lisa ülesandesse
+                  + {t('inputCard.addTaskButton')}
                 </button>
               </div>
             </div>
@@ -274,7 +279,7 @@ function App() {
                   color: colors.primary,
                   margin: '0 0 1rem 0',
                 }}>
-                  Tulemus
+                  {t('resultsCard.title')}
                 </h3>
                 <StressedText />
                 <div style={{ 
@@ -309,7 +314,7 @@ function App() {
                 color: colors.primary,
                 margin: '0 0 1rem 0',
               }}>
-                Kõnevoor
+                {t('playlistCard.title')}
               </h3>
               <div style={{
                 color: colors.gray,
@@ -317,7 +322,7 @@ function App() {
                 textAlign: 'center',
                 padding: '2rem 0',
               }}>
-                Lisa lausungeid kõnevooru
+                {t('playlistCard.empty')}
               </div>
             </div>
           </div>
@@ -334,7 +339,7 @@ function App() {
         fontSize: '0.75rem',
         color: colors.gray,
       }}>
-        HAK Platform • Eesti keele häälduse õppimise platvorm
+        {t('footer.text')}
       </footer>
       
       <TaskSelectModal />

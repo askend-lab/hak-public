@@ -1,0 +1,17 @@
+{
+  "header.title1": "EESTI KEELE",
+  "header.title2": "KÕNESÜNTEES",
+  "nav.synthesis": "Süntees",
+  "nav.tasks": "Ülesanded",
+  "hero.title": "Eesti keele kõnesüntees",
+  "hero.subtitle": "Sisesta tekst ja kuula, kuidas seda hääldatakse",
+  "inputCard.title": "Teksti sisestamine",
+  "inputCard.example": "Näide:",
+  "inputCard.helpText": "Vajuta Enter või nuppu kuulamiseks",
+  "inputCard.playButton": "Mängi",
+  "inputCard.addTaskButton": "Lisa ülesandesse",
+  "resultsCard.title": "Tulemus",
+  "playlistCard.title": "Kõnevoor",
+  "playlistCard.empty": "Lisa lausungeid kõnevooru",
+  "footer.text": "HAK Platvorm • Eesti keele häälduse õppimise platvorm"
+}
