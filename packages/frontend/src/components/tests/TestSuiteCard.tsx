@@ -1,39 +1,12 @@
 import { colors } from '../../styles/colors'
-
-interface TestAssertion {
-  fullName: string
-  title: string
-  status: 'passed' | 'failed' | 'pending'
-  duration: number
-  ancestorTitles: string[]
-  failureMessages: string[]
-}
-
-interface TestSuiteResult {
-  name: string
-  status: 'passed' | 'failed'
-  assertionResults: TestAssertion[]
-  startTime: number
-  endTime: number
-  message?: string
-}
-
-interface ParsedScenario {
-  name: string
-  tags: string[]
-  steps: string[]
-}
-
-interface ParsedFeature {
-  name: string
-  description: string
-  tags: string[]
-  scenarios: ParsedScenario[]
-}
-
-function getFileName(path: string): string {
-  return path.split('/').pop() || path
-}
+import { 
+  TestSuiteResult, 
+  ParsedFeature, 
+  getFileName, 
+  getStatusColors, 
+  countResults, 
+  findScenarioSteps 
+} from './test-card-helpers'
 
 export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expandedTests, onToggleTest }: {
   suite: TestSuiteResult
@@ -43,21 +16,8 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
   expandedTests: Set<string>
   onToggleTest: (id: string) => void
 }) {
-  const passed = suite.assertionResults.filter(t => t.status === 'passed').length
-  const failed = suite.assertionResults.filter(t => t.status === 'failed').length
-  
-  const findScenarioSteps = (testTitle: string): string[] => {
-    if (!featureData) return []
-    const scenario = featureData.scenarios.find(s => 
-      testTitle.toLowerCase().includes(s.name.toLowerCase()) ||
-      s.name.toLowerCase().includes(testTitle.toLowerCase())
-    )
-    return scenario?.steps || []
-  }
-  
-  const statusColor = suite.status === 'passed' 
-    ? { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' }
-    : { bg: '#FFEBEE', text: '#C62828', border: '#EF9A9A' }
+  const { passed, failed } = countResults(suite.assertionResults)
+  const statusColor = getStatusColors(suite.status)
 
   return (
     <div style={{
@@ -146,7 +106,7 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
                 
                 const testId = `${suite.name}-${idx}`
                 const isTestExpanded = expandedTests.has(testId)
-                const steps = findScenarioSteps(test.title)
+                const steps = findScenarioSteps(featureData, test.title)
                 
                 return (
                   <div key={idx} style={{

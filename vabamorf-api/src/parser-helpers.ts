@@ -1,35 +1,21 @@
 import { Variant, MorphologyInfo } from './types';
+import { buildDescription } from './description-builder';
 
-const POS_MAP: Record<string, string> = {
-  'S': 'nimisõna',
-  'V': 'tegusõna',
-  'A': 'omadussõna',
-  'D': 'määrsõna',
-  'P': 'asesõna',
-  'K': 'sidesõna',
-  'J': 'kaassõna',
-  'I': 'hüüdsõna',
-  'Y': 'lühend'
-};
+export { buildDescription };
 
 export function formatPhoneticText(stem: string, ending: string): string {
   return ending && ending !== '0' ? `${stem}+${ending}` : stem;
 }
 
-export function extractTokenText(tokenData: { features?: { mrf?: Array<{ stem?: string; ending?: string }>; token?: string } }): string | null {
-  const mrf = tokenData.features?.mrf;
-  if (mrf && mrf.length > 0 && mrf[0].stem) {
-    return formatPhoneticText(mrf[0].stem, mrf[0].ending || '');
-  }
-  return tokenData.features?.token || null;
+function getFirstMrfStem(mrf: Array<{ stem?: string; ending?: string }> | undefined): { stem: string; ending: string } | null {
+  if (!mrf || mrf.length === 0 || !mrf[0].stem) return null;
+  return { stem: mrf[0].stem, ending: mrf[0].ending || '' };
 }
 
-export function buildDescription(lemma: string, pos: string, fs: string, word: string): string {
-  const parts: string[] = [];
-  if (lemma && lemma.toLowerCase() !== word.toLowerCase()) parts.push(`lemma: ${lemma}`);
-  if (pos && POS_MAP[pos]) parts.push(POS_MAP[pos]);
-  if (fs) parts.push(fs);
-  return parts.length > 0 ? parts.join(', ') : 'tavaline';
+export function extractTokenText(tokenData: { features?: { mrf?: Array<{ stem?: string; ending?: string }>; token?: string } }): string | null {
+  const first = getFirstMrfStem(tokenData.features?.mrf);
+  if (first) return formatPhoneticText(first.stem, first.ending);
+  return tokenData.features?.token || null;
 }
 
 export function createVariantFromMrf(mrfVariant: { stem?: string; ending?: string; pos?: string; lemma?: string; fs?: string }, word: string): Variant | null {

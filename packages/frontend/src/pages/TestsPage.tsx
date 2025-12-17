@@ -1,109 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Header, Footer } from '../components'
 import { colors } from '../styles/colors'
-import { TestSuiteCard, UnimplementedFeatures, TestSuiteResult, ParsedFeature } from '../components/tests'
-
-interface JestResults {
-  numPassedTests: number
-  numFailedTests: number
-  numTotalTests: number
-  numPassedTestSuites: number
-  numFailedTestSuites: number
-  numTotalTestSuites: number
-  startTime: number
-  success: boolean
-  testResults: TestSuiteResult[]
-}
-
-function parseFeatureContent(content: string): ParsedFeature | null {
-  const lines = content.split('\n')
-  const feature: ParsedFeature = { name: '', description: '', tags: [], scenarios: [] }
-  
-  let currentScenario: { name: string; tags: string[]; steps: string[] } | null = null
-  let pendingTags: string[] = []
-  let inBackground = false
-  
-  for (const line of lines) {
-    const trimmed = line.trim()
-    
-    if (trimmed.startsWith('@')) {
-      pendingTags.push(...trimmed.split(/\s+/).filter(t => t.startsWith('@')))
-    } else if (trimmed.startsWith('Feature:')) {
-      feature.name = trimmed.replace('Feature:', '').trim()
-      feature.tags = [...pendingTags]
-      pendingTags = []
-    } else if (trimmed.startsWith('Background:')) {
-      inBackground = true
-      pendingTags = []
-    } else if (trimmed.startsWith('Scenario:')) {
-      inBackground = false
-      if (currentScenario) feature.scenarios.push(currentScenario)
-      currentScenario = { name: trimmed.replace('Scenario:', '').trim(), tags: [...pendingTags], steps: [] }
-      pendingTags = []
-    } else if (currentScenario && !inBackground && /^(Given|When|Then|And|But)/.test(trimmed)) {
-      currentScenario.steps.push(trimmed)
-    }
-  }
-  
-  if (currentScenario) feature.scenarios.push(currentScenario)
-  return feature.name ? feature : null
-}
+import { TestSuiteCard, UnimplementedFeatures } from '../components/tests'
+import { useFeatureData, useTestResults, useExpandedState } from './tests/hooks'
 
 export function TestsPage() {
-  const [results, setResults] = useState<JestResults | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [expandedSuites, setExpandedSuites] = useState<Set<string>>(new Set())
-  const [expandedTests, setExpandedTests] = useState<Set<string>>(new Set())
-  const [expandedScenarios, setExpandedScenarios] = useState<Set<string>>(new Set())
+  const featureData = useFeatureData()
+  const { results, loading, error } = useTestResults()
+  const { expanded: expandedSuites, toggle: toggleSuite } = useExpandedState<string>()
+  const { expanded: expandedTests, toggle: toggleTest } = useExpandedState<string>()
+  const { expanded: expandedScenarios, setExpanded: setExpandedScenarios } = useExpandedState<string>()
   const [filter, setFilter] = useState<'all' | 'passed' | 'failed'>('all')
-  const [featureData, setFeatureData] = useState<ParsedFeature | null>(null)
-
-  useEffect(() => {
-    fetch('/US-020-add-synthesis-to-task.feature')
-      .then(res => res.text())
-      .then(content => setFeatureData(parseFeatureContent(content)))
-      .catch(() => {})
-  }, [])
-
-  useEffect(() => {
-    fetch('/jest-results.json')
-      .then(res => res.json())
-      .then(data => {
-        const featureTests = data.testResults.filter((s: TestSuiteResult) => 
-          s.name.includes('/features/') || s.name.includes('.feature')
-        )
-        const counts = featureTests.reduce((acc: { total: number; passed: number }, s: TestSuiteResult) => ({
-          total: acc.total + s.assertionResults.length,
-          passed: acc.passed + s.assertionResults.filter(t => t.status === 'passed').length
-        }), { total: 0, passed: 0 })
-        
-        setResults({
-          ...data,
-          testResults: featureTests,
-          numTotalTests: counts.total,
-          numPassedTests: counts.passed,
-          numFailedTests: counts.total - counts.passed,
-          numTotalTestSuites: featureTests.length,
-          numPassedTestSuites: featureTests.filter((s: TestSuiteResult) => s.status === 'passed').length,
-          numFailedTestSuites: featureTests.filter((s: TestSuiteResult) => s.status === 'failed').length,
-        })
-        setLoading(false)
-      })
-      .catch(err => { setError(err.message); setLoading(false) })
-  }, [])
-
-  const toggleSuite = (name: string) => {
-    const newExpanded = new Set(expandedSuites)
-    newExpanded.has(name) ? newExpanded.delete(name) : newExpanded.add(name)
-    setExpandedSuites(newExpanded)
-  }
-
-  const toggleTest = (id: string) => {
-    const newExpanded = new Set(expandedTests)
-    newExpanded.has(id) ? newExpanded.delete(id) : newExpanded.add(id)
-    setExpandedTests(newExpanded)
-  }
 
   const filteredSuites = results?.testResults.filter(s => {
     if (filter === 'all') return true
