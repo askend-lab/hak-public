@@ -12,7 +12,7 @@ provider:
   
   environment:
     BUCKET_NAME: hak-audio-${self:provider.stage}
-    QUEUE_URL: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:hak-audio-generation-${self:provider.stage}
+    QUEUE_URL: !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/hak-audio-generation-${self:provider.stage}
 
   iam:
     role:
