@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { Button, WaffleMenu, UserAvatar, NavTab, LogoWithText } from '../ui'
+import { colors } from '../../styles/colors'
 
 interface HeaderProps {
   isLoggedIn?: boolean
@@ -39,6 +41,22 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
           isActive={activeTab === 'tasks'}
           onClick={() => setActiveTab('tasks')}
         />
+        <Link
+          to="/tests"
+          style={{
+            padding: '0.5rem 0',
+            background: 'transparent',
+            border: 'none',
+            borderBottom: '2px solid transparent',
+            color: colors.gray,
+            fontSize: '0.9375rem',
+            fontWeight: 500,
+            cursor: 'pointer',
+            textDecoration: 'none',
+          }}
+        >
+          Tests
+        </Link>
       </nav>
 
       {/* Right side - Auth & Menu */}
