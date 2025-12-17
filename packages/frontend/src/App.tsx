@@ -1,22 +1,9 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextInput, AudioPlayer, StressedText, AddToTaskButton, TaskSelectModal, NotificationContainer, LanguageSwitcher } from './components'
+import { TextInput, AudioPlayer, StressedText, AddToTaskButton, TaskSelectModal, NotificationContainer, Header, Footer } from './components'
 import { useSynthesisStore } from './features'
 import { synthesizeText } from './services/audio'
-
-// EKI Design System Colors
-const colors = {
-  primary: '#173148',
-  secondary: '#D7E5F2',
-  softPrimaryBg: '#E3EFFB',
-  surfaceBg: '#FBFCFE',
-  softNeutralBg: '#F0F4F8',
-  textSecondary: '#32383E',
-  gray: '#636B74',
-  outlinedNeutral: '#CDD7E1',
-  outlinedPrimary: '#0B6BCB',
-  white: '#FFFFFF',
-}
+import { colors } from './styles/colors'
 
 function App() {
   const { t } = useTranslation()
@@ -44,81 +31,7 @@ function App() {
       background: `linear-gradient(to bottom, ${colors.softPrimaryBg} 0%, ${colors.softNeutralBg} 100%)`,
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }}>
-      {/* Header */}
-      <header style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '1.5rem 1rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{
-            width: '48px',
-            height: '48px',
-            backgroundColor: colors.primary,
-            color: colors.white,
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 700,
-            fontSize: '0.875rem',
-            letterSpacing: '0.5px',
-          }}>
-            HAK
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-            <span style={{
-              fontSize: '0.875rem',
-              fontWeight: 700,
-              color: colors.primary,
-              letterSpacing: '0.5px',
-            }}>
-              {t('header.title1')}
-            </span>
-            <span style={{
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              color: colors.primary,
-              letterSpacing: '0.25px',
-            }}>
-              {t('header.title2')}
-            </span>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <nav style={{ display: 'flex', gap: '0.5rem' }}>
-            <button style={{
-              padding: '0.75rem 1.5rem',
-              background: colors.primary,
-              border: '1px solid transparent',
-              borderRadius: '8px',
-              color: colors.white,
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-            }}>
-              {t('nav.synthesis')}
-            </button>
-            <button style={{
-              padding: '0.75rem 1.5rem',
-              background: 'transparent',
-              border: '1px solid transparent',
-              borderRadius: '8px',
-              color: colors.gray,
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-            }}>
-              {t('nav.tasks')}
-            </button>
-          </nav>
-          <LanguageSwitcher />
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main style={{
@@ -329,18 +242,7 @@ function App() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '1.5rem 1rem',
-        borderTop: `1px solid ${colors.outlinedNeutral}`,
-        textAlign: 'center',
-        fontSize: '0.75rem',
-        color: colors.gray,
-      }}>
-        {t('footer.text')}
-      </footer>
+      <Footer />
       
       <TaskSelectModal />
       <NotificationContainer />
