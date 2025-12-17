@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { colors } from '../../styles/colors'
-import { Logo, Button, SocialLink, FooterLink, SectionHeading } from '../ui'
+import { Button, SocialLink, FooterLink, SectionHeading, LogoWithText } from '../ui'
 
 export function Footer() {
   const { t } = useTranslation()
@@ -21,16 +21,8 @@ export function Footer() {
       }}>
         {/* Logo & Contact */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '1rem' }}>
-            <Logo size="small" withBackground />
-            <div style={{ lineHeight: 1.2 }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: colors.primary }}>
-                {t('header.title1')}
-              </div>
-              <div style={{ fontSize: '0.625rem', fontWeight: 500, color: colors.primary }}>
-                {t('header.title2')}
-              </div>
-            </div>
+          <div style={{ marginBottom: '1rem' }}>
+            <LogoWithText withBackground />
           </div>
           <p style={{
             fontSize: '0.75rem',

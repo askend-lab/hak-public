@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { colors } from '../../styles/colors'
-import { Logo, Button, WaffleMenu, UserAvatar, NavTab } from '../ui'
+import { Button, WaffleMenu, UserAvatar, NavTab, LogoWithText } from '../ui'
 
 interface HeaderProps {
   isLoggedIn?: boolean
@@ -26,26 +25,7 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
       alignItems: 'center',
     }}>
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <Logo size="small" />
-        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-          <span style={{
-            fontSize: '0.625rem',
-            fontWeight: 700,
-            color: colors.primary,
-            letterSpacing: '0.5px',
-          }}>
-            {t('header.title1')}
-          </span>
-          <span style={{
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            color: colors.primary,
-          }}>
-            {t('header.title2')}
-          </span>
-        </div>
-      </div>
+      <LogoWithText />
 
       {/* Navigation */}
       <nav style={{ display: 'flex', gap: '2rem' }}>
