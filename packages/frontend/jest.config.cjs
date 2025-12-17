@@ -12,7 +12,8 @@ module.exports = {
     }]
   },
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
   },
   globals: {
     'import.meta': {

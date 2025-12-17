@@ -5,7 +5,8 @@
   "scripts": {
     "dx": "node devbox dx",
     "dx:cli": "node devbox",
-    "test": "jest --json --outputFile=jest-results.json",
+    "test:features": "jest test/features --json --outputFile=jest-results-features.json",
+    "test:unit": "jest --testPathIgnorePatterns=test/features --json --outputFile=jest-results-unit.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
     "kill-ports": "fuser -k -9 5180/tcp 4000/tcp 3002/tcp 2>/dev/null; sleep 0.2; true",
@@ -22,6 +23,11 @@
     "ts-jest": "^29.2.0",
     "@types/jest": "^29.5.0",
     "typescript": "^5.9.3",
-    "jest-cucumber": "^3.0.0"
+    "jest-cucumber": "^3.0.0",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-react": "^7.24.0",
+    "@babel/preset-typescript": "^7.24.0",
+    "babel-jest": "^29.7.0"
   }
 }

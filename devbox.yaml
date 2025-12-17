@@ -21,6 +21,13 @@ test_modules:
     type: jest
     min_coverage_lines: 16
     min_coverage_branches: 12
+    suites:
+      - name: unit
+        command: 'pnpm test:unit'
+        results_file: 'jest-results-unit.json'
+      - name: features
+        command: 'pnpm test:features'
+        results_file: 'jest-results-features.json'
   - name: singletablelambda
     path: singletablelambda
     type: jest
@@ -83,7 +90,7 @@ hooks:
 
   run-tests:
     active: true
-    command: 'npm test'
+    command: 'node devbox test'
 
   plan-validation:
     active: false
