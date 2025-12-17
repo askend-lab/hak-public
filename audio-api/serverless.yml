@@ -2,6 +2,12 @@ service: audio-api
 
 frameworkVersion: '3'
 
+package:
+  patterns:
+    - '!**'
+    - 'dist/**'
+    - 'node_modules/**'
+
 provider:
   name: aws
   runtime: nodejs18.x
