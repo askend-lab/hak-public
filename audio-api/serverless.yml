@@ -30,6 +30,10 @@ provider:
           Resource: arn:aws:s3:::hak-audio-${self:provider.stage}/*
         - Effect: Allow
           Action:
+            - s3:ListBucket
+          Resource: arn:aws:s3:::hak-audio-${self:provider.stage}
+        - Effect: Allow
+          Action:
             - sqs:SendMessage
           Resource: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:hak-audio-generation-${self:provider.stage}
 
