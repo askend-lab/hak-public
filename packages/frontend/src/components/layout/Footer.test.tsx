@@ -1,25 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { Footer } from './Footer';
-import { useTranslation } from 'react-i18next';
+import { setupI18nMock } from './test-utils';
 
 jest.mock('react-i18next', () => ({
   useTranslation: jest.fn(),
 }));
 
-const mockUseTranslation = useTranslation as jest.MockedFunction<typeof useTranslation>;
-
 describe('Footer', () => {
   beforeEach(() => {
-    mockUseTranslation.mockReturnValue({
-      t: (key: string) => {
-        const translations: Record<string, string> = {
-          'header.title1': 'EESTI KEELE',
-          'header.title2': 'HÄÄLDUSABILINE',
-        };
-        return translations[key] || key;
-      },
-      i18n: { changeLanguage: jest.fn() },
-    } as any);
+    setupI18nMock();
   });
 
   it('should render footer', () => {
