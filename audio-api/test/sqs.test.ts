@@ -39,7 +39,7 @@ describe('SQS Message Publishing', () => {
 
   it('should handle publish errors', async () => {
     const mockSQSWithError = {
-      sendMessage: async () => {
+      send: async () => {
         throw new Error('Queue not found');
       }
     };

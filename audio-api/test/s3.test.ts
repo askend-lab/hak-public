@@ -26,7 +26,7 @@ describe('S3 Cache Check', () => {
 
   it('should throw error on connection errors', async () => {
     const mockS3WithError = {
-      headObject: async () => {
+      send: async () => {
         const error: any = new Error('Connection timeout');
         error.name = 'NetworkError';
         throw error;
