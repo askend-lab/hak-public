@@ -1,23 +1,23 @@
 import { handler } from '../src/handler';
-import { MockS3Client, MockSQSClient } from './mocks';
+import {
+  TestContext,
+  createTestContext,
+  setupTestEnv,
+  createRequestEvent,
+} from './setup';
 
 describe('Input Validation', () => {
-  let mockS3: MockS3Client;
-  let mockSQS: MockSQSClient;
+  let ctx: TestContext;
 
   beforeEach(() => {
-    mockS3 = new MockS3Client();
-    mockSQS = new MockSQSClient();
-    process.env.BUCKET_NAME = 'test-bucket';
-    process.env.QUEUE_URL = 'https://sqs.us-east-1.amazonaws.com/123456789/test-queue';
+    ctx = createTestContext();
+    setupTestEnv();
   });
 
   it('should reject empty text', async () => {
-    const event = {
-      body: JSON.stringify({ text: '' })
-    };
+    const event = createRequestEvent('');
     
-    const response = await handler(event, mockS3 as any, mockSQS as any);
+    const response = await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
     
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);
@@ -25,11 +25,9 @@ describe('Input Validation', () => {
   });
 
   it('should reject missing text field', async () => {
-    const event = {
-      body: JSON.stringify({})
-    };
+    const event = { body: JSON.stringify({}) };
     
-    const response = await handler(event, mockS3 as any, mockSQS as any);
+    const response = await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
     
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);
@@ -37,11 +35,9 @@ describe('Input Validation', () => {
   });
 
   it('should reject text longer than max length', async () => {
-    const event = {
-      body: JSON.stringify({ text: 'a'.repeat(1001) })
-    };
+    const event = createRequestEvent('a'.repeat(1001));
     
-    const response = await handler(event, mockS3 as any, mockSQS as any);
+    const response = await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
     
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);

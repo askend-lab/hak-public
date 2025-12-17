@@ -1,44 +1,37 @@
 import { handler } from '../src/handler';
-import { MockS3Client, MockSQSClient } from './mocks';
+import {
+  TestContext,
+  createTestContext,
+  setupTestEnv,
+  setupCacheMiss,
+  createRequestEvent,
+} from './setup';
 
 describe('Lambda Handler - Cache Miss', () => {
-  let mockS3: MockS3Client;
-  let mockSQS: MockSQSClient;
+  let ctx: TestContext;
 
   beforeEach(() => {
-    mockS3 = new MockS3Client();
-    mockSQS = new MockSQSClient();
-    process.env.BUCKET_NAME = 'test-bucket';
-    process.env.QUEUE_URL = 'https://sqs.us-east-1.amazonaws.com/123456789/test-queue';
+    ctx = createTestContext();
+    setupTestEnv();
   });
 
   it('should send SQS message when file not in S3', async () => {
-    const event = {
-      body: JSON.stringify({ text: 'new-phrase' })
-    };
+    const event = createRequestEvent('new-phrase');
+    const hash = setupCacheMiss(ctx.mockS3, 'new-phrase');
     
-    const { calculateHash } = require('../src/hash');
-    const hash = calculateHash('new-phrase');
-    mockS3.setFileExists(`cache/${hash}.mp3`, false);
+    await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
     
-    await handler(event, mockS3 as any, mockSQS as any);
-    
-    expect(mockSQS.messages).toHaveLength(1);
-    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody);
+    expect(ctx.mockSQS.messages).toHaveLength(1);
+    const messageBody = JSON.parse(ctx.mockSQS.messages[0].MessageBody);
     expect(messageBody.text).toBe('new-phrase');
     expect(messageBody.hash).toBe(hash);
   });
 
   it('should return status processing with hash', async () => {
-    const event = {
-      body: JSON.stringify({ text: 'new-phrase' })
-    };
+    const event = createRequestEvent('new-phrase');
+    const hash = setupCacheMiss(ctx.mockS3, 'new-phrase');
     
-    const { calculateHash } = require('../src/hash');
-    const hash = calculateHash('new-phrase');
-    mockS3.setFileExists(`cache/${hash}.mp3`, false);
-    
-    const response = await handler(event, mockS3 as any, mockSQS as any);
+    const response = await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
     
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
@@ -47,15 +40,10 @@ describe('Lambda Handler - Cache Miss', () => {
   });
 
   it('should return hash for frontend polling', async () => {
-    const event = {
-      body: JSON.stringify({ text: 'test' })
-    };
+    const event = createRequestEvent('test');
+    const hash = setupCacheMiss(ctx.mockS3, 'test');
     
-    const { calculateHash } = require('../src/hash');
-    const hash = calculateHash('test');
-    mockS3.setFileExists(`cache/${hash}.mp3`, false);
-    
-    const response = await handler(event, mockS3 as any, mockSQS as any);
+    const response = await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
     
     const body = JSON.parse(response.body);
     expect(body.hash).toBeDefined();
