@@ -1,3 +1,6 @@
+import { HeadObjectCommand } from '@aws-sdk/client-s3';
+import { SendMessageCommand } from '@aws-sdk/client-sqs';
+
 export class MockS3Client {
   private files = new Map<string, boolean>();
 
@@ -5,14 +8,18 @@ export class MockS3Client {
     this.files.set(key, exists);
   }
 
-  async headObject(params: { Bucket: string; Key: string }) {
-    const exists = this.files.get(params.Key);
-    if (exists) {
-      return { $metadata: { httpStatusCode: 200 } };
+  async send(command: any) {
+    if (command instanceof HeadObjectCommand) {
+      const params = command.input;
+      const exists = this.files.get(params.Key);
+      if (exists) {
+        return { $metadata: { httpStatusCode: 200 } };
+      }
+      const error: any = new Error('Not Found');
+      error.name = 'NotFound';
+      throw error;
     }
-    const error: any = new Error('Not Found');
-    error.name = 'NotFound';
-    throw error;
+    throw new Error(`Unknown command: ${command.constructor.name}`);
   }
 
   reset() {
@@ -23,9 +30,12 @@ export class MockS3Client {
 export class MockSQSClient {
   public messages: any[] = [];
 
-  async sendMessage(params: any) {
-    this.messages.push(params);
-    return { MessageId: 'mock-message-id' };
+  async send(command: any) {
+    if (command instanceof SendMessageCommand) {
+      this.messages.push(command.input);
+      return { MessageId: 'mock-message-id' };
+    }
+    throw new Error(`Unknown command: ${command.constructor.name}`);
   }
 
   reset() {
