@@ -3,19 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, WaffleMenu, UserAvatar, NavTab, LogoWithText } from '../ui'
 import { colors } from '../../styles/colors'
+import { useAuth } from '../../services/auth'
 
-interface HeaderProps {
-  isLoggedIn?: boolean
-  user?: {
-    name: string
-    id: string
-    initials: string
-  }
-}
-
-export function Header({ isLoggedIn = false, user }: HeaderProps) {
+export function Header() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'synthesis' | 'tasks'>('synthesis')
+  const { isAuthenticated, user, login, logout } = useAuth()
 
   return (
     <header style={{
@@ -61,10 +54,14 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
 
       {/* Right side - Auth & Menu */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {isLoggedIn && user ? (
-          <UserAvatar initials={user.initials} name={user.name} id={user.id} />
+        {isAuthenticated && user ? (
+          <UserAvatar 
+            initials={user.email?.substring(0, 2).toUpperCase() || 'U'} 
+            name={user.email || ''} 
+            id={user.id}
+          />
         ) : (
-          <Button variant="primary">Logi sisse</Button>
+          <Button variant="primary" onClick={login}>Logi sisse</Button>
         )}
 
         <WaffleMenu />
