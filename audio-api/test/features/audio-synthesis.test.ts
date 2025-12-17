@@ -2,8 +2,9 @@ import { S3Client, HeadObjectCommand } from '@aws-sdk/client-s3';
 import axios from 'axios';
 import { createHash } from 'crypto';
 
-const BUCKET_NAME = 'hak-audio-dev';
-const API_ENDPOINT = 'http://hak-dev.askend-lab.com/api/generate';
+const STAGE = process.env.STAGE || 'dev';
+const BUCKET_NAME = `hak-audio-${STAGE}`;
+const API_ENDPOINT = process.env.API_ENDPOINT || `https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/${STAGE}/generate`;
 const TEST_TEXT = `tere-${Date.now()}`;
 
 const s3Client = new S3Client({ region: 'eu-west-1' });
