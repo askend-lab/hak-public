@@ -56,7 +56,7 @@ hooks:
 
   complexity:
     active: true
-    max_complexity: 20
+    max_complexity: 18
     excludePaths:
       - '**/task-channel/**'  # Legacy scripts with high complexity
       - '**/dist/**'  # Build artifacts

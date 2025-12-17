@@ -17,20 +17,12 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load tasks when modal opens
   useEffect(() => {
-    if (activeModal === 'taskSelect') {
-      setLoading(true);
-      // For local dev, use test-user
-      const userId = user?.id || 'test-user';
-      listTasks(userId)
-        .then(response => {
-          if (response.success && response.data) {
-            setTasks(response.data);
-          }
-        })
-        .finally(() => setLoading(false));
-    }
+    if (activeModal !== 'taskSelect') return;
+    setLoading(true);
+    listTasks(user?.id || 'test-user')
+      .then(response => response.success && response.data && setTasks(response.data))
+      .finally(() => setLoading(false));
   }, [activeModal, user, setTasks, setLoading]);
 
   const handleClose = useCallback(() => {
@@ -52,21 +44,16 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
 
   const handleSubmit = useCallback(async () => {
     if (!selectedId || !result) return;
-    const userId = user?.id || 'test-user';
     const entry = createEntry();
     if (!entry) return;
 
     setIsSubmitting(true);
     try {
-      const response = await addEntryToTask(userId, selectedId, entry);
+      const response = await addEntryToTask(user?.id || 'test-user', selectedId, entry);
       const taskName = tasks.find(t => t.id === selectedId)?.name;
-      
-      if (response.success) {
-        addNotification('success', `Lisatud ülesandesse "${taskName}"`);
-        handleClose();
-      } else {
-        addNotification('error', response.error || 'Lisamine ebaõnnestus');
-      }
+      response.success 
+        ? (addNotification('success', `Lisatud ülesandesse "${taskName}"`), handleClose())
+        : addNotification('error', response.error || 'Lisamine ebaõnnestus');
     } catch {
       addNotification('error', 'Võrgu viga');
     } finally {
