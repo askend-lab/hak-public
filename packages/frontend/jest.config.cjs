@@ -13,10 +13,12 @@ module.exports = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '^.*/services/config$': '<rootDir>/src/services/__mocks__/config.ts',
-    '^../config$': '<rootDir>/src/services/__mocks__/config.ts'
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
   },
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    'synthesis.integration.test.ts'
+  ],
   globals: {
     'import.meta': {
       env: {
