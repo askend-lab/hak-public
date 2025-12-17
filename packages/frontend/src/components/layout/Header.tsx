@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { colors } from '../../styles/colors'
-import { Logo, Button, WaffleMenu, UserAvatar } from '../ui'
+import { Logo, Button, WaffleMenu, UserAvatar, NavTab } from '../ui'
 
 interface HeaderProps {
   isLoggedIn?: boolean
@@ -49,36 +49,16 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
 
       {/* Navigation */}
       <nav style={{ display: 'flex', gap: '2rem' }}>
-        <button
+        <NavTab
+          label={t('nav.synthesis')}
+          isActive={activeTab === 'synthesis'}
           onClick={() => setActiveTab('synthesis')}
-          style={{
-            padding: '0.5rem 0',
-            background: 'transparent',
-            border: 'none',
-            borderBottom: activeTab === 'synthesis' ? `2px solid ${colors.primary}` : '2px solid transparent',
-            color: activeTab === 'synthesis' ? colors.primary : colors.gray,
-            fontSize: '0.9375rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}
-        >
-          {t('nav.synthesis')}
-        </button>
-        <button
+        />
+        <NavTab
+          label={t('nav.tasks')}
+          isActive={activeTab === 'tasks'}
           onClick={() => setActiveTab('tasks')}
-          style={{
-            padding: '0.5rem 0',
-            background: 'transparent',
-            border: 'none',
-            borderBottom: activeTab === 'tasks' ? `2px solid ${colors.primary}` : '2px solid transparent',
-            color: activeTab === 'tasks' ? colors.primary : colors.gray,
-            fontSize: '0.9375rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}
-        >
-          {t('nav.tasks')}
-        </button>
+        />
       </nav>
 
       {/* Right side - Auth & Menu */}

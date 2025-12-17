@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { colors } from '../../styles/colors'
-import { Logo, Button, SocialLink } from '../ui'
+import { Logo, Button, SocialLink, FooterLink, SectionHeading } from '../ui'
 
 export function Footer() {
   const { t } = useTranslation()
@@ -44,43 +44,17 @@ export function Footer() {
 
         {/* Hääldusabiline Links */}
         <div>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            color: colors.primary,
-            margin: '0 0 1rem 0',
-          }}>
-            {t('header.title2')}
-          </h3>
+          <SectionHeading>{t('header.title2')}</SectionHeading>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            <li style={{ marginBottom: '0.5rem' }}>
-              <a href="#" style={{ fontSize: '0.8125rem', color: colors.textSecondary, textDecoration: 'none' }}>
-                Portaaliest
-              </a>
-            </li>
-            <li style={{ marginBottom: '0.5rem' }}>
-              <a href="#" style={{ fontSize: '0.8125rem', color: colors.textSecondary, textDecoration: 'none' }}>
-                Versiooniajalugu
-              </a>
-            </li>
-            <li style={{ marginBottom: '0.5rem' }}>
-              <a href="#" style={{ fontSize: '0.8125rem', color: colors.textSecondary, textDecoration: 'none' }}>
-                Kasutus- ja privaatsustingimused
-              </a>
-            </li>
+            <FooterLink href="#">Portaaliest</FooterLink>
+            <FooterLink href="#">Versiooniajalugu</FooterLink>
+            <FooterLink href="#">Kasutus- ja privaatsustingimused</FooterLink>
           </ul>
         </div>
 
         {/* Social Media */}
         <div>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            color: colors.primary,
-            margin: '0 0 1rem 0',
-          }}>
-            Sotsiaalmeedia
-          </h3>
+          <SectionHeading>Sotsiaalmeedia</SectionHeading>
           <p style={{
             fontSize: '0.8125rem',
             color: colors.textSecondary,
@@ -97,14 +71,7 @@ export function Footer() {
 
         {/* Feedback */}
         <div>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            color: colors.primary,
-            margin: '0 0 1rem 0',
-          }}>
-            Tagasiside
-          </h3>
+          <SectionHeading>Tagasiside</SectionHeading>
           <p style={{
             fontSize: '0.8125rem',
             color: colors.textSecondary,
