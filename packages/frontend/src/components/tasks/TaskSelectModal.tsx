@@ -38,27 +38,31 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     onClose?.();
   }, [closeModal, onClose]);
 
+  const createEntry = useCallback(() => {
+    if (!result) return null;
+    const synthesis = createSynthesisEntry({
+      originalText: text,
+      phoneticText: result.phoneticText,
+      audioHash: result.audioHash,
+      voiceModel: result.voiceModel,
+    });
+    const order = tasks.find(t => t.id === selectedId)?.entries.length ?? 0;
+    return createTaskEntry(synthesis, order);
+  }, [result, text, tasks, selectedId]);
+
   const handleSubmit = useCallback(async () => {
     if (!selectedId || !result) return;
     const userId = user?.id || 'test-user';
+    const entry = createEntry();
+    if (!entry) return;
 
     setIsSubmitting(true);
     try {
-      const synthesis = createSynthesisEntry({
-        originalText: text,
-        phoneticText: result.phoneticText,
-        audioHash: result.audioHash,
-        voiceModel: result.voiceModel,
-      });
-      const existingTask = tasks.find(t => t.id === selectedId);
-      const order = existingTask?.entries.length ?? 0;
-      const entry = createTaskEntry(synthesis, order);
-      
       const response = await addEntryToTask(userId, selectedId, entry);
+      const taskName = tasks.find(t => t.id === selectedId)?.name;
       
       if (response.success) {
-        const task = tasks.find(t => t.id === selectedId);
-        addNotification('success', `Lisatud ülesandesse "${task?.name}"`);
+        addNotification('success', `Lisatud ülesandesse "${taskName}"`);
         handleClose();
       } else {
         addNotification('error', response.error || 'Lisamine ebaõnnestus');
@@ -68,7 +72,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedId, user, result, text, tasks, addNotification, handleClose]);
+  }, [selectedId, user, result, tasks, createEntry, addNotification, handleClose]);
 
   const footer = (
     <>

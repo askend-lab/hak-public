@@ -1,70 +1,31 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { initVmetajson, analyze, isInitialized } from './vmetajson';
+import { analyze } from './vmetajson';
 import { extractStressedText, extractVariants } from './parser';
 import { AnalyzeRequest, VariantsRequest, LambdaResponse } from './types';
+import { createResponse, ensureInitialized, parseJsonBody, validateField } from './validation';
 
 const MAX_TEXT_LENGTH = 10000;
-const VMETAJSON_PATH = process.env.VMETAJSON_PATH || './vmetajson';
-const DICT_PATH = process.env.DICT_PATH || '.';
 
-function createResponse(statusCode: number, body: object): LambdaResponse {
-  return {
-    statusCode,
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  };
-}
-
-interface ParsedInput<T> {
-  success: true;
-  body: T;
-  value: string;
-}
-
-interface ParseError {
-  success: false;
-  response: LambdaResponse;
-}
-
+interface ParsedInput<T> { success: true; body: T; value: string; }
+interface ParseError { success: false; response: LambdaResponse; }
 type ParseResult<T> = ParsedInput<T> | ParseError;
 
-function parseAndValidate<T>(
-  event: APIGatewayProxyEvent,
-  fieldName: string,
-  maxLength?: number
-): ParseResult<T> {
-  if (!isInitialized()) {
-    initVmetajson(VMETAJSON_PATH, DICT_PATH);
-  }
+function parseAndValidate<T>(event: APIGatewayProxyEvent, fieldName: string, maxLength?: number): ParseResult<T> {
+  ensureInitialized();
+  if (!event.body) return { success: false, response: createResponse(400, { error: 'Missing request body' }) };
 
-  if (!event.body) {
-    return { success: false, response: createResponse(400, { error: 'Missing request body' }) };
-  }
+  const body = parseJsonBody<T>(event.body);
+  if (!body) return { success: false, response: createResponse(400, { error: 'Invalid JSON' }) };
 
-  let body: T;
-  try {
-    body = JSON.parse(event.body);
-  } catch {
-    return { success: false, response: createResponse(400, { error: 'Invalid JSON' }) };
-  }
+  const fieldResult = validateField(body as Record<string, unknown>, fieldName, maxLength);
+  if ('error' in fieldResult) return { success: false, response: createResponse(400, { error: fieldResult.error }) };
 
-  const fieldValue = (body as Record<string, unknown>)[fieldName];
-  if (!fieldValue || typeof fieldValue !== 'string') {
-    return { success: false, response: createResponse(400, { error: `Missing '${fieldName}' field in request body` }) };
-  }
+  return { success: true, body, value: fieldResult.value };
+}
 
-  const value = fieldValue.trim();
-  if (!value) {
-    return { success: false, response: createResponse(400, { error: `'${fieldName}' must be a non-empty string` }) };
-  }
-
-  if (maxLength && value.length > maxLength) {
-    return { success: false, response: createResponse(400, { error: `Text is too long (max ${maxLength} characters)` }) };
-  }
-
-  return { success: true, body, value };
+function handleError(error: unknown): APIGatewayProxyResult {
+  const message = error instanceof Error ? error.message : 'Unknown error';
+  return createResponse(500, { error: `Processing error: ${message}` });
 }
 
 export async function analyzeHandler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -72,17 +33,13 @@ export async function analyzeHandler(event: APIGatewayProxyEvent): Promise<APIGa
     const parsed = parseAndValidate<AnalyzeRequest>(event, 'text', MAX_TEXT_LENGTH);
     if (!parsed.success) return parsed.response;
 
-    const { value: text } = parsed;
-    const response = await analyze(text);
-    const stressedText = extractStressedText(response, text);
-
+    const response = await analyze(parsed.value);
     return createResponse(200, {
-      stressedText,
-      originalText: text
+      stressedText: extractStressedText(response, parsed.value),
+      originalText: parsed.value
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return createResponse(500, { error: `Processing error: ${message}` });
+    return handleError(error);
   }
 }
 
@@ -91,21 +48,14 @@ export async function variantsHandler(event: APIGatewayProxyEvent): Promise<APIG
     const parsed = parseAndValidate<VariantsRequest>(event, 'word');
     if (!parsed.success) return parsed.response;
 
-    const { value: word } = parsed;
-    const response = await analyze(word);
-    const variants = extractVariants(response, word);
+    const response = await analyze(parsed.value);
+    const variants = extractVariants(response, parsed.value);
 
-    if (variants.length === 0) {
-      return createResponse(500, { error: 'No phonetic variants found for the word' });
-    }
+    if (variants.length === 0) return createResponse(500, { error: 'No phonetic variants found for the word' });
 
-    return createResponse(200, {
-      word,
-      variants
-    });
+    return createResponse(200, { word: parsed.value, variants });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return createResponse(500, { error: `Processing error: ${message}` });
+    return handleError(error);
   }
 }
 
