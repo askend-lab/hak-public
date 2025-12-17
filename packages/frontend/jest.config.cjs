@@ -18,9 +18,11 @@ module.exports = {
   globals: {
     'import.meta': {
       env: {
+        PROD: false,
         VITE_API_URL: '/api',
         VITE_VABAMORF_URL: '/api/analyze',
         VITE_MERLIN_URL: '/api/synthesize',
+        VITE_API_BASE_URL: '/api',
       }
     }
   },
