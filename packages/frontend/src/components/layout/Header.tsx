@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { colors } from '../../styles/colors'
-import { Logo, Button } from '../ui'
+import { Logo, Button, WaffleMenu, UserAvatar } from '../ui'
 
 interface HeaderProps {
   isLoggedIn?: boolean
@@ -84,64 +84,12 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
       {/* Right side - Auth & Menu */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {isLoggedIn && user ? (
-          /* Logged in - User profile */
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundColor: '#2D5A7B',
-              color: colors.white,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-            }}>
-              {user.initials}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.3 }}>
-              <span style={{
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                color: colors.primary,
-              }}>
-                {user.name}
-              </span>
-              <span style={{
-                fontSize: '0.75rem',
-                color: colors.gray,
-              }}>
-                {user.id}
-              </span>
-            </div>
-          </div>
+          <UserAvatar initials={user.initials} name={user.name} id={user.id} />
         ) : (
           <Button variant="primary">Logi sisse</Button>
         )}
 
-        {/* Waffle menu */}
-        <button style={{
-          width: '40px',
-          height: '40px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 6px)',
-          gridTemplateRows: 'repeat(3, 6px)',
-          gap: '4px',
-          padding: '8px',
-        }}>
-          {[...Array(9)].map((_, i) => (
-            <div key={i} style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              backgroundColor: colors.gray,
-            }} />
-          ))}
-        </button>
+        <WaffleMenu />
       </div>
     </header>
   )
