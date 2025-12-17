@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { colors } from '../../styles/colors'
+import { Logo, Button } from '../ui'
 
 interface HeaderProps {
   isLoggedIn?: boolean
@@ -26,9 +27,7 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
     }}>
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M34 0H0V20H14C13.8 24.8 12.6 28 10.4 30.2C8.2 32.4 4.4 33.6 0 33.8V40C14.4 39.5 24 32 24 18V0Z" fill={colors.primary}/>
-        </svg>
+        <Logo size="small" />
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
           <span style={{
             fontSize: '0.625rem',
@@ -118,19 +117,7 @@ export function Header({ isLoggedIn = false, user }: HeaderProps) {
             </div>
           </div>
         ) : (
-          /* Logged out - Login button */
-          <button style={{
-            padding: '0.625rem 1.5rem',
-            backgroundColor: colors.primary,
-            color: colors.white,
-            border: 'none',
-            borderRadius: '25px',
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}>
-            Logi sisse
-          </button>
+          <Button variant="primary">Logi sisse</Button>
         )}
 
         {/* Waffle menu */}
