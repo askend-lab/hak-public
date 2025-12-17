@@ -11,7 +11,7 @@ export class MockS3Client {
   async send(command: any) {
     if (command instanceof HeadObjectCommand) {
       const params = command.input;
-      const exists = this.files.get(params.Key);
+      const exists = this.files.get(params.Key!);
       if (exists) {
         return { $metadata: { httpStatusCode: 200 } };
       }
