@@ -14,7 +14,8 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '^(\\.\\./)*services/config$': '<rootDir>/src/services/__mocks__/config.ts'
+    '^.*/services/config$': '<rootDir>/src/services/__mocks__/config.ts',
+    '^../config$': '<rootDir>/src/services/__mocks__/config.ts'
   },
   globals: {
     'import.meta': {
