@@ -1,7 +1,7 @@
-@import 'abstracts/variables';
-@import 'components/app';
-@import 'components/header';
-@import 'components/button';
-@import 'components/main';
-@import 'components/footer';
-@import 'components/placeholders';
+@use 'abstracts/variables' as *;
+@use 'components/app';
+@use 'components/header';
+@use 'components/button';
+@use 'components/main';
+@use 'components/footer';
+@use 'components/placeholders';
