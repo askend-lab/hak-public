@@ -1,5 +1,5 @@
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   coverageDirectory: 'coverage',
   coverageReporters: ['json-summary', 'text', 'lcov'],
   collectCoverageFrom: [
@@ -18,7 +18,9 @@ module.exports = {
   ],
   modulePathIgnorePatterns: ['/singletablelambda/'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { isolatedModules: true }],
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
+  transformIgnorePatterns: [],
+  setupFilesAfterEnv: ['./jest.setup.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
 };
