@@ -2,7 +2,7 @@ import { AuthStorage } from './storage';
 
 describe('AuthStorage', () => {
   beforeEach(() => {
-    localStorage.clear();
+    AuthStorage.clear();
   });
 
   describe('getUser', () => {
@@ -11,31 +11,25 @@ describe('AuthStorage', () => {
     });
 
     it('should return stored user', () => {
-      const user = { id: '123', name: 'Test User' };
-      localStorage.setItem('hak_auth', JSON.stringify(user));
+      const user = { id: '123', email: 'test@example.com' };
+      AuthStorage.setUser(user);
       expect(AuthStorage.getUser()).toEqual(user);
-    });
-
-    it('should return null and clear storage on invalid JSON', () => {
-      localStorage.setItem('hak_auth', 'invalid-json');
-      expect(AuthStorage.getUser()).toBeNull();
-      expect(localStorage.getItem('hak_auth')).toBeNull();
     });
   });
 
   describe('setUser', () => {
-    it('should store user in localStorage', () => {
-      const user = { id: '456', name: 'Another User' };
+    it('should store user in memory', () => {
+      const user = { id: '456', email: 'another@example.com' };
       AuthStorage.setUser(user);
-      expect(localStorage.getItem('hak_auth')).toBe(JSON.stringify(user));
+      expect(AuthStorage.getUser()).toEqual(user);
     });
   });
 
   describe('clear', () => {
-    it('should remove user from localStorage', () => {
-      localStorage.setItem('hak_auth', '{"id":"123"}');
+    it('should remove user from memory', () => {
+      AuthStorage.setUser({ id: '123', email: 'test@example.com' });
       AuthStorage.clear();
-      expect(localStorage.getItem('hak_auth')).toBeNull();
+      expect(AuthStorage.getUser()).toBeNull();
     });
   });
 });
