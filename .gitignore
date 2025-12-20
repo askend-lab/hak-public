@@ -1,6 +1,8 @@
 node_modules/
 coverage/
 jest-results.json
+jest-results-unit.json
+jest-results-features.json
 .test-runner-state.json
 dist/
 

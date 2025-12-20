@@ -8,13 +8,42 @@ import {
   addEntryToTask,
 } from './api';
 
-// Mock config
 jest.mock('../config', () => ({
   API_CONFIG: { baseUrl: '/api' },
 }));
 
-// Mock fetch
 global.fetch = jest.fn();
+
+// DRY: Helper functions for fetch mocks
+const mockFetchSuccess = <T>(data: T) => {
+  (global.fetch as jest.Mock).mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve(data),
+  });
+};
+
+const mockFetchError = (status = 500) => {
+  (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status });
+};
+
+const mockFetchSequence = (responses: Array<{ ok: boolean; data?: unknown; status?: number }>) => {
+  const mock = global.fetch as jest.Mock;
+  responses.forEach((res, i) => {
+    if (i === 0) {
+      mock.mockResolvedValueOnce({
+        ok: res.ok,
+        status: res.status,
+        json: () => Promise.resolve(res.data),
+      });
+    } else {
+      mock.mockResolvedValueOnce({
+        ok: res.ok,
+        status: res.status,
+        json: () => Promise.resolve(res.data),
+      });
+    }
+  });
+};
 
 describe('Tasks API', () => {
   beforeEach(() => {
@@ -25,19 +54,12 @@ describe('Tasks API', () => {
   describe('setAuthTokenGetter', () => {
     it('should set auth token getter', async () => {
       setAuthTokenGetter(() => 'test-token');
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ id: '1' }),
-      });
-
+      mockFetchSuccess({ id: '1' });
       await getTask('user1', 'task1');
-      
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: 'Bearer test-token',
-          }),
+          headers: expect.objectContaining({ Authorization: 'Bearer test-token' }),
         })
       );
     });
@@ -45,27 +67,14 @@ describe('Tasks API', () => {
 
   describe('createTask', () => {
     it('should create a new task', async () => {
-      const mockTask = { id: '1', name: 'Test', entries: [] };
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockTask),
-      });
-
+      mockFetchSuccess({ id: '1', name: 'Test', entries: [] });
       const result = await createTask('user1', { name: 'Test' });
-      
       expect(result.success).toBe(true);
-      expect(global.fetch).toHaveBeenCalledWith(
-        '/api/save',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(global.fetch).toHaveBeenCalledWith('/api/save', expect.objectContaining({ method: 'POST' }));
     });
 
     it('should return error on failure', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: false,
-        status: 500,
-      });
-
+      mockFetchError();
       const result = await createTask('user1', { name: 'Test' });
       expect(result.success).toBe(false);
     });
@@ -74,13 +83,8 @@ describe('Tasks API', () => {
   describe('getTask', () => {
     it('should get a task by id', async () => {
       const mockTask = { id: 'task1', name: 'Test' };
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockTask),
-      });
-
+      mockFetchSuccess(mockTask);
       const result = await getTask('user1', 'task1');
-      
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockTask);
     });
@@ -88,29 +92,19 @@ describe('Tasks API', () => {
 
   describe('listTasks', () => {
     it('should list all tasks for user', async () => {
-      const mockResponse = {
+      mockFetchSuccess({
         items: [
           { data: { name: 'Task 1' }, SK: 'TASK#1' },
           { data: { name: 'Task 2' }, SK: 'TASK#2' },
         ],
-      };
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockResponse),
       });
-
       const result = await listTasks('user1');
-      
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(2);
     });
 
     it('should return error on failure', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: false,
-        status: 500,
-      });
-
+      mockFetchError();
       const result = await listTasks('user1');
       expect(result.success).toBe(false);
     });
@@ -118,28 +112,17 @@ describe('Tasks API', () => {
 
   describe('updateTask', () => {
     it('should update an existing task', async () => {
-      const existingTask = { id: 'task1', name: 'Original', entries: [] };
-      (global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(existingTask),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ ...existingTask, name: 'Updated' }),
-        });
-
+      const task = { id: 'task1', name: 'Original', entries: [] };
+      mockFetchSequence([
+        { ok: true, data: task },
+        { ok: true, data: { ...task, name: 'Updated' } },
+      ]);
       const result = await updateTask('user1', 'task1', { name: 'Updated' });
-      
       expect(result.success).toBe(true);
     });
 
     it('should return error if task not found', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: false,
-        status: 404,
-      });
-
+      mockFetchError(404);
       const result = await updateTask('user1', 'nonexistent', { name: 'Test' });
       expect(result.success).toBe(false);
     });
@@ -147,51 +130,28 @@ describe('Tasks API', () => {
 
   describe('deleteTask', () => {
     it('should delete a task', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({}),
-      });
-
+      mockFetchSuccess({});
       const result = await deleteTask('user1', 'task1');
-      
       expect(result.success).toBe(true);
-      expect(global.fetch).toHaveBeenCalledWith(
-        '/api/delete',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(global.fetch).toHaveBeenCalledWith('/api/delete', expect.objectContaining({ method: 'POST' }));
     });
   });
 
   describe('addEntryToTask', () => {
     it('should add entry to existing task', async () => {
-      const existingTask = { id: 'task1', name: 'Test', entries: [] };
+      const task = { id: 'task1', name: 'Test', entries: [] };
       const entry = { text: 'Hello', audioUrl: 'test.mp3' };
-      
-      (global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(existingTask),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(existingTask),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ ...existingTask, entries: [entry] }),
-        });
-
+      mockFetchSequence([
+        { ok: true, data: task },
+        { ok: true, data: task },
+        { ok: true, data: { ...task, entries: [entry] } },
+      ]);
       const result = await addEntryToTask('user1', 'task1', entry);
-      
       expect(result.success).toBe(true);
     });
 
     it('should return error if task not found', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: false,
-        status: 404,
-      });
-
+      mockFetchError(404);
       const result = await addEntryToTask('user1', 'nonexistent', { text: 'Test' });
       expect(result.success).toBe(false);
     });

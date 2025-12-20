@@ -6,6 +6,18 @@ jest.mock('./context');
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
+// DRY: Factory function for auth context mock
+const createAuthMock = (overrides: Partial<ReturnType<typeof useAuth>> = {}) => ({
+  isAuthenticated: false,
+  isLoading: false,
+  user: null,
+  error: null,
+  login: jest.fn(),
+  logout: jest.fn(),
+  refreshSession: jest.fn(),
+  ...overrides,
+});
+
 describe('ProtectedRoute', () => {
   const originalLocation = window.location;
 
@@ -20,103 +32,36 @@ describe('ProtectedRoute', () => {
   });
 
   it('should show loading when auth is loading', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: true,
-      user: null,
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
-    render(
-      <ProtectedRoute>
-        <div>Protected Content</div>
-      </ProtectedRoute>
-    );
-
+    mockUseAuth.mockReturnValue(createAuthMock({ isLoading: true }));
+    render(<ProtectedRoute><div>Protected Content</div></ProtectedRoute>);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('should show custom fallback when loading', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: true,
-      user: null,
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
-    render(
-      <ProtectedRoute fallback={<div>Custom Loading</div>}>
-        <div>Protected Content</div>
-      </ProtectedRoute>
-    );
-
+    mockUseAuth.mockReturnValue(createAuthMock({ isLoading: true }));
+    render(<ProtectedRoute fallback={<div>Custom Loading</div>}><div>Protected Content</div></ProtectedRoute>);
     expect(screen.getByText('Custom Loading')).toBeInTheDocument();
   });
 
   it('should render children when authenticated', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      user: { id: '1', email: 'test@test.com' },
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
-    render(
-      <ProtectedRoute>
-        <div>Protected Content</div>
-      </ProtectedRoute>
-    );
-
+    mockUseAuth.mockReturnValue(createAuthMock({ 
+      isAuthenticated: true, 
+      user: { id: '1', email: 'test@test.com' } 
+    }));
+    render(<ProtectedRoute><div>Protected Content</div></ProtectedRoute>);
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
 
   it('should redirect when not authenticated', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      user: null,
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
-    render(
-      <ProtectedRoute>
-        <div>Protected Content</div>
-      </ProtectedRoute>
-    );
-
+    mockUseAuth.mockReturnValue(createAuthMock());
+    render(<ProtectedRoute><div>Protected Content</div></ProtectedRoute>);
     expect(window.location.href).toBe('/login');
     expect(sessionStorage.getItem('returnUrl')).toBe('/current');
   });
 
   it('should redirect to custom URL', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      user: null,
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
-    render(
-      <ProtectedRoute redirectTo="/custom-login">
-        <div>Protected Content</div>
-      </ProtectedRoute>
-    );
-
+    mockUseAuth.mockReturnValue(createAuthMock());
+    render(<ProtectedRoute redirectTo="/custom-login"><div>Protected Content</div></ProtectedRoute>);
     expect(window.location.href).toBe('/custom-login');
   });
 });
@@ -133,47 +78,23 @@ describe('useRequireAuth', () => {
   }
 
   it('should return not ready when loading', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: true,
-      user: null,
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
+    mockUseAuth.mockReturnValue(createAuthMock({ isLoading: true }));
     render(<TestComponent />);
     expect(screen.getByTestId('ready')).toHaveTextContent('no');
   });
 
   it('should return ready and userId when authenticated', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      user: { id: 'user-123', email: 'test@test.com' },
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
+    mockUseAuth.mockReturnValue(createAuthMock({ 
+      isAuthenticated: true, 
+      user: { id: 'user-123', email: 'test@test.com' } 
+    }));
     render(<TestComponent />);
     expect(screen.getByTestId('ready')).toHaveTextContent('yes');
     expect(screen.getByTestId('userId')).toHaveTextContent('user-123');
   });
 
   it('should return null userId when not authenticated', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      user: null,
-      error: null,
-      login: jest.fn(),
-      logout: jest.fn(),
-      refreshSession: jest.fn(),
-    });
-
+    mockUseAuth.mockReturnValue(createAuthMock());
     render(<TestComponent />);
     expect(screen.getByTestId('userId')).toHaveTextContent('none');
   });
