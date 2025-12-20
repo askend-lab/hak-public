@@ -33,6 +33,12 @@ export default defineConfig({
         target: 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/audio/, '/dev'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+            proxyReq.removeHeader('Cookie');
+          });
+        },
       },
       '/api': {
         target: 'http://localhost:4000',

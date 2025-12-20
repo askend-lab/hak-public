@@ -28,12 +28,18 @@ async function pollForAudio(hash: string): Promise<string> {
   
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     try {
-      const response = await fetch(audioUrl, { method: 'HEAD' });
-      if (response.ok) {
+      // Use GET with range header to check if file exists (HEAD blocked by CORS)
+      const response = await fetch(audioUrl, { 
+        method: 'GET',
+        headers: { 'Range': 'bytes=0-0' }
+      });
+      // 200/206 = file ready, 403/404 = not ready yet
+      if (response.ok || response.status === 206) {
         return audioUrl;
       }
+      // 403/404 means file not ready yet - continue polling
     } catch {
-      // File not ready yet
+      // Network error - continue polling
     }
     await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
   }
