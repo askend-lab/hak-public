@@ -8,15 +8,13 @@ jest.mock('react-i18next', () => ({
   useTranslation: jest.fn(),
 }));
 
-const renderWithProviders = (ui: React.ReactElement) => {
-  return render(
-    <BrowserRouter>
-      <AuthProvider>
-        {ui}
-      </AuthProvider>
-    </BrowserRouter>
-  );
-};
+const renderWithProviders = (ui: React.ReactElement) => render(
+  <BrowserRouter>
+    <AuthProvider>
+      {ui}
+    </AuthProvider>
+  </BrowserRouter>
+);
 
 describe('Header', () => {
   beforeEach(() => {

@@ -3,9 +3,7 @@ import { AuthDisplay } from './AuthDisplay';
 import { AuthProvider } from '../../services/auth/context';
 import { AuthStorage } from '../../services/auth/storage';
 
-const renderWithAuth = (ui: React.ReactElement) => {
-  return render(<AuthProvider>{ui}</AuthProvider>);
-};
+const renderWithAuth = (ui: React.ReactElement) => render(<AuthProvider>{ui}</AuthProvider>);
 
 describe('AuthDisplay', () => {
   beforeEach(() => {
