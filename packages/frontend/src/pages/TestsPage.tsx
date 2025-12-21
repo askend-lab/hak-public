@@ -4,6 +4,7 @@ import { colors } from '../styles/colors'
 import { TestSuiteCard, UnimplementedFeatures } from '../components/tests'
 import { useFeatureData, useTestResults, useExpandedState } from './tests/hooks'
 
+// eslint-disable-next-line max-lines-per-function, complexity -- page component with multiple states
 export function TestsPage() {
   const featureData = useFeatureData()
   const { results, loading, error } = useTestResults()
