@@ -30,6 +30,7 @@ async function pollForAudio(hash: string): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     try {
       // Use GET with range header to check if file exists (HEAD blocked by CORS)
+      // eslint-disable-next-line no-await-in-loop -- sequential polling required
       const response = await fetch(audioUrl, { 
         method: 'GET',
         headers: { 'Range': 'bytes=0-0' }
@@ -42,6 +43,7 @@ async function pollForAudio(hash: string): Promise<string> {
     } catch {
       // Network error - continue polling
     }
+    // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- sequential delay
     await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
   }
   

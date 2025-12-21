@@ -19,11 +19,13 @@ export async function withRetry<T>(
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
+      // eslint-disable-next-line no-await-in-loop -- sequential retry required
       return await fn();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
       if (attempt < maxRetries - 1) {
         const delay = backoff ? delayMs * (attempt + 1) : delayMs;
+        // eslint-disable-next-line no-await-in-loop -- sequential delay required
         await sleep(delay);
       }
     }
