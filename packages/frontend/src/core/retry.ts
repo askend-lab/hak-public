@@ -35,5 +35,6 @@ export async function withRetry<T>(
 }
 
 export function sleep(ms: number): Promise<void> {
+  // eslint-disable-next-line no-promise-executor-return -- setTimeout return value intentionally ignored
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
