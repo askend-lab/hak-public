@@ -9,6 +9,7 @@ interface AudioApiResponse {
 
 const POLL_INTERVAL_MS = 1000;
 const MAX_POLL_ATTEMPTS = 60;
+const HTTP_PARTIAL_CONTENT = 206;
 
 export async function synthesizeViaApi(text: string): Promise<string> {
   const response = await httpPost<AudioApiResponse>(API_CONFIG.audioApiUrl, { text });
@@ -34,7 +35,7 @@ async function pollForAudio(hash: string): Promise<string> {
         headers: { 'Range': 'bytes=0-0' }
       });
       // 200/206 = file ready, 403/404 = not ready yet
-      if (response.ok || response.status === 206) {
+      if (response.ok || response.status === HTTP_PARTIAL_CONTENT) {
         return audioUrl;
       }
       // 403/404 means file not ready yet - continue polling
