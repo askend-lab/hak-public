@@ -4,45 +4,29 @@ import { Button, Card } from './components/ui'
 import { colors } from './styles/colors'
 import { useSentences } from './hooks'
 
+const appStyle = {
+  minHeight: '100vh',
+  background: `linear-gradient(to bottom, ${colors.softPrimaryBg} 0%, ${colors.softNeutralBg} 100%)`,
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+} as const;
+
+const mainStyle = { maxWidth: '900px', margin: '0 auto', padding: '2rem 1.5rem 4rem' } as const;
+const titleSectionStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' } as const;
+const h1Style = { fontSize: '1.5rem', fontWeight: 700, color: colors.primary, margin: '0 0 0.5rem 0' } as const;
+const subtitleStyle = { fontSize: '0.9375rem', color: colors.textSecondary, margin: 0 } as const;
+
 function App() {
   const { t } = useTranslation()
   const { sentences, loadingIndex, audioRef, addSentence, updateSentence, playSentence } = useSentences()
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: `linear-gradient(to bottom, ${colors.softPrimaryBg} 0%, ${colors.softNeutralBg} 100%)`,
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    }}>
+    <div style={appStyle}>
       <Header />
-
-      {/* Main Content */}
-      <main style={{
-        maxWidth: '900px',
-        margin: '0 auto',
-        padding: '2rem 1.5rem 4rem',
-      }}>
-        {/* Title Section */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: '1.5rem',
-        }}>
+      <main style={mainStyle}>
+        <div style={titleSectionStyle}>
           <div>
-            <h1 style={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              color: colors.primary,
-              margin: '0 0 0.5rem 0',
-            }}>
-              {t('hero.title')}
-            </h1>
-            <p style={{
-              fontSize: '0.9375rem',
-              color: colors.textSecondary,
-              margin: 0,
-            }}>
+            <h1 style={h1Style}>{t('hero.title')}</h1>
+            <p style={subtitleStyle}>
               Sisesta <span style={{ color: colors.primary }}>tekst</span> või <span style={{ color: colors.primary }}>sõna</span>, et <span style={{ color: '#4CAF50' }}>kuulata</span> selle hääldust ja uurida variante
             </p>
           </div>
