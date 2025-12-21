@@ -115,7 +115,7 @@ export function TestsPage() {
               setExpandedScenarios={setExpandedScenarios}
             />
           </>
-        ) : null}
+        )}
       </main>
       <Footer />
     </div>
