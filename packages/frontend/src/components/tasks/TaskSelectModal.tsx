@@ -83,9 +83,8 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
       title="Vali ülesanne"
       footer={footer}
     >
-      {isLoading ? (
-        <p>Laadin ülesandeid...</p>
-      ) : tasks.length === 0 ? (
+      {isLoading && <p>Laadin ülesandeid...</p>}
+      {!isLoading && tasks.length === 0 && (
         <div>
           <p>Ülesandeid pole.</p>
           <button 
@@ -95,7 +94,8 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
             + Loo uus ülesanne
           </button>
         </div>
-      ) : (
+      )}
+      {!isLoading && tasks.length > 0 && (
         <ul className="task-list">
           {tasks.map(task => (
             <li
