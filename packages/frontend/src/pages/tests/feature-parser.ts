@@ -37,6 +37,7 @@ function isStepLine(line: string): boolean {
   return /^(Given|When|Then|And|But)/.test(line)
 }
 
+// eslint-disable-next-line complexity -- parser logic requires multiple conditionals
 export function parseFeatureContent(content: string): ParsedFeature | null {
   const lines = content.split('\n')
   const feature: ParsedFeature = { name: '', description: '', tags: [], scenarios: [] }
