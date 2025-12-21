@@ -1,5 +1,10 @@
 import type { SynthesisEntry, TaskEntry, VoiceModel } from './schemas';
 
+const HEX_BASE = 16;
+const UUID_RANDOM_MASK = 0x3;
+const UUID_VERSION_BITS = 0x8;
+const HASH_PAD_LENGTH = 8;
+
 export function generateAudioHash(
   text: string,
   voiceModel: VoiceModel
@@ -66,9 +71,9 @@ export function generateUUID(): string {
     return crypto.randomUUID();
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
+    const r = (Math.random() * HEX_BASE) | 0;
+    const v = c === 'x' ? r : (r & UUID_RANDOM_MASK) | UUID_VERSION_BITS;
+    return v.toString(HEX_BASE);
   });
 }
 
@@ -79,5 +84,5 @@ export function simpleHash(str: string): string {
     hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
-  return Math.abs(hash).toString(16).padStart(8, '0');
+  return Math.abs(hash).toString(HEX_BASE).padStart(HASH_PAD_LENGTH, '0');
 }
