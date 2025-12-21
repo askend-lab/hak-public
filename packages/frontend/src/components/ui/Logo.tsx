@@ -1,12 +1,15 @@
 import { colors } from '../../styles/colors'
 
+const LOGO_SIZE_SMALL = 40;
+const LOGO_SIZE_MEDIUM = 48;
+
 interface LogoProps {
   size?: 'small' | 'medium'
   withBackground?: boolean
 }
 
 export function Logo({ size = 'medium', withBackground = false }: LogoProps) {
-  const dimensions = size === 'small' ? 40 : 48
+  const dimensions = size === 'small' ? LOGO_SIZE_SMALL : LOGO_SIZE_MEDIUM
 
   if (withBackground) {
     return (

@@ -2,6 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { colors } from '../../styles/colors'
 import { Logo } from './Logo'
 
+const FONT_WEIGHT_MEDIUM = 500;
+const FONT_WEIGHT_SEMIBOLD = 600;
+
 interface LogoWithTextProps {
   withBackground?: boolean
   size?: 'small' | 'medium'
@@ -24,7 +27,7 @@ export function LogoWithText({ withBackground = false, size = 'small' }: LogoWit
         </span>
         <span style={{
           fontSize: withBackground ? '0.625rem' : '0.75rem',
-          fontWeight: withBackground ? 500 : 600,
+          fontWeight: withBackground ? FONT_WEIGHT_MEDIUM : FONT_WEIGHT_SEMIBOLD,
           color: colors.primary,
         }}>
           {t('header.title2')}
