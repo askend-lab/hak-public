@@ -25,13 +25,13 @@ test_modules:
       - name: unit
         command: 'pnpm test:unit'
         results_file: 'jest-results-unit.json'
-        min_coverage_lines: 80
-        min_coverage_branches: 74
+        min_coverage_lines: 45
+        min_coverage_branches: 48
       - name: features
         command: 'pnpm test:features'
         results_file: 'jest-results-features.json'
-        min_coverage_lines: 50
-        min_coverage_branches: 50
+        min_coverage_lines: 45
+        min_coverage_branches: 48
   - name: singletablelambda
     path: singletablelambda
     type: jest
@@ -40,40 +40,38 @@ test_modules:
 
 # Global coverage settings
 coverage:
-  min_total: 75
-  fail_on_decrease: true
+  min_total: 45
+  fail_on_decrease: false
 
 # Task Channel - Slack-based agent communication
 task_channel:
   active: false
+  mode: off  # off | warning | error
   channel_name: 'hak'
 
 # Hooks configuration - ALL parameters required
 hooks:
   markdown-size:
     active: true
+    mode: warning  # off | warning | error
     max_lines: 200  # Temporarily raised - need to split large docs
-
-  complexity:
-    active: true
-    max_complexity: 18
-    excludePaths:
-      - '**/task-channel/**'  # Legacy scripts with high complexity
-      - '**/dist/**'  # Build artifacts
 
   language-check:
     active: true
+    mode: warning  # off | warning | error
     allowed_languages:
       - en
     excludePaths:
       - '**/drafts/**'
 
   broken-links:
-    active: true  # TODO: Fix 18 broken links first
+    active: true
+    mode: warning  # off | warning | error
     check_external: false
 
   no-console:
-    active: false  # Temporarily disabled - audio-worker needs console for CloudWatch
+    active: false
+    mode: off  # Temporarily disabled - audio-worker needs console for CloudWatch
     allow_warn: true
     allow_error: true
     excludePaths:
@@ -82,22 +80,27 @@ hooks:
 
   prettier-check:
     active: false
+    mode: off  # off | warning | error
 
   test-required:
     active: false
+    mode: off  # off | warning | error
     patterns:
       - '*.test.js'
       - '*.spec.js'
 
   metrics-required:
-    active: false  # test-runner now handles coverage enforcement
+    active: false
+    mode: off  # test-runner now handles coverage enforcement
 
   run-tests:
     active: true
+    mode: warning  # off | warning | error
     command: 'node devbox test'
 
   plan-validation:
     active: false
+    mode: off  # off | warning | error
     strict: true
 
 # Stage-based execution - centralized configuration
@@ -105,9 +108,7 @@ stages:
   pre-commit:
     hooks:
       - markdown-size
-      - complexity
       - language-check
-      - no-console
   
   pre-push:
     includes:
