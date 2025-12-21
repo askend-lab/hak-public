@@ -34,13 +34,15 @@ export function TestsPage() {
           </p>
         </div>
 
-        {loading ? (
+        {loading && (
           <div style={{ textAlign: 'center', padding: '3rem', color: colors.gray }}>Loading...</div>
-        ) : error ? (
+        )}
+        {!loading && error && (
           <div style={{ padding: '2rem', background: '#FFEBEE', borderRadius: '12px', color: '#C62828' }}>
             Error: {error}
           </div>
-        ) : results ? (
+        )}
+        {!loading && !error && results && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
               {[
