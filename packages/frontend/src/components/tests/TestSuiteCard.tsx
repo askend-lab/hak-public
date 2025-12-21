@@ -8,6 +8,7 @@ import {
   findScenarioSteps 
 } from './test-card-helpers'
 
+// eslint-disable-next-line max-lines-per-function -- complex UI component with nested rendering
 export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expandedTests, onToggleTest }: {
   suite: TestSuiteResult
   isExpanded: boolean

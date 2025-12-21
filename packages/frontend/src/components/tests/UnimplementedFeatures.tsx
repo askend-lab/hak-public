@@ -43,6 +43,7 @@ const UNIMPLEMENTED_SCENARIOS = [
   ]},
 ]
 
+// eslint-disable-next-line max-lines-per-function -- component with hardcoded scenario data
 export function UnimplementedFeatures({ expandedScenarios, setExpandedScenarios }: {
   expandedScenarios: Set<string>
   setExpandedScenarios: (s: Set<string>) => void
@@ -151,6 +152,7 @@ export function UnimplementedFeatures({ expandedScenarios, setExpandedScenarios 
   )
 }
 
+// eslint-disable-next-line max-lines-per-function -- UI component with styling
 function ScenarioItem({ scenario, isExpanded, onToggle }: {
   scenario: { name: string; steps: string[] }
   isExpanded: boolean
