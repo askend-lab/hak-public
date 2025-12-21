@@ -100,6 +100,7 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {/* eslint-disable-next-line max-lines-per-function -- nested test rendering */}
               {suite.assertionResults.map((test, idx) => {
                 const testStatusColor = test.status === 'passed'
                   ? { bg: '#E8F5E9', text: '#2E7D32', icon: '✓' }

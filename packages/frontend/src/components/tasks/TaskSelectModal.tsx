@@ -46,6 +46,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
 
   const handleClose = useCallback(() => { closeModal(); onClose?.(); }, [closeModal, onClose]);
 
+  // eslint-disable-next-line complexity -- submit handler with error handling
   const handleSubmit = useCallback(async () => {
     if (!selectedId || !result) return;
     const synthesis = createSynthesisEntry({ originalText: text, phoneticText: result.phoneticText, audioHash: result.audioHash, voiceModel: result.voiceModel });
