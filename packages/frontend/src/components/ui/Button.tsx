@@ -1,6 +1,8 @@
 import { CSSProperties, ReactNode } from 'react'
 import { colors } from '../../styles/colors'
 
+const DISABLED_OPACITY = 0.6;
+
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost'
 type ButtonSize = 'small' | 'medium'
 
@@ -76,7 +78,7 @@ export function Button({
         ...variantStyles[variant],
         ...sizeStyles[size],
         cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.6 : 1,
+        opacity: disabled ? DISABLED_OPACITY : 1,
         ...style,
       }}
     >

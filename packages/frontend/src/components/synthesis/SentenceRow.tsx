@@ -1,5 +1,7 @@
 import { colors } from '../../styles/colors'
 
+const DRAG_HANDLE_DOT_COUNT = 6;
+
 interface SentenceRowProps {
   value: string
   onChange: (value: string) => void
@@ -55,7 +57,7 @@ function DragHandle() {
       gap: '2px',
       cursor: 'grab',
     }}>
-      {[...Array(6)].map((_, i) => (
+      {[...Array(DRAG_HANDLE_DOT_COUNT)].map((_, i) => (
         <div key={i} style={{
           width: '4px',
           height: '4px',
