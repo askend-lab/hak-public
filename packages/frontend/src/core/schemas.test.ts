@@ -1,7 +1,7 @@
 import {
   SynthesisEntrySchema,
   CreateTaskRequestSchema,
-  ApiResponseSchema,
+  apiResponseSchema,
 } from './schemas';
 import { z } from 'zod';
 
@@ -47,16 +47,16 @@ describe('CreateTaskRequestSchema', () => {
   });
 });
 
-describe('ApiResponseSchema', () => {
+describe('apiResponseSchema', () => {
   it('creates schema for string data', () => {
-    const schema = ApiResponseSchema(z.string());
+    const schema = apiResponseSchema(z.string());
     const result = schema.parse({ success: true, data: 'hello' });
     expect(result.success).toBe(true);
     expect(result.data).toBe('hello');
   });
 
   it('validates error response', () => {
-    const schema = ApiResponseSchema(z.string());
+    const schema = apiResponseSchema(z.string());
     const result = schema.parse({ success: false, error: 'Something went wrong' });
     expect(result.success).toBe(false);
     expect(result.error).toBe('Something went wrong');
