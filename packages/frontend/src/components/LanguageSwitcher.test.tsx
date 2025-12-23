@@ -17,7 +17,7 @@ describe('LanguageSwitcher', () => {
     mockUseTranslation.mockReturnValue({
       i18n: { changeLanguage: mockChangeLanguage },
       t: (key: string) => key,
-    } as jest.Mocked<ReturnType<typeof useTranslation>>);
+    } as any);
   });
 
   it('should render language buttons', () => {

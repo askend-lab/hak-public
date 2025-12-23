@@ -16,6 +16,7 @@ function NotificationItem({ notification }: NotificationItemProps) {
       }, notification.duration);
       return () => { clearTimeout(timer); };
     }
+    return undefined;
   }, [notification.id, notification.duration, removeNotification]);
 
   const handleClose = useCallback(() => {

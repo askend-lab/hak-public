@@ -21,7 +21,7 @@ export function useSentences(initialSentences: string[] = ['']) {
 
   const playSentence = useCallback(async (index: number) => {
     const text = sentences[index]
-    if (!text.trim()) return
+    if (!text?.trim()) return
 
     setLoadingIndex(index)
     try {

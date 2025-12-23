@@ -84,7 +84,7 @@ export async function listTasks(userId: string): Promise<ApiResponse<Task[]>> {
   const response = await apiRequest<QueryResponse>(`/query?${params.toString()}`);
   
   if (!response.success || !response.data) {
-    return { success: false, error: response.error };
+    return { success: false, error: response.error || 'Unknown error' };
   }
   
   // Transform items: extract data and derive id from SK
@@ -93,11 +93,11 @@ export async function listTasks(userId: string): Promise<ApiResponse<Task[]>> {
     const taskId = skParts[skParts.length - 1]; // Get last part after TASK#
     return {
       ...item.data,
-      id: item.data.id || taskId,
+      id: item.data.id || taskId || '',
     };
   });
   
-  return { success: true, data: tasks };
+  return { success: true, data: tasks as Task[] };
 }
 
 export async function updateTask(

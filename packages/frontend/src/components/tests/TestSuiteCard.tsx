@@ -154,7 +154,7 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
                       }}>
                         {steps.map((step, stepIdx) => {
                           const keyword = step.split(' ')[0]
-                          const rest = step.substring(keyword.length)
+                          const rest = step.substring(keyword?.length || 0)
                           return (
                             <div key={stepIdx} style={{
                               fontSize: '0.75rem',
