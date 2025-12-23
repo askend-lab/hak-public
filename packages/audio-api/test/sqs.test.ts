@@ -1,12 +1,12 @@
 import { publishToQueue } from '../src/sqs';
 
-import { MockSQSClient } from './mocks';
+import { createMockSQSClient } from './mocks';
 
 describe('SQS Message Publishing', () => {
-  let mockSQS: MockSQSClient;
+  let mockSQS: any;
 
   beforeEach(() => {
-    mockSQS = new MockSQSClient();
+    mockSQS = createMockSQSClient();
   });
 
   it('should send SQS message with correct payload', async () => {
@@ -19,7 +19,7 @@ describe('SQS Message Publishing', () => {
     expect(mockSQS.messages).toHaveLength(1);
     expect(mockSQS.messages[0].QueueUrl).toBe(queueUrl);
     
-    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody);
+    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody!);
     expect(messageBody.text).toBe(text);
     expect(messageBody.hash).toBe(hash);
   });
@@ -31,7 +31,7 @@ describe('SQS Message Publishing', () => {
     
     await publishToQueue(mockSQS, queueUrl, text, hash);
     
-    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody);
+    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody!);
     expect(messageBody.text).toBeDefined();
     expect(messageBody.hash).toBeDefined();
     expect(messageBody.timestamp).toBeDefined();

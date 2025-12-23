@@ -5,7 +5,7 @@ import { initVmetajson, analyze, closeVmetajson, isInitialized } from '../src/vm
 
 jest.mock('child_process');
 
-const mockSpawn = spawn;
+const mockSpawn = spawn as jest.MockedFunction<typeof spawn>;
 
 function createMockProcess() {
   const stdin = new EventEmitter() as any;

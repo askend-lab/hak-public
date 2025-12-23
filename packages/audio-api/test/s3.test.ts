@@ -1,12 +1,12 @@
 import { checkFileExists } from '../src/s3';
 
-import { MockS3Client } from './mocks';
+import { createMockS3Client } from './mocks';
 
 describe('S3 Cache Check', () => {
-  let mockS3: MockS3Client;
+  let mockS3: any;
 
   beforeEach(() => {
-    mockS3 = new MockS3Client();
+    mockS3 = createMockS3Client();
   });
 
   it('should return true when file exists', async () => {

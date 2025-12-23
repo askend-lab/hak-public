@@ -12,7 +12,7 @@ export class MockS3Client {
   async send(command: HeadObjectCommand | SendMessageCommand): Promise<{ $metadata: { httpStatusCode: number } } | { MessageId: string }> {
     if (command instanceof HeadObjectCommand) {
       const params = command.input;
-      const exists = this.files.get(params.Key);
+      const exists = this.files.get(params.Key!);
       if (exists) {
         return { $metadata: { httpStatusCode: 200 } };
       }
@@ -20,7 +20,7 @@ export class MockS3Client {
       error.name = 'NotFound';
       throw error;
     }
-    throw new Error(`Unknown command: ${command.constructor.name}`);
+    throw new Error(`Unknown command: ${(command as any).constructor?.name || 'Unknown'}`);
   }
 
   reset() {
@@ -36,10 +36,14 @@ export class MockSQSClient {
       this.messages.push(command.input);
       return { MessageId: 'mock-message-id' };
     }
-    throw new Error(`Unknown command: ${command.constructor.name}`);
+    throw new Error(`Unknown command: ${(command as any).constructor?.name || 'Unknown'}`);
   }
 
   reset() {
     this.messages = [];
   }
 }
+
+// Type assertion to make MockS3Client compatible with S3Client interface
+export const createMockS3Client = () => new MockS3Client() as any;
+export const createMockSQSClient = () => new MockSQSClient() as any;

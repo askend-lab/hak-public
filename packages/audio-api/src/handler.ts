@@ -13,8 +13,8 @@ interface RequestBody {
 
 export async function handler(
   event: { body: string },
-  s3Client: { checkFileExists: (bucket: string, key: string) => Promise<boolean> },
-  sqsClient: { publishToQueue: (queueUrl: string, text: string, hash: string) => Promise<void> }
+  s3Client: any,
+  sqsClient: any
 ): Promise<{ statusCode: number; body: string }> {
   try {
     const bucketName = (process.env.BUCKET_NAME as string | undefined) ?? '';

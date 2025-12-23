@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access -- Test setup with process.env */
 import { calculateHash } from '../src/hash';
 
-import { MockS3Client, MockSQSClient } from './mocks';
+import { MockS3Client, MockSQSClient, createMockS3Client, createMockSQSClient } from './mocks';
 
 /**
  * Global test setup
@@ -19,14 +19,14 @@ export const TEST_BUCKET = 'test-bucket';
 export const TEST_QUEUE_URL = 'https://sqs.us-east-1.amazonaws.com/123456789012/test-queue';
 
 export interface TestContext {
-  mockS3: MockS3Client;
-  mockSQS: MockSQSClient;
+  mockS3: any;
+  mockSQS: any;
 }
 
 export function createTestContext(): TestContext {
   return {
-    mockS3: new MockS3Client(),
-    mockSQS: new MockSQSClient(),
+    mockS3: createMockS3Client(),
+    mockSQS: createMockSQSClient(),
   };
 }
 
@@ -35,13 +35,13 @@ export function setupTestEnv(): void {
   process.env.QUEUE_URL = TEST_QUEUE_URL;
 }
 
-export function setupCacheHit(mockS3: MockS3Client, text: string): string {
+export function setupCacheHit(mockS3: any, text: string): string {
   const hash = calculateHash(text);
   mockS3.setFileExists(`cache/${hash}.mp3`, true);
   return hash;
 }
 
-export function setupCacheMiss(mockS3: MockS3Client, text: string): string {
+export function setupCacheMiss(mockS3: any, text: string): string {
   const hash = calculateHash(text);
   mockS3.setFileExists(`cache/${hash}.mp3`, false);
   return hash;
