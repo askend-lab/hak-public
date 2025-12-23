@@ -62,7 +62,7 @@ jobs:
       
       - name: Run tests with coverage (push)
         if: github.event_name == 'push'
-        run: pnpm test
+        run: node devbox test
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
