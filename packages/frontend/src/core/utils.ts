@@ -22,10 +22,8 @@ export function normalizeText(text: string): string {
     .replace(/[^\p{L}\p{N}\s\-'`´+]/gu, '');
 }
 
-const SHORT_TEXT_WORD_LIMIT = 3;
-
 export function selectVoiceModel(wordCount: number): VoiceModel {
-  return wordCount <= SHORT_TEXT_WORD_LIMIT ? 'efm_s' : 'efm_l';
+  return wordCount <= 3 ? 'efm_s' : 'efm_l';
 }
 
 export function countWords(text: string): number {
@@ -68,18 +66,13 @@ export function nowISO(): string {
   return new Date().toISOString();
 }
 
-const HEX_BASE = 16;
-const UUID_BIT_MASK = 0x3;
-const UUID_BIT_OR = 0x8;
-const HASH_PAD_LENGTH = 8;
-
 export function generateUUID(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * HEX_BASE) | 0;
-    const v = c === 'x' ? r : (r & UUID_BIT_MASK) | UUID_BIT_OR;
+    const v = c === 'x' ? r : (r & UUID_RANDOM_MASK) | UUID_VERSION_BITS;
     return v.toString(HEX_BASE);
   });
 }

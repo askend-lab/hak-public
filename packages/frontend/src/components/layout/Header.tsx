@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-
-import { useAuth } from '../../services/auth'
-import { colors } from '../../styles/colors'
 import { Button, WaffleMenu, UserAvatar, NavTab, LogoWithText } from '../ui'
+import { colors } from '../../styles/colors'
+import { useAuth } from '../../services/auth'
 
 const testLinkStyle = {
   padding: '0.5rem 0',
@@ -32,50 +31,19 @@ export function Header() {
   const [activeTab, setActiveTab] = useState<'synthesis' | 'tasks'>('synthesis')
   const { isAuthenticated, user, login } = useAuth()
 
-  const handleLogin = () => {
-    void login();
-  };
-
   return (
     <header style={headerStyle}>
       <LogoWithText />
       <nav style={{ display: 'flex', gap: '2rem' }}>
-        <NavTab
-          label={t('nav.synthesis')}
-          isActive={activeTab === 'synthesis'}
-          onClick={() => { setActiveTab('synthesis'); }}
-        />
-        <NavTab
-          label={t('nav.tasks')}
-          isActive={activeTab === 'tasks'}
-          onClick={() => { setActiveTab('tasks'); }}
-        />
-        <Link
-          to="/tests"
-          style={{
-            padding: '0.5rem 0',
-            background: 'transparent',
-            border: 'none',
-            borderBottom: '2px solid transparent',
-            color: colors.gray,
-            fontSize: '0.9375rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-            textDecoration: 'none',
-          }}
-        >
-          Tests
-        </Link>
+        <NavTab label={t('nav.synthesis')} isActive={activeTab === 'synthesis'} onClick={() => setActiveTab('synthesis')} />
+        <NavTab label={t('nav.tasks')} isActive={activeTab === 'tasks'} onClick={() => setActiveTab('tasks')} />
+        <Link to="/tests" style={testLinkStyle}>Tests</Link>
       </nav>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {isAuthenticated && user ? (
-          <UserAvatar 
-            initials={user.email.substring(0, 2).toUpperCase()} 
-            name={user.email} 
-            id={user.id}
-          />
+          <UserAvatar initials={user.email?.substring(0, 2).toUpperCase() || 'U'} name={user.email || ''} id={user.id} />
         ) : (
-          <Button variant="primary" onClick={handleLogin}>Logi sisse</Button>
+          <Button variant="primary" onClick={login}>Logi sisse</Button>
         )}
         <WaffleMenu />
       </div>

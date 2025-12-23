@@ -1,5 +1,4 @@
 import { CSSProperties, ReactNode } from 'react'
-
 import { colors } from '../../styles/colors'
 
 const DISABLED_OPACITY = 0.6;
@@ -15,8 +14,6 @@ interface ButtonProps {
   disabled?: boolean
   style?: CSSProperties
 }
-
-const DISABLED_OPACITY = 0.6;
 
 const baseStyles: CSSProperties = {
   display: 'flex',
@@ -80,8 +77,8 @@ export function Button({
         ...baseStyles,
         ...variantStyles[variant],
         ...sizeStyles[size],
-        cursor: disabled === true ? 'not-allowed' : 'pointer',
-        opacity: disabled === true ? DISABLED_OPACITY : 1,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? DISABLED_OPACITY : 1,
         ...style,
       }}
     >

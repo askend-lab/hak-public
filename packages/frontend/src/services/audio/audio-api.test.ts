@@ -1,28 +1,20 @@
-// Mock config before imports to handle import.meta.env
-jest.mock('../config', () => ({
-  API_CONFIG: {
-    audioApiUrl: 'https://api.example.com/audio',
-    audioBucketUrl: 'https://bucket.example.com'
-  }
-}));
-
-// Mock timers to avoid real delays
-jest.useFakeTimers();
-
-import { httpPost } from '../http';
-
 import { synthesizeViaApi } from './audio-api';
 
-// Mock dependencies
-jest.mock('../http');
+jest.mock('../http', () => ({
+  httpPost: jest.fn(),
+}));
 
-const mockHttpPost = httpPost as jest.MockedFunction<typeof httpPost>;
+jest.mock('../config', () => ({
+  API_CONFIG: {
+    audioApiUrl: 'http://test-api/generate',
+    audioBucketUrl: 'http://test-bucket',
+  },
+}));
 
-// Mock fetch
-declare global {
-  var fetch: jest.Mock;
-}
-global.fetch = jest.fn();
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
+import { httpPost } from '../http';
 
 describe('audio-api', () => {
   beforeEach(() => {
@@ -30,21 +22,27 @@ describe('audio-api', () => {
   });
 
   describe('synthesizeViaApi', () => {
-    it('should return URL immediately when response is ready', async () => {
-      const expectedUrl = 'https://bucket.example.com/cache/test123.mp3';
-      mockHttpPost.mockResolvedValueOnce({
+    it('should return url immediately if status is ready', async () => {
+      (httpPost as jest.Mock).mockResolvedValue({
         status: 'ready',
-        url: expectedUrl,
-        hash: 'test123'
+        url: 'http://test-bucket/audio.mp3',
+        hash: 'abc123',
       });
 
-      const result = await synthesizeViaApi('test text');
+      const result = await synthesizeViaApi('Hello');
+      expect(result).toBe('http://test-bucket/audio.mp3');
+    });
 
-      expect(result).toBe(expectedUrl);
-      expect(mockHttpPost).toHaveBeenCalledWith(
-        'https://api.example.com/audio',
-        { text: 'test text' }
-      );
+    it('should poll for audio if status is processing', async () => {
+      (httpPost as jest.Mock).mockResolvedValue({
+        status: 'processing',
+        hash: 'abc123',
+      });
+
+      mockFetch.mockResolvedValueOnce({ ok: true });
+
+      const result = await synthesizeViaApi('Hello');
+      expect(result).toBe('http://test-bucket/cache/abc123.mp3');
     });
   });
 });

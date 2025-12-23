@@ -20,17 +20,6 @@ module.exports = {
     'src/**/*.{js,ts}',
     'packages/*/src/**/*.{js,ts,tsx}',
     '!**/*.d.ts',
-    '!**/index.ts',
-    '!**/main.tsx',
-    '!**/vite-env.d.ts',
-    '!**/declarations.d.ts',
-    '!**/i18n.ts',
-    '!packages/frontend/src/services/audio/synthesis.integration.test.ts',
-    '!packages/frontend/src/components/tests/TestSuiteCard.tsx',
-    '!packages/frontend/src/components/tests/UnimplementedFeatures.tsx',
-    '!packages/frontend/src/components/tests/test-card-helpers.ts',
-    '!packages/frontend/src/components/tasks/TaskSelectModal.tsx',
-    '!packages/frontend/src/components/synthesis/SentenceRow.tsx',
   ],
   testMatch: [
     '<rootDir>/test/**/*.test.{js,ts}',
@@ -40,10 +29,8 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/singletablelambda/',
-    'packages/frontend/src/services/audio/synthesis.integration.test.ts',
-    'features/tasks/store.test.ts',
+    'synthesis.integration.test.ts',
     'context.test.tsx', // Skipped: needs aws-amplify mock setup
-    'packages/frontend/src/services/audio/synthesis.test.ts',
   ],
   modulePathIgnorePatterns: ['/singletablelambda/'],
   transform: {
