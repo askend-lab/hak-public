@@ -10,6 +10,10 @@ export const HTTP_ERRORS = {
   INVALID_JSON: 'Invalid JSON body'
 } as const;
 
+export const HTTP_UNAUTHORIZED = 401;
+export const HTTP_NOT_FOUND = 404;
+export const HTTP_INTERNAL_ERROR = 500;
+
 const ERROR_STATUS_MAP: Record<string, number> = {
   [ERRORS.NOT_FOUND]: 404,
   [ERRORS.ACCESS_DENIED]: 403

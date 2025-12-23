@@ -4,7 +4,7 @@ import { getUserIdFromEvent } from './auth';
 import { config } from './config';
 import { DynamoDBAdapter } from './dynamoClient';
 import { handleSave, handleGet, handleDelete, handleQuery } from './handlers';
-import { HTTP_ERRORS, createResponse } from './response';
+import { HTTP_ERRORS, HTTP_UNAUTHORIZED, HTTP_NOT_FOUND, HTTP_INTERNAL_ERROR, createResponse } from './response';
 import { Store } from './store';
 import { ServerContext } from './types';
 
