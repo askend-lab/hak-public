@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+
 import { colors } from '../../styles/colors'
 
 interface CardProps {

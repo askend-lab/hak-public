@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+
 import { useUIStore, type Notification as NotificationType } from '../../features';
 
 interface NotificationItemProps {
@@ -9,11 +10,11 @@ function NotificationItem({ notification }: NotificationItemProps) {
   const { removeNotification } = useUIStore();
 
   useEffect(() => {
-    if (notification.duration && notification.duration > 0) {
+    if (notification.duration !== undefined && notification.duration > 0) {
       const timer = setTimeout(() => {
         removeNotification(notification.id);
       }, notification.duration);
-      return () => clearTimeout(timer);
+      return () => { clearTimeout(timer); };
     }
   }, [notification.id, notification.duration, removeNotification]);
 

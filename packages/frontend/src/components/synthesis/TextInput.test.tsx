@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TextInput } from './TextInput';
+
 import { mockUseSynthesisStore, mockStoreWithText } from './test-utils';
+import { TextInput } from './TextInput';
 
 jest.mock('../../features', () => ({
   useSynthesisStore: jest.fn(),

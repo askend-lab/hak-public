@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+
 import { useUIStore } from '../features';
 
 interface AsyncActionOptions {
@@ -33,7 +34,7 @@ export function useAsyncAction<T>(
       try {
         const result = await action(...args);
         setState({ isLoading: false, error: null });
-        if (options.showNotification && options.successMessage) {
+        if (options.showNotification === true && options.successMessage !== undefined && options.successMessage !== '') {
           addNotification('success', options.successMessage);
         }
         return result;
@@ -41,7 +42,7 @@ export function useAsyncAction<T>(
         const message = err instanceof Error ? err.message : 'Operation failed';
         setState({ isLoading: false, error: message });
         if (options.showNotification !== false) {
-          addNotification('error', options.errorMessage || message);
+          addNotification('error', options.errorMessage ?? message);
         }
         return undefined;
       }

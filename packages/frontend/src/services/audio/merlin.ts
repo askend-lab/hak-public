@@ -1,6 +1,7 @@
-import type { MerlinRequest, MerlinResponse } from './types';
-import { httpPost, httpPostBlob } from '../http';
 import { API_CONFIG } from '../config';
+import { httpPost, httpPostBlob } from '../http';
+
+import type { MerlinRequest, MerlinResponse } from './types';
 
 interface EkiMerlinResponse {
   audio: string;
@@ -11,6 +12,7 @@ export type SynthesizeFormat = 'json' | 'blob';
 
 export async function synthesize(
   request: MerlinRequest,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- format parameter reserved for future use
   _format: SynthesizeFormat = 'json'
 ): Promise<MerlinResponse> {
   const ekiResponse = await httpPost<EkiMerlinResponse>(API_CONFIG.merlinUrl, {

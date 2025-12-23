@@ -1,17 +1,21 @@
-import { synthesize, synthesizeToBlob } from './merlin';
-
-jest.mock('../http', () => ({
-  httpPost: jest.fn(),
-  httpPostBlob: jest.fn(),
-}));
-
+// Mock config before imports to handle import.meta.env
 jest.mock('../config', () => ({
   API_CONFIG: {
-    merlinUrl: 'http://test-merlin/synthesize',
-  },
+    merlinUrl: 'https://merlin.example.com/synthesize'
+  }
 }));
 
 import { httpPost, httpPostBlob } from '../http';
+
+import { synthesize, synthesizeToBlob } from './merlin';
+
+import type { MerlinRequest } from './types';
+
+// Mock dependencies
+jest.mock('../http');
+
+const mockHttpPost = httpPost as jest.MockedFunction<typeof httpPost>;
+const mockHttpPostBlob = httpPostBlob as jest.MockedFunction<typeof httpPostBlob>;
 
 describe('merlin', () => {
   beforeEach(() => {
@@ -19,41 +23,123 @@ describe('merlin', () => {
   });
 
   describe('synthesize', () => {
-    it('should return audio URL from base64 response', async () => {
-      (httpPost as jest.Mock).mockResolvedValue({
-        audio: 'dGVzdA==',
-        format: 'wav',
+    it('should return audio URL with base64 data', async () => {
+      const mockRequest: MerlinRequest = {
+        text: 'test text',
+        voice: 'test-voice'
+      };
+
+      const mockEkiResponse = {
+        audio: 'dGVzdCBhdWRpbyBkYXRh', // base64 encoded 'test audio data'
+        format: 'wav'
+      };
+
+      mockHttpPost.mockResolvedValueOnce(mockEkiResponse);
+
+      const result = await synthesize(mockRequest);
+
+      expect(result).toEqual({
+        audioUrl: 'data:audio/wav;base64,dGVzdCBhdWRpbyBkYXRh',
+        duration: 0
       });
 
-      const result = await synthesize({ text: 'Hello', voice: 'mari' });
-      
-      expect(result.audioUrl).toBe('data:audio/wav;base64,dGVzdA==');
-      expect(result.duration).toBe(0);
+      expect(mockHttpPost).toHaveBeenCalledWith(
+        'https://merlin.example.com/synthesize',
+        {
+          text: 'test text',
+          voice: 'test-voice',
+          returnBase64: true
+        }
+      );
     });
 
-    it('should call httpPost with correct params', async () => {
-      (httpPost as jest.Mock).mockResolvedValue({ audio: 'test', format: 'wav' });
+    it('should work with blob format parameter', async () => {
+      const mockRequest: MerlinRequest = {
+        text: 'test text',
+        voice: 'test-voice'
+      };
 
-      await synthesize({ text: 'Hello', voice: 'mari' });
+      const mockEkiResponse = {
+        audio: 'YmxvYiBkYXRh', // base64 encoded 'blob data'
+        format: 'wav'
+      };
 
-      expect(httpPost).toHaveBeenCalledWith(
-        'http://test-merlin/synthesize',
-        { text: 'Hello', voice: 'mari', returnBase64: true }
-      );
+      mockHttpPost.mockResolvedValueOnce(mockEkiResponse);
+
+      const result = await synthesize(mockRequest, 'blob');
+
+      expect(result).toEqual({
+        audioUrl: 'data:audio/wav;base64,YmxvYiBkYXRh',
+        duration: 0
+      });
+    });
+
+    it('should handle empty audio data', async () => {
+      const mockRequest: MerlinRequest = {
+        text: '',
+        voice: 'test-voice'
+      };
+
+      mockHttpPost.mockResolvedValueOnce({
+        audio: '',
+        format: 'wav'
+      });
+
+      const result = await synthesize(mockRequest);
+
+      expect(result).toEqual({
+        audioUrl: 'data:audio/wav;base64,',
+        duration: 0
+      });
     });
   });
 
   describe('synthesizeToBlob', () => {
-    it('should call httpPostBlob with format blob', async () => {
-      const mockBlob = new Blob(['test']);
-      (httpPostBlob as jest.Mock).mockResolvedValue(mockBlob);
+    it('should return blob response', async () => {
+      const mockRequest: MerlinRequest = {
+        text: 'test text',
+        voice: 'test-voice'
+      };
 
-      const result = await synthesizeToBlob({ text: 'Hello', voice: 'mari' });
+      const mockBlob = new Blob(['test'], { type: 'audio/wav' });
+      mockHttpPostBlob.mockResolvedValueOnce(mockBlob);
+
+      const result = await synthesizeToBlob(mockRequest);
 
       expect(result).toBe(mockBlob);
-      expect(httpPostBlob).toHaveBeenCalledWith(
-        'http://test-merlin/synthesize',
-        { text: 'Hello', voice: 'mari', format: 'blob' }
+
+      expect(mockHttpPostBlob).toHaveBeenCalledWith(
+        'https://merlin.example.com/synthesize',
+        {
+          text: 'test text',
+          voice: 'test-voice',
+          format: 'blob'
+        }
+      );
+    });
+
+    it('should pass all request parameters correctly', async () => {
+      const mockRequest: MerlinRequest = {
+        text: 'complex text',
+        voice: 'another-voice',
+        speed: 1.5,
+        pitch: 0.8
+      };
+
+      const mockBlob = new Blob(['complex'], { type: 'audio/wav' });
+      mockHttpPostBlob.mockResolvedValueOnce(mockBlob);
+
+      await synthesizeToBlob(mockRequest);
+
+      expect(mockHttpPostBlob).toHaveBeenCalledWith(
+        'https://merlin.example.com/synthesize',
+        {
+          text: 'complex text',
+          voice: 'another-voice',
+          speed: 1.5,
+          pitch: 0.8,
+          format: 'blob'
+        }
       );
     });
   });

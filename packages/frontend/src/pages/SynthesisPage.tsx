@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import {
   TextInput,
   AudioPlayer,
@@ -37,9 +38,9 @@ export function SynthesisPage() {
 
       <main className="synthesis-page__main">
         <section className="synthesis-section">
-          <TextInput onSynthesize={handleSynthesize} />
+          <TextInput onSynthesize={() => { void handleSynthesize(); }} />
 
-          {error && (
+          {error !== null && error !== '' && (
             <div className="error-message">{error}</div>
           )}
 

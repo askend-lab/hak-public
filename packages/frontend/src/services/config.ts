@@ -14,12 +14,12 @@ const DEV_CONFIG = {
 
 const PROD_CONFIG = {
   // This should be the absolute URL of the deployed single-table-lambda API Gateway.
-  baseUrl: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseUrl: (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api',
   // These URLs are from the vite.config.ts proxy and are assumed to be production-ready.
   vabamorfUrl: 'https://ibgaeez4mm.eu-west-1.awsapprunner.com/analyze',
   merlinUrl: 'https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize',
   // This should point to the production audio cache endpoint.
-  cacheUrl: `${import.meta.env.VITE_API_BASE_URL || ''}/audio-cache`,
+  cacheUrl: `${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ''}/audio-cache`,
   audioApiUrl: 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/dev/generate',
   audioBucketUrl: 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
 } as const;

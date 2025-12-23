@@ -1,5 +1,6 @@
-import { getCachedAudio, cacheAudio, generateCacheKey } from './cache';
 import { httpGet, httpPost, HttpError } from '../http';
+
+import { getCachedAudio, cacheAudio, generateCacheKey } from './cache';
 
 jest.mock('../http');
 jest.mock('../config', () => ({

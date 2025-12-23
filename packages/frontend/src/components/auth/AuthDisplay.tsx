@@ -9,14 +9,20 @@ const colors = {
 export function AuthDisplay() {
   const { isAuthenticated, user, login, logout } = useAuth();
 
-  
-  
+  const handleLogout = () => {
+    void logout();
+  };
+
+  const handleLogin = () => {
+    void login();
+  };
+
   if (isAuthenticated) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <span style={{ color: colors.primary, fontWeight: 500 }}>{user?.email}</span>
         <button
-          onClick={logout}
+          onClick={handleLogout}
           style={{
             padding: '0.75rem 1.5rem',
             background: 'transparent',
@@ -36,7 +42,7 @@ export function AuthDisplay() {
 
   return (
     <button
-      onClick={login}
+      onClick={handleLogin}
       style={{
         padding: '0.75rem 1.5rem',
         background: colors.primary,

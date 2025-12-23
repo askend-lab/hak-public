@@ -1,7 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AddToTaskButton } from './AddToTaskButton';
+
 import { useSynthesisStore, useUIStore } from '../../features';
 import { useAuth } from '../../services/auth';
+
+import { AddToTaskButton } from './AddToTaskButton';
 
 jest.mock('../../features', () => ({
   useSynthesisStore: jest.fn(),

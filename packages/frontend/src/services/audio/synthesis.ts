@@ -1,7 +1,9 @@
-import type { SynthesisResult } from './types';
-import { synthesizeViaApi } from './audio-api';
-import { selectVoiceModel, countWords } from '../../core/utils';
 import { withRetry } from '../../core/retry';
+import { selectVoiceModel, countWords } from '../../core/utils';
+
+import { synthesizeViaApi } from './audio-api';
+
+import type { SynthesisResult } from './types';
 
 export async function synthesizeText(text: string): Promise<SynthesisResult> {
   const wordCount = countWords(text);

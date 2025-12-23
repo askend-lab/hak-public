@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+
+import LanguageSwitcher from './LanguageSwitcher';
 
 jest.mock('react-i18next', () => ({
   useTranslation: jest.fn(),
@@ -16,7 +17,7 @@ describe('LanguageSwitcher', () => {
     mockUseTranslation.mockReturnValue({
       i18n: { changeLanguage: mockChangeLanguage },
       t: (key: string) => key,
-    } as any);
+    } as jest.Mocked<ReturnType<typeof useTranslation>>);
   });
 
   it('should render language buttons', () => {

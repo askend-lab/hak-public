@@ -1,20 +1,46 @@
+// Mock config before imports to handle import.meta.env
+jest.mock('../config', () => ({
+  API_CONFIG: {
+    audioApiUrl: 'https://api.example.com/audio',
+    audioBucketUrl: 'https://bucket.example.com',
+    merlinUrl: 'https://merlin.example.com/synthesize'
+  }
+}));
+
 // Mock modules that use import.meta.env
 jest.mock('./cache', () => ({
-  generateCacheKey: (text: string, voice: string, version = 'v1') => 
+  generateCacheKey: (text: string, voice: string, version) => 
     `${version}:${voice}:${btoa(text)}`,
   checkCache: jest.fn(),
   saveToCache: jest.fn(),
 }));
 
 jest.mock('./vabamorf', () => ({
-  toPhoneticText: (response?: { words?: Array<{ phonetic: string }> }) => 
+  toPhoneticText: (response?: { words?: { phonetic: string }[] }) => 
     response?.words?.map((w: { phonetic: string }) => w.phonetic).join(' ') || '',
   analyzeText: jest.fn(),
 }));
 
+jest.mock('./audio-api');
+jest.mock('../../core/utils');
+jest.mock('../../core/retry');
+
+import { withRetry } from '../../core/retry';
+import { selectVoiceModel, countWords } from '../../core/utils';
+
+import { synthesizeViaApi } from './audio-api';
 import { generateCacheKey } from './cache';
+import { synthesizeText, synthesizeWithRetry } from './synthesis';
 import { toPhoneticText } from './vabamorf';
-import type { VabamorfResponse } from './types';
+
+import type { VabamorfResponse, SynthesisResult } from './types';
+import type { VoiceModel } from '../../core/schemas';
+
+// Mock dependencies
+const mockSynthesizeViaApi = synthesizeViaApi as jest.MockedFunction<typeof synthesizeViaApi>;
+const mockSelectVoiceModel = selectVoiceModel as jest.MockedFunction<typeof selectVoiceModel>;
+const mockCountWords = countWords as jest.MockedFunction<typeof countWords>;
+const mockWithRetry = withRetry as jest.MockedFunction<typeof withRetry>;
 
 describe('generateCacheKey', () => {
   it('generates consistent key for same input', () => {
@@ -42,7 +68,7 @@ describe('generateCacheKey', () => {
 
   it('includes voice model', () => {
     const key = generateCacheKey('tere', 'efm_l');
-    expect(key.includes(':efm_l:')).toBe(true);
+    expect(key).toContain(':efm_l:');
   });
 });
 
@@ -67,5 +93,127 @@ describe('toPhoneticText', () => {
   it('handles empty response', () => {
     const response: VabamorfResponse = { words: [] };
     expect(toPhoneticText(response)).toBe('');
+  });
+});
+
+describe('synthesizeText', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should synthesize text and return result', async () => {
+    const text = 'test text';
+    const wordCount = 2;
+    const voiceModel: VoiceModel = 'efm_s';
+    const audioUrl = 'https://example.com/audio.mp3';
+
+    mockCountWords.mockReturnValue(wordCount);
+    mockSelectVoiceModel.mockReturnValue(voiceModel);
+    mockSynthesizeViaApi.mockResolvedValue(audioUrl);
+
+    const result = await synthesizeText(text);
+
+    expect(result).toEqual({
+      originalText: text,
+      phoneticText: text,
+      audioUrl,
+      audioHash: '',
+      voiceModel,
+      cached: false
+    });
+
+    expect(mockCountWords).toHaveBeenCalledWith(text);
+    expect(mockSelectVoiceModel).toHaveBeenCalledWith(wordCount);
+    expect(mockSynthesizeViaApi).toHaveBeenCalledWith(text);
+  });
+
+  it('should handle empty text', async () => {
+    const text = '';
+    const wordCount = 0;
+    const voiceModel: VoiceModel = 'efm_l';
+    const audioUrl = 'https://example.com/empty.mp3';
+
+    mockCountWords.mockReturnValue(wordCount);
+    mockSelectVoiceModel.mockReturnValue(voiceModel);
+    mockSynthesizeViaApi.mockResolvedValue(audioUrl);
+
+    const result = await synthesizeText(text);
+
+    expect(result).toEqual({
+      originalText: '',
+      phoneticText: '',
+      audioUrl,
+      audioHash: '',
+      voiceModel,
+      cached: false
+    });
+  });
+});
+
+describe('synthesizeWithRetry', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should call synthesizeText with retry logic', async () => {
+    const text = 'test text';
+    const voiceModel: VoiceModel = 'efm_s';
+    const expectedResult: SynthesisResult = {
+      originalText: text,
+      phoneticText: text,
+      audioUrl: 'https://example.com/retry.mp3',
+      audioHash: '',
+      voiceModel,
+      cached: false
+    };
+
+    mockWithRetry.mockImplementation(async (fn, options) => {
+      expect(options?.maxRetries).toBe(3);
+      return await fn();
+    });
+
+    mockSynthesizeViaApi.mockResolvedValue(expectedResult.audioUrl);
+    mockCountWords.mockReturnValue(1);
+    mockSelectVoiceModel.mockReturnValue(voiceModel);
+
+    const result = await synthesizeWithRetry(text);
+
+    expect(result).toEqual(expectedResult);
+    expect(mockWithRetry).toHaveBeenCalled();
+  });
+
+  it('should use custom maxRetries value', async () => {
+    const text = 'test text';
+    const voiceModel: VoiceModel = 'efm_l';
+    const expectedResult: SynthesisResult = {
+      originalText: text,
+      phoneticText: text,
+      audioUrl: 'https://example.com/custom.mp3',
+      audioHash: '',
+      voiceModel,
+      cached: false
+    };
+
+    mockWithRetry.mockImplementation(async (fn, options) => {
+      expect(options?.maxRetries).toBe(5);
+      return await fn();
+    });
+
+    mockSynthesizeViaApi.mockResolvedValue(expectedResult.audioUrl);
+    mockCountWords.mockReturnValue(1);
+    mockSelectVoiceModel.mockReturnValue(voiceModel);
+
+    const result = await synthesizeWithRetry(text, 5);
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should propagate errors from retry mechanism', async () => {
+    const text = 'test text';
+    const error = new Error('Synthesis failed');
+
+    mockWithRetry.mockRejectedValue(error);
+
+    await expect(synthesizeWithRetry(text)).rejects.toThrow('Synthesis failed');
   });
 });

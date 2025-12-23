@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+
 import { parseFeatureContent, ParsedFeature } from './feature-parser'
 
 interface TestAssertion {
@@ -37,7 +38,7 @@ export function useFeatureData() {
   useEffect(() => {
     fetch('/US-020-add-synthesis-to-task.feature')
       .then(res => res.text())
-      .then(content => setFeatureData(parseFeatureContent(content)))
+      .then(content => { setFeatureData(parseFeatureContent(content)); })
       .catch(() => {})
   }, [])
 

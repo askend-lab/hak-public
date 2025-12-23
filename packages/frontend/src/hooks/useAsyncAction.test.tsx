@@ -1,6 +1,8 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useAsyncAction } from './useAsyncAction';
+
 import { useUIStore } from '../features';
+
+import { useAsyncAction } from './useAsyncAction';
 
 jest.mock('../features', () => ({
   useUIStore: jest.fn(),
@@ -15,7 +17,7 @@ describe('useAsyncAction', () => {
     jest.clearAllMocks();
     mockUseUIStore.mockReturnValue({
       addNotification: mockAddNotification,
-    } as any);
+    } as jest.Mocked<Partial<ReturnType<typeof useUIStore>>>);
   });
 
   it('should initialize with correct state', () => {

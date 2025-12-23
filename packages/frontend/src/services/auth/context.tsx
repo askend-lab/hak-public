@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import type { AuthContextValue, AuthState, User } from './types';
+
 import { AuthStorage } from './storage';
+
+import type { AuthContextValue, AuthState, User } from './types';
 
 const initialState: AuthState = {
   user: null,
@@ -27,21 +29,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  const login = useCallback(async (credentials?: { email: string; password: string }) => {
+  const login = useCallback((credentials?: { email: string; password: string }) => {
     const user: User = {
-      id: credentials?.email || 'test-user',
-      email: credentials?.email || 'test@example.com',
+      id: credentials?.email ?? 'test-user',
+      email: credentials?.email ?? 'test@example.com',
     };
     AuthStorage.setUser(user);
     setState({ user, isAuthenticated: true, isLoading: false, error: null });
+    return Promise.resolve();
   }, []);
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(() => {
     AuthStorage.clear();
     setState({ user: null, isAuthenticated: false, isLoading: false, error: null });
+    return Promise.resolve();
   }, []);
 
-  const refreshSession = useCallback(async () => {}, []);
+  const refreshSession = useCallback(() => Promise.resolve(), []);
 
   const value: AuthContextValue = {
     ...state,

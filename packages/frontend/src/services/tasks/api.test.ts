@@ -12,6 +12,10 @@ jest.mock('../config', () => ({
   API_CONFIG: { baseUrl: '/api' },
 }));
 
+// Mock fetch
+declare global {
+  var fetch: jest.Mock;
+}
 global.fetch = jest.fn();
 
 // DRY: Helper functions for fetch mocks
@@ -26,7 +30,7 @@ const mockFetchError = (status = 500) => {
   (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status });
 };
 
-const mockFetchSequence = (responses: Array<{ ok: boolean; data?: unknown; status?: number }>) => {
+const mockFetchSequence = (responses: { ok: boolean; data?: unknown; status?: number }[]) => {
   const mock = global.fetch as jest.Mock;
   responses.forEach((res, i) => {
     if (i === 0) {

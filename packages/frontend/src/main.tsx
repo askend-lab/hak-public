@@ -1,12 +1,16 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './services/auth'
+
 import App from './App'
 import { TestsPage } from './pages'
+import { AuthProvider } from './services/auth'
 import './i18n'
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Root element not found');
+
+createRoot(rootElement).render(
   <StrictMode>
     <AuthProvider>
       <BrowserRouter>

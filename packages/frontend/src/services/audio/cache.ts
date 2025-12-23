@@ -1,8 +1,16 @@
+import { simpleHash } from '../../core/utils';
+import { API_CONFIG } from '../config';
+import { httpGet, httpPost, HttpError } from '../http';
+
 import type { AudioCacheEntry } from './types';
 import type { VoiceModel } from '../../core/schemas';
-import { simpleHash } from '../../core/utils';
-import { httpGet, httpPost, HttpError } from '../http';
-import { API_CONFIG } from '../config';
+
+const HTTP_NOT_FOUND = 404;
+const DEFAULT_TTL_DAYS = 365;
+const HOURS_PER_DAY = 24;
+const MINUTES_PER_HOUR = 60;
+const SECONDS_PER_MINUTE = 60;
+const MS_PER_SECOND = 1000;
 
 const HTTP_NOT_FOUND = 404;
 const DEFAULT_TTL_DAYS = 365;
@@ -24,7 +32,7 @@ export async function cacheAudio(
   ttlDays = DEFAULT_TTL_DAYS
 ): Promise<void> {
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + ttlDays * HOURS_PER_DAY * MS_PER_HOUR);
+  const expiresAt = new Date(now.getTime() + ttlDays * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MS_PER_SECOND);
 
   await httpPost(API_CONFIG.cacheUrl, {
     hash,

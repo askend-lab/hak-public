@@ -19,8 +19,8 @@ const initialState: SynthesisTextState = {
 export const useSynthesisTextStore = create<SynthesisTextState & SynthesisTextActions>(
   (set) => ({
     ...initialState,
-    setText: (text) => set({ text }),
-    setPhoneticText: (phoneticText) => set({ phoneticText }),
-    resetText: () => set(initialState),
+    setText: (text) => { set({ text }); },
+    setPhoneticText: (phoneticText) => { set({ phoneticText }); },
+    resetText: () => { set(initialState); },
   })
 );

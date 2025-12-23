@@ -1,6 +1,7 @@
-import type { VabamorfResponse } from './types';
-import { httpPost } from '../http';
 import { API_CONFIG } from '../config';
+import { httpPost } from '../http';
+
+import type { VabamorfResponse } from './types';
 
 interface EkiVabamorfResponse {
   stressedText: string;
@@ -16,7 +17,7 @@ export async function analyzeText(text: string): Promise<VabamorfResponse> {
   return {
     words: words.map((word, i) => ({
       text: word,
-      phonetic: phoneticWords[i] || word,
+      phonetic: phoneticWords[i] ?? word,
       stress: 1,
     })),
   };
@@ -32,5 +33,5 @@ export function getWordVariants(
 ) {
   const word = response.words[wordIndex];
   if (!word) return [];
-  return word.variants || [{ phonetic: word.phonetic, stress: word.stress }];
+  return word.variants ?? [{ phonetic: word.phonetic, stress: word.stress }];
 }

@@ -1,9 +1,10 @@
+import { z } from 'zod';
+
 import {
   SynthesisEntrySchema,
   CreateTaskRequestSchema,
   apiResponseSchema,
 } from './schemas';
-import { z } from 'zod';
 
 describe('SynthesisEntrySchema', () => {
   it('validates correct entry', () => {

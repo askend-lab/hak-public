@@ -9,6 +9,7 @@ import {
   nowISO,
   simpleHash,
 } from './utils';
+
 import type { SynthesisEntry } from './schemas';
 
 describe('normalizeText', () => {
@@ -118,7 +119,7 @@ describe('generateUUID', () => {
 
   it('uses fallback when crypto.randomUUID is not available', () => {
     const originalCrypto = global.crypto;
-    // @ts-ignore - testing fallback
+    // @ts-expect-error - testing fallback
     global.crypto = { randomUUID: undefined };
     
     const uuid = generateUUID();

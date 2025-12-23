@@ -1,5 +1,6 @@
-import { analyzeText, toPhoneticText, getWordVariants } from './vabamorf';
 import { httpPost } from '../http';
+
+import { analyzeText, toPhoneticText, getWordVariants } from './vabamorf';
 
 jest.mock('../http');
 jest.mock('../config', () => ({

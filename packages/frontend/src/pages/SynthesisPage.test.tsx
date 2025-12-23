@@ -1,7 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { SynthesisPage } from './SynthesisPage';
+
 import { useSynthesisStore } from '../features';
 import { synthesizeWithRetry } from '../services/audio';
+
+import { SynthesisPage } from './SynthesisPage';
 
 jest.mock('../features', () => ({
   useSynthesisStore: jest.fn(),
@@ -39,7 +41,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: null,
-    } as any);
+    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
   });
 
   it('should render page title', () => {
@@ -62,7 +64,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: true,
       error: null,
-    } as any);
+    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     expect(screen.queryByTestId('audio-player')).not.toBeInTheDocument();
@@ -76,7 +78,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: 'Something went wrong',
-    } as any);
+    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -101,7 +103,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: null,
-    } as any);
+    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     fireEvent.click(screen.getByTestId('synthesize'));

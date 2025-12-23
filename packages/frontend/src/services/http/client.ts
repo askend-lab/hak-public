@@ -33,12 +33,12 @@ async function doFetch(
     ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...fetchOptions.headers,
+      ...(fetchOptions.headers as Record<string, string> | undefined),
     },
   });
 
   if (!response.ok) {
-    throw new HttpError(response.status, `HTTP error: ${response.status}`);
+    throw new HttpError(response.status, `HTTP error: ${String(response.status)}`);
   }
 
   return response;
@@ -49,7 +49,7 @@ export async function httpRequest<T>(
   options: HttpRequestOptions = {}
 ): Promise<T> {
   const response = await doFetch(url, options);
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 export async function httpPost<T>(

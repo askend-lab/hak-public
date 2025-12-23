@@ -1,6 +1,8 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { NotificationContainer } from './Notification';
+
 import { useUIStore } from '../../features';
+
+import { NotificationContainer } from './Notification';
 
 describe('NotificationContainer', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
-import { httpPost } from '../http';
 import { API_CONFIG } from '../config';
+import { httpPost } from '../http';
 
 interface AudioApiResponse {
   status: 'ready' | 'processing';
@@ -14,7 +14,7 @@ const HTTP_PARTIAL_CONTENT = 206;
 export async function synthesizeViaApi(text: string): Promise<string> {
   const response = await httpPost<AudioApiResponse>(API_CONFIG.audioApiUrl, { text });
   
-  if (response.status === 'ready' && response.url) {
+  if (response.status === 'ready' && response.url !== undefined && response.url !== '') {
     return response.url;
   }
   
@@ -27,10 +27,11 @@ async function pollForAudio(hash: string): Promise<string> {
   const bucketUrl = API_CONFIG.audioBucketUrl;
   const audioUrl = `${bucketUrl}/cache/${hash}.mp3`;
   
+   
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     try {
       // Use GET with range header to check if file exists (HEAD blocked by CORS)
-      // eslint-disable-next-line no-await-in-loop -- sequential polling required
+      // eslint-disable-next-line no-await-in-loop -- intentional polling with delay
       const response = await fetch(audioUrl, { 
         method: 'GET',
         headers: { 'Range': 'bytes=0-0' }
@@ -43,8 +44,10 @@ async function pollForAudio(hash: string): Promise<string> {
     } catch {
       // Network error - continue polling
     }
-    // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- sequential delay
-    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+    // eslint-disable-next-line no-await-in-loop -- intentional delay between polling attempts
+    await new Promise((resolve) => {
+      setTimeout(resolve, POLL_INTERVAL_MS);
+    });
   }
   
   throw new Error('Audio generation timed out');

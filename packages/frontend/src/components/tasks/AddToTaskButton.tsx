@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import { useSynthesisStore, useUIStore } from '../../features';
 import { useAuth } from '../../services/auth';
 
@@ -20,7 +21,7 @@ export function AddToTaskButton({ className = '' }: AddToTaskButtonProps) {
     openModal('taskSelect');
   }, [openModal]);
 
-  if (!result?.audioUrl) {
+  if (!result?.audioUrl || result.audioUrl === '') {
     return null;
   }
 

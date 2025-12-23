@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import type { SynthesisResult } from '../../services/audio';
 
 interface SynthesisState {
@@ -34,12 +35,12 @@ const initialState: SynthesisState = {
 
 export const useSynthesisStore = create<SynthesisState & SynthesisActions>((set) => ({
   ...initialState,
-  setText: (text) => set({ text }),
-  setPhoneticText: (phoneticText) => set({ phoneticText }),
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-  setResult: (result) => set({ result, phoneticText: result?.phoneticText || '' }),
-  setAudioElement: (audioElement) => set({ audioElement }),
-  setIsPlaying: (isPlaying) => set({ isPlaying }),
-  reset: () => set(initialState),
+  setText: (text) => { set({ text }); },
+  setPhoneticText: (phoneticText) => { set({ phoneticText }); },
+  setLoading: (isLoading) => { set({ isLoading }); },
+  setError: (error) => { set({ error }); },
+  setResult: (result) => { set({ result, phoneticText: result?.phoneticText ?? '' }); },
+  setAudioElement: (audioElement) => { set({ audioElement }); },
+  setIsPlaying: (isPlaying) => { set({ isPlaying }); },
+  reset: () => { set(initialState); },
 }));

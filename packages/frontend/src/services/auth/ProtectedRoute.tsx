@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+
 import { useAuth } from './context';
 
 interface ProtectedRouteProps {
@@ -11,7 +12,7 @@ export function ProtectedRoute({ children, fallback, redirectTo = '/login' }: Pr
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return fallback ? <>{fallback}</> : <div>Loading...</div>;
+    return fallback !== undefined ? <>{fallback}</> : <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {

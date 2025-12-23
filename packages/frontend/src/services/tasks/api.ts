@@ -1,7 +1,10 @@
-import type { Task, TaskEntry, CreateTaskRequest, ApiResponse } from './types';
-import { API_CONFIG } from '../config';
-import { buildUserPK, buildTaskSK, TASK_SK_PREFIX } from './keys';
 import { nowISO } from '../../core/utils';
+import { API_CONFIG } from '../config';
+
+import { buildUserPK, buildTaskSK, TASK_SK_PREFIX } from './keys';
+
+import type { Task, TaskEntry, CreateTaskRequest, ApiResponse } from './types';
+
 
 let authTokenGetter: (() => string | null) | null = null;
 
@@ -16,8 +19,8 @@ async function apiRequest<T>(
   const token = authTokenGetter?.();
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
+    ...(token !== null && token !== '' ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers as Record<string, string> | undefined),
   };
 
   const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
@@ -26,10 +29,10 @@ async function apiRequest<T>(
   });
 
   if (!response.ok) {
-    return { success: false, error: `API error: ${response.status}` };
+    return { success: false, error: `API error: ${String(response.status)}` };
   }
 
-  const data = await response.json();
+  const data = await response.json() as T;
   return { success: true, data };
 }
 
@@ -70,7 +73,7 @@ export async function getTask(
 }
 
 interface QueryResponse {
-  items: Array<{ data: Task; SK: string }>;
+  items: { data: Task; SK: string }[];
 }
 
 export async function listTasks(userId: string): Promise<ApiResponse<Task[]>> {
@@ -127,8 +130,8 @@ export async function updateTask(
 export async function deleteTask(
   userId: string,
   taskId: string
-): Promise<ApiResponse<void>> {
-  return apiRequest<void>('/delete', {
+): Promise<ApiResponse<undefined>> {
+  return apiRequest<undefined>('/delete', {
     method: 'POST',
     body: JSON.stringify({
       pk: buildUserPK(userId),

@@ -11,11 +11,12 @@ jest.mock('./services/audio', () => ({
 }));
 
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
-import { AuthProvider } from './services/auth';
+import { MemoryRouter } from 'react-router-dom';
+
 import App from './App';
 import i18n from './i18n-test';
+import { AuthProvider } from './services/auth';
 
 describe('App', () => {
   it('renders with AuthProvider without crashing', () => {

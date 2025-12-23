@@ -26,7 +26,7 @@ export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: Sent
       <input
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => { onChange(e.target.value); }}
         placeholder="Kirjuta oma lause siia"
         style={{
           flex: 1,
@@ -49,6 +49,7 @@ export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: Sent
 }
 
 function DragHandle() {
+  const DRAG_DOTS_COUNT = 6;
   return (
     <div style={{
       display: 'grid',
@@ -57,7 +58,7 @@ function DragHandle() {
       gap: '2px',
       cursor: 'grab',
     }}>
-      {[...Array(DRAG_HANDLE_DOT_COUNT)].map((_, i) => (
+      {[...Array(DRAG_DOTS_COUNT)].map((_, i) => (
         <div key={i} style={{
           width: '4px',
           height: '4px',

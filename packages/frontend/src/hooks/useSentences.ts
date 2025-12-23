@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+
 import { synthesizeText } from '../services/audio'
 
 export function useSentences(initialSentences: string[] = ['']) {
@@ -27,7 +28,7 @@ export function useSentences(initialSentences: string[] = ['']) {
       const result = await synthesizeText(text)
       if (audioRef.current) {
         audioRef.current.src = result.audioUrl
-        audioRef.current.play()
+        void audioRef.current.play()
       }
     } catch (err) {
       console.error('Synthesis failed:', err)

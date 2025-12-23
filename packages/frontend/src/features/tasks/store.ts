@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import type { Task } from '../../core/schemas';
 
 interface TasksState {
@@ -28,21 +29,21 @@ const initialState: TasksState = {
 
 export const useTasksStore = create<TasksState & TasksActions>((set) => ({
   ...initialState,
-  setTasks: (tasks) => set({ tasks }),
-  addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
+  setTasks: (tasks) => { set({ tasks }); },
+  addTask: (task) => { set((state) => ({ tasks: [...state.tasks, task] })); },
   updateTask: (taskId, updates) =>
-    set((state) => ({
+    { set((state) => ({
       tasks: state.tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t)),
-    })),
+    })); },
   removeTask: (taskId) =>
-    set((state) => ({ tasks: state.tasks.filter((t) => t.id !== taskId) })),
-  selectTask: (taskId) => set({ selectedTaskId: taskId }),
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-  reset: () => set(initialState),
+    { set((state) => ({ tasks: state.tasks.filter((t) => t.id !== taskId) })); },
+  selectTask: (taskId) => { set({ selectedTaskId: taskId }); },
+  setLoading: (isLoading) => { set({ isLoading }); },
+  setError: (error) => { set({ error }); },
+  reset: () => { set(initialState); },
 }));
 
 export const getSelectedTask = (state: TasksState): Task | null => {
-  if (!state.selectedTaskId) return null;
-  return state.tasks.find((t) => t.id === state.selectedTaskId) || null;
+  if (state.selectedTaskId === null) return null;
+  return state.tasks.find((t) => t.id === state.selectedTaskId) ?? null;
 };

@@ -30,8 +30,20 @@ export function Modal({
   }
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className={`modal ${className}`} onClick={handleContentClick}>
+    <div 
+      className="modal-overlay" 
+      onClick={handleOverlayClick}
+      onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
+      role="button"
+      tabIndex={-1}
+    >
+      <div 
+        className={`modal ${className}`} 
+        onClick={handleContentClick}
+        onKeyDown={(e) => { e.stopPropagation(); }}
+        role="dialog"
+        tabIndex={-1}
+      >
         <div className="modal__header">
           <h2>{title}</h2>
           <button onClick={onClose} className="modal__close">
@@ -39,7 +51,7 @@ export function Modal({
           </button>
         </div>
         <div className="modal__body">{children}</div>
-        {footer && <div className="modal__footer">{footer}</div>}
+        {footer !== undefined && <div className="modal__footer">{footer}</div>}
       </div>
     </div>
   );

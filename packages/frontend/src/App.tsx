@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
+
 import { TaskSelectModal, NotificationContainer, Header, Footer, SentenceRow } from './components'
 import { Button, Card } from './components/ui'
-import { colors } from './styles/colors'
 import { useSentences } from './hooks'
+import { colors } from './styles/colors'
 
 const appStyle = {
   minHeight: '100vh',
@@ -42,8 +43,8 @@ function App() {
             <SentenceRow
               key={index}
               value={sentence}
-              onChange={(value) => updateSentence(index, value)}
-              onPlay={() => playSentence(index)}
+              onChange={(value) => { updateSentence(index, value); }}
+              onPlay={() => { void playSentence(index); }}
               isLoading={loadingIndex === index}
               isLast={index === sentences.length - 1}
             />
@@ -62,6 +63,7 @@ function App() {
       <NotificationContainer />
       
       {/* Hidden audio element for playback */}
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- hidden audio player for synthesis */}
       <audio ref={audioRef} style={{ display: 'none' }} />
     </div>
   )

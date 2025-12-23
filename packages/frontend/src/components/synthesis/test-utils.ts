@@ -29,7 +29,7 @@ export function mockStoreWith(state: MockStoreState): void {
     isPlaying: state.isPlaying ?? false,
     setIsPlaying: state.setIsPlaying ?? defaultMocks.setIsPlaying,
     setAudioElement: state.setAudioElement ?? defaultMocks.setAudioElement,
-  } as any);
+  } as jest.Mocked<ReturnType<typeof useSynthesisStore>>);
 }
 
 export function mockEmptyStore(): void {

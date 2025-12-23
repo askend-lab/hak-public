@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
+
 import { colors } from '../../styles/colors'
+
 import { Logo } from './Logo'
 
 const FONT_WEIGHT_MEDIUM = 500;

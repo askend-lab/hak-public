@@ -3,6 +3,7 @@ coverage/
 jest-results.json
 jest-results-unit.json
 jest-results-features.json
+command.counter
 .test-runner-state.json
 dist/
 

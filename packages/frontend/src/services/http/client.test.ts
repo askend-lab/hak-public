@@ -1,6 +1,9 @@
 import { httpRequest, httpPost, httpGet, httpPostBlob, HttpError } from './client';
 
 // Mock fetch
+declare global {
+  var fetch: jest.Mock;
+}
 global.fetch = jest.fn();
 
 describe('HTTP Client', () => {

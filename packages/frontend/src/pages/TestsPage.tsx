@@ -1,7 +1,9 @@
 import { useState } from 'react'
+
 import { Header, Footer } from '../components'
-import { colors } from '../styles/colors'
 import { TestSuiteCard, UnimplementedFeatures } from '../components/tests'
+import { colors } from '../styles/colors'
+
 import { useFeatureData, useTestResults, useExpandedState } from './tests/hooks'
 
 // eslint-disable-next-line max-lines-per-function, complexity -- page component with multiple states
@@ -47,10 +49,10 @@ export function TestsPage() {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
               {[
-                { label: 'Total Tests', value: results.numTotalTests, color: colors.primary },
-                { label: 'Passed', value: results.numPassedTests, color: '#2E7D32' },
-                { label: 'Failed', value: results.numFailedTests, color: results.numFailedTests > 0 ? '#C62828' : colors.gray },
-                { label: 'Test Suites', value: `${results.numPassedTestSuites}/${results.numTotalTestSuites}`, color: '#1565C0' },
+                { label: 'Total Tests', value: String(results.numTotalTests), color: colors.primary },
+                { label: 'Passed', value: String(results.numPassedTests), color: '#2E7D32' },
+                { label: 'Failed', value: String(results.numFailedTests), color: results.numFailedTests > 0 ? '#C62828' : colors.gray },
+                { label: 'Test Suites', value: `${String(results.numPassedTestSuites)}/${String(results.numTotalTestSuites)}`, color: '#1565C0' },
               ].map((stat, idx) => (
                 <div key={idx} style={{ background: colors.white, borderRadius: '8px', padding: '1rem', border: `1px solid ${colors.outlinedNeutral}`, textAlign: 'center' }}>
                   <div style={{ fontSize: '1.5rem', fontWeight: 700, color: stat.color }}>{stat.value}</div>
@@ -82,7 +84,7 @@ export function TestsPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {(['all', 'passed', 'failed'] as const).map(f => (
-                  <button key={f} onClick={() => setFilter(f)} style={{
+                  <button key={f} onClick={() => { setFilter(f); }} style={{
                     padding: '0.5rem 1rem',
                     background: filter === f ? colors.primary : colors.white,
                     border: `1px solid ${filter === f ? colors.primary : colors.outlinedNeutral}`,
@@ -103,7 +105,7 @@ export function TestsPage() {
                   key={suite.name}
                   suite={suite}
                   isExpanded={expandedSuites.has(suite.name)}
-                  onToggle={() => toggleSuite(suite.name)}
+                  onToggle={() => { toggleSuite(suite.name); }}
                   featureData={featureData}
                   expandedTests={expandedTests}
                   onToggleTest={toggleTest}

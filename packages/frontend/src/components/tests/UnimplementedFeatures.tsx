@@ -141,7 +141,7 @@ export function UnimplementedFeatures({ expandedScenarios, setExpandedScenarios 
                   key={idx}
                   scenario={scenario}
                   isExpanded={isExpanded}
-                  onToggle={() => toggleScenario(idx)}
+                  onToggle={() => { toggleScenario(idx); }}
                 />
               )
             })}

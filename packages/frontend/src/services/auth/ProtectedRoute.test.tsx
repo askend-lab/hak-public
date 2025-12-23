@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { ProtectedRoute, useRequireAuth } from './ProtectedRoute';
+
 import { useAuth } from './context';
+import { ProtectedRoute, useRequireAuth } from './ProtectedRoute';
 
 jest.mock('./context');
 
@@ -23,7 +24,7 @@ describe('ProtectedRoute', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    delete (window as any).location;
+    delete (window as Window & { location?: Location }).location;
     window.location = { ...originalLocation, href: '', pathname: '/current' };
   });
 

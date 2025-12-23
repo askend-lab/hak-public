@@ -1,4 +1,6 @@
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
+
 import { AudioPlayer } from './AudioPlayer';
 import { mockStoreWith, mockStoreWithAudio, TEST_AUDIO_URL } from './test-utils';
 
