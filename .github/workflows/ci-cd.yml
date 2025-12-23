@@ -64,9 +64,9 @@ jobs:
         if: github.event_name == 'push'
         run: |
           pnpm --filter @hak/frontend test
-          pnpm --filter singletablelambda test
+          pnpm --filter packages/singletablelambda test
           pnpm --filter hak test
-          cd audio-api && npm ci && npm test
+          cd packages/audio-api && npm ci && npm test
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
@@ -99,22 +99,22 @@ jobs:
           node-version: '20'
       
       - name: Install dependencies
-        working-directory: vabamorf-api
+        working-directory: packages/vabamorf-api
         run: npm ci
       
       - name: Run tests
-        working-directory: vabamorf-api
+        working-directory: packages/vabamorf-api
         run: npm test
       
       - name: Build TypeScript
-        working-directory: vabamorf-api
+        working-directory: packages/vabamorf-api
         run: npx tsc
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: vabamorf-api-dist
-          path: vabamorf-api/dist/
+          path: packages/vabamorf-api/dist/
           retention-days: 30
 
   deploy-vabamorf-api:
@@ -149,7 +149,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vabamorf-api-dist
-          path: vabamorf-api/dist/
+          path: packages/vabamorf-api/dist/
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -162,7 +162,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
       
       - name: Build and push Docker image
-        working-directory: vabamorf-api
+        working-directory: packages/vabamorf-api
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: askend-lab
@@ -182,7 +182,7 @@ jobs:
         run: npm install -g serverless@3
       
       - name: Deploy with Serverless
-        working-directory: vabamorf-api
+        working-directory: packages/vabamorf-api
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
@@ -206,22 +206,22 @@ jobs:
           node-version: '20'
       
       - name: Install dependencies
-        working-directory: audio-api
+        working-directory: packages/audio-api
         run: npm ci
       
       - name: Run tests
-        working-directory: audio-api
+        working-directory: packages/audio-api
         run: npm test
       
       - name: Build TypeScript
-        working-directory: audio-api
+        working-directory: packages/audio-api
         run: npm run build
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: audio-api-dist
-          path: audio-api/dist/
+          path: packages/audio-api/dist/
           retention-days: 30
 
   deploy-audio-api:
@@ -256,7 +256,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: audio-api-dist
-          path: audio-api/dist/
+          path: packages/audio-api/dist/
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -264,7 +264,7 @@ jobs:
           node-version: '20'
       
       - name: Install production dependencies
-        working-directory: audio-api
+        working-directory: packages/audio-api
         run: npm ci --omit=dev
       
       - name: Configure AWS credentials
@@ -282,7 +282,7 @@ jobs:
         run: npm install -g serverless@3
       
       - name: Deploy with Serverless
-        working-directory: audio-api
+        working-directory: packages/audio-api
         run: |
           serverless deploy --stage ${{ matrix.environment }} --region eu-west-1
       
@@ -322,11 +322,11 @@ jobs:
           node-version: '20'
       
       - name: Install dependencies
-        working-directory: audio-api
+        working-directory: packages/audio-api
         run: npm ci
       
       - name: Run E2E tests
-        working-directory: audio-api
+        working-directory: packages/audio-api
         env:
           STAGE: ${{ matrix.environment }}
         run: npm run test:e2e
@@ -345,15 +345,15 @@ jobs:
           node-version: '20'
       
       - name: Install dependencies
-        working-directory: audio-worker
+        working-directory: packages/audio-worker
         run: npm ci
       
       - name: Run tests
-        working-directory: audio-worker
+        working-directory: packages/audio-worker
         run: npm test
       
       - name: Build TypeScript
-        working-directory: audio-worker
+        working-directory: packages/audio-worker
         run: npm run build
       
       - name: Upload build artifacts
@@ -361,9 +361,9 @@ jobs:
         with:
           name: audio-worker-dist
           path: |
-            audio-worker/dist/
-            audio-worker/package*.json
-            audio-worker/Dockerfile
+            packages/audio-worker/dist/
+            packages/audio-worker/package*.json
+            packages/audio-worker/Dockerfile
           retention-days: 30
 
   deploy-audio-worker:
@@ -395,7 +395,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: audio-worker-dist
-          path: audio-worker/
+          path: packages/audio-worker/
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -408,7 +408,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
       
       - name: Build and push Docker image
-        working-directory: audio-worker
+        working-directory: packages/audio-worker
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: askend-lab
