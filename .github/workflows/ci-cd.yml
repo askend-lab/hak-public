@@ -66,7 +66,7 @@ jobs:
           pnpm --filter @hak/frontend test
           pnpm --filter packages/singletablelambda test
           pnpm --filter hak test
-          cd packages/audio-api && npm ci && npm test
+          pnpm --filter packages/audio-api test
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
