@@ -1,4 +1,6 @@
 import { processMessage } from '../src/worker';
+import { SQSClient } from '@aws-sdk/client-sqs';
+import { S3Client } from '@aws-sdk/client-s3';
 
 jest.mock('../src/sqs', () => ({
   receiveMessage: jest.fn(),
@@ -18,8 +20,8 @@ import { synthesize } from '../src/merlin';
 import { uploadAudio } from '../src/s3';
 import { receiveMessage, parseMessage, deleteMessage } from '../src/sqs';
 
-const mockSqsClient: { send: jest.Mock } = { send: jest.fn() };
-const mockS3Client: { send: jest.Mock } = { send: jest.fn() };
+const mockSqsClient = { send: jest.fn() } as any;
+const mockS3Client = { send: jest.fn() } as any;
 const config = {
   queueUrl: 'https://queue-url',
   bucketName: 'test-bucket',

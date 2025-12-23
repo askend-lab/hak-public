@@ -1,8 +1,9 @@
 import { uploadAudio } from '../src/s3';
+import { S3Client } from '@aws-sdk/client-s3';
 
 const mockS3Client = {
   send: jest.fn(),
-};
+} as any;
 
 describe('S3 Operations', () => {
   beforeEach(() => {

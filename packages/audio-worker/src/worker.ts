@@ -32,7 +32,7 @@ export async function processMessage(
     await uploadAudio(s3Client, config.bucketName, hash, audioBuffer);
     console.log(`Uploaded: cache/${hash}.mp3`);
 
-    await deleteMessage(sqsClient, config.queueUrl, message.ReceiptHandle);
+    await deleteMessage(sqsClient, config.queueUrl, message.ReceiptHandle!);
     console.log(`Deleted message: ${message.MessageId}`);
 
     return true;
