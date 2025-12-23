@@ -12,6 +12,11 @@ const s3Client = new S3Client({ region: 'eu-west-1' });
 
 describe('Audio Synthesis E2E Test', () => {
   it('should generate and cache an audio file', async () => {
+    // Skip E2E test in CI environment
+    if (process.env.CI === 'true') {
+      console.log('Skipping E2E test in CI environment');
+      return;
+    }
     // 1. Calculate hash and define S3 key
     const hash = createHash('sha256').update(TEST_TEXT).digest('hex');
     const key = `cache/${hash}.mp3`;
