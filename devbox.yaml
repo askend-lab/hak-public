@@ -127,9 +127,9 @@ hooks:
     active: true
 
   run-lint:
-    mode: warning
+    mode: error
     active: true
-    command: 'pnpm exec eslint .'
+    command: 'pnpm exec eslint --max-warnings=0 .'
 
   run-typecheck:
     mode: error

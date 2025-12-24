@@ -27,6 +27,7 @@ describe('vmetajson', () => {
     jest.clearAllMocks();
     closeVmetajson();
     mockProcess = createMockProcess();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockSpawn.mockReturnValue(mockProcess as any);
   });
 

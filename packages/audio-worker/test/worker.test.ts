@@ -17,7 +17,9 @@ jest.mock('../src/s3', () => ({
   uploadAudio: jest.fn(),
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockSqsClient = { send: jest.fn() } as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockS3Client = { send: jest.fn() } as any;
 const config = {
   queueUrl: 'https://queue-url',

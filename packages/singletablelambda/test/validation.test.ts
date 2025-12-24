@@ -41,6 +41,7 @@ describe('Validation', () => {
       const result = validateStoreRequest({
         pk: 'entity1',
         sk: 'sort1',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         type: 'invalid' as any,
         ttl: 3600
       });
