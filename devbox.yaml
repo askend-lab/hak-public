@@ -32,8 +32,8 @@ test_modules:
         command: 'pnpm test:features'
         results_file: 'jest-results-features.json'
         coverage_path: 'coverage-features'
-        min_coverage_lines: 80
-        min_coverage_branches: 70
+        min_coverage_lines: 0  # Feature tests don't generate code coverage
+        min_coverage_branches: 0
   - name: singletablelambda
     path: packages/singletablelambda
     type: jest
@@ -58,7 +58,7 @@ test_modules:
 # Global coverage settings
 coverage:
   min_total: 45
-  fail_on_decrease: false
+  fail_on_decrease: true
 
 # Task Channel - Slack-based agent communication
 task_channel:
@@ -138,11 +138,11 @@ hooks:
 
   test-coverage:
     mode: off
-    active: false
+    active: false  # Incompatible with Jest - coverage enforced by test runner
 
   run-tests:
     active: true
-    mode: warning  # off | warning | error
+    mode: error  # Strict: test failures block commits
     command: 'node devbox test'
 
   plan-validation:

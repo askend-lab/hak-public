@@ -3,12 +3,16 @@ import { SendMessageCommand } from '@aws-sdk/client-sqs';
 
 export class MockS3Client {
   private readonly files = new Map<string, boolean>();
+  public shouldThrow = false;
 
   setFileExists(key: string, exists: boolean): void {
     this.files.set(key, exists);
   }
 
   send(command: HeadObjectCommand | SendMessageCommand): Promise<{ $metadata: { httpStatusCode: number } } | { MessageId: string }> {
+    if (this.shouldThrow) {
+      throw new Error('Mock S3 error');
+    }
     if (command instanceof HeadObjectCommand) {
       const params = command.input;
       const exists = this.files.get(params.Key ?? '');
