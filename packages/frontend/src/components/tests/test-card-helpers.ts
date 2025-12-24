@@ -1,3 +1,5 @@
+import { colors } from '../../styles/colors'
+
 export interface TestAssertion {
   fullName: string
   title: string
@@ -35,8 +37,8 @@ export function getFileName(path: string): string {
 
 export function getStatusColors(status: 'passed' | 'failed'): { bg: string; text: string; border: string; icon: string } {
   return status === 'passed' 
-    ? { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7', icon: '✓' }
-    : { bg: '#FFEBEE', text: '#C62828', border: '#EF9A9A', icon: '✗' }
+    ? { bg: colors.successBg, text: colors.successDark, border: colors.successBorder, icon: '✓' }
+    : { bg: colors.errorBg, text: colors.error, border: colors.errorBorder, icon: '✗' }
 }
 
 export function countResults(results: TestAssertion[]): { passed: number; failed: number } {

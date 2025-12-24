@@ -1,5 +1,4 @@
 export { TextInput, AudioPlayer, StressedText, SentenceRow } from './synthesis';
 export { AddToTaskButton, TaskSelectModal } from './tasks';
-export { NotificationContainer } from './ui';
-export { default as LanguageSwitcher } from './LanguageSwitcher';
+export { NotificationContainer, LanguageSwitcher } from './ui';
 export { Header, Footer } from './layout';

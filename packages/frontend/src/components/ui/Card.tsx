@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 
-import { colors } from '../../styles/colors'
+import { colors, borderRadius, gap } from '../../styles/colors'
 
 interface CardProps {
   children: ReactNode
@@ -10,14 +10,12 @@ export function Card({ children }: CardProps) {
   return (
     <div style={{
       background: colors.white,
-      borderRadius: '12px',
+      borderRadius: borderRadius.medium,
       boxShadow: '0 2px 8px rgba(23, 49, 72, 0.08)',
       border: `1px solid ${colors.outlinedNeutral}`,
-      padding: '1rem',
+      padding: gap.lg,
     }}>
       {children}
     </div>
   )
 }
-
-export default Card

@@ -1,4 +1,4 @@
-import { colors } from '../../styles/colors'
+import { colors, gap, borderRadius, cursors } from '../../styles/colors'
 
 interface SentenceRowProps {
   value: string
@@ -13,7 +13,7 @@ export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: Sent
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: '0.75rem',
+      gap: gap.md,
       padding: '0.75rem 0',
       borderBottom: !isLast ? `1px solid ${colors.outlinedNeutral}` : 'none',
     }}>
@@ -30,7 +30,7 @@ export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: Sent
           flex: 1,
           padding: '0.75rem 1rem',
           border: `1px solid ${colors.outlinedNeutral}`,
-          borderRadius: '8px',
+          borderRadius: borderRadius.small,
           fontSize: '0.9375rem',
           color: colors.primary,
           outline: 'none',
@@ -54,7 +54,7 @@ function DragHandle() {
       gridTemplateColumns: 'repeat(2, 4px)',
       gridTemplateRows: 'repeat(3, 4px)',
       gap: '2px',
-      cursor: 'grab',
+      cursor: cursors.pointer,
     }}>
       {Array.from({ length: DRAG_DOTS_COUNT }).map((_, i) => (
         <div key={i} style={{
@@ -76,11 +76,11 @@ function PlayButton({ onClick, isLoading }: { onClick: () => void; isLoading: bo
       style={{
         width: '36px',
         height: '36px',
-        borderRadius: '50%',
-        background: isLoading ? '#81C784' : '#4CAF50',
+        borderRadius: borderRadius.round,
+        background: isLoading ? colors.successLight : colors.success,
         border: 'none',
         color: colors.white,
-        cursor: isLoading ? 'wait' : 'pointer',
+        cursor: isLoading ? 'wait' : cursors.pointer,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -99,7 +99,7 @@ function MoreButton() {
       height: '36px',
       background: 'transparent',
       border: 'none',
-      cursor: 'pointer',
+      cursor: cursors.pointer,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -110,5 +110,3 @@ function MoreButton() {
     </button>
   )
 }
-
-export default SentenceRow

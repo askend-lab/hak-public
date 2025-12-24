@@ -131,5 +131,3 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     </Modal>
   );
 }
-
-export default TaskSelectModal;

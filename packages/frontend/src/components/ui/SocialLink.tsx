@@ -1,4 +1,4 @@
-import { colors } from '../../styles/colors'
+import { colors, gap, textDecoration, borderRadius } from '../../styles/colors'
 
 interface SocialLinkProps {
   href: string
@@ -8,7 +8,7 @@ interface SocialLinkProps {
 
 export function SocialLink({ href, icon, label }: SocialLinkProps) {
   return (
-    <li style={{ marginBottom: '0.5rem' }}>
+    <li style={{ marginBottom: gap.sm }}>
       <a
         href={href}
         target="_blank"
@@ -16,17 +16,17 @@ export function SocialLink({ href, icon, label }: SocialLinkProps) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
+          gap: gap.sm,
           fontSize: '0.8125rem',
           color: colors.textSecondary,
-          textDecoration: 'none',
+          textDecoration: textDecoration.none,
         }}
       >
         <span style={{
           width: '20px',
           height: '20px',
           backgroundColor: colors.primary,
-          borderRadius: '4px',
+          borderRadius: borderRadius.small,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -40,5 +40,3 @@ export function SocialLink({ href, icon, label }: SocialLinkProps) {
     </li>
   )
 }
-
-export default SocialLink

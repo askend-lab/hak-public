@@ -1,10 +1,5 @@
 import { useAuth } from '../../services/auth';
-
-const colors = {
-  primary: '#173148',
-  white: '#FFFFFF',
-  gray: '#636B74',
-};
+import { colors, gap, borderRadius, fontWeight, cursors } from '../../styles/colors';
 
 export function AuthDisplay() {
   const { isAuthenticated, user, login, logout } = useAuth();
@@ -19,19 +14,19 @@ export function AuthDisplay() {
 
   if (isAuthenticated) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <span style={{ color: colors.primary, fontWeight: 500 }}>{user?.email}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: gap.lg }}>
+        <span style={{ color: colors.primary, fontWeight: fontWeight.medium }}>{user?.email}</span>
         <button
           onClick={handleLogout}
           style={{
             padding: '0.75rem 1.5rem',
             background: 'transparent',
             border: '1px solid transparent',
-            borderRadius: '8px',
+            borderRadius: borderRadius.small,
             color: colors.gray,
             fontSize: '0.875rem',
-            fontWeight: 500,
-            cursor: 'pointer',
+            fontWeight: fontWeight.medium,
+            cursor: cursors.pointer,
           }}
         >
           Logout
@@ -47,11 +42,11 @@ export function AuthDisplay() {
         padding: '0.75rem 1.5rem',
         background: colors.primary,
         border: '1px solid transparent',
-        borderRadius: '8px',
+        borderRadius: borderRadius.small,
         color: colors.white,
         fontSize: '0.875rem',
-        fontWeight: 500,
-        cursor: 'pointer',
+        fontWeight: fontWeight.medium,
+        cursor: cursors.pointer,
       }}
     >
       Login

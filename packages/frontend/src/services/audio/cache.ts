@@ -7,10 +7,7 @@ import type { VoiceModel } from '../../core/schemas';
 
 const HTTP_NOT_FOUND = 404;
 const DEFAULT_TTL_DAYS = 365;
-const HOURS_PER_DAY = 24;
-const MINUTES_PER_HOUR = 60;
-const SECONDS_PER_MINUTE = 60;
-const MS_PER_SECOND = 1000;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export async function getCachedAudio(hash: string): Promise<AudioCacheEntry | null> {
   try {
@@ -27,7 +24,7 @@ export async function cacheAudio(
   ttlDays = DEFAULT_TTL_DAYS
 ): Promise<void> {
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + ttlDays * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MS_PER_SECOND);
+  const expiresAt = new Date(now.getTime() + ttlDays * MS_PER_DAY);
 
   await httpPost(API_CONFIG.cacheUrl, {
     hash,

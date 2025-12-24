@@ -1,11 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-import { colors } from '../../styles/colors'
+import { colors, fontWeight, gap, lineHeight } from '../../styles/colors'
 
 import { Logo } from './Logo'
-
-const FONT_WEIGHT_MEDIUM = 500;
-const FONT_WEIGHT_SEMIBOLD = 600;
 
 interface LogoWithTextProps {
   withBackground?: boolean
@@ -16,9 +13,9 @@ export function LogoWithText({ withBackground = false, size = 'small' }: LogoWit
   const { t } = useTranslation()
 
   return (
-    <div style={{ display: 'flex', alignItems: withBackground ? 'flex-start' : 'center', gap: withBackground ? '0.5rem' : '0.75rem' }}>
+    <div style={{ display: 'flex', alignItems: withBackground ? 'flex-start' : 'center', gap: withBackground ? gap.sm : gap.md }}>
       <Logo size={size} withBackground={withBackground} />
-      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: lineHeight.tight }}>
         <span style={{
           fontSize: withBackground ? '0.75rem' : '0.625rem',
           fontWeight: 700,
@@ -29,7 +26,7 @@ export function LogoWithText({ withBackground = false, size = 'small' }: LogoWit
         </span>
         <span style={{
           fontSize: withBackground ? '0.625rem' : '0.75rem',
-          fontWeight: withBackground ? FONT_WEIGHT_MEDIUM : FONT_WEIGHT_SEMIBOLD,
+          fontWeight: withBackground ? fontWeight.medium : fontWeight.semibold,
           color: colors.primary,
         }}>
           {t('header.title2')}
@@ -38,5 +35,3 @@ export function LogoWithText({ withBackground = false, size = 'small' }: LogoWit
     </div>
   )
 }
-
-export default LogoWithText

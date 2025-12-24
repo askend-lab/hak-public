@@ -56,5 +56,3 @@ export function useSentences(initialSentences: string[] = ['']): UseSentencesRet
     playSentence,
   }
 }
-
-export default useSentences

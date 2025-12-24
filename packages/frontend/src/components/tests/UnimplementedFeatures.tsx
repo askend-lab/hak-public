@@ -1,4 +1,4 @@
-import { colors } from '../../styles/colors'
+import { colors, fontFamily, borderRadius, gap, overflow, fontWeight, lineHeight } from '../../styles/colors'
 
 const UNIMPLEMENTED_SCENARIOS = [
   { name: 'Baseline tasks visible to all users', steps: [
@@ -63,63 +63,63 @@ export function UnimplementedFeatures({ expandedScenarios, setExpandedScenarios 
     <div style={{ marginTop: '2rem' }}>
       <h2 style={{
         fontSize: '1.25rem',
-        fontWeight: 600,
+        fontWeight: fontWeight.semibold,
         color: colors.primary,
         marginBottom: '1rem',
         display: 'flex',
         alignItems: 'center',
         gap: '0.5rem',
       }}>
-        <span style={{ color: '#E65100' }}>○</span>
+        <span style={{ color: colors.warning }}>○</span>
         Unimplemented Features
       </h2>
       
       <div style={{
         background: colors.white,
-        borderRadius: '12px',
-        border: '1px solid #FFCC80',
-        overflow: 'hidden',
+        borderRadius: borderRadius.medium,
+        border: `1px solid ${colors.warningBorder}`,
+        overflow: overflow.hidden,
       }}>
         <div style={{
           padding: '1.25rem',
-          background: '#FFF3E0',
-          borderBottom: '1px solid #FFCC80',
+          background: colors.warningBg,
+          borderBottom: `1px solid ${colors.warningBorder}`,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: gap.lg }}>
             <div style={{
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: '#FFF3E0',
-              border: '2px solid #FFCC80',
+              background: colors.warningBg,
+              border: `2px solid ${colors.warningBorder}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-              <span style={{ color: '#E65100', fontSize: '12px' }}>○</span>
+              <span style={{ color: colors.warning, fontSize: '12px' }}>○</span>
             </div>
             <div>
               <h3 style={{
                 fontSize: '0.9375rem',
-                fontWeight: 600,
+                fontWeight: fontWeight.semibold,
                 color: colors.primary,
                 margin: 0,
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: fontFamily.monoSimple,
               }}>
                 US-033-baseline-tasks.feature
               </h3>
-              <span style={{ fontSize: '0.75rem', color: '#E65100', fontWeight: 500 }}>
+              <span style={{ fontSize: '0.75rem', color: colors.warning, fontWeight: fontWeight.medium }}>
                 @draft @unimplemented • 8 scenarios
               </span>
             </div>
           </div>
         </div>
         
-        <div style={{ padding: '1rem', background: '#FFFBF5' }}>
+        <div style={{ padding: '1rem', background: colors.warningBgLight }}>
           <div style={{
             fontSize: '0.875rem',
             color: colors.primary,
-            fontWeight: 500,
+            fontWeight: fontWeight.medium,
             marginBottom: '0.75rem',
           }}>
             Feature: Baseline tasks access (US-033)
@@ -162,7 +162,7 @@ function ScenarioItem({ scenario, isExpanded, onToggle }: {
     <div style={{
       background: colors.white,
       borderRadius: '6px',
-      border: '1px solid #FFCC80',
+      border: `1px solid ${colors.warningBorder}`,
       overflow: 'hidden',
     }}>
       <div 
@@ -179,7 +179,7 @@ function ScenarioItem({ scenario, isExpanded, onToggle }: {
         }}
       >
         <span style={{ 
-          color: '#E65100', 
+          color: colors.warning, 
           fontSize: '0.75rem',
           transform: isExpanded ? 'rotate(90deg)' : 'rotate(0)',
           transition: 'transform 0.2s',
@@ -189,8 +189,8 @@ function ScenarioItem({ scenario, isExpanded, onToggle }: {
         </span>
         <span style={{
           fontSize: '0.625rem',
-          color: '#E65100',
-          background: '#FFF3E0',
+          color: colors.warning,
+          background: colors.warningBg,
           padding: '0.125rem 0.375rem',
           borderRadius: '4px',
         }}>
@@ -200,8 +200,8 @@ function ScenarioItem({ scenario, isExpanded, onToggle }: {
       {isExpanded && (
         <div style={{
           padding: '0.5rem 0.75rem 0.75rem 1.75rem',
-          background: '#FFFBF5',
-          borderTop: '1px solid #FFCC80',
+          background: colors.warningBgLight,
+          borderTop: `1px solid ${colors.warningBorder}`,
         }}>
           {scenario.steps.map((step, stepIdx) => {
             const keyword = step.split(' ')[0]
@@ -209,11 +209,11 @@ function ScenarioItem({ scenario, isExpanded, onToggle }: {
             return (
               <div key={stepIdx} style={{
                 fontSize: '0.75rem',
-                fontFamily: "'JetBrains Mono', monospace",
-                lineHeight: 1.6,
+                fontFamily: fontFamily.monoSimple,
+                lineHeight: lineHeight.relaxed,
                 color: colors.textSecondary,
               }}>
-                <span style={{ color: '#E65100', fontWeight: 600 }}>{keyword}</span>
+                <span style={{ color: colors.warning, fontWeight: fontWeight.semibold }}>{keyword}</span>
                 {rest}
               </div>
             )

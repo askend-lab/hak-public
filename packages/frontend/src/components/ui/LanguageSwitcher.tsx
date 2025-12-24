@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-const LanguageSwitcher = () => {
+export function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
@@ -13,6 +13,4 @@ const LanguageSwitcher = () => {
       <button onClick={() => { changeLanguage('et'); }}>Estonian</button>
     </div>
   );
-};
-
-export default LanguageSwitcher;
+}

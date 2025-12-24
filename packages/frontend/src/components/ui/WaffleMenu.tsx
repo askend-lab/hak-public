@@ -1,4 +1,4 @@
-import { colors } from '../../styles/colors'
+import { colors, cursors, borderRadius } from '../../styles/colors'
 
 export function WaffleMenu() {
   const WAFFLE_DOTS_COUNT = 9;
@@ -8,7 +8,7 @@ export function WaffleMenu() {
       height: '40px',
       background: 'transparent',
       border: 'none',
-      cursor: 'pointer',
+      cursor: cursors.pointer,
       display: 'grid',
       gridTemplateColumns: 'repeat(3, 6px)',
       gridTemplateRows: 'repeat(3, 6px)',
@@ -19,12 +19,10 @@ export function WaffleMenu() {
         <div key={i} style={{
           width: '6px',
           height: '6px',
-          borderRadius: '50%',
+          borderRadius: borderRadius.round,
           backgroundColor: colors.gray,
         }} />
       ))}
     </button>
   )
 }
-
-export default WaffleMenu

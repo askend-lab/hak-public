@@ -1,6 +1,6 @@
 import { CSSProperties, ReactNode } from 'react'
 
-import { colors } from '../../styles/colors'
+import { colors, borderRadius, gap, cursors, fontWeight } from '../../styles/colors'
 
 const DISABLED_OPACITY = 0.6;
 
@@ -20,29 +20,29 @@ const baseStyles: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '0.5rem',
+  gap: gap.sm,
   border: 'none',
-  cursor: 'pointer',
-  fontWeight: 500,
+  cursor: cursors.pointer,
+  fontWeight: fontWeight.medium,
 }
 
 const variantStyles: Record<ButtonVariant, CSSProperties> = {
   primary: {
     backgroundColor: colors.primary,
     color: colors.white,
-    borderRadius: '25px',
+    borderRadius: borderRadius.pill,
   },
   secondary: {
     backgroundColor: colors.white,
     color: colors.primary,
     border: `2px solid ${colors.primary}`,
-    borderRadius: '25px',
+    borderRadius: borderRadius.pill,
   },
   outline: {
     backgroundColor: 'transparent',
     color: colors.gray,
     border: `1px solid ${colors.outlinedNeutral}`,
-    borderRadius: '20px',
+    borderRadius: borderRadius.large,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -78,7 +78,7 @@ export function Button({
         ...baseStyles,
         ...variantStyles[variant],
         ...sizeStyles[size],
-        cursor: disabled === true ? 'not-allowed' : 'pointer',
+        cursor: disabled === true ? cursors.notAllowed : cursors.pointer,
         opacity: disabled === true ? DISABLED_OPACITY : 1,
         ...style,
       }}
@@ -87,5 +87,3 @@ export function Button({
     </button>
   )
 }
-
-export default Button

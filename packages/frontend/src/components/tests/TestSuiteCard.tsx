@@ -1,4 +1,4 @@
-import { colors } from '../../styles/colors'
+import { colors, fontFamily, borderRadius, gap, overflow, cursors, fontWeight, lineHeight } from '../../styles/colors'
 
 import { 
   TestSuiteResult, 
@@ -24,10 +24,10 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
   return (
     <div style={{
       background: colors.white,
-      borderRadius: '12px',
+      borderRadius: borderRadius.medium,
       border: `1px solid ${statusColor.border}`,
-      marginBottom: '1rem',
-      overflow: 'hidden',
+      marginBottom: gap.lg,
+      overflow: overflow.hidden,
     }}>
       <div 
         onClick={onToggle}
@@ -36,10 +36,10 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
         tabIndex={0}
         style={{
           padding: '1.25rem',
-          cursor: 'pointer',
+          cursor: cursors.pointer,
           display: 'flex',
           alignItems: 'center',
-          gap: '1rem',
+          gap: gap.lg,
         }}
       >
         <div style={{
@@ -63,16 +63,16 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
         <div style={{ flex: 1 }}>
           <h3 style={{
             fontSize: '0.9375rem',
-            fontWeight: 600,
+            fontWeight: fontWeight.semibold,
             color: colors.primary,
             margin: 0,
-            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+            fontFamily: fontFamily.mono,
           }}>
             {getFileName(suite.name)}
           </h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.25rem' }}>
-            <span style={{ fontSize: '0.75rem', color: '#2E7D32' }}>✓ {passed} passed</span>
-            {failed > 0 && <span style={{ fontSize: '0.75rem', color: '#C62828' }}>✗ {failed} failed</span>}
+            <span style={{ fontSize: '0.75rem', color: colors.successDark }}>✓ {passed} passed</span>
+            {failed > 0 && <span style={{ fontSize: '0.75rem', color: colors.error }}>✗ {failed} failed</span>}
           </div>
         </div>
         
@@ -95,9 +95,9 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
           {suite.assertionResults.length === 0 ? (
             <div style={{
               padding: '1rem',
-              background: '#FFEBEE',
+              background: colors.errorBg,
               borderRadius: '8px',
-              color: '#C62828',
+              color: colors.error,
               fontSize: '0.875rem',
             }}>
               {suite.message === undefined ? 'No tests executed' : suite.message.substring(0, 500)}
@@ -107,8 +107,8 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
               { }
               {suite.assertionResults.map((test, idx) => {
                 const testStatusColor = test.status === 'passed'
-                  ? { bg: '#E8F5E9', text: '#2E7D32', icon: '✓' }
-                  : { bg: '#FFEBEE', text: '#C62828', icon: '✗' }
+                  ? { bg: colors.successBg, text: colors.successDark, icon: '✓' }
+                  : { bg: colors.errorBg, text: colors.error, icon: '✗' }
                 
                 const testId = `${suite.name}-${idx.toString()}`
                 const isTestExpanded = expandedTests.has(testId)
@@ -152,7 +152,7 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
                           transition: 'transform 0.2s',
                         }}>▶</span>
                       )}
-                      <span style={{ color: testStatusColor.text, fontSize: '0.875rem', fontWeight: 600 }}>
+                      <span style={{ color: testStatusColor.text, fontSize: '0.875rem', fontWeight: fontWeight.semibold }}>
                         {testStatusColor.icon}
                       </span>
                       <div style={{ flex: 1 }}>
@@ -174,11 +174,11 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
                           return (
                             <div key={stepIdx} style={{
                               fontSize: '0.75rem',
-                              fontFamily: "'JetBrains Mono', monospace",
-                              lineHeight: 1.6,
+                              fontFamily: fontFamily.monoSimple,
+                              lineHeight: lineHeight.relaxed,
                               color: colors.textSecondary,
                             }}>
-                              <span style={{ color: testStatusColor.text, fontWeight: 600 }}>{keyword}</span>
+                              <span style={{ color: testStatusColor.text, fontWeight: fontWeight.semibold }}>{keyword}</span>
                               {rest}
                             </div>
                           )

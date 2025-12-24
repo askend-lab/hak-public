@@ -1,4 +1,4 @@
-import { colors } from '../../styles/colors'
+import { colors, cursors, fontWeight } from '../../styles/colors'
 
 interface NavTabProps {
   label: string
@@ -17,13 +17,11 @@ export function NavTab({ label, isActive, onClick }: NavTabProps) {
         borderBottom: isActive ? `2px solid ${colors.primary}` : '2px solid transparent',
         color: isActive ? colors.primary : colors.gray,
         fontSize: '0.9375rem',
-        fontWeight: 500,
-        cursor: 'pointer',
+        fontWeight: fontWeight.medium,
+        cursor: cursors.pointer,
       }}
     >
       {label}
     </button>
   )
 }
-
-export default NavTab

@@ -1,24 +1,11 @@
 import { useState, useEffect } from 'react'
 
+import { TestSuiteResult } from '../../components/tests/test-card-helpers'
+import { useExpandedState } from '../../hooks'
 import { parseFeatureContent, ParsedFeature } from './feature-parser'
 
-interface TestAssertion {
-  fullName: string
-  title: string
-  status: 'passed' | 'failed' | 'pending'
-  duration: number
-  ancestorTitles: string[]
-  failureMessages: string[]
-}
-
-export interface TestSuiteResult {
-  name: string
-  status: 'passed' | 'failed'
-  assertionResults: TestAssertion[]
-  startTime: number
-  endTime: number
-  message?: string
-}
+export type { TestSuiteResult }
+export { useExpandedState }
 
 export interface JestResults {
   numPassedTests: number
@@ -95,18 +82,3 @@ export function useTestResults(): { results: JestResults | null; loading: boolea
   return { results, loading, error }
 }
 
-export function useExpandedState<T>(): { expanded: Set<T>; toggle: (item: T) => void; setExpanded: React.Dispatch<React.SetStateAction<Set<T>>> } {
-  const [expanded, setExpanded] = useState<Set<T>>(new Set())
-  
-  const toggle = (item: T): void => {
-    const newExpanded = new Set(expanded)
-    if (newExpanded.has(item)) {
-      newExpanded.delete(item)
-    } else {
-      newExpanded.add(item)
-    }
-    setExpanded(newExpanded)
-  }
-  
-  return { expanded, toggle, setExpanded }
-}

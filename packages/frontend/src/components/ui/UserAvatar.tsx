@@ -1,4 +1,4 @@
-import { colors } from '../../styles/colors'
+import { colors, gap, borderRadius, fontWeight, lineHeight, fontSize } from '../../styles/colors'
 
 interface UserAvatarProps {
   initials: string
@@ -8,31 +8,31 @@ interface UserAvatarProps {
 
 export function UserAvatar({ initials, name, id }: UserAvatarProps) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: gap.md }}>
       <div style={{
         width: '40px',
         height: '40px',
-        borderRadius: '50%',
-        backgroundColor: '#2D5A7B',
+        borderRadius: borderRadius.round,
+        backgroundColor: colors.primary,
         color: colors.white,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '0.875rem',
-        fontWeight: 600,
+        fontSize: fontSize.base,
+        fontWeight: fontWeight.semibold,
       }}>
         {initials}
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.3 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: lineHeight.tight }}>
         <span style={{
-          fontSize: '0.875rem',
-          fontWeight: 600,
+          fontSize: fontSize.base,
+          fontWeight: fontWeight.semibold,
           color: colors.primary,
         }}>
           {name}
         </span>
         <span style={{
-          fontSize: '0.75rem',
+          fontSize: fontSize.sm,
           color: colors.gray,
         }}>
           {id}
@@ -41,5 +41,3 @@ export function UserAvatar({ initials, name, id }: UserAvatarProps) {
     </div>
   )
 }
-
-export default UserAvatar

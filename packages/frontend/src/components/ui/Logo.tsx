@@ -27,5 +27,3 @@ export function Logo({ size = 'medium', withBackground = false }: LogoProps) {
     </svg>
   )
 }
-
-export default Logo

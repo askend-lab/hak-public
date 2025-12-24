@@ -7,11 +7,50 @@ import { checkFileExists } from './s3';
 import { publishToQueue } from './sqs';
 
 const MAX_TEXT_LENGTH = 1000;
-const SUCCESS_STATUS_CODE = 200;
-const MAX_STATUS_CODE = 400;
+
+const HTTP_STATUS = {
+  OK: 200,
+  BAD_REQUEST: 400
+} as const;
 
 interface RequestBody {
   text?: unknown;
+}
+
+interface ApiResponse {
+  statusCode: number;
+  body: string;
+}
+
+function createResponse(statusCode: number, body: unknown): ApiResponse {
+  return { statusCode, body: JSON.stringify(body) };
+}
+
+function createErrorResponse(error: string): ApiResponse {
+  return createResponse(HTTP_STATUS.BAD_REQUEST, { error });
+}
+
+function createSuccessResponse(body: unknown): ApiResponse {
+  return createResponse(HTTP_STATUS.OK, body);
+}
+
+function validateText(text: unknown): { valid: true; text: string } | { valid: false; error: string } {
+  if (typeof text !== 'string' || text === '') {
+    return { valid: false, error: 'Text field is required' };
+  }
+  if (text.length > MAX_TEXT_LENGTH) {
+    return { valid: false, error: `Text is too long (max ${String(MAX_TEXT_LENGTH)} characters)` };
+  }
+  return { valid: true, text };
+}
+
+function getRequiredEnvVars(): { bucketName: string; queueUrl: string } {
+  const bucketName = process.env.BUCKET_NAME ?? '';
+  const queueUrl = process.env.QUEUE_URL ?? '';
+  if (bucketName === '' || queueUrl === '') {
+    throw new Error('BUCKET_NAME and QUEUE_URL environment variables are required');
+  }
+  return { bucketName, queueUrl };
 }
 
 export async function handler(
@@ -20,33 +59,16 @@ export async function handler(
   sqsClient: Pick<SQSClient, 'send'>
 ): Promise<{ statusCode: number; body: string }> {
   try {
-    const bucketName = process.env.BUCKET_NAME ?? '';
-    const queueUrl = process.env.QUEUE_URL ?? '';
-    
-    if (bucketName === '' || queueUrl === '') {
-      throw new Error('BUCKET_NAME and QUEUE_URL environment variables are required');
-    }
+    const { bucketName, queueUrl } = getRequiredEnvVars();
     
     const body = JSON.parse(event.body) as RequestBody;
-    const text = body.text;
+    const validation = validateText(body.text);
     
-    if (typeof text !== 'string' || text === '') {
-      return {
-        statusCode: MAX_STATUS_CODE,
-        body: JSON.stringify({
-          error: 'Text field is required'
-        })
-      };
+    if (!validation.valid) {
+      return createErrorResponse(validation.error);
     }
     
-    if (text.length > MAX_TEXT_LENGTH) {
-      return {
-        statusCode: MAX_STATUS_CODE,
-        body: JSON.stringify({
-          error: `Text is too long (max ${String(MAX_TEXT_LENGTH)} characters)`
-        })
-      };
-    }
+    const text = validation.text;
     
     const hash = calculateHash(text);
     const key = `cache/${hash}.mp3`;
@@ -54,32 +76,21 @@ export async function handler(
     const exists = await checkFileExists(s3Client, bucketName, key);
     
     if (exists) {
-      return {
-        statusCode: SUCCESS_STATUS_CODE,
-        body: JSON.stringify({
-          status: 'ready',
-          url: `https://${bucketName}.s3.amazonaws.com/${key}`,
-          hash
-        })
-      };
+      return createSuccessResponse({
+        status: 'ready',
+        url: `https://${bucketName}.s3.amazonaws.com/${key}`,
+        hash
+      });
     }
     
     await publishToQueue(sqsClient, queueUrl, text, hash);
     
-    return {
-      statusCode: SUCCESS_STATUS_CODE,
-      body: JSON.stringify({
-        status: 'processing',
-        hash
-      })
-    };
+    return createSuccessResponse({
+      status: 'processing',
+      hash
+    });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return {
-      statusCode: MAX_STATUS_CODE,
-      body: JSON.stringify({
-        error: errorMessage
-      })
-    };
+    return createErrorResponse(errorMessage);
   }
 }
