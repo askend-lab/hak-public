@@ -8,18 +8,22 @@ export function formatPhoneticText(stem: string, ending: string): string {
 }
 
 function getFirstMrfStem(mrf: { stem?: string; ending?: string }[] | undefined): { stem: string; ending: string } | null {
-  if (!mrf || mrf.length === 0 || !mrf[0].stem) return null;
-  return { stem: mrf[0].stem, ending: mrf[0].ending || '' };
+   
+  if (mrf == null || mrf.length === 0 || mrf[0].stem == null) return null;
+    
+  return { stem: mrf[0].stem, ending: mrf[0].ending ?? '' };
 }
 
 export function extractTokenText(tokenData: { features?: { mrf?: { stem?: string; ending?: string }[]; token?: string } }): string | null {
   const first = getFirstMrfStem(tokenData.features?.mrf);
   if (first) return formatPhoneticText(first.stem, first.ending);
-  return tokenData.features?.token || null;
+   
+  return tokenData.features?.token ?? null;
 }
 
 export function createVariantFromMrf(mrfVariant: { stem?: string; ending?: string; pos?: string; lemma?: string; fs?: string }, word: string): Variant | null {
-  if (!mrfVariant.stem) return null;
+   
+  if (mrfVariant.stem == null) return null;
   
   const { stem, ending = '', pos = '', lemma = '', fs = '' } = mrfVariant;
   const text = formatPhoneticText(stem, ending);

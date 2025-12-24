@@ -25,7 +25,7 @@ describe('ProtectedRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete (window as Window & { location?: Location }).location;
-    window.location = { ...originalLocation, href: '', pathname: '/current' };
+    window.location = Object.assign({}, originalLocation, { href: '', pathname: '/current' });
   });
 
   afterEach(() => {
@@ -73,7 +73,8 @@ describe('useRequireAuth', () => {
     return (
       <div>
         <span data-testid="ready">{isReady ? 'yes' : 'no'}</span>
-        <span data-testid="userId">{userId || 'none'}</span>
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-nullish-coalescing
+        <span data-testid="userId">{userId ?? 'none'}</span>
       </div>
     );
   }

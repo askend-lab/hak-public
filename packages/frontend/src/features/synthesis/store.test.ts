@@ -36,7 +36,7 @@ describe('useSynthesisStore', () => {
   it('should set result and update phonetic text', () => {
     const result = { audioUrl: 'test.mp3', phoneticText: 'te`re' };
     useSynthesisStore.getState().setResult(result);
-    expect(useSynthesisStore.getState().result).toEqual(result);
+    expect(useSynthesisStore.getState().result).toStrictEqual(result);
     expect(useSynthesisStore.getState().phoneticText).toBe('te`re');
   });
 

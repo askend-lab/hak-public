@@ -3,7 +3,7 @@ interface MerlinResponse {
   format: string;
 }
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/strict-boolean-expressions -- fetch API and Buffer */
+ 
 export async function synthesize(
   text: string,
   merlinUrl: string,

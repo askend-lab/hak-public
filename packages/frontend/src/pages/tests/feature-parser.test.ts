@@ -1,4 +1,4 @@
-import { parseFeatureContent, ParsedFeature } from './feature-parser';
+import { parseFeatureContent } from './feature-parser';
 
 describe('feature-parser', () => {
   describe('parseFeatureContent', () => {

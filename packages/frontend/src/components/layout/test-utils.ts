@@ -13,7 +13,7 @@ export function setupI18nMock(extraTranslations: Record<string, string> = {}): v
   const translations = { ...DEFAULT_TRANSLATIONS, ...extraTranslations };
   
   mockUseTranslation.mockReturnValue({
-    t: (key: string) => translations[key] || key,
+    t: (key: string) => translations[key] ?? key,
     i18n: { changeLanguage: jest.fn() },
-  } as any);
+  } as jest.Mocked<ReturnType<typeof useTranslation>>);
 }

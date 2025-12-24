@@ -47,13 +47,14 @@ export function AudioPlayer({ className = '' }: AudioPlayerProps) {
     }
   }, [isPlaying]);
 
-  if (!result?.audioUrl || result.audioUrl === '') {
+   
+  if (result?.audioUrl == null || result.audioUrl === '') {
     return null;
   }
 
   return (
     <div className={`audio-player ${className}`}>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- audio player for synthesis */}
+      { }
       <audio ref={audioRef} src={result.audioUrl} preload="auto" />
       <button onClick={togglePlay} className="audio-player__button">
         {isPlaying ? '⏸ Paus' : '▶ Mängi'}

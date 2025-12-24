@@ -21,7 +21,7 @@ describe('Audio Cache', () => {
       mockHttpGet.mockResolvedValue(mockEntry);
 
       const result = await getCachedAudio('abc123');
-      expect(result).toEqual(mockEntry);
+      expect(result).toStrictEqual(mockEntry);
       expect(mockHttpGet).toHaveBeenCalledWith('/api/cache/abc123');
     });
 

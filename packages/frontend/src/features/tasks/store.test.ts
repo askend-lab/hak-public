@@ -104,7 +104,7 @@ describe('getSelectedTask', () => {
 
   it('should return selected task', () => {
     const state = { tasks: [mockTask], selectedTaskId: 'task-1', isLoading: false, error: null };
-    expect(getSelectedTask(state)).toEqual(mockTask);
+    expect(getSelectedTask(state)).toStrictEqual(mockTask);
   });
 
   it('should return null when selected task not found', () => {

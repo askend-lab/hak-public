@@ -12,7 +12,7 @@ export type SynthesizeFormat = 'json' | 'blob';
 
 export async function synthesize(
   request: MerlinRequest,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- format parameter reserved for future use
+   
   _format: SynthesizeFormat = 'json'
 ): Promise<MerlinResponse> {
   const ekiResponse = await httpPost<EkiMerlinResponse>(API_CONFIG.merlinUrl, {

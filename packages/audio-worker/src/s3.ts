@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- AWS SDK S3 operations */
+ 
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 export async function uploadAudio(

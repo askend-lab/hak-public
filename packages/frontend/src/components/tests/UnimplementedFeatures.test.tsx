@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+
 import { UnimplementedFeatures } from './UnimplementedFeatures';
 
 describe('UnimplementedFeatures', () => {
@@ -6,7 +7,7 @@ describe('UnimplementedFeatures', () => {
     render(
       <UnimplementedFeatures 
         expandedScenarios={new Set()} 
-        setExpandedScenarios={() => {}} 
+        setExpandedScenarios={jest.fn()} 
       />
     );
     expect(screen.getByText('Unimplemented Features')).toBeInTheDocument();
@@ -16,7 +17,7 @@ describe('UnimplementedFeatures', () => {
     render(
       <UnimplementedFeatures 
         expandedScenarios={new Set()} 
-        setExpandedScenarios={() => {}} 
+        setExpandedScenarios={jest.fn()} 
       />
     );
     expect(screen.getByText('US-033-baseline-tasks.feature')).toBeInTheDocument();
@@ -26,7 +27,7 @@ describe('UnimplementedFeatures', () => {
     render(
       <UnimplementedFeatures 
         expandedScenarios={new Set()} 
-        setExpandedScenarios={() => {}} 
+        setExpandedScenarios={jest.fn()} 
       />
     );
     expect(screen.getByText('Baseline tasks visible to all users')).toBeInTheDocument();
@@ -50,7 +51,7 @@ describe('UnimplementedFeatures', () => {
     render(
       <UnimplementedFeatures 
         expandedScenarios={new Set(['unimpl-0'])} 
-        setExpandedScenarios={() => {}} 
+        setExpandedScenarios={jest.fn()} 
       />
     );
     expect(screen.getByText(/I am a newly authenticated user/)).toBeInTheDocument();

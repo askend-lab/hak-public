@@ -43,14 +43,14 @@ const UNIMPLEMENTED_SCENARIOS = [
   ]},
 ]
 
-// eslint-disable-next-line max-lines-per-function -- component with hardcoded scenario data
+ 
 export function UnimplementedFeatures({ expandedScenarios, setExpandedScenarios }: {
   expandedScenarios: Set<string>
   setExpandedScenarios: (s: Set<string>) => void
 }) {
   const toggleScenario = (idx: number) => {
     const newExpanded = new Set(expandedScenarios)
-    const key = `unimpl-${idx}`
+    const key = `unimpl-${idx.toString()}`
     if (newExpanded.has(key)) {
       newExpanded.delete(key)
     } else {
@@ -135,7 +135,7 @@ export function UnimplementedFeatures({ expandedScenarios, setExpandedScenarios 
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {UNIMPLEMENTED_SCENARIOS.map((scenario, idx) => {
-              const isExpanded = expandedScenarios.has(`unimpl-${idx}`)
+              const isExpanded = expandedScenarios.has(`unimpl-${idx.toString()}`)
               return (
                 <ScenarioItem 
                   key={idx}
@@ -152,7 +152,7 @@ export function UnimplementedFeatures({ expandedScenarios, setExpandedScenarios 
   )
 }
 
-// eslint-disable-next-line max-lines-per-function -- UI component with styling
+ 
 function ScenarioItem({ scenario, isExpanded, onToggle }: {
   scenario: { name: string; steps: string[] }
   isExpanded: boolean
@@ -167,6 +167,9 @@ function ScenarioItem({ scenario, isExpanded, onToggle }: {
     }}>
       <div 
         onClick={onToggle}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggle(); }}
+        role="button"
+        tabIndex={0}
         style={{
           padding: '0.5rem 0.75rem',
           display: 'flex',

@@ -37,6 +37,7 @@ export function Modal({
       role="button"
       tabIndex={-1}
     >
+      { }
       <div 
         className={`modal ${className}`} 
         onClick={handleContentClick}

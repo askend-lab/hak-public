@@ -23,12 +23,12 @@ describe('AddToTaskButton', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseUIStore.mockReturnValue({ openModal: mockOpenModal } as any);
-    mockUseAuth.mockReturnValue({} as any);
+    mockUseUIStore.mockReturnValue({ openModal: mockOpenModal } as ReturnType<typeof mockUseUIStore>);
+    mockUseAuth.mockReturnValue({} as ReturnType<typeof mockUseAuth>);
   });
 
   it('should not render when no result', () => {
-    mockUseSynthesisStore.mockReturnValue({ result: null } as any);
+    mockUseSynthesisStore.mockReturnValue({ result: null } as ReturnType<typeof mockUseSynthesisStore>);
 
     const { container } = render(<AddToTaskButton />);
     expect(container.querySelector('.add-to-task-button')).toBeNull();
@@ -37,7 +37,7 @@ describe('AddToTaskButton', () => {
   it('should render button when result exists', () => {
     mockUseSynthesisStore.mockReturnValue({
       result: { audioUrl: 'test.mp3' },
-    } as any);
+    } as ReturnType<typeof mockUseSynthesisStore>);
 
     render(<AddToTaskButton />);
     expect(screen.getByText('+ Lisa ülesandesse')).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe('AddToTaskButton', () => {
   it('should open task select modal on click', () => {
     mockUseSynthesisStore.mockReturnValue({
       result: { audioUrl: 'test.mp3' },
-    } as any);
+    } as ReturnType<typeof mockUseSynthesisStore>);
 
     render(<AddToTaskButton />);
     fireEvent.click(screen.getByText('+ Lisa ülesandesse'));
@@ -56,7 +56,7 @@ describe('AddToTaskButton', () => {
   it('should apply custom className', () => {
     mockUseSynthesisStore.mockReturnValue({
       result: { audioUrl: 'test.mp3' },
-    } as any);
+    } as ReturnType<typeof mockUseSynthesisStore>);
 
     render(<AddToTaskButton className="custom-class" />);
     expect(document.querySelector('.custom-class')).toBeInTheDocument();

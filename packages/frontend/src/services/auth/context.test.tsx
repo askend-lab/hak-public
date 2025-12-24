@@ -13,11 +13,12 @@ function TestComponent() {
     <div>
       <div data-testid="loading">{isLoading ? 'loading' : 'ready'}</div>
       <div data-testid="authenticated">{isAuthenticated ? 'yes' : 'no'}</div>
-      <div data-testid="user">{user?.email || 'none'}</div>
-      <button onClick={() => login({ email: 'test@test.com', password: 'pass' })}>
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-nullish-coalescing
+      <div data-testid="user">{user?.email ?? 'none'}</div>
+      <button onClick={() => void login({ email: 'test@test.com', password: 'pass' })}>
         Login
       </button>
-      <button onClick={() => logout()}>Logout</button>
+      <button onClick={() => void logout()}>Logout</button>
     </div>
   );
 }
@@ -66,12 +67,13 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('loading')).toHaveTextContent('ready');
     });
 
-    await act(async () => {
+    act(() => {
       screen.getByText('Login').click();
     });
 
     await waitFor(() => {
       expect(screen.getByTestId('authenticated')).toHaveTextContent('yes');
+       
       expect(mockAuthStorage.setUser).toHaveBeenCalled();
     });
   });
@@ -89,12 +91,13 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('authenticated')).toHaveTextContent('yes');
     });
 
-    await act(async () => {
+    act(() => {
       screen.getByText('Logout').click();
     });
 
     await waitFor(() => {
       expect(screen.getByTestId('authenticated')).toHaveTextContent('no');
+       
       expect(mockAuthStorage.clear).toHaveBeenCalled();
     });
   });
@@ -102,7 +105,8 @@ describe('AuthProvider', () => {
 
 describe('useAuth', () => {
   it('should throw error when used outside AuthProvider', () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+     
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(jest.fn());
     
     expect(() => render(<TestComponent />)).toThrow(
       'useAuth must be used within AuthProvider'

@@ -29,7 +29,7 @@ describe('HTTP Client', () => {
       });
 
       const result = await httpRequest('/api/test');
-      expect(result).toEqual(mockData);
+      expect(result).toStrictEqual(mockData);
       expect(global.fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
         headers: { 'Content-Type': 'application/json' },
       }));

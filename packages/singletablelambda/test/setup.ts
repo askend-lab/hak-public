@@ -10,9 +10,9 @@ export const mockContext: Context = {
   logGroupName: 'test-group',
   logStreamName: 'test-stream',
   getRemainingTimeInMillis: () => 1000,
-  done: () => {},
-  fail: () => {},
-  succeed: () => {},
+  done: jest.fn(),
+  fail: jest.fn(),
+  succeed: jest.fn(),
 };
 
 const baseRequestContext = {
@@ -80,10 +80,18 @@ export function createGetEvent(path: string, params: Record<string, string> | nu
 }
 
 export function createPostEvent(path: string, body: object | string | null): APIGatewayProxyEvent {
+  let bodyStr: string | null;
+  if (typeof body === 'string') {
+    bodyStr = body;
+  } else if (body) {
+    bodyStr = JSON.stringify(body);
+  } else {
+    bodyStr = null;
+  }
   return createEvent({
     httpMethod: 'POST',
     path,
-    body: typeof body === 'string' ? body : body ? JSON.stringify(body) : null,
+    body: bodyStr,
   });
 }
 

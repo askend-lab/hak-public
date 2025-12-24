@@ -32,14 +32,14 @@ export interface JestResults {
   testResults: TestSuiteResult[]
 }
 
-export function useFeatureData() {
+export function useFeatureData(): ParsedFeature | null {
   const [featureData, setFeatureData] = useState<ParsedFeature | null>(null)
 
   useEffect(() => {
     fetch('/US-020-add-synthesis-to-task.feature')
       .then(res => res.text())
       .then(content => { setFeatureData(parseFeatureContent(content)); })
-      .catch(() => {})
+      .catch(jest.fn())
   }, [])
 
   return featureData
@@ -56,7 +56,7 @@ function countTests(featureTests: TestSuiteResult[]): { total: number; passed: n
   }), { total: 0, passed: 0 })
 }
 
-export function useTestResults() {
+export function useTestResults(): { results: JestResults | null; loading: boolean; error: string | null } {
   const [results, setResults] = useState<JestResults | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -65,33 +65,46 @@ export function useTestResults() {
     fetch('/jest-results.json')
       .then(res => res.json())
       .then(data => {
+         
         const featureTests = data.testResults.filter(isFeatureTest)
+         
         const counts = countTests(featureTests)
         
+         
         setResults({
+           
           ...data,
+           
           testResults: featureTests,
           numTotalTests: counts.total,
           numPassedTests: counts.passed,
           numFailedTests: counts.total - counts.passed,
+           
           numTotalTestSuites: featureTests.length,
+           
           numPassedTestSuites: featureTests.filter((s: TestSuiteResult) => s.status === 'passed').length,
+           
           numFailedTestSuites: featureTests.filter((s: TestSuiteResult) => s.status === 'failed').length,
         })
         setLoading(false)
       })
+       
       .catch(err => { setError(err.message); setLoading(false) })
   }, [])
 
   return { results, loading, error }
 }
 
-export function useExpandedState<T>() {
+export function useExpandedState<T>(): { expanded: Set<T>; toggle: (item: T) => void; setExpanded: React.Dispatch<React.SetStateAction<Set<T>>> } {
   const [expanded, setExpanded] = useState<Set<T>>(new Set())
   
-  const toggle = (item: T) => {
+  const toggle = (item: T): void => {
     const newExpanded = new Set(expanded)
-    newExpanded.has(item) ? newExpanded.delete(item) : newExpanded.add(item)
+    if (newExpanded.has(item)) {
+      newExpanded.delete(item)
+    } else {
+      newExpanded.add(item)
+    }
     setExpanded(newExpanded)
   }
   

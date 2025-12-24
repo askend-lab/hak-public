@@ -16,7 +16,7 @@ describe('TextInput', () => {
       text: '',
       setText: mockSetText,
       isLoading: false,
-    } as any);
+    } as ReturnType<typeof mockUseSynthesisStore>);
   });
 
   it('should render textarea with placeholder', () => {

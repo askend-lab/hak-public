@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayEventRequestContext } from 'aws-lambda';
 
 import { analyzeHandler, variantsHandler, healthHandler } from '../src/handler';
 import * as vmetajson from '../src/vmetajson';
@@ -21,7 +21,7 @@ function createEvent(body: object | null): APIGatewayProxyEvent {
     queryStringParameters: null,
     multiValueQueryStringParameters: null,
     stageVariables: null,
-    requestContext: {} as any,
+    requestContext: {} as APIGatewayEventRequestContext,
     resource: ''
   };
 }
@@ -180,8 +180,8 @@ describe('variantsHandler', () => {
 });
 
 describe('healthHandler', () => {
-  it('should return ok status', async () => {
-    const result = await healthHandler();
+  it('should return ok status', () => {
+    const result = healthHandler();
 
     expect(result.statusCode).toBe(200);
     const body = JSON.parse(result.body);

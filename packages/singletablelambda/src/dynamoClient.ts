@@ -37,7 +37,7 @@ export class DynamoDBAdapter implements StoreDynamoDBClient {
       TableName: this.tableName,
       Key: { PK: pk, SK: sk }
     }));
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- DynamoDB result may be undefined
+     
     return (result.Item as StoreItem) ?? null;
   }
 

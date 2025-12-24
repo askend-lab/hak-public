@@ -1,11 +1,9 @@
 #!/usr/bin/env node
-// DevBox wrapper - finds local or npm devbox
+// DevBox wrapper - use boxer's devbox
 
-const { execSync } = require('child_process');
-const args = process.argv.slice(2).join(' ');
+const { spawnSync } = require('child_process');
+const args = process.argv.slice(2);
 
-if (process.env.DEVBOX) {
-  execSync(`node ${process.env.DEVBOX}/cli.js ${args}`, { stdio: 'inherit' });
-} else {
-  execSync(`npx @askend-lab/devbox ${args}`, { stdio: 'inherit' });
-}
+const boxerDevbox = '/home/alex/users/boxer/devbox/cli.js';
+const result = spawnSync('node', [boxerDevbox, ...args], { stdio: 'inherit' });
+process.exit(result.status || 0);

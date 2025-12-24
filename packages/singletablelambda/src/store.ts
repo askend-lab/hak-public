@@ -34,7 +34,7 @@ export class Store {
   async save(request: StoreRequest): Promise<StoreResult> {
     const ttlValidation = validateTtl(request.ttl);
     if (!ttlValidation.valid) {
-      return this.failure(ttlValidation.error!);
+      return this.failure(ttlValidation.error ?? 'Invalid TTL');
     }
 
     const item = this.createItem(request);

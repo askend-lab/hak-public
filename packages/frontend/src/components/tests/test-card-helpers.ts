@@ -30,10 +30,10 @@ export interface ParsedFeature {
 }
 
 export function getFileName(path: string): string {
-  return path.split('/').pop() || path
+  return path.split('/').pop() ?? path
 }
 
-export function getStatusColors(status: 'passed' | 'failed') {
+export function getStatusColors(status: 'passed' | 'failed'): { bg: string; text: string; border: string; icon: string } {
   return status === 'passed' 
     ? { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7', icon: '✓' }
     : { bg: '#FFEBEE', text: '#C62828', border: '#EF9A9A', icon: '✗' }
@@ -52,5 +52,5 @@ export function findScenarioSteps(featureData: ParsedFeature | null, testTitle: 
     testTitle.toLowerCase().includes(s.name.toLowerCase()) ||
     s.name.toLowerCase().includes(testTitle.toLowerCase())
   )
-  return scenario?.steps || []
+  return scenario?.steps ?? []
 }

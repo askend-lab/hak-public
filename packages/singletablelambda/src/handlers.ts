@@ -19,7 +19,8 @@ interface RequestBody {
 }
 
 function parseBody(event: APIGatewayProxyEvent): RequestBody | null {
-  if (!event.body) return null;
+  if (event.body === null) return null;
+   
   try { return JSON.parse(event.body); } catch { return null; }
 }
 
@@ -61,7 +62,8 @@ export async function handleQuery(event: APIGatewayProxyEvent, store: Store): Pr
   const { prefix, type } = event.queryStringParameters ?? {};
   const validation = validateQueryRequest(prefix, type);
   if (!validation.valid) return createResponse(HTTP_BAD_REQUEST, { errors: validation.errors });
-  if (!prefix) return createResponse(HTTP_BAD_REQUEST, { error: 'Missing prefix parameter' });
+   
+  if (prefix == null) return createResponse(HTTP_BAD_REQUEST, { error: 'Missing prefix parameter' });
   const result = await store.query(prefix, type as DataType);
   return result.success ? createResponse(HTTP_OK, { items: result.items }) : createErrorResponse(result, HTTP_INTERNAL_ERROR);
 }

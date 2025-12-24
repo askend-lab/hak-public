@@ -16,7 +16,7 @@ describe('SynthesisEntrySchema', () => {
       voiceModel: 'efm_s',
       createdAt: '2025-01-01T00:00:00.000Z',
     };
-    expect(SynthesisEntrySchema.parse(valid)).toEqual(valid);
+    expect(SynthesisEntrySchema.parse(valid)).toStrictEqual(valid);
   });
 
   it('rejects invalid voiceModel', () => {
@@ -35,12 +35,12 @@ describe('SynthesisEntrySchema', () => {
 describe('CreateTaskRequestSchema', () => {
   it('validates correct request', () => {
     const valid = { name: 'My Task' };
-    expect(CreateTaskRequestSchema.parse(valid)).toEqual(valid);
+    expect(CreateTaskRequestSchema.parse(valid)).toStrictEqual(valid);
   });
 
   it('validates with description', () => {
     const valid = { name: 'My Task', description: 'A description' };
-    expect(CreateTaskRequestSchema.parse(valid)).toEqual(valid);
+    expect(CreateTaskRequestSchema.parse(valid)).toStrictEqual(valid);
   });
 
   it('rejects empty name', () => {

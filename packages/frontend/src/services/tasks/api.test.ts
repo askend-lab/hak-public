@@ -19,18 +19,18 @@ declare global {
 global.fetch = jest.fn();
 
 // DRY: Helper functions for fetch mocks
-const mockFetchSuccess = <T>(data: T) => {
+const mockFetchSuccess = (data: unknown): void => {
   (global.fetch as jest.Mock).mockResolvedValue({
     ok: true,
-    json: () => Promise.resolve(data),
+    json: (): Promise<unknown> => Promise.resolve(data),
   });
 };
 
-const mockFetchError = (status = 500) => {
+const mockFetchError = (status = 500): void => {
   (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status });
 };
 
-const mockFetchSequence = (responses: { ok: boolean; data?: unknown; status?: number }[]) => {
+const mockFetchSequence = (responses: { ok: boolean; data?: unknown; status?: number }[]): void => {
   const mock = global.fetch as jest.Mock;
   responses.forEach((res, i) => {
     if (i === 0) {
@@ -90,7 +90,7 @@ describe('Tasks API', () => {
       mockFetchSuccess(mockTask);
       const result = await getTask('user1', 'task1');
       expect(result.success).toBe(true);
-      expect(result.data).toEqual(mockTask);
+      expect(result.data).toStrictEqual(mockTask);
     });
   });
 

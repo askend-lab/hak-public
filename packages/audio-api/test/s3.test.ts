@@ -1,12 +1,12 @@
 import { checkFileExists } from '../src/s3';
 
-import { createMockS3Client } from './mocks';
+import { MockS3Client } from './mocks';
 
 describe('S3 Cache Check', () => {
-  let mockS3: any;
+  let mockS3: MockS3Client;
 
   beforeEach(() => {
-    mockS3 = createMockS3Client();
+    mockS3 = new MockS3Client();
   });
 
   it('should return true when file exists', async () => {
@@ -27,7 +27,7 @@ describe('S3 Cache Check', () => {
 
   it('should throw error on connection errors', async () => {
     const mockS3WithError = {
-      send: async () => {
+      send: (): never => {
         const error = new Error('Connection timeout') as Error & { name: string };
         error.name = 'NetworkError';
         throw error;

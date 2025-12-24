@@ -22,7 +22,7 @@ function result(errors: string[]): ValidationResult {
  * Validates a string field
  */
 function validateString(value: unknown, name: string, errors: string[]): void {
-  if (!value || typeof value !== 'string') {
+  if (value === null || typeof value !== 'string') {
     errors.push(`${name} is required and must be a string`);
   }
 }
@@ -31,7 +31,7 @@ function validateString(value: unknown, name: string, errors: string[]): void {
  * Validates data type field
  */
 function validateType(type: unknown, errors: string[]): void {
-  if (!type || !VALID_TYPES.includes(type as DataType)) {
+  if (type === null || !VALID_TYPES.includes(type as DataType)) {
     errors.push(`type must be one of: ${VALID_TYPES.join(', ')}`);
   }
 }
@@ -51,11 +51,11 @@ export function validateStoreRequest(request: Partial<StoreRequest>): Validation
   } else {
     const ttlValidation = validateTtl(request.ttl);
     if (!ttlValidation.valid) {
-      errors.push(ttlValidation.error!);
+      errors.push(ttlValidation.error ?? 'Invalid TTL');
     }
   }
 
-  if (request.data !== undefined && (typeof request.data !== 'object' || request.data === null)) {
+  if (request.data !== undefined && typeof request.data !== 'object') {
     errors.push('data must be an object');
   }
 

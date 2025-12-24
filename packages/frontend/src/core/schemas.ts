@@ -39,7 +39,11 @@ export const AddEntryRequestSchema = z.object({
   synthesis: SynthesisEntrySchema,
 });
 
-export const apiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
+export const apiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T): z.ZodObject<{
+  success: z.ZodBoolean;
+  data: z.ZodOptional<T>;
+  error: z.ZodOptional<z.ZodString>;
+}> =>
   z.object({
     success: z.boolean(),
     data: dataSchema.optional(),

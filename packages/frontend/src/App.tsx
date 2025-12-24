@@ -63,7 +63,7 @@ function App() {
       <NotificationContainer />
       
       {/* Hidden audio element for playback */}
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- hidden audio player for synthesis */}
+      { }
       <audio ref={audioRef} style={{ display: 'none' }} />
     </div>
   )

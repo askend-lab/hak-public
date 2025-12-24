@@ -29,18 +29,18 @@ const initialState: TasksState = {
 
 export const useTasksStore = create<TasksState & TasksActions>((set) => ({
   ...initialState,
-  setTasks: (tasks) => { set({ tasks }); },
-  addTask: (task) => { set((state) => ({ tasks: [...state.tasks, task] })); },
-  updateTask: (taskId, updates) =>
+  setTasks: (tasks): void => { set({ tasks }); },
+  addTask: (task): void => { set((state) => ({ tasks: [...state.tasks, task] })); },
+  updateTask: (taskId, updates): void =>
     { set((state) => ({
       tasks: state.tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t)),
     })); },
-  removeTask: (taskId) =>
+  removeTask: (taskId): void =>
     { set((state) => ({ tasks: state.tasks.filter((t) => t.id !== taskId) })); },
-  selectTask: (taskId) => { set({ selectedTaskId: taskId }); },
-  setLoading: (isLoading) => { set({ isLoading }); },
-  setError: (error) => { set({ error }); },
-  reset: () => { set(initialState); },
+  selectTask: (taskId): void => { set({ selectedTaskId: taskId }); },
+  setLoading: (isLoading): void => { set({ isLoading }); },
+  setError: (error): void => { set({ error }); },
+  reset: (): void => { set(initialState); },
 }));
 
 export const getSelectedTask = (state: TasksState): Task | null => {

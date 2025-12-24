@@ -66,12 +66,12 @@ describe('test-card-helpers', () => {
 
     it('should return empty array if no match', () => {
       const steps = findScenarioSteps(mockFeature, 'Unknown Scenario');
-      expect(steps).toEqual([]);
+      expect(steps).toStrictEqual([]);
     });
 
     it('should return empty array if featureData is null', () => {
       const steps = findScenarioSteps(null, 'User Login');
-      expect(steps).toEqual([]);
+      expect(steps).toStrictEqual([]);
     });
 
     it('should match case-insensitively', () => {

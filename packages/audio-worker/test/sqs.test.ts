@@ -24,7 +24,7 @@ describe('SQS Operations', () => {
 
       const result = await receiveMessage(mockSqsClient, 'https://queue-url');
       
-      expect(result).toEqual(mockMessage);
+      expect(result).toStrictEqual(mockMessage);
       expect(mockSqsClient.send).toHaveBeenCalledTimes(1);
     });
 
@@ -55,7 +55,7 @@ describe('SQS Operations', () => {
 
       const result = parseMessage(message);
       
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         text: 'tere päevast',
         hash: 'abc123def456',
       });
@@ -66,7 +66,7 @@ describe('SQS Operations', () => {
         Body: 'invalid json',
       };
 
-      expect(() => parseMessage(message as any)).toThrow();
+      expect(() => parseMessage(message as { Body: string })).toThrow();
     });
 
     it('should throw error for missing text field', () => {
@@ -74,7 +74,7 @@ describe('SQS Operations', () => {
         Body: JSON.stringify({ hash: 'abc123' }),
       };
 
-      expect(() => parseMessage(message as any)).toThrow('Missing text field');
+      expect(() => parseMessage(message as { Body: string })).toThrow('Missing text field');
     });
 
     it('should throw error for missing hash field', () => {
@@ -82,7 +82,7 @@ describe('SQS Operations', () => {
         Body: JSON.stringify({ text: 'tere' }),
       };
 
-      expect(() => parseMessage(message as any)).toThrow('Missing hash field');
+      expect(() => parseMessage(message as { Body: string })).toThrow('Missing hash field');
     });
   });
 

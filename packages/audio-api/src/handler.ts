@@ -1,4 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, max-lines-per-function, max-statements, complexity -- handler function needs process.env and has complex logic */
+ 
+import type { S3Client } from '@aws-sdk/client-s3';
+import type { SQSClient } from '@aws-sdk/client-sqs';
+
 import { calculateHash } from './hash';
 import { checkFileExists } from './s3';
 import { publishToQueue } from './sqs';
@@ -13,12 +16,12 @@ interface RequestBody {
 
 export async function handler(
   event: { body: string },
-  s3Client: any,
-  sqsClient: any
+  s3Client: Pick<S3Client, 'send'>,
+  sqsClient: Pick<SQSClient, 'send'>
 ): Promise<{ statusCode: number; body: string }> {
   try {
-    const bucketName = (process.env.BUCKET_NAME as string | undefined) ?? '';
-    const queueUrl = (process.env.QUEUE_URL as string | undefined) ?? '';
+    const bucketName = process.env.BUCKET_NAME ?? '';
+    const queueUrl = process.env.QUEUE_URL ?? '';
     
     if (bucketName === '' || queueUrl === '') {
       throw new Error('BUCKET_NAME and QUEUE_URL environment variables are required');

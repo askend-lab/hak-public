@@ -41,7 +41,7 @@ describe('Validation', () => {
       const result = validateStoreRequest({
         pk: 'entity1',
         sk: 'sort1',
-        type: 'invalid' as any,
+        type: 'invalid' as 'private' | 'public' | 'draft',
         ttl: 3600
       });
 
@@ -79,7 +79,7 @@ describe('Validation', () => {
         sk: 'sort1',
         type: 'private',
         ttl: 3600,
-        data: 'not an object' as any
+        data: 'not an object' as unknown as Record<string, unknown>
       });
 
       expect(result.valid).toBe(false);

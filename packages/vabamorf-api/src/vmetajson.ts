@@ -21,13 +21,15 @@ export function initVmetajson(binaryPath = './vmetajson', dictPath = '.'): void 
     const lines = buffer.split('\n');
     
     while (lines.length > 1) {
-      const line = lines.shift()!;
-      if (line.trim() && pendingResolve) {
+      const line = lines.shift();
+      // intentional null/undefined check
+      if (line !== undefined && line.trim() !== '' && pendingResolve !== null) {
         try {
           const response = JSON.parse(line) as VmetajsonResponse;
           pendingResolve(response);
-        } catch (e) {
-          pendingReject?.(new Error(`Failed to parse vmetajson response: ${line}`));
+        } catch {
+           
+          pendingReject?.(new Error(`Failed to parse vmetajson response: ${line ?? 'unknown'}`));
         }
         pendingResolve = null;
         pendingReject = null;
@@ -46,7 +48,7 @@ export function initVmetajson(binaryPath = './vmetajson', dictPath = '.'): void 
 
   process.on('exit', (code: number | null) => {
     if (pendingReject) {
-      pendingReject(new Error(`vmetajson exited with code ${code}`));
+      pendingReject(new Error(`vmetajson exited with code ${String(code ?? 'unknown')}`));
       pendingResolve = null;
       pendingReject = null;
     }
@@ -76,22 +78,24 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
       reject(new Error('vmetajson timeout'));
     }, 5000);
 
-    const cleanup = () => clearTimeout(timeout);
+    const cleanup = (): void => { clearTimeout(timeout); };
     
     const originalResolve = resolve;
     const originalReject = reject;
     
-    pendingResolve = (value) => {
+    pendingResolve = (value): void => {
       cleanup();
       originalResolve(value);
     };
     
-    pendingReject = (error) => {
+    pendingReject = (error): void => {
       cleanup();
       originalReject(error);
     };
 
-    process!.stdin?.write(`${JSON.stringify(input)  }\n`);
+    if (process?.stdin) {
+      process.stdin.write(`${JSON.stringify(input)  }\n`);
+    }
   });
 }
 

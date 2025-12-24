@@ -1,12 +1,12 @@
 import { publishToQueue } from '../src/sqs';
 
-import { createMockSQSClient } from './mocks';
+import { MockSQSClient } from './mocks';
 
 describe('SQS Message Publishing', () => {
-  let mockSQS: any;
+  let mockSQS: MockSQSClient;
 
   beforeEach(() => {
-    mockSQS = createMockSQSClient();
+    mockSQS = new MockSQSClient();
   });
 
   it('should send SQS message with correct payload', async () => {
@@ -19,7 +19,7 @@ describe('SQS Message Publishing', () => {
     expect(mockSQS.messages).toHaveLength(1);
     expect(mockSQS.messages[0].QueueUrl).toBe(queueUrl);
     
-    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody!);
+    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody);
     expect(messageBody.text).toBe(text);
     expect(messageBody.hash).toBe(hash);
   });
@@ -31,7 +31,7 @@ describe('SQS Message Publishing', () => {
     
     await publishToQueue(mockSQS, queueUrl, text, hash);
     
-    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody!);
+    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody);
     expect(messageBody.text).toBeDefined();
     expect(messageBody.hash).toBeDefined();
     expect(messageBody.timestamp).toBeDefined();
@@ -40,7 +40,7 @@ describe('SQS Message Publishing', () => {
 
   it('should handle publish errors', async () => {
     const mockSQSWithError = {
-      send: async () => {
+      send: (): never => {
         throw new Error('Queue not found');
       }
     };

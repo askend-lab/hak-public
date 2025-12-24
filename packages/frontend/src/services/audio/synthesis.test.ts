@@ -9,15 +9,16 @@ jest.mock('../config', () => ({
 
 // Mock modules that use import.meta.env
 jest.mock('./cache', () => ({
-  generateCacheKey: (text: string, voice: string, version) => 
+  generateCacheKey: (text: string, voice: string, version: string): string => 
     `${version}:${voice}:${btoa(text)}`,
   checkCache: jest.fn(),
   saveToCache: jest.fn(),
 }));
 
 jest.mock('./vabamorf', () => ({
-  toPhoneticText: (response?: { words?: { phonetic: string }[] }) => 
-    response?.words?.map((w: { phonetic: string }) => w.phonetic).join(' ') || '',
+  toPhoneticText: (response?: { words?: { phonetic: string }[] }): string => 
+     
+    response?.words?.map((w: { phonetic: string }) => w.phonetic).join(' ') ?? '',
   analyzeText: jest.fn(),
 }));
 
@@ -113,7 +114,7 @@ describe('synthesizeText', () => {
 
     const result = await synthesizeText(text);
 
-    expect(result).toEqual({
+    expect(result).toStrictEqual({
       originalText: text,
       phoneticText: text,
       audioUrl,
@@ -139,7 +140,7 @@ describe('synthesizeText', () => {
 
     const result = await synthesizeText(text);
 
-    expect(result).toEqual({
+    expect(result).toStrictEqual({
       originalText: '',
       phoneticText: '',
       audioUrl,
@@ -169,7 +170,7 @@ describe('synthesizeWithRetry', () => {
 
     mockWithRetry.mockImplementation(async (fn, options) => {
       expect(options?.maxRetries).toBe(3);
-      return await fn();
+      return fn();
     });
 
     mockSynthesizeViaApi.mockResolvedValue(expectedResult.audioUrl);
@@ -178,7 +179,7 @@ describe('synthesizeWithRetry', () => {
 
     const result = await synthesizeWithRetry(text);
 
-    expect(result).toEqual(expectedResult);
+    expect(result).toStrictEqual(expectedResult);
     expect(mockWithRetry).toHaveBeenCalled();
   });
 
@@ -196,7 +197,7 @@ describe('synthesizeWithRetry', () => {
 
     mockWithRetry.mockImplementation(async (fn, options) => {
       expect(options?.maxRetries).toBe(5);
-      return await fn();
+      return fn();
     });
 
     mockSynthesizeViaApi.mockResolvedValue(expectedResult.audioUrl);
@@ -205,7 +206,7 @@ describe('synthesizeWithRetry', () => {
 
     const result = await synthesizeWithRetry(text, 5);
 
-    expect(result).toEqual(expectedResult);
+    expect(result).toStrictEqual(expectedResult);
   });
 
   it('should propagate errors from retry mechanism', async () => {

@@ -84,7 +84,7 @@ describe('Vabamorf', () => {
     it('should return empty array for invalid index', () => {
       const response = { words: [] };
       const variants = getWordVariants(response, 5);
-      expect(variants).toEqual([]);
+      expect(variants).toStrictEqual([]);
     });
   });
 });

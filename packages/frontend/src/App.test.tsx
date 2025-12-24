@@ -35,6 +35,7 @@ describe('App', () => {
 
   it('throws error when TaskSelectModal used without AuthProvider', () => {
     // This test documents the requirement: App needs AuthProvider
+     
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     
     expect(() => {

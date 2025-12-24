@@ -5,24 +5,23 @@ import { initVmetajson, analyze, closeVmetajson, isInitialized } from '../src/vm
 
 jest.mock('child_process');
 
-const mockSpawn = spawn as jest.MockedFunction<typeof spawn>;
+const mockSpawn = spawn;
 
-function createMockProcess() {
-  const stdin = new EventEmitter() as any;
-  stdin.write = jest.fn();
-  
+interface MockProcess extends EventEmitter {
+  stdin: EventEmitter & { write: jest.Mock };
+  stdout: EventEmitter;
+  kill: jest.Mock;
+}
+
+function createMockProcess(): MockProcess {
+  const stdin = Object.assign(new EventEmitter(), { write: jest.fn() });
   const stdout = new EventEmitter();
-  
-  const proc = new EventEmitter() as any;
-  proc.stdin = stdin;
-  proc.stdout = stdout;
-  proc.kill = jest.fn();
-  
+  const proc = Object.assign(new EventEmitter(), { stdin, stdout, kill: jest.fn() }) as MockProcess;
   return proc;
 }
 
 describe('vmetajson', () => {
-  let mockProcess: any;
+  let mockProcess: MockProcess;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -153,7 +152,7 @@ describe('vmetajson', () => {
       }, 10);
 
       const result = await analyzePromise;
-      expect(result.annotations).toEqual({});
+      expect(result.annotations).toStrictEqual({});
     });
   });
 
@@ -182,7 +181,7 @@ describe('vmetajson', () => {
       }, 10);
 
       const result = await analyzePromise;
-      expect(result.annotations).toEqual({});
+      expect(result.annotations).toStrictEqual({});
     });
 
     it('should use default paths', () => {

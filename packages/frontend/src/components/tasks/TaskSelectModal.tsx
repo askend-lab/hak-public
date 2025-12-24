@@ -1,35 +1,14 @@
 import { useState, useCallback, useEffect } from 'react';
+
+import { createSynthesisEntry } from '../../core';
 import { useSynthesisStore, useTasksStore, useUIStore } from '../../features';
 import { useAuth } from '../../services/auth';
 import { addEntryToTask, listTasks } from '../../services/tasks';
-import { createSynthesisEntry, createTaskEntry } from '../../core';
 import { Modal } from '../ui';
-import type { Task } from '../../core/schemas';
 
 interface TaskSelectModalProps { onClose?: () => void; }
 
-function TaskList({ tasks, selectedId, onSelect }: { tasks: Task[]; selectedId: string | null; onSelect: (id: string) => void }) {
-  return (
-    <ul className="task-list">
-      {tasks.map(task => (
-        <li key={task.id} className={`task-list__item ${selectedId === task.id ? 'task-list__item--selected' : ''}`} onClick={() => onSelect(task.id)}>
-          <span className="task-list__name">{task.name}</span>
-          <span className="task-list__count">{task.entries.length} kirjet</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
-  return (
-    <div>
-      <p>Ülesandeid pole.</p>
-      <button onClick={onCreateNew} className="btn btn--link">+ Loo uus ülesanne</button>
-    </div>
-  );
-}
-
+ 
 export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
   const { activeModal, closeModal, openModal, addNotification } = useUIStore();
   const { tasks, setTasks, setLoading, isLoading } = useTasksStore();
@@ -41,36 +20,116 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
   useEffect(() => {
     if (activeModal !== 'taskSelect') return;
     setLoading(true);
-    listTasks(user?.id || 'test-user').then(r => r.success && r.data && setTasks(r.data)).finally(() => setLoading(false));
+    const userId = user?.id ?? 'test-user';
+    void listTasks(userId)
+      .then(response => {
+        if (response.success && response.data) {
+          setTasks(response.data);
+        }
+      })
+      .finally(() => { setLoading(false); });
   }, [activeModal, user, setTasks, setLoading]);
 
   const handleClose = useCallback(() => { closeModal(); onClose?.(); }, [closeModal, onClose]);
 
-  // eslint-disable-next-line complexity -- submit handler with error handling
+  // Create a synthesis entry from the current result
+  const createEntry = useCallback(() => {
+    if (!result) return null;
+    return createSynthesisEntry({
+      originalText: text,
+      phoneticText: result.phoneticText,
+      audioHash: result.audioHash,
+      voiceModel: result.voiceModel,
+    });
+  }, [result, text]);
+
+   
   const handleSubmit = useCallback(async () => {
-    if (!selectedId || !result) return;
-    const synthesis = createSynthesisEntry({ originalText: text, phoneticText: result.phoneticText, audioHash: result.audioHash, voiceModel: result.voiceModel });
-    const entry = createTaskEntry(synthesis, tasks.find(t => t.id === selectedId)?.entries.length ?? 0);
+    if (selectedId === null || !result) return;
+    const entry = createEntry();
+    if (!entry) return;
+
     setIsSubmitting(true);
     try {
-      const response = await addEntryToTask(user?.id || 'test-user', selectedId, entry);
-      const taskName = tasks.find(t => t.id === selectedId)?.name;
-      response.success ? (addNotification('success', `Lisatud ülesandesse "${taskName}"`), handleClose()) : addNotification('error', response.error || 'Lisamine ebaõnnestus');
-    } catch { addNotification('error', 'Võrgu viga'); } finally { setIsSubmitting(false); }
-  }, [selectedId, user, result, text, tasks, addNotification, handleClose]);
+      const userId = user?.id ?? 'test-user';
+      const response = await addEntryToTask(userId, selectedId, entry);
+      const taskName = tasks.find(t => t.id === selectedId)?.name ?? 'ülesanne';
+      if (response.success) {
+        addNotification('success', `Lisatud ülesandesse "${taskName}"`);
+        handleClose();
+      } else {
+        addNotification('error', response.error ?? 'Lisamine ebaõnnestus');
+      }
+    } catch {
+      addNotification('error', 'Võrgu viga');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [selectedId, user, result, tasks, createEntry, addNotification, handleClose]);
 
   const footer = (
     <>
-      <button onClick={handleClose} className="btn btn--secondary">Tühista</button>
-      <button onClick={handleSubmit} disabled={!selectedId || isSubmitting} className="btn btn--primary">{isSubmitting ? 'Lisan...' : 'Lisa'}</button>
+      <button onClick={handleClose} className="btn btn--secondary">
+        Tühista
+      </button>
+      <button
+        onClick={() => { void handleSubmit(); }}
+        disabled={selectedId === null || isSubmitting}
+        className="btn btn--primary"
+      >
+        {isSubmitting ? 'Lisan...' : 'Lisa'}
+      </button>
     </>
   );
 
+  const renderContent = () => {
+    if (isLoading) {
+      return <p>Laadin ülesandeid...</p>;
+    }
+    
+    if (tasks.length === 0) {
+      return (
+        <div>
+          <p>Ülesandeid pole.</p>
+          <button 
+            onClick={() => { openModal('taskCreate'); }} 
+            className="btn btn--link"
+          >
+            + Loo uus ülesanne
+          </button>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="task-list">
+        {tasks.map(task => (
+          <button
+             
+            key={task.id}
+            className={`task-list__item ${selectedId === task.id ? 'task-list__item--selected' : ''}`}
+            onClick={() => { setSelectedId(task.id); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedId(task.id); }}
+            type="button"
+          >
+            <span className="task-list__name">{task.name}</span>
+            <span className="task-list__count">{task.entries.length} kirjet</span>
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <Modal isOpen={activeModal === 'taskSelect'} onClose={handleClose} title="Vali ülesanne" footer={footer}>
-      {isLoading && <p>Laadin ülesandeid...</p>}
-      {!isLoading && tasks.length === 0 && <EmptyState onCreateNew={() => openModal('taskCreate')} />}
-      {!isLoading && tasks.length > 0 && <TaskList tasks={tasks} selectedId={selectedId} onSelect={setSelectedId} />}
+    <Modal
+      isOpen={activeModal === 'taskSelect'}
+      onClose={handleClose}
+      title="Vali ülesanne"
+      footer={footer}
+    >
+      {renderContent()}
     </Modal>
   );
 }
+
+export default TaskSelectModal;

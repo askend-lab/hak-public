@@ -21,7 +21,8 @@ export function AddToTaskButton({ className = '' }: AddToTaskButtonProps) {
     openModal('taskSelect');
   }, [openModal]);
 
-  if (!result?.audioUrl || result.audioUrl === '') {
+   
+  if (result?.audioUrl == null || result.audioUrl === '') {
     return null;
   }
 

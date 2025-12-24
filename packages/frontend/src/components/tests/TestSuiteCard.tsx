@@ -9,7 +9,7 @@ import {
   findScenarioSteps 
 } from './test-card-helpers'
 
-// eslint-disable-next-line max-lines-per-function -- complex UI component with nested rendering
+ 
 export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expandedTests, onToggleTest }: {
   suite: TestSuiteResult
   isExpanded: boolean
@@ -31,6 +31,9 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
     }}>
       <div 
         onClick={onToggle}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggle(); }}
+        role="button"
+        tabIndex={0}
         style={{
           padding: '1.25rem',
           cursor: 'pointer',
@@ -97,17 +100,17 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
               color: '#C62828',
               fontSize: '0.875rem',
             }}>
-              {suite.message ? suite.message.substring(0, 500) : 'No tests executed'}
+              {suite.message === undefined ? 'No tests executed' : suite.message.substring(0, 500)}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {/* eslint-disable-next-line max-lines-per-function -- nested test rendering */}
+              { }
               {suite.assertionResults.map((test, idx) => {
                 const testStatusColor = test.status === 'passed'
                   ? { bg: '#E8F5E9', text: '#2E7D32', icon: '✓' }
                   : { bg: '#FFEBEE', text: '#C62828', icon: '✗' }
                 
-                const testId = `${suite.name}-${idx}`
+                const testId = `${suite.name}-${idx.toString()}`
                 const isTestExpanded = expandedTests.has(testId)
                 const steps = findScenarioSteps(featureData, test.title)
                 
@@ -119,7 +122,20 @@ export function TestSuiteCard({ suite, isExpanded, onToggle, featureData, expand
                     overflow: 'hidden',
                   }}>
                     <div 
-                      onClick={() => steps.length > 0 && onToggleTest(testId)}
+                      onClick={() => {
+                        if (steps.length > 0) {
+                          onToggleTest(testId);
+                        }
+                      }}
+                      onKeyDown={(e) => { 
+                        if (e.key === 'Enter' || e.key === ' ') { 
+                          if (steps.length > 0) {
+                            onToggleTest(testId);
+                          }
+                        } 
+                      }}
+                      role="button"
+                      tabIndex={0}
                       style={{
                         padding: '0.75rem 1rem',
                         display: 'flex',

@@ -65,7 +65,7 @@ export function validateTtl(ttl: number): TtlValidationResult {
   }
   
   if (ttl > config.maxTtlSeconds) {
-    return { valid: false, error: `TTL exceeds maximum of ${config.maxTtlSeconds} seconds (1 year)` };
+    return { valid: false, error: `TTL exceeds maximum of ${String(config.maxTtlSeconds)} seconds (1 year)` };
   }
   
   return { valid: true, ttl };

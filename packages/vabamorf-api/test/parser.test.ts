@@ -181,7 +181,7 @@ describe('extractVariants', () => {
   it('should return empty array if no tokens', () => {
     const response: VmetajsonResponse = {};
     const result = extractVariants(response, 'word');
-    expect(result).toEqual([]);
+    expect(result).toStrictEqual([]);
   });
 
   it('should include lemma in description if different from word', () => {
@@ -218,7 +218,7 @@ describe('extractVariants', () => {
     };
 
     const result = extractVariants(response, 'xyz');
-    expect(result).toEqual([]);
+    expect(result).toStrictEqual([]);
   });
 
   it('should handle empty mrf array', () => {

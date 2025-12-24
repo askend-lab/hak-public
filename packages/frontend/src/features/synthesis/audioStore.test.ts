@@ -12,7 +12,7 @@ describe('useSynthesisAudioStore', () => {
   it('should set result', () => {
     const result = { audioUrl: 'test.mp3', duration: 10 };
     useSynthesisAudioStore.getState().setResult(result);
-    expect(useSynthesisAudioStore.getState().result).toEqual(result);
+    expect(useSynthesisAudioStore.getState().result).toStrictEqual(result);
   });
 
   it('should set audio element', () => {

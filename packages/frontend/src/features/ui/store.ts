@@ -30,20 +30,20 @@ const initialState: UIState = {
 
 export const useUIStore = create<UIState & UIActions>((set) => ({
   ...initialState,
-  openModal: (modal) => { set({ activeModal: modal }); },
-  closeModal: () => { set({ activeModal: null }); },
-  addNotification: (type, message, duration = 5000) =>
+  openModal: (modal): void => { set({ activeModal: modal }); },
+  closeModal: (): void => { set({ activeModal: null }); },
+  addNotification: (type, message, duration = 5000): void =>
     { set((state) => ({
       notifications: [
         ...state.notifications,
         { id: String(Date.now()), type, message, duration },
       ],
     })); },
-  removeNotification: (id) =>
+  removeNotification: (id): void =>
     { set((state) => ({
       notifications: state.notifications.filter((n) => n.id !== id),
     })); },
-  clearNotifications: () => { set({ notifications: [] }); },
+  clearNotifications: (): void => { set({ notifications: [] }); },
 }));
 
 export type { ModalType, NotificationType, Notification };

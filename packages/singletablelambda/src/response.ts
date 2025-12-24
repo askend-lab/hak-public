@@ -20,7 +20,8 @@ const ERROR_STATUS_MAP: Record<string, number> = {
 };
 
 function getErrorStatusCode(error: string | undefined, defaultStatus: number): number {
-  return error ? (ERROR_STATUS_MAP[error] ?? defaultStatus) : defaultStatus;
+   
+  return error != null ? (ERROR_STATUS_MAP[error] ?? defaultStatus) : defaultStatus;
 }
 
 export function createResponse(statusCode: number, body: unknown): APIGatewayProxyResult {

@@ -7,7 +7,7 @@ describe('asyncSlice', () => {
     });
 
     it('should have error set to null', () => {
-      expect(initialAsyncState.error).toBe(null);
+      expect(initialAsyncState.error).toBeNull();
     });
   });
 

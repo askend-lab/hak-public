@@ -50,7 +50,7 @@ describe('KeyBuilder', () => {
 
   describe('validateTtl', () => {
     it('should accept valid TTL within limits', () => {
-      expect(validateTtl(3600)).toEqual({ valid: true, ttl: 3600 });
+      expect(validateTtl(3600)).toStrictEqual({ valid: true, ttl: 3600 });
     });
 
     it('should reject TTL of zero', () => {
@@ -72,7 +72,7 @@ describe('KeyBuilder', () => {
     });
 
     it('should accept TTL at max limit', () => {
-      expect(validateTtl(config.maxTtlSeconds)).toEqual({ valid: true, ttl: config.maxTtlSeconds });
+      expect(validateTtl(config.maxTtlSeconds)).toStrictEqual({ valid: true, ttl: config.maxTtlSeconds });
     });
   });
 });

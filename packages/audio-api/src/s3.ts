@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call -- AWS SDK S3 operations */
 import { HeadObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 
 interface S3Error {
@@ -16,7 +15,6 @@ export async function checkFileExists(
   key: string
 ): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- AWS SDK command construction
     const command = new HeadObjectCommand({
       Bucket: bucket,
       Key: key

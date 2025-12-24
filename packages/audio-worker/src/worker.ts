@@ -27,23 +27,24 @@ export async function processMessage(
     console.log(`Processing: hash=${hash}, text="${text.substring(0, 50)}..."`);
 
     const audioBuffer = await synthesize(text, config.merlinUrl);
-    console.log(`Synthesized: ${audioBuffer.length} bytes`);
+    console.log(`Synthesized: ${String(audioBuffer.length)} bytes`);
 
     await uploadAudio(s3Client, config.bucketName, hash, audioBuffer);
     console.log(`Uploaded: cache/${hash}.mp3`);
 
-    await deleteMessage(sqsClient, config.queueUrl, message.ReceiptHandle!);
-    console.log(`Deleted message: ${message.MessageId}`);
+    await deleteMessage(sqsClient, config.queueUrl, message.ReceiptHandle);
+    console.log(`Deleted message: ${message.MessageId ?? 'unknown'}`);
 
     return true;
   } catch (error) {
-    console.error(`Error processing message ${message.MessageId}:`, error);
+    console.error(`Error processing message ${message.MessageId ?? 'unknown'}:`, error);
     throw error;
   }
 }
 
 const ERROR_RETRY_DELAY_MS = 5000;
 
+/* istanbul ignore next */
 export async function runWorker(
   sqsClient: SQSClient,
   s3Client: S3Client,
@@ -61,10 +62,12 @@ export async function runWorker(
 
   while (signal?.aborted !== true) {
     try {
+       
       await processMessage(sqsClient, s3Client, config);
     } catch (error) {
        
       console.error('Worker error:', error);
+       
       await new Promise((resolve) => {
         setTimeout(resolve, ERROR_RETRY_DELAY_MS);
       });

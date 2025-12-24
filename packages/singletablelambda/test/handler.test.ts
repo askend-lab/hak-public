@@ -22,7 +22,7 @@ describe('Lambda Handler', () => {
       const event = createEventWithAuth({});
       const result = await handler(event, mockContext);
       expect(result.statusCode).toBe(401);
-      expect(JSON.parse(result.body)).toEqual({ error: 'Unauthorized' });
+      expect(JSON.parse(result.body)).toStrictEqual({ error: 'Unauthorized' });
     });
 
     it('should return 401 if authorizer is null', async () => {

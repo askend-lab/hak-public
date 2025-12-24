@@ -6,7 +6,7 @@ import { colors } from '../styles/colors'
 
 import { useFeatureData, useTestResults, useExpandedState } from './tests/hooks'
 
-// eslint-disable-next-line max-lines-per-function, complexity -- page component with multiple states
+ 
 export function TestsPage() {
   const featureData = useFeatureData()
   const { results, loading, error } = useTestResults()
@@ -18,7 +18,7 @@ export function TestsPage() {
   const filteredSuites = results?.testResults.filter(s => {
     if (filter === 'all') return true
     return filter === 'passed' ? s.status === 'passed' : s.status === 'failed'
-  }) || []
+  }) ?? []
 
   return (
     <div style={{
@@ -40,12 +40,12 @@ export function TestsPage() {
         {loading && (
           <div style={{ textAlign: 'center', padding: '3rem', color: colors.gray }}>Loading...</div>
         )}
-        {!loading && error && (
+        {!loading && error !== null && (
           <div style={{ padding: '2rem', background: '#FFEBEE', borderRadius: '12px', color: '#C62828' }}>
             Error: {error}
           </div>
         )}
-        {!loading && !error && results && (
+        {!loading && error === null && results !== null && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
               {[

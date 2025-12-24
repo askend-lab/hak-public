@@ -4,10 +4,10 @@ import { ServerContext, StoreRequest, StoreItem } from '../src/types';
 import { InMemoryDynamoDB } from './mockDynamoDB';
 
 class FailingDynamoDB implements DynamoDBClient {
-  async put(): Promise<void> { throw new Error('DB error'); }
-  async get(): Promise<StoreItem | null> { throw new Error('DB error'); }
-  async delete(): Promise<void> { throw new Error('DB error'); }
-  async queryBySortKeyPrefix(): Promise<StoreItem[]> { throw new Error('DB error'); }
+  put(): Promise<void> { throw new Error('DB error'); }
+  get(): Promise<StoreItem | null> { throw new Error('DB error'); }
+  delete(): Promise<void> { throw new Error('DB error'); }
+  queryBySortKeyPrefix(): Promise<StoreItem[]> { throw new Error('DB error'); }
 }
 
 describe('Store', () => {
@@ -39,7 +39,7 @@ describe('Store', () => {
 
       expect(result.success).toBe(true);
       expect(result.item).toBeDefined();
-      expect(result.item?.data).toEqual({ name: 'test' });
+      expect(result.item?.data).toStrictEqual({ name: 'test' });
       expect(result.item?.owner).toBe('user123');
       expect(db.size()).toBe(1);
     });
@@ -99,7 +99,7 @@ describe('Store', () => {
       const result = await store.save(request);
 
       expect(result.success).toBe(true);
-      expect(result.item?.data).toEqual({});
+      expect(result.item?.data).toStrictEqual({});
     });
   });
 
@@ -116,7 +116,7 @@ describe('Store', () => {
       const result = await store.get('entity1', 'sort1', 'private');
 
       expect(result.success).toBe(true);
-      expect(result.item?.data).toEqual({ value: 42 });
+      expect(result.item?.data).toStrictEqual({ value: 42 });
     });
 
     it('should return error for non-existent item', async () => {

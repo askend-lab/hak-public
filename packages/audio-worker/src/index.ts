@@ -4,9 +4,9 @@ import { SQSClient } from '@aws-sdk/client-sqs';
 import { runWorker, WorkerConfig } from './worker';
 
 const config: WorkerConfig = {
-  queueUrl: process.env.QUEUE_URL!,
-  bucketName: process.env.BUCKET_NAME!,
-  merlinUrl: process.env.MERLIN_URL!,
+  queueUrl: process.env.QUEUE_URL ?? '',
+  bucketName: process.env.BUCKET_NAME ?? '',
+  merlinUrl: process.env.MERLIN_URL ?? '',
 };
 
 if (!config.queueUrl || !config.bucketName || !config.merlinUrl) {

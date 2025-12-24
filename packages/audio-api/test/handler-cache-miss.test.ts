@@ -32,7 +32,7 @@ describe('Lambda Handler - Cache Miss', () => {
     const event = createRequestEvent('new-phrase');
     const hash = setupCacheMiss(ctx.mockS3, 'new-phrase');
     
-    const response = await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
     
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
@@ -44,7 +44,7 @@ describe('Lambda Handler - Cache Miss', () => {
     const event = createRequestEvent('test');
     const hash = setupCacheMiss(ctx.mockS3, 'test');
     
-    const response = await handler(event, ctx.mockS3 as any, ctx.mockSQS as any);
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
     
     const body = JSON.parse(response.body);
     expect(body.hash).toBeDefined();

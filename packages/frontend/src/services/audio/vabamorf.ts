@@ -30,7 +30,7 @@ export function toPhoneticText(response: VabamorfResponse): string {
 export function getWordVariants(
   response: VabamorfResponse,
   wordIndex: number
-) {
+): Array<{ phonetic: string; stress: number }> {
   const word = response.words[wordIndex];
   if (!word) return [];
   return word.variants ?? [{ phonetic: word.phonetic, stress: word.stress }];

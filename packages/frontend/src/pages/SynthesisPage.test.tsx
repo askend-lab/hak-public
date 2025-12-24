@@ -95,7 +95,7 @@ describe('SynthesisPage', () => {
     });
   });
 
-  it('should not synthesize empty text', async () => {
+  it('should not synthesize empty text', () => {
     mockUseSynthesisStore.mockReturnValue({
       text: '   ',
       setResult: mockSetResult,

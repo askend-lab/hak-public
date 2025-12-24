@@ -8,23 +8,24 @@ export class InMemoryDynamoDB implements DynamoDBClient {
     return `${pk}|${sk}`;
   }
 
-  async put(item: StoreItem): Promise<void> {
+  put(item: StoreItem): Promise<void> {
     const key = this.makeKey(item.PK, item.SK);
     this.items.set(key, { ...item });
   }
 
-  async get(pk: string, sk: string): Promise<StoreItem | null> {
+  get(pk: string, sk: string): Promise<StoreItem | null> {
     const key = this.makeKey(pk, sk);
     const item = this.items.get(key);
-    return item ? { ...item } : null;
+    return Promise.resolve(item ? { ...item } : null);
   }
 
-  async delete(pk: string, sk: string): Promise<void> {
+  delete(pk: string, sk: string): Promise<void> {
     const key = this.makeKey(pk, sk);
     this.items.delete(key);
+    return Promise.resolve();
   }
 
-  async queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]> {
+  queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]> {
     const results: StoreItem[] = [];
     for (const item of this.items.values()) {
       if (item.PK === pk && item.SK.startsWith(skPrefix)) {

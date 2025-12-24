@@ -22,8 +22,10 @@ export function normalizeText(text: string): string {
     .replace(/[^\p{L}\p{N}\s\-'`´+]/gu, '');
 }
 
+const SHORT_TEXT_WORD_LIMIT = 3;
+
 export function selectVoiceModel(wordCount: number): VoiceModel {
-  return wordCount <= 3 ? 'efm_s' : 'efm_l';
+  return wordCount <= SHORT_TEXT_WORD_LIMIT ? 'efm_s' : 'efm_l';
 }
 
 export function countWords(text: string): number {
@@ -67,7 +69,7 @@ export function nowISO(): string {
 }
 
 export function generateUUID(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {

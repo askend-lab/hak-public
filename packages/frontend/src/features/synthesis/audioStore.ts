@@ -24,9 +24,9 @@ const initialState: SynthesisAudioState = {
 export const useSynthesisAudioStore = create<SynthesisAudioState & SynthesisAudioActions>(
   (set) => ({
     ...initialState,
-    setResult: (result) => { set({ result }); },
-    setAudioElement: (audioElement) => { set({ audioElement }); },
-    setIsPlaying: (isPlaying) => { set({ isPlaying }); },
-    resetAudio: () => { set(initialState); },
+    setResult: (result): void => { set({ result }); },
+    setAudioElement: (audioElement): void => { set({ audioElement }); },
+    setIsPlaying: (isPlaying): void => { set({ isPlaying }); },
+    resetAudio: (): void => { set(initialState); },
   })
 );

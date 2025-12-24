@@ -13,7 +13,7 @@ describe('AuthStorage', () => {
     it('should return stored user', () => {
       const user = { id: '123', email: 'test@example.com' };
       AuthStorage.setUser(user);
-      expect(AuthStorage.getUser()).toEqual(user);
+      expect(AuthStorage.getUser()).toStrictEqual(user);
     });
   });
 
@@ -21,7 +21,7 @@ describe('AuthStorage', () => {
     it('should store user in memory', () => {
       const user = { id: '456', email: 'another@example.com' };
       AuthStorage.setUser(user);
-      expect(AuthStorage.getUser()).toEqual(user);
+      expect(AuthStorage.getUser()).toStrictEqual(user);
     });
   });
 
