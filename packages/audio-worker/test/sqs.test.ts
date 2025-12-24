@@ -1,8 +1,10 @@
+import type { SQSClient } from '@aws-sdk/client-sqs';
+
 import { receiveMessage, deleteMessage, parseMessage } from '../src/sqs';
 
 const mockSqsClient = {
   send: jest.fn(),
-};
+} as unknown as SQSClient & { send: jest.Mock };
 
 describe('SQS Operations', () => {
   beforeEach(() => {

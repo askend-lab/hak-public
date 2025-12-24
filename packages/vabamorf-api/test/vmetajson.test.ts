@@ -5,7 +5,7 @@ import { initVmetajson, analyze, closeVmetajson, isInitialized } from '../src/vm
 
 jest.mock('child_process');
 
-const mockSpawn = spawn;
+const mockSpawn = spawn as jest.MockedFunction<typeof spawn>;
 
 interface MockProcess extends EventEmitter {
   stdin: EventEmitter & { write: jest.Mock };
@@ -27,7 +27,7 @@ describe('vmetajson', () => {
     jest.clearAllMocks();
     closeVmetajson();
     mockProcess = createMockProcess();
-    mockSpawn.mockReturnValue(mockProcess);
+    mockSpawn.mockReturnValue(mockProcess as any);
   });
 
   afterEach(() => {

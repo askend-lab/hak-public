@@ -41,7 +41,7 @@ describe('Validation', () => {
       const result = validateStoreRequest({
         pk: 'entity1',
         sk: 'sort1',
-        type: 'invalid' as 'private' | 'public' | 'draft',
+        type: 'invalid' as any,
         ttl: 3600
       });
 

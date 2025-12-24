@@ -12,7 +12,7 @@ describe('S3 Cache Check', () => {
   it('should return true when file exists', async () => {
     mockS3.setFileExists('cache/abc123.mp3', true);
     
-    const exists = await checkFileExists(mockS3, 'test-bucket', 'cache/abc123.mp3');
+    const exists = await checkFileExists(mockS3 as any, 'test-bucket', 'cache/abc123.mp3');
     
     expect(exists).toBe(true);
   });
@@ -20,7 +20,7 @@ describe('S3 Cache Check', () => {
   it('should return false when file does not exist', async () => {
     mockS3.setFileExists('cache/abc123.mp3', false);
     
-    const exists = await checkFileExists(mockS3, 'test-bucket', 'cache/abc123.mp3');
+    const exists = await checkFileExists(mockS3 as any, 'test-bucket', 'cache/abc123.mp3');
     
     expect(exists).toBe(false);
   });

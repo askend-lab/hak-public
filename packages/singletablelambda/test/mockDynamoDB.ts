@@ -11,6 +11,7 @@ export class InMemoryDynamoDB implements DynamoDBClient {
   put(item: StoreItem): Promise<void> {
     const key = this.makeKey(item.PK, item.SK);
     this.items.set(key, { ...item });
+    return Promise.resolve();
   }
 
   get(pk: string, sk: string): Promise<StoreItem | null> {
@@ -32,7 +33,7 @@ export class InMemoryDynamoDB implements DynamoDBClient {
         results.push({ ...item });
       }
     }
-    return results;
+    return Promise.resolve(results);
   }
 
   clear(): void {

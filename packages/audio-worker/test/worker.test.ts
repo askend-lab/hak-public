@@ -17,8 +17,8 @@ jest.mock('../src/s3', () => ({
   uploadAudio: jest.fn(),
 }));
 
-const mockSqsClient: { send: jest.Mock } = { send: jest.fn() };
-const mockS3Client: { send: jest.Mock } = { send: jest.fn() };
+const mockSqsClient = { send: jest.fn() } as any;
+const mockS3Client = { send: jest.fn() } as any;
 const config = {
   queueUrl: 'https://queue-url',
   bucketName: 'test-bucket',

@@ -26,7 +26,7 @@ function parseAndValidate<T>(event: APIGatewayProxyEvent, fieldName: string, max
   const fieldResult = validateField(body as Record<string, unknown>, fieldName, maxLength);
   if ('error' in fieldResult) return { success: false, response: createResponse(HTTP_BAD_REQUEST, { error: fieldResult.error }) };
 
-  return { success: true, body, value: fieldResult.value };
+  return { success: true, body: body as T, value: fieldResult.value };
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
