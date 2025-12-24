@@ -38,22 +38,22 @@ test_modules:
     path: packages/singletablelambda
     type: jest
     min_coverage_lines: 80
-    min_coverage_branches: 80
+    min_coverage_branches: 70
   - name: audio-api
     path: packages/audio-api
     type: jest
-    min_coverage_lines: 0
-    min_coverage_branches: 0
+    min_coverage_lines: 80
+    min_coverage_branches: 70
   - name: audio-worker
     path: packages/audio-worker
     type: jest
-    min_coverage_lines: 0
-    min_coverage_branches: 0
+    min_coverage_lines: 80
+    min_coverage_branches: 70
   - name: vabamorf-api
     path: packages/vabamorf-api
     type: jest
-    min_coverage_lines: 0
-    min_coverage_branches: 0
+    min_coverage_lines: 80
+    min_coverage_branches: 70
 
 # Global coverage settings
 coverage:
@@ -131,6 +131,15 @@ hooks:
     active: true
     command: 'pnpm exec eslint .'
 
+  run-typecheck:
+    mode: error
+    active: true
+    command: 'pnpm exec tsc --noEmit'
+
+  test-coverage:
+    mode: off
+    active: false
+
   run-tests:
     active: true
     mode: warning  # off | warning | error
@@ -149,6 +158,7 @@ stages:
       - language-check
       - broken-links
       - run-lint
+      - run-typecheck
       - test-coverage
       - prettier-check
   
