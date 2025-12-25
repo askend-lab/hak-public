@@ -58,6 +58,11 @@ test_modules:
     type: jest
     min_coverage_lines: 0
     min_coverage_branches: 0
+  - name: frontend
+    path: packages/frontend
+    type: vitest
+    min_coverage_lines: 80
+    min_coverage_branches: 70
 
 # Global coverage settings
 coverage:
@@ -133,7 +138,7 @@ hooks:
   run-lint:
     mode: error
     active: true
-    command: 'pnpm exec eslint --max-warnings=0 .'
+    command: 'pnpm lint'
 
   run-typecheck:
     mode: error

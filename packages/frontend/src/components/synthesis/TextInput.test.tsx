@@ -1,17 +1,18 @@
+import { vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import { mockUseSynthesisStore, mockStoreWithText } from './test-utils';
 import { TextInput } from './TextInput';
 
-jest.mock('../../features', () => ({
-  useSynthesisStore: jest.fn(),
+vi.mock('../../features', () => ({
+  useSynthesisStore: vi.fn(),
 }));
 
 describe('TextInput', () => {
-  const mockSetText = jest.fn();
+  const mockSetText = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseSynthesisStore.mockReturnValue({
       text: '',
       setText: mockSetText,
@@ -50,7 +51,7 @@ describe('TextInput', () => {
   });
 
   it('should call onSynthesize when button clicked', () => {
-    const onSynthesize = jest.fn();
+    const onSynthesize = vi.fn();
     mockStoreWithText('Hello');
     render(<TextInput onSynthesize={onSynthesize} />);
     fireEvent.click(screen.getByText('Sünteesi'));
@@ -69,7 +70,7 @@ describe('TextInput', () => {
   });
 
   it('should call onSynthesize on Ctrl+Enter', () => {
-    const onSynthesize = jest.fn();
+    const onSynthesize = vi.fn();
     mockStoreWithText('Hello');
     render(<TextInput onSynthesize={onSynthesize} />);
     const textarea = screen.getByRole('textbox');
@@ -78,7 +79,7 @@ describe('TextInput', () => {
   });
 
   it('should not call onSynthesize on Enter without Ctrl', () => {
-    const onSynthesize = jest.fn();
+    const onSynthesize = vi.fn();
     mockStoreWithText('Hello');
     render(<TextInput onSynthesize={onSynthesize} />);
     const textarea = screen.getByRole('textbox');

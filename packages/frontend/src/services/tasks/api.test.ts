@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import {
   setAuthTokenGetter,
   createTask,
@@ -8,30 +9,30 @@ import {
   addEntryToTask,
 } from './api';
 
-jest.mock('../config', () => ({
+vi.mock('../config', () => ({
   API_CONFIG: { baseUrl: '/api' },
 }));
 
 // Mock fetch
 declare global {
-  var fetch: jest.Mock;
+  var fetch: vi.Mock;
 }
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // DRY: Helper functions for fetch mocks
 const mockFetchSuccess = (data: unknown): void => {
-  (global.fetch as jest.Mock).mockResolvedValue({
+  (global.fetch as vi.Mock).mockResolvedValue({
     ok: true,
     json: (): Promise<unknown> => Promise.resolve(data),
   });
 };
 
 const mockFetchError = (status = 500): void => {
-  (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status });
+  (global.fetch as vi.Mock).mockResolvedValue({ ok: false, status });
 };
 
 const mockFetchSequence = (responses: { ok: boolean; data?: unknown; status?: number }[]): void => {
-  const mock = global.fetch as jest.Mock;
+  const mock = global.fetch as vi.Mock;
   responses.forEach((res, i) => {
     if (i === 0) {
       mock.mockResolvedValueOnce({
@@ -51,7 +52,7 @@ const mockFetchSequence = (responses: { ok: boolean; data?: unknown; status?: nu
 
 describe('Tasks API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setAuthTokenGetter(null);
   });
 

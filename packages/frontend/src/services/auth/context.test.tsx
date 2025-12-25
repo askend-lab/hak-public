@@ -1,11 +1,12 @@
+import { vi } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 
 import { AuthProvider, useAuth } from './context';
 import { AuthStorage } from './storage';
 
-jest.mock('./storage');
+vi.mock('./storage');
 
-const mockAuthStorage = AuthStorage as jest.Mocked<typeof AuthStorage>;
+const mockAuthStorage = AuthStorage as vi.Mocked<typeof AuthStorage>;
 
 function TestComponent() {
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
@@ -25,7 +26,7 @@ function TestComponent() {
 
 describe('AuthProvider', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
   });
 
@@ -106,7 +107,7 @@ describe('AuthProvider', () => {
 describe('useAuth', () => {
   it('should throw error when used outside AuthProvider', () => {
      
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(jest.fn());
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(vi.fn());
     
     expect(() => render(<TestComponent />)).toThrow(
       'useAuth must be used within AuthProvider'

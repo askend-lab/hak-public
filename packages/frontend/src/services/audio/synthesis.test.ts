@@ -1,5 +1,6 @@
+import { vi } from 'vitest';
 // Mock config before imports to handle import.meta.env
-jest.mock('../config', () => ({
+vi.mock('../config', () => ({
   API_CONFIG: {
     audioApiUrl: 'https://api.example.com/audio',
     audioBucketUrl: 'https://bucket.example.com',
@@ -8,23 +9,23 @@ jest.mock('../config', () => ({
 }));
 
 // Mock modules that use import.meta.env
-jest.mock('./cache', () => ({
+vi.mock('./cache', () => ({
   generateCacheKey: (text: string, voice: string, version: string): string => 
     `${version}:${voice}:${btoa(text)}`,
-  checkCache: jest.fn(),
-  saveToCache: jest.fn(),
+  checkCache: vi.fn(),
+  saveToCache: vi.fn(),
 }));
 
-jest.mock('./vabamorf', () => ({
+vi.mock('./vabamorf', () => ({
   toPhoneticText: (response?: { words?: { phonetic: string }[] }): string => 
      
     response?.words?.map((w: { phonetic: string }) => w.phonetic).join(' ') ?? '',
-  analyzeText: jest.fn(),
+  analyzeText: vi.fn(),
 }));
 
-jest.mock('./audio-api');
-jest.mock('../../core/utils');
-jest.mock('../../core/retry');
+vi.mock('./audio-api');
+vi.mock('../../core/utils');
+vi.mock('../../core/retry');
 
 import { withRetry } from '../../core/retry';
 import { selectVoiceModel, countWords } from '../../core/utils';
@@ -38,10 +39,10 @@ import type { VabamorfResponse, SynthesisResult } from './types';
 import type { VoiceModel } from '../../core/schemas';
 
 // Mock dependencies
-const mockSynthesizeViaApi = synthesizeViaApi as jest.MockedFunction<typeof synthesizeViaApi>;
-const mockSelectVoiceModel = selectVoiceModel as jest.MockedFunction<typeof selectVoiceModel>;
-const mockCountWords = countWords as jest.MockedFunction<typeof countWords>;
-const mockWithRetry = withRetry as jest.MockedFunction<typeof withRetry>;
+const mockSynthesizeViaApi = synthesizeViaApi as vi.MockedFunction<typeof synthesizeViaApi>;
+const mockSelectVoiceModel = selectVoiceModel as vi.MockedFunction<typeof selectVoiceModel>;
+const mockCountWords = countWords as vi.MockedFunction<typeof countWords>;
+const mockWithRetry = withRetry as vi.MockedFunction<typeof withRetry>;
 
 describe('generateCacheKey', () => {
   it('generates consistent key for same input', () => {
@@ -99,7 +100,7 @@ describe('toPhoneticText', () => {
 
 describe('synthesizeText', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should synthesize text and return result', async () => {
@@ -153,7 +154,7 @@ describe('synthesizeText', () => {
 
 describe('synthesizeWithRetry', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call synthesizeText with retry logic', async () => {

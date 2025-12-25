@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -6,37 +7,40 @@ import { useAuth } from '../../services/auth';
 import { Header } from './Header';
 import { setupI18nMock } from './test-utils';
 
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn(),
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(),
 }));
 
-jest.mock('../ui', () => ({
-  ...jest.requireActual('../ui'),
-  LogoWithText: (): JSX.Element => <div data-testid="logo-with-text">LogoWithText</div>,
-  NavTab: ({ label, ...props }: { label: string; [key: string]: unknown }): JSX.Element => <button data-testid="nav-tab" {...props}>{label}</button>,
-  Button: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }): JSX.Element => <button data-testid="button" {...props}>{children}</button>,
-  WaffleMenu: (): JSX.Element => <div data-testid="waffle-menu">WaffleMenu</div>,
-  UserAvatar: ({ initials, ...props }: { initials: string; [key: string]: unknown }): JSX.Element => <div data-testid="user-avatar" {...props}>{initials}</div>,
+vi.mock('../ui', async () => {
+  const actual = await vi.importActual('../ui');
+  return {
+    ...actual,
+    LogoWithText: (): JSX.Element => <div data-testid="logo-with-text">LogoWithText</div>,
+    NavTab: ({ label, ...props }: { label: string; [key: string]: unknown }): JSX.Element => <button data-testid="nav-tab" {...props}>{label}</button>,
+    Button: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }): JSX.Element => <button data-testid="button" {...props}>{children}</button>,
+    WaffleMenu: (): JSX.Element => <div data-testid="waffle-menu">WaffleMenu</div>,
+    UserAvatar: ({ initials, ...props }: { initials: string; [key: string]: unknown }): JSX.Element => <div data-testid="user-avatar" {...props}>{initials}</div>,
+  };
+});
+
+vi.mock('../../services/auth', () => ({
+  useAuth: vi.fn(),
 }));
 
-jest.mock('../../services/auth', () => ({
-  useAuth: jest.fn(),
-}));
-
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
 
 describe('Header', () => {
   beforeEach(() => {
     setupI18nMock();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render header titles', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       user: null,
-      login: jest.fn(),
-      logout: jest.fn()
+      login: vi.fn(),
+      logout: vi.fn()
     });
     
     render(
@@ -51,8 +55,8 @@ describe('Header', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       user: null,
-      login: jest.fn(),
-      logout: jest.fn()
+      login: vi.fn(),
+      logout: vi.fn()
     });
     
     render(
@@ -69,8 +73,8 @@ describe('Header', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       user: null,
-      login: jest.fn(),
-      logout: jest.fn()
+      login: vi.fn(),
+      logout: vi.fn()
     });
     
     render(
@@ -86,8 +90,8 @@ describe('Header', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: { id: 'user123', email: 'test@example.com' },
-      login: jest.fn(),
-      logout: jest.fn()
+      login: vi.fn(),
+      logout: vi.fn()
     });
     
     render(
@@ -102,8 +106,8 @@ describe('Header', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       user: null,
-      login: jest.fn(),
-      logout: jest.fn()
+      login: vi.fn(),
+      logout: vi.fn()
     });
     
     render(

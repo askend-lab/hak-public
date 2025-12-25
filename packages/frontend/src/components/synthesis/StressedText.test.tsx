@@ -1,15 +1,16 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { StressedText } from './StressedText';
 import { mockStoreWithPhonetic } from './test-utils';
 
-jest.mock('../../features', () => ({
-  useSynthesisStore: jest.fn(),
+vi.mock('../../features', () => ({
+  useSynthesisStore: vi.fn(),
 }));
 
 describe('StressedText', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not render when no text', () => {

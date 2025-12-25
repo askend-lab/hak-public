@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import { useSynthesisStore, useUIStore } from '../../features';
@@ -5,24 +6,24 @@ import { useAuth } from '../../services/auth';
 
 import { AddToTaskButton } from './AddToTaskButton';
 
-jest.mock('../../features', () => ({
-  useSynthesisStore: jest.fn(),
-  useUIStore: jest.fn(),
+vi.mock('../../features', () => ({
+  useSynthesisStore: vi.fn(),
+  useUIStore: vi.fn(),
 }));
 
-jest.mock('../../services/auth', () => ({
-  useAuth: jest.fn(),
+vi.mock('../../services/auth', () => ({
+  useAuth: vi.fn(),
 }));
 
-const mockUseSynthesisStore = useSynthesisStore as jest.MockedFunction<typeof useSynthesisStore>;
-const mockUseUIStore = useUIStore as jest.MockedFunction<typeof useUIStore>;
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseSynthesisStore = useSynthesisStore as vi.MockedFunction<typeof useSynthesisStore>;
+const mockUseUIStore = useUIStore as vi.MockedFunction<typeof useUIStore>;
+const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
 
 describe('AddToTaskButton', () => {
-  const mockOpenModal = jest.fn();
+  const mockOpenModal = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseUIStore.mockReturnValue({ openModal: mockOpenModal } as ReturnType<typeof mockUseUIStore>);
     mockUseAuth.mockReturnValue({} as ReturnType<typeof mockUseAuth>);
   });

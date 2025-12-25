@@ -60,6 +60,17 @@ Gherkin tests should:
 - `@testing-library/user-event` - simulate clicks
 - `msw` or `jest.mock` - mock HTTP requests
 
+### Known Issue: ESM + jsdom
+
+When combining `jest-cucumber` with `jsdom` environment (required for React Testing Library), Jest fails to parse ESM modules from `uuid` and `@cucumber/*` dependencies. 
+
+**Workarounds being explored:**
+1. Use Vitest instead of Jest (better ESM support)
+2. Mock jest-cucumber dependencies
+3. Run Gherkin tests separately from React tests
+
+**Current status:** POC test in `frontend/src/steps/synthesis-poc.test.tsx` demonstrates React Testing Library approach works. Gherkin integration pending ESM resolution.
+
 ## Usage
 
 ```bash

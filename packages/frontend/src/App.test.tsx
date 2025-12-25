@@ -1,13 +1,14 @@
+import { vi } from 'vitest';
 // Mock services that use import.meta.env
-jest.mock('./services/tasks/api', () => ({
-  addEntryToTask: jest.fn(),
-  createTask: jest.fn(),
-  getTask: jest.fn(),
-  setAuthTokenGetter: jest.fn(),
+vi.mock('./services/tasks/api', () => ({
+  addEntryToTask: vi.fn(),
+  createTask: vi.fn(),
+  getTask: vi.fn(),
+  setAuthTokenGetter: vi.fn(),
 }));
 
-jest.mock('./services/audio', () => ({
-  synthesizeText: jest.fn(),
+vi.mock('./services/audio', () => ({
+  synthesizeText: vi.fn(),
 }));
 
 import { render, screen } from '@testing-library/react';
@@ -36,7 +37,7 @@ describe('App', () => {
   it('throws error when TaskSelectModal used without AuthProvider', () => {
     // This test documents the requirement: App needs AuthProvider
      
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     
     expect(() => {
       render(

@@ -1,11 +1,12 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { useAuth } from './context';
 import { ProtectedRoute, useRequireAuth } from './ProtectedRoute';
 
-jest.mock('./context');
+vi.mock('./context');
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
 
 // DRY: Factory function for auth context mock
 const createAuthMock = (overrides: Partial<ReturnType<typeof useAuth>> = {}) => ({
@@ -13,9 +14,9 @@ const createAuthMock = (overrides: Partial<ReturnType<typeof useAuth>> = {}) => 
   isLoading: false,
   user: null,
   error: null,
-  login: jest.fn(),
-  logout: jest.fn(),
-  refreshSession: jest.fn(),
+  login: vi.fn(),
+  logout: vi.fn(),
+  refreshSession: vi.fn(),
   ...overrides,
 });
 
@@ -23,7 +24,7 @@ describe('ProtectedRoute', () => {
   const originalLocation = window.location;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     delete (window as Window & { location?: Location }).location;
     window.location = Object.assign({}, originalLocation, { href: '', pathname: '/current' });
   });

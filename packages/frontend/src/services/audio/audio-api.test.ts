@@ -1,5 +1,6 @@
+import { vi } from 'vitest';
 // Mock config before imports to handle import.meta.env
-jest.mock('../config', () => ({
+vi.mock('../config', () => ({
   API_CONFIG: {
     audioApiUrl: 'https://api.example.com/audio',
     audioBucketUrl: 'https://bucket.example.com'
@@ -7,26 +8,26 @@ jest.mock('../config', () => ({
 }));
 
 // Mock timers to avoid real delays
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 import { httpPost } from '../http';
 
 import { synthesizeViaApi } from './audio-api';
 
 // Mock dependencies
-jest.mock('../http');
+vi.mock('../http');
 
-const mockHttpPost = httpPost as jest.MockedFunction<typeof httpPost>;
+const mockHttpPost = httpPost as vi.MockedFunction<typeof httpPost>;
 
 // Mock fetch
 declare global {
-  var fetch: jest.Mock;
+  var fetch: vi.Mock;
 }
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('audio-api', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('synthesizeViaApi', () => {

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { initialAsyncState, createAsyncActions, AsyncState } from './asyncSlice';
 
 describe('asyncSlice', () => {
@@ -13,12 +14,12 @@ describe('asyncSlice', () => {
 
   describe('createAsyncActions', () => {
     let state: AsyncState;
-    let set: jest.Mock;
+    let set: vi.Mock;
     let actions: ReturnType<typeof createAsyncActions>;
 
     beforeEach(() => {
       state = { ...initialAsyncState };
-      set = jest.fn((partial) => Object.assign(state, partial));
+      set = vi.fn((partial) => Object.assign(state, partial));
       actions = createAsyncActions(set);
     });
 

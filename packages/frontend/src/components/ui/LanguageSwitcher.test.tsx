@@ -1,23 +1,24 @@
+import { vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 
 import { LanguageSwitcher } from './LanguageSwitcher';
 
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn(),
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(),
 }));
 
-const mockUseTranslation = useTranslation as jest.MockedFunction<typeof useTranslation>;
+const mockUseTranslation = useTranslation as vi.MockedFunction<typeof useTranslation>;
 
 describe('LanguageSwitcher', () => {
-  const mockChangeLanguage = jest.fn();
+  const mockChangeLanguage = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseTranslation.mockReturnValue({
       i18n: { changeLanguage: mockChangeLanguage },
       t: (key: string) => key,
-    } as jest.Mocked<ReturnType<typeof useTranslation>>);
+    } as vi.Mocked<ReturnType<typeof useTranslation>>);
   });
 
   it('should render language buttons', () => {

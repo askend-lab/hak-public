@@ -1,18 +1,19 @@
+import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 
 import { AudioPlayer } from './AudioPlayer';
 import { mockStoreWith, mockStoreWithAudio, TEST_AUDIO_URL } from './test-utils';
 
-jest.mock('../../features', () => ({
-  useSynthesisStore: jest.fn(),
+vi.mock('../../features', () => ({
+  useSynthesisStore: vi.fn(),
 }));
 
 describe('AudioPlayer', () => {
-  const mockSetAudioElement = jest.fn();
+  const mockSetAudioElement = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not render when no audio result', () => {

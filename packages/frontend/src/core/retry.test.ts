@@ -11,14 +11,14 @@ describe('sleep', () => {
 
 describe('withRetry', () => {
   it('returns result on first successful attempt', async () => {
-    const fn = jest.fn().mockResolvedValue('success');
+    const fn = vi.fn().mockResolvedValue('success');
     const result = await withRetry(fn, { maxRetries: 3, delayMs: 10 });
     expect(result).toBe('success');
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
   it('retries on failure and succeeds', async () => {
-    const fn = jest.fn()
+    const fn = vi.fn()
       .mockRejectedValueOnce(new Error('fail'))
       .mockResolvedValue('success');
     const result = await withRetry(fn, { maxRetries: 3, delayMs: 10 });
@@ -27,19 +27,19 @@ describe('withRetry', () => {
   });
 
   it('throws after max retries exhausted', async () => {
-    const fn = jest.fn().mockRejectedValue(new Error('persistent fail'));
+    const fn = vi.fn().mockRejectedValue(new Error('persistent fail'));
     await expect(withRetry(fn, { maxRetries: 2, delayMs: 10 })).rejects.toThrow('persistent fail');
     expect(fn).toHaveBeenCalledTimes(2);
   });
 
   it('uses default options', async () => {
-    const fn = jest.fn().mockResolvedValue('ok');
+    const fn = vi.fn().mockResolvedValue('ok');
     const result = await withRetry(fn);
     expect(result).toBe('ok');
   });
 
   it('handles non-Error throws', async () => {
-    const fn = jest.fn()
+    const fn = vi.fn()
       .mockRejectedValueOnce('string error')
       .mockResolvedValue('success');
     const result = await withRetry(fn, { maxRetries: 2, delayMs: 10 });
@@ -47,7 +47,7 @@ describe('withRetry', () => {
   });
 
   it('uses backoff when enabled', async () => {
-    const fn = jest.fn()
+    const fn = vi.fn()
       .mockRejectedValueOnce(new Error('fail'))
       .mockRejectedValueOnce(new Error('fail'))
       .mockResolvedValue('success');
@@ -59,7 +59,7 @@ describe('withRetry', () => {
   });
 
   it('uses fixed delay when backoff disabled', async () => {
-    const fn = jest.fn()
+    const fn = vi.fn()
       .mockRejectedValueOnce(new Error('fail'))
       .mockResolvedValue('success');
     const start = Date.now();
@@ -70,12 +70,12 @@ describe('withRetry', () => {
 
   it('throws fallback error when lastError is null', async () => {
     // This tests the edge case where lastError might be null
-    const fn = jest.fn().mockRejectedValue(null);
+    const fn = vi.fn().mockRejectedValue(null);
     await expect(withRetry(fn, { maxRetries: 1, delayMs: 1 })).rejects.toThrow();
   });
 
   it('converts non-Error to Error', async () => {
-    const fn = jest.fn().mockRejectedValue('string error');
+    const fn = vi.fn().mockRejectedValue('string error');
     await expect(withRetry(fn, { maxRetries: 1, delayMs: 1 })).rejects.toThrow('string error');
   });
 });

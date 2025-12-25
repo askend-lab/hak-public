@@ -1,17 +1,18 @@
+import { vi } from 'vitest';
 import { httpPost } from '../http';
 
 import { analyzeText, toPhoneticText, getWordVariants } from './vabamorf';
 
-jest.mock('../http');
-jest.mock('../config', () => ({
+vi.mock('../http');
+vi.mock('../config', () => ({
   API_CONFIG: { vabamorfUrl: '/api/vabamorf' },
 }));
 
-const mockHttpPost = httpPost as jest.MockedFunction<typeof httpPost>;
+const mockHttpPost = httpPost as vi.MockedFunction<typeof httpPost>;
 
 describe('Vabamorf', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('analyzeText', () => {

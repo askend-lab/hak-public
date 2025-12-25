@@ -13,7 +13,7 @@ describe('ErrorBoundary', () => {
   const originalError = console.error;
   
   beforeAll(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
   
   afterAll(() => {

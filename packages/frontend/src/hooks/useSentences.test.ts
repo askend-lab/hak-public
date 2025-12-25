@@ -1,10 +1,14 @@
+import { vi, Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 import { useSentences } from './useSentences';
+import { synthesizeText } from '../services/audio';
 
-jest.mock('../services/audio', () => ({
-  synthesizeText: jest.fn().mockResolvedValue({ audioUrl: 'mock-url' }),
+vi.mock('../services/audio', () => ({
+  synthesizeText: vi.fn().mockResolvedValue({ audioUrl: 'mock-url' }),
 }));
+
+const mockSynthesizeText = synthesizeText as Mock;
 
 describe('useSentences', () => {
   it('should initialize with default empty sentence', () => {
@@ -44,8 +48,7 @@ describe('useSentences', () => {
   });
 
   describe('playSentence', () => {
-    const mockSynthesizeText = jest.requireMock('../services/audio').synthesizeText;
-    const mockPlay = jest.fn();
+    const mockPlay = vi.fn();
 
     beforeEach(() => {
       mockSynthesizeText.mockClear();
@@ -100,7 +103,7 @@ describe('useSentences', () => {
 
     it('should handle synthesis errors', async () => {
       const { result } = renderHook(() => useSentences(['Hello']));
-      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      const consoleError = vi.spyOn(console, 'error').mockImplementation();
       
       mockSynthesizeText.mockRejectedValueOnce(new Error('Synthesis failed'));
       

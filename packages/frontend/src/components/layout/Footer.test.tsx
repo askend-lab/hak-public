@@ -1,10 +1,11 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { Footer } from './Footer';
 import { setupI18nMock } from './test-utils';
 
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn(),
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(),
 }));
 
 describe('Footer', () => {

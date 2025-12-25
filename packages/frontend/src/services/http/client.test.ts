@@ -1,14 +1,15 @@
+import { vi } from 'vitest';
 import { httpRequest, httpPost, httpGet, httpPostBlob, HttpError } from './client';
 
 // Mock fetch
 declare global {
-  var fetch: jest.Mock;
+  var fetch: vi.Mock;
 }
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('HTTP Client', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('HttpError', () => {
@@ -23,7 +24,7 @@ describe('HTTP Client', () => {
   describe('httpRequest', () => {
     it('should make a request and return JSON', async () => {
       const mockData = { id: 1, name: 'Test' };
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as vi.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockData),
       });
@@ -36,7 +37,7 @@ describe('HTTP Client', () => {
     });
 
     it('should add query params to URL', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as vi.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({}),
       });
@@ -49,7 +50,7 @@ describe('HTTP Client', () => {
     });
 
     it('should throw HttpError on non-ok response', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as vi.Mock).mockResolvedValue({
         ok: false,
         status: 500,
       });
@@ -61,7 +62,7 @@ describe('HTTP Client', () => {
   describe('httpPost', () => {
     it('should make POST request with body', async () => {
       const body = { name: 'Test' };
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as vi.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ success: true }),
       });
@@ -76,7 +77,7 @@ describe('HTTP Client', () => {
 
   describe('httpGet', () => {
     it('should make GET request', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as vi.Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ data: [] }),
       });
@@ -91,7 +92,7 @@ describe('HTTP Client', () => {
   describe('httpPostBlob', () => {
     it('should make POST request and return blob', async () => {
       const mockBlob = new Blob(['test'], { type: 'audio/wav' });
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as vi.Mock).mockResolvedValue({
         ok: true,
         blob: () => Promise.resolve(mockBlob),
       });

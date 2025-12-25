@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 import { useSynthesisStore } from '../features';
@@ -5,15 +6,15 @@ import { synthesizeWithRetry } from '../services/audio';
 
 import { SynthesisPage } from './SynthesisPage';
 
-jest.mock('../features', () => ({
-  useSynthesisStore: jest.fn(),
+vi.mock('../features', () => ({
+  useSynthesisStore: vi.fn(),
 }));
 
-jest.mock('../services/audio', () => ({
-  synthesizeWithRetry: jest.fn(),
+vi.mock('../services/audio', () => ({
+  synthesizeWithRetry: vi.fn(),
 }));
 
-jest.mock('../components', () => ({
+vi.mock('../components', () => ({
   TextInput: ({ onSynthesize }: { onSynthesize: () => void }) => (
     <button onClick={onSynthesize} data-testid="synthesize">Synthesize</button>
   ),
@@ -24,16 +25,16 @@ jest.mock('../components', () => ({
   NotificationContainer: () => <div data-testid="notifications">Notifications</div>,
 }));
 
-const mockUseSynthesisStore = useSynthesisStore as jest.MockedFunction<typeof useSynthesisStore>;
-const mockSynthesizeWithRetry = synthesizeWithRetry as jest.MockedFunction<typeof synthesizeWithRetry>;
+const mockUseSynthesisStore = useSynthesisStore as vi.MockedFunction<typeof useSynthesisStore>;
+const mockSynthesizeWithRetry = synthesizeWithRetry as vi.MockedFunction<typeof synthesizeWithRetry>;
 
 describe('SynthesisPage', () => {
-  const mockSetResult = jest.fn();
-  const mockSetLoading = jest.fn();
-  const mockSetError = jest.fn();
+  const mockSetResult = vi.fn();
+  const mockSetLoading = vi.fn();
+  const mockSetError = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseSynthesisStore.mockReturnValue({
       text: 'test text',
       setResult: mockSetResult,
@@ -41,7 +42,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: null,
-    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
   });
 
   it('should render page title', () => {
@@ -64,7 +65,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: true,
       error: null,
-    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     expect(screen.queryByTestId('audio-player')).not.toBeInTheDocument();
@@ -78,7 +79,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: 'Something went wrong',
-    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -103,7 +104,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: null,
-    } as jest.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     fireEvent.click(screen.getByTestId('synthesize'));

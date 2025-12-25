@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { useAuth } from '../../services/auth';
@@ -5,23 +6,23 @@ import { useAuth } from '../../services/auth';
 import { AuthDisplay } from './AuthDisplay';
 
 // Mock the auth service
-jest.mock('../../services/auth', () => ({
-  useAuth: jest.fn(),
+vi.mock('../../services/auth', () => ({
+  useAuth: vi.fn(),
 }));
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
 
 describe('AuthDisplay', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should show login button when not authenticated', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       user: null,
-      login: jest.fn(),
-      logout: jest.fn(),
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
     render(<AuthDisplay />);
@@ -40,8 +41,8 @@ describe('AuthDisplay', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: mockUser,
-      login: jest.fn(),
-      logout: jest.fn(),
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
     render(<AuthDisplay />);
@@ -58,12 +59,12 @@ describe('AuthDisplay', () => {
   });
 
   it('should call login when login button is clicked', () => {
-    const mockLogin = jest.fn();
+    const mockLogin = vi.fn();
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       user: null,
       login: mockLogin,
-      logout: jest.fn(),
+      logout: vi.fn(),
     });
 
     render(<AuthDisplay />);
@@ -75,12 +76,12 @@ describe('AuthDisplay', () => {
   });
 
   it('should call logout when logout button is clicked', () => {
-    const mockLogout = jest.fn();
+    const mockLogout = vi.fn();
     const mockUser = { email: 'test@example.com', id: '123' };
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: mockUser,
-      login: jest.fn(),
+      login: vi.fn(),
       logout: mockLogout,
     });
 
@@ -97,8 +98,8 @@ describe('AuthDisplay', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: mockUser,
-      login: jest.fn(),
-      logout: jest.fn(),
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
     render(<AuthDisplay />);
@@ -112,8 +113,8 @@ describe('AuthDisplay', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: undefined,
-      login: jest.fn(),
-      logout: jest.fn(),
+      login: vi.fn(),
+      logout: vi.fn(),
     });
 
     render(<AuthDisplay />);

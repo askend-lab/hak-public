@@ -1,5 +1,6 @@
+import { vi } from 'vitest';
 // Mock config before imports to handle import.meta.env
-jest.mock('../config', () => ({
+vi.mock('../config', () => ({
   API_CONFIG: {
     merlinUrl: 'https://merlin.example.com/synthesize'
   }
@@ -12,14 +13,14 @@ import { synthesize, synthesizeToBlob } from './merlin';
 import type { MerlinRequest } from './types';
 
 // Mock dependencies
-jest.mock('../http');
+vi.mock('../http');
 
-const mockHttpPost = httpPost as jest.MockedFunction<typeof httpPost>;
-const mockHttpPostBlob = httpPostBlob as jest.MockedFunction<typeof httpPostBlob>;
+const mockHttpPost = httpPost as vi.MockedFunction<typeof httpPost>;
+const mockHttpPostBlob = httpPostBlob as vi.MockedFunction<typeof httpPostBlob>;
 
 describe('merlin', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('synthesize', () => {

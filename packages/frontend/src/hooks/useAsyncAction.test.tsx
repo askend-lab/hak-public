@@ -1,27 +1,28 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 import { useUIStore } from '../features';
 
 import { useAsyncAction } from './useAsyncAction';
 
-jest.mock('../features', () => ({
-  useUIStore: jest.fn(),
+vi.mock('../features', () => ({
+  useUIStore: vi.fn(),
 }));
 
-const mockUseUIStore = useUIStore as jest.MockedFunction<typeof useUIStore>;
+const mockUseUIStore = useUIStore as vi.MockedFunction<typeof useUIStore>;
 
 describe('useAsyncAction', () => {
-  const mockAddNotification = jest.fn();
+  const mockAddNotification = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseUIStore.mockReturnValue({
       addNotification: mockAddNotification,
-    } as jest.Mocked<Partial<ReturnType<typeof useUIStore>>>);
+    } as vi.Mocked<Partial<ReturnType<typeof useUIStore>>>);
   });
 
   it('should initialize with correct state', () => {
-    const action = jest.fn();
+    const action = vi.fn();
     const { result } = renderHook(() => useAsyncAction(action));
 
     expect(result.current.isLoading).toBe(false);
@@ -29,7 +30,7 @@ describe('useAsyncAction', () => {
   });
 
   it('should execute action successfully', async () => {
-    const action = jest.fn().mockResolvedValue('result');
+    const action = vi.fn().mockResolvedValue('result');
     const { result } = renderHook(() => useAsyncAction(action));
 
     await act(async () => {
@@ -42,7 +43,7 @@ describe('useAsyncAction', () => {
   });
 
   it('should handle action failure', async () => {
-    const action = jest.fn().mockRejectedValue(new Error('Test error'));
+    const action = vi.fn().mockRejectedValue(new Error('Test error'));
     const { result } = renderHook(() => useAsyncAction(action));
 
     await act(async () => {
@@ -54,7 +55,7 @@ describe('useAsyncAction', () => {
   });
 
   it('should show success notification', async () => {
-    const action = jest.fn().mockResolvedValue('result');
+    const action = vi.fn().mockResolvedValue('result');
     const { result } = renderHook(() => 
       useAsyncAction(action, { showNotification: true, successMessage: 'Success!' })
     );
@@ -67,7 +68,7 @@ describe('useAsyncAction', () => {
   });
 
   it('should use custom error message', async () => {
-    const action = jest.fn().mockRejectedValue(new Error('Original'));
+    const action = vi.fn().mockRejectedValue(new Error('Original'));
     const { result } = renderHook(() => 
       useAsyncAction(action, { errorMessage: 'Custom error' })
     );
@@ -80,7 +81,7 @@ describe('useAsyncAction', () => {
   });
 
   it('should not show notification when disabled', async () => {
-    const action = jest.fn().mockRejectedValue(new Error('Error'));
+    const action = vi.fn().mockRejectedValue(new Error('Error'));
     const { result } = renderHook(() => 
       useAsyncAction(action, { showNotification: false })
     );
@@ -93,7 +94,7 @@ describe('useAsyncAction', () => {
   });
 
   it('should reset state', async () => {
-    const action = jest.fn().mockRejectedValue(new Error('Error'));
+    const action = vi.fn().mockRejectedValue(new Error('Error'));
     const { result } = renderHook(() => useAsyncAction(action));
 
     await act(async () => {
@@ -111,7 +112,7 @@ describe('useAsyncAction', () => {
   });
 
   it('should handle non-Error rejection', async () => {
-    const action = jest.fn().mockRejectedValue('string error');
+    const action = vi.fn().mockRejectedValue('string error');
     const { result } = renderHook(() => useAsyncAction(action));
 
     await act(async () => {

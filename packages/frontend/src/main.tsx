@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import App from './App'
 import { ErrorBoundary } from './components'
+import { SpecsPage } from './pages/SpecsPage'
 import { AuthProvider } from './services/auth'
 import './i18n'
 
@@ -17,6 +18,7 @@ createRoot(rootElement).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} />
+            <Route path="/specs" element={<SpecsPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

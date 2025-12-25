@@ -1,18 +1,19 @@
+import { vi } from 'vitest';
 import { httpGet, httpPost, HttpError } from '../http';
 
 import { getCachedAudio, cacheAudio, generateCacheKey } from './cache';
 
-jest.mock('../http');
-jest.mock('../config', () => ({
+vi.mock('../http');
+vi.mock('../config', () => ({
   API_CONFIG: { cacheUrl: '/api/cache' },
 }));
 
-const mockHttpGet = httpGet as jest.MockedFunction<typeof httpGet>;
-const mockHttpPost = httpPost as jest.MockedFunction<typeof httpPost>;
+const mockHttpGet = httpGet as vi.MockedFunction<typeof httpGet>;
+const mockHttpPost = httpPost as vi.MockedFunction<typeof httpPost>;
 
 describe('Audio Cache', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getCachedAudio', () => {

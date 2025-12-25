@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
 import { useUIStore } from '../../features';
@@ -10,11 +11,11 @@ describe('NotificationContainer', () => {
       notifications: [],
       activeModal: null,
     });
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should not render when no notifications', () => {
@@ -69,7 +70,7 @@ describe('NotificationContainer', () => {
     expect(screen.getByText('Auto remove')).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(useUIStore.getState().notifications).toHaveLength(0);
@@ -85,7 +86,7 @@ describe('NotificationContainer', () => {
     render(<NotificationContainer />);
     
     act(() => {
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
     });
 
     expect(useUIStore.getState().notifications).toHaveLength(1);

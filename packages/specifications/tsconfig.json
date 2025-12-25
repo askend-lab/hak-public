@@ -6,5 +6,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["e2e/**/*"]
+  "include": ["e2e/**/*", "parser/**/*"]
 }
