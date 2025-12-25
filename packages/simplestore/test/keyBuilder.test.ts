@@ -1,5 +1,5 @@
 import { config } from '../src/config';
-import { buildKeys, buildPartitionKey, validateTtl } from '../src/keyBuilder';
+import { buildKeys, buildPartitionKey, parseTtl } from '../src/keyBuilder';
 import { ServerContext } from '../src/types';
 
 describe('KeyBuilder', () => {
@@ -48,31 +48,31 @@ describe('KeyBuilder', () => {
     });
   });
 
-  describe('validateTtl', () => {
+  describe('parseTtl', () => {
     it('should accept valid TTL within limits', () => {
-      expect(validateTtl(3600)).toStrictEqual({ valid: true, ttl: 3600 });
+      expect(parseTtl(3600)).toStrictEqual({ valid: true, value: 3600 });
     });
 
     it('should reject TTL of zero', () => {
-      const result = validateTtl(0);
+      const result = parseTtl(0);
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('TTL must be positive');
+      if (!result.valid) expect(result.error).toContain('TTL must be positive');
     });
 
     it('should reject negative TTL', () => {
-      const result = validateTtl(-100);
+      const result = parseTtl(-100);
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('TTL must be positive');
+      if (!result.valid) expect(result.error).toContain('TTL must be positive');
     });
 
     it('should reject TTL exceeding max limit', () => {
-      const result = validateTtl(config.maxTtlSeconds + 1);
+      const result = parseTtl(config.maxTtlSeconds + 1);
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('exceeds maximum');
+      if (!result.valid) expect(result.error).toContain('exceeds maximum');
     });
 
     it('should accept TTL at max limit', () => {
-      expect(validateTtl(config.maxTtlSeconds)).toStrictEqual({ valid: true, ttl: config.maxTtlSeconds });
+      expect(parseTtl(config.maxTtlSeconds)).toStrictEqual({ valid: true, value: config.maxTtlSeconds });
     });
   });
 });

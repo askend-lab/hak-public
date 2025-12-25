@@ -12,7 +12,7 @@
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
     "kill-ports": "fuser -k -9 5180/tcp 4000/tcp 3002/tcp 2>/dev/null; sleep 0.2; true",
     "start:frontend": "pnpm --filter @hak/frontend dev",
-    "start:backend": "pnpm --filter simplestore dev",
+    "start:backend": "pnpm exec tsc --noEmit && pnpm --filter simplestore dev",
     "start": "pnpm run kill-ports && (pnpm run start:backend & pnpm run start:frontend)"
   },
   "engines": {
