@@ -121,3 +121,14 @@ export const overflow = {
   scroll: 'scroll',
   visible: 'visible',
 } as const
+
+export const sizes = {
+  buttonSmall: '36px',
+  buttonMedium: '44px',
+  iconSmall: '4px',
+} as const
+
+export const padding = {
+  inputVertical: '0.75rem',
+  inputHorizontal: '1rem',
+} as const

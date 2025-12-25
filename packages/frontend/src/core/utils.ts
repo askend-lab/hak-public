@@ -1,17 +1,18 @@
+import { calculateHash } from '@hak/shared';
+
 import type { SynthesisEntry, TaskEntry, VoiceModel } from './schemas';
 
 const HEX_BASE = 16;
 const UUID_RANDOM_MASK = 0x3;
 const UUID_VERSION_BITS = 0x8;
-const HASH_PAD_LENGTH = 8;
 
-export function generateAudioHash(
+export async function generateAudioHash(
   text: string,
   voiceModel: VoiceModel
-): string {
+): Promise<string> {
   const normalized = normalizeText(text);
   const input = `${normalized}:${voiceModel}`;
-  return simpleHash(input);
+  return calculateHash(input);
 }
 
 export function normalizeText(text: string): string {
@@ -79,12 +80,3 @@ export function generateUUID(): string {
   });
 }
 
-export function simpleHash(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(HEX_BASE).padStart(HASH_PAD_LENGTH, '0');
-}

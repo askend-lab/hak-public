@@ -9,11 +9,7 @@ export default [
   
   {
     ignores: [
-      'eslint-rules/**',
-      'test/features/sample.test.ts',
-      'coverage/**',
-      'coverage-features/**',
-      'coverage-unit/**'
+      'tmp/**'
     ]
   },
 

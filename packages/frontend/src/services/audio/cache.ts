@@ -1,4 +1,5 @@
-import { simpleHash } from '../../core/utils';
+import { calculateHash } from '@hak/shared';
+
 import { API_CONFIG } from '../config';
 import { httpGet, httpPost, HttpError } from '../http';
 
@@ -34,11 +35,12 @@ export async function cacheAudio(
   });
 }
 
-export function generateCacheKey(
+export async function generateCacheKey(
   text: string,
   voiceModel: VoiceModel,
   version = 'v1'
-): string {
-  return `${version}:${voiceModel}:${simpleHash(text)}`;
+): Promise<string> {
+  const hash = await calculateHash(text);
+  return `${version}:${voiceModel}:${hash}`;
 }
 

@@ -1,41 +1,11 @@
 import { nowISO } from '../../core/utils';
-import { API_CONFIG } from '../config';
 
+import { apiRequest, setAuthTokenGetter } from './httpClient';
 import { buildUserPK, buildTaskSK, TASK_SK_PREFIX } from './keys';
 
 import type { Task, TaskEntry, CreateTaskRequest, ApiResponse } from './types';
 
-
-let authTokenGetter: (() => string | null) | null = null;
-
-export function setAuthTokenGetter(getter: () => string | null): void {
-  authTokenGetter = getter;
-}
-
-async function apiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<ApiResponse<T>> {
-  const token = authTokenGetter?.();
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-     
-    ...(token !== null && token !== '' ? { Authorization: `Bearer ${token}` } : {}),
-    ...(options.headers as Record<string, string> | undefined),
-  };
-
-  const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  if (!response.ok) {
-    return { success: false, error: `API error: ${String(response.status)}` };
-  }
-
-  const data = await response.json() as T;
-  return { success: true, data };
-}
+export { setAuthTokenGetter };
 
 export async function createTask(
   userId: string,
@@ -77,6 +47,15 @@ interface QueryResponse {
   items: { data: Task; SK: string }[];
 }
 
+function extractTaskFromItem(item: { data: Task; SK: string }): Task {
+  const skParts = item.SK.split('#');
+  const taskId = skParts[skParts.length - 1] ?? '';
+  return {
+    ...item.data,
+    id: item.data.id !== '' ? item.data.id : taskId,
+  };
+}
+
 export async function listTasks(userId: string): Promise<ApiResponse<Task[]>> {
   const params = new URLSearchParams({
     prefix: `${buildUserPK(userId)}#${TASK_SK_PREFIX}`,
@@ -85,18 +64,10 @@ export async function listTasks(userId: string): Promise<ApiResponse<Task[]>> {
   const response = await apiRequest<QueryResponse>(`/query?${params.toString()}`);
   
   if (!response.success || !response.data) {
-    return { success: false, error: response.error };
+    return { success: false, error: response.error ?? 'Unknown error' };
   }
   
-  // Transform items: extract data and derive id from SK
-  const tasks = response.data.items.map(item => {
-    const skParts = item.SK.split('#');
-    const taskId = skParts[skParts.length - 1]; // Get last part after TASK#
-    return {
-      ...item.data,
-      id: item.data.id || taskId,
-    };
-  });
+  const tasks = response.data.items.map(item => extractTaskFromItem(item));
   
   return { success: true, data: tasks };
 }

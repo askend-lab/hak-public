@@ -6,14 +6,13 @@
     "dx": "node devbox dx",
     "dx:cli": "node devbox",
     "test": "node devbox test",
-    "test:features": "jest test/features --testPathIgnorePatterns=packages/audio-api/test/features --coverage --coverageDirectory=coverage-features --json --outputFile=jest-results-features.json",
-    "test:unit": "jest --testPathIgnorePatterns=test/features --coverage --coverageDirectory=coverage-unit --json --outputFile=jest-results-unit.json",
-    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
+    "test:unit": "jest --testPathIgnorePatterns=packages/audio-api/test/features --coverage --coverageDirectory=tmp/coverage-unit --json --outputFile=tmp/jest-results-unit.json",
+    "test:coverage": "jest --coverage --json --outputFile=tmp/jest-results.json",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
     "kill-ports": "fuser -k -9 5180/tcp 4000/tcp 3002/tcp 2>/dev/null; sleep 0.2; true",
     "start:frontend": "pnpm --filter @hak/frontend dev",
-    "start:backend": "pnpm --filter single-table-lambda dev",
+    "start:backend": "pnpm --filter simplestore dev",
     "start": "pnpm run kill-ports && (pnpm run start:backend & pnpm run start:frontend)"
   },
   "engines": {

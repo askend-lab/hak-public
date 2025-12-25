@@ -1,12 +1,12 @@
- 
 import type { S3Client } from '@aws-sdk/client-s3';
 import type { SQSClient } from '@aws-sdk/client-sqs';
+import { TEXT_LIMITS } from '@hak/shared';
 
 import { calculateHash } from './hash';
 import { checkFileExists } from './s3';
 import { publishToQueue } from './sqs';
 
-const MAX_TEXT_LENGTH = 1000;
+const MAX_TEXT_LENGTH = TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH;
 
 const HTTP_STATUS = {
   OK: 200,

@@ -27,13 +27,11 @@ function App() {
         <div style={titleSectionStyle}>
           <div>
             <h1 style={h1Style}>{t('hero.title')}</h1>
-            <p style={subtitleStyle}>
-              Sisesta <span style={{ color: colors.primary }}>tekst</span> või <span style={{ color: colors.primary }}>sõna</span>, et <span style={{ color: colors.success }}>kuulata</span> selle hääldust ja uurida variante
-            </p>
+            <p style={subtitleStyle}>{t('hero.subtitle')}</p>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <Button variant="outline" size="small">Lisa ülesandesse (0)</Button>
-            <Button variant="primary" size="small"><span>▶</span> Mängi kõik</Button>
+            <Button variant="outline" size="small">{t('buttons.addToTask')} (0)</Button>
+            <Button variant="primary" size="small"><span>▶</span> {t('buttons.playAll')}</Button>
           </div>
         </div>
 
@@ -53,7 +51,7 @@ function App() {
 
         {/* Add sentence button */}
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          <Button variant="outline" onClick={addSentence}>Lisa lause</Button>
+          <Button variant="outline" onClick={addSentence}>{t('buttons.addSentence')}</Button>
         </div>
       </main>
 

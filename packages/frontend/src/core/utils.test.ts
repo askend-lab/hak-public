@@ -7,7 +7,6 @@ import {
   createSynthesisEntry,
   generateUUID,
   nowISO,
-  simpleHash,
 } from './utils';
 
 import type { SynthesisEntry } from './schemas';
@@ -79,27 +78,27 @@ describe('selectVoiceModel', () => {
 });
 
 describe('generateAudioHash', () => {
-  it('generates consistent hash for same input', () => {
-    const hash1 = generateAudioHash('hello', 'efm_s');
-    const hash2 = generateAudioHash('hello', 'efm_s');
+  it('generates consistent hash for same input', async () => {
+    const hash1 = await generateAudioHash('hello', 'efm_s');
+    const hash2 = await generateAudioHash('hello', 'efm_s');
     expect(hash1).toBe(hash2);
   });
 
-  it('generates different hash for different text', () => {
-    const hash1 = generateAudioHash('hello', 'efm_s');
-    const hash2 = generateAudioHash('world', 'efm_s');
+  it('generates different hash for different text', async () => {
+    const hash1 = await generateAudioHash('hello', 'efm_s');
+    const hash2 = await generateAudioHash('world', 'efm_s');
     expect(hash1).not.toBe(hash2);
   });
 
-  it('generates different hash for different voice model', () => {
-    const hash1 = generateAudioHash('hello', 'efm_s');
-    const hash2 = generateAudioHash('hello', 'efm_l');
+  it('generates different hash for different voice model', async () => {
+    const hash1 = await generateAudioHash('hello', 'efm_s');
+    const hash2 = await generateAudioHash('hello', 'efm_l');
     expect(hash1).not.toBe(hash2);
   });
 
-  it('normalizes text before hashing', () => {
-    const hash1 = generateAudioHash('Hello', 'efm_s');
-    const hash2 = generateAudioHash('hello', 'efm_s');
+  it('normalizes text before hashing', async () => {
+    const hash1 = await generateAudioHash('Hello', 'efm_s');
+    const hash2 = await generateAudioHash('hello', 'efm_s');
     expect(hash1).toBe(hash2);
   });
 });
@@ -221,26 +220,3 @@ describe('nowISO', () => {
   });
 });
 
-describe('simpleHash', () => {
-  it('generates consistent hash for same input', () => {
-    const hash1 = simpleHash('hello');
-    const hash2 = simpleHash('hello');
-    expect(hash1).toBe(hash2);
-  });
-
-  it('generates different hash for different input', () => {
-    const hash1 = simpleHash('hello');
-    const hash2 = simpleHash('world');
-    expect(hash1).not.toBe(hash2);
-  });
-
-  it('returns 8 character hex string', () => {
-    const hash = simpleHash('test');
-    expect(hash).toMatch(/^[0-9a-f]{8}$/);
-  });
-
-  it('handles empty string', () => {
-    const hash = simpleHash('');
-    expect(hash).toMatch(/^[0-9a-f]{8}$/);
-  });
-});

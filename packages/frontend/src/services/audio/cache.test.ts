@@ -62,19 +62,19 @@ describe('Audio Cache', () => {
   });
 
   describe('generateCacheKey', () => {
-    it('should generate cache key with default version', () => {
-      const key = generateCacheKey('hello', 'mari');
+    it('should generate cache key with default version', async () => {
+      const key = await generateCacheKey('hello', 'mari');
       expect(key).toMatch(/^v1:mari:/);
     });
 
-    it('should generate cache key with custom version', () => {
-      const key = generateCacheKey('hello', 'tambet', 'v2');
+    it('should generate cache key with custom version', async () => {
+      const key = await generateCacheKey('hello', 'tambet', 'v2');
       expect(key).toMatch(/^v2:tambet:/);
     });
 
-    it('should generate different keys for different texts', () => {
-      const key1 = generateCacheKey('hello', 'mari');
-      const key2 = generateCacheKey('world', 'mari');
+    it('should generate different keys for different texts', async () => {
+      const key1 = await generateCacheKey('hello', 'mari');
+      const key2 = await generateCacheKey('world', 'mari');
       expect(key1).not.toBe(key2);
     });
   });

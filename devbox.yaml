@@ -24,18 +24,12 @@ test_modules:
     suites:
       - name: unit
         command: 'pnpm test:unit'
-        results_file: 'jest-results-unit.json'
-        coverage_path: 'coverage-unit'
+        results_file: 'tmp/jest-results-unit.json'
+        coverage_path: 'tmp/coverage-unit'
         min_coverage_lines: 80
         min_coverage_branches: 70
-      - name: features
-        command: 'pnpm test:features'
-        results_file: 'jest-results-features.json'
-        coverage_path: 'coverage-features'
-        min_coverage_lines: 0  # Feature tests don't generate code coverage
-        min_coverage_branches: 0
-  - name: singletablelambda
-    path: packages/singletablelambda
+  - name: simplestore
+    path: packages/simplestore
     type: jest
     min_coverage_lines: 80
     min_coverage_branches: 70
@@ -44,8 +38,8 @@ test_modules:
     type: jest
     min_coverage_lines: 80
     min_coverage_branches: 70
-  - name: audio-worker
-    path: packages/audio-worker
+  - name: merlin-worker
+    path: packages/merlin-worker
     type: jest
     min_coverage_lines: 80
     min_coverage_branches: 70
@@ -54,6 +48,16 @@ test_modules:
     type: jest
     min_coverage_lines: 80
     min_coverage_branches: 70
+  - name: specifications
+    path: packages/specifications
+    type: jest
+    min_coverage_lines: 0
+    min_coverage_branches: 0
+  - name: shared
+    path: packages/shared
+    type: jest
+    min_coverage_lines: 0
+    min_coverage_branches: 0
 
 # Global coverage settings
 coverage:

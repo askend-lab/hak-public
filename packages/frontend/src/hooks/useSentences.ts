@@ -40,7 +40,6 @@ export function useSentences(initialSentences: string[] = ['']): UseSentencesRet
         void audioRef.current.play()
       }
     } catch (err) {
-      // TODO: Add proper logger
       console.error('Synthesis failed:', err)
     } finally {
       setLoadingIndex(null)

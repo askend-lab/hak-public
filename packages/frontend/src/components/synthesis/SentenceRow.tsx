@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { colors, gap, borderRadius, cursors } from '../../styles/colors'
 
 interface SentenceRowProps {
@@ -9,6 +11,7 @@ interface SentenceRowProps {
 }
 
 export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: SentenceRowProps) {
+  const { t } = useTranslation()
   return (
     <div style={{
       display: 'flex',
@@ -25,7 +28,7 @@ export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: Sent
         type="text"
         value={value}
         onChange={(e) => { onChange(e.target.value); }}
-        placeholder="Kirjuta oma lause siia"
+        placeholder={t('input.placeholder')}
         style={{
           flex: 1,
           padding: '0.75rem 1rem',

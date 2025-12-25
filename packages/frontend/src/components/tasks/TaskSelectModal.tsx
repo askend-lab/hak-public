@@ -19,15 +19,21 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
 
   useEffect(() => {
     if (activeModal !== 'taskSelect') return;
-    setLoading(true);
-    const userId = user?.id ?? 'test-user';
-    void listTasks(userId)
-      .then(response => {
+    
+    const loadTasks = async (): Promise<void> => {
+      setLoading(true);
+      try {
+        const userId = user?.id ?? 'test-user';
+        const response = await listTasks(userId);
         if (response.success && response.data) {
           setTasks(response.data);
         }
-      })
-      .finally(() => { setLoading(false); });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    void loadTasks();
   }, [activeModal, user, setTasks, setLoading]);
 
   const handleClose = useCallback(() => { closeModal(); onClose?.(); }, [closeModal, onClose]);

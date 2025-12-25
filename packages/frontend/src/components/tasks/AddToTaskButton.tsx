@@ -13,11 +13,6 @@ export function AddToTaskButton({ className = '' }: AddToTaskButtonProps) {
   useAuth(); // Keep hook for future auth check
 
   const handleClick = useCallback(() => {
-    // TODO: Re-enable auth check after testing
-    // if (!isAuthenticated) {
-    //   openModal('login');
-    //   return;
-    // }
     openModal('taskSelect');
   }, [openModal]);
 

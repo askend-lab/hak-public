@@ -1,0 +1,36 @@
+/**
+ * SHA-256 hash utility that works in both browser and Node.js
+ */
+
+declare const window: { crypto?: { subtle?: SubtleCrypto } } | undefined;
+
+export async function calculateHash(text: string): Promise<string> {
+  if (!text || text.trim().length === 0) {
+    throw new Error('Text cannot be empty');
+  }
+
+  // Browser environment
+  if (typeof window !== 'undefined' && window?.crypto?.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // Node.js environment
+  const crypto = await import('node:crypto');
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
+
+/**
+ * Synchronous hash for Node.js only (for backward compatibility)
+ */
+export function calculateHashSync(text: string): string {
+  if (!text || text.trim().length === 0) {
+    throw new Error('Text cannot be empty');
+  }
+  
+  const crypto = require('node:crypto');
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
