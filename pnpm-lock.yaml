@@ -160,6 +160,9 @@ importers:
 
   packages/frontend:
     dependencies:
+      '@hak/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@hak/specifications':
         specifier: workspace:*
         version: link:../specifications
