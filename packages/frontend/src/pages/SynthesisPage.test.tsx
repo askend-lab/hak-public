@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction, type Mocked } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 import { useSynthesisStore } from '../features';
@@ -25,8 +25,8 @@ vi.mock('../components', () => ({
   NotificationContainer: () => <div data-testid="notifications">Notifications</div>,
 }));
 
-const mockUseSynthesisStore = useSynthesisStore as vi.MockedFunction<typeof useSynthesisStore>;
-const mockSynthesizeWithRetry = synthesizeWithRetry as vi.MockedFunction<typeof synthesizeWithRetry>;
+const mockUseSynthesisStore = useSynthesisStore as unknown as MockedFunction<typeof useSynthesisStore>;
+const mockSynthesizeWithRetry = synthesizeWithRetry as MockedFunction<typeof synthesizeWithRetry>;
 
 describe('SynthesisPage', () => {
   const mockSetResult = vi.fn();
@@ -42,7 +42,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: null,
-    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
   });
 
   it('should render page title', () => {
@@ -65,7 +65,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: true,
       error: null,
-    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     expect(screen.queryByTestId('audio-player')).not.toBeInTheDocument();
@@ -79,14 +79,14 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: 'Something went wrong',
-    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
 
   it('should call synthesize on button click', async () => {
-    mockSynthesizeWithRetry.mockResolvedValue({ audioUrl: 'test.mp3' });
+    mockSynthesizeWithRetry.mockResolvedValue({ originalText: 'test', phoneticText: 'test', audioUrl: 'test.mp3', audioHash: 'abc', voiceModel: 'efm_s', cached: false });
 
     render(<SynthesisPage />);
     fireEvent.click(screen.getByTestId('synthesize'));
@@ -104,7 +104,7 @@ describe('SynthesisPage', () => {
       setError: mockSetError,
       isLoading: false,
       error: null,
-    } as vi.Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
+    } as Mocked<Partial<ReturnType<typeof useSynthesisStore>>>);
 
     render(<SynthesisPage />);
     fireEvent.click(screen.getByTestId('synthesize'));

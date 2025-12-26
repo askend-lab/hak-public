@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { useAuth } from './context';
@@ -6,7 +6,7 @@ import { ProtectedRoute, useRequireAuth } from './ProtectedRoute';
 
 vi.mock('./context');
 
-const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 
 // DRY: Factory function for auth context mock
 const createAuthMock = (overrides: Partial<ReturnType<typeof useAuth>> = {}) => ({
@@ -74,7 +74,6 @@ describe('useRequireAuth', () => {
     return (
       <div>
         <span data-testid="ready">{isReady ? 'yes' : 'no'}</span>
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-nullish-coalescing
         <span data-testid="userId">{userId ?? 'none'}</span>
       </div>
     );

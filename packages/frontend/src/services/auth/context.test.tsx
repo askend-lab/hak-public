@@ -14,7 +14,6 @@ function TestComponent() {
     <div>
       <div data-testid="loading">{isLoading ? 'loading' : 'ready'}</div>
       <div data-testid="authenticated">{isAuthenticated ? 'yes' : 'no'}</div>
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-nullish-coalescing
       <div data-testid="user">{user?.email ?? 'none'}</div>
       <button onClick={() => void login({ email: 'test@test.com', password: 'pass' })}>
         Login

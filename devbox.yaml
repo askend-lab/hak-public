@@ -159,17 +159,86 @@ hooks:
     active: true
     strict: true
 
+  # New hooks from boxer/devbox
+  secret-detection:
+    mode: error
+    active: true
+    excludePaths:
+      - '**/test/fixtures/**'
+
+  no-any:
+    mode: error
+    active: true
+
+  import-order:
+    mode: error
+    active: true
+
+  no-floating-promises:
+    mode: error
+    active: true
+
+  security-audit:
+    mode: error
+    active: true
+    auditLevel: moderate
+    packageManager: pnpm
+
+  dependency-check:
+    mode: error
+    active: true
+    excludeDev: true
+    ignoreBinPackage: false
+
+  jscpd:
+    mode: error
+    active: true
+    threshold: 5
+    minLines: 5
+    minTokens: 50
+    excludePaths:
+      - '**/node_modules/**'
+      - '**/dist/**'
+      - '**/coverage/**'
+      - '**/test/fixtures/**'
+      - '**/*.min.js'
+
+  source-size:
+    mode: error
+    active: true
+    max_lines: 400
+    excludePaths:
+      - '**/node_modules/**'
+      - '**/dist/**'
+      - '**/build/**'
+      - '**/coverage/**'
+      - '**/.git/**'
+      - '**/test/fixtures/**'
+      - '**/*.min.js'
+      - '**/*.bundle.js'
+      - '**/vendor/**'
+      - '**/package-lock.json'
+      - '**/pnpm-lock.yaml'
+      - '**/yarn.lock'
+      - '**/*.lock'
+
   # Stage-based execution - centralized configuration
 stages:
   pre-commit:
     hooks:
       - markdown-size
+      - source-size
       - language-check
       - broken-links
       - run-lint
       - run-typecheck
-      - test-coverage
-      - prettier-check
+      - jscpd
+      - dependency-check
+      - security-audit
+      - secret-detection
+      - import-order
+      - no-any
+      - no-floating-promises
   
   pre-push:
     includes:

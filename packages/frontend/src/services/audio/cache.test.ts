@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 import { httpGet, httpPost, HttpError } from '../http';
 
 import { getCachedAudio, cacheAudio, generateCacheKey } from './cache';
@@ -8,8 +8,8 @@ vi.mock('../config', () => ({
   API_CONFIG: { cacheUrl: '/api/cache' },
 }));
 
-const mockHttpGet = httpGet as vi.MockedFunction<typeof httpGet>;
-const mockHttpPost = httpPost as vi.MockedFunction<typeof httpPost>;
+const mockHttpGet = httpGet as MockedFunction<typeof httpGet>;
+const mockHttpPost = httpPost as MockedFunction<typeof httpPost>;
 
 describe('Audio Cache', () => {
   beforeEach(() => {
@@ -64,18 +64,18 @@ describe('Audio Cache', () => {
 
   describe('generateCacheKey', () => {
     it('should generate cache key with default version', async () => {
-      const key = await generateCacheKey('hello', 'mari');
-      expect(key).toMatch(/^v1:mari:/);
+      const key = await generateCacheKey('hello', 'efm_s');
+      expect(key).toMatch(/^v1:efm_s:/);
     });
 
     it('should generate cache key with custom version', async () => {
-      const key = await generateCacheKey('hello', 'tambet', 'v2');
-      expect(key).toMatch(/^v2:tambet:/);
+      const key = await generateCacheKey('hello', 'efm_l', 'v2');
+      expect(key).toMatch(/^v2:efm_l:/);
     });
 
     it('should generate different keys for different texts', async () => {
-      const key1 = await generateCacheKey('hello', 'mari');
-      const key2 = await generateCacheKey('world', 'mari');
+      const key1 = await generateCacheKey('hello', 'efm_s');
+      const key2 = await generateCacheKey('world', 'efm_s');
       expect(key1).not.toBe(key2);
     });
   });

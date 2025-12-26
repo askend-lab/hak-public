@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { useAuth } from '../../services/auth';
@@ -10,7 +10,7 @@ vi.mock('../../services/auth', () => ({
   useAuth: vi.fn(),
 }));
 
-const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 
 describe('AuthDisplay', () => {
   beforeEach(() => {
@@ -23,6 +23,9 @@ describe('AuthDisplay', () => {
       user: null,
       login: vi.fn(),
       logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
 
     render(<AuthDisplay />);
@@ -43,6 +46,9 @@ describe('AuthDisplay', () => {
       user: mockUser,
       login: vi.fn(),
       logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
 
     render(<AuthDisplay />);
@@ -65,6 +71,9 @@ describe('AuthDisplay', () => {
       user: null,
       login: mockLogin,
       logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
 
     render(<AuthDisplay />);
@@ -83,6 +92,9 @@ describe('AuthDisplay', () => {
       user: mockUser,
       login: vi.fn(),
       logout: mockLogout,
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
 
     render(<AuthDisplay />);
@@ -94,12 +106,15 @@ describe('AuthDisplay', () => {
   });
 
   it('should handle null user email gracefully', () => {
-    const mockUser = { email: null, id: '123' };
+    const mockUser = { email: null, id: '123' } as unknown as { email: string; id: string };
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: mockUser,
       login: vi.fn(),
       logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
 
     render(<AuthDisplay />);
@@ -112,9 +127,12 @@ describe('AuthDisplay', () => {
   it('should handle undefined user gracefully', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: undefined,
+      user: null,
       login: vi.fn(),
       logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
 
     render(<AuthDisplay />);

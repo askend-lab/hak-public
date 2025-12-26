@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction, type Mocked } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
 }));
 
-const mockUseTranslation = useTranslation as vi.MockedFunction<typeof useTranslation>;
+const mockUseTranslation = useTranslation as MockedFunction<typeof useTranslation>;
 
 describe('LanguageSwitcher', () => {
   const mockChangeLanguage = vi.fn();
@@ -18,7 +18,7 @@ describe('LanguageSwitcher', () => {
     mockUseTranslation.mockReturnValue({
       i18n: { changeLanguage: mockChangeLanguage },
       t: (key: string) => key,
-    } as vi.Mocked<ReturnType<typeof useTranslation>>);
+    } as Mocked<ReturnType<typeof useTranslation>>);
   });
 
   it('should render language buttons', () => {

@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import { useSynthesisStore, useUIStore } from '../../features';
@@ -15,9 +15,9 @@ vi.mock('../../services/auth', () => ({
   useAuth: vi.fn(),
 }));
 
-const mockUseSynthesisStore = useSynthesisStore as vi.MockedFunction<typeof useSynthesisStore>;
-const mockUseUIStore = useUIStore as vi.MockedFunction<typeof useUIStore>;
-const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
+const mockUseSynthesisStore = useSynthesisStore as unknown as MockedFunction<typeof useSynthesisStore>;
+const mockUseUIStore = useUIStore as unknown as MockedFunction<typeof useUIStore>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 
 describe('AddToTaskButton', () => {
   const mockOpenModal = vi.fn();

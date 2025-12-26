@@ -26,14 +26,14 @@ describe('useUIStore', () => {
       useUIStore.getState().addNotification('success', 'Test message');
       const notifications = useUIStore.getState().notifications;
       expect(notifications).toHaveLength(1);
-      expect(notifications[0].type).toBe('success');
-      expect(notifications[0].message).toBe('Test message');
+      expect(notifications[0]?.type).toBe('success');
+      expect(notifications[0]?.message).toBe('Test message');
     });
 
     it('should add notification with custom duration', () => {
       useUIStore.getState().addNotification('error', 'Error!', 10000);
       const notification = useUIStore.getState().notifications[0];
-      expect(notification.duration).toBe(10000);
+      expect(notification?.duration).toBe(10000);
     });
 
     it('should remove notification by id', () => {
@@ -47,7 +47,7 @@ describe('useUIStore', () => {
       useUIStore.getState().removeNotification('notif-1');
       const remaining = useUIStore.getState().notifications;
       expect(remaining).toHaveLength(1);
-      expect(remaining[0].id).toBe('notif-2');
+      expect(remaining[0]?.id).toBe('notif-2');
     });
 
     it('should clear all notifications', () => {

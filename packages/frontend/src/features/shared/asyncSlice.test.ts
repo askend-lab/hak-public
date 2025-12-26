@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { initialAsyncState, createAsyncActions, AsyncState } from './asyncSlice';
 
 describe('asyncSlice', () => {
@@ -14,7 +14,7 @@ describe('asyncSlice', () => {
 
   describe('createAsyncActions', () => {
     let state: AsyncState;
-    let set: vi.Mock;
+    let set: Mock;
     let actions: ReturnType<typeof createAsyncActions>;
 
     beforeEach(() => {

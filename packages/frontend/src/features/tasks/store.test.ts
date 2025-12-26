@@ -4,9 +4,10 @@ describe('useTasksStore', () => {
   const mockTask = {
     id: 'task-1',
     userId: 'user-1',
-    text: 'Test task',
-    createdAt: '2024-01-01',
-    status: 'pending' as const,
+    name: 'Test task',
+    entries: [],
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   };
 
   beforeEach(() => {
@@ -31,14 +32,14 @@ describe('useTasksStore', () => {
 
     it('should update task', () => {
       useTasksStore.setState({ tasks: [mockTask] });
-      useTasksStore.getState().updateTask('task-1', { text: 'Updated' });
-      expect(useTasksStore.getState().tasks[0].text).toBe('Updated');
+      useTasksStore.getState().updateTask('task-1', { name: 'Updated' });
+      expect(useTasksStore.getState().tasks[0]?.name).toBe('Updated');
     });
 
     it('should not update non-existent task', () => {
       useTasksStore.setState({ tasks: [mockTask] });
-      useTasksStore.getState().updateTask('non-existent', { text: 'Updated' });
-      expect(useTasksStore.getState().tasks[0].text).toBe('Test task');
+      useTasksStore.getState().updateTask('non-existent', { name: 'Updated' });
+      expect(useTasksStore.getState().tasks[0]?.name).toBe('Test task');
     });
 
     it('should remove task', () => {
@@ -92,9 +93,10 @@ describe('getSelectedTask', () => {
   const mockTask = {
     id: 'task-1',
     userId: 'user-1',
-    text: 'Test task',
-    createdAt: '2024-01-01',
-    status: 'pending' as const,
+    name: 'Test task',
+    entries: [],
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   };
 
   it('should return null when no task selected', () => {

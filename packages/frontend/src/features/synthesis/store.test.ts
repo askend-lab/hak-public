@@ -34,14 +34,14 @@ describe('useSynthesisStore', () => {
   });
 
   it('should set result and update phonetic text', () => {
-    const result = { audioUrl: 'test.mp3', phoneticText: 'te`re' };
+    const result = { originalText: 'tere', phoneticText: 'te`re', audioUrl: 'test.mp3', audioHash: 'abc123', voiceModel: 'efm_s' as const, cached: false };
     useSynthesisStore.getState().setResult(result);
     expect(useSynthesisStore.getState().result).toStrictEqual(result);
     expect(useSynthesisStore.getState().phoneticText).toBe('te`re');
   });
 
   it('should set result without phonetic text', () => {
-    const result = { audioUrl: 'test.mp3' };
+    const result = { originalText: 'test', phoneticText: '', audioUrl: 'test.mp3', audioHash: 'abc123', voiceModel: 'efm_s' as const, cached: false };
     useSynthesisStore.getState().setResult(result);
     expect(useSynthesisStore.getState().phoneticText).toBe('');
   });
@@ -63,7 +63,7 @@ describe('useSynthesisStore', () => {
       phoneticText: 'həˈloʊ',
       isLoading: true,
       error: 'Error',
-      result: { audioUrl: 'test.mp3' },
+      result: { originalText: 'test', phoneticText: 'test', audioUrl: 'test.mp3', audioHash: 'abc', voiceModel: 'efm_s' as const, cached: false },
       audioElement: new Audio(),
       isPlaying: true,
     });

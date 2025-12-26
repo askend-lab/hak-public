@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { httpRequest, httpPost, httpGet, httpPostBlob, HttpError } from './client';
 
 // Mock fetch
 declare global {
-  var fetch: vi.Mock;
+  var fetch: Mock;
 }
 global.fetch = vi.fn();
 
@@ -24,7 +24,7 @@ describe('HTTP Client', () => {
   describe('httpRequest', () => {
     it('should make a request and return JSON', async () => {
       const mockData = { id: 1, name: 'Test' };
-      (global.fetch as vi.Mock).mockResolvedValue({
+      (global.fetch as Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockData),
       });
@@ -37,7 +37,7 @@ describe('HTTP Client', () => {
     });
 
     it('should add query params to URL', async () => {
-      (global.fetch as vi.Mock).mockResolvedValue({
+      (global.fetch as Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({}),
       });
@@ -50,7 +50,7 @@ describe('HTTP Client', () => {
     });
 
     it('should throw HttpError on non-ok response', async () => {
-      (global.fetch as vi.Mock).mockResolvedValue({
+      (global.fetch as Mock).mockResolvedValue({
         ok: false,
         status: 500,
       });
@@ -62,7 +62,7 @@ describe('HTTP Client', () => {
   describe('httpPost', () => {
     it('should make POST request with body', async () => {
       const body = { name: 'Test' };
-      (global.fetch as vi.Mock).mockResolvedValue({
+      (global.fetch as Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ success: true }),
       });
@@ -77,7 +77,7 @@ describe('HTTP Client', () => {
 
   describe('httpGet', () => {
     it('should make GET request', async () => {
-      (global.fetch as vi.Mock).mockResolvedValue({
+      (global.fetch as Mock).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ data: [] }),
       });
@@ -92,7 +92,7 @@ describe('HTTP Client', () => {
   describe('httpPostBlob', () => {
     it('should make POST request and return blob', async () => {
       const mockBlob = new Blob(['test'], { type: 'audio/wav' });
-      (global.fetch as vi.Mock).mockResolvedValue({
+      (global.fetch as Mock).mockResolvedValue({
         ok: true,
         blob: () => Promise.resolve(mockBlob),
       });

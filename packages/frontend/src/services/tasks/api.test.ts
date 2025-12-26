@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import {
   setAuthTokenGetter,
   createTask,
@@ -15,24 +15,24 @@ vi.mock('../config', () => ({
 
 // Mock fetch
 declare global {
-  var fetch: vi.Mock;
+  var fetch: Mock;
 }
 global.fetch = vi.fn();
 
 // DRY: Helper functions for fetch mocks
 const mockFetchSuccess = (data: unknown): void => {
-  (global.fetch as vi.Mock).mockResolvedValue({
+  (global.fetch as Mock).mockResolvedValue({
     ok: true,
     json: (): Promise<unknown> => Promise.resolve(data),
   });
 };
 
 const mockFetchError = (status = 500): void => {
-  (global.fetch as vi.Mock).mockResolvedValue({ ok: false, status });
+  (global.fetch as Mock).mockResolvedValue({ ok: false, status });
 };
 
 const mockFetchSequence = (responses: { ok: boolean; data?: unknown; status?: number }[]): void => {
-  const mock = global.fetch as vi.Mock;
+  const mock = global.fetch as Mock;
   responses.forEach((res, i) => {
     if (i === 0) {
       mock.mockResolvedValueOnce({

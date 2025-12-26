@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction, type Mocked } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 import { useUIStore } from '../features';
@@ -9,7 +9,7 @@ vi.mock('../features', () => ({
   useUIStore: vi.fn(),
 }));
 
-const mockUseUIStore = useUIStore as vi.MockedFunction<typeof useUIStore>;
+const mockUseUIStore = useUIStore as unknown as MockedFunction<typeof useUIStore>;
 
 describe('useAsyncAction', () => {
   const mockAddNotification = vi.fn();
@@ -18,7 +18,7 @@ describe('useAsyncAction', () => {
     vi.clearAllMocks();
     mockUseUIStore.mockReturnValue({
       addNotification: mockAddNotification,
-    } as vi.Mocked<Partial<ReturnType<typeof useUIStore>>>);
+    } as Mocked<Partial<ReturnType<typeof useUIStore>>>);
   });
 
   it('should initialize with correct state', () => {

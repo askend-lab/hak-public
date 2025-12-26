@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 // Mock config before imports to handle import.meta.env
 vi.mock('../config', () => ({
   API_CONFIG: {
@@ -39,10 +39,10 @@ import type { VabamorfResponse, SynthesisResult } from './types';
 import type { VoiceModel } from '../../core/schemas';
 
 // Mock dependencies
-const mockSynthesizeViaApi = synthesizeViaApi as vi.MockedFunction<typeof synthesizeViaApi>;
-const mockSelectVoiceModel = selectVoiceModel as vi.MockedFunction<typeof selectVoiceModel>;
-const mockCountWords = countWords as vi.MockedFunction<typeof countWords>;
-const mockWithRetry = withRetry as vi.MockedFunction<typeof withRetry>;
+const mockSynthesizeViaApi = synthesizeViaApi as MockedFunction<typeof synthesizeViaApi>;
+const mockSelectVoiceModel = selectVoiceModel as MockedFunction<typeof selectVoiceModel>;
+const mockCountWords = countWords as MockedFunction<typeof countWords>;
+const mockWithRetry = withRetry as MockedFunction<typeof withRetry>;
 
 describe('generateCacheKey', () => {
   it('generates consistent key for same input', () => {
@@ -63,8 +63,8 @@ describe('generateCacheKey', () => {
     expect(key1).not.toBe(key2);
   });
 
-  it('includes version prefix', () => {
-    const key = generateCacheKey('tere', 'efm_s', 'v2');
+  it('includes version prefix', async () => {
+    const key = await generateCacheKey('tere', 'efm_s', 'v2');
     expect(key.startsWith('v2:')).toBe(true);
   });
 

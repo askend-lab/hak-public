@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { withRetry, sleep } from './retry';
 
 describe('sleep', () => {

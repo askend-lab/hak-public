@@ -1,4 +1,5 @@
-import { vi } from 'vitest';
+import React from 'react';
+import { vi, type MockedFunction } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -15,11 +16,11 @@ vi.mock('../ui', async () => {
   const actual = await vi.importActual('../ui');
   return {
     ...actual,
-    LogoWithText: (): JSX.Element => <div data-testid="logo-with-text">LogoWithText</div>,
-    NavTab: ({ label, ...props }: { label: string; [key: string]: unknown }): JSX.Element => <button data-testid="nav-tab" {...props}>{label}</button>,
-    Button: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }): JSX.Element => <button data-testid="button" {...props}>{children}</button>,
-    WaffleMenu: (): JSX.Element => <div data-testid="waffle-menu">WaffleMenu</div>,
-    UserAvatar: ({ initials, ...props }: { initials: string; [key: string]: unknown }): JSX.Element => <div data-testid="user-avatar" {...props}>{initials}</div>,
+    LogoWithText: (): React.JSX.Element => <div data-testid="logo-with-text">LogoWithText</div>,
+    NavTab: ({ label, ...props }: { label: string; [key: string]: unknown }): React.JSX.Element => <button data-testid="nav-tab" {...props}>{label}</button>,
+    Button: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }): React.JSX.Element => <button data-testid="button" {...props}>{children}</button>,
+    WaffleMenu: (): React.JSX.Element => <div data-testid="waffle-menu">WaffleMenu</div>,
+    UserAvatar: ({ initials, ...props }: { initials: string; [key: string]: unknown }): React.JSX.Element => <div data-testid="user-avatar" {...props}>{initials}</div>,
   };
 });
 
@@ -27,7 +28,7 @@ vi.mock('../../services/auth', () => ({
   useAuth: vi.fn(),
 }));
 
-const mockUseAuth = useAuth as vi.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 
 describe('Header', () => {
   beforeEach(() => {
@@ -40,7 +41,10 @@ describe('Header', () => {
       isAuthenticated: false,
       user: null,
       login: vi.fn(),
-      logout: vi.fn()
+      logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
     
     render(
@@ -56,7 +60,10 @@ describe('Header', () => {
       isAuthenticated: false,
       user: null,
       login: vi.fn(),
-      logout: vi.fn()
+      logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
     
     render(
@@ -74,7 +81,10 @@ describe('Header', () => {
       isAuthenticated: false,
       user: null,
       login: vi.fn(),
-      logout: vi.fn()
+      logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
     
     render(
@@ -91,7 +101,10 @@ describe('Header', () => {
       isAuthenticated: true,
       user: { id: 'user123', email: 'test@example.com' },
       login: vi.fn(),
-      logout: vi.fn()
+      logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
     
     render(
@@ -107,7 +120,10 @@ describe('Header', () => {
       isAuthenticated: false,
       user: null,
       login: vi.fn(),
-      logout: vi.fn()
+      logout: vi.fn(),
+      refreshSession: vi.fn(),
+      isLoading: false,
+      error: null,
     });
     
     render(
@@ -124,9 +140,9 @@ describe('Header', () => {
     expect(navTabs[1]).toHaveTextContent('Ülesanded');
     
     // Click tasks tab - should not crash
-    navTabs[1].click();
+    navTabs[1]?.click();
     
     // Click synthesis tab - should not crash
-    navTabs[0].click();
+    navTabs[0]?.click();
   });
 });

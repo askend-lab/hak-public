@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 import { httpPost } from '../http';
 
 import { analyzeText, toPhoneticText, getWordVariants } from './vabamorf';
@@ -8,7 +8,7 @@ vi.mock('../config', () => ({
   API_CONFIG: { vabamorfUrl: '/api/vabamorf' },
 }));
 
-const mockHttpPost = httpPost as vi.MockedFunction<typeof httpPost>;
+const mockHttpPost = httpPost as MockedFunction<typeof httpPost>;
 
 describe('Vabamorf', () => {
   beforeEach(() => {
@@ -25,10 +25,10 @@ describe('Vabamorf', () => {
       const result = await analyzeText('tere maailm');
       
       expect(result.words).toHaveLength(2);
-      expect(result.words[0].text).toBe('tere');
-      expect(result.words[0].phonetic).toBe('te`re');
-      expect(result.words[1].text).toBe('maailm');
-      expect(result.words[1].phonetic).toBe('maa`ilm');
+      expect(result.words[0]?.text).toBe('tere');
+      expect(result.words[0]?.phonetic).toBe('te`re');
+      expect(result.words[1]?.text).toBe('maailm');
+      expect(result.words[1]?.phonetic).toBe('maa`ilm');
     });
   });
 

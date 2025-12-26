@@ -10,7 +10,7 @@ describe('useSynthesisAudioStore', () => {
   });
 
   it('should set result', () => {
-    const result = { audioUrl: 'test.mp3', duration: 10 };
+    const result = { originalText: 'test', phoneticText: 'test', audioUrl: 'test.mp3', audioHash: 'abc', voiceModel: 'efm_s' as const, cached: false };
     useSynthesisAudioStore.getState().setResult(result);
     expect(useSynthesisAudioStore.getState().result).toStrictEqual(result);
   });
@@ -28,7 +28,7 @@ describe('useSynthesisAudioStore', () => {
 
   it('should reset audio to initial state', () => {
     useSynthesisAudioStore.setState({
-      result: { audioUrl: 'test.mp3', duration: 10 },
+      result: { originalText: 'test', phoneticText: 'test', audioUrl: 'test.mp3', audioHash: 'abc', voiceModel: 'efm_s' as const, cached: false },
       audioElement: new Audio(),
       isPlaying: true,
     });

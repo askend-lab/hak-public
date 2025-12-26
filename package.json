@@ -29,6 +29,7 @@
     "@types/json-schema": "^7.0.15",
     "@types/json5": "^2.2.0",
     "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
     "@typescript-eslint/eslint-plugin": "^8.50.1",
     "@typescript-eslint/parser": "^8.50.1",
     "babel-jest": "^29.7.0",
@@ -54,8 +55,6 @@
     "typescript-eslint": "^8.50.1"
   },
   "dependencies": {
-    "@types/react": "^19.2.7",
-    "aws-amplify": "^6.15.9",
     "react": "^19.2.3"
   }
 }

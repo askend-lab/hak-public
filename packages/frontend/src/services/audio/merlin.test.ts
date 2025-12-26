@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 // Mock config before imports to handle import.meta.env
 vi.mock('../config', () => ({
   API_CONFIG: {
@@ -15,8 +15,8 @@ import type { MerlinRequest } from './types';
 // Mock dependencies
 vi.mock('../http');
 
-const mockHttpPost = httpPost as vi.MockedFunction<typeof httpPost>;
-const mockHttpPostBlob = httpPostBlob as vi.MockedFunction<typeof httpPostBlob>;
+const mockHttpPost = httpPost as MockedFunction<typeof httpPost>;
+const mockHttpPostBlob = httpPostBlob as MockedFunction<typeof httpPostBlob>;
 
 describe('merlin', () => {
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('merlin', () => {
     it('should return audio URL with base64 data', async () => {
       const mockRequest: MerlinRequest = {
         text: 'test text',
-        voice: 'test-voice'
+        voice: 'efm_s'
       };
 
       const mockEkiResponse = {
@@ -48,7 +48,7 @@ describe('merlin', () => {
         'https://merlin.example.com/synthesize',
         {
           text: 'test text',
-          voice: 'test-voice',
+          voice: 'efm_s',
           returnBase64: true
         }
       );
@@ -57,7 +57,7 @@ describe('merlin', () => {
     it('should work with blob format parameter', async () => {
       const mockRequest: MerlinRequest = {
         text: 'test text',
-        voice: 'test-voice'
+        voice: 'efm_s'
       };
 
       const mockEkiResponse = {
@@ -78,7 +78,7 @@ describe('merlin', () => {
     it('should handle empty audio data', async () => {
       const mockRequest: MerlinRequest = {
         text: '',
-        voice: 'test-voice'
+        voice: 'efm_s'
       };
 
       mockHttpPost.mockResolvedValueOnce({
@@ -99,7 +99,7 @@ describe('merlin', () => {
     it('should return blob response', async () => {
       const mockRequest: MerlinRequest = {
         text: 'test text',
-        voice: 'test-voice'
+        voice: 'efm_s'
       };
 
       const mockBlob = new Blob(['test'], { type: 'audio/wav' });
@@ -113,7 +113,7 @@ describe('merlin', () => {
         'https://merlin.example.com/synthesize',
         {
           text: 'test text',
-          voice: 'test-voice',
+          voice: 'efm_s',
           format: 'blob'
         }
       );
@@ -122,9 +122,7 @@ describe('merlin', () => {
     it('should pass all request parameters correctly', async () => {
       const mockRequest: MerlinRequest = {
         text: 'complex text',
-        voice: 'another-voice',
-        speed: 1.5,
-        pitch: 0.8
+        voice: 'efm_l',
       };
 
       const mockBlob = new Blob(['complex'], { type: 'audio/wav' });
@@ -136,9 +134,7 @@ describe('merlin', () => {
         'https://merlin.example.com/synthesize',
         {
           text: 'complex text',
-          voice: 'another-voice',
-          speed: 1.5,
-          pitch: 0.8,
+          voice: 'efm_l',
           format: 'blob'
         }
       );
