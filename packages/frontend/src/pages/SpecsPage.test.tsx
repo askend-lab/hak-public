@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { SpecsPage } from './SpecsPage';
@@ -26,35 +26,28 @@ vi.mock('@hak/specifications', () => ({
 
 // Mock specs service
 vi.mock('../services/specs', () => ({
-  loadTestResults: vi.fn().mockResolvedValue({
-    numTotalTests: 1,
-    numPassedTests: 1,
-    numFailedTests: 0,
-    numPendingTests: 0,
-    testResults: [
-      {
-        name: '/steps/test.tsx',
-        status: 'passed',
-        assertionResults: [
-          {
-            fullName: 'Test Scenario',
-            title: 'Test Scenario',
-            status: 'passed',
-            duration: 100,
-            ancestorTitles: [],
-          },
-        ],
-      },
-    ],
+  loadCucumberResults: vi.fn().mockResolvedValue([{
+    keyword: 'Feature',
+    name: 'Test Feature',
+    elements: [{
+      keyword: 'Scenario',
+      name: 'Test Scenario',
+      steps: [
+        { keyword: 'Given', name: 'I am on the page', result: { status: 'passed', duration: 50000000 } },
+        { keyword: 'When', name: 'I click button', result: { status: 'passed', duration: 50000000 } },
+      ]
+    }]
+  }]),
+  getFeatureGroups: vi.fn().mockReturnValue({
+    'test': {
+      'test-feature': 'Feature: Test\n  Scenario: Test\n    Given step',
+    },
   }),
-  getFeatures: vi.fn().mockReturnValue({
-    'test-feature': 'Feature: Test\n  Scenario: Test\n    Given step',
-  }),
-  findGherkinTests: vi.fn().mockReturnValue([
+  parseCucumberResults: vi.fn().mockReturnValue([
     {
-      name: 'test.tsx',
+      name: 'Test Feature',
       status: 'passed',
-      tests: [{ name: 'Test Scenario', fullName: 'Test Scenario', status: 'passed', duration: 100 }],
+      tests: [{ name: 'Test Scenario', fullName: 'Test Feature > Test Scenario', status: 'passed', duration: 100 }],
     },
   ]),
 }));
@@ -81,36 +74,24 @@ describe('SpecsPage', () => {
     vi.clearAllMocks();
   });
 
-  it('shows loading state initially', () => {
-    renderSpecsPage();
-    expect(screen.getByText('Loading specifications...')).toBeInTheDocument();
-  });
-
-  it('displays specifications title after loading', async () => {
+  it('displays features header after loading', async () => {
     renderSpecsPage();
     await waitFor(() => {
-      expect(screen.getByText('📋 Specifications')).toBeInTheDocument();
+      expect(screen.getByText('📋 Features')).toBeInTheDocument();
     });
   });
 
   it('displays feature name', async () => {
     renderSpecsPage();
     await waitFor(() => {
-      expect(screen.getByText('Test Feature')).toBeInTheDocument();
+      expect(screen.getAllByText('Test Feature').length).toBeGreaterThan(0);
     });
   });
 
   it('displays scenario name', async () => {
     renderSpecsPage();
     await waitFor(() => {
-      expect(screen.getByText('Test Scenario')).toBeInTheDocument();
-    });
-  });
-
-  it('displays test results summary', async () => {
-    renderSpecsPage();
-    await waitFor(() => {
-      expect(screen.getByText('Test Results')).toBeInTheDocument();
+      expect(screen.getAllByText('Test Scenario').length).toBeGreaterThan(0);
     });
   });
 
@@ -123,10 +104,36 @@ describe('SpecsPage', () => {
     });
   });
 
-  it('displays test duration', async () => {
+  it('displays group name with folder icon', async () => {
     renderSpecsPage();
     await waitFor(() => {
-      expect(screen.getByText('100ms')).toBeInTheDocument();
+      expect(screen.getByText(/📂.*test/i)).toBeInTheDocument();
     });
+  });
+
+  it('toggles group expansion on click', async () => {
+    renderSpecsPage();
+    await waitFor(() => {
+      expect(screen.getByText(/📂.*test/i)).toBeInTheDocument();
+    });
+    const groupText = screen.getByText(/📂.*test/i);
+    fireEvent.click(groupText);
+    await waitFor(() => {
+      expect(screen.getByText(/📁.*test/i)).toBeInTheDocument();
+    });
+  });
+
+  it('toggles feature expansion on click', async () => {
+    renderSpecsPage();
+    await waitFor(() => {
+      expect(screen.getAllByText('Test Feature').length).toBeGreaterThan(0);
+    });
+    const featureItems = screen.getAllByText(/▼.*Test Feature/);
+    if (featureItems[0]) {
+      fireEvent.click(featureItems[0]);
+      await waitFor(() => {
+        expect(screen.getByText(/▶.*Test Feature/)).toBeInTheDocument();
+      });
+    }
   });
 });

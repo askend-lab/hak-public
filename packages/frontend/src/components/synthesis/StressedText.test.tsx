@@ -13,10 +13,11 @@ describe('StressedText', () => {
     vi.clearAllMocks();
   });
 
-  it('should not render when no text', () => {
+  it('should render label but no content when no text', () => {
     mockStoreWithPhonetic('', '');
-    const { container } = render(<StressedText />);
-    expect(container.querySelector('.stressed-text')).toBeNull();
+    render(<StressedText />);
+    expect(screen.getByText('Foneetiline tekst:')).toBeInTheDocument();
+    expect(document.querySelector('.stressed-text__content')).toBeNull();
   });
 
   it('should render phonetic text when available', () => {

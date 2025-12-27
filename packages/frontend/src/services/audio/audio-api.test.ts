@@ -1,4 +1,4 @@
-import { vi, type Mock, type MockedFunction } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 // Mock config before imports to handle import.meta.env
 vi.mock('../config', () => ({
   API_CONFIG: {
@@ -20,10 +20,8 @@ vi.mock('../http');
 const mockHttpPost = httpPost as MockedFunction<typeof httpPost>;
 
 // Mock fetch
-declare global {
-  var fetch: Mock;
-}
-global.fetch = vi.fn();
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
 describe('audio-api', () => {
   beforeEach(() => {

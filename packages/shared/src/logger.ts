@@ -48,6 +48,19 @@ export function createLogger(minLevel: LogLevel = 'info'): Logger {
   };
 }
 
-export const logger = createLogger(
-  (process.env.LOG_LEVEL as LogLevel | undefined) ?? 'info'
-);
+// Environment-safe log level detection
+const getLogLevel = (): LogLevel => {
+  try {
+    // Node.js environment (works in Jest and Node)
+    // eslint-disable-next-line no-restricted-globals
+    if (typeof process !== 'undefined' && process.env?.LOG_LEVEL) {
+      // eslint-disable-next-line no-restricted-globals
+      return process.env.LOG_LEVEL as LogLevel;
+    }
+  } catch {
+    // Ignore errors in environment detection
+  }
+  return 'info';
+};
+
+export const logger = createLogger(getLogLevel());

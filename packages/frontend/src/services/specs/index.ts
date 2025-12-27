@@ -2,6 +2,8 @@
  * Service for loading Gherkin specifications and test results
  */
 
+import { FEATURES, FEATURE_GROUPS } from './features/index.js';
+
 export interface TestResult {
   name: string;
   fullName: string;
@@ -33,27 +35,35 @@ export interface VitestResults {
   }>;
 }
 
-// Feature files content (will be populated by Vite plugin or build script)
-const FEATURES: Record<string, string> = {
-  'US-001-basic-synthesis': `Feature: Basic text synthesis (US-001)
-  As a user
-  I want to enter text and hear it synthesized
-  So that I can learn Estonian pronunciation
 
-  Scenario: Synthesize a word
-    Given I am on the main page
-    When I enter "Tere" in the text input
-    And I click the play button
-    Then I hear the synthesized audio
-    And the audio player shows the audio is playing`,
-};
+// Cucumber results format
+interface CucumberResult {
+  keyword: string;
+  name: string;
+  elements: Array<{
+    keyword: string;
+    name: string;
+    steps: Array<{
+      keyword: string;
+      name: string;
+      result: {
+        status: string;
+        duration?: number;
+      };
+    }>;
+  }>;
+}
 
 export async function loadTestResults(): Promise<VitestResults | null> {
+  // No longer loading jest results - cucumber results are shown differently
+  return null;
+}
+
+export async function loadCucumberResults(): Promise<CucumberResult[] | null> {
   try {
-    // In dev mode, fetch from the file system via Vite
-    const response = await fetch('/jest-results.json');
+    const response = await fetch('/cucumber-results.json');
     if (!response.ok) return null;
-    return await response.json() as VitestResults;
+    return await response.json() as CucumberResult[];
   } catch {
     return null;
   }
@@ -63,17 +73,28 @@ export function getFeatures(): Record<string, string> {
   return FEATURES;
 }
 
-export function findGherkinTests(results: VitestResults): TestSuite[] {
-  return results.testResults
-    .filter(suite => suite.name.includes('/steps/') || suite.name.includes('Gherkin'))
-    .map(suite => ({
-      name: suite.name.split('/').pop() ?? suite.name,
-      status: suite.status,
-      tests: suite.assertionResults.map(test => ({
-        name: test.title,
-        fullName: test.fullName,
-        status: test.status as TestResult['status'],
-        duration: test.duration,
-      })),
-    }));
+export function getFeatureGroups(): Record<string, Record<string, string>> {
+  return FEATURE_GROUPS;
+}
+
+export function findGherkinTests(_results: VitestResults): TestSuite[] {
+  // Deprecated - use cucumber results instead
+  return [];
+}
+
+export function parseCucumberResults(results: CucumberResult[]): TestSuite[] {
+  return results.map(feature => ({
+    name: feature.name,
+    status: 'passed',
+    tests: feature.elements.map(scenario => {
+      const allPassed = scenario.steps.every(s => s.result.status === 'passed');
+      const totalDuration = scenario.steps.reduce((sum, s) => sum + (s.result.duration ?? 0), 0);
+      return {
+        name: scenario.name,
+        fullName: `${feature.name} > ${scenario.name}`,
+        status: allPassed ? 'passed' as const : 'failed' as const,
+        duration: totalDuration / 1000000, // Convert from nanoseconds to ms
+      };
+    }),
+  }));
 }

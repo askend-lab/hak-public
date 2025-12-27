@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { colors, gap, borderRadius, cursors } from '../../styles/colors'
@@ -6,11 +7,12 @@ interface SentenceRowProps {
   value: string
   onChange: (value: string) => void
   onPlay: () => void
+  onRemove: () => void
   isLoading: boolean
   isLast: boolean
 }
 
-export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: SentenceRowProps) {
+export function SentenceRow({ value, onChange, onPlay, onRemove, isLoading, isLast }: SentenceRowProps) {
   const { t } = useTranslation()
   return (
     <div style={{
@@ -44,7 +46,7 @@ export function SentenceRow({ value, onChange, onPlay, isLoading, isLast }: Sent
       <PlayButton onClick={onPlay} isLoading={isLoading} />
 
       {/* More menu */}
-      <MoreButton />
+      <MoreButton onRemove={onRemove} />
     </div>
   )
 }
@@ -95,21 +97,56 @@ function PlayButton({ onClick, isLoading }: { onClick: () => void; isLoading: bo
   )
 }
 
-function MoreButton() {
+function MoreButton({ onRemove }: { onRemove: () => void }) {
+  const [isOpen, setIsOpen] = useState(false)
+  
   return (
-    <button style={{
-      width: '36px',
-      height: '36px',
-      background: 'transparent',
-      border: 'none',
-      cursor: cursors.pointer,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: colors.gray,
-      fontSize: '1.25rem',
-    }}>
-      ⋯
-    </button>
+    <div style={{ position: 'relative' }}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '36px',
+          height: '36px',
+          background: 'transparent',
+          border: 'none',
+          cursor: cursors.pointer,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: colors.gray,
+          fontSize: '1.25rem',
+        }}>
+        ⋯
+      </button>
+      {isOpen && (
+        <div role="menu" style={{
+          position: 'absolute',
+          right: 0,
+          top: '100%',
+          background: colors.white,
+          border: `1px solid ${colors.outlinedNeutral}`,
+          borderRadius: borderRadius.small,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          zIndex: 10,
+          minWidth: '120px',
+        }}>
+          <button
+            role="menuitem"
+            onClick={() => { onRemove(); setIsOpen(false); }}
+            style={{
+              width: '100%',
+              padding: '0.5rem 1rem',
+              background: 'transparent',
+              border: 'none',
+              textAlign: 'left',
+              cursor: cursors.pointer,
+              color: colors.error,
+            }}
+          >
+            Eemalda
+          </button>
+        </div>
+      )}
+    </div>
   )
 }

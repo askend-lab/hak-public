@@ -6,7 +6,7 @@ import { AuthStorage } from './storage';
 
 vi.mock('./storage');
 
-const mockAuthStorage = AuthStorage as vi.Mocked<typeof AuthStorage>;
+const mockAuthStorage = vi.mocked(AuthStorage);
 
 function TestComponent() {
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();

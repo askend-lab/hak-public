@@ -1,4 +1,4 @@
-import { vi, type MockedFunction, type Mocked } from 'vitest';
+import { vi, type MockedFunction } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,7 +18,7 @@ describe('LanguageSwitcher', () => {
     mockUseTranslation.mockReturnValue({
       i18n: { changeLanguage: mockChangeLanguage },
       t: (key: string) => key,
-    } as Mocked<ReturnType<typeof useTranslation>>);
+    } as unknown as ReturnType<typeof useTranslation>);
   });
 
   it('should render language buttons', () => {

@@ -1,0 +1,107 @@
+MEETING TRANSCRIPT - ESTONIAN LANGUAGE INSTITUTE PROJECT
+Date: October 15, 2025
+Participants: Aleksei, Tatjana, Client (Estonian Language Institute)
+
+=== PROJECT MAIN OBJECTIVE ===
+
+Development of a web application for learning proper Estonian pronunciation.
+The application helps people who speak Estonian as a non-native language to learn correct pronunciation.
+
+=== KEY FUNCTIONALITY ===
+
+1. User (teacher or student) enters a sentence in Estonian
+2. System places stress marks in the sentence (using Estonian language dictionaries)
+3. System synthesizes speech from text with stress marks
+4. User listens to correct pronunciation
+
+=== USER ROLES ===
+
+IMPORTANT: There are no real roles in the system. The only difference is in authorization:
+
+- Non-logged-in user:
+  * Can enter sentences
+  * Listen to pronunciation
+  * Save to browser local storage
+  * Everything is lost on logout
+
+- Logged-in user:
+  * All of the above + create exercises
+  * Create lessons (sets of sentences)
+  * Generate unique links for sharing
+  * Exercises accessible to others via link in read-only mode
+
+=== ARCHITECTURAL COMPONENTS ===
+
+1. Frontend (UI) - needs to be developed
+2. Backend API - needs to be developed
+3. Database - for storing user exercises
+4. Stress marking component - READY (provided by client)
+   - Source code available
+   - Can run in Docker
+   - Works with Estonian language dictionaries
+5. Merlin speech synthesizer - READY (provided by client)
+   - Source code available
+   - Works with file system (reads text from file, writes audio to file)
+   - Limitation: can only generate one file at a time
+   - Needs to be wrapped in a service
+
+=== TECHNICAL REQUIREMENTS ===
+
+1. Modularity:
+   - Components should be easily replaceable
+   - Universities can connect their own models
+   - Ability to integrate into other systems (Moodle, etc.)
+
+2. Hosting and scalability:
+   - Minimal cost (preferably free or nearly free)
+   - Scalability (project will go to public website)
+   - Estonian Language Institute will host and support
+
+3. Authorization:
+   - Client is still deciding which provider to use
+   - Under consideration: Google, possibly government authorization system
+   - Should support multiple providers
+   - Users from other countries (not only Estonian citizens)
+
+4. Open Source:
+   - Code will be open
+   - Institutions can fork and adapt to their needs
+
+=== LIMITATIONS AND RISKS ===
+
+1. This is "cashier leadership" - UI on top of ready-made components
+2. Small budget
+3. Need to report implementation difficulties early
+4. Main risks - in integration of ready components
+5. Merlin synthesizer has limitation on simultaneous generation
+
+=== FUTURE DEVELOPMENT ===
+
+1. Replacement of synthesis and language processing models
+2. Integration into LMS systems (Moodle, etc.)
+3. University authorization systems
+4. Support for different phonetic notations
+5. Use by researchers to test their models
+
+=== USE CASES ===
+
+1. Institutes want to integrate into their systems
+2. Researchers want to use for testing their models
+3. Teachers create exercises/lessons for students
+4. Students practice pronunciation
+
+=== STATUS ===
+
+- There is an AI prototype (shows functionality)
+- Designer not involved
+- Recently completed analysis and functionality description
+- Architecture diagram exists
+
+=== ACTIONS ===
+
+1. Get links to documentation
+2. Get access to ready components (repositories)
+3. Check component licenses
+4. Review prototype
+5. Clarify technical integration details
+

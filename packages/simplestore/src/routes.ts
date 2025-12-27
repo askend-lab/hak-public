@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { HTTP_STATUS, HTTP_ERRORS, createResponse, createErrorResponse, isResponse } from './response';
 import { Store } from './store';
-import { DataType } from './types';
+import { DataType, StoreRequest } from './types';
 import { validateStoreRequest, validateGetRequest, validateQueryRequest } from './validation';
 
 interface RequestBody {
@@ -35,7 +35,8 @@ export async function handleSave(event: APIGatewayProxyEvent, store: Store): Pro
   if (!validation.valid) return createResponse(HTTP_STATUS.BAD_REQUEST, { errors: validation.errors });
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- validated by validateStoreRequest
-  const result = await store.save({ pk: body.pk!, sk: body.sk!, type: body.type!, ttl: body.ttl!, data: body.data });
+  const request: StoreRequest = { pk: body.pk!, sk: body.sk!, type: body.type!, ttl: body.ttl!, ...(body.data !== undefined && { data: body.data }) };
+  const result = await store.save(request);
   return result.success ? createResponse(HTTP_STATUS.OK, { item: result.item }) : createErrorResponse(result, HTTP_STATUS.BAD_REQUEST);
 }
 

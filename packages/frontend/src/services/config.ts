@@ -1,4 +1,4 @@
-const isProd = import.meta.env.PROD;
+const isProd = typeof import.meta !== 'undefined' && import.meta.env?.PROD;
 
 // In development, Vite's proxy will handle these relative URLs.
 // In production, the build should be configured with absolute URLs
@@ -12,14 +12,18 @@ const DEV_CONFIG = {
   audioBucketUrl: 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
 } as const;
 
+const getEnvVar = (key: string): string | undefined => {
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    return import.meta.env[key] as string | undefined;
+  }
+  return undefined;
+};
+
 const PROD_CONFIG = {
-  // This should be the absolute URL of the deployed single-table-lambda API Gateway.
-  baseUrl: (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api',
-  // These URLs are from the vite.config.ts proxy and are assumed to be production-ready.
+  baseUrl: getEnvVar('VITE_API_BASE_URL') ?? '/api',
   vabamorfUrl: 'https://ibgaeez4mm.eu-west-1.awsapprunner.com/analyze',
   merlinUrl: 'https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize',
-  // This should point to the production audio cache endpoint.
-  cacheUrl: `${(import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ''}/audio-cache`,
+  cacheUrl: `${getEnvVar('VITE_API_BASE_URL') ?? ''}/audio-cache`,
   audioApiUrl: 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/dev/generate',
   audioBucketUrl: 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
 } as const;

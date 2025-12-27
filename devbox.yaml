@@ -16,18 +16,6 @@ tdd:
 
 # Test modules with coverage requirements
 test_modules:
-  - name: hak
-    path: .
-    type: jest
-    min_coverage_lines: 0
-    min_coverage_branches: 0
-    suites:
-      - name: unit
-        command: 'pnpm test:unit'
-        results_file: 'tmp/jest-results-unit.json'
-        coverage_path: 'tmp/coverage-unit'
-        min_coverage_lines: 80
-        min_coverage_branches: 70
   - name: simplestore
     path: packages/simplestore
     type: jest
@@ -48,11 +36,11 @@ test_modules:
     type: jest
     min_coverage_lines: 80
     min_coverage_branches: 70
-  - name: specifications
-    path: packages/specifications
+  - name: gherkin-parser
+    path: packages/gherkin-parser
     type: jest
-    min_coverage_lines: 0
-    min_coverage_branches: 0
+    min_coverage_lines: 80
+    min_coverage_branches: 70
   - name: shared
     path: packages/shared
     type: jest
@@ -63,6 +51,11 @@ test_modules:
     type: vitest
     min_coverage_lines: 80
     min_coverage_branches: 70
+  - name: cucumber
+    path: packages/frontend
+    type: cucumber
+    min_coverage_lines: 0
+    min_coverage_branches: 0
 
 # Global coverage settings
 coverage:
@@ -79,7 +72,7 @@ task_channel:
 hooks:
   markdown-size:
     active: true
-    mode: warning  # off | warning | error
+    mode: error  # off | warning | error
     max_lines: 200  # Temporarily raised - need to split large docs
     excludePaths:
       - 'docs/work/**'
@@ -90,25 +83,28 @@ hooks:
       - 'docs/templates/**'
       - '**/test/fixtures/**'
       - 'docs/DAILY_ITERATIONS.md'
+      - '.design/**'
 
   language-check:
     active: true
-    mode: warning  # off | warning | error
+    mode: error  # off | warning | error
     allowed_languages:
       - en
     excludePaths:
       - '**/drafts/**'
       - '**/test/fixtures/**'
+      - '.design/**'
 
   broken-links:
-    mode: warning
+    mode: error
     active: true
     check_external: false
     excludePaths:
       - '**/test/fixtures/**'
+      - '.design/**'
 
   no-console:
-    mode: warning
+    mode: error
     active: true
     allow_warn: true
     allow_error: true
@@ -121,18 +117,18 @@ hooks:
       - '**/coverage/**'
 
   prettier-check:
-    active: false
-    mode: off  # off | warning | error
+    active: true
+    mode: error  # off | warning | error
 
   test-required:
-    mode: warning
+    mode: error
     active: true
     patterns:
       - '*.test.js'
       - '*.spec.js'
 
   metrics-required:
-    mode: warning
+    mode: error
     active: true
 
   run-lint:
@@ -146,16 +142,21 @@ hooks:
     command: 'pnpm exec tsc --noEmit'
 
   test-coverage:
-    mode: off
-    active: false  # Incompatible with Jest - coverage enforced by test runner
+    mode: error
+    active: true
 
   run-tests:
     active: true
     mode: error  # Strict: test failures block commits
     command: 'node devbox test'
 
+  run-build:
+    active: true
+    mode: error
+    command: 'pnpm --filter @hak/frontend build'
+
   plan-validation:
-    mode: warning
+    mode: error
     active: true
     strict: true
 
@@ -232,6 +233,7 @@ stages:
       - broken-links
       - run-lint
       - run-typecheck
+      - run-build
       - jscpd
       - dependency-check
       - security-audit

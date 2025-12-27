@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { colors, layout, gap, lineHeight } from '../../styles/colors'
 import { Button, SocialLink, FooterLink, SectionHeading, LogoWithText } from '../ui'
+import { FeedbackModal } from './FeedbackModal'
 
 const footerStyle = { background: colors.white, borderTop: `1px solid ${colors.outlinedNeutral}`, padding: '2.5rem 0' } as const;
 const containerStyle = { maxWidth: layout.maxWidthWide, margin: '0 auto', padding: '0 1rem', display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: gap.xxl } as const;
@@ -11,6 +13,7 @@ const listStyle = { listStyle: 'none', padding: 0, margin: 0 } as const;
 
 export function Footer() {
   const { t } = useTranslation()
+  const [showFeedback, setShowFeedback] = useState(false)
 
   return (
     <footer style={footerStyle}>
@@ -46,9 +49,10 @@ export function Footer() {
         <div>
           <SectionHeading>Tagasiside</SectionHeading>
           <p style={{ ...descStyle, lineHeight: lineHeight.normal }}>Iga arvamus loeb ja aitab Hääldusabilist paremaks teha!</p>
-          <Button variant="primary" size="small">Kirjuta meile</Button>
+          <Button variant="primary" size="small" onClick={() => { setShowFeedback(true); }}>Kirjuta meile</Button>
         </div>
       </div>
+      {showFeedback && <FeedbackModal onClose={() => { setShowFeedback(false); }} />}
     </footer>
   )
 }

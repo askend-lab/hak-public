@@ -1,4 +1,4 @@
-import { vi, type Mock } from 'vitest';
+import { vi } from 'vitest';
 import {
   setAuthTokenGetter,
   createTask,
@@ -14,46 +14,35 @@ vi.mock('../config', () => ({
 }));
 
 // Mock fetch
-declare global {
-  var fetch: Mock;
-}
-global.fetch = vi.fn();
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
 // DRY: Helper functions for fetch mocks
 const mockFetchSuccess = (data: unknown): void => {
-  (global.fetch as Mock).mockResolvedValue({
+  mockFetch.mockResolvedValue({
     ok: true,
     json: (): Promise<unknown> => Promise.resolve(data),
   });
 };
 
 const mockFetchError = (status = 500): void => {
-  (global.fetch as Mock).mockResolvedValue({ ok: false, status });
+  mockFetch.mockResolvedValue({ ok: false, status });
 };
 
 const mockFetchSequence = (responses: { ok: boolean; data?: unknown; status?: number }[]): void => {
-  const mock = global.fetch as Mock;
-  responses.forEach((res, i) => {
-    if (i === 0) {
-      mock.mockResolvedValueOnce({
-        ok: res.ok,
-        status: res.status,
-        json: () => Promise.resolve(res.data),
-      });
-    } else {
-      mock.mockResolvedValueOnce({
-        ok: res.ok,
-        status: res.status,
-        json: () => Promise.resolve(res.data),
-      });
-    }
+  responses.forEach((res) => {
+    mockFetch.mockResolvedValueOnce({
+      ok: res.ok,
+      status: res.status,
+      json: () => Promise.resolve(res.data),
+    });
   });
 };
 
 describe('Tasks API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    setAuthTokenGetter(null);
+    setAuthTokenGetter(() => null);
   });
 
   describe('setAuthTokenGetter', () => {
@@ -145,7 +134,19 @@ describe('Tasks API', () => {
   describe('addEntryToTask', () => {
     it('should add entry to existing task', async () => {
       const task = { id: 'task1', name: 'Test', entries: [] };
-      const entry = { text: 'Hello', audioUrl: 'test.mp3' };
+      const entry = {
+        id: 'entry1',
+        synthesis: {
+          id: 'synth1',
+          originalText: 'Hello',
+          phoneticText: 'Hello',
+          audioHash: 'abc123',
+          voiceModel: 'efm_s' as const,
+          createdAt: '2024-01-01T00:00:00Z',
+        },
+        order: 0,
+        addedAt: '2024-01-01T00:00:00Z',
+      };
       mockFetchSequence([
         { ok: true, data: task },
         { ok: true, data: task },
@@ -157,7 +158,20 @@ describe('Tasks API', () => {
 
     it('should return error if task not found', async () => {
       mockFetchError(404);
-      const result = await addEntryToTask('user1', 'nonexistent', { text: 'Test' });
+      const entry = {
+        id: 'entry1',
+        synthesis: {
+          id: 'synth1',
+          originalText: 'Test',
+          phoneticText: 'Test',
+          audioHash: 'abc123',
+          voiceModel: 'efm_s' as const,
+          createdAt: '2024-01-01T00:00:00Z',
+        },
+        order: 0,
+        addedAt: '2024-01-01T00:00:00Z',
+      };
+      const result = await addEntryToTask('user1', 'nonexistent', entry);
       expect(result.success).toBe(false);
     });
   });

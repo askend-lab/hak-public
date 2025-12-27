@@ -79,7 +79,7 @@ describe('Vabamorf', () => {
 
       const variants = getWordVariants(response, 0);
       expect(variants).toHaveLength(1);
-      expect(variants[0].phonetic).toBe('te`re');
+      expect(variants[0]?.phonetic).toBe('te`re');
     });
 
     it('should return empty array for invalid index', () => {

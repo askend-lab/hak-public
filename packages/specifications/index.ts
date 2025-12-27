@@ -1,1 +1,2 @@
-export { parseFeatureContent, ParsedFeature, ParsedScenario } from './parser/index';
+export { parseFeatureContent } from '@hak/gherkin-parser';
+export type { ParsedFeature, ParsedScenario } from '@hak/gherkin-parser';

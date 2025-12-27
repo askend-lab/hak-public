@@ -103,7 +103,7 @@ describe('useSentences', () => {
 
     it('should handle synthesis errors', async () => {
       const { result } = renderHook(() => useSentences(['Hello']));
-      const consoleError = vi.spyOn(console, 'error').mockImplementation();
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
       
       mockSynthesizeText.mockRejectedValueOnce(new Error('Synthesis failed'));
       

@@ -1,0 +1,294 @@
+# Architecture Diagram - Estonian Pronunciation Platform
+
+## High-Level System Architecture
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                         USER LAYER                              ┃
+┃                                                                  ┃
+┃  ┌─────────────────┐              ┌─────────────────┐          ┃
+┃  │  Anonymous User │              │ Logged-in User  │          ┃
+┃  │  - Type text    │              │  - All anon +   │          ┃
+┃  │  - Listen       │              │  - Create tasks │          ┃
+┃  │  - Local save   │              │  - Share links  │          ┃
+┃  └────────┬────────┘              └────────┬────────┘          ┃
+┃           └────────────────┬───────────────┘                    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                             │ HTTPS
+                             ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                      PRESENTATION LAYER                          ┃
+┃                                                                  ┃
+┃  ┌──────────────────────────────────────────────────────────┐  ┃
+┃  │          Single Page Application (SPA)                   │  ┃
+┃  │                                                          │  ┃
+┃  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │  ┃
+┃  │  │   Input     │  │   Audio     │  │  Exercise   │    │  ┃
+┃  │  │   Form      │  │   Player    │  │  Builder    │    │  ┃
+┃  │  └─────────────┘  └─────────────┘  └─────────────┘    │  ┃
+┃  │                                                          │  ┃
+┃  │  Tech: React/Vue + TypeScript + Tailwind CSS            │  ┃
+┃  └──────────────────────────────────────────────────────────┘  ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                             │ REST API / JSON
+                             ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                      APPLICATION LAYER                           ┃
+┃                                                                  ┃
+┃  ┌──────────────────────────────────────────────────────────┐  ┃
+┃  │                   Backend API Server                     │  ┃
+┃  │         (Node.js/Python + Express/FastAPI)               │  ┃
+┃  │                                                          │  ┃
+┃  │  ┌───────────┐  ┌────────────┐  ┌──────────────────┐   │  ┃
+┃  │  │   Auth    │  │  Exercise  │  │    Synthesis     │   │  ┃
+┃  │  │  Service  │  │  Service   │  │   Orchestrator   │   │  ┃
+┃  │  │           │  │            │  │                  │   │  ┃
+┃  │  │ - OAuth   │  │ - CRUD     │  │ - Queue mgmt    │   │  ┃
+┃  │  │ - Session │  │ - Sharing  │  │ - Cache check   │   │  ┃
+┃  │  └───────────┘  └────────────┘  └──────────────────┘   │  ┃
+┃  └──────────────────────────────────────────────────────────┘  ┃
+┗━━━━━━━━━━━━━━┯━━━━━━━━━━━━┯━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━┛
+               │             │              │
+    ┌──────────┘   ┌─────────┘   ┌──────────┘
+    ▼              ▼             ▼
+┏━━━━━━━━━━━┓ ┏━━━━━━━━━━┓ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃   Auth    ┃ ┃ Database ┃ ┃    Message Queue & Storage      ┃
+┃ Provider  ┃ ┃          ┃ ┃                                 ┃
+┃           ┃ ┃ Postgres ┃ ┃  ┌──────────┐  ┌─────────────┐ ┃
+┃  Google   ┃ ┃          ┃ ┃  │  Redis   │  │   Object    │ ┃
+┃  OAuth    ┃ ┃  Tables: ┃ ┃  │  Queue   │  │   Storage   │ ┃
+┃           ┃ ┃ - users  ┃ ┃  │          │  │             │ ┃
+┃  (Future: ┃ ┃ - exer-  ┃ ┃  │ - Jobs   │  │ - Audio MP3 │ ┃
+┃  ID-Card) ┃ ┃   cises  ┃ ┃  │ - Cache  │  │ - Metadata  │ ┃
+┃           ┃ ┃ - senten-┃ ┃  │ - Status │  │             │ ┃
+┃           ┃ ┃   ces    ┃ ┃  └──────────┘  └─────────────┘ ┃
+┗━━━━━━━━━━━┛ ┗━━━━━━━━━━┛ ┗━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                   │
+           ┌───────────────────────┴────────────────────┐
+           ▼                                            ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓         ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  LANGUAGE PROCESSING LAYER  ┃         ┃  SPEECH SYNTHESIS LAYER   ┃
+┃                             ┃         ┃                           ┃
+┃  ┌──────────────────────┐  ┃         ┃  ┌────────────────────┐  ┃
+┃  │  Stress Marker       │  ┃         ┃  │  Merlin TTS        │  ┃
+┃  │  (Client Component)  │  ┃         ┃  │  (Client Component)│  ┃
+┃  │                      │  ┃         ┃  │                    │  ┃
+┃  │  Input:  Plain text  │  ┃         ┃  │  Input:  Stressed  │  ┃
+┃  │  Output: Stressed    │  ┃         ┃  │          text      │  ┃
+┃  │          text        │  ┃         ┃  │  Output: Audio WAV │  ┃
+┃  │                      │  ┃         ┃  │          (MP3)     │  ┃
+┃  │  Tech: Docker        │  ┃         ┃  │                    │  ┃
+┃  │  (Estonian Dict)     │  ┃         ┃  │  Limitation:       │  ┃
+┃  │                      │  ┃         ┃  │  1 file at a time  │  ┃
+┃  └──────────────────────┘  ┃         ┃  │                    │  ┃
+┃                             ┃         ┃  │  Tech: Docker      │  ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛         ┃  │  (File I/O based)  │  ┃
+                                        ┃  └────────────────────┘  ┃
+                                        ┗━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+## Data Flow - Synthesis Request
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. USER TYPES SENTENCE                                          │
+│    "Tere, kuidas läheb?"                                        │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. FRONTEND                                                     │
+│    POST /api/synthesize                                         │
+│    { text: "Tere, kuidas läheb?" }                              │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. SYNTHESIS ORCHESTRATOR                                       │
+│    - Check cache: hash(text) → audio exists?                    │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+            ┌────────────┴────────────┐
+            │                         │
+      [Cache HIT]               [Cache MISS]
+            │                         │
+            ▼                         ▼
+┌─────────────────────┐    ┌─────────────────────────────────────┐
+│ 4a. RETURN CACHED   │    │ 4b. NEW SYNTHESIS                   │
+│     audioUrl        │    │     - Call Stress Marker            │
+│     (instant)       │    │     - Enqueue Merlin job            │
+└─────────────────────┘    │     - Return jobId                  │
+                           └────────┬────────────────────────────┘
+                                    │
+                                    ▼
+                           ┌─────────────────────────────────────┐
+                           │ 5. STRESS MARKER SERVICE            │
+                           │    Input:  "Tere, kuidas läheb?"    │
+                           │    Output: "Te're, ku'idas lä'heb?" │
+                           └────────┬────────────────────────────┘
+                                    │
+                                    ▼
+                           ┌─────────────────────────────────────┐
+                           │ 6. REDIS JOB QUEUE                  │
+                           │    job: { id, stressedText, status }│
+                           └────────┬────────────────────────────┘
+                                    │
+                                    ▼
+                           ┌─────────────────────────────────────┐
+                           │ 7. MERLIN WORKER                    │
+                           │    - Pick job from queue            │
+                           │    - Write text to /tmp/input.txt   │
+                           │    - Call Merlin                    │
+                           │    - Read /tmp/output.wav           │
+                           │    - Upload to storage              │
+                           │    - Update job: status=completed   │
+                           └────────┬────────────────────────────┘
+                                    │
+                                    ▼
+                           ┌─────────────────────────────────────┐
+                           │ 8. FRONTEND POLLING                 │
+                           │    GET /api/synthesize/:jobId       │
+                           │    Response: { status: "completed", │
+                           │               audioUrl: "..." }     │
+                           └────────┬────────────────────────────┘
+                                    │
+                                    ▼
+                           ┌─────────────────────────────────────┐
+                           │ 9. USER LISTENS                     │
+                           │    <audio src="audioUrl" />         │
+                           └─────────────────────────────────────┘
+
+
+## Database Schema (Simplified)
+
+┌─────────────────────┐
+│       USERS         │
+├─────────────────────┤
+│ id (PK)             │
+│ email               │
+│ provider            │  ← "google", "estonian-id"
+│ provider_id         │
+│ name                │
+│ created_at          │
+└──────┬──────────────┘
+       │
+       │ 1:N
+       ▼
+┌─────────────────────┐
+│     EXERCISES       │
+├─────────────────────┤
+│ id (PK)             │
+│ user_id (FK)        │ ───┐
+│ title               │    │
+│ description         │    │
+│ share_token         │    │  Unique link: /share/:token
+│ is_public           │    │
+│ created_at          │    │
+└──────┬──────────────┘    │
+       │                   │
+       │ 1:N               │
+       ▼                   │
+┌─────────────────────┐    │
+│     SENTENCES       │    │
+├─────────────────────┤    │
+│ id (PK)             │    │
+│ exercise_id (FK)    │ ───┘
+│ text                │  ← Original
+│ stressed_text       │  ← After stress marker
+│ audio_url           │  ← After synthesis
+│ order               │  ← Position in exercise
+│ notes               │  ← Teacher's notes
+└─────────────────────┘
+
+
+## Component Modularity (Future-Proof)
+
+┌──────────────────────────────────────────────────────────────┐
+│                   SYNTHESIS INTERFACE                        │
+│                                                              │
+│   interface IStressMarker {                                 │
+│     markStress(text: string): Promise<StressedText>         │
+│   }                                                          │
+│                                                              │
+│   interface ITTSEngine {                                    │
+│     synthesize(stressedText: string): Promise<AudioFile>    │
+│   }                                                          │
+└───────────────┬──────────────────────────┬───────────────────┘
+                │                          │
+        ┌───────┴────────┐        ┌────────┴─────────┐
+        ▼                ▼        ▼                  ▼
+┌──────────────┐  ┌──────────┐  ┌────────┐  ┌───────────────┐
+│   Current    │  │  Future  │  │Current │  │    Future     │
+│              │  │          │  │        │  │               │
+│ EKI Stress   │  │University│  │Merlin  │  │ Google TTS    │
+│   Marker     │  │ Model X  │  │  TTS   │  │ Azure TTS     │
+│              │  │          │  │        │  │ Custom Model  │
+└──────────────┘  └──────────┘  └────────┘  └───────────────┘
+
+    Swap by changing configuration, no code changes!
+
+
+## Deployment Topology (Production)
+
+┌──────────────────────────────────────────────────────────────┐
+│                         INTERNET                             │
+└──────────────────────────┬───────────────────────────────────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   Nginx     │  ← Reverse proxy
+                    │  (SSL/TLS)  │     Rate limiting
+                    └──────┬──────┘
+                           │
+           ┌───────────────┼───────────────┐
+           ▼               ▼               ▼
+    ┌────────────┐  ┌────────────┐  ┌────────────┐
+    │  Frontend  │  │  Backend   │  │   Static   │
+    │  (Static)  │  │    API     │  │   Assets   │
+    └────────────┘  └──────┬─────┘  └────────────┘
+                           │
+           ┌───────────────┼───────────────┬──────────────┐
+           ▼               ▼               ▼              ▼
+    ┌──────────┐    ┌──────────┐   ┌──────────┐   ┌──────────┐
+    │ Postgres │    │  Redis   │   │  Stress  │   │  Merlin  │
+    │    DB    │    │  Queue   │   │  Marker  │   │   TTS    │
+    └──────────┘    └──────────┘   └──────────┘   └──────────┘
+
+    All running in Docker Compose on single VPS (or Kubernetes)
+
+
+## Security Layers
+
+┌──────────────────────────────────────────────────────────────┐
+│ 1. Network Layer                                             │
+│    - HTTPS only (Let's Encrypt SSL)                          │
+│    - Firewall rules (only 80, 443 open)                      │
+└──────────────────────────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼───────────────────────────────────┐
+│ 2. Application Layer                                         │
+│    - CORS configured                                         │
+│    - Rate limiting (per IP, per user)                        │
+│    - Input validation & sanitization                         │
+│    - CSRF protection                                         │
+└──────────────────────────┬───────────────────────────────────┘
+                           │
+┌──────────────────────────▼───────────────────────────────────┐
+│ 3. Authentication Layer                                      │
+│    - OAuth 2.0 (Google, etc.)                                │
+│    - Secure session cookies (httpOnly, secure, sameSite)     │
+│    - JWT with short expiration                               │
+└──────────────────────────┬───────────────────────────────────┘
+                           │
+┌──────────────────────────▼───────────────────────────────────┐
+│ 4. Data Layer                                                │
+│    - Database: Encrypted at rest                             │
+│    - Audio files: Signed URLs (expiring)                     │
+│    - Backups: Encrypted                                      │
+└──────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════
+End of Architecture Diagram
+═══════════════════════════════════════════════════════════════
+
+
+

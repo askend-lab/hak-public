@@ -25,7 +25,7 @@ export interface AuthTokens {
 }
 
 export interface AuthContextValue extends AuthState {
-  login: () => Promise<void>;
+  login: (credentials?: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
 }

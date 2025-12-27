@@ -1,22 +1,23 @@
+import { vi, type Mock } from 'vitest';
 import { useSynthesisStore } from '../../features';
 
-export const mockUseSynthesisStore = useSynthesisStore as jest.MockedFunction<typeof useSynthesisStore>;
+export const mockUseSynthesisStore = useSynthesisStore as unknown as Mock;
 
 export interface MockStoreState {
   text?: string;
-  setText?: jest.Mock;
+  setText?: Mock;
   isLoading?: boolean;
   phoneticText?: string;
   result?: { audioUrl: string; cached: boolean } | null;
   isPlaying?: boolean;
-  setIsPlaying?: jest.Mock;
-  setAudioElement?: jest.Mock;
+  setIsPlaying?: Mock;
+  setAudioElement?: Mock;
 }
 
 const defaultMocks = {
-  setText: jest.fn(),
-  setIsPlaying: jest.fn(),
-  setAudioElement: jest.fn(),
+  setText: vi.fn(),
+  setIsPlaying: vi.fn(),
+  setAudioElement: vi.fn(),
 };
 
 export function mockStoreWith(state: MockStoreState): void {
@@ -29,7 +30,7 @@ export function mockStoreWith(state: MockStoreState): void {
     isPlaying: state.isPlaying ?? false,
     setIsPlaying: state.setIsPlaying ?? defaultMocks.setIsPlaying,
     setAudioElement: state.setAudioElement ?? defaultMocks.setAudioElement,
-  } as jest.Mocked<ReturnType<typeof useSynthesisStore>>);
+  } as unknown as ReturnType<typeof useSynthesisStore>);
 }
 
 export function mockEmptyStore(): void {

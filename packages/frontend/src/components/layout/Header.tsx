@@ -19,11 +19,7 @@ const headerStyle = {
 export function Header() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'synthesis' | 'tasks'>('synthesis')
-  const { isAuthenticated, user, login } = useAuth()
-
-  const handleLogin = () => {
-    void login();
-  };
+  const { isAuthenticated, user, login, logout } = useAuth()
 
   return (
     <header style={headerStyle}>
@@ -40,7 +36,7 @@ export function Header() {
           onClick={() => { setActiveTab('tasks'); }}
         />
         <Link
-          to="/tests"
+          to="/specs"
           style={{
             padding: '0.5rem 0',
             background: 'transparent',
@@ -58,13 +54,16 @@ export function Header() {
       </nav>
       <div style={{ display: 'flex', alignItems: 'center', gap: gap.lg }}>
         {isAuthenticated && user ? (
-          <UserAvatar 
-            initials={user.email.substring(0, 2).toUpperCase()} 
-            name={user.email} 
-            id={user.id}
-          />
+          <>
+            <UserAvatar 
+              initials={user.email.substring(0, 2).toUpperCase()} 
+              name={user.email} 
+              id={user.id}
+            />
+            <Button variant="outline" onClick={() => { void logout(); }}>Logi välja</Button>
+          </>
         ) : (
-          <Button variant="primary" onClick={handleLogin}>Logi sisse</Button>
+          <Button variant="primary" onClick={() => { void login(); }}>Logi sisse</Button>
         )}
         <WaffleMenu />
       </div>

@@ -4,20 +4,25 @@
  */
 
 // Core store functionality
-export { Store, DynamoDBClient, ERRORS } from './store';
+export { Store, ERRORS } from './store';
+export type { DynamoDBClient } from './store';
 export { DynamoDBAdapter } from './dynamoClient';
+export { InMemoryStore } from './inMemoryAdapter';
 
 // Lambda handler
-export { handler } from './handler';
+export { handler, createStore, setAdapter, getAdapter } from './handler';
 
 // Key building utilities
-export { buildKeys, buildPartitionKey, buildSortKey, parseTtl, KeyPair, TtlResult } from './keyBuilder';
+export { buildKeys, buildPartitionKey, buildSortKey, parseTtl } from './keyBuilder';
+export type { KeyPair, TtlResult } from './keyBuilder';
 
 // Validation
-export { validateStoreRequest, validateGetRequest, validateQueryRequest, ValidationResult } from './validation';
+export { validateStoreRequest, validateGetRequest, validateQueryRequest } from './validation';
+export type { ValidationResult } from './validation';
 
 // Configuration
-export { config, Config, loadConfig } from './config';
+export { config, loadConfig } from './config';
+export type { Config } from './config';
 
 // Types
-export { DataType, ServerContext, StoreRequest, StoreItem, StoreResult } from './types';
+export type { DataType, ServerContext, StoreRequest, StoreItem, StoreResult } from './types';

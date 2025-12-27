@@ -25,12 +25,19 @@ describe('ProtectedRoute', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    delete (window as Window & { location?: Location }).location;
-    window.location = Object.assign({}, originalLocation, { href: '', pathname: '/current' });
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, href: '', pathname: '/current' },
+      writable: true,
+      configurable: true,
+    });
   });
 
   afterEach(() => {
-    window.location = originalLocation;
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('should show loading when auth is loading', () => {

@@ -5,11 +5,24 @@ import { config } from './config';
 import { DynamoDBAdapter } from './dynamoClient';
 import { handleSave, handleGet, handleDelete, handleQuery } from './routes';
 import { HTTP_ERRORS, HTTP_UNAUTHORIZED, HTTP_NOT_FOUND, HTTP_INTERNAL_ERROR, createResponse } from './response';
-import { Store } from './store';
+import { Store, DynamoDBClient } from './store';
 import { ServerContext } from './types';
 
 function createServerContext(userId: string): ServerContext {
   return { app: config.appName, tenant: config.tenant, env: config.environment, userId };
+}
+
+/** Default adapter - can be overridden for testing */
+let defaultAdapter: DynamoDBClient | null = null;
+
+/** Set custom adapter (for testing with InMemoryStore) */
+export function setAdapter(adapter: DynamoDBClient | null): void {
+  defaultAdapter = adapter;
+}
+
+/** Get current adapter */
+export function getAdapter(): DynamoDBClient {
+  return defaultAdapter ?? new DynamoDBAdapter();
 }
 
 interface Route {
@@ -30,7 +43,7 @@ function findRoute(method: string, path: string): Route | undefined {
 }
 
 export function createStore(userId: string): Store {
-  return new Store(new DynamoDBAdapter(), createServerContext(userId));
+  return new Store(getAdapter(), createServerContext(userId));
 }
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {

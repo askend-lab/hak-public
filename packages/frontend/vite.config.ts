@@ -1,8 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@hak/specifications': path.resolve(__dirname, '../specifications/index.ts'),
+      '@hak/shared': path.resolve(__dirname, '../shared/src/index.ts'),
+    },
+  },
   server: {
     port: 5180,
     strictPort: true,

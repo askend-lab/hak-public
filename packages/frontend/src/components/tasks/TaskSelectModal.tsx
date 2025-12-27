@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 
-import { createSynthesisEntry } from '../../core';
+import { createSynthesisEntry, createTaskEntry } from '../../core';
 import { useSynthesisStore, useTasksStore, useUIStore } from '../../features';
 import { useAuth } from '../../services/auth';
 import { addEntryToTask, listTasks } from '../../services/tasks';
@@ -38,15 +38,16 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
 
   const handleClose = useCallback(() => { closeModal(); onClose?.(); }, [closeModal, onClose]);
 
-  // Create a synthesis entry from the current result
+  // Create a task entry from the current result
   const createEntry = useCallback(() => {
     if (!result) return null;
-    return createSynthesisEntry({
+    const synthesis = createSynthesisEntry({
       originalText: text,
       phoneticText: result.phoneticText,
       audioHash: result.audioHash,
       voiceModel: result.voiceModel,
     });
+    return createTaskEntry(synthesis, 0);
   }, [result, text]);
 
    
