@@ -1,35 +1,38 @@
-Feature: Audio performance optimization - caching (US-031)
+@synthesis @performance @caching @US-031
+Feature: US-031 Audio performance optimization (caching)
   As a language learner
   I want synthesized audio to load quickly when revisiting the same text
   So that I can practice efficiently without waiting for re-synthesis
 
-  Scenario: Instant playback from cache
-    Given I have synthesized audio for "Tere"
-    And the audio has finished playing
-    When I click play again for the same text
-    Then the audio plays immediately from cache
-    And no API call is made to the synthesis service
+  Background:
+    Given I am on the synthesis page
 
-  Scenario: Cache invalidation on text change
-    Given I have cached audio for "Tere"
-    When I modify the text to "Tere hommikust"
+  Scenario: Audio generated once per unique text
+    Given I have synthesized audio for a text
+    When I play the same text again
+    Then the cached audio plays immediately
+
+  Scenario: Cache validation on text change
+    Given I have cached audio for a text
+    When I modify the text
     Then the cache is automatically invalidated
-    And the next play synthesizes new audio
 
-  Scenario: Cache invalidation on variant selection
-    Given I have cached audio for "mees"
-    When I select a different pronunciation variant
-    Then the cache is invalidated
-    And the next play uses the new variant
+  Scenario: Cache stores phonetic text
+    Given audio has been synthesized
+    When caching the audio
+    Then both audio blob and phonetic text are cached together
 
-  Scenario: Download uses cached audio
-    Given I have cached audio for "Tere"
-    When I click download for the same text
-    Then the download uses the cached version
-    And no re-synthesis is required
+  Scenario: Automatic retry on cache corruption
+    Given cached audio fails to play
+    When playback error is detected
+    Then system invalidates cache and regenerates audio
 
-  Scenario: Retry on cache corruption
-    Given cached audio has become corrupted
-    When playback fails
-    Then the system invalidates the cache
-    And automatically retries synthesis once
+  Scenario: Memory cleanup on unmount
+    Given audio URLs have been created
+    When component unmounts
+    Then blob URLs are revoked to free memory
+
+  Scenario: Cache used for download
+    Given I want to download audio
+    When cached audio exists
+    Then download uses cached version without re-synthesis

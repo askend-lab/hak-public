@@ -123,5 +123,19 @@ export async function addEntryToTask(
   }
 
   const entries = [...existing.data.entries, entry];
-  return updateTask(userId, taskId, { entries });
+  const updated = {
+    ...existing.data,
+    entries,
+    updatedAt: nowISO(),
+  };
+
+  return apiRequest<Task>('/save', {
+    method: 'POST',
+    body: JSON.stringify({
+      pk: buildUserPK(userId),
+      sk: buildTaskSK(taskId),
+      data: updated,
+      type: 'private',
+    }),
+  });
 }

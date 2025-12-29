@@ -1,0 +1,39 @@
+// Layer 3: App-specific component (no vendor equivalent)
+// User avatar styles
+@import '../../../../vendor/eki-storybook/src/stories/assets/scss/components/avatar';
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  &__circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: $color-primary;
+    color: $color-white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+
+  &__name {
+    font-size: 16px;
+    font-weight: 600;
+    color: $color-primary;
+  }
+
+  &__email {
+    font-size: 14px;
+    color: $color-gray;
+  }
+}

@@ -1,0 +1,14 @@
+// Layer 3: Navigation tab (no vendor equivalent)
+.nav-tab {
+  padding: 0.5rem 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: $color-gray;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover { color: $color-primary; }
+  &--active { border-bottom-color: $color-primary; color: $color-primary; }
+}

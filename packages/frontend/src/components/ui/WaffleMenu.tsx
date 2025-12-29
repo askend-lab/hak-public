@@ -1,27 +1,10 @@
-import { colors, cursors, borderRadius } from '../../styles/colors'
+const WAFFLE_DOTS_COUNT = 9;
 
 export function WaffleMenu() {
-  const WAFFLE_DOTS_COUNT = 9;
   return (
-    <button style={{
-      width: '40px',
-      height: '40px',
-      background: 'transparent',
-      border: 'none',
-      cursor: cursors.pointer,
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, 6px)',
-      gridTemplateRows: 'repeat(3, 6px)',
-      gap: '4px',
-      padding: '8px',
-    }}>
+    <button className="waffle-menu">
       {Array.from({ length: WAFFLE_DOTS_COUNT }).map((_, i) => (
-        <div key={i} style={{
-          width: '6px',
-          height: '6px',
-          borderRadius: borderRadius.round,
-          backgroundColor: colors.gray,
-        }} />
+        <div key={`waffle-dot-${i}`} className="waffle-menu__dot" />
       ))}
     </button>
   )

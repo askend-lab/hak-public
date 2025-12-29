@@ -32,11 +32,6 @@ describe('AuthDisplay', () => {
 
     const loginButton = screen.getByRole('button', { name: 'Login' });
     expect(loginButton).toBeInTheDocument();
-    expect(loginButton).toHaveStyle({
-      padding: '0.75rem 1.5rem',
-      background: '#173148',
-      color: '#FFFFFF',
-    });
   });
 
   it('should show user email and logout button when authenticated', () => {
@@ -57,11 +52,6 @@ describe('AuthDisplay', () => {
     
     const logoutButton = screen.getByRole('button', { name: 'Logout' });
     expect(logoutButton).toBeInTheDocument();
-    expect(logoutButton).toHaveStyle({
-      padding: '0.75rem 1.5rem',
-      background: 'transparent',
-      color: '#636B74',
-    });
   });
 
   it('should call login when login button is clicked', () => {

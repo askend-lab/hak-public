@@ -34,8 +34,7 @@ export function Modal({
       className="modal-overlay" 
       onClick={handleOverlayClick}
       onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
-      role="button"
-      tabIndex={-1}
+      role="presentation"
     >
       { }
       <div 

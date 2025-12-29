@@ -4,9 +4,11 @@ export const mockUseTranslation = useTranslation as jest.MockedFunction<typeof u
 
 const DEFAULT_TRANSLATIONS: Record<string, string> = {
   'header.title1': 'EESTI KEELE',
-  'header.title2': 'HÄÄLDUSABILINE',
-  'nav.synthesis': 'Süntees',
+  'header.title2': 'INSTITUUT',
+  'header.title3': 'HÄÄLDUSABILINE',
+  'nav.synthesis': 'Kõnesüntees',
   'nav.tasks': 'Ülesanded',
+  'footer.links.title': 'Hääldusabiline',
 };
 
 export function setupI18nMock(extraTranslations: Record<string, string> = {}): void {

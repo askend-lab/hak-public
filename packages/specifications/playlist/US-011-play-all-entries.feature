@@ -1,3 +1,4 @@
+@playlist @US-011
 Feature: Play all sentences sequentially (US-011)
   As a language learner
   I want to play all my sentences in sequence

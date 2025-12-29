@@ -1,10 +1,11 @@
+@synthesis @US-004
 Feature: View text with stress markers (US-004)
   As a language learner
   I want to see the Estonian text with stress markers visually indicated
   So that I can understand which syllables to emphasize when pronouncing
 
   Scenario: Display phonetic markers after synthesis
-    Given I have entered "mees" in the text input
+    Given I have entered "mees" in the synthesis text field
     When the synthesis is complete
     Then I see the phonetic text with stress markers
     And the stressed syllables are visually distinct

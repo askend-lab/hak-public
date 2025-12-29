@@ -53,16 +53,38 @@ export function useSentences(initialSentences: string[] = ['']): UseSentencesRet
         audioRef.current.src = audioUrl
         void audioRef.current.play()
       }
-    } catch (err) {
-      console.error('Synthesis failed:', err)
+    } catch (error) {
+      console.error('Synthesis failed:', error)
     } finally {
       setLoadingIndex(null)
     }
   }, [sentences])
 
-  const playAll = useCallback(() => {
+  const playAll = useCallback(async () => {
     setIsPlayingAll(true);
-  }, []);
+    const sentencesWithText = sentences.filter(s => s.trim().length > 0);
+    for (const sentence of sentencesWithText) {
+      const text = sentence.trim();
+      try {
+        const { audioUrl } = await synthesizeText(text);
+        if (audioRef.current) {
+          audioRef.current.src = audioUrl;
+          await audioRef.current.play();
+          // Wait for audio to finish before playing next
+          await new Promise<void>((resolve): void => {
+            if (audioRef.current) {
+              audioRef.current.onended = (): void => resolve();
+            } else {
+              resolve();
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Synthesis failed:', error);
+      }
+    }
+    setIsPlayingAll(false);
+  }, [sentences]);
 
   const stopAll = useCallback(() => {
     setIsPlayingAll(false);

@@ -5,7 +5,7 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'node:assert';
 
-import { getSentenceCount, setupSentences } from './helpers';
+import { getSentenceCount, setupSentences, getTextInputs } from './helpers';
 import type { TestWorld } from './setup';
 
 // US-013: Reorder scenarios
@@ -36,8 +36,7 @@ Given('I am dragging a sentence', async function (this: TestWorld) {
 });
 
 When('the drag is in progress', async function (this: TestWorld) {
-  // Drag state - verify UI is interactive
-  const inputs = this.container?.querySelectorAll('input');
+  const inputs = getTextInputs(this.container);
   assert.ok(inputs && inputs.length > 0, 'UI should be interactive during drag');
 });
 
@@ -48,7 +47,6 @@ Then('the dragged sentence appears semi-transparent', async function (this: Test
 });
 
 Then('the drop target shows a visual indicator', async function (this: TestWorld) {
-  // Drop target - verify UI structure exists
-  const inputs = this.container?.querySelectorAll('input');
+  const inputs = getTextInputs(this.container);
   assert.ok(inputs && inputs.length > 0, 'Drop targets should be visible');
 });

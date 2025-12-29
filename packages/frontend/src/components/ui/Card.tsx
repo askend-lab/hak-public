@@ -1,20 +1,15 @@
 import { ReactNode } from 'react'
 
-import { colors, borderRadius, gap } from '../../styles/colors'
-
 interface CardProps {
   children: ReactNode
+  className?: string
 }
 
-export function Card({ children }: CardProps) {
+export function Card({ children, className }: CardProps) {
+  const classes = ['card', 'card--simple', className].filter(Boolean).join(' ')
+  
   return (
-    <div style={{
-      background: colors.white,
-      borderRadius: borderRadius.medium,
-      boxShadow: '0 2px 8px rgba(23, 49, 72, 0.08)',
-      border: `1px solid ${colors.outlinedNeutral}`,
-      padding: gap.lg,
-    }}>
+    <div className={classes}>
       {children}
     </div>
   )

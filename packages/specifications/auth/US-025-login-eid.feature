@@ -1,3 +1,4 @@
+@auth @US-025
 Feature: Login with eID (US-025)
   As a registered user
   I want to log in using Estonian eID via Cognito

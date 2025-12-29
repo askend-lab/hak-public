@@ -1,34 +1,13 @@
+// Layer 3: Header layout (no vendor equivalent)
 .header {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
   background-color: $color-white;
-  border-bottom: 1px solid $color-secondary;
 
-  &__logo {
-    font-weight: bold;
-    color: $color-primary;
-  }
-
-  &__nav {
-    display: flex;
-    gap: 1rem;
-
-    .button {
-      font-weight: 500;
-      color: $color-gray;
-
-      &--active {
-        color: $color-primary;
-        border-bottom: 2px solid $color-primary;
-      }
-    }
-  }
-
-  &__actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
+  &__nav { display: flex; gap: 48px; }
+  &__actions { display: flex; align-items: center; gap: 24px; }
 }

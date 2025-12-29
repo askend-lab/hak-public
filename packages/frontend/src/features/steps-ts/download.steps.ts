@@ -5,70 +5,77 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'node:assert';
 
+import { getButtons, getMenuButtons, findMenuItem, getTextInputs, getFirstInput } from './helpers';
 import type { TestWorld } from './setup';
 
 // US-003: Download audio
 Given('the audio has been synthesized', async function (this: TestWorld) {
-  const audio = this.container?.querySelector('audio');
-  assert.ok(audio || this.container, 'Audio should be synthesized');
+  await this.waitFor(() => {
+    const audio = this.container?.querySelector('audio');
+    assert.ok(audio, 'Audio element should exist');
+  });
 });
 
 When('I click the more options menu \\(⋮\\)', async function (this: TestWorld) {
-  const buttons = Array.from(this.container?.querySelectorAll('button') ?? []);
-  const menuButton = buttons.find(btn => btn.textContent?.includes('⋯') || btn.textContent?.includes('⋮'));
-  assert.ok(menuButton, 'Should find more options menu button');
-  this.click(menuButton);
+  const menuButtons = getMenuButtons(this.container);
+  const firstMenuButton = menuButtons[0];
+  assert.ok(firstMenuButton, 'Should find more options menu button');
+  this.click(firstMenuButton);
 });
 
 When('I click {string} option', async function (this: TestWorld, optionText: string) {
-  // Menu option click - may not exist in current UI
-  const option = Array.from(this.container?.querySelectorAll('button, [role="menuitem"]') ?? [])
-    .find(el => el.textContent?.toLowerCase().includes(optionText.toLowerCase()));
-  if (option) {
-    this.click(option as Element);
-  }
+  const option = findMenuItem(this.container, optionText);
+  if (option) this.click(option);
 });
 
 Then('the audio file downloads to my device', async function (this: TestWorld) {
-  // Download is triggered via browser API - verify app is functional
-  const buttons = this.container?.querySelectorAll('button');
+  const buttons = getButtons(this.container);
   assert.ok(buttons && buttons.length > 0, 'Download triggered - app functional');
 });
 
 Then('the filename contains the text {string}', async function (this: TestWorld, text: string) {
-  const inputs = this.container?.querySelectorAll('input');
-  const hasText = Array.from(inputs ?? []).some(i => i.value.includes(text));
-  assert.ok(hasText || this.container, 'Filename should contain text');
+  await this.waitFor(() => {
+    const inputs = getTextInputs(this.container);
+    const hasText = Array.from(inputs ?? []).some(i => i.value.includes(text));
+    assert.ok(hasText, 'Filename should contain text');
+  });
 });
 
 Given('the audio has not been synthesized yet', async function (this: TestWorld) {
-  const inputs = this.container?.querySelectorAll('input');
+  const inputs = getTextInputs(this.container);
   assert.ok(inputs && inputs.length > 0, 'App ready for synthesis');
 });
 
 Then('the system synthesizes the audio first', async function (this: TestWorld) {
-  const audio = this.container?.querySelector('audio');
-  assert.ok(audio || this.container, 'System should synthesize audio');
+  await this.waitFor(() => {
+    const audio = this.container?.querySelector('audio');
+    assert.ok(audio, 'Audio element should exist after synthesis');
+  });
 });
 
 Given('I have downloaded the audio for {string}', async function (this: TestWorld, text: string) {
   await this.renderApp();
-  const inputs = this.container?.querySelectorAll('input');
-  if (inputs?.[0]) this.type(inputs[0] as HTMLInputElement, text);
+  const input = getFirstInput(this.container);
+  this.type(input, text);
 });
 
 When('I open the downloaded file', async function (this: TestWorld) {
-  const audio = this.container?.querySelector('audio');
-  assert.ok(audio || this.container, 'Downloaded file should be openable');
+  await this.waitFor(() => {
+    const audio = this.container?.querySelector('audio');
+    assert.ok(audio, 'Audio element should exist');
+  });
 });
 
 Then('the audio plays correctly in a standard audio player', async function (this: TestWorld) {
-  const audio = this.container?.querySelector('audio');
-  assert.ok(audio || this.container, 'Audio should play correctly');
+  await this.waitFor(() => {
+    const audio = this.container?.querySelector('audio');
+    assert.ok(audio, 'Audio element should exist for playback');
+  });
 });
 
 Then('the format is WAV', async function (this: TestWorld) {
-  // WAV format verification - app level check
-  const audio = this.container?.querySelector('audio');
-  assert.ok(audio || this.container, 'Format should be WAV');
+  await this.waitFor(() => {
+    const audio = this.container?.querySelector('audio');
+    assert.ok(audio, 'Audio element should exist with WAV format');
+  });
 });

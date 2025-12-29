@@ -1,0 +1,12 @@
+// Layer 1: Import base card styles from EKI Storybook vendor
+@import '../../../../vendor/eki-storybook/src/stories/assets/scss/components/card';
+
+// Layer 3: App-specific card overrides (vendor card has shadow, we need bordered)
+.card {
+  background: $color-white;
+  border-radius: $border-radius;
+  border: 1px solid $color-outlined-neutral;
+  box-shadow: none;
+  max-width: none;
+  padding: 24px;
+}

@@ -1,0 +1,21 @@
+// Layer 3: App-specific component (no vendor equivalent)
+// Waffle menu styles
+.waffle-menu {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: repeat(3, 6px);
+  grid-template-rows: repeat(3, 6px);
+  gap: 4px;
+  padding: 8px;
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: $color-gray;
+  }
+}

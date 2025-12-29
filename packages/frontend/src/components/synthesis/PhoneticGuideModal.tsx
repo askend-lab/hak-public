@@ -1,25 +1,6 @@
-import { colors, borderRadius, gap, fontWeight } from '../../styles/colors';
-import { modalOverlayStyle, modalHeaderStyle, closeButtonStyle } from '../../styles/modalStyles';
-
 interface PhoneticGuideModalProps {
   onClose: () => void;
 }
-
-const contentStyle = {
-  background: colors.white,
-  padding: '2rem',
-  borderRadius: borderRadius.large,
-  maxWidth: '500px',
-  width: '90%',
-  maxHeight: '80vh',
-  overflow: 'auto',
-} as const;
-
-const titleStyle = { margin: 0, color: colors.primary, fontWeight: fontWeight.bold } as const;
-const symbolListStyle = { display: 'flex', flexDirection: 'column', gap: gap.md } as const;
-const symbolCardStyle = { padding: gap.md, background: colors.softNeutralBg, borderRadius: borderRadius.small } as const;
-const symbolRowStyle = { display: 'flex', alignItems: 'center', gap: gap.sm, marginBottom: gap.xs } as const;
-const symbolStyle = { fontSize: '1.5rem', fontWeight: fontWeight.bold, color: colors.primary, minWidth: '2rem', textAlign: 'center' } as const;
 
 const PHONETIC_SYMBOLS = [
   { symbol: '`', name: 'Kolmas pikkusaste', description: 'Third degree length - extra long vowel', example: 'sa`ada (to send)' },
@@ -30,30 +11,21 @@ const PHONETIC_SYMBOLS = [
 
 export function PhoneticGuideModal({ onClose }: PhoneticGuideModalProps) {
   return (
-    <div
-      role="dialog"
-      aria-label="Phonetic guide"
-      className="phonetic-guide-modal"
-      style={modalOverlayStyle}
-    >
-      <div style={contentStyle}>
-        <div style={modalHeaderStyle}>
-          <h2 style={titleStyle}>Foneetilised sümbolid</h2>
-          <button onClick={onClose} aria-label="Close" style={closeButtonStyle}>×</button>
+    <div role="dialog" aria-label="Phonetic guide" className="phonetic-guide-modal__overlay">
+      <div className="phonetic-guide-modal__content">
+        <div className="phonetic-guide-modal__header">
+          <h2 className="phonetic-guide-modal__title">Foneetilised sümbolid</h2>
+          <button onClick={onClose} aria-label="Close" className="phonetic-guide-modal__close">×</button>
         </div>
-        <div style={symbolListStyle}>
+        <div className="phonetic-guide-modal__list">
           {PHONETIC_SYMBOLS.map(({ symbol, name, description, example }) => (
-            <div key={symbol} style={symbolCardStyle}>
-              <div style={symbolRowStyle}>
-                <span style={symbolStyle}>{symbol}</span>
-                <span style={{ fontWeight: fontWeight.medium }}>{name}</span>
+            <div key={symbol} className="phonetic-guide-modal__card">
+              <div className="phonetic-guide-modal__symbol-row">
+                <span className="phonetic-guide-modal__symbol">{symbol}</span>
+                <span className="phonetic-guide-modal__name">{name}</span>
               </div>
-              <p style={{ margin: `0 0 ${gap.xs} 0`, color: colors.textSecondary, fontSize: '0.875rem' }}>
-                {description}
-              </p>
-              <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.875rem' }}>
-                Näide: {example}
-              </p>
+              <p className="phonetic-guide-modal__description">{description}</p>
+              <p className="phonetic-guide-modal__example">Näide: {example}</p>
             </div>
           ))}
         </div>

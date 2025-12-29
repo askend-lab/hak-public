@@ -71,7 +71,7 @@ describe('Header', () => {
         <Header />
       </MemoryRouter>
     );
-    expect(screen.getByText('Süntees')).toBeInTheDocument();
+    expect(screen.getByText('Kõnesüntees')).toBeInTheDocument();
     expect(screen.getByText('Ülesanded')).toBeInTheDocument();
     expect(screen.getByText('Tests')).toBeInTheDocument();
   });
@@ -136,7 +136,7 @@ describe('Header', () => {
     
     // Check that tabs are rendered
     expect(navTabs).toHaveLength(2);
-    expect(navTabs[0]).toHaveTextContent('Süntees');
+    expect(navTabs[0]).toHaveTextContent('Kõnesüntees');
     expect(navTabs[1]).toHaveTextContent('Ülesanded');
     
     // Click tasks tab - should not crash
@@ -144,5 +144,27 @@ describe('Header', () => {
     
     // Click synthesis tab - should not crash
     navTabs[0]?.click();
+  });
+
+  describe('Header styling (bug fixes)', () => {
+    it('should have header class for white background styling', () => {
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: false,
+        user: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+        refreshSession: vi.fn(),
+        isLoading: false,
+        error: null,
+      });
+      
+      render(
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      );
+      const header = document.querySelector('.header');
+      expect(header).toBeInTheDocument();
+    });
   });
 });

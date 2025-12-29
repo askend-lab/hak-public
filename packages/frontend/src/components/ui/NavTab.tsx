@@ -1,5 +1,3 @@
-import { colors, cursors, fontWeight } from '../../styles/colors'
-
 interface NavTabProps {
   label: string
   isActive: boolean
@@ -7,20 +5,10 @@ interface NavTabProps {
 }
 
 export function NavTab({ label, isActive, onClick }: NavTabProps) {
+  const classes = ['nav-tab', isActive && 'nav-tab--active'].filter(Boolean).join(' ')
+  
   return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: '0.5rem 0',
-        background: 'transparent',
-        border: 'none',
-        borderBottom: isActive ? `2px solid ${colors.primary}` : '2px solid transparent',
-        color: isActive ? colors.primary : colors.gray,
-        fontSize: '0.9375rem',
-        fontWeight: fontWeight.medium,
-        cursor: cursors.pointer,
-      }}
-    >
+    <button className={classes} onClick={onClick}>
       {label}
     </button>
   )

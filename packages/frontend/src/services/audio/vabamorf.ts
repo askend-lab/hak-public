@@ -3,6 +3,8 @@ import { httpPost } from '../http';
 
 import type { VabamorfResponse } from './types';
 
+const DEFAULT_STRESS_LEVEL = 1;
+
 interface EkiVabamorfResponse {
   stressedText: string;
   originalText: string;
@@ -18,7 +20,7 @@ export async function analyzeText(text: string): Promise<VabamorfResponse> {
     words: words.map((word, i) => ({
       text: word,
       phonetic: phoneticWords[i] ?? word,
-      stress: 1,
+      stress: DEFAULT_STRESS_LEVEL,
     })),
   };
 }

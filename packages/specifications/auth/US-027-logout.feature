@@ -1,3 +1,4 @@
+@auth @US-027
 Feature: Logout from system (US-027)
   As an authenticated user
   I want to log out of the application

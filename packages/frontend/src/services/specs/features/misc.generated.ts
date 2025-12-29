@@ -3,30 +3,8 @@
 // Group: misc
 
 export const FEATURES_MISC: Record<string, string> = {
-  'US-022-generate-share-link': `Feature: Generate shareable link for task (US-022)
-  As a language teacher
-  I want to generate a shareable link for my task
-  So that I can distribute exercises to students
-
-  Scenario: Share button visible on task
-    Given I am viewing task details
-    When the page loads
-    Then I see a Share button
-
-  Scenario: Generate unique share link
-    Given I am viewing a task
-    When I click the Share button
-    Then a unique shareable URL is generated
-    And the link is displayed in a dialog
-
-  Scenario: Copy link to clipboard
-    Given the share link dialog is open
-    When I click "Copy link"
-    Then the URL is copied to my clipboard
-    And I see a confirmation message
-`,
-
-  'US-024-view-phonetic-guide': `Feature: View phonetic symbols reference guide (US-024)
+  'US-024-view-phonetic-guide': `@misc @US-024
+Feature: View phonetic symbols reference guide (US-024)
   As a language learner
   I want to view an explanation of phonetic markers
   So that I can understand the stress and pronunciation symbols
@@ -58,7 +36,8 @@ export const FEATURES_MISC: Record<string, string> = {
     And I return to the main synthesis view
 `,
 
-  'US-029-submit-feedback': `Feature: Submit feedback (US-029)
+  'US-029-submit-feedback': `@misc @US-029
+Feature: Submit feedback (US-029)
   As a user of the application
   I want to submit feedback about the platform
   So that I can report issues or suggest improvements
@@ -87,5 +66,36 @@ export const FEATURES_MISC: Record<string, string> = {
     When I view the email field
     Then it is clearly marked as optional
     And I can submit without entering an email
+`,
+
+  'US-030-notifications': `@misc @US-030
+Feature: Display and dismiss notifications (US-030)
+  As a user of the application
+  I want to see notifications for system messages
+  So that I am informed about successes, errors, and important information
+
+  Scenario: Show success notification
+    Given a successful action occurs
+    Then I see a success notification
+    And it is colored green
+
+  Scenario: Show error notification
+    Given an error occurs
+    Then I see an error notification
+    And it is colored red
+
+  Scenario: Dismiss notification manually
+    Given a notification is visible
+    When I click the notification close button
+    Then the notification disappears
+
+  Scenario: Auto-dismiss notification
+    Given a notification is visible
+    When 5 seconds pass
+    Then the notification automatically disappears
+
+  Scenario: Multiple notifications stack
+    Given multiple events occur
+    Then notifications stack without overlapping
 `,
 };

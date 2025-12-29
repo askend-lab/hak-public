@@ -4,6 +4,19 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @use "${path.resolve(__dirname, '../vendor/eki-storybook/src/stories/assets/scss/abstracts/variables')}" as *;
+          $color-light-blue: #e3effb;
+          $border-radius-round: 50px;
+        `,
+        loadPaths: [path.resolve(__dirname, '..')],
+        silenceDeprecations: ['import'],
+      },
+    },
+  },
   resolve: {
     alias: {
       '@hak/specifications': path.resolve(__dirname, '../specifications/index.ts'),

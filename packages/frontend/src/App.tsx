@@ -1,52 +1,51 @@
 import { useTranslation } from 'react-i18next'
 
 import { TaskSelectModal, NotificationContainer, Header, Footer, SentenceRow, StressedText } from './components'
+import { LoginModal } from './components/auth'
 import { Button, Card } from './components/ui'
+import { useUIStore } from './features'
 import { useSentences } from './hooks'
-import { colors, fontFamily, backgrounds, layout, spacing, fontWeight } from './styles/colors'
-
-const appStyle = {
-  minHeight: '100vh',
-  background: backgrounds.pageGradient,
-  fontFamily: fontFamily.system,
-} as const;
-
-const mainStyle = { maxWidth: layout.maxWidthNarrow, margin: '0 auto', padding: spacing.mainPadding } as const;
-const titleSectionStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' } as const;
-const h1Style = { fontSize: '1.5rem', fontWeight: fontWeight.bold, color: colors.primary, margin: '0 0 0.5rem 0' } as const;
-const subtitleStyle = { fontSize: '0.9375rem', color: colors.textSecondary, margin: 0 } as const;
-const buttonGroupStyle = { display: 'flex', gap: '0.75rem' } as const;
-const addButtonContainerStyle = { textAlign: 'center', marginTop: '1rem' } as const;
-const hiddenAudioStyle = { display: 'none' } as const;
+import { useAuth } from './services/auth'
 
 function App() {
   const { t } = useTranslation()
   const { sentences, loadingIndex, isPlayingAll, audioRef, addSentence, updateSentence, removeSentence, playSentence, playAll, stopAll } = useSentences()
+  const { openModal } = useUIStore()
+  const { isAuthenticated } = useAuth()
+  
+  const hasContent = sentences.some(s => s.trim().length > 0)
+  
+  const handleAddToTask = (): void => {
+    if (isAuthenticated) {
+      openModal('taskSelect')
+    } else {
+      openModal('login')
+    }
+  }
 
   return (
-    <div style={appStyle}>
+    <div className="app-page">
       <Header />
-      <main style={mainStyle}>
-        <div style={titleSectionStyle}>
+      <main className="app-main">
+        <div className="app-main__header">
           <div>
-            <h1 style={h1Style}>{t('hero.title')}</h1>
-            <p style={subtitleStyle}>{t('hero.subtitle')}</p>
+            <h1 className="app-main__title">{t('hero.title')}</h1>
+            <p className="app-main__subtitle">{t('hero.subtitle')}</p>
           </div>
-          <div style={buttonGroupStyle}>
-            <Button variant="outline" size="small">{t('buttons.addToTask')} (0)</Button>
+          <div className="app-main__actions">
+            <Button variant="outline" size="small" disabled={!hasContent} onClick={handleAddToTask}>{t('buttons.addToTask')} (0)</Button>
             {isPlayingAll ? (
               <Button variant="primary" size="small" onClick={stopAll}>Peata</Button>
             ) : (
-              <Button variant="primary" size="small" onClick={playAll}>▶ {t('buttons.playAll')}</Button>
+              <Button variant="primary" size="small" onClick={playAll} disabled={!hasContent}>▶ {t('buttons.playAll')}</Button>
             )}
           </div>
         </div>
 
-        {/* Input Section */}
         <Card>
           {sentences.map((sentence, index) => (
             <SentenceRow
-              key={index}
+              key={`sentence-${index}`}
               value={sentence}
               onChange={(value) => { updateSentence(index, value); }}
               onPlay={() => { void playSentence(index); }}
@@ -57,20 +56,20 @@ function App() {
           ))}
         </Card>
 
-        <div style={addButtonContainerStyle}>
+        <div className="app-main__add-button">
           <Button variant="outline" onClick={addSentence}>{t('buttons.addSentence')}</Button>
         </div>
 
-        {/* Phonetic text display with help icon */}
-        <StressedText />
+<StressedText className="visually-hidden" />
       </main>
 
       <Footer />
       
       <TaskSelectModal />
+      <LoginModal />
       <NotificationContainer />
       
-      <audio ref={audioRef} style={hiddenAudioStyle} />
+      <audio ref={audioRef} className="hidden-audio" />
     </div>
   )
 }

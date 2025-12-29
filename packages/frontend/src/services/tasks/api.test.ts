@@ -95,6 +95,8 @@ describe('Tasks API', () => {
       const result = await listTasks('user1');
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(2);
+      expect(result.data?.[0]?.name).toBe('Task 1');
+      expect(result.data?.[1]?.name).toBe('Task 2');
     });
 
     it('should return error on failure', async () => {

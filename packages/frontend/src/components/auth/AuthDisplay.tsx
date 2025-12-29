@@ -1,5 +1,4 @@
 import { useAuth } from '../../services/auth';
-import { colors, gap, borderRadius, fontWeight, cursors } from '../../styles/colors';
 
 export function AuthDisplay() {
   const { isAuthenticated, user, login, logout } = useAuth();
@@ -14,21 +13,9 @@ export function AuthDisplay() {
 
   if (isAuthenticated) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: gap.lg }}>
-        <span style={{ color: colors.primary, fontWeight: fontWeight.medium }}>{user?.email}</span>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: 'transparent',
-            border: '1px solid transparent',
-            borderRadius: borderRadius.small,
-            color: colors.gray,
-            fontSize: '0.875rem',
-            fontWeight: fontWeight.medium,
-            cursor: cursors.pointer,
-          }}
-        >
+      <div className="auth-display">
+        <span className="auth-display__email">{user?.email}</span>
+        <button onClick={handleLogout} className="auth-display__btn auth-display__btn--logout">
           Logout
         </button>
       </div>
@@ -36,19 +23,7 @@ export function AuthDisplay() {
   }
 
   return (
-    <button
-      onClick={handleLogin}
-      style={{
-        padding: '0.75rem 1.5rem',
-        background: colors.primary,
-        border: '1px solid transparent',
-        borderRadius: borderRadius.small,
-        color: colors.white,
-        fontSize: '0.875rem',
-        fontWeight: fontWeight.medium,
-        cursor: cursors.pointer,
-      }}
-    >
+    <button onClick={handleLogin} className="auth-display__btn auth-display__btn--login">
       Login
     </button>
   );

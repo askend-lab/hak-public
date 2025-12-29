@@ -1,16 +1,8 @@
 // -------------------------------------------------------------------------
-// This file contains all Storybook Sass variables.
+// Layer 1: Import all variables from EKI Storybook vendor
 // -------------------------------------------------------------------------
+@forward '../../../../vendor/eki-storybook/src/stories/assets/scss/abstracts/variables';
 
-$color-primary: #173148;
-$color-secondary: #D7E5F2;
-$color-white: #FFFFFF;
-$color-gray: #636B74;
-$color-light-blue: #e3effb;
-$color-text-secondary: #32383E;
-$color-black: #000;
-
-$font-body: 'Inter', sans-serif;
-
-$border-radius: 8px;
-$border-radius-round: 50px;
+// Layer 2: App-specific variables (only if not available in vendor)
+// Note: $color-light-blue = $color-soft-primary-bg from vendor
+// Note: $border-radius-round already in vendor (10rem)

@@ -41,8 +41,9 @@ async function pollForAudio(hash: string): Promise<string> {
         return audioUrl;
       }
       // 403/404 means file not ready yet - continue polling
-    } catch {
-      // Network error - continue polling
+    } catch (error) {
+      // Network error - log and continue polling
+      console.debug('Polling attempt failed:', error);
     }
      
     await new Promise((resolve) => {

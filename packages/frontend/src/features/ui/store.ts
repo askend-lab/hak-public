@@ -3,7 +3,7 @@ import { create } from 'zustand';
 type ModalType = 'taskSelect' | 'taskCreate' | 'login' | null;
 type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
-interface Notification {
+interface NotificationItem {
   id: string;
   type: NotificationType;
   message: string;
@@ -12,7 +12,7 @@ interface Notification {
 
 interface UIState {
   activeModal: ModalType;
-  notifications: Notification[];
+  notifications: NotificationItem[];
 }
 
 interface UIActions {
@@ -46,4 +46,4 @@ export const useUIStore = create<UIState & UIActions>((set) => ({
   clearNotifications: (): void => { set({ notifications: [] }); },
 }));
 
-export type { ModalType, NotificationType, Notification };
+export type { ModalType, NotificationType, NotificationItem };

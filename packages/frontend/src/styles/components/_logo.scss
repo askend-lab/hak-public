@@ -1,0 +1,16 @@
+// Logo styles - uses CSS custom properties for dynamic colors
+.logo {
+  display: inline-block;
+  
+  &__bg {
+    fill: $color-primary;
+  }
+  
+  &__shape {
+    fill: $color-primary;
+  }
+  
+  &__shape--inverted {
+    fill: $color-white;
+  }
+}

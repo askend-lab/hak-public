@@ -1,3 +1,4 @@
+@playlist @US-013
 Feature: Reorder sentences via drag and drop (US-013)
   As a language learner
   I want to change the order of my sentences

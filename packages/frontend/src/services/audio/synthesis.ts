@@ -5,15 +5,24 @@ import { synthesizeViaApi } from './audio-api';
 
 import type { SynthesisResult } from './types';
 
-export async function synthesizeText(text: string): Promise<SynthesisResult> {
+interface SynthesizeOptions {
+  phoneticText?: string;
+}
+
+export async function synthesizeText(
+  text: string,
+  options: SynthesizeOptions = {}
+): Promise<SynthesisResult> {
   const wordCount = countWords(text);
   const voiceModel = selectVoiceModel(wordCount);
 
-  const audioUrl = await synthesizeViaApi(text);
+  // Use phoneticText for synthesis if provided (variant pronunciation)
+  const textToSynthesize = options.phoneticText ?? text;
+  const audioUrl = await synthesizeViaApi(textToSynthesize);
 
   return {
     originalText: text,
-    phoneticText: text,
+    phoneticText: options.phoneticText ?? text,
     audioUrl,
     audioHash: '',
     voiceModel,

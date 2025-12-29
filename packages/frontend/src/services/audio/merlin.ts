@@ -11,9 +11,7 @@ interface EkiMerlinResponse {
 export type SynthesizeFormat = 'json' | 'blob';
 
 export async function synthesize(
-  request: MerlinRequest,
-   
-  _format: SynthesizeFormat = 'json'
+  request: MerlinRequest
 ): Promise<MerlinResponse> {
   const ekiResponse = await httpPost<EkiMerlinResponse>(API_CONFIG.merlinUrl, {
     text: request.text,

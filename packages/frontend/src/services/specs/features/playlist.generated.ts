@@ -3,7 +3,8 @@
 // Group: playlist
 
 export const FEATURES_PLAYLIST: Record<string, string> = {
-  'US-009-add-to-playlist': `Feature: Add sentence to synthesis list (US-009)
+  'US-009-add-to-playlist': `@playlist @US-009
+Feature: Add sentence to synthesis list (US-009)
   As a language learner
   I want to add multiple sentence rows to the synthesis page
   So that I can prepare and practice several phrases in one session
@@ -26,10 +27,15 @@ export const FEATURES_PLAYLIST: Record<string, string> = {
     And each sentence has a unique ID
 `,
 
-  'US-010-play-playlist-entry': `Feature: Play individual sentence (US-010)
+  'US-010-play-playlist-entry': `@playlist @US-010
+Feature: Play individual sentence (US-010)
   As a language learner
   I want to play a specific sentence from my list
   So that I can focus on practicing individual phrases
+
+  Background:
+    Given I am on the synthesis page
+    And authentication is not required
 
   Scenario: Play button per sentence
     Given I have sentence rows with text
@@ -55,7 +61,8 @@ export const FEATURES_PLAYLIST: Record<string, string> = {
     And "Hommikust" starts playing
 `,
 
-  'US-011-play-all-entries': `Feature: Play all sentences sequentially (US-011)
+  'US-011-play-all-entries': `@playlist @US-011
+Feature: Play all sentences sequentially (US-011)
   As a language learner
   I want to play all my sentences in sequence
   So that I can practice listening to multiple phrases without interruption
@@ -84,7 +91,8 @@ export const FEATURES_PLAYLIST: Record<string, string> = {
     And the button changes back to "Mängi kõik"
 `,
 
-  'US-012-delete-playlist-entry': `Feature: Remove sentence from list (US-012)
+  'US-012-delete-playlist-entry': `@playlist @US-012
+Feature: Remove sentence from list (US-012)
   As a language learner
   I want to remove a sentence from my list
   So that I can focus only on the phrases I need to practice
@@ -107,7 +115,8 @@ export const FEATURES_PLAYLIST: Record<string, string> = {
     And I still have 1 sentence row visible
 `,
 
-  'US-013-reorder-playlist': `Feature: Reorder sentences via drag and drop (US-013)
+  'US-013-reorder-playlist': `@playlist @US-013
+Feature: Reorder sentences via drag and drop (US-013)
   As a language learner
   I want to change the order of my sentences
   So that I can organize phrases in my preferred learning sequence

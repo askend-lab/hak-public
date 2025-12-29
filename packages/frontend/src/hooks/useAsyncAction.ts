@@ -27,6 +27,8 @@ export function useAsyncAction<T>(
     error: null,
   });
   const { addNotification } = useUIStore();
+  
+  const { successMessage, errorMessage, showNotification } = options;
 
   const execute = useCallback(
     async (...args: unknown[]): Promise<T | undefined> => {
@@ -34,20 +36,20 @@ export function useAsyncAction<T>(
       try {
         const result = await action(...args);
         setState({ isLoading: false, error: null });
-        if (options.showNotification === true && options.successMessage !== undefined && options.successMessage !== '') {
-          addNotification('success', options.successMessage);
+        if (showNotification === true && successMessage !== undefined && successMessage !== '') {
+          addNotification('success', successMessage);
         }
         return result;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Operation failed';
         setState({ isLoading: false, error: message });
-        if (options.showNotification !== false) {
-          addNotification('error', options.errorMessage ?? message);
+        if (showNotification !== false) {
+          addNotification('error', errorMessage ?? message);
         }
         return undefined;
       }
     },
-    [action, options, addNotification]
+    [action, successMessage, errorMessage, showNotification, addNotification]
   );
 
   const reset = useCallback(() => {

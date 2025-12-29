@@ -1,7 +1,12 @@
+@playlist @US-010
 Feature: Play individual sentence (US-010)
   As a language learner
   I want to play a specific sentence from my list
   So that I can focus on practicing individual phrases
+
+  Background:
+    Given I am on the synthesis page
+    And authentication is not required
 
   Scenario: Play button per sentence
     Given I have sentence rows with text

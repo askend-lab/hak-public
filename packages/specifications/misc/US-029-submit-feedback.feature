@@ -1,3 +1,4 @@
+@misc @US-029
 Feature: Submit feedback (US-029)
   As a user of the application
   I want to submit feedback about the platform

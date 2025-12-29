@@ -10,7 +10,13 @@ void i18n
       en: {
         translation: {
           "header.title1": "Estonian Speech Synthesis",
-          "hero.title": "Eesti keele kõnesüntees"
+          "hero.title": "Eesti keele kõnesüntees",
+          "hero.subtitle": "Sisesta tekst või sõna, et kuulata selle hääldust ja uurida variante",
+          "buttons.remove": "Eemalda",
+          "buttons.addToTask": "Lisa ülesandesse",
+          "buttons.playAll": "Mängi kõik",
+          "buttons.addSentence": "Lisa lause",
+          "input.placeholder": "Kirjuta oma lause siia"
         }
       }
     },

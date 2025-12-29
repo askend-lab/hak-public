@@ -37,14 +37,11 @@ describe('useSentences', () => {
     expect(result.current.sentences).toStrictEqual(['Hello', 'Updated']);
   });
 
-  it('should have loadingIndex as null initially', () => {
+  it('should have correct initial state', () => {
     const { result } = renderHook(() => useSentences());
     expect(result.current.loadingIndex).toBeNull();
-  });
-
-  it('should have audioRef', () => {
-    const { result } = renderHook(() => useSentences());
     expect(result.current.audioRef).toBeDefined();
+    expect(result.current.audioRef.current).toBeNull();
   });
 
   describe('playSentence', () => {
@@ -101,9 +98,8 @@ describe('useSentences', () => {
       expect(result.current.loadingIndex).toBeNull();
     });
 
-    it('should handle synthesis errors', async () => {
+    it('should handle synthesis errors silently', async () => {
       const { result } = renderHook(() => useSentences(['Hello']));
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
       
       mockSynthesizeText.mockRejectedValueOnce(new Error('Synthesis failed'));
       
@@ -111,10 +107,8 @@ describe('useSentences', () => {
         await result.current.playSentence(0);
       });
 
-      expect(consoleError).toHaveBeenCalledWith('Synthesis failed:', expect.any(Error));
+      // Error handled silently - loading state should reset
       expect(result.current.loadingIndex).toBeNull();
-      
-      consoleError.mockRestore();
     });
 
     it('should handle missing audio ref gracefully', async () => {

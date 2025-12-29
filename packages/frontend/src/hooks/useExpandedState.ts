@@ -1,6 +1,12 @@
 import { useState } from 'react'
 
-export function useExpandedState<T>(): { expanded: Set<T>; toggle: (item: T) => void; setExpanded: React.Dispatch<React.SetStateAction<Set<T>>> } {
+interface ExpandedStateResult<T> {
+  expanded: Set<T>;
+  toggle: (item: T) => void;
+  setExpanded: React.Dispatch<React.SetStateAction<Set<T>>>;
+}
+
+export function useExpandedState<T>(): ExpandedStateResult<T> {
   const [expanded, setExpanded] = useState<Set<T>>(new Set())
   
   const toggle = (item: T): void => {

@@ -70,6 +70,8 @@ describe('Vabamorf', () => {
 
       const variants = getWordVariants(response, 0);
       expect(variants).toHaveLength(2);
+      expect(variants[0]).toStrictEqual({ phonetic: 'te`re', stress: 1 });
+      expect(variants[1]).toStrictEqual({ phonetic: 'tere`', stress: 2 });
     });
 
     it('should return default variant if no variants', () => {

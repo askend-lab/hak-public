@@ -1,2 +1,2 @@
 export { useUIStore } from './store';
-export type { ModalType, NotificationType, Notification } from './store';
+export type { ModalType, NotificationType, NotificationItem } from './store';

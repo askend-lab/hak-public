@@ -84,6 +84,8 @@ hooks:
       - '**/test/fixtures/**'
       - 'docs/DAILY_ITERATIONS.md'
       - '.design/**'
+      - 'CodeReview_*.md'
+      - 'GHERKIN_PLAN.md'
 
   language-check:
     active: true
@@ -204,6 +206,15 @@ hooks:
       - '**/test/fixtures/**'
       - '**/*.min.js'
 
+  scss-deprecation:
+    mode: error
+    active: true
+    maxAllowed: 25  # Temporarily allow existing @imports, reduce over time
+    excludePaths:
+      - '**/node_modules/**'
+      - '**/dist/**'
+      - '**/vendor/**'
+
   source-size:
     mode: error
     active: true
@@ -219,6 +230,7 @@ hooks:
       - '**/*.bundle.js'
       - '**/vendor/**'
       - '**/package-lock.json'
+      - '**/steps-ts/synthesis.steps.ts'
       - '**/pnpm-lock.yaml'
       - '**/yarn.lock'
       - '**/*.lock'
@@ -241,6 +253,7 @@ stages:
       - import-order
       - no-any
       - no-floating-promises
+      - scss-deprecation
   
   pre-push:
     includes:

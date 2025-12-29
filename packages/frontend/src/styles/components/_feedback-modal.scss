@@ -1,0 +1,116 @@
+// Layer 1: Import modal from vendor
+@import '../../../../vendor/eki-storybook/src/stories/assets/scss/components/modal';
+
+// Layer 3: Feedback modal (app-specific layout)
+
+.feedback-modal {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  &__form {
+    background: $color-white;
+    padding: 2rem;
+    border-radius: $border-radius;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    margin: 0;
+    color: $color-primary;
+    font-weight: 700;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: $color-gray;
+    padding: 0;
+    line-height: 1;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__label {
+    color: $color-text-secondary;
+    font-size: 0.875rem;
+  }
+
+  &__optional {
+    color: $color-gray;
+  }
+
+  &__input,
+  &__textarea {
+    padding: 0.75rem;
+    border: 1px solid $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+    font-size: 1rem;
+  }
+
+  &__textarea {
+    resize: vertical;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+  }
+
+  &__btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+
+    &--cancel {
+      background: transparent;
+      border: 1px solid $color-outlined-neutral;
+    }
+
+    &--submit {
+      background: $color-primary;
+      color: $color-white;
+      border: none;
+      font-weight: 500;
+    }
+  }
+
+  &__success {
+    background: $color-white;
+    padding: 2rem;
+    border-radius: $border-radius;
+    text-align: center;
+  }
+
+  &__success-title {
+    color: $color-primary;
+    margin-bottom: 16px;
+  }
+
+  &__success-message {
+    color: $color-text-secondary;
+    margin-bottom: 24px;
+  }
+}

@@ -17,13 +17,13 @@ describe('FeedbackModal', () => {
 
   it('should render message textarea', () => {
     render(<FeedbackModal onClose={mockOnClose} />);
-    expect(screen.getByLabelText('Sõnum')).toBeInTheDocument();
+    expect(screen.getByLabelText('Teade')).toBeInTheDocument();
   });
 
-  it('should render email input marked as optional', () => {
+  it('should render email input with optional section', () => {
     render(<FeedbackModal onClose={mockOnClose} />);
     expect(screen.getByLabelText(/E-post/)).toBeInTheDocument();
-    expect(screen.getByText('(optional)')).toBeInTheDocument();
+    expect(screen.getByText('Kas soovid vastust?')).toBeInTheDocument();
   });
 
   it('should render submit and cancel buttons', () => {
@@ -46,7 +46,7 @@ describe('FeedbackModal', () => {
 
   it('should show thank you message after submit', () => {
     render(<FeedbackModal onClose={mockOnClose} />);
-    const textarea = screen.getByLabelText('Sõnum');
+    const textarea = screen.getByLabelText('Teade');
     fireEvent.change(textarea, { target: { value: 'Test feedback' } });
     fireEvent.click(screen.getByText('Saada'));
     expect(screen.getByText('Täname!')).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('FeedbackModal', () => {
 
   it('should update message value on input', () => {
     render(<FeedbackModal onClose={mockOnClose} />);
-    const textarea = screen.getByLabelText('Sõnum') as HTMLTextAreaElement;
+    const textarea = screen.getByLabelText('Teade') as HTMLTextAreaElement;
     fireEvent.change(textarea, { target: { value: 'My feedback' } });
     expect(textarea.value).toBe('My feedback');
   });

@@ -1,0 +1,46 @@
+// Layer 3: App-specific component (no vendor equivalent)
+// Share task modal styles
+.share-task-modal {
+  padding: 1rem;
+
+  &__description {
+    margin-top: 0;
+    color: $color-gray;
+  }
+
+  &__input-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  &__input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+    font-size: 0.875rem;
+    font-family: monospace;
+  }
+
+  &__copy-btn {
+    padding: 0.75rem 1.5rem;
+    background: $color-primary;
+    border: none;
+    border-radius: $border-radius-sm;
+    color: $color-white;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 80px;
+
+    &--copied {
+      background: $color-success;
+    }
+  }
+
+  &__note {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: $color-gray;
+  }
+}

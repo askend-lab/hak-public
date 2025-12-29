@@ -1,37 +1,30 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { colors, layout, gap, lineHeight } from '../../styles/colors'
 import { Button, SocialLink, FooterLink, SectionHeading, LogoWithText } from '../ui'
 import { FeedbackModal } from './FeedbackModal'
-
-const footerStyle = { background: colors.white, borderTop: `1px solid ${colors.outlinedNeutral}`, padding: '2.5rem 0' } as const;
-const containerStyle = { maxWidth: layout.maxWidthWide, margin: '0 auto', padding: '0 1rem', display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: gap.xxl } as const;
-const contactStyle = { fontSize: '0.75rem', color: colors.textSecondary, lineHeight: lineHeight.relaxed, margin: 0 } as const;
-const descStyle = { fontSize: '0.8125rem', color: colors.textSecondary, margin: '0 0 1rem 0' } as const;
-const listStyle = { listStyle: 'none', padding: 0, margin: 0 } as const;
 
 export function Footer() {
   const { t } = useTranslation()
   const [showFeedback, setShowFeedback] = useState(false)
 
   return (
-    <footer style={footerStyle}>
-      <div style={containerStyle}>
-        {/* Logo & Contact */}
+    <footer className="footer">
+      <div className="footer__container">
         <div>
-          <div style={{ marginBottom: '1rem' }}>
-            <LogoWithText withBackground />
+          <div className="footer__logo-section">
+            <LogoWithText />
           </div>
-          <p style={contactStyle}>
-            Roosikrantsi 6, 10119 Tallinn Reg-kood: 70004011 Keelenõu 631 3731 Üldkontakt 617 7500 eki@eki.ee
+          <p className="footer__contact">
+            Roosikrantsi 6, 10119 Tallinn Reg-kood:<br />
+            70004011 Keelenõu 631 3731 Üldkontakt 617<br />
+            7500 eki@eki.ee
           </p>
         </div>
 
-        {/* Hääldusabiline Links */}
         <div>
-          <SectionHeading>{t('header.title2')}</SectionHeading>
-          <ul style={listStyle}>
+          <SectionHeading>{t('footer.links.title')}</SectionHeading>
+          <ul className="footer__list">
             <FooterLink href="#">Portaaliest</FooterLink>
             <FooterLink href="#">Versiooniajalugu</FooterLink>
             <FooterLink href="#">Kasutus- ja privaatsustingimused</FooterLink>
@@ -39,8 +32,8 @@ export function Footer() {
         </div>
         <div>
           <SectionHeading>Sotsiaalmeedia</SectionHeading>
-          <p style={descStyle}>Hoia pilk peal.</p>
-          <ul style={listStyle}>
+          <p className="footer__desc">Hoia pilk peal.</p>
+          <ul className="footer__list">
             <SocialLink href="https://www.facebook.com/eestikeeleinstituut" icon="f" label="Facebook" />
             <SocialLink href="https://www.youtube.com/@EestiKeeleInstituut" icon="▶" label="Youtube" />
             <SocialLink href="https://www.linkedin.com/company/eesti-keele-instituut" icon="in" label="LinkedIn" />
@@ -48,7 +41,7 @@ export function Footer() {
         </div>
         <div>
           <SectionHeading>Tagasiside</SectionHeading>
-          <p style={{ ...descStyle, lineHeight: lineHeight.normal }}>Iga arvamus loeb ja aitab Hääldusabilist paremaks teha!</p>
+          <p className="footer__desc footer__desc--feedback">Iga arvamus loeb ja aitab Hääldusabilist paremaks teha!</p>
           <Button variant="primary" size="small" onClick={() => { setShowFeedback(true); }}>Kirjuta meile</Button>
         </div>
       </div>

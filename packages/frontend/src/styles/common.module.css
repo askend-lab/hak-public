@@ -1,0 +1,167 @@
+/* Common reusable styles */
+
+/* Flex layouts */
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flexBetween {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flexEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Gaps */
+.gapXs { gap: 0.25rem; }
+.gapSm { gap: 0.5rem; }
+.gapMd { gap: 0.75rem; }
+.gapLg { gap: 1rem; }
+.gapXl { gap: 1.5rem; }
+
+/* Padding */
+.padSm { padding: 0.5rem; }
+.padMd { padding: 0.75rem; }
+.padLg { padding: 1rem; }
+.padXl { padding: 1.5rem; }
+
+/* Margins */
+.mt0 { margin-top: 0; }
+.mb0 { margin-bottom: 0; }
+.ml0 { margin-left: 0; }
+.mr0 { margin-right: 0; }
+.m0 { margin: 0; }
+
+/* Text */
+.textCenter { text-align: center; }
+.textLeft { text-align: left; }
+.textRight { text-align: right; }
+
+/* Buttons */
+.buttonBase {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buttonPrimary {
+  composes: buttonBase;
+  background: #173148;
+  color: #FFFFFF;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+.buttonSecondary {
+  composes: buttonBase;
+  background: transparent;
+  border: 1px solid #CDD7E1;
+  color: #636B74;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+.buttonIcon {
+  composes: buttonBase;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+/* Inputs */
+.inputBase {
+  padding: 0.75rem 1rem;
+  border: 1px solid #CDD7E1;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  color: #173148;
+  outline: none;
+}
+
+.inputBase:focus {
+  border-color: #0B6BCB;
+}
+
+/* Cards */
+.card {
+  background: #FFFFFF;
+  border: 1px solid #CDD7E1;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* Dividers */
+.dividerTop {
+  border-top: 1px solid #CDD7E1;
+  padding-top: 1rem;
+}
+
+.dividerBottom {
+  border-bottom: 1px solid #CDD7E1;
+  padding-bottom: 1rem;
+}
+
+/* Grid */
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Visibility */
+.hidden { display: none; }
+.visible { visibility: visible; }
+
+/* Full width */
+.fullWidth { width: 100%; }
+.flex1 { flex: 1; }
+
+/* Avatar */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatarSm {
+  composes: avatar;
+  width: 32px;
+  height: 32px;
+}
+
+.avatarMd {
+  composes: avatar;
+  width: 48px;
+  height: 48px;
+}
+
+.avatarLg {
+  composes: avatar;
+  width: 64px;
+  height: 64px;
+}

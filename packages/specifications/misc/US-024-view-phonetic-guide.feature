@@ -1,3 +1,4 @@
+@misc @US-024
 Feature: View phonetic symbols reference guide (US-024)
   As a language learner
   I want to view an explanation of phonetic markers

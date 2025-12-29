@@ -67,7 +67,7 @@ describe('merlin', () => {
 
       mockHttpPost.mockResolvedValueOnce(mockEkiResponse);
 
-      const result = await synthesize(mockRequest, 'blob');
+      const result = await synthesize(mockRequest);
 
       expect(result).toStrictEqual({
         audioUrl: 'data:audio/wav;base64,YmxvYiBkYXRh',

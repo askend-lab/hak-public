@@ -22,7 +22,9 @@ describe('useTasksStore', () => {
   describe('task actions', () => {
     it('should set tasks', () => {
       useTasksStore.getState().setTasks([mockTask]);
-      expect(useTasksStore.getState().tasks).toHaveLength(1);
+      const tasks = useTasksStore.getState().tasks;
+      expect(tasks).toHaveLength(1);
+      expect(tasks[0]).toStrictEqual(mockTask);
     });
 
     it('should add task', () => {

@@ -1,10 +1,14 @@
+@synthesis @US-003
 Feature: Download synthesized audio (US-003)
   As a language learner
   I want to download the synthesized audio file
   So that I can listen to it offline or use it in other applications
 
+  Background:
+    Given I am on the main page
+
   Scenario: Download audio via menu
-    Given I have entered "Tere" in the text input
+    Given I have entered "Tere" in the synthesis text field
     And the audio has been synthesized
     When I click the more options menu (⋮)
     And I click "Download" option
@@ -12,7 +16,7 @@ Feature: Download synthesized audio (US-003)
     And the filename contains the text "Tere"
 
   Scenario: Download generates audio if not cached
-    Given I have entered "Päike paistab" in the text input
+    Given I have entered "Päike paistab" in the synthesis text field
     And the audio has not been synthesized yet
     When I click the more options menu (⋮)
     And I click "Download" option

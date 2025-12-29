@@ -14,7 +14,7 @@ export default [
   ...baseConfig,
   
   {
-    ignores: ['tmp/**']
+    ignores: ['tmp/**', 'packages/vendor/**']
   },
 
   // Disable rules not compatible with current plugin versions

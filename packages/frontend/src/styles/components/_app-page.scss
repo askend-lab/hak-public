@@ -1,0 +1,59 @@
+// Layer 3: App-specific component (no vendor equivalent)
+// App page styles
+.app-page {
+  min-height: 100vh;
+  background-color: $color-secondary;
+  font-family: $font-body;
+}
+
+.app-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $color-primary;
+    margin: 0 0 0.5rem 0;
+  }
+
+  &__subtitle {
+    font-size: 0.9375rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  &__add-button {
+    text-align: center;
+    margin-top: 1rem;
+  }
+}
+
+.hidden-audio {
+  display: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

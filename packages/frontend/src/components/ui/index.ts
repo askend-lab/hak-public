@@ -1,5 +1,6 @@
 export { NotificationContainer } from './Notification';
 export { Modal } from './Modal';
+export { ConfirmDialog } from './ConfirmDialog';
 export { Logo } from './Logo';
 export { Button } from './Button';
 export { SocialLink } from './SocialLink';

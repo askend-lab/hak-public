@@ -3,99 +3,14 @@ import { parseFeatureContent, ParsedFeature } from '@hak/specifications';
 
 import { Header, Footer } from '../components';
 import { loadCucumberResults, getFeatureGroups, parseCucumberResults, TestSuite } from '../services/specs';
-import { colors, fontFamily, backgrounds, fontWeight, borderRadius } from '../styles/colors';
-
-const pageStyle = {
-  minHeight: '100vh',
-  background: backgrounds.pageGradient,
-  fontFamily: fontFamily.system,
-} as const;
-
-const splitLayoutStyle = {
-  display: 'flex',
-  maxWidth: '1400px',
-  margin: '0 auto',
-  padding: '1rem',
-  gap: '1rem',
-  minHeight: 'calc(100vh - 180px)',
-} as const;
-
-const navPanelStyle = {
-  width: '320px',
-  flexShrink: 0,
-  background: colors.white,
-  borderRadius: borderRadius.medium,
-  border: `1px solid ${colors.outlinedNeutral}`,
-  overflow: 'auto',
-  maxHeight: 'calc(100vh - 200px)',
-} as const;
-
-const contentPanelStyle = {
-  flex: 1,
-  background: colors.white,
-  borderRadius: borderRadius.medium,
-  border: `1px solid ${colors.outlinedNeutral}`,
-  padding: '1.5rem',
-  overflow: 'auto',
-  maxHeight: 'calc(100vh - 200px)',
-} as const;
-
-const groupHeaderStyle = (isExpanded: boolean) => ({
-  padding: '0.75rem 1rem',
-  cursor: 'pointer',
-  borderBottom: `1px solid ${colors.outlinedNeutral}`,
-  background: isExpanded ? colors.softPrimaryBg : colors.softNeutralBg,
-  fontWeight: fontWeight.bold,
-  fontSize: '0.85rem',
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.5px',
-  transition: 'background 0.15s',
-} as const);
-
-const featureItemStyle = (isSelected: boolean, isSkipped: boolean) => ({
-  padding: '0.5rem 1rem 0.5rem 1.5rem',
-  cursor: 'pointer',
-  borderBottom: `1px solid ${colors.outlinedNeutral}`,
-  background: isSelected ? colors.softPrimaryBg : 'transparent',
-  opacity: isSkipped ? 0.6 : 1,
-  transition: 'background 0.15s',
-} as const);
-
-const scenarioItemStyle = {
-  padding: '0.5rem 1rem 0.5rem 2rem',
-  cursor: 'pointer',
-  fontSize: '0.875rem',
-  borderBottom: `1px solid ${colors.softNeutralBg}`,
-} as const;
-
-const stepStyle = {
-  fontFamily: 'monospace',
-  fontSize: '0.875rem',
-  color: colors.textSecondary,
-  padding: '0.25rem 0',
-  lineHeight: 1.6,
-} as const;
-
-const badgeStyle = (status: 'passed' | 'failed' | 'skipped' | 'pending') => ({
-  display: 'inline-block',
-  padding: '0.15rem 0.4rem',
-  borderRadius: borderRadius.small,
-  fontSize: '0.7rem',
-  fontWeight: fontWeight.medium,
-  marginLeft: '0.5rem',
-  background: status === 'passed' ? colors.successBg 
-    : status === 'failed' ? colors.errorBg 
-    : status === 'skipped' ? colors.warningBg 
-    : colors.softNeutralBg,
-  color: status === 'passed' ? colors.success 
-    : status === 'failed' ? colors.error 
-    : status === 'skipped' ? colors.warning 
-    : colors.gray,
-} as const);
 
 interface FeatureGroup {
   name: string;
   features: ParsedFeature[];
+}
+
+function getBadgeClass(status: 'passed' | 'failed' | 'skipped' | 'pending'): string {
+  return `specs-badge specs-badge--${status}`;
 }
 
 export function SpecsPage() {
@@ -136,8 +51,8 @@ export function SpecsPage() {
         if (cucumberResults) {
           setTestSuites(parseCucumberResults(cucumberResults));
         }
-      } catch (error) {
-        console.error('Failed to load specs:', error);
+      } catch {
+        // Silent failure - specs page will show empty state
       } finally {
         setLoading(false);
       }
@@ -187,9 +102,9 @@ export function SpecsPage() {
 
   if (loading) {
     return (
-      <div style={pageStyle}>
+      <div className="specs-page">
         <Header />
-        <main style={splitLayoutStyle}>
+        <main className="specs-page__layout">
           <p>Loading specifications...</p>
         </main>
         <Footer />
@@ -198,16 +113,13 @@ export function SpecsPage() {
   }
 
   return (
-    <div style={pageStyle}>
+    <div className="specs-page">
       <Header />
-      <main style={splitLayoutStyle}>
-        {/* Left Navigation Panel */}
-        <nav style={navPanelStyle}>
-          <div style={{ padding: '1rem', borderBottom: `1px solid ${colors.outlinedNeutral}`, background: colors.softPrimaryBg }}>
-            <strong style={{ color: colors.primary }}>📋 Features</strong>
-            <span style={{ float: 'right', fontSize: '0.8rem', color: colors.gray }}>
-              {totalFeatures} total
-            </span>
+      <main className="specs-page__layout">
+        <nav className="specs-page__nav">
+          <div className="specs-page__nav-header">
+            <strong className="specs-page__nav-title">📋 Features</strong>
+            <span className="specs-page__nav-count">{totalFeatures} total</span>
           </div>
           
           {groups.map((group) => {
@@ -219,63 +131,49 @@ export function SpecsPage() {
               },
               { passed: 0, total: 0 }
             );
+            const groupHeaderClasses = ['specs-group__header', isGroupExpanded && 'specs-group__header--expanded'].filter(Boolean).join(' ');
             
             return (
               <div key={group.name}>
-                <div 
-                  style={groupHeaderStyle(isGroupExpanded)}
-                  onClick={() => toggleGroup(group.name)}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span>
-                      {isGroupExpanded ? '📂' : '📁'} {group.name}
-                    </span>
-                    <span style={badgeStyle(groupStats.passed === groupStats.total ? 'passed' : 'pending')}>
-                      {groupStats.passed}/{groupStats.total}
-                    </span>
-                  </div>
+                <div className={groupHeaderClasses} onClick={() => toggleGroup(group.name)}>
+                  <span>{isGroupExpanded ? '📂' : '📁'} {group.name}</span>
+                  <span className={getBadgeClass(groupStats.passed === groupStats.total ? 'passed' : 'pending')}>
+                    {groupStats.passed}/{groupStats.total}
+                  </span>
                 </div>
                 
                 {isGroupExpanded && group.features.map((feature) => {
                   const isSkipped = feature.tags.includes('@skip');
                   const isFeatureExpanded = expandedFeatures.has(feature.name);
                   const stats = getFeatureStats(feature);
+                  const featureClasses = [
+                    'specs-feature__item',
+                    selectedFeature === feature.name && 'specs-feature__item--selected',
+                    isSkipped && 'specs-feature__item--skipped'
+                  ].filter(Boolean).join(' ');
                   
                   return (
                     <div key={feature.name}>
-                      <div 
-                        style={featureItemStyle(selectedFeature === feature.name, isSkipped)}
-                        onClick={() => { toggleFeature(feature.name); setSelectedFeature(feature.name); }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: '0.85rem', fontWeight: fontWeight.medium }}>
-                            {isFeatureExpanded ? '▼' : '▶'} {feature.name.replace(/\s*\(US-\d+\)/, '')}
+                      <div className={featureClasses} onClick={() => { toggleFeature(feature.name); setSelectedFeature(feature.name); }}>
+                        <span className="specs-feature__name">
+                          {isFeatureExpanded ? '▼' : '▶'} {feature.name.replace(/\s*\(US-\d+\)/, '')}
+                        </span>
+                        {isSkipped ? (
+                          <span className={getBadgeClass('skipped')}>skip</span>
+                        ) : (
+                          <span className={getBadgeClass(stats.passed === stats.total ? 'passed' : 'pending')}>
+                            {stats.passed}/{stats.total}
                           </span>
-                          {isSkipped ? (
-                            <span style={badgeStyle('skipped')}>skip</span>
-                          ) : (
-                            <span style={badgeStyle(stats.passed === stats.total ? 'passed' : 'pending')}>
-                              {stats.passed}/{stats.total}
-                            </span>
-                          )}
-                        </div>
+                        )}
                       </div>
                       
                       {isFeatureExpanded && feature.scenarios.map((scenario) => {
                         const result = getTestResult(scenario.name);
                         const status = isSkipped ? 'skipped' : (result?.status === 'passed' ? 'passed' : 'pending');
                         return (
-                          <div 
-                            key={scenario.name}
-                            style={{ ...scenarioItemStyle, paddingLeft: '2.5rem' }}
-                            onClick={() => setSelectedFeature(feature.name)}
-                          >
-                            <span style={badgeStyle(status)}>
-                              {status === 'passed' ? '✓' : '○'}
-                            </span>
-                            <span style={{ marginLeft: '0.5rem', color: colors.textSecondary }}>
-                              {scenario.name}
-                            </span>
+                          <div key={scenario.name} className="specs-scenario__item" onClick={() => setSelectedFeature(feature.name)}>
+                            <span className={getBadgeClass(status)}>{status === 'passed' ? '✓' : '○'}</span>
+                            <span className="specs-scenario__name">{scenario.name}</span>
                           </div>
                         );
                       })}
@@ -287,17 +185,12 @@ export function SpecsPage() {
           })}
         </nav>
 
-        {/* Right Content Panel */}
-        <section style={contentPanelStyle}>
+        <section className="specs-page__content">
           {selectedFeatureData ? (
             <>
-              <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', color: colors.primary }}>
-                {selectedFeatureData.name}
-              </h1>
+              <h1 className="specs-page__feature-title">{selectedFeatureData.name}</h1>
               {selectedFeatureData.description && (
-                <p style={{ color: colors.textSecondary, fontSize: '0.9rem', margin: '0 0 1.5rem 0', whiteSpace: 'pre-line', lineHeight: 1.5 }}>
-                  {selectedFeatureData.description}
-                </p>
+                <p className="specs-page__feature-desc">{selectedFeatureData.description}</p>
               )}
 
               {selectedFeatureData.scenarios.map((scenario, sIdx) => {
@@ -305,10 +198,10 @@ export function SpecsPage() {
                 const status = selectedFeatureData.tags.includes('@skip') ? 'skipped' 
                   : (result?.status === 'passed' ? 'passed' : 'pending');
                 return (
-                  <div key={sIdx} style={{ marginBottom: '1.5rem', padding: '1rem', background: colors.softNeutralBg, borderRadius: borderRadius.small }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                      <strong style={{ color: colors.primary }}>{scenario.name}</strong>
-                      <span style={badgeStyle(status)}>
+                  <div key={sIdx} className="specs-scenario__card">
+                    <div className="specs-scenario__header">
+                      <strong className="specs-scenario__title">{scenario.name}</strong>
+                      <span className={getBadgeClass(status)}>
                         {status === 'passed' ? '✓ passed' : status === 'skipped' ? '○ skipped' : '○ pending'}
                         {result && ` ${result.duration.toFixed(0)}ms`}
                       </span>
@@ -318,8 +211,8 @@ export function SpecsPage() {
                       const keyword = match?.[1] ?? '';
                       const text = match?.[2] ?? step;
                       return (
-                        <div key={stepIdx} style={stepStyle}>
-                          <span style={{ color: colors.success, fontWeight: fontWeight.medium, marginRight: '0.5rem' }}>{keyword}</span>
+                        <div key={stepIdx} className="specs-step">
+                          <span className="specs-step__keyword">{keyword}</span>
                           {text}
                         </div>
                       );
@@ -329,7 +222,7 @@ export function SpecsPage() {
               })}
             </>
           ) : (
-            <p style={{ color: colors.textSecondary }}>Select a feature to view its details.</p>
+            <p className="specs-page__empty">Select a feature to view its details.</p>
           )}
         </section>
       </main>

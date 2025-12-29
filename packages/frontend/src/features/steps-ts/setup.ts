@@ -1,6 +1,13 @@
 /**
- * Cucumber setup - jsdom environment for React rendering
- * Each scenario gets isolated InMemoryStore for test independence
+ * Cucumber Test Setup
+ * 
+ * Provides:
+ * - JSDOM environment for React rendering
+ * - TestWorld class with rendering helpers
+ * - Before/After hooks for test isolation
+ * - InMemoryStore adapter for each scenario
+ * 
+ * @module setup
  */
 
 import { setWorldConstructor, World, Before, After } from '@cucumber/cucumber';
@@ -8,7 +15,7 @@ import { JSDOM } from 'jsdom';
 import { InMemoryStore, setAdapter } from 'simplestore';
 import { render, cleanup, fireEvent, waitFor, RenderResult } from '@testing-library/react';
 import { createElement } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 // Setup jsdom
 const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></html>', {
@@ -26,6 +33,9 @@ Object.assign(global, {
   Node: dom.window.Node,
   Text: dom.window.Text,
   DocumentFragment: dom.window.DocumentFragment,
+  KeyboardEvent: dom.window.KeyboardEvent,
+  MouseEvent: dom.window.MouseEvent,
+  Event: dom.window.Event,
 });
 
 // Mock matchMedia
@@ -43,6 +53,27 @@ Object.defineProperty(global.window, 'matchMedia', {
   }),
 });
 
+// Mock fetch to handle relative URLs in JSDOM environment
+const originalFetch = global.fetch;
+global.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  let url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+  
+  // Convert relative URLs to absolute for JSDOM
+  if (url.startsWith('/')) {
+    url = `http://localhost:3000${url}`;
+  }
+  
+  // Return mock response for API calls to avoid actual network requests
+  if (url.includes('/api/')) {
+    return new Response(JSON.stringify({ items: [], tasks: [] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  
+  return originalFetch(url, init);
+};
+
 
 /**
  * Custom World for Cucumber tests with React rendering
@@ -55,17 +86,24 @@ export class TestWorld extends World {
     return this._renderResult?.container;
   }
 
-  async renderApp(): Promise<void> {
+  async renderApp(initialPath = '/'): Promise<void> {
     const { default: App } = await import('../../App');
     const { AuthProvider } = await import('../../services/auth');
+    const { TasksPage } = await import('../../pages/TasksPage');
+    const { Routes, Route } = await import('react-router-dom');
     
     const element = createElement(
-      BrowserRouter,
-      null,
+      MemoryRouter,
+      { initialEntries: [initialPath] },
       createElement(
         AuthProvider,
         null,
-        createElement(App)
+        createElement(
+          Routes,
+          null,
+          createElement(Route, { path: '/', element: createElement(App) }),
+          createElement(Route, { path: '/tasks', element: createElement(TasksPage) })
+        )
       )
     );
     
@@ -78,11 +116,25 @@ export class TestWorld extends World {
 
   type(element: Element, text: string): void {
     const input = element as HTMLInputElement;
-    // Clear existing value first
-    input.value = '';
-    fireEvent.change(element, { target: { value: text } });
-    // Also dispatch input event for React controlled components
-    fireEvent.input(element, { target: { value: text } });
+    // Set value directly and trigger change for React controlled components
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype, 'value'
+    )?.set;
+    const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype, 'value'
+    )?.set;
+    
+    if (element.tagName === 'TEXTAREA' && nativeTextAreaValueSetter) {
+      nativeTextAreaValueSetter.call(element, text);
+    } else if (nativeInputValueSetter) {
+      nativeInputValueSetter.call(element, text);
+    } else {
+      input.value = text;
+    }
+    
+    // Pass target.value for React controlled components
+    fireEvent.input(element, { target: { value: text }, bubbles: true });
+    fireEvent.change(element, { target: { value: text }, bubbles: true });
   }
 
   async waitFor<T>(callback: () => T): Promise<T> {

@@ -1,12 +1,12 @@
 import { useEffect, useCallback } from 'react';
 
-import { useUIStore, type Notification as NotificationType } from '../../features';
+import { useUIStore, type NotificationItem } from '../../features';
 
 interface NotificationItemProps {
-  notification: NotificationType;
+  notification: NotificationItem;
 }
 
-function NotificationItem({ notification }: NotificationItemProps) {
+function NotificationToast({ notification }: NotificationItemProps) {
   const { removeNotification } = useUIStore();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function NotificationContainer() {
   return (
     <div className="notification-container">
       {notifications.map(n => (
-        <NotificationItem key={n.id} notification={n} />
+        <NotificationToast key={n.id} notification={n} />
       ))}
     </div>
   );

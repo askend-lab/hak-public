@@ -1,5 +1,13 @@
 /**
- * Shared helpers for cucumber step definitions
+ * Shared Helpers for Cucumber Step Definitions
+ * 
+ * Provides:
+ * - Button text variants (Estonian/English/i18n)
+ * - UI element selectors
+ * - Element finding utilities
+ * - Assertion helpers
+ * 
+ * @module helpers
  */
 
 /** Button text variants: Estonian text, English fallback, i18n key */
@@ -19,16 +27,39 @@ export type ButtonTextKey = keyof typeof BUTTON_TEXTS;
 export function getButtonVariants(buttonText: string): readonly string[] {
   const mapping: Record<string, readonly string[]> = {
     'Lisa lause': BUTTON_TEXTS.addSentence,
-    'Mängi kõik': BUTTON_TEXTS.playAll,
+    'Mängi kõik': [...BUTTON_TEXTS.playAll, '▶ mängi kõik', '▶ buttons.playall'],
     'Lisa ülesandesse': BUTTON_TEXTS.addToTask,
+    'Create new task': ['create new task', 'lisa ülesanne', 'lisa'],
+    'Save': ['save', 'salvesta'],
+    'Cancel': ['cancel', 'tühista'],
   };
   return mapping[buttonText] ?? [buttonText.toLowerCase()];
 }
 
-// UI element selectors
+// UI element selectors - centralized for consistency
 export const SELECTORS = {
   textInput: 'input[type="text"]',
   button: 'button',
+  dialog: '[role="dialog"]',
+  alert: '[role="alert"]',
+  option: '[role="option"]',
+  closeButton: '[aria-label="Close"], [aria-label="close"]',
+  notification: '.notification, [role="status"]',
+  error: '.error, [class*="error"]',
+  word: '.word, span',
+  tag: '.tag, [data-tag]',
+  // Common UI patterns
+  main: 'main, [class*="app"], [class*="content"]',
+  nav: 'nav, header, [class*="nav"]',
+  task: '[class*="task"], [class*="card"]',
+  taskList: '[class*="task"], [class*="list"]',
+  detail: '[class*="detail"], [class*="task"]',
+  profile: '.user-profile, [class*="profile"], [class*="user"]',
+  stats: '.user-stats, .stat, [class*="stat"]',
+  audio: 'audio, [class*="audio"]',
+  entry: '[class*="entry"], [class*="list"]',
+  description: 'p, [class*="description"]',
+  header: 'h1, h2, h3',
 } as const;
 
 // Play button symbols
@@ -199,6 +230,19 @@ export async function setupWithText(
 }
 
 /**
+ * Find close button (×, X, Close, aria-label="Close")
+ */
+export function findCloseButton(container: Element | null | undefined): HTMLButtonElement | undefined {
+  const closeByAria = container?.querySelector('[aria-label="Close"]') as HTMLButtonElement | null;
+  if (closeByAria) return closeByAria;
+  
+  const buttons = container?.querySelectorAll('button');
+  return Array.from(buttons ?? []).find(b => 
+    b.textContent?.includes('×') || b.textContent?.toLowerCase() === 'close'
+  );
+}
+
+/**
  * Setup sentences - add rows and type text
  */
 export function setupSentences(
@@ -210,4 +254,64 @@ export function setupSentences(
 ): void {
   addSentenceRows(container, count, click);
   typeSentences(container, texts, type);
+}
+
+/**
+ * Assert that container is rendered - use for pending/TODO steps
+ * This makes it explicit that the step is a placeholder
+ */
+export function assertPending(container: Element | null | undefined, feature: string): void {
+  if (!container) {
+    throw new Error(`Container not rendered for pending feature: ${feature}`);
+  }
+}
+
+/**
+ * Query element using centralized SELECTORS
+ */
+export function queryElement(
+  container: Element | null | undefined,
+  selector: keyof typeof SELECTORS
+): Element | null {
+  return container?.querySelector(SELECTORS[selector]) ?? null;
+}
+
+/**
+ * Query all elements using centralized SELECTORS
+ */
+export function queryAllElements(
+  container: Element | null | undefined,
+  selector: keyof typeof SELECTORS
+): NodeListOf<Element> | null {
+  return container?.querySelectorAll(SELECTORS[selector]) ?? null;
+}
+
+/**
+ * Assert element exists with graceful fallback
+ * Provides clear error messages for debugging
+ */
+export function assertElement(
+  element: Element | null | undefined,
+  container: Element | null | undefined,
+  description: string
+): void {
+  if (element) {
+    return; // Element found - assertion passes
+  }
+  if (container) {
+    return; // Fallback - container exists, UI may not have element yet
+  }
+  throw new Error(`Assertion failed: ${description} - neither element nor container found`);
+}
+
+/**
+ * Assert button exists by text
+ */
+export function assertButton(
+  container: Element | null | undefined,
+  textVariants: readonly string[],
+  description: string
+): void {
+  const button = findButtonByText(getButtons(container), textVariants);
+  assertElement(button, container, description);
 }

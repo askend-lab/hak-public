@@ -21,11 +21,11 @@ const getEnvVar = (key: string): string | undefined => {
 
 const PROD_CONFIG = {
   baseUrl: getEnvVar('VITE_API_BASE_URL') ?? '/api',
-  vabamorfUrl: 'https://ibgaeez4mm.eu-west-1.awsapprunner.com/analyze',
-  merlinUrl: 'https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize',
+  vabamorfUrl: getEnvVar('VITE_VABAMORF_URL') ?? 'https://ibgaeez4mm.eu-west-1.awsapprunner.com/analyze',
+  merlinUrl: getEnvVar('VITE_MERLIN_URL') ?? 'https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize',
   cacheUrl: `${getEnvVar('VITE_API_BASE_URL') ?? ''}/audio-cache`,
-  audioApiUrl: 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/dev/generate',
-  audioBucketUrl: 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
+  audioApiUrl: getEnvVar('VITE_AUDIO_API_URL') ?? 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/dev/generate',
+  audioBucketUrl: getEnvVar('VITE_AUDIO_BUCKET_URL') ?? 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
 } as const;
 
 export const API_CONFIG = isProd ? PROD_CONFIG : DEV_CONFIG;

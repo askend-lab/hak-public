@@ -5,16 +5,17 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'node:assert';
 
+import { findCloseButton, getFirstInput } from './helpers';
 import type { TestWorld } from './setup';
 
 // US-024: View phonetic guide
 Given('I am viewing the synthesis page', async function (this: TestWorld) {
   await this.renderApp();
-  // Enter text to trigger phonetic display
-  const input = this.container?.querySelector('input[type="text"], textarea') as HTMLInputElement;
-  if (input) this.type(input, 'tere');
+  const input = getFirstInput(this.container);
+  this.type(input, 'tere');
   await this.waitFor(() => {
-    assert.ok(this.container, 'Synthesis page should be rendered');
+    const inputs = this.container?.querySelectorAll('input');
+    assert.ok(inputs && inputs.length > 0, 'Synthesis page should be rendered');
   });
 });
 
@@ -103,14 +104,8 @@ Given('the phonetic guide modal is open', async function (this: TestWorld) {
 });
 
 When('I click the close button', async function (this: TestWorld) {
-  const closeButton = this.container?.querySelector('[aria-label="Close"]') as HTMLButtonElement;
-  if (closeButton) {
-    this.click(closeButton);
-  } else {
-    const buttons = this.container?.querySelectorAll('button');
-    const close = Array.from(buttons ?? []).find(b => b.textContent?.includes('×'));
-    if (close) this.click(close);
-  }
+  const closeButton = findCloseButton(this.container);
+  if (closeButton) this.click(closeButton);
 });
 
 Then('the modal closes', async function (this: TestWorld) {
@@ -121,6 +116,8 @@ Then('the modal closes', async function (this: TestWorld) {
 });
 
 Then('I return to the main synthesis view', async function (this: TestWorld) {
-  const input = this.container?.querySelector('input[type="text"], textarea');
-  assert.ok(input, 'Should see main synthesis view with input');
+  await this.waitFor(() => {
+    const input = getFirstInput(this.container);
+    assert.ok(input, 'Should see main synthesis view with input');
+  });
 });

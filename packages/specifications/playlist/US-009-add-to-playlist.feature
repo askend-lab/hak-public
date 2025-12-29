@@ -1,3 +1,4 @@
+@playlist @US-009
 Feature: Add sentence to synthesis list (US-009)
   As a language learner
   I want to add multiple sentence rows to the synthesis page
