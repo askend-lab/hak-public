@@ -1,4 +1,6 @@
-import { handler, createStore } from '../src/handler';
+import { handler } from '../src/lambda/handler';
+import { Store } from '../src/core/store';
+import { InMemoryAdapter } from '../src/adapters/memory';
 
 import {
   createEvent,
@@ -9,9 +11,10 @@ import {
 } from './setup';
 
 describe('Lambda Handler', () => {
-  describe('createStore factory', () => {
-    it('should create store with user context', () => {
-      const store = createStore('user123');
+  describe('Store factory', () => {
+    it('should create store with adapter and context', () => {
+      const adapter = new InMemoryAdapter();
+      const store = new Store(adapter, { app: 'test', tenant: 'test', env: 'dev', userId: 'user123' });
       expect(store).toBeDefined();
     });
   });

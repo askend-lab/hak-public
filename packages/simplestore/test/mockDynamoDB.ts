@@ -1,7 +1,6 @@
-import { DynamoDBClient } from '../src/store';
-import { StoreItem } from '../src/types';
+import { StorageAdapter, StoreItem } from '../src/core/types';
 
-export class InMemoryDynamoDB implements DynamoDBClient {
+export class InMemoryDynamoDB implements StorageAdapter {
   private readonly items = new Map<string, StoreItem>();
 
   private makeKey(pk: string, sk: string): string {

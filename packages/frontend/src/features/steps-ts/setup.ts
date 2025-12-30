@@ -12,7 +12,7 @@
 
 import { setWorldConstructor, World, Before, After } from '@cucumber/cucumber';
 import { JSDOM } from 'jsdom';
-import { InMemoryStore, setAdapter } from 'simplestore';
+import { InMemoryAdapter, setAdapter } from 'simplestore';
 import { render, cleanup, fireEvent, waitFor, RenderResult } from '@testing-library/react';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -146,7 +146,7 @@ setWorldConstructor(TestWorld);
 
 // Setup isolated InMemoryStore before each scenario
 Before(async function (): Promise<void> {
-  setAdapter(new InMemoryStore());
+  setAdapter(new InMemoryAdapter());
   // Clear auth storage to ensure tests start unauthenticated
   const { AuthStorage } = await import('../../services/auth/storage');
   AuthStorage.clear();

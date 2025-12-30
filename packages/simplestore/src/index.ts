@@ -1,28 +1,45 @@
 /**
- * Single Table Lambda - Universal Backend
- * @module single-table-lambda
+ * SimpleStore - Universal Key-Value Backend
+ * 
+ * Clean Architecture:
+ * - core/     Pure business logic, no external dependencies
+ * - adapters/ Storage implementations (DynamoDB, Memory)
+ * - lambda/   Thin HTTP layer for AWS Lambda
  */
 
-// Core store functionality
-export { Store, ERRORS } from './store';
-export type { DynamoDBClient } from './store';
-export { DynamoDBAdapter } from './dynamoClient';
-export { InMemoryStore } from './inMemoryAdapter';
+// Core - pure business logic (use this for library usage)
+export { 
+  Store, 
+  ERRORS,
+  buildKeys,
+  buildPartitionKey,
+  buildSortKey,
+  validateStoreRequest,
+  validateGetRequest,
+  validateQueryRequest,
+  validateServerContext,
+  parseTtl,
+  isValidType,
+  getValidTypes
+} from './core';
 
-// Lambda handler
-export { handler, createStore, setAdapter, getAdapter } from './handler';
+export type { 
+  DataType, 
+  ServerContext, 
+  StoreRequest, 
+  StoreItem, 
+  StoreResult,
+  StoreConfig,
+  StorageAdapter,
+  ValidationResult,
+  TtlResult
+} from './core';
 
-// Key building utilities
-export { buildKeys, buildPartitionKey, buildSortKey, parseTtl } from './keyBuilder';
-export type { KeyPair, TtlResult } from './keyBuilder';
+// Adapters - storage implementations
+export { InMemoryAdapter, DynamoDBAdapter } from './adapters';
 
-// Validation
-export { validateStoreRequest, validateGetRequest, validateQueryRequest } from './validation';
-export type { ValidationResult } from './validation';
+// Lambda - HTTP layer (use this for AWS Lambda deployment)
+export { handler, setAdapter, handleSave, handleGet, handleDelete, handleQuery, createResponse, HTTP_STATUS, HTTP_ERRORS } from './lambda';
 
-// Configuration
-export { config, loadConfig } from './config';
-export type { Config } from './config';
-
-// Types
-export type { DataType, ServerContext, StoreRequest, StoreItem, StoreResult } from './types';
+// Legacy exports for backward compatibility (deprecated)
+export { Store as default } from './core';

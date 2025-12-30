@@ -1,22 +1,24 @@
+/**
+ * AWS DynamoDB storage adapter
+ */
+
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 
-import { config } from './config';
-import { DynamoDBClient as StoreDynamoDBClient } from './store';
-import { StoreItem } from './types';
+import { StorageAdapter, StoreItem } from '../core/types';
 
 /**
- * AWS DynamoDB adapter implementing the StoreDynamoDBClient interface
+ * AWS DynamoDB adapter implementing StorageAdapter interface
  * Provides actual DynamoDB operations for production use
  */
-export class DynamoDBAdapter implements StoreDynamoDBClient {
+export class DynamoDBAdapter implements StorageAdapter {
   private readonly docClient: DynamoDBDocumentClient;
   private readonly tableName: string;
 
-  constructor(client?: DynamoDBClient) {
+  constructor(tableName: string, client?: DynamoDBClient) {
     const dynamoClient = client ?? new DynamoDBClient({});
     this.docClient = DynamoDBDocumentClient.from(dynamoClient);
-    this.tableName = config.tableName;
+    this.tableName = tableName;
   }
 
   /**

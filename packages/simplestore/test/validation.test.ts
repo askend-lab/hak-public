@@ -1,4 +1,4 @@
-import { validateStoreRequest, validateGetRequest, validateQueryRequest } from '../src/validation';
+import { validateStoreRequest, validateGetRequest, validateQueryRequest } from '../src/core/validation';
 
 describe('Validation', () => {
   describe('validateStoreRequest', () => {

@@ -1,7 +1,15 @@
 /**
- * Data access type determining visibility and access rules
+ * Core types for SimpleStore - no external dependencies
  */
-export type DataType = 'public' | 'shared' | 'private';
+
+/**
+ * Data access type determining visibility and access rules
+ * - private: only owner sees and modifies
+ * - unlisted: owner modifies, anyone with key can read
+ * - public: everyone sees/searches, owner modifies
+ * - shared: everyone sees, everyone can modify
+ */
+export type DataType = 'private' | 'unlisted' | 'public' | 'shared';
 
 /**
  * Server-side context extracted from authentication and configuration
@@ -46,4 +54,22 @@ export interface StoreResult {
   readonly item?: StoreItem;
   readonly items?: StoreItem[];
   readonly error?: string;
+}
+
+/**
+ * Configuration for SimpleStore
+ */
+export interface StoreConfig {
+  readonly maxTtlSeconds: number;
+  readonly keyDelimiter: string;
+}
+
+/**
+ * Storage adapter interface - dependency injection point
+ */
+export interface StorageAdapter {
+  put(item: StoreItem): Promise<void>;
+  get(pk: string, sk: string): Promise<StoreItem | null>;
+  delete(pk: string, sk: string): Promise<void>;
+  queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]>;
 }

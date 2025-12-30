@@ -1,5 +1,12 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
+// Set test environment variables
+process.env.APP_NAME = 'test-app';
+process.env.TENANT = 'test-tenant';
+process.env.ENVIRONMENT = 'test';
+process.env.TABLE_NAME = 'test-table';
+process.env.IS_OFFLINE = 'true';
+
 export const mockContext: Context = {
   callbackWaitsForEmptyEventLoop: false,
   functionName: 'test',

@@ -1,11 +1,14 @@
-import { DynamoDBClient } from './store';
-import { StoreItem } from './types';
+/**
+ * In-memory storage adapter for testing
+ */
+
+import { StorageAdapter, StoreItem } from '../core/types';
 
 /**
- * In-memory store implementing DynamoDBClient interface
+ * In-memory store implementing StorageAdapter interface
  * For testing without AWS dependencies - provides test isolation
  */
-export class InMemoryStore implements DynamoDBClient {
+export class InMemoryAdapter implements StorageAdapter {
   private readonly data: Map<string, StoreItem> = new Map();
 
   private buildKey(pk: string, sk: string): string {

@@ -1,8 +1,8 @@
-import { InMemoryStore } from '../src/inMemoryAdapter';
-import { StoreItem } from '../src/types';
+import { InMemoryAdapter } from '../src/adapters/memory';
+import { StoreItem } from '../src/core/types';
 
-describe('InMemoryStore', () => {
-  let adapter: InMemoryStore;
+describe('InMemoryAdapter', () => {
+  let adapter: InMemoryAdapter;
 
   const createItem = (pk: string, sk: string): StoreItem => ({
     PK: pk,
@@ -15,7 +15,7 @@ describe('InMemoryStore', () => {
   });
 
   beforeEach(() => {
-    adapter = new InMemoryStore();
+    adapter = new InMemoryAdapter();
   });
 
   describe('put', () => {

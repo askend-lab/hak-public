@@ -1,9 +1,9 @@
-import { Store, DynamoDBClient } from '../src/store';
-import { ServerContext, StoreRequest, StoreItem } from '../src/types';
+import { Store } from '../src/core/store';
+import { ServerContext, StoreRequest, StoreItem, StorageAdapter } from '../src/core/types';
 
 import { InMemoryDynamoDB } from './mockDynamoDB';
 
-class FailingDynamoDB implements DynamoDBClient {
+class FailingDynamoDB implements StorageAdapter {
   put(): Promise<void> { throw new Error('DB error'); }
   get(): Promise<StoreItem | null> { throw new Error('DB error'); }
   delete(): Promise<void> { throw new Error('DB error'); }

@@ -125,6 +125,7 @@ hooks:
   test-required:
     mode: error
     active: true
+    tdd: true  # Enable strict TDD enforcement for feat/fix commits
     patterns:
       - '*.test.js'
       - '*.spec.js'
