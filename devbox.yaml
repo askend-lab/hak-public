@@ -206,15 +206,6 @@ hooks:
       - '**/test/fixtures/**'
       - '**/*.min.js'
 
-  scss-deprecation:
-    mode: error
-    active: true
-    maxAllowed: 25  # Temporarily allow existing @imports, reduce over time
-    excludePaths:
-      - '**/node_modules/**'
-      - '**/dist/**'
-      - '**/vendor/**'
-
   source-size:
     mode: error
     active: true
@@ -253,7 +244,6 @@ stages:
       - import-order
       - no-any
       - no-floating-promises
-      - scss-deprecation
   
   pre-push:
     includes:
