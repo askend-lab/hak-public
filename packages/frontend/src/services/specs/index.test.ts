@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { loadCucumberResults, getFeatures, parseCucumberResults } from './index';
+import { loadCucumberResults, loadTestResults, getFeatures, getFeatureGroups, findGherkinTests, parseCucumberResults } from './index';
 
 describe('specs service', () => {
   beforeEach(() => {
@@ -102,6 +102,52 @@ describe('specs service', () => {
     it('returns empty array for empty results', () => {
       const suites = parseCucumberResults([]);
       expect(suites).toHaveLength(0);
+    });
+
+    it('handles steps without duration', () => {
+      const mockResults = [{
+        keyword: 'Feature',
+        name: 'Test Feature',
+        elements: [{
+          keyword: 'Scenario',
+          name: 'Test scenario',
+          steps: [
+            { keyword: 'Given', name: 'step 1', result: { status: 'passed' } },
+          ]
+        }]
+      }];
+
+      const suites = parseCucumberResults(mockResults);
+      expect(suites[0]?.tests[0]?.duration).toBe(0);
+    });
+  });
+
+  describe('loadTestResults', () => {
+    it('returns null (deprecated)', async () => {
+      const result = await loadTestResults();
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getFeatureGroups', () => {
+    it('returns feature groups object', () => {
+      const groups = getFeatureGroups();
+      expect(groups).toBeDefined();
+      expect(typeof groups).toBe('object');
+    });
+  });
+
+  describe('findGherkinTests', () => {
+    it('returns empty array (deprecated)', () => {
+      const mockResults = {
+        numTotalTests: 0,
+        numPassedTests: 0,
+        numFailedTests: 0,
+        numPendingTests: 0,
+        testResults: [],
+      };
+      const result = findGherkinTests(mockResults);
+      expect(result).toEqual([]);
     });
   });
 });

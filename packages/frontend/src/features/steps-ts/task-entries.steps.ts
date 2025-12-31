@@ -46,6 +46,24 @@ Then('I see an option to create new task', async function (this: TestWorld) {
   assert.ok(createOption ?? this.container, 'Create new task option should be visible');
 });
 
+// Modal search functionality (prototype alignment)
+
+Then('I see a search input in the dialog', async function (this: TestWorld) {
+  await this.waitFor(() => {
+    const dialog = this.container?.querySelector('[role="dialog"], .modal');
+    assert.ok(dialog, 'Dialog should be visible');
+    const searchInput = dialog?.querySelector('input[type="text"], input[type="search"], .task-select__search');
+    assert.ok(searchInput, 'Search input should be visible in the dialog');
+  });
+});
+
+Then('the search input has placeholder {string}', async function (this: TestWorld, placeholder: string) {
+  const dialog = this.container?.querySelector('[role="dialog"], .modal');
+  const searchInput = dialog?.querySelector('input[type="text"], input[type="search"], .task-select__search') as HTMLInputElement;
+  assert.ok(searchInput, 'Search input should exist');
+  assert.strictEqual(searchInput.placeholder, placeholder, `Search input should have placeholder "${placeholder}"`);
+});
+
 // US-021: Add playlist entries to task
 
 Given('I have entries in playlist', async function (this: TestWorld) {

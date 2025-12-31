@@ -15,7 +15,7 @@ export async function getCachedAudio(hash: string): Promise<AudioCacheEntry | nu
     return await httpGet<AudioCacheEntry>(`${API_CONFIG.cacheUrl}/${hash}`);
   } catch (error) {
     if (error instanceof HttpError && error.status === HTTP_NOT_FOUND) return null;
-    console.error('Cache lookup failed:', error);
+    // Cache lookup failed - silently return null
     return null;
   }
 }

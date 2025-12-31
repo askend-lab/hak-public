@@ -123,4 +123,61 @@ describe('useSentences', () => {
       expect(result.current.loadingIndex).toBeNull();
     });
   });
+
+  describe('removeSentence', () => {
+    it('should remove sentence at index', () => {
+      const { result } = renderHook(() => useSentences(['Hello', 'World', 'Test']));
+      act(() => {
+        result.current.removeSentence(1);
+      });
+      expect(result.current.sentences).toStrictEqual(['Hello', 'Test']);
+    });
+
+    it('should reset to empty string when removing last sentence', () => {
+      const { result } = renderHook(() => useSentences(['Only']));
+      act(() => {
+        result.current.removeSentence(0);
+      });
+      expect(result.current.sentences).toStrictEqual(['']);
+    });
+  });
+
+  describe('stopAll', () => {
+    it('should stop playing and reset audio', () => {
+      const { result } = renderHook(() => useSentences(['Hello']));
+      
+      const mockAudioElement = { 
+        pause: vi.fn(), 
+        currentTime: 10,
+        src: 'test'
+      } as unknown as HTMLAudioElement;
+      result.current.audioRef.current = mockAudioElement;
+      
+      act(() => {
+        result.current.stopAll();
+      });
+
+      expect(result.current.isPlayingAll).toBe(false);
+      expect(mockAudioElement.pause).toHaveBeenCalled();
+      expect(mockAudioElement.currentTime).toBe(0);
+    });
+
+    it('should handle missing audio ref', () => {
+      const { result } = renderHook(() => useSentences(['Hello']));
+      
+      act(() => {
+        result.current.stopAll();
+      });
+
+      expect(result.current.isPlayingAll).toBe(false);
+    });
+  });
+
+  describe('isPlayingAll state', () => {
+    it('should have isPlayingAll initially false', () => {
+      const { result } = renderHook(() => useSentences(['Hello']));
+      expect(result.current.isPlayingAll).toBe(false);
+    });
+  });
+
 });

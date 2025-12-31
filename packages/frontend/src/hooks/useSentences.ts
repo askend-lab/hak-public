@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 
+import { logger } from '../core'
 import { synthesizeText } from '../services/audio'
 
 interface UseSentencesReturn {
@@ -54,7 +55,7 @@ export function useSentences(initialSentences: string[] = ['']): UseSentencesRet
         void audioRef.current.play()
       }
     } catch (error) {
-      console.error('Synthesis failed:', error)
+      logger.error('Synthesis failed:', error)
     } finally {
       setLoadingIndex(null)
     }
@@ -80,7 +81,7 @@ export function useSentences(initialSentences: string[] = ['']): UseSentencesRet
           });
         }
       } catch (error) {
-        console.error('Synthesis failed:', error);
+        logger.error('Synthesis failed:', error);
       }
     }
     setIsPlayingAll(false);

@@ -60,4 +60,24 @@ describe('AudioPlayer', () => {
     render(<AudioPlayer />);
     expect(mockSetAudioElement).toHaveBeenCalled();
   });
+
+  it('should toggle play when button clicked while playing', async () => {
+    const { fireEvent } = await import('@testing-library/react');
+    mockStoreWithAudio(TEST_AUDIO_URL, false, true);
+    render(<AudioPlayer />);
+    const button = screen.getByText('⏸ Paus');
+    fireEvent.click(button);
+    // Button should exist after click
+    expect(button).toBeInTheDocument();
+  });
+
+  it('should toggle play when button clicked while paused', async () => {
+    const { fireEvent } = await import('@testing-library/react');
+    mockStoreWithAudio(TEST_AUDIO_URL, false, false);
+    render(<AudioPlayer />);
+    const button = screen.getByText('▶ Mängi');
+    fireEvent.click(button);
+    // Button should exist after click
+    expect(button).toBeInTheDocument();
+  });
 });

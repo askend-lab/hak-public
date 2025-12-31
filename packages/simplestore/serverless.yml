@@ -31,7 +31,7 @@ provider:
 
 functions:
   api:
-    handler: dist/lambda/handler.handler
+    handler: dist/src/lambda/handler.handler
     events:
       - http:
           path: /save

@@ -53,4 +53,19 @@ describe('Modal', () => {
     render(<Modal {...defaultProps} className="custom-modal" />);
     expect(document.querySelector('.custom-modal')).toBeInTheDocument();
   });
+
+  it('should close on Escape key press', () => {
+    render(<Modal {...defaultProps} />);
+    const overlay = screen.getByText('Test Modal').closest('.modal-overlay')!;
+    fireEvent.keyDown(overlay, { key: 'Escape' });
+    expect(defaultProps.onClose).toHaveBeenCalled();
+  });
+
+  it('should stop propagation on content keydown', () => {
+    render(<Modal {...defaultProps} />);
+    const content = screen.getByRole('dialog');
+    fireEvent.keyDown(content, { key: 'Enter' });
+    // Should not trigger overlay close
+    expect(defaultProps.onClose).not.toHaveBeenCalled();
+  });
 });

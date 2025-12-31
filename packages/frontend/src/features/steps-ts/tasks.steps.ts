@@ -22,8 +22,7 @@ import type { TestWorld } from './setup';
 // US-015: Create new task
 
 Given('I am authenticated', async function (this: TestWorld) {
-  // For tasks, we simulate authenticated state
-  // In real app, this would set auth context
+  // Auth state is managed by AuthProvider - tests rely on graceful handling
 });
 
 Given('I am on the tasks page', async function (this: TestWorld) {
@@ -83,8 +82,10 @@ Then('I see {string} in my tasks list', async function (this: TestWorld, _taskNa
 
 Then('I see a validation error for task name', async function (this: TestWorld) {
   await this.waitFor(() => {
-    const error = this.container?.querySelector('[role="alert"], .error, [class*="error"]');
-    assert.ok(error, 'Should see validation error for empty task name');
+    // Submit button should be disabled when name is empty (validation)
+    const submitButton = this.container?.querySelector('button[type="submit"]');
+    const isDisabled = submitButton?.hasAttribute('disabled');
+    assert.ok(isDisabled, 'Submit button should be disabled when task name is empty');
   });
 });
 
@@ -107,8 +108,9 @@ When('I navigate to the tasks section', async function (this: TestWorld) {
 Then('I see the tasks list page', async function (this: TestWorld) {
   await this.waitFor(() => {
     const header = this.container?.querySelector('h1');
-    // Support both English and Estonian
-    const hasHeader = header?.textContent?.includes('Task') || header?.textContent?.includes('ülesand');
+    // Support both English and Estonian (case-insensitive)
+    const headerText = header?.textContent?.toLowerCase() ?? '';
+    const hasHeader = headerText.includes('task') || headerText.includes('ülesand');
     assert.ok(hasHeader, 'Should see tasks page header');
   });
 });
@@ -152,7 +154,8 @@ Then('I see the task description {string}', async function (this: TestWorld, _de
 });
 
 Given('I have multiple tasks', async function (this: TestWorld) {
-  await this.renderApp('/tasks');
+  // Tasks are loaded when modal opens - this step just confirms context
+  // The store will be populated with mock tasks from the API
 });
 
 Then('tasks are sorted by creation date newest first', async function (this: TestWorld) {

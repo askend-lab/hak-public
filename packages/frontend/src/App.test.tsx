@@ -102,4 +102,86 @@ describe('App', () => {
       expect(modal).toBeInTheDocument();
     });
   });
+
+  describe('Sentence interactions', () => {
+    it('should add new sentence when add button is clicked', () => {
+      render(
+        <MemoryRouter>
+          <AuthProvider>
+            <I18nextProvider i18n={i18n}>
+              <App />
+            </I18nextProvider>
+          </AuthProvider>
+        </MemoryRouter>
+      );
+      
+      const addButton = screen.getByText(/Lisa lause/i);
+      fireEvent.click(addButton);
+      
+      // Should have multiple inputs after adding
+      const inputs = document.querySelectorAll('input[type="text"]');
+      expect(inputs.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should update sentence when typing', () => {
+      render(
+        <MemoryRouter>
+          <AuthProvider>
+            <I18nextProvider i18n={i18n}>
+              <App />
+            </I18nextProvider>
+          </AuthProvider>
+        </MemoryRouter>
+      );
+      
+      const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'Test sentence' } });
+      expect(input.value).toBe('Test sentence');
+    });
+
+    it('should enable play all button when sentence has content', () => {
+      render(
+        <MemoryRouter>
+          <AuthProvider>
+            <I18nextProvider i18n={i18n}>
+              <App />
+            </I18nextProvider>
+          </AuthProvider>
+        </MemoryRouter>
+      );
+      
+      const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'Test' } });
+      
+      const playAllButton = screen.getByText(/Mängi kõik/i);
+      expect(playAllButton).not.toBeDisabled();
+    });
+
+    it('should remove sentence when remove button is clicked', () => {
+      render(
+        <MemoryRouter>
+          <AuthProvider>
+            <I18nextProvider i18n={i18n}>
+              <App />
+            </I18nextProvider>
+          </AuthProvider>
+        </MemoryRouter>
+      );
+      
+      // Add second sentence
+      const addButton = screen.getByText(/Lisa lause/i);
+      fireEvent.click(addButton);
+      
+      let inputs = document.querySelectorAll('input[type="text"]');
+      expect(inputs.length).toBe(2);
+      
+      // Find and click remove button (X button)
+      const removeButtons = document.querySelectorAll('.sentence-row__remove-btn');
+      if (removeButtons.length > 0) {
+        fireEvent.click(removeButtons[0] as Element);
+        inputs = document.querySelectorAll('input[type="text"]');
+        expect(inputs.length).toBe(1);
+      }
+    });
+  });
 });

@@ -45,5 +45,61 @@ describe('audio-api', () => {
         { text: 'test text' }
       );
     });
+
+    it('should poll for audio when status is processing', async () => {
+      mockHttpPost.mockResolvedValueOnce({
+        status: 'processing',
+        hash: 'poll123'
+      });
+
+      // First poll returns 404, second returns 200
+      mockFetch
+        .mockResolvedValueOnce({ ok: false, status: 404 })
+        .mockResolvedValueOnce({ ok: true, status: 200 });
+
+      const resultPromise = synthesizeViaApi('test text');
+      
+      // Advance timers for polling
+      await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(1000);
+
+      const result = await resultPromise;
+      expect(result).toBe('https://bucket.example.com/cache/poll123.mp3');
+    });
+
+    it('should return URL when fetch returns 206 partial content', async () => {
+      mockHttpPost.mockResolvedValueOnce({
+        status: 'processing',
+        hash: 'partial123'
+      });
+
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 206 });
+
+      const resultPromise = synthesizeViaApi('test text');
+      await vi.advanceTimersByTimeAsync(100);
+
+      const result = await resultPromise;
+      expect(result).toBe('https://bucket.example.com/cache/partial123.mp3');
+    });
+
+    it('should continue polling on network error', async () => {
+      mockHttpPost.mockResolvedValueOnce({
+        status: 'processing',
+        hash: 'error123'
+      });
+
+      // First poll throws error, second returns 200
+      mockFetch
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce({ ok: true, status: 200 });
+
+      const resultPromise = synthesizeViaApi('test text');
+      
+      await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(1000);
+
+      const result = await resultPromise;
+      expect(result).toBe('https://bucket.example.com/cache/error123.mp3');
+    });
   });
 });

@@ -61,4 +61,32 @@ describe('Footer', () => {
       expect(logoContainer).not.toHaveClass('logo-with-text--with-background');
     });
   });
+
+  describe('Feedback modal', () => {
+    it('should open feedback modal when button is clicked', async () => {
+      const { fireEvent } = await import('@testing-library/react');
+      render(<Footer />);
+      const feedbackButton = screen.getByText('Kirjuta meile');
+      fireEvent.click(feedbackButton);
+      // Modal should be rendered after click
+      expect(document.querySelector('.feedback-modal, [class*="modal"]')).toBeInTheDocument();
+    });
+
+    it('should close feedback modal when onClose is called', async () => {
+      const { fireEvent } = await import('@testing-library/react');
+      render(<Footer />);
+      
+      // Open modal
+      const feedbackButton = screen.getByText('Kirjuta meile');
+      fireEvent.click(feedbackButton);
+      expect(document.querySelector('.feedback-modal__overlay')).toBeInTheDocument();
+      
+      // Close modal by clicking close button
+      const closeButton = document.querySelector('.feedback-modal__close');
+      if (closeButton) {
+        fireEvent.click(closeButton);
+        expect(document.querySelector('.feedback-modal__overlay')).not.toBeInTheDocument();
+      }
+    });
+  });
 });

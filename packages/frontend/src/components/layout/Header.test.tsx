@@ -167,4 +167,54 @@ describe('Header', () => {
       expect(header).toBeInTheDocument();
     });
   });
+
+  describe('Auth buttons', () => {
+    it('should call login when login button clicked', async () => {
+      const { fireEvent } = await import('@testing-library/react');
+      const mockLogin = vi.fn();
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: false,
+        user: null,
+        login: mockLogin,
+        logout: vi.fn(),
+        refreshSession: vi.fn(),
+        isLoading: false,
+        error: null,
+      });
+      
+      render(
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      );
+      
+      const loginButton = screen.getByText('Logi sisse');
+      fireEvent.click(loginButton);
+      expect(mockLogin).toHaveBeenCalled();
+    });
+
+    it('should call logout when logout button clicked', async () => {
+      const { fireEvent } = await import('@testing-library/react');
+      const mockLogout = vi.fn();
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: true,
+        user: { id: 'user123', email: 'test@example.com' },
+        login: vi.fn(),
+        logout: mockLogout,
+        refreshSession: vi.fn(),
+        isLoading: false,
+        error: null,
+      });
+      
+      render(
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      );
+      
+      const logoutButton = screen.getByText('Logi välja');
+      fireEvent.click(logoutButton);
+      expect(mockLogout).toHaveBeenCalled();
+    });
+  });
 });

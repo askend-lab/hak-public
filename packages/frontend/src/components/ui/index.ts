@@ -1,6 +1,8 @@
 export { NotificationContainer } from './Notification';
 export { Modal } from './Modal';
 export { ConfirmDialog } from './ConfirmDialog';
+export { DropdownMenu, MoreOptionsIcon } from './DropdownMenu';
+export type { DropdownMenuItem } from './DropdownMenu';
 export { Logo } from './Logo';
 export { Button } from './Button';
 export { SocialLink } from './SocialLink';

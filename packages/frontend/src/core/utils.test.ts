@@ -116,17 +116,20 @@ describe('generateUUID', () => {
     expect(uuid1).not.toBe(uuid2);
   });
 
-  it.skip('uses fallback when crypto.randomUUID is not available', () => {
-    // Skipped: jsdom crypto is read-only
-    const originalCrypto = global.crypto;
-    // @ts-expect-error - testing fallback
-    global.crypto = { randomUUID: undefined };
+  it('uses fallback when crypto.randomUUID is not available', () => {
+    const originalRandomUUID = crypto.randomUUID;
+    delete (crypto as { randomUUID?: unknown }).randomUUID;
     
     const uuid = generateUUID();
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     expect(uuid).toMatch(uuidRegex);
     
-    global.crypto = originalCrypto;
+    // Restore
+    Object.defineProperty(crypto, 'randomUUID', {
+      value: originalRandomUUID,
+      writable: true,
+      configurable: true,
+    });
   });
 });
 
