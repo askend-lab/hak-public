@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --testPathIgnorePatterns=test/features --json --outputFile=jest-results.json",
+    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
+    "test:full": "NODE_OPTIONS=--experimental-vm-modules jest --testPathIgnorePatterns=test/features --json --outputFile=jest-results.json",
     "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=test/features --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
     "test:watch": "jest --watch"

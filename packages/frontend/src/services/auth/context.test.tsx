@@ -43,6 +43,7 @@ describe('AuthProvider', () => {
 
   it('should restore user from storage', async () => {
     mockAuthStorage.getUser.mockReturnValue({ id: '1', email: 'stored@test.com' });
+    mockAuthStorage.getAccessToken.mockReturnValue('mock-token');
 
     render(
       <AuthProvider>
@@ -56,7 +57,14 @@ describe('AuthProvider', () => {
     });
   });
 
-  it('should login user', async () => {
+  it('should trigger login redirect', async () => {
+    // Mock window.location
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...originalLocation, href: '' },
+    });
+
     render(
       <AuthProvider>
         <TestComponent />
@@ -71,10 +79,13 @@ describe('AuthProvider', () => {
       screen.getByText('Login').click();
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId('authenticated')).toHaveTextContent('yes');
-       
-      expect(mockAuthStorage.setUser).toHaveBeenCalled();
+    // Login should trigger redirect to OAuth
+    expect(window.location.href).toContain('cognito');
+
+    // Restore
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: originalLocation,
     });
   });
 

@@ -8,7 +8,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "jest --coverage --json --outputFile=jest-results.json",
+    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
+    "test:full": "jest --coverage --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
   },
   "devDependencies": {

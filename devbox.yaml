@@ -9,6 +9,8 @@ project:
 methodology: none
 git_workflow: github-flow  # github-flow | gitflow | trunk-based
 
+# Incremental testing - only runs affected tests (requires module-level opt-in)
+
 # TDD enforcement
 tdd:
   enabled: true
@@ -51,6 +53,7 @@ test_modules:
     type: vitest
     min_coverage_lines: 80
     min_coverage_branches: 70
+    command: "pnpm test"
   - name: cucumber
     path: packages/frontend
     type: cucumber

@@ -6,6 +6,7 @@
     "dx": "node devbox dx",
     "dx:cli": "node devbox",
     "test": "node devbox test",
+    "test:full": "node devbox test --full",
     "test:coverage": "jest --coverage --json --outputFile=tmp/jest-results.json",
     "lint": "eslint --ext .js,.ts,.tsx . --max-warnings=0 && npx gherkin-lint 'packages/specifications/**/*.feature'",
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",

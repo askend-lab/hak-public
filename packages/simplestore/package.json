@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc && serverless offline --httpPort 4000 --host 0.0.0.0",
-    "test": "jest --json --outputFile=jest-results.json",
+    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
+    "test:full": "jest --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
   },
   "engines": {

@@ -1,5 +1,6 @@
-const isProd = import.meta.env.PROD;
-const isDev = import.meta.env.DEV;
+const isProd = typeof import.meta !== 'undefined' && import.meta.env?.PROD || false;
+// eslint-disable-next-line no-restricted-globals
+const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production');
 
 // Cognito configuration for Hosted UI
 // Using centralized askend-lab-users pool with Google login

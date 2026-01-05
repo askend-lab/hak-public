@@ -18,6 +18,9 @@ import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Setup jsdom
+// Mock import.meta.env for Vite compatibility
+(global as unknown as Record<string, unknown>).import = { meta: { env: { PROD: false, DEV: true } } };
+
 const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></html>', {
   url: 'http://localhost:3000',
   pretendToBeVisual: true,
@@ -25,6 +28,8 @@ const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></
 
 // Set globals
 Object.assign(global, {
+  localStorage: dom.window.localStorage,
+  sessionStorage: dom.window.sessionStorage,
   window: dom.window,
   document: dom.window.document,
   navigator: dom.window.navigator,

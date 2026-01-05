@@ -23,7 +23,7 @@ describe('Lambda Handler - Cache Miss', () => {
     await handler(event, ctx.mockS3, ctx.mockSQS);
     
     expect(ctx.mockSQS.messages).toHaveLength(1);
-    const messageBody = JSON.parse(ctx.mockSQS.messages[0].MessageBody!);
+    const messageBody = JSON.parse(ctx.mockSQS.messages[0].MessageBody ?? "{}");
     expect(messageBody.text).toBe('new-phrase');
     expect(messageBody.hash).toBe(hash);
   });
