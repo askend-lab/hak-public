@@ -54,6 +54,7 @@ test_modules:
     min_coverage_lines: 80
     min_coverage_branches: 70
     command: "pnpm test"
+    command_full: "pnpm test:coverage"
   - name: cucumber
     path: packages/frontend
     type: cucumber

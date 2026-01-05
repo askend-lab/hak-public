@@ -52,6 +52,12 @@ Ideas and future work that may be implemented someday.
   
   Generate TypeScript types from translation JSON files for type-safe translation keys.
 
+## DevBox / Agent Workflow
+
+- [ ] **Block multiple branch creation per agent per day**
+  
+  Prevent agents from creating multiple branches and working chaotically. Enforce: cannot start a new branch until the previous one is merged or deleted. This keeps work focused and prevents branch sprawl.
+
 ## Infrastructure
 
 - [ ] **Enable CloudFront after AWS account verification**

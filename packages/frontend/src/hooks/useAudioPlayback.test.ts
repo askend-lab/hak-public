@@ -96,4 +96,63 @@ describe('useAudioPlayback', () => {
     expect(result.current.currentId).toBe('url-id');
     expect(result.current.isPlaying).toBe(true);
   });
+
+  it('should set loading state during play', async () => {
+    const { result } = renderHook(() => useAudioPlayback());
+    
+    await act(async () => {
+      await result.current.play('test text', 'play-id');
+    });
+    
+    expect(mockSynthesizeText).toHaveBeenCalledWith('test text');
+  });
+
+  it('should play sequence with cached urls', async () => {
+    const { result } = renderHook(() => useAudioPlayback());
+    
+    const items = [
+      { id: '1', text: 'text1', cachedUrl: 'http://cached1.mp3' },
+    ];
+    
+    await act(async () => {
+      result.current.playSequence(items);
+    });
+    
+    expect(result.current.isPlayingSequence).toBe(true);
+  });
+
+  it('should play sequence without cached urls', async () => {
+    const { result } = renderHook(() => useAudioPlayback());
+    
+    const items = [
+      { id: '1', text: 'text1' },
+    ];
+    
+    await act(async () => {
+      result.current.playSequence(items);
+    });
+    
+    expect(mockSynthesizeText).toHaveBeenCalledWith('text1');
+  });
+
+  it('should handle playFromUrl without id', async () => {
+    const { result } = renderHook(() => useAudioPlayback());
+    
+    await act(async () => {
+      result.current.playFromUrl('http://test.mp3');
+    });
+    
+    expect(result.current.currentId).toBeNull();
+    expect(result.current.isPlaying).toBe(true);
+  });
+
+  it('should handle play without id', async () => {
+    const { result } = renderHook(() => useAudioPlayback());
+    
+    await act(async () => {
+      await result.current.play('hello');
+    });
+    
+    expect(mockSynthesizeText).toHaveBeenCalledWith('hello');
+  });
 });

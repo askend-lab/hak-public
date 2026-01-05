@@ -28,6 +28,9 @@ export default defineConfig({
     ],
     reporters: ['default', 'json'],
     outputFile: 'jest-results.json',
+    forceRerunTriggers: [
+      '**/vitest.config.*',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['json-summary', 'text', 'lcov'],

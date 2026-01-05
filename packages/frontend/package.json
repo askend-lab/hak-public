@@ -9,7 +9,6 @@
     "preview": "vite preview",
     "test:full": "vitest run",
     "test": "vitest run --changed",
-    "test:watch": "vitest --changed",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:cucumber": "NODE_OPTIONS='--import tsx' cucumber-js --config cucumber.cjs",
