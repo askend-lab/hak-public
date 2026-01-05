@@ -102,8 +102,8 @@ resources:
           Enabled: true
 
     # Use centralized Cognito User Pool (askend-lab-users)
-    # Pool ID: eu-west-1_UoyXFGqR4
-    # Client ID: 9m3i70h5ckgnin8aoujc5qqo3
+    # Pool ID: eu-west-1_wlRtuLkG2
+    # Client ID: 64tf6nf61n6sgftqif6q975hka
     # Domain: askend-lab-auth.auth.eu-west-1.amazoncognito.com
 
     ApiGatewayAuthorizer:
@@ -114,7 +114,7 @@ resources:
         IdentitySource: method.request.header.Authorization
         RestApiId: !Ref ApiGatewayRestApi
         ProviderARNs:
-          - arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_UoyXFGqR4
+          - arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
 
   Outputs:
     ApiEndpoint:
