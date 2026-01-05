@@ -33,8 +33,19 @@ export const AuthStorage = {
   },
 
   clear(): void {
+    // Clear our keys
     localStorage.removeItem(STORAGE_KEYS.USER);
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.ID_TOKEN);
+    
+    // Clear ALL Cognito-related keys (from any client ID)
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('CognitoIdentityServiceProvider')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
   },
 };
