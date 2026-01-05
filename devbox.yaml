@@ -142,7 +142,7 @@ hooks:
   run-typecheck:
     mode: error
     active: true
-    command: 'pnpm exec tsc --noEmit'
+    command: 'pnpm -r exec tsc --noEmit'
 
   test-coverage:
     mode: error
