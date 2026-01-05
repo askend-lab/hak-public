@@ -196,22 +196,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
       
       - name: Install dependencies
-        working-directory: packages/audio-api
-        run: npm ci
+        run: pnpm install
       
       - name: Run tests
-        working-directory: packages/audio-api
-        run: npm test
+        run: pnpm --filter audio-api test
       
       - name: Build TypeScript
-        working-directory: packages/audio-api
-        run: npm run build
+        run: pnpm --filter audio-api build
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -327,104 +335,7 @@ jobs:
           STAGE: ${{ matrix.environment }}
         run: npm run test:e2e
 
-  build-audio-worker:
-    name: Build Audio Worker
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install dependencies
-        working-directory: packages/audio-worker
-        run: npm ci
-      
-      - name: Run tests
-        working-directory: packages/audio-worker
-        run: npm test
-      
-      - name: Build TypeScript
-        working-directory: packages/audio-worker
-        run: npm run build
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: audio-worker-dist
-          path: |
-            packages/audio-worker/dist/
-            packages/audio-worker/package*.json
-            packages/audio-worker/Dockerfile
-          retention-days: 30
-
-  deploy-audio-worker:
-    name: Deploy Audio Worker
-    needs: [build-and-test, build-audio-worker]
-    runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      github.event_name == 'workflow_dispatch'
-    
-    strategy:
-      matrix:
-        include:
-          - environment: dev
-            auto: ${{ github.event_name == 'push' }}
-          - environment: prod
-            auto: false
-    
-    environment: ${{ matrix.environment }}
-    
-    steps:
-      - name: Skip if not triggered
-        if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.environment != matrix.environment) ||
-          (github.event_name == 'push' && !matrix.auto)
-        run: echo "Skipping deployment to ${{ matrix.environment }}" && exit 0
-      
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: audio-worker-dist
-          path: packages/audio-worker/
-      
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
-          aws-region: eu-west-1
-      
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-      
-      - name: Build and push Docker image
-        working-directory: packages/audio-worker
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: askend-lab
-          IMAGE_TAG: audio-worker-${{ matrix.environment }}-${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:audio-worker-${{ matrix.environment }}-latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:audio-worker-${{ matrix.environment }}-latest
-      
-      - name: Update ECS service
-        env:
-          CLUSTER_NAME: hak-${{ matrix.environment }}
-          SERVICE_NAME: audio-worker
-        run: |
-          aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --force-new-deployment || echo "Service not yet created"
-      
-      - name: Deployment summary
-        run: |
-          echo "✅ Deployed Audio Worker to ${{ matrix.environment }}"
+  # build-audio-worker and deploy-audio-worker jobs removed - packages/audio-worker does not exist
 
   deploy-to-aws:
     name: Deploy to AWS
