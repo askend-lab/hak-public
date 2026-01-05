@@ -13,7 +13,7 @@ import { setAuthTokenGetter } from './services/tasks'
 import './i18n'
 import './styles/main.scss'
 
-setAuthTokenGetter(() => AuthStorage.getAccessToken())
+setAuthTokenGetter(() => AuthStorage.getIdToken())
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
