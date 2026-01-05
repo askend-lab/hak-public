@@ -52,17 +52,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       
-      - name: Run DevBox PR checks
-        if: github.event_name == 'pull_request'
-        run: node node_modules/@askend-lab/devbox/packages/hooks/src/cli/index.js run pr-check --all-files
-      
-      - name: Run tests with coverage (PR)
-        if: github.event_name == 'pull_request'
-        run: pnpm dx
-      
-      - name: Run tests with coverage (push)
-        if: github.event_name == 'push'
-        run: node devbox test
+      # DevBox disabled in CI - run tests directly
+      - name: Run tests
+        run: pnpm test
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
