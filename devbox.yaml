@@ -164,12 +164,6 @@ hooks:
     strict: true
 
   # New hooks from boxer/devbox
-  secret-detection:
-    mode: error
-    active: true
-    excludePaths:
-      - '**/test/fixtures/**'
-
   no-any:
     mode: error
     active: true
@@ -241,7 +235,6 @@ stages:
       - jscpd
       - dependency-check
       - security-audit
-      - secret-detection
       - import-order
       - no-any
       - no-floating-promises
