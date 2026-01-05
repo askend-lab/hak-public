@@ -50,7 +50,6 @@ function parseBody(event: APIGatewayProxyEvent): Record<string, unknown> | null 
 }
 
 export async function handleSave(event: APIGatewayProxyEvent, store: Store): Promise<APIGatewayProxyResult> {
-  console.log('Save request body:', event.body);
   const body = parseBody(event);
   if (!body) {
     return createResponse(HTTP_STATUS.BAD_REQUEST, { error: HTTP_ERRORS.INVALID_JSON });
@@ -58,7 +57,6 @@ export async function handleSave(event: APIGatewayProxyEvent, store: Store): Pro
 
   const validation = validateStoreRequest(body as Partial<StoreRequest>);
   if (!validation.valid) {
-    console.log('Validation failed:', validation.errors);
     return createResponse(HTTP_STATUS.BAD_REQUEST, { errors: validation.errors });
   }
 
