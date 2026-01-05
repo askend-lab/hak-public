@@ -69,6 +69,12 @@ export default defineConfig({
         target: 'https://hak-api-dev.askend-lab.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+            proxyReq.removeHeader('Cookie');
+          });
+        },
       },
     },
   },
