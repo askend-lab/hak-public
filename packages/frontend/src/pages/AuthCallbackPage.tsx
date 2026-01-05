@@ -21,10 +21,12 @@ export function AuthCallbackPage() {
     if (accessToken && idToken && handleCallback) {
       handleCallback({ accessToken, idToken, expiresIn: Number(expiresIn) });
       navigate('/', { replace: true });
-    } else if (!accessToken || !idToken) {
+    } else {
       const error = params.get('error');
       const errorDescription = params.get('error_description');
-      console.error('Auth callback error:', error, errorDescription);
+      if (error) {
+        console.error('Auth callback error:', error, errorDescription);
+      }
       navigate('/', { replace: true });
     }
   }, [handleCallback, navigate]);
