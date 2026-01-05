@@ -4,6 +4,24 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-offline
+  - serverless-domain-manager
+
+custom:
+  # Custom domain configuration
+  # Domain: hak-api-{stage}.askend-lab.com (dev) / hak-api.askend-lab.com (prod)
+  domainName:
+    dev: hak-api-dev.askend-lab.com
+    prod: hak-api.askend-lab.com
+  
+  customDomain:
+    domainName: ${self:custom.domainName.${self:provider.stage}}
+    basePath: api
+    stage: ${self:provider.stage}
+    certificateName: '*.askend-lab.com'
+    createRoute53Record: true
+    endpointType: regional
+    securityPolicy: tls_1_2
+    apiType: rest
 
 provider:
   name: aws
