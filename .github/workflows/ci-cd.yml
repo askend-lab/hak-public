@@ -329,6 +329,75 @@ jobs:
 
   # build-audio-worker and deploy-audio-worker jobs removed - packages/audio-worker does not exist
 
+  deploy-simplestore:
+    name: Deploy SimpleStore
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    
+    strategy:
+      matrix:
+        include:
+          - environment: dev
+            auto: ${{ github.event_name == 'push' }}
+          - environment: prod
+            auto: false
+    
+    environment: ${{ matrix.environment }}
+    
+    steps:
+      - name: Skip if not triggered
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.environment != matrix.environment) ||
+          (github.event_name == 'push' && !matrix.auto)
+        run: echo "Skipping deployment to ${{ matrix.environment }}" && exit 0
+      
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Build SimpleStore
+        run: pnpm --filter simplestore build
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Install Serverless Framework
+        run: npm install -g serverless@3
+      
+      - name: Deploy with Serverless
+        working-directory: packages/simplestore
+        run: |
+          serverless deploy --stage ${{ matrix.environment }} --region eu-west-1
+      
+      - name: Deployment summary
+        run: |
+          echo "✅ Deployed SimpleStore to ${{ matrix.environment }}"
+          echo "🌐 API URL: https://hak-api${{ matrix.environment == 'prod' && '' || format('-{0}', matrix.environment) }}.askend-lab.com/api"
+
   deploy-to-aws:
     name: Deploy to AWS
     needs: build-and-test

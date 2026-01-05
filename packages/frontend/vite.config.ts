@@ -61,9 +61,14 @@ export default defineConfig({
         },
       },
       '/api': {
-        target: 'http://localhost:4000',
+        // Local development: use local serverless-offline
+        // target: 'http://localhost:4000',
+        // rewrite: (path) => path.replace(/^\/api/, '/dev'),
+        
+        // Deployed API: use hak-api-dev.askend-lab.com
+        target: 'https://hak-api-dev.askend-lab.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/dev'),
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },
   },
