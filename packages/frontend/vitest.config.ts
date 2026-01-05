@@ -13,6 +13,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    poolOptions: {
+      threads: {
+        isolate: false,
+      },
+    },
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     exclude: [
