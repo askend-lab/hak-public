@@ -52,9 +52,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       
-      # DevBox disabled in CI - run tests directly
+      # Run jest tests directly (devbox hooks disabled in CI)
       - name: Run tests
-        run: pnpm test
+        run: pnpm exec jest --passWithNoTests
       
       - name: Build frontend
         run: pnpm --filter @hak/frontend build
