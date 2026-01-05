@@ -39,7 +39,7 @@ provider:
 
 functions:
   generate:
-    handler: dist/index.handler
+    handler: dist/src/index.handler
     events:
       - http:
           path: /generate
@@ -47,7 +47,7 @@ functions:
           cors: true
 
   health:
-    handler: dist/index.healthHandler
+    handler: dist/src/index.healthHandler
     events:
       - http:
           path: /health
