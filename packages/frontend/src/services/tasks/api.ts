@@ -26,6 +26,7 @@ export async function createTask(
       sk: buildTaskSK(String(Date.now())),
       data: task,
       type: 'private',
+      ttl: 0, // 0 = no expiration
     }),
   });
 }
@@ -99,6 +100,7 @@ export async function updateTask(
       sk: buildTaskSK(taskId),
       data: updated,
       type: 'private',
+      ttl: 0,
     }),
   });
 }
@@ -140,6 +142,7 @@ export async function addEntryToTask(
       sk: buildTaskSK(taskId),
       data: updated,
       type: 'private',
+      ttl: 0,
     }),
   });
 }
