@@ -2,17 +2,20 @@ service: simplestore
 
 frameworkVersion: '3'
 
-package:
-  patterns:
-    - '!**'
-    - 'dist/**'
-    - 'node_modules/**'
-
 plugins:
+  - serverless-esbuild
   - serverless-offline
   - serverless-domain-manager
 
 custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    platform: 'node'
+    target: 'node18'
+    packager: 'pnpm'
+    
   # Custom domain configuration
   # Domain: hak-api-{stage}.askend-lab.com (dev) / hak-api.askend-lab.com (prod)
   domainName:
