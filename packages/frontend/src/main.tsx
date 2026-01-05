@@ -7,7 +7,7 @@ import { ErrorBoundary } from './components'
 import { AuthCallbackPage } from './pages/AuthCallbackPage'
 import { SpecsPage } from './pages/SpecsPage'
 import { TasksPage } from './pages/TasksPage'
-import { AuthProvider } from './services/auth'
+import { AuthProvider, ProtectedRoute } from './services/auth'
 import { AuthStorage } from './services/auth/storage'
 import { setAuthTokenGetter } from './services/tasks'
 import './i18n'
@@ -26,7 +26,7 @@ createRoot(rootElement).render(
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
-            <Route path="/tasks" element={<TasksPage />} />
+            <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
             <Route path="/specs" element={<SpecsPage />} />
           </Routes>
         </BrowserRouter>

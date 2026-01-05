@@ -61,17 +61,18 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
 
-  it('should redirect when not authenticated', () => {
-    mockUseAuth.mockReturnValue(createAuthMock());
+  it('should trigger login when not authenticated', () => {
+    const mockLogin = vi.fn().mockResolvedValue(undefined);
+    mockUseAuth.mockReturnValue(createAuthMock({ login: mockLogin }));
     render(<ProtectedRoute><div>Protected Content</div></ProtectedRoute>);
-    expect(window.location.href).toBe('/login');
+    expect(mockLogin).toHaveBeenCalled();
     expect(sessionStorage.getItem('returnUrl')).toBe('/current');
   });
 
-  it('should redirect to custom URL', () => {
+  it('should show redirect message when not authenticated', () => {
     mockUseAuth.mockReturnValue(createAuthMock());
-    render(<ProtectedRoute redirectTo="/custom-login"><div>Protected Content</div></ProtectedRoute>);
-    expect(window.location.href).toBe('/custom-login');
+    render(<ProtectedRoute><div>Protected Content</div></ProtectedRoute>);
+    expect(screen.getByText('Redirecting to login...')).toBeInTheDocument();
   });
 });
 
