@@ -39,7 +39,13 @@ export async function apiRequest<T>(
   });
 
   if (!response.ok) {
-    return { success: false, error: `API error: ${String(response.status)}` };
+    try {
+      const errorBody = await response.json() as { error?: string; errors?: string[] };
+      const errorMessage = errorBody.errors?.join(', ') ?? errorBody.error ?? `API error: ${String(response.status)}`;
+      return { success: false, error: errorMessage };
+    } catch {
+      return { success: false, error: `API error: ${String(response.status)}` };
+    }
   }
 
   const data = await response.json() as T;
