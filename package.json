@@ -18,7 +18,7 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@askend-lab/devbox": "^0.2.1",
+    "@askend-lab/devbox": "latest",
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
     "@babel/preset-react": "^7.24.0",
