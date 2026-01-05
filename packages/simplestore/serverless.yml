@@ -126,6 +126,29 @@ resources:
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
         GenerateSecret: false
+        AllowedOAuthFlows:
+          - implicit
+        AllowedOAuthFlowsUserPoolClient: true
+        AllowedOAuthScopes:
+          - email
+          - openid
+          - profile
+        CallbackURLs:
+          - http://localhost:5180/auth/callback
+          - https://hak-dev.askend-lab.com/auth/callback
+          - https://hak.askend-lab.com/auth/callback
+        LogoutURLs:
+          - http://localhost:5180
+          - https://hak-dev.askend-lab.com
+          - https://hak.askend-lab.com
+        SupportedIdentityProviders:
+          - COGNITO
+
+    UserPoolDomain:
+      Type: AWS::Cognito::UserPoolDomain
+      Properties:
+        Domain: hak-${self:provider.stage}
+        UserPoolId: !Ref UserPool
 
     ApiGatewayAuthorizer:
       Type: AWS::ApiGateway::Authorizer
@@ -149,6 +172,10 @@ resources:
     UserPoolClientId:
       Description: Cognito User Pool Client ID
       Value: !Ref UserPoolClient
+    
+    UserPoolDomain:
+      Description: Cognito User Pool Domain
+      Value: !Sub https://hak-${self:provider.stage}.auth.${AWS::Region}.amazoncognito.com
     
     TableName:
       Description: DynamoDB Table Name

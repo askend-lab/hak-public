@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import App from './App'
 import { ErrorBoundary } from './components'
+import { AuthCallbackPage } from './pages/AuthCallbackPage'
 import { SpecsPage } from './pages/SpecsPage'
 import { TasksPage } from './pages/TasksPage'
 import { AuthProvider } from './services/auth'
@@ -20,6 +21,7 @@ createRoot(rootElement).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/tasks" element={<TasksPage />} />
             <Route path="/specs" element={<SpecsPage />} />
           </Routes>

@@ -24,8 +24,15 @@ export interface AuthTokens {
   expiresAt: number;
 }
 
+export interface TokenPayload {
+  accessToken: string;
+  idToken: string;
+  expiresIn: number;
+}
+
 export interface AuthContextValue extends AuthState {
   login: (credentials?: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
+  handleCallback?: (tokens: TokenPayload) => void;
 }
