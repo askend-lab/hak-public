@@ -254,14 +254,24 @@ jobs:
           name: audio-api-dist
           path: packages/audio-api/dist/
       
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
       
-      - name: Install production dependencies
-        working-directory: packages/audio-api
-        run: npm ci --omit=dev
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install --prod
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
