@@ -17,6 +17,14 @@ module.exports = {
   },
   coverageDirectory: 'tmp/coverage',
   coverageReporters: ['json-summary', 'text', 'lcov'],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  },
   collectCoverageFrom: [
     'packages/*/src/**/*.{js,ts,tsx}',
     '!packages/frontend/**', // Frontend uses Vitest now
