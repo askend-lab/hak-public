@@ -8,8 +8,12 @@ import { AuthCallbackPage } from './pages/AuthCallbackPage'
 import { SpecsPage } from './pages/SpecsPage'
 import { TasksPage } from './pages/TasksPage'
 import { AuthProvider } from './services/auth'
+import { AuthStorage } from './services/auth/storage'
+import { setAuthTokenGetter } from './services/tasks'
 import './i18n'
 import './styles/main.scss'
+
+setAuthTokenGetter(() => AuthStorage.getAccessToken())
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
