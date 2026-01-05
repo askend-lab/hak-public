@@ -85,16 +85,14 @@ const routes: Route[] = [
  * Main Lambda handler
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  console.log('Request:', { method: event.httpMethod, path: event.path, resource: event.resource });
-  
   const userId = getUserId(event);
   if (!userId) {
     return createResponse(HTTP_STATUS.UNAUTHORIZED, { error: HTTP_ERRORS.UNAUTHORIZED });
   }
 
-  const route = routes.find(r => r.method === event.httpMethod && r.path === event.path);
+  // Use event.resource (API Gateway resource path) instead of event.path (which includes basePath)
+  const route = routes.find(r => r.method === event.httpMethod && r.path === event.resource);
   if (!route) {
-    console.log('Route not found. Available:', routes.map(r => `${r.method} ${r.path}`));
     return createResponse(HTTP_STATUS.NOT_FOUND, { error: HTTP_ERRORS.NOT_FOUND });
   }
 
