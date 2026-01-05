@@ -5,8 +5,8 @@ const isDev = import.meta.env.DEV;
 // Using centralized askend-lab-users pool with Google login
 export const cognitoConfig = {
   region: 'eu-west-1',
-  userPoolId: 'eu-west-1_UoyXFGqR4',
-  clientId: '9m3i70h5ckgnin8aoujc5qqo3',
+  userPoolId: 'eu-west-1_wlRtuLkG2',
+  clientId: '64tf6nf61n6sgftqif6q975hka',
   
   // Hosted UI domain (centralized)
   domain: 'askend-lab-auth.auth.eu-west-1.amazoncognito.com',
