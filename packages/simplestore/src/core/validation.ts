@@ -57,8 +57,14 @@ export type TtlResult =
  * Parses and validates TTL value against constraints
  */
 export function parseTtl(ttl: number, config: StoreConfig = DEFAULT_CONFIG): TtlResult {
-  if (ttl <= 0) {
-    return { valid: false, error: 'TTL must be positive' };
+  // 0 means no expiration, negative is invalid
+  if (ttl < 0) {
+    return { valid: false, error: 'TTL must be 0 (no expiration) or positive' };
+  }
+  
+  // 0 = no expiration, skip max check
+  if (ttl === 0) {
+    return { valid: true, value: 0 };
   }
   
   if (ttl > config.maxTtlSeconds) {
