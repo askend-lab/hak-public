@@ -56,16 +56,16 @@ describe('KeyBuilder', () => {
       expect(parseTtl(3600)).toStrictEqual({ valid: true, value: 3600 });
     });
 
-    it('should reject TTL of zero', () => {
+    it('should accept TTL of zero (no expiration)', () => {
       const result = parseTtl(0);
-      expect(result.valid).toBe(false);
-      if (!result.valid) expect(result.error).toContain('TTL must be positive');
+      expect(result.valid).toBe(true);
+      if (result.valid) expect(result.value).toBe(0);
     });
 
     it('should reject negative TTL', () => {
       const result = parseTtl(-100);
       expect(result.valid).toBe(false);
-      if (!result.valid) expect(result.error).toContain('TTL must be positive');
+      if (!result.valid) expect(result.error).toContain('TTL must be 0');
     });
 
     it('should reject TTL exceeding max limit', () => {

@@ -50,7 +50,7 @@ describe('Validation', () => {
       expect(result.errors[0]).toContain('type must be one of');
     });
 
-    it('should reject zero ttl', () => {
+    it('should accept zero ttl (no expiration)', () => {
       const result = validateStoreRequest({
         pk: 'entity1',
         sk: 'sort1',
@@ -58,8 +58,19 @@ describe('Validation', () => {
         ttl: 0
       });
 
+      expect(result.valid).toBe(true);
+    });
+
+    it('should reject negative ttl', () => {
+      const result = validateStoreRequest({
+        pk: 'entity1',
+        sk: 'sort1',
+        type: 'private',
+        ttl: -1
+      });
+
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('TTL must be positive');
+      expect(result.errors[0]).toContain('TTL must be 0');
     });
 
     it('should reject ttl exceeding max', () => {

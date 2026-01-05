@@ -82,6 +82,7 @@ export function createGetEvent(path: string, params: Record<string, string> | nu
   return createEvent({
     httpMethod: 'GET',
     path,
+    resource: path,
     queryStringParameters: params,
   });
 }
@@ -98,6 +99,7 @@ export function createPostEvent(path: string, body: object | string | null): API
   return createEvent({
     httpMethod: 'POST',
     path,
+    resource: path,
     body: bodyStr,
   });
 }
@@ -106,6 +108,7 @@ export function createDeleteEvent(path: string, params: Record<string, string> |
   return createEvent({
     httpMethod: 'DELETE',
     path,
+    resource: path,
     queryStringParameters: params,
   });
 }

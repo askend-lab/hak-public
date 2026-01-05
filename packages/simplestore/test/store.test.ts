@@ -44,12 +44,26 @@ describe('Store', () => {
       expect(db.size()).toBe(1);
     });
 
-    it('should reject invalid TTL', async () => {
+    it('should accept TTL of zero (no expiration)', async () => {
       const request: StoreRequest = {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
         ttl: 0,
+        data: {}
+      };
+
+      const result = await store.save(request);
+
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject negative TTL', async () => {
+      const request: StoreRequest = {
+        pk: 'entity1',
+        sk: 'sort1',
+        type: 'private',
+        ttl: -1,
         data: {}
       };
 

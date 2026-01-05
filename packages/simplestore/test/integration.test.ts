@@ -154,12 +154,24 @@ describe('Integration Tests - Full Pipeline', () => {
       expect(result.statusCode).toBe(400);
     });
 
-    it('should reject zero ttl', async () => {
+    it('should accept zero ttl (no expiration)', async () => {
+      const event = addUserHeader(createPostEvent('/save', {
+        pk: 'test-zero-ttl',
+        sk: 'test',
+        type: 'public',
+        ttl: 0
+      }), 'user1');
+
+      const result = await handler(event);
+      expect(result.statusCode).toBe(200);
+    });
+
+    it('should reject negative ttl', async () => {
       const event = addUserHeader(createPostEvent('/save', {
         pk: 'test',
         sk: 'test',
         type: 'public',
-        ttl: 0
+        ttl: -1
       }), 'user1');
 
       const result = await handler(event);
