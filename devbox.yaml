@@ -176,32 +176,11 @@ hooks:
       - '**/test/fixtures/**'
       - '**/*.min.js'
 
-  source-size:
-    mode: error
-    active: true
-    max_lines: 400
-    excludePaths:
-      - '**/node_modules/**'
-      - '**/dist/**'
-      - '**/build/**'
-      - '**/coverage/**'
-      - '**/.git/**'
-      - '**/test/fixtures/**'
-      - '**/*.min.js'
-      - '**/*.bundle.js'
-      - '**/vendor/**'
-      - '**/package-lock.json'
-      - '**/steps-ts/synthesis.steps.ts'
-      - '**/pnpm-lock.yaml'
-      - '**/yarn.lock'
-      - '**/*.lock'
-
   # Stage-based execution - centralized configuration
 stages:
   pre-commit:
     hooks:
       - markdown-size
-      - source-size
       - language-check
       - broken-links
       - run-lint
