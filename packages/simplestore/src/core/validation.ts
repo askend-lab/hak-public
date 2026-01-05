@@ -78,15 +78,12 @@ export function validateStoreRequest(request: Partial<StoreRequest>, config: Sto
   validateRequiredString(request.sk, 'sk', errors);
   validateType(request.type, errors);
 
-  // ttl is optional - if provided, must be a valid number
-  if (request.ttl !== undefined) {
-    if (typeof request.ttl !== 'number') {
-      errors.push('ttl must be a number');
-    } else {
-      const ttlResult = parseTtl(request.ttl, config);
-      if (!ttlResult.valid) {
-        errors.push(ttlResult.error);
-      }
+  if (typeof request.ttl !== 'number') {
+    errors.push('ttl must be a number');
+  } else {
+    const ttlResult = parseTtl(request.ttl, config);
+    if (!ttlResult.valid) {
+      errors.push(ttlResult.error);
     }
   }
 
