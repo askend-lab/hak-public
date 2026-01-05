@@ -271,7 +271,7 @@ jobs:
           echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
       
       - name: Install dependencies
-        run: pnpm install --prod
+        run: pnpm install
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
