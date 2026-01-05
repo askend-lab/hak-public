@@ -16,3 +16,4 @@ tmp/
 *.tfplan.*
 tfplan-*.out
 packages/frontend/cucumber-results.json
+.agent-channel
