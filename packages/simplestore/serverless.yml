@@ -2,6 +2,12 @@ service: simplestore
 
 frameworkVersion: '3'
 
+package:
+  patterns:
+    - '!**'
+    - 'dist/**'
+    - 'node_modules/**'
+
 plugins:
   - serverless-offline
   - serverless-domain-manager
