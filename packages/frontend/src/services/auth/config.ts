@@ -2,13 +2,14 @@ const isProd = import.meta.env.PROD;
 const isDev = import.meta.env.DEV;
 
 // Cognito configuration for Hosted UI
+// Using centralized askend-lab-users pool with Google login
 export const cognitoConfig = {
   region: 'eu-west-1',
-  userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID ?? 'eu-west-1_placeholder',
-  clientId: import.meta.env.VITE_COGNITO_CLIENT_ID ?? 'placeholder',
+  userPoolId: 'eu-west-1_UoyXFGqR4',
+  clientId: '9m3i70h5ckgnin8aoujc5qqo3',
   
-  // Hosted UI domain
-  domain: import.meta.env.VITE_COGNITO_DOMAIN ?? 'hak-dev.auth.eu-west-1.amazoncognito.com',
+  // Hosted UI domain (centralized)
+  domain: 'askend-lab-auth.auth.eu-west-1.amazoncognito.com',
   
   // Callback URLs
   redirectUri: isDev 
