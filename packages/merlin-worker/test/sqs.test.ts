@@ -70,6 +70,20 @@ describe('SQS Operations', () => {
       expect(() => parseMessage(message as { Body: string })).toThrow();
     });
 
+    it('should throw error for empty message body', () => {
+      const message = {
+        Body: '',
+      };
+
+      expect(() => parseMessage(message as { Body: string })).toThrow('Message body is empty');
+    });
+
+    it('should throw error for undefined message body', () => {
+      const message = {};
+
+      expect(() => parseMessage(message as { Body: string })).toThrow('Message body is empty');
+    });
+
     it('should throw error for missing text field', () => {
       const message = {
         Body: JSON.stringify({ hash: 'abc123' }),
