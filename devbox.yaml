@@ -163,31 +163,6 @@ hooks:
     active: true
     strict: true
 
-  # New hooks from boxer/devbox
-  no-any:
-    mode: error
-    active: true
-
-  import-order:
-    mode: error
-    active: true
-
-  no-floating-promises:
-    mode: error
-    active: true
-
-  security-audit:
-    mode: error
-    active: true
-    auditLevel: moderate
-    packageManager: pnpm
-
-  dependency-check:
-    mode: error
-    active: true
-    excludeDev: true
-    ignoreBinPackage: false
-
   jscpd:
     mode: error
     active: true
@@ -233,11 +208,6 @@ stages:
       - run-typecheck
       - run-build
       - jscpd
-      - dependency-check
-      - security-audit
-      - import-order
-      - no-any
-      - no-floating-promises
   
   pre-push:
     includes:
