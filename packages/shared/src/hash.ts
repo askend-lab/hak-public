@@ -2,7 +2,12 @@
  * SHA-256 hash utility that works in both browser and Node.js
  */
 
-declare const window: { crypto?: { subtle?: SubtleCrypto } } | undefined;
+// Define SubtleCrypto interface for environments without DOM types
+interface SubtleCryptoLike {
+  digest(algorithm: string, data: ArrayBuffer | ArrayBufferView): Promise<ArrayBuffer>;
+}
+
+declare const window: { crypto?: { subtle?: SubtleCryptoLike } } | undefined;
 
 export async function calculateHash(text: string): Promise<string> {
   if (!text || text.trim().length === 0) {

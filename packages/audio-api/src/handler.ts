@@ -1,5 +1,5 @@
-import type { S3Client } from '@aws-sdk/client-s3';
-import type { SQSClient } from '@aws-sdk/client-sqs';
+import type { S3ClientLike } from './s3';
+import type { SQSClientLike } from './sqs';
 import { TEXT_LIMITS } from '@hak/shared';
 
 import { calculateHash } from './hash';
@@ -55,8 +55,8 @@ function getRequiredEnvVars(): { bucketName: string; queueUrl: string } {
 
 export async function handler(
   event: { body: string },
-  s3Client: Pick<S3Client, 'send'>,
-  sqsClient: Pick<SQSClient, 'send'>
+  s3Client: S3ClientLike,
+  sqsClient: SQSClientLike
 ): Promise<{ statusCode: number; body: string }> {
   try {
     const { bucketName, queueUrl } = getRequiredEnvVars();

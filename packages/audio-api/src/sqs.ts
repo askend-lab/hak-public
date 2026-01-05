@@ -1,7 +1,11 @@
-import { SendMessageCommand, type SQSClient } from '@aws-sdk/client-sqs';
+import { SendMessageCommand } from '@aws-sdk/client-sqs';
+
+export interface SQSClientLike {
+  send(command: SendMessageCommand): Promise<unknown>;
+}
 
 export async function publishToQueue(
-  sqsClient: Pick<SQSClient, 'send'>,
+  sqsClient: SQSClientLike,
   queueUrl: string,
   text: string,
   hash: string

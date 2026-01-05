@@ -1,4 +1,8 @@
-import { HeadObjectCommand, type S3Client } from '@aws-sdk/client-s3';
+import { HeadObjectCommand } from '@aws-sdk/client-s3';
+
+export interface S3ClientLike {
+  send(command: HeadObjectCommand): Promise<unknown>;
+}
 
 interface S3Error {
   name?: string;
@@ -10,7 +14,7 @@ interface S3Error {
 }
 
 export async function checkFileExists(
-  s3Client: Pick<S3Client, 'send'>,
+  s3Client: S3ClientLike,
   bucket: string,
   key: string
 ): Promise<boolean> {
