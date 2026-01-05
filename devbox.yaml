@@ -1,5 +1,5 @@
-# DevBox Configuration
-# ALL parameters are REQUIRED - no hidden defaults
+# DevBox Configuration - extends defaults
+extends: './defaults.yaml'
 
 project:
   name: 'HAK'

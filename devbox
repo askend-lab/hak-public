@@ -1,9 +1,19 @@
 #!/usr/bin/env node
-// DevBox wrapper - use boxer's devbox
+// DevBox wrapper - use local devbox in dev, npm package in CI
 
 const { spawnSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 const args = process.argv.slice(2);
 
-const boxerDevbox = '/home/alex/users/boxer/devbox/cli.js';
-const result = spawnSync('node', [boxerDevbox, ...args], { stdio: 'inherit' });
+// Local development path
+const localDevbox = '/home/alex/users/boxer/devbox/cli.js';
+
+// npm package path
+const npmDevbox = path.join(__dirname, 'node_modules/@askend-lab/devbox/cli.js');
+
+// Use local if exists, otherwise npm package (for CI)
+const devboxPath = fs.existsSync(localDevbox) ? localDevbox : npmDevbox;
+
+const result = spawnSync('node', [devboxPath, ...args], { stdio: 'inherit' });
 process.exit(result.status || 0);
