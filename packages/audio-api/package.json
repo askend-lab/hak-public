@@ -19,6 +19,8 @@
     "axios": "^1.6.2",
     "@types/axios": "^0.14.0",
     "serverless": "^3.38.0",
+    "serverless-esbuild": "^1.52.0",
+    "esbuild": "^0.20.0",
     "jest-cucumber": "^3.0.1"
   },
   "dependencies": {

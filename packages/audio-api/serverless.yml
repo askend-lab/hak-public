@@ -2,11 +2,17 @@ service: audio-api
 
 frameworkVersion: '3'
 
-package:
-  patterns:
-    - '!**'
-    - 'dist/**'
-    - 'node_modules/**'
+plugins:
+  - serverless-esbuild
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    platform: 'node'
+    target: 'node18'
+    packager: 'pnpm'
 
 provider:
   name: aws
@@ -39,7 +45,7 @@ provider:
 
 functions:
   generate:
-    handler: dist/src/index.handler
+    handler: src/index.handler
     events:
       - http:
           path: /generate
@@ -47,7 +53,7 @@ functions:
           cors: true
 
   health:
-    handler: dist/src/index.healthHandler
+    handler: src/index.healthHandler
     events:
       - http:
           path: /health
