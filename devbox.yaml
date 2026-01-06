@@ -192,11 +192,14 @@ stages:
       - run-build
       - jscpd
   
+  commit-msg:
+    hooks:
+      - test-required
+  
   pre-push:
     includes:
       - pre-commit
     hooks:
-      - test-required
       - run-tests
   
   pr-check:
