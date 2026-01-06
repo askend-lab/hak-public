@@ -6,27 +6,53 @@ This document describes the algorithm for fixing bugs in HAK project using TDD m
 
 ```
 For each bug in bug.md:
-  1. ANALYZE → Understand the bug by comparing prototype vs HAK
-  2. TEST (RED) → Write a failing test that captures the expected behavior
-  3. IMPLEMENT (GREEN) → Write minimal code to make the test pass
-  4. REFACTOR → Clean up code while keeping tests green
-  5. VERIFY → Check visually that fix matches prototype
-  6. COMMIT → Mark checkboxes in bug.md, commit changes
+  1. ANALYZE → Deep analysis of the bug (prototype vs HAK)
+  2. PLAN → Write fix plan in bug.md under the bug item
+  3. TEST (RED) → Write failing test, run it, confirm it's RED
+  4. IMPLEMENT (GREEN) → Minimal code to pass test
+  5. REFACTOR → Clean up, minimize inline styles, use vendor styles
+  6. VERIFY → Visual check against prototype screenshot
+  7. COMMIT → Mark checkbox, commit, stay on branch
+  8. NEXT → Move to next bug (or escalate if blocked)
 ```
 
 ## Detailed Steps
 
-### Step 1: ANALYZE
+### Step 1: ANALYZE (Deep Investigation)
 
+**Prototype analysis:**
 1. Open prototype at `http://localhost:3000`
-2. Open HAK app at `http://localhost:5180`
-3. Locate the specific UI element/feature
-4. Document exactly what differs:
-   - Visual appearance (colors, sizes, spacing)
-   - Behavior (interactions, animations)
-   - Functionality (what it does)
+2. Inspect HTML structure using browser DevTools
+3. Take screenshot of the element/feature
+4. Look at prototype source code in `/home/alex/users/luna/eki/`
 
-### Step 2: TEST (RED)
+**HAK app analysis:**
+1. Open HAK app at `http://localhost:5180`
+2. Inspect HTML structure using browser DevTools
+3. Take screenshot for comparison
+4. Look at HAK source code in `packages/frontend/src/`
+
+**Document findings:**
+- What exactly differs (visual, behavior, functionality)
+- Which files need to change
+- CSS classes/styles involved
+
+### Step 2: PLAN (Write Fix Plan)
+
+Add a plan section under the bug in `bug.md`:
+
+```markdown
+- [ ] **Bug name**: Description
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed)
+  
+  **Fix plan:**
+  1. Add [component/element] to [file]
+  2. Style using [vendor class] or add to [css file]
+  3. Test: [what to test]
+```
+
+### Step 3: TEST (RED)
 
 Write a failing Cucumber test in `packages/frontend/src/features/`:
 
@@ -53,54 +79,72 @@ it('should [expected behavior]', () => {
 pnpm test -- --testPathPattern="[test-file]"
 ```
 
-### Step 3: IMPLEMENT (GREEN)
+### Step 4: IMPLEMENT (GREEN)
 
 1. Locate the component that needs modification
-2. Make the minimal change to pass the test
-3. Run the test again to confirm it passes
+2. Make the **minimal** change to pass the test
+3. Run the test again to confirm it passes (GREEN)
 
 **Key files:**
 - Components: `packages/frontend/src/components/`
 - Styles: `packages/frontend/src/styles/`
 - Features: `packages/frontend/src/features/`
 
-### Step 4: REFACTOR
+**Check the page if needed:**
+- Refresh `http://localhost:5180` to see changes
+- If server restart needed: `pnpm start` (kills previous, starts new)
+- Don't restart unnecessarily — hot reload usually works
 
-1. Review the code for clarity and consistency
-2. Ensure it follows existing patterns in the codebase
-3. Run full test suite to ensure no regressions:
+### Step 5: REFACTOR
+
+**Run full test suite:**
 ```bash
 pnpm test
 ```
 
-### Step 5: VERIFY
+**Code quality review:**
+1. Look at new code together with existing code
+2. Check for consistency and beauty
+3. **Minimize inline styles** — avoid `style={{...}}` in JSX
+4. **Minimize app-specific CSS** — prefer vendor styles
+5. **Maximize vendor style usage** — check `packages/vendor/` for existing classes
 
-1. Refresh HAK app at `http://localhost:5180`
-2. Compare visually with prototype at `http://localhost:3000`
-3. Test the interaction manually
-4. Take screenshot if needed for documentation
+### Step 6: VERIFY (Final Visual Check)
 
-### Step 6: COMMIT
+1. Open HAK app at `http://localhost:5180`
+2. Compare with prototype screenshot
+3. Confirm the bug is fixed correctly
+4. If NOT fixed → go back to Step 3 (TDD cycle)
 
-1. Update `bug.md` - mark checkboxes:
+### Step 7: COMMIT
+
+1. Update `bug.md` — mark checkbox as done:
    ```markdown
    - [x] **Bug name**: Description
      - [x] Failing test written
      - [x] Test passes (bug fixed)
    ```
 
-2. Commit with conventional commit message:
+2. Commit:
    ```bash
    git add .
-   git commit -m "fix: [description]
-
-   - Added test for [behavior]
-   - Implemented [change]
-   
-   Closes: [bug name from bug.md]"
+   git commit -m "fix: [description]"
    ```
 
-3. Push and create PR
+3. **Stay on branch** — continue with next bug
+
+### Step 8: NEXT (Move to Next Bug or Escalate)
+
+**If problem occurs:**
+1. Try to solve it 3 times
+2. If still not working → commit stable state
+3. Document the problem in `bug.md` under the bug item
+4. Move to next bug
+
+**If critical blocker (server down, everything broken):**
+- Stop immediately
+- Report to user via Slack with `--critical` flag
+- Wait for help
 
 ## Bug Priority Order
 
