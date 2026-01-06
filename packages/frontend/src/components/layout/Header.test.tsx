@@ -20,7 +20,12 @@ vi.mock('../ui', async () => {
     NavTab: ({ label, ...props }: { label: string; [key: string]: unknown }): React.JSX.Element => <button data-testid="nav-tab" {...props}>{label}</button>,
     Button: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }): React.JSX.Element => <button data-testid="button" {...props}>{children}</button>,
     WaffleMenu: (): React.JSX.Element => <div data-testid="waffle-menu">WaffleMenu</div>,
-    UserAvatar: ({ initials, ...props }: { initials: string; [key: string]: unknown }): React.JSX.Element => <div data-testid="user-avatar" {...props}>{initials}</div>,
+    UserAvatar: ({ initials, onLogout, ...props }: { initials: string; onLogout?: () => void; [key: string]: unknown }): React.JSX.Element => (
+      <div data-testid="user-avatar" {...props}>
+        {initials}
+        {onLogout && <button onClick={onLogout}>Logi välja</button>}
+      </div>
+    ),
   };
 });
 

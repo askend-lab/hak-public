@@ -43,6 +43,20 @@ Object.assign(global, {
   Event: dom.window.Event,
 });
 
+// Polyfill attachEvent/detachEvent for React DOM compatibility in JSDOM
+// These are old IE methods that React's focus management code may reference
+const htmlProto = global.window.HTMLElement.prototype as HTMLElement & { attachEvent?: unknown; detachEvent?: unknown };
+if (!htmlProto.attachEvent) {
+  htmlProto.attachEvent = function(event: string, handler: EventListener): void {
+    this.addEventListener(event.replace(/^on/, ''), handler);
+  };
+}
+if (!htmlProto.detachEvent) {
+  htmlProto.detachEvent = function(event: string, handler: EventListener): void {
+    this.removeEventListener(event.replace(/^on/, ''), handler);
+  };
+}
+
 // Mock matchMedia
 Object.defineProperty(global.window, 'matchMedia', {
   writable: true,

@@ -118,13 +118,6 @@ pnpm test
 
 ### Step 7: COMMIT
 
-1. Update `bug.md` — mark checkbox as done:
-   ```markdown
-   - [x] **Bug name**: Description
-     - [x] Failing test written
-     - [x] Test passes (bug fixed)
-   ```
-
 2. Commit:
    ```bash
    git add .
@@ -137,8 +130,7 @@ pnpm test
 
 **If problem occurs:**
 1. Try to solve it 3 times
-2. If still not working → commit stable state
-3. Document the problem in `bug.md` under the bug item
+2. If still not working → commit stable state (do not forget to say to user at teh end)
 4. Move to next bug
 
 **If critical blocker (server down, everything broken):**
@@ -146,9 +138,35 @@ pnpm test
 - Report to user via Slack with `--critical` flag
 - Wait for help
 
+**MEGA BLOCKER — No MCP Browser Access:**
+- If no MCP browser AND no access to prototype/production source code
+- This is CRITICAL SCOPE BLOCKER
+- Cannot implement UI features without seeing the prototype
+- STOP IMMEDIATELY and escalate via `--critical`
+- Do NOT attempt to guess or invent UI behavior
+
 ## Notes
 
 - Always check prototype behavior before implementing
 - Use browser dev tools to inspect prototype CSS if needed
 - Keep commits small and focused on single bugs
 - Run `pnpm run dx` before pushing to ensure all checks pass
+- **Do NOT use `curl` for localhost** — it hangs. Use MCP browser_preview instead
+
+## Lessons Learned
+
+### React Lists & Reordering
+- **Never use array index as key** for lists that can be reordered
+- Use unique IDs: `key={item.id}` not `key={index}`
+- Without unique IDs, React doesn't know items moved and won't rerender
+
+### Drag & Drop Implementation
+- **Study prototype source code first** — don't reinvent
+- `draggable` should be on drag handle only, not whole row
+- Use `setDragImage()` to show whole row while dragging
+- `onDrop` does the actual reorder, `onDragEnd` just cleans up state
+
+### Manual Testing
+- Unit tests passing ≠ feature works in browser
+- Always manually test UI interactions after implementing
+- If visual doesn't match state, check: keys, rerenders, event handlers

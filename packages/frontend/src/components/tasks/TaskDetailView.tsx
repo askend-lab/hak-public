@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 
+import { PlayButton } from '../ui';
 import { API_CONFIG } from '../../services/config';
 import { synthesizeText, playAudio } from '../../services/audio';
 import type { Task, TaskEntry } from '../../services/tasks';
@@ -257,27 +258,13 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
                   <span className="playlist-item-date">{formatDate(entry.addedAt)}</span>
                 </div>
                 <div className="playlist-item-actions">
-                  <button
-                    className={`playlist-item-play ${currentPlayingId === entry.id ? 'playing' : ''} ${currentLoadingId === entry.id ? 'loading' : ''}`}
+                  <PlayButton
                     onClick={() => { void handlePlayEntry(entry.id); }}
-                    aria-label="Mängi"
-                    disabled={currentLoadingId === entry.id}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {currentLoadingId === entry.id ? (
-                        <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" strokeDasharray="25" strokeLinecap="round">
-                          <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
-                        </circle>
-                      ) : currentPlayingId === entry.id ? (
-                        <>
-                          <rect x="7" y="6" width="3" height="12" fill="currentColor" rx="1" />
-                          <rect x="14" y="6" width="3" height="12" fill="currentColor" rx="1" />
-                        </>
-                      ) : (
-                        <path d="M8 5.14V19.14L19 12.14L8 5.14Z" fill="currentColor"/>
-                      )}
-                    </svg>
-                  </button>
+                    isActive={true}
+                    isLoading={currentLoadingId === entry.id}
+                    isPlaying={currentPlayingId === entry.id}
+                    size="small"
+                  />
                 </div>
               </div>
             ))}

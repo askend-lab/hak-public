@@ -1,13 +1,22 @@
 // Layer 3: Navigation tab (no vendor equivalent)
 .nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 0.5rem 0;
   background: transparent;
   border: none;
-  border-bottom: 1px solid transparent;
+  border-bottom: 2px solid transparent;
   color: $color-gray;
   font-size: 18px;
   font-weight: 500;
   cursor: pointer;
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   &:hover { color: $color-primary; }
   &--active { border-bottom-color: $color-primary; color: $color-primary; }

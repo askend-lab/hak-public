@@ -6,6 +6,21 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  position: relative;
+
+  &__button {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 
   &__circle {
     width: 40px;
@@ -24,6 +39,7 @@
     display: flex;
     flex-direction: column;
     line-height: 1.25;
+    text-align: left;
   }
 
   &__name {
@@ -35,5 +51,77 @@
   &__email {
     font-size: 14px;
     color: $color-gray;
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: $color-white;
+    border: 1px solid $color-outlined-neutral;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 1000;
+  }
+
+  &__dropdown-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid $color-outlined-neutral;
+  }
+
+  &__dropdown-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: $color-primary;
+    color: $color-white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__dropdown-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__dropdown-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: $color-primary;
+  }
+
+  &__dropdown-email {
+    font-size: 14px;
+    color: $color-gray;
+  }
+
+  &__dropdown-action {
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    border-top: 1px solid $color-outlined-neutral;
+    text-align: left;
+    font-size: 14px;
+    color: $color-primary;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $color-soft-neutral-bg;
+    }
+
+    &--logout {
+      border-top: none;
+    }
   }
 }

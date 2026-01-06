@@ -164,13 +164,13 @@ describe('TaskDetailView interactions', () => {
 
   it('renders entry play button with aria-label', () => {
     render(<TaskDetailView task={mockTask} onBack={mockOnBack} />);
-    const playBtn = screen.getByLabelText('Mängi');
+    const playBtn = screen.getByLabelText('Play');
     expect(playBtn).toBeInTheDocument();
   });
 
   it('clicking entry play button triggers play', async () => {
     render(<TaskDetailView task={mockTask} onBack={mockOnBack} />);
-    const playBtn = screen.getByLabelText('Mängi');
+    const playBtn = screen.getByLabelText('Play');
     fireEvent.click(playBtn);
     // Button should be in the document after click
     expect(playBtn).toBeInTheDocument();
@@ -237,7 +237,7 @@ describe('TaskDetailView with multiple entries', () => {
 
   it('renders multiple play buttons', () => {
     render(<TaskDetailView task={multiEntryTask} onBack={mockOnBack} />);
-    const playButtons = screen.getAllByLabelText('Mängi');
+    const playButtons = screen.getAllByLabelText('Play');
     expect(playButtons).toHaveLength(2);
   });
 });

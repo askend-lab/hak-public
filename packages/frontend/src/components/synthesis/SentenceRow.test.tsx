@@ -15,8 +15,14 @@ describe('SentenceRow', () => {
     onChange: vi.fn(),
     onPlay: vi.fn(),
     onRemove: vi.fn(),
+    onExplorePhonetic: vi.fn(),
     isLoading: false,
     isLast: false,
+    index: 0,
+    onDragStart: vi.fn(),
+    onDragOver: vi.fn(),
+    onDragEnd: vi.fn(),
+    onDrop: vi.fn(),
   };
 
   beforeEach(() => {
@@ -148,10 +154,11 @@ describe('SentenceRow', () => {
       fireEvent.click(menuTrigger!);
       
       const menuItems = document.querySelectorAll('[role="menuitem"]');
-      expect(menuItems).toHaveLength(3);
-      expect(menuItems[0]).toHaveTextContent('Lisa ülesandesse');
-      expect(menuItems[1]).toHaveTextContent('Lae alla');
-      expect(menuItems[2]).toHaveTextContent('Eemalda');
+      expect(menuItems).toHaveLength(4);
+      expect(menuItems[0]).toHaveTextContent('Uuri foneetilist kuju');
+      expect(menuItems[1]).toHaveTextContent('Lisa ülesandesse');
+      expect(menuItems[2]).toHaveTextContent('Lae alla');
+      expect(menuItems[3]).toHaveTextContent('Eemalda');
     });
   });
 
@@ -360,7 +367,7 @@ describe('SentenceRow', () => {
 
       render(<SentenceRow {...defaultProps} value="Tere" />);
       fireEvent.click(document.querySelector('.word-chip')!);
-      fireEvent.click(document.querySelectorAll('.variant-option__play')[0] as Element);
+      fireEvent.click(document.querySelectorAll('.play-button')[1] as Element);
       await vi.waitFor(() => { expect(playAudioMock).toHaveBeenCalledWith('blob:test'); });
     });
   });
@@ -388,6 +395,105 @@ describe('SentenceRow', () => {
       fireEvent.change(input, { target: { value: 'test' } });
       fireEvent.keyDown(input, { key: 'Enter' });
       expect(defaultProps.onPlay).toHaveBeenCalled();
+    });
+  });
+
+  describe('Drag and drop', () => {
+    it('should call onDragStart with index when drag handle is dragged', () => {
+      const onDragStart = vi.fn();
+      render(<SentenceRow {...defaultProps} index={2} onDragStart={onDragStart} />);
+      const dragHandle = document.querySelector('.drag-handle');
+      const dataTransfer = { effectAllowed: '', setDragImage: vi.fn() };
+      fireEvent.dragStart(dragHandle!, { dataTransfer });
+      expect(onDragStart).toHaveBeenCalledWith(2);
+    });
+
+    it('should have draggable only on drag handle, not on row', () => {
+      render(<SentenceRow {...defaultProps} />);
+      const row = document.querySelector('.sentence-row');
+      const dragHandle = document.querySelector('.drag-handle');
+      expect(row).not.toHaveAttribute('draggable');
+      expect(dragHandle).toHaveAttribute('draggable', 'true');
+    });
+
+    it('should call onDragOver with index when dragged over', () => {
+      const onDragOver = vi.fn();
+      render(<SentenceRow {...defaultProps} index={1} onDragOver={onDragOver} />);
+      const row = document.querySelector('.sentence-row');
+      // dragOver requires dataTransfer object
+      const dataTransfer = { dropEffect: '' };
+      fireEvent.dragOver(row!, { dataTransfer });
+      expect(onDragOver).toHaveBeenCalledWith(1);
+    });
+
+    it('should call onDragEnd when drag ends on handle', () => {
+      const onDragEnd = vi.fn();
+      render(<SentenceRow {...defaultProps} onDragEnd={onDragEnd} />);
+      const dragHandle = document.querySelector('.drag-handle');
+      fireEvent.dragEnd(dragHandle!);
+      expect(onDragEnd).toHaveBeenCalled();
+    });
+
+    it('should have dragging class when isDragging is true', () => {
+      render(<SentenceRow {...defaultProps} isDragging={true} />);
+      const row = document.querySelector('.sentence-row');
+      expect(row).toHaveClass('sentence-row--dragging');
+    });
+
+    it('should have drag-over class when isDragOver is true', () => {
+      render(<SentenceRow {...defaultProps} isDragOver={true} />);
+      const row = document.querySelector('.sentence-row');
+      expect(row).toHaveClass('sentence-row--drag-over');
+    });
+
+    it('should call onDrop with index when dropped', () => {
+      const onDrop = vi.fn();
+      render(<SentenceRow {...defaultProps} index={1} onDrop={onDrop} />);
+      const row = document.querySelector('.sentence-row');
+      const dataTransfer = { dropEffect: '' };
+      fireEvent.drop(row!, { dataTransfer });
+      expect(onDrop).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe('Clear button', () => {
+    it('should show clear button when input has text', () => {
+      render(<SentenceRow {...defaultProps} value="test" />);
+      const clearButton = document.querySelector('.sentence-row__clear-btn');
+      expect(clearButton).toBeInTheDocument();
+    });
+
+    it('should hide clear button when input is empty', () => {
+      render(<SentenceRow {...defaultProps} value="" />);
+      const clearButton = document.querySelector('.sentence-row__clear-btn');
+      expect(clearButton).not.toBeInTheDocument();
+    });
+
+    it('should clear text when clear button is clicked', () => {
+      const onChange = vi.fn();
+      render(<SentenceRow {...defaultProps} value="test" onChange={onChange} />);
+      const clearButton = document.querySelector('.sentence-row__clear-btn');
+      fireEvent.click(clearButton!);
+      expect(onChange).toHaveBeenCalledWith('');
+    });
+  });
+
+  describe('Context menu', () => {
+    it('should have "Uuri foneetilist kuju" option in more menu', () => {
+      render(<SentenceRow {...defaultProps} value="test" />);
+      const moreButton = screen.getByText('⋯');
+      fireEvent.click(moreButton);
+      expect(screen.getByText('Uuri foneetilist kuju')).toBeInTheDocument();
+    });
+
+    it('should call onExplorePhonetic when "Uuri foneetilist kuju" is clicked', () => {
+      const onExplorePhonetic = vi.fn();
+      render(<SentenceRow {...defaultProps} value="test" onExplorePhonetic={onExplorePhonetic} />);
+      const moreButton = screen.getByText('⋯');
+      fireEvent.click(moreButton);
+      const exploreOption = screen.getByText('Uuri foneetilist kuju');
+      fireEvent.click(exploreOption);
+      expect(onExplorePhonetic).toHaveBeenCalled();
     });
   });
 });

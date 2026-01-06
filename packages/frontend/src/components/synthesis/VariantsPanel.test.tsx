@@ -78,7 +78,7 @@ describe('VariantsPanel', () => {
 
   it('should call onPlayVariant when play button clicked', () => {
     const { container } = render(<VariantsPanel {...defaultProps} />);
-    const playButtons = container.querySelectorAll('.variant-option__play');
+    const playButtons = container.querySelectorAll('.play-button');
     expect(playButtons[0]).toBeDefined();
     fireEvent.click(playButtons[0] as Element);
     expect(defaultProps.onPlayVariant).toHaveBeenCalledWith(mockVariants[0]);
@@ -113,7 +113,7 @@ describe('VariantsPanel', () => {
       const customInput = container.querySelector('.variants-panel__input') as HTMLInputElement;
       fireEvent.change(customInput, { target: { value: 'custom-variant' } });
       
-      const customPlayBtn = container.querySelector('.variants-panel__custom .variant-option__play');
+      const customPlayBtn = container.querySelector('.variants-panel__custom .play-button');
       fireEvent.click(customPlayBtn!);
       
       await vi.waitFor(() => { expect(playAudioMock).toHaveBeenCalled(); });

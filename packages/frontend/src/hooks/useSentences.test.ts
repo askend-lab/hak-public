@@ -10,15 +10,22 @@ vi.mock('../services/audio', () => ({
 
 const mockSynthesizeText = synthesizeText as Mock;
 
+const getTexts = (sentences: { text: string }[]): string[] => sentences.map(s => s.text);
+
 describe('useSentences', () => {
-  it('should initialize with default empty sentence', () => {
+  it('should initialize with default empty sentence with unique id', () => {
     const { result } = renderHook(() => useSentences());
-    expect(result.current.sentences).toStrictEqual(['']);
+    expect(result.current.sentences).toHaveLength(1);
+    expect(result.current.sentences[0]).toHaveProperty('id');
+    expect(result.current.sentences[0]).toHaveProperty('text', '');
   });
 
-  it('should initialize with provided sentences', () => {
+  it('should initialize with provided sentences with unique ids', () => {
     const { result } = renderHook(() => useSentences(['Hello', 'World']));
-    expect(result.current.sentences).toStrictEqual(['Hello', 'World']);
+    expect(result.current.sentences).toHaveLength(2);
+    expect(result.current.sentences[0]).toHaveProperty('text', 'Hello');
+    expect(result.current.sentences[1]).toHaveProperty('text', 'World');
+    expect(result.current.sentences[0]?.id).not.toBe(result.current.sentences[1]?.id);
   });
 
   it('should add a new empty sentence', () => {
@@ -26,7 +33,7 @@ describe('useSentences', () => {
     act(() => {
       result.current.addSentence();
     });
-    expect(result.current.sentences).toStrictEqual(['Hello', '']);
+    expect(getTexts(result.current.sentences)).toStrictEqual(['Hello', '']);
   });
 
   it('should update sentence at index', () => {
@@ -34,7 +41,7 @@ describe('useSentences', () => {
     act(() => {
       result.current.updateSentence(1, 'Updated');
     });
-    expect(result.current.sentences).toStrictEqual(['Hello', 'Updated']);
+    expect(getTexts(result.current.sentences)).toStrictEqual(['Hello', 'Updated']);
   });
 
   it('should have correct initial state', () => {
@@ -130,7 +137,7 @@ describe('useSentences', () => {
       act(() => {
         result.current.removeSentence(1);
       });
-      expect(result.current.sentences).toStrictEqual(['Hello', 'Test']);
+      expect(getTexts(result.current.sentences)).toStrictEqual(['Hello', 'Test']);
     });
 
     it('should reset to empty string when removing last sentence', () => {
@@ -138,7 +145,7 @@ describe('useSentences', () => {
       act(() => {
         result.current.removeSentence(0);
       });
-      expect(result.current.sentences).toStrictEqual(['']);
+      expect(getTexts(result.current.sentences)).toStrictEqual(['']);
     });
   });
 
@@ -177,6 +184,45 @@ describe('useSentences', () => {
     it('should have isPlayingAll initially false', () => {
       const { result } = renderHook(() => useSentences(['Hello']));
       expect(result.current.isPlayingAll).toBe(false);
+    });
+  });
+
+  describe('reorderSentences (drag & drop)', () => {
+    it('should reorder sentences when dragging from index 0 to index 2', () => {
+      const { result } = renderHook(() => useSentences(['A', 'B', 'C']));
+      act(() => {
+        result.current.reorderSentences(0, 2);
+      });
+      expect(getTexts(result.current.sentences)).toStrictEqual(['B', 'C', 'A']);
+    });
+
+    it('should reorder sentences when dragging from index 2 to index 0', () => {
+      const { result } = renderHook(() => useSentences(['A', 'B', 'C']));
+      act(() => {
+        result.current.reorderSentences(2, 0);
+      });
+      expect(getTexts(result.current.sentences)).toStrictEqual(['C', 'A', 'B']);
+    });
+
+    it('should not change order when dragging to same position', () => {
+      const { result } = renderHook(() => useSentences(['A', 'B', 'C']));
+      act(() => {
+        result.current.reorderSentences(1, 1);
+      });
+      expect(getTexts(result.current.sentences)).toStrictEqual(['A', 'B', 'C']);
+    });
+
+    it('should preserve sentence ids when reordering', () => {
+      const { result } = renderHook(() => useSentences(['A', 'B', 'C']));
+      const originalIds = result.current.sentences.map(s => s.id);
+      act(() => {
+        result.current.reorderSentences(0, 2);
+      });
+      const newIds = result.current.sentences.map(s => s.id);
+      // After moving A from 0 to 2: [B, C, A]
+      expect(newIds[0]).toBe(originalIds[1]); // B's id
+      expect(newIds[1]).toBe(originalIds[2]); // C's id
+      expect(newIds[2]).toBe(originalIds[0]); // A's id
     });
   });
 

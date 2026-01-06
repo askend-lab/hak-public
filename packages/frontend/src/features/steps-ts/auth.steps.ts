@@ -105,16 +105,17 @@ When('I click the login button', async function (this: TestWorld) {
 
 Then('I am logged in successfully', async function (this: TestWorld) {
   await this.waitFor(() => {
-    const logoutButton = findButtonByText(getButtons(this.container), BUTTON_TEXTS.logout);
-    assert.ok(logoutButton, 'Should be logged in - logout button visible');
+    // When logged in, user avatar should be visible (logout is in dropdown)
+    const userAvatar = this.container?.querySelector('.user-avatar__button');
+    assert.ok(userAvatar, 'Should be logged in - user avatar visible');
   });
 });
 
 Then('I see my profile information', async function (this: TestWorld) {
   await this.waitFor(() => {
-    // After login, logout button must be visible (confirms auth state)
-    const logoutButton = findButtonByText(getButtons(this.container), BUTTON_TEXTS.logout);
-    assert.ok(logoutButton, 'Logout button should be visible when logged in');
+    // After login, user avatar should be visible (confirms auth state)
+    const userAvatar = this.container?.querySelector('.user-avatar__button');
+    assert.ok(userAvatar, 'User avatar should be visible when logged in');
   });
 });
 
@@ -136,8 +137,9 @@ Given('I am logged in', async function (this: TestWorld) {
   
   await this.renderApp();
   await this.waitFor(() => {
-    const logoutBtn = findButtonByText(getButtons(this.container), BUTTON_TEXTS.logout);
-    assert.ok(logoutBtn, 'Should be logged in - logout button visible');
+    // When logged in, user avatar button should be visible (not login button)
+    const userAvatar = this.container?.querySelector('.user-avatar__button');
+    assert.ok(userAvatar, 'Should be logged in - user avatar visible');
   });
 });
 
@@ -161,12 +163,23 @@ When('I view the navigation menu', async function (this: TestWorld) {
 
 Then('I see a logout button', async function (this: TestWorld) {
   await this.waitFor(() => {
+    // First click on user avatar to open dropdown
+    const userAvatar = this.container?.querySelector('.user-avatar__button');
+    if (userAvatar) this.click(userAvatar);
+  });
+  await this.waitFor(() => {
     const logoutButton = findButtonByText(getButtons(this.container), BUTTON_TEXTS.logout);
     assert.ok(logoutButton, 'Should find logout button when logged in');
   });
 });
 
 When('I click the logout button', async function (this: TestWorld) {
+  // First open the dropdown if not already open
+  const dropdown = this.container?.querySelector('.user-avatar__dropdown');
+  if (!dropdown) {
+    const userAvatar = this.container?.querySelector('.user-avatar__button');
+    if (userAvatar) this.click(userAvatar);
+  }
   clickButton(this.container, BUTTON_TEXTS.logout, (el) => this.click(el));
 });
 

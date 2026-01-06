@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { PlayButton } from '../ui'
+
 interface Variant {
   id: string
   phonetic: string
@@ -80,13 +82,11 @@ export function VariantsPanel({
               <span className="variant-option__type">{variant.type}</span>
             </div>
             <div className="variant-option__actions">
-              <button 
-                className="variant-option__play"
+              <PlayButton 
                 onClick={() => onPlayVariant(variant)}
-                aria-label={`Play ${variant.phonetic}`}
-              >
-                ▶
-              </button>
+                isActive={true}
+                size="small"
+              />
               <button 
                 className="variant-option__use"
                 onClick={() => onSelectVariant(variant)}
@@ -109,7 +109,7 @@ export function VariantsPanel({
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
           />
-          <button className="variant-option__play" onClick={handlePlayCustom}>▶</button>
+          <PlayButton onClick={handlePlayCustom} isActive={customInput.trim().length > 0} size="small" />
           <button className="variant-option__use" onClick={() => {
             if (customInput.trim()) {
               onSelectVariant({ id: 'custom', phonetic: customInput.trim(), type: 'custom' })

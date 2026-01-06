@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { TaskSelectModal, NotificationContainer, Header, Footer, SentenceRow, StressedText } from './components'
@@ -9,11 +10,13 @@ import { useAuth } from './services/auth'
 
 function App() {
   const { t } = useTranslation()
-  const { sentences, loadingIndex, isPlayingAll, audioRef, addSentence, updateSentence, removeSentence, playSentence, playAll, stopAll } = useSentences()
+  const { sentences, loadingIndex, isPlayingAll, audioRef, addSentence, updateSentence, removeSentence, reorderSentences, playSentence, playAll, stopAll } = useSentences()
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const { openModal } = useUIStore()
   const { isAuthenticated } = useAuth()
   
-  const hasContent = sentences.some(s => s.trim().length > 0)
+  const hasContent = sentences.some(s => s.text.trim().length > 0)
   
   const handleAddToTask = (): void => {
     if (isAuthenticated) {
@@ -21,6 +24,27 @@ function App() {
     } else {
       openModal('login')
     }
+  }
+  
+  const handleDragStart = (index: number): void => {
+    setDraggedIndex(index)
+  }
+  
+  const handleDragOver = (index: number): void => {
+    setDragOverIndex(index)
+  }
+  
+  const handleDragEnd = (): void => {
+    setDraggedIndex(null)
+    setDragOverIndex(null)
+  }
+  
+  const handleDrop = (toIndex: number): void => {
+    if (draggedIndex !== null && draggedIndex !== toIndex) {
+      reorderSentences(draggedIndex, toIndex)
+    }
+    setDraggedIndex(null)
+    setDragOverIndex(null)
   }
 
   return (
@@ -45,13 +69,20 @@ function App() {
         <Card>
           {sentences.map((sentence, index) => (
             <SentenceRow
-              key={`sentence-${index}`}
-              value={sentence}
+              key={sentence.id}
+              value={sentence.text}
               onChange={(value) => { updateSentence(index, value); }}
               onPlay={() => { void playSentence(index); }}
               onRemove={() => { removeSentence(index); }}
               isLoading={loadingIndex === index}
               isLast={index === sentences.length - 1}
+              index={index}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+              onDrop={handleDrop}
+              isDragging={draggedIndex === index}
+              isDragOver={dragOverIndex === index}
             />
           ))}
         </Card>
