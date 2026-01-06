@@ -1,43 +1,35 @@
 # Bugs to Fix
 
-**TDD Process**: For each bug, mark both:
-- [ ] Failing test written
-- [ ] Test passes (bug fixed)
+See [bugfixingProcess.md](bugfixingProcess.md) for the fix algorithm.
 
 ## Home page - Prototype vs HAK differences
 
 ### Critical (affects UX)
 
 - [ ] **Drag & Drop**: Prototype has draggable sentence rows, HAK doesn't
-  - [ ] Failing test written
-  - [ ] Test passes (bug fixed)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md)
 
 - [ ] **Context menu missing options**: Prototype has "Uuri foneetilist kuju" and "Lae alla .wav fail", HAK only has basic options
-  - [ ] Failing test written
-  - [ ] Test passes (bug fixed)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md)
 
 - [ ] **Input example text**: Prototype shows "Näiteks: Printsess eestlanna elab lossis", HAK has none
-  - [ ] Failing test written
-  - [ ] Test passes (bug fixed)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md)
 
 - [ ] **Input hint text**: Prototype shows "Kuula hääldust ja uuri erinevaid variante", HAK has none
-  - [ ] Failing test written
-  - [ ] Test passes (bug fixed)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md)
 
 - [ ] **Clear button**: Prototype has X button to clear text input, HAK doesn't
-  - [ ] Failing test written
-  - [ ] Test passes (bug fixed)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md)
 
 ### Medium priority
 
 - [ ] **Section title**: Prototype has "Teksti kõnesüntees" title above input, HAK doesn't
-  - [ ] Failing test written
-  - [ ] Test passes (bug fixed)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md)
 
 - [ ] **Tags/chips display**: Prototype shows words as chips in `tags-group`, HAK has different visualization
-  - [ ] Failing test written
-  - [ ] Test passes (bug fixed)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md)
 
-## Context menu styling
+### Styling
 
-- [ ] Menu dropdown styling may differ from prototype (position, shadow, border-radius) 
+- [ ] **Menu dropdown styling**: May differ from prototype (position, shadow, border-radius)
+- [ ] I confirm fix follows [bugfixingProcess.md](bugfixingProcess.md) 
