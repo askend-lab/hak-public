@@ -46,4 +46,38 @@
 - [ ] Menu dropdown styling may differ from prototype (position, shadow, border-radius) - prototype menu not interactive for comparison
 - [x] Menu trigger button ("...") should be more contrasted and larger (match prototype)
 - [x] Context menu items should be black text, not red
-- [x] Context menu should close when clicking outside 
+- [x] Context menu should close when clicking outside
+
+## Home page - Prototype vs HAK differences (2025-01-06)
+
+### Critical (affects UX)
+
+- [ ] **Drag & Drop**: Prototype has draggable sentence rows, HAK doesn't
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed)
+
+- [ ] **Context menu missing options**: Prototype has "Uuri foneetilist kuju" and "Lae alla .wav fail", HAK only has basic options
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed)
+
+- [ ] **Input example text**: Prototype shows "Näiteks: Printsess eestlanna elab lossis", HAK has none
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed)
+
+- [ ] **Input hint text**: Prototype shows "Kuula hääldust ja uuri erinevaid variante", HAK has none
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed)
+
+- [ ] **Clear button**: Prototype has X button to clear text input, HAK doesn't
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed)
+
+### Medium priority
+
+- [ ] **Section title**: Prototype has "Teksti kõnesüntees" title above input, HAK doesn't
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed)
+
+- [ ] **Tags/chips display**: Prototype shows words as chips in `tags-group`, HAK has different visualization
+  - [ ] Failing test written
+  - [ ] Test passes (bug fixed) 
