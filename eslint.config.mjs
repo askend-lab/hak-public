@@ -14,7 +14,7 @@ export default [
   ...baseConfig,
   
   {
-    ignores: ['tmp/**', 'packages/vendor/**']
+    ignores: ['tmp/**', 'packages/vendor/**', '**/.esbuild/**', '**/dist/**']
   },
 
   // Disable rules not compatible with current plugin versions
