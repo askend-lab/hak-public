@@ -12,8 +12,8 @@ RUN chmod +x ${LAMBDA_TASK_ROOT}/vmetajson
 COPY package*.json ${LAMBDA_TASK_ROOT}/
 RUN npm ci --only=production
 
-# Copy compiled TypeScript
-COPY dist/ ${LAMBDA_TASK_ROOT}/
+# Copy compiled TypeScript (from dist/src/ to root)
+COPY dist/src/ ${LAMBDA_TASK_ROOT}/
 
 # Set environment variables
 ENV VMETAJSON_PATH=${LAMBDA_TASK_ROOT}/vmetajson
