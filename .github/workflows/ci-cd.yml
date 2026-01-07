@@ -167,6 +167,15 @@ jobs:
         working-directory: infra
         run: terraform init -backend-config="key=${{ matrix.environment }}/terraform.tfstate"
       
+      - name: Terraform Import Existing Resources
+        working-directory: infra
+        continue-on-error: true
+        run: |
+          terraform import -var="env=${{ matrix.environment }}" \
+            aws_iam_role.vabamorf_lambda "vabamorf-lambda-${{ matrix.environment }}" || true
+          terraform import -var="env=${{ matrix.environment }}" \
+            aws_cloudwatch_log_group.vabamorf_api "/aws/lambda/vabamorf-api-${{ matrix.environment }}" || true
+      
       - name: Terraform Apply (Vabamorf only)
         working-directory: infra
         run: |
