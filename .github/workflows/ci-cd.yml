@@ -158,42 +158,27 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       
-      - name: Update Lambda function image
-        run: |
-          aws lambda update-function-code \
-            --function-name vabamorf-api-${{ matrix.environment }} \
-            --image-uri 465168436856.dkr.ecr.eu-west-1.amazonaws.com/vabamorf-api:latest \
-            --region eu-west-1
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
       
-      - name: Create Function URL (if not exists)
-        continue-on-error: true
-        run: |
-          aws lambda create-function-url-config \
-            --function-name vabamorf-api-${{ matrix.environment }} \
-            --auth-type NONE \
-            --cors 'AllowOrigins=*,AllowMethods=*,AllowHeaders=Content-Type' \
-            --region eu-west-1 || echo "Function URL already exists"
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init -backend-config="key=${{ matrix.environment }}/terraform.tfstate"
       
-      - name: Add public access permission
-        continue-on-error: true
+      - name: Terraform Apply (Vabamorf)
+        working-directory: infra
         run: |
-          aws lambda add-permission \
-            --function-name vabamorf-api-${{ matrix.environment }} \
-            --statement-id FunctionURLAllowPublicAccess \
-            --action lambda:InvokeFunctionUrl \
-            --principal "*" \
-            --function-url-auth-type NONE \
-            --region eu-west-1 || echo "Permission already exists"
+          terraform apply -auto-approve -var="env=${{ matrix.environment }}"
       
-      - name: Get Function URL
-        id: function_url
+      - name: Get API URL
+        id: api_url
+        working-directory: infra
         run: |
-          URL=$(aws lambda get-function-url-config \
-            --function-name vabamorf-api-${{ matrix.environment }} \
-            --region eu-west-1 \
-            --query 'FunctionUrl' --output text)
+          URL=$(terraform output -raw vabamorf_api_url 2>/dev/null || echo "")
           echo "url=$URL" >> $GITHUB_OUTPUT
-          echo "Function URL: $URL"
+          echo "Vabamorf API URL: $URL"
       
       - name: Deployment summary
         run: |
