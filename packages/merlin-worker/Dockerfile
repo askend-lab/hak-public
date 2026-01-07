@@ -1,13 +1,13 @@
 # Merlin TTS SQS Worker
-# Clones from official repo: https://github.com/ikiissel/mrln_spn
+# Source code from hak repo, voice models from S3
 
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies + git
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential csh automake sox wget ca-certificates dos2unix git \
+    build-essential csh automake sox wget ca-certificates dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 # Create unprivileged user
@@ -31,21 +31,24 @@ RUN ARCH=$(uname -m) && \
 
 ENV PATH=/home/merlin_user/miniconda3/bin:$PATH
 
-# Clone Merlin from official repo
-RUN git clone --depth 1 https://github.com/ikiissel/mrln_spn.git merlin_repo
+# Create merlin directory structure
+RUN mkdir -p merlin_repo/src merlin_repo/voices merlin_repo/tools
 
-# Download voice models from S3 (not included in git repo)
+# Copy Merlin source code from hak repo
+COPY --chown=merlin_user:merlin_user merlin/ merlin_repo/src/
+COPY --chown=merlin_user:merlin_user mrln_et.yml .
+COPY --chown=merlin_user:merlin_user tools/ merlin_repo/tools/
+
+# Download voice models from S3 (267MB, too large for git)
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_DEFAULT_REGION=eu-west-1
 
 RUN pip install awscli && \
-    aws s3 sync s3://hak-merlin-dev-audio/models/voices/ merlin_repo/voices/ --region eu-west-1 && \
-    aws s3 sync s3://hak-merlin-dev-audio/models/src/ merlin_repo/src/ --region eu-west-1
+    aws s3 sync s3://hak-merlin-dev-audio/models/voices/ merlin_repo/voices/ --region eu-west-1
 
-# Copy conda environment file and create environment
-RUN cp merlin_repo/mrln_et.yml . && \
-    conda env create -f mrln_et.yml && \
+# Create conda environment
+RUN conda env create -f mrln_et.yml && \
     conda clean -afy
 
 # Fix Windows line endings and compile tools
