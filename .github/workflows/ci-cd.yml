@@ -153,28 +153,30 @@ jobs:
         working-directory: packages/vabamorf-api
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: askend-lab
-          IMAGE_TAG: vabamorf-api-${{ matrix.environment }}-${{ github.sha }}
+          ECR_REPOSITORY: vabamorf-api
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:vabamorf-api-${{ matrix.environment }}-latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:vabamorf-api-${{ matrix.environment }}-latest
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       
-      - name: Setup Node.js for Serverless
-        uses: actions/setup-node@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
-          node-version: '20'
+          terraform_version: 1.5.7
       
-      - name: Install Serverless Framework
-        run: npm install -g serverless@3
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init -backend-config="key=${{ matrix.environment }}/terraform.tfstate"
       
-      - name: Deploy with Serverless
-        working-directory: packages/vabamorf-api
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      - name: Terraform Apply (Vabamorf only)
+        working-directory: infra
         run: |
-          serverless deploy --stage ${{ matrix.environment }} --region eu-west-1
+          terraform apply -auto-approve \
+            -var="env=${{ matrix.environment }}" \
+            -target=aws_lambda_function.vabamorf_api \
+            -target=aws_lambda_function_url.vabamorf_api \
+            -target=aws_iam_role.vabamorf_lambda \
+            -target=aws_iam_role_policy_attachment.vabamorf_lambda_basic \
+            -target=aws_cloudwatch_log_group.vabamorf_api
       
       - name: Deployment summary
         run: |
