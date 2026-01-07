@@ -26,6 +26,12 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
+  // Parse URL to get path without query string
+  const url = new URL(req.url || '/', `http://localhost:${PORT}`);
+  const path = url.pathname;
+  
+  console.log(`[REQUEST] ${req.method} ${path} (raw: ${req.url})`);
+  
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
     res.end();
@@ -35,20 +41,22 @@ const server = http.createServer(async (req, res) => {
   let body = '';
   req.on('data', (chunk) => { body += chunk; });
   req.on('end', async () => {
-    const event = createEvent(body, req.url || '/', req.method || 'GET');
+    const event = createEvent(body, path, req.method || 'GET');
     let result;
     
     try {
-      if (req.url === '/analyze' && req.method === 'POST') {
+      if (path === '/analyze' && req.method === 'POST') {
         result = await analyzeHandler(event);
-      } else if (req.url === '/variants' && req.method === 'POST') {
+      } else if (path === '/variants' && req.method === 'POST') {
         result = await variantsHandler(event);
-      } else if (req.url === '/health') {
+      } else if (path === '/health' || path === '/health/') {
         result = healthHandler();
       } else {
-        result = { statusCode: 404, body: JSON.stringify({ error: 'Not found' }) };
+        console.log(`[404] Path not found: ${path}`);
+        result = { statusCode: 404, body: JSON.stringify({ error: 'Not found', path }) };
       }
     } catch (error) {
+      console.error(`[ERROR] ${error}`);
       result = { statusCode: 500, body: JSON.stringify({ error: String(error) }) };
     }
     
