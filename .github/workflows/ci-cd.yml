@@ -139,6 +139,14 @@ jobs:
           name: vabamorf-api-dist
           path: packages/vabamorf-api/dist/
       
+      - name: Rebuild TypeScript (ensure fresh code)
+        working-directory: packages/vabamorf-api
+        run: |
+          npm ci
+          npx tsc
+          echo "Compiled files:"
+          ls -la dist/src/
+      
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
