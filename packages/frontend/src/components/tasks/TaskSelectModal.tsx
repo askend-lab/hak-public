@@ -123,6 +123,8 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     }
   }, [mode, name, description, selectedTaskId, user, tasks, createEntries, addNotification, handleClose]);
 
+  if (!isOpen) return null;
+
   return (
     <Modal
       isOpen={isOpen}
