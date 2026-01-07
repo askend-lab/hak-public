@@ -3,10 +3,10 @@ FROM public.ecr.aws/lambda/nodejs:18
 # Install libjsoncpp for vmetajson binary
 RUN yum install -y jsoncpp && yum clean all
 
-# Copy vmetajson binary and dictionary
-COPY vmetajson ${LAMBDA_TASK_ROOT}/
+# Copy vmetajson binary (renamed to .bin to avoid collision with vmetajson.js)
+COPY vmetajson ${LAMBDA_TASK_ROOT}/vmetajson.bin
 COPY et.dct ${LAMBDA_TASK_ROOT}/
-RUN chmod +x ${LAMBDA_TASK_ROOT}/vmetajson
+RUN chmod +x ${LAMBDA_TASK_ROOT}/vmetajson.bin
 
 # Copy package files and install dependencies
 COPY package*.json ${LAMBDA_TASK_ROOT}/
@@ -16,7 +16,7 @@ RUN npm ci --only=production
 COPY dist/src/ ${LAMBDA_TASK_ROOT}/
 
 # Set environment variables
-ENV VMETAJSON_PATH=${LAMBDA_TASK_ROOT}/vmetajson
+ENV VMETAJSON_PATH=${LAMBDA_TASK_ROOT}/vmetajson.bin
 ENV DICT_PATH=${LAMBDA_TASK_ROOT}
 
 # Default handler (can be overridden in serverless.yml)
