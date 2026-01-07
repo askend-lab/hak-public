@@ -39,7 +39,7 @@ export default defineConfig({
         },
       },
       '/api/merlin': {
-        target: 'https://swq24fqfiu.eu-west-1.awsapprunner.com',
+        target: 'https://merlin-dev.askend-lab.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/merlin/, ''),
         configure: (proxy) => {

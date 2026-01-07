@@ -22,7 +22,7 @@ const getEnvVar = (key: string): string | undefined => {
 const PROD_CONFIG = {
   baseUrl: getEnvVar('VITE_API_BASE_URL') ?? 'https://hak-api-dev.askend-lab.com/api',
   vabamorfUrl: getEnvVar('VITE_VABAMORF_URL') ?? 'https://vabamorf-dev.askend-lab.com/analyze',
-  merlinUrl: getEnvVar('VITE_MERLIN_URL') ?? 'https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize',
+  merlinUrl: getEnvVar('VITE_MERLIN_URL') ?? 'https://merlin-dev.askend-lab.com',
   cacheUrl: `${getEnvVar('VITE_API_BASE_URL') ?? 'https://hak-api-dev.askend-lab.com/api'}/audio-cache`,
   audioApiUrl: getEnvVar('VITE_AUDIO_API_URL') ?? 'https://hak-api-dev.askend-lab.com/api/audio/generate',
   audioBucketUrl: getEnvVar('VITE_AUDIO_BUCKET_URL') ?? 'https://hak-audio-dev.s3.eu-west-1.amazonaws.com',
