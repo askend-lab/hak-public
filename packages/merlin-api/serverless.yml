@@ -1,0 +1,74 @@
+service: merlin-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-west-1
+  stage: ${opt:stage, 'dev'}
+  
+  environment:
+    SQS_QUEUE_URL: https://sqs.eu-west-1.amazonaws.com/465168436856/hak-merlin-${self:provider.stage}-queue
+    S3_BUCKET: hak-merlin-${self:provider.stage}-audio
+    AWS_REGION_NAME: eu-west-1
+  
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:GetQueueUrl
+          Resource: arn:aws:sqs:eu-west-1:465168436856:hak-merlin-${self:provider.stage}-queue
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:HeadObject
+          Resource: arn:aws:s3:::hak-merlin-${self:provider.stage}-audio/*
+
+functions:
+  synthesize:
+    handler: dist/handler.synthesize
+    timeout: 30
+    events:
+      - httpApi:
+          path: /synthesize
+          method: POST
+  
+  status:
+    handler: dist/handler.status
+    timeout: 10
+    events:
+      - httpApi:
+          path: /status/{cacheKey}
+          method: GET
+  
+  health:
+    handler: dist/handler.health
+    timeout: 5
+    events:
+      - httpApi:
+          path: /health
+          method: GET
+
+plugins:
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: merlin-${self:provider.stage}.askend-lab.com
+    basePath: ''
+    stage: ${self:provider.stage}
+    certificateArn: arn:aws:acm:eu-west-1:465168436856:certificate/f91069e3-9ca9-4651-b912-765c9f49fc0d
+    createRoute53Record: true
+    endpointType: REGIONAL
+    hostedZoneId: Z0251725SXN1AR149FEI
+
+package:
+  individually: true
+  patterns:
+    - '!node_modules/**'
+    - '!src/**'
+    - '!test/**'
+    - 'dist/**'

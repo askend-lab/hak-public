@@ -1,0 +1,22 @@
+{
+  "name": "merlin-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "deploy": "serverless deploy",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.478.0",
+    "@aws-sdk/client-sqs": "^3.478.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.131",
+    "@types/node": "^20.10.6",
+    "serverless": "^3.38.0",
+    "serverless-domain-manager": "^7.3.3",
+    "typescript": "^5.3.3"
+  }
+}

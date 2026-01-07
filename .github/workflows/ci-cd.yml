@@ -491,3 +491,118 @@ jobs:
           echo "✅ Deployed build ${{ steps.build.outputs.timestamp }} to ${{ matrix.environment }}"
           echo "🌐 URL: http://hak${{ matrix.environment == 'prod' && '' || format('-{0}', matrix.environment) }}.askend-lab.com"
           echo "⚠️  TEMPORARY: Using S3 static hosting (HTTP only) until AWS account verification"
+
+  # =============================================================================
+  # Merlin API
+  # =============================================================================
+  
+  build-merlin-api:
+    name: Build Merlin API
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Build TypeScript
+        working-directory: packages/merlin-api
+        run: pnpm build
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: merlin-api-dist
+          path: packages/merlin-api/dist/
+          retention-days: 30
+
+  deploy-merlin-api:
+    name: Deploy Merlin API (${{ matrix.environment }}, ${{ matrix.auto }})
+    needs: [build-and-test, build-merlin-api]
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    
+    strategy:
+      matrix:
+        include:
+          - environment: dev
+            auto: true
+          - environment: prod
+            auto: false
+    
+    environment: ${{ matrix.environment }}
+    
+    steps:
+      - name: Skip if not triggered
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.environment != matrix.environment) ||
+          (github.event_name == 'push' && !matrix.auto)
+        run: echo "Skipping deployment to ${{ matrix.environment }}" && exit 0
+      
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: merlin-api-dist
+          path: packages/merlin-api/dist/
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Install Serverless Framework
+        run: npm install -g serverless@3
+      
+      - name: Deploy with Serverless
+        working-directory: packages/merlin-api
+        run: serverless deploy --stage ${{ matrix.environment }}
+      
+      - name: Deployment summary
+        run: |
+          echo "## Merlin API Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: https://merlin-${{ matrix.environment }}.askend-lab.com" >> $GITHUB_STEP_SUMMARY
