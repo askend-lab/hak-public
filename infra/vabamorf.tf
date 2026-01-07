@@ -6,12 +6,17 @@ locals {
   vabamorf_image_tag     = "latest"
 }
 
+# Reference existing ECR repository (created in ecr.tf)
+data "aws_ecr_repository" "vabamorf_api" {
+  name = "vabamorf-api"
+}
+
 # Lambda function using container image
 resource "aws_lambda_function" "vabamorf_api" {
   function_name = local.vabamorf_function_name
   role          = aws_iam_role.vabamorf_lambda.arn
   package_type  = "Image"
-  image_uri     = "${aws_ecr_repository.vabamorf_api.repository_url}:${local.vabamorf_image_tag}"
+  image_uri     = "${data.aws_ecr_repository.vabamorf_api.repository_url}:${local.vabamorf_image_tag}"
   timeout       = 30
   memory_size   = 1024
 
