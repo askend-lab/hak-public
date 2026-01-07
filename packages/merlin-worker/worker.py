@@ -96,7 +96,11 @@ def synthesize_audio(text, voice='efm_l', speed=1.0, pitch=0):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             universal_newlines=True, timeout=60)
         
+        if result.stdout:
+            log(f"Merlin stdout:\n{result.stdout}")
         if result.returncode != 0:
+            if result.stderr:
+                log(f"Merlin stderr:\n{result.stderr}")
             raise Exception(f"Merlin failed: {result.stderr}")
         
         if not os.path.exists(wav_file):

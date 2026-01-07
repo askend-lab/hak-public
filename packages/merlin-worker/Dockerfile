@@ -56,7 +56,8 @@ USER root
 RUN find /home/merlin_user/merlin_repo/tools -name "*.sh" -exec dos2unix {} \;
 USER merlin_user:merlin_user
 
-RUN cd merlin_repo/tools && bash compile_tools.sh
+RUN cd merlin_repo/tools && bash compile_tools.sh && \
+    chmod -R +x /home/merlin_user/merlin_repo/tools/bin/
 
 # Install boto3 for AWS SDK
 RUN /home/merlin_user/miniconda3/bin/pip install boto3

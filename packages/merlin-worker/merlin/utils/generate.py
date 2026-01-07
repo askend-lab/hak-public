@@ -57,8 +57,7 @@ import numpy as np
 
 
 def run_process(args):
-    #print(args)
-    #print()
+    print('[DEBUG] run_process called with: %s' % args, flush=True)
     # a convenience function instead of calling subprocess directly
     # this is so that we can do some logging and catch exceptions
 
@@ -79,10 +78,10 @@ def run_process(args):
 
         if p.returncode != 0:
             # for critical things, we always log, even if log==False
-            print('exit status %d' % p.returncode )
-            print(' for command: %s' % args )
-            print('      stderr: %s' % stderrdata )
-            print('      stdout: %s' % stdoutdata )
+            print('exit status %d' % p.returncode, flush=True)
+            print(' for command: %s' % args, flush=True)
+            print('      stderr: %s' % stderrdata, flush=True)
+            print('      stdout: %s' % stdoutdata, flush=True)
             raise OSError
 
         return (stdoutdata, stderrdata)
@@ -123,6 +122,12 @@ def erb_alpha(sr):
     return 0.5941*np.sqrt(np.arctan(0.1418*sr/1000.0))+0.03237
 
 def post_filter(mgc_file_in, mgc_file_out, mgc_dim, pf_coef, fw_coef, co_coef, fl_coef, gen_dir, cfg_sptk):
+    print('[DEBUG] post_filter called', flush=True)
+    print('[DEBUG] mgc_file_in: %s' % mgc_file_in, flush=True)
+    print('[DEBUG] gen_dir: %s' % gen_dir, flush=True)
+    print('[DEBUG] SPTK keys: %s' % list(cfg_sptk.keys()), flush=True)
+    for k, v in cfg_sptk.items():
+        print('[DEBUG] SPTK[%s] = %s, exists=%s' % (k, v, os.path.exists(v)), flush=True)
 
     SPTK = cfg_sptk
 

@@ -126,6 +126,14 @@ def main_function(AcousticModel, full_path_dir, TempDir, voice_name):
     TempDir = TempDir + "/" # ei ole ilus
     SPTKBinDir = full_path_dir + "/tools/bin/SPTK-3.9"
     WorldBinDir = full_path_dir + "/tools/bin/WORLD"
+    
+    print('[DEBUG] full_path_dir: %s' % full_path_dir, flush=True)
+    print('[DEBUG] SPTKBinDir: %s, exists=%s' % (SPTKBinDir, os.path.exists(SPTKBinDir)), flush=True)
+    print('[DEBUG] WorldBinDir: %s, exists=%s' % (WorldBinDir, os.path.exists(WorldBinDir)), flush=True)
+    if os.path.exists(SPTKBinDir):
+        print('[DEBUG] SPTK files: %s' % os.listdir(SPTKBinDir)[:10], flush=True)
+    if os.path.exists(WorldBinDir):
+        print('[DEBUG] WORLD files: %s' % os.listdir(WorldBinDir), flush=True)
     #voice_name = "eki_et_tnu16k"        
 
     #eeldab test_id_list.scp asub temp kataloogi juurikas
