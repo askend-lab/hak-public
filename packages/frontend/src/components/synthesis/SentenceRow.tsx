@@ -89,11 +89,9 @@ export function SentenceRow({ value, onChange, onPlay, onRemove, onExplorePhonet
     inputRef.current?.focus()
   }
   
-  // Mock variants for demonstration (would come from API in real implementation)
-  const getMockVariants = (word: string): Variant[] => [
-    { id: '1', phonetic: word, type: 'nimisõna' },
-    { id: '2', phonetic: word, type: 'tegusõna' },
-  ]
+  // TODO: Variants should come from API via getVariants prop
+  // For now, returning empty array until API integration is complete
+  const getVariants = (_word: string): Variant[] => []
   
   const handleSelectVariant = (_variant: Variant): void => {
     handleClosePanel()
@@ -154,7 +152,7 @@ export function SentenceRow({ value, onChange, onPlay, onRemove, onExplorePhonet
       {selectedWord && (
         <VariantsPanel
           word={selectedWord}
-          variants={getMockVariants(selectedWord)}
+          variants={getVariants(selectedWord)}
           isOpen={isPanelOpen}
           onClose={handleClosePanel}
           onSelectVariant={handleSelectVariant}

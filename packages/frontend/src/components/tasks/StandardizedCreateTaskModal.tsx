@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ExtendedModal } from '../ui'
 import { StandardizedTaskForm } from './StandardizedTaskForm'
-import { useAuth } from '../../services/auth'
+import { useUserId } from '../../hooks/useUserId'
 import { createTask } from '../../services/tasks'
 
 interface CreateTaskModalProps {
@@ -11,7 +11,7 @@ interface CreateTaskModalProps {
 }
 
 export function StandardizedCreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalProps) {
-  const { user } = useAuth()
+  const userId = useUserId()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,7 +26,6 @@ export function StandardizedCreateTaskModal({ isOpen, onClose, onSuccess }: Crea
     setError(null)
 
     try {
-      const userId = user?.id ?? 'test-user'
       const response = await createTask(userId, {
         name: data.name,
         description: data.description || undefined,

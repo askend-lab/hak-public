@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Modal } from '../ui';
-import { useAuth } from '../../services/auth';
+import { useUserId } from '../../hooks/useUserId';
 import { createTask } from '../../services/tasks';
 import { TaskForm } from './TaskForm';
 
@@ -12,7 +12,7 @@ interface CreateTaskModalProps {
 }
 
 export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalProps) {
-  const { user } = useAuth();
+  const userId = useUserId();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +21,6 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
     setError(null);
 
     try {
-      const userId = user?.id ?? 'test-user';
       const response = await createTask(userId, {
         name: data.name,
         description: data.description || undefined,

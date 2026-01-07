@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Modal } from '../ui';
 import { createSynthesisEntry, createTaskEntry } from '../../core';
 import { useSynthesisStore, useTasksStore, useUIStore } from '../../features';
-import { useAuth } from '../../services/auth';
+import { useUserId } from '../../hooks/useUserId';
 import { addEntryToTask, listTasks, createTask } from '../../services/tasks';
 
 interface TaskSelectModalProps { onClose?: () => void; }
@@ -12,7 +12,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
   const { activeModal, closeModal, addNotification } = useUIStore();
   const { tasks, setTasks, setLoading, isLoading } = useTasksStore();
   const { text, sentences } = useSynthesisStore();
-  const { user } = useAuth();
+  const userId = useUserId();
   
   const [mode, setMode] = useState<'create' | 'existing'>('create');
   const [name, setName] = useState('');
@@ -29,7 +29,6 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     const loadTasks = async (): Promise<void> => {
       setLoading(true);
       try {
-        const userId = user?.id ?? 'test-user';
         const response = await listTasks(userId);
         if (response.success && response.data) {
           setTasks(response.data);
@@ -40,7 +39,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     };
     
     void loadTasks();
-  }, [isOpen, mode, user, setTasks, setLoading]);
+  }, [isOpen, mode, userId, setTasks, setLoading]);
 
   const resetForm = useCallback(() => {
     setMode('create');
@@ -90,7 +89,6 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     setError(null);
 
     try {
-      const userId = user?.id ?? 'test-user';
       const entries = createEntries();
 
       if (mode === 'create') {
@@ -121,7 +119,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [mode, name, description, selectedTaskId, user, tasks, createEntries, addNotification, handleClose]);
+  }, [mode, name, description, selectedTaskId, userId, tasks, createEntries, addNotification, handleClose]);
 
   if (!isOpen) return null;
 
