@@ -186,7 +186,7 @@ jobs:
       - name: Terraform Apply (Vabamorf)
         working-directory: infra
         run: |
-          terraform apply -auto-approve \
+          terraform apply -auto-approve -lock-timeout=120s \
             -var="env=${{ matrix.environment }}" \
             -var="vabamorf_image_tag=${{ github.sha }}"
       
