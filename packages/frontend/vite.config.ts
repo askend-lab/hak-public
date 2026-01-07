@@ -28,7 +28,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api/vabamorf': {
-        target: 'https://ibgaeez4mm.eu-west-1.awsapprunner.com',
+        target: 'https://vabamorf-dev.askend-lab.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/vabamorf/, ''),
         configure: (proxy) => {
