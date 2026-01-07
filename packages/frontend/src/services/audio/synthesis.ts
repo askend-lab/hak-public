@@ -1,7 +1,7 @@
 import { withRetry } from '../../core/retry';
 import { selectVoiceModel, countWords } from '../../core/utils';
 
-import { synthesizeViaApi } from './audio-api';
+import { synthesize } from './merlin';
 
 import type { SynthesisResult } from './types';
 
@@ -18,12 +18,12 @@ export async function synthesizeText(
 
   // Use phoneticText for synthesis if provided (variant pronunciation)
   const textToSynthesize = options.phoneticText ?? text;
-  const audioUrl = await synthesizeViaApi(textToSynthesize);
+  const result = await synthesize({ text: textToSynthesize, voice: voiceModel });
 
   return {
     originalText: text,
     phoneticText: options.phoneticText ?? text,
-    audioUrl,
+    audioUrl: result.audioUrl,
     audioHash: '',
     voiceModel,
     cached: false,
