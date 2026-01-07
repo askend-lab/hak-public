@@ -597,6 +597,10 @@ jobs:
       - name: Install Serverless Framework
         run: npm install -g serverless@3
       
+      - name: Create custom domain (if not exists)
+        working-directory: packages/merlin-api
+        run: serverless create_domain --stage ${{ matrix.environment }} || true
+      
       - name: Deploy with Serverless
         working-directory: packages/merlin-api
         run: serverless deploy --stage ${{ matrix.environment }}
