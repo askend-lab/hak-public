@@ -45,15 +45,16 @@ const server = http.createServer(async (req, res) => {
     let result;
     
     try {
-      if (path === '/analyze' && req.method === 'POST') {
+      // Flexible path matching (handles with/without trailing slash, stage prefixes)
+      if (path.endsWith('/analyze') && req.method === 'POST') {
         result = await analyzeHandler(event);
-      } else if (path === '/variants' && req.method === 'POST') {
+      } else if (path.endsWith('/variants') && req.method === 'POST') {
         result = await variantsHandler(event);
-      } else if (path === '/health' || path === '/health/') {
+      } else if (path.endsWith('/health') || path === '/') {
         result = healthHandler();
       } else {
         console.log(`[404] Path not found: ${path}`);
-        result = { statusCode: 404, body: JSON.stringify({ error: 'Not found', path }) };
+        result = { statusCode: 404, body: JSON.stringify({ error: 'Not found', path, method: req.method }) };
       }
     } catch (error) {
       console.error(`[ERROR] ${error}`);
