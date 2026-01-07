@@ -184,6 +184,15 @@ jobs:
             -var="env=${{ matrix.environment }}" \
             -var="vabamorf_image_tag=${{ github.sha }}"
       
+      - name: Force Lambda update with new image
+        run: |
+          aws lambda update-function-code \
+            --function-name vabamorf-api-${{ matrix.environment }} \
+            --image-uri 465168436856.dkr.ecr.eu-west-1.amazonaws.com/vabamorf-api:${{ github.sha }} \
+            --region eu-west-1
+          echo "Waiting for Lambda update..."
+          aws lambda wait function-updated --function-name vabamorf-api-${{ matrix.environment }} --region eu-west-1
+      
       - name: Get API URL
         id: api_url
         working-directory: infra
