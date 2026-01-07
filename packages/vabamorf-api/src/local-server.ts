@@ -26,6 +26,18 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
+  // Debug: return raw request info immediately for /debug path
+  if (req.url?.includes('/debug')) {
+    res.writeHead(200);
+    res.end(JSON.stringify({ 
+      url: req.url, 
+      method: req.method,
+      headers: req.headers,
+      version: 'v2'
+    }));
+    return;
+  }
+  
   // Parse URL to get path without query string
   const url = new URL(req.url || '/', `http://localhost:${PORT}`);
   const path = url.pathname;
