@@ -171,7 +171,7 @@ jobs:
           aws lambda create-function-url-config \
             --function-name vabamorf-api-${{ matrix.environment }} \
             --auth-type NONE \
-            --cors '{"AllowOrigins":["*"],"AllowMethods":["GET","POST","OPTIONS"],"AllowHeaders":["Content-Type"]}' \
+            --cors 'AllowOrigins=*,AllowMethods=*,AllowHeaders=Content-Type' \
             --region eu-west-1 || echo "Function URL already exists"
       
       - name: Add public access permission
