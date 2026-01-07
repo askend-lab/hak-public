@@ -7,10 +7,15 @@ import type { Task, TaskEntry, CreateTaskRequest, ApiResponse } from './types';
 
 export { setAuthTokenGetter };
 
+interface SaveResponse {
+  item: { data: Task; SK: string; PK: string };
+}
+
 export async function createTask(
   userId: string,
   request: CreateTaskRequest
 ): Promise<ApiResponse<Task>> {
+  const taskId = String(Date.now());
   const task: Omit<Task, 'id' | 'userId'> = {
     name: request.name,
     description: request.description,
@@ -19,29 +24,46 @@ export async function createTask(
     updatedAt: nowISO(),
   };
 
-  return apiRequest<Task>('/save', {
+  const response = await apiRequest<SaveResponse>('/save', {
     method: 'POST',
     body: JSON.stringify({
       pk: buildUserPK(userId),
-      sk: buildTaskSK(String(Date.now())),
+      sk: buildTaskSK(taskId),
       data: task,
       type: 'private',
       ttl: 0, // 0 = no expiration
     }),
   });
+
+  if (!response.success || !response.data?.item) {
+    return { success: false, error: response.error ?? 'Failed to create task' };
+  }
+
+  return { success: true, data: { ...response.data.item.data, id: taskId } };
+}
+
+interface GetResponse {
+  item: { data: Task; SK: string; PK: string };
 }
 
 export async function getTask(
   userId: string,
   taskId: string
 ): Promise<ApiResponse<Task>> {
-  return apiRequest<Task>('/get', {
-    method: 'POST',
-    body: JSON.stringify({
-      pk: buildUserPK(userId),
-      sk: buildTaskSK(taskId),
-    }),
+  const params = new URLSearchParams({
+    pk: buildUserPK(userId),
+    sk: buildTaskSK(taskId),
+    type: 'private',
   });
+
+  const response = await apiRequest<GetResponse>(`/get?${params.toString()}`);
+
+  if (!response.success || !response.data?.item) {
+    return { success: false, error: response.error ?? 'Task not found' };
+  }
+
+  const task = extractTaskFromItem(response.data.item);
+  return { success: true, data: task };
 }
 
 interface QueryResponse {
@@ -53,7 +75,7 @@ function extractTaskFromItem(item: { data: Task; SK: string }): Task {
   const taskId = skParts[skParts.length - 1] ?? '';
   return {
     ...item.data,
-    id: item.data.id !== '' ? item.data.id : taskId,
+    id: item.data.id && item.data.id !== '' ? item.data.id : taskId,
   };
 }
 
@@ -109,12 +131,14 @@ export async function deleteTask(
   userId: string,
   taskId: string
 ): Promise<ApiResponse<undefined>> {
-  return apiRequest<undefined>('/delete', {
-    method: 'POST',
-    body: JSON.stringify({
-      pk: buildUserPK(userId),
-      sk: buildTaskSK(taskId),
-    }),
+  const params = new URLSearchParams({
+    pk: buildUserPK(userId),
+    sk: buildTaskSK(taskId),
+    type: 'private',
+  });
+
+  return apiRequest<undefined>(`/delete?${params.toString()}`, {
+    method: 'DELETE',
   });
 }
 

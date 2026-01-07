@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { TaskSelectModal, NotificationContainer, Header, Footer, SentenceRow, StressedText } from './components'
 import { LoginModal } from './components/auth'
 import { Button, Card } from './components/ui'
-import { useUIStore } from './features'
+import { useUIStore, useSynthesisStore } from './features'
 import { useSentences } from './hooks'
 import { useAuth } from './services/auth'
 
@@ -18,7 +18,16 @@ function App() {
   
   const hasContent = sentences.some(s => s.text.trim().length > 0)
   
-  const handleAddToTask = (): void => {
+  const { setText, setSentences } = useSynthesisStore()
+  
+  const handleAddToTask = (text?: string): void => {
+    if (text) {
+      setText(text)
+      setSentences([text])
+    } else {
+      const nonEmptySentences = sentences.filter(s => s.text.trim().length > 0).map(s => s.text)
+      setSentences(nonEmptySentences)
+    }
     if (isAuthenticated) {
       openModal('taskSelect')
     } else {
@@ -57,7 +66,7 @@ function App() {
             <p className="app-main__subtitle">{t('hero.subtitle')}</p>
           </div>
           <div className="app-main__actions">
-            <Button variant="outline" size="small" disabled={!hasContent} onClick={handleAddToTask}>{t('buttons.addToTask')} (0)</Button>
+            <Button variant="outline" size="small" disabled={!hasContent} onClick={() => { handleAddToTask(); }}>{t('buttons.addToTask')} ({sentences.filter(s => s.text.trim().length > 0).length})</Button>
             {isPlayingAll ? (
               <Button variant="primary" size="small" onClick={stopAll}>Peata</Button>
             ) : (
@@ -74,6 +83,7 @@ function App() {
               onChange={(value) => { updateSentence(index, value); }}
               onPlay={() => { void playSentence(index); }}
               onRemove={() => { removeSentence(index); }}
+              onAddToTask={handleAddToTask}
               isLoading={loadingIndex === index}
               isLast={index === sentences.length - 1}
               index={index}

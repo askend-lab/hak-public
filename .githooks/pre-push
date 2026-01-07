@@ -1,8 +1,6 @@
 #!/bin/sh
-# DevBox pre-push hook
-set -e
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$PROJECT_ROOT"
+# Git pre-push hook - empty by design
+# All checks run on pre-commit for fastest feedback
+# This hook exists but does nothing (no duplication)
 
-node "/home/alex/users/boxer/devbox/packages/hooks/src/cli/index.js" run pre-push
-npm test
+exit 0

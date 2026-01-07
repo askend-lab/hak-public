@@ -36,7 +36,7 @@ describe('SentenceRow', () => {
 
   it('should render drag handle', () => {
     render(<SentenceRow {...defaultProps} />);
-    expect(document.querySelector('.drag-handle')).toBeInTheDocument();
+    expect(document.querySelector('.sentence-list-item__drag')).toBeInTheDocument();
   });
 
   describe('Play button state (matching prototype)', () => {
@@ -125,12 +125,12 @@ describe('SentenceRow', () => {
 
   it('should have border when not last', () => {
     render(<SentenceRow {...defaultProps} isLast={false} />);
-    expect(document.querySelector('.sentence-row--bordered')).toBeInTheDocument();
+    expect(document.querySelector('.sentence-list-item--bordered')).toBeInTheDocument();
   });
 
   it('should not have border when last', () => {
     render(<SentenceRow {...defaultProps} isLast={true} />);
-    expect(document.querySelector('.sentence-row--bordered')).not.toBeInTheDocument();
+    expect(document.querySelector('.sentence-list-item--bordered')).not.toBeInTheDocument();
   });
 
   describe('Play button cursor styling (bug fix)', () => {
@@ -241,7 +241,7 @@ describe('SentenceRow', () => {
 
     it('should have sentence-row__words container', () => {
       render(<SentenceRow {...defaultProps} value="Tere" />);
-      expect(document.querySelector('.sentence-row__words')).toBeInTheDocument();
+      expect(document.querySelector('.sentence-list-item__content')).toBeInTheDocument();
     });
   });
 
@@ -335,7 +335,7 @@ describe('SentenceRow', () => {
   describe('Input container click behavior', () => {
     it('should focus input when words container clicked', () => {
       render(<SentenceRow {...defaultProps} value="Tere" />);
-      const wordsContainer = document.querySelector('.sentence-row__words');
+      const wordsContainer = document.querySelector('.sentence-list-item__content');
       const input = document.querySelector('.sentence-row__input') as HTMLInputElement;
       
       fireEvent.click(wordsContainer!);
@@ -402,7 +402,7 @@ describe('SentenceRow', () => {
     it('should call onDragStart with index when drag handle is dragged', () => {
       const onDragStart = vi.fn();
       render(<SentenceRow {...defaultProps} index={2} onDragStart={onDragStart} />);
-      const dragHandle = document.querySelector('.drag-handle');
+      const dragHandle = document.querySelector('.sentence-list-item__drag');
       const dataTransfer = { effectAllowed: '', setDragImage: vi.fn() };
       fireEvent.dragStart(dragHandle!, { dataTransfer });
       expect(onDragStart).toHaveBeenCalledWith(2);
@@ -410,8 +410,8 @@ describe('SentenceRow', () => {
 
     it('should have draggable only on drag handle, not on row', () => {
       render(<SentenceRow {...defaultProps} />);
-      const row = document.querySelector('.sentence-row');
-      const dragHandle = document.querySelector('.drag-handle');
+      const row = document.querySelector('.sentence-list-item');
+      const dragHandle = document.querySelector('.sentence-list-item__drag');
       expect(row).not.toHaveAttribute('draggable');
       expect(dragHandle).toHaveAttribute('draggable', 'true');
     });
@@ -419,7 +419,7 @@ describe('SentenceRow', () => {
     it('should call onDragOver with index when dragged over', () => {
       const onDragOver = vi.fn();
       render(<SentenceRow {...defaultProps} index={1} onDragOver={onDragOver} />);
-      const row = document.querySelector('.sentence-row');
+      const row = document.querySelector('.sentence-list-item');
       // dragOver requires dataTransfer object
       const dataTransfer = { dropEffect: '' };
       fireEvent.dragOver(row!, { dataTransfer });
@@ -429,27 +429,27 @@ describe('SentenceRow', () => {
     it('should call onDragEnd when drag ends on handle', () => {
       const onDragEnd = vi.fn();
       render(<SentenceRow {...defaultProps} onDragEnd={onDragEnd} />);
-      const dragHandle = document.querySelector('.drag-handle');
+      const dragHandle = document.querySelector('.sentence-list-item__drag');
       fireEvent.dragEnd(dragHandle!);
       expect(onDragEnd).toHaveBeenCalled();
     });
 
     it('should have dragging class when isDragging is true', () => {
       render(<SentenceRow {...defaultProps} isDragging={true} />);
-      const row = document.querySelector('.sentence-row');
-      expect(row).toHaveClass('sentence-row--dragging');
+      const row = document.querySelector('.sentence-list-item');
+      expect(row).toHaveClass('sentence-list-item--dragging');
     });
 
     it('should have drag-over class when isDragOver is true', () => {
       render(<SentenceRow {...defaultProps} isDragOver={true} />);
-      const row = document.querySelector('.sentence-row');
-      expect(row).toHaveClass('sentence-row--drag-over');
+      const row = document.querySelector('.sentence-list-item');
+      expect(row).toHaveClass('sentence-list-item--drag-over');
     });
 
     it('should call onDrop with index when dropped', () => {
       const onDrop = vi.fn();
       render(<SentenceRow {...defaultProps} index={1} onDrop={onDrop} />);
-      const row = document.querySelector('.sentence-row');
+      const row = document.querySelector('.sentence-list-item');
       const dataTransfer = { dropEffect: '' };
       fireEvent.drop(row!, { dataTransfer });
       expect(onDrop).toHaveBeenCalledWith(1);
@@ -494,6 +494,50 @@ describe('SentenceRow', () => {
       const exploreOption = screen.getByText('Uuri foneetilist kuju');
       fireEvent.click(exploreOption);
       expect(onExplorePhonetic).toHaveBeenCalled();
+    });
+  });
+
+  describe('Add to task functionality', () => {
+    it('should call onAddToTask with sentence text when "Lisa ülesandesse" is clicked', () => {
+      const onAddToTask = vi.fn();
+      render(<SentenceRow {...defaultProps} value="Tere maailm" onAddToTask={onAddToTask} />);
+      const moreButton = screen.getByText('⋯');
+      fireEvent.click(moreButton);
+      const addToTaskOption = screen.getByText('Lisa ülesandesse');
+      fireEvent.click(addToTaskOption);
+      expect(onAddToTask).toHaveBeenCalledWith('Tere maailm');
+    });
+
+    it('should close menu after "Lisa ülesandesse" is clicked', () => {
+      const onAddToTask = vi.fn();
+      render(<SentenceRow {...defaultProps} value="test" onAddToTask={onAddToTask} />);
+      const moreButton = screen.getByText('⋯');
+      fireEvent.click(moreButton);
+      const addToTaskOption = screen.getByText('Lisa ülesandesse');
+      fireEvent.click(addToTaskOption);
+      expect(document.querySelector('.more-menu__dropdown')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('More menu disabled state', () => {
+    it('should not open menu when input is empty', () => {
+      render(<SentenceRow {...defaultProps} value="" />);
+      const moreButton = screen.getByText('⋯');
+      fireEvent.click(moreButton);
+      expect(document.querySelector('.more-menu__dropdown')).not.toBeInTheDocument();
+    });
+
+    it('should open menu when input has text', () => {
+      render(<SentenceRow {...defaultProps} value="Tere" />);
+      const moreButton = screen.getByText('⋯');
+      fireEvent.click(moreButton);
+      expect(document.querySelector('.more-menu__dropdown')).toBeInTheDocument();
+    });
+
+    it('should have disabled style on trigger when input is empty', () => {
+      render(<SentenceRow {...defaultProps} value="" />);
+      const moreButton = document.querySelector('.more-menu__trigger');
+      expect(moreButton).toHaveClass('more-menu__trigger--disabled');
     });
   });
 });

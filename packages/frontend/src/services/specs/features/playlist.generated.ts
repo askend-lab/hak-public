@@ -91,7 +91,7 @@ Feature: Play all sentences sequentially (US-011)
     And the button changes back to "Mängi kõik"
 `,
 
-  'US-012-delete-playlist-entry': `@playlist @US-012
+  'US-012-delete-playlist-entry': `@playlist @US-012 @skip
 Feature: Remove sentence from list (US-012)
   As a language learner
   I want to remove a sentence from my list

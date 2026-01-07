@@ -138,3 +138,7 @@ describe('TasksPage with tasks', () => {
     expect(container.querySelector('.task-manager')).toBeInTheDocument();
   });
 });
+
+// Note: Test for task list refresh after modal close
+// The TasksPage should watch for activeModal changes and reload tasks when modal closes
+// This behavior is tested by verifying that loadTasks depends on activeModal

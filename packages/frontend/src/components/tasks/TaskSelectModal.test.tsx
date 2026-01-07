@@ -22,6 +22,7 @@ vi.mock('../../features', () => ({
   useSynthesisStore: vi.fn(() => ({
     text: 'Tere',
     result: { phoneticText: 'test', audioHash: 'hash123', voiceModel: 'model' },
+    sentences: [],
   })),
 }));
 
@@ -149,6 +150,30 @@ describe('TaskSelectModal (Task Creation)', () => {
     const descInput = screen.getByLabelText('Kirjeldus') as HTMLTextAreaElement;
     fireEvent.change(descInput, { target: { value: 'Task description' } });
     expect(descInput.value).toBe('Task description');
+  });
+
+  it('should create entry even without synthesis result', async () => {
+    // Override mock to have text but NO result
+    const { useSynthesisStore } = await import('../../features');
+    vi.mocked(useSynthesisStore).mockReturnValue({
+      text: 'WWW',
+      result: null,
+      sentences: [],
+    });
+
+    const { createTaskEntry } = await import('../../core');
+    
+    render(<TaskSelectModal />);
+    const nameInput = screen.getByLabelText('Ülesande nimi *');
+    fireEvent.change(nameInput, { target: { value: 'Test Task' } });
+    
+    const submitButton = screen.getByRole('button', { name: 'Loo ülesanne' });
+    fireEvent.click(submitButton);
+    
+    // Should still create entry with just the text
+    await vi.waitFor(() => {
+      expect(createTaskEntry).toHaveBeenCalled();
+    });
   });
 });
 

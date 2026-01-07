@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 import { TaskDetailView } from './TaskDetailView';
+import * as audioModule from '../../services/audio';
 
 // Mock audio services
 vi.mock('../../services/audio', () => ({
@@ -118,14 +119,14 @@ describe('TaskDetailView interactions', () => {
     render(<TaskDetailView task={mockTask} onBack={mockOnBack} />);
     // Each entry should have a play button
     const entryPlayBtn = screen.getAllByRole('button').find(btn => 
-      btn.closest('.playlist-item')
+      btn.closest('.sentence-list-item')
     );
     expect(entryPlayBtn).toBeDefined();
   });
 
-  it('renders entry index number', () => {
+  it('renders entry text', () => {
     render(<TaskDetailView task={mockTask} onBack={mockOnBack} />);
-    expect(screen.getByText('1.')).toBeInTheDocument();
+    expect(screen.getByText('Hello world')).toBeInTheDocument();
   });
 
   it('renders add sentence button in empty state', () => {
@@ -176,15 +177,16 @@ describe('TaskDetailView interactions', () => {
     expect(playBtn).toBeInTheDocument();
   });
 
-  it('renders formatted date for entries', () => {
+  it('renders more menu button for entries', () => {
     render(<TaskDetailView task={mockTask} onBack={mockOnBack} />);
-    // Date should be formatted in Estonian format
-    expect(screen.getByText(/01\.01\.2024/)).toBeInTheDocument();
+    // Each entry should have a more menu button
+    const moreButtons = screen.getAllByText('⋯');
+    expect(moreButtons.length).toBeGreaterThan(0);
   });
 
   it('renders drag handle for entries', () => {
     const { container } = render(<TaskDetailView task={mockTask} onBack={mockOnBack} />);
-    const dragHandle = container.querySelector('.playlist-item-drag');
+    const dragHandle = container.querySelector('.sentence-list-item__drag');
     expect(dragHandle).toBeInTheDocument();
   });
 });
@@ -229,15 +231,65 @@ describe('TaskDetailView with multiple entries', () => {
     expect(screen.getByText('Second entry')).toBeInTheDocument();
   });
 
-  it('renders correct entry numbers', () => {
+  it('renders multiple entry texts', () => {
     render(<TaskDetailView task={multiEntryTask} onBack={mockOnBack} />);
-    expect(screen.getByText('1.')).toBeInTheDocument();
-    expect(screen.getByText('2.')).toBeInTheDocument();
+    expect(screen.getByText('First entry')).toBeInTheDocument();
+    expect(screen.getByText('Second entry')).toBeInTheDocument();
   });
 
   it('renders multiple play buttons', () => {
     render(<TaskDetailView task={multiEntryTask} onBack={mockOnBack} />);
     const playButtons = screen.getAllByLabelText('Play');
     expect(playButtons).toHaveLength(2);
+  });
+});
+
+describe('TaskDetailView audio synthesis fallback', () => {
+  const mockOnBack = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should use originalText when phoneticText is empty', async () => {
+    const taskWithEmptyPhonetic = {
+      id: 'task-1',
+      userId: 'user-1',
+      name: 'Test Task',
+      entries: [
+        {
+          id: 'entry-1',
+          synthesis: {
+            id: 'synth-1',
+            originalText: 'Tere maailm',
+            phoneticText: '',  // Empty phonetic text
+            audioHash: '',     // No cached audio
+            voiceModel: 'efm_s' as const,
+            createdAt: '2024-01-01T00:00:00Z',
+          },
+          order: 0,
+          addedAt: '2024-01-01T00:00:00Z',
+        },
+      ],
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    };
+
+    render(<TaskDetailView task={taskWithEmptyPhonetic} onBack={mockOnBack} />);
+    
+    const playBtn = screen.getByLabelText('Play');
+    fireEvent.click(playBtn);
+
+    await vi.waitFor(() => {
+      expect(audioModule.synthesizeText).toHaveBeenCalled();
+    });
+    
+    // Get the actual call argument
+    const calls = vi.mocked(audioModule.synthesizeText).mock.calls;
+    const calledWith = calls[0]?.[0];
+    
+    // Should NOT be called with empty string - should use originalText instead
+    expect(calledWith).not.toBe('');
+    expect(calledWith).toBe('Tere maailm');
   });
 });

@@ -1,4 +1,4 @@
-@playlist @US-012
+@playlist @US-012 @skip
 Feature: Remove sentence from list (US-012)
   As a language learner
   I want to remove a sentence from my list

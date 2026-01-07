@@ -1,3 +1,9 @@
 tests/cucumber/reports/
 coverage-cucumber/
 .env
+
+# Playwright
+e2e/screenshots/
+e2e/.auth/
+test-results/
+playwright-report/

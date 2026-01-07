@@ -61,9 +61,18 @@ describe('Tasks API', () => {
 
   describe('createTask', () => {
     it('should create a new task', async () => {
-      mockFetchSuccess({ id: '1', name: 'Test', entries: [] });
+      const taskData = { name: 'Test', entries: [], createdAt: '2024-01-01', updatedAt: '2024-01-01' };
+      mockFetchSuccess({
+        item: {
+          PK: 'USER#user1',
+          SK: 'TASK#12345',
+          data: taskData,
+        },
+      });
       const result = await createTask('user1', { name: 'Test' });
       expect(result.success).toBe(true);
+      expect(result.data?.name).toBe('Test');
+      expect(result.data?.id).toBeDefined();
       expect(global.fetch).toHaveBeenCalledWith('/api/save', expect.objectContaining({ method: 'POST' }));
     });
 
@@ -75,12 +84,25 @@ describe('Tasks API', () => {
   });
 
   describe('getTask', () => {
-    it('should get a task by id', async () => {
-      const mockTask = { id: 'task1', name: 'Test' };
-      mockFetchSuccess(mockTask);
+    it('should get a task by id and unwrap backend response', async () => {
+      const taskData = { name: 'Test Task', entries: [], createdAt: '2024-01-01', updatedAt: '2024-01-01' };
+      mockFetchSuccess({
+        item: {
+          PK: 'USER#user1',
+          SK: 'TASK#task1',
+          data: taskData,
+        },
+      });
       const result = await getTask('user1', 'task1');
       expect(result.success).toBe(true);
-      expect(result.data).toStrictEqual(mockTask);
+      expect(result.data?.name).toBe('Test Task');
+      expect(result.data?.id).toBe('task1');
+    });
+
+    it('should return error if item not found', async () => {
+      mockFetchSuccess({ item: null });
+      const result = await getTask('user1', 'nonexistent');
+      expect(result.success).toBe(false);
     });
   });
 
@@ -108,10 +130,10 @@ describe('Tasks API', () => {
 
   describe('updateTask', () => {
     it('should update an existing task', async () => {
-      const task = { id: 'task1', name: 'Original', entries: [] };
+      const taskData = { name: 'Original', entries: [], createdAt: '2024-01-01', updatedAt: '2024-01-01' };
       mockFetchSequence([
-        { ok: true, data: task },
-        { ok: true, data: { ...task, name: 'Updated' } },
+        { ok: true, data: { item: { PK: 'USER#user1', SK: 'TASK#task1', data: taskData } } },
+        { ok: true, data: { item: { PK: 'USER#user1', SK: 'TASK#task1', data: { ...taskData, name: 'Updated' } } } },
       ]);
       const result = await updateTask('user1', 'task1', { name: 'Updated' });
       expect(result.success).toBe(true);
@@ -125,17 +147,20 @@ describe('Tasks API', () => {
   });
 
   describe('deleteTask', () => {
-    it('should delete a task', async () => {
+    it('should delete a task using DELETE method with query params', async () => {
       mockFetchSuccess({});
       const result = await deleteTask('user1', 'task1');
       expect(result.success).toBe(true);
-      expect(global.fetch).toHaveBeenCalledWith('/api/delete', expect.objectContaining({ method: 'POST' }));
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/delete?'),
+        expect.objectContaining({ method: 'DELETE' })
+      );
     });
   });
 
   describe('addEntryToTask', () => {
     it('should add entry to existing task', async () => {
-      const task = { id: 'task1', name: 'Test', entries: [] };
+      const taskData = { name: 'Test', entries: [], createdAt: '2024-01-01', updatedAt: '2024-01-01' };
       const entry = {
         id: 'entry1',
         synthesis: {
@@ -150,9 +175,8 @@ describe('Tasks API', () => {
         addedAt: '2024-01-01T00:00:00Z',
       };
       mockFetchSequence([
-        { ok: true, data: task },
-        { ok: true, data: task },
-        { ok: true, data: { ...task, entries: [entry] } },
+        { ok: true, data: { item: { PK: 'USER#user1', SK: 'TASK#task1', data: taskData } } },
+        { ok: true, data: { item: { PK: 'USER#user1', SK: 'TASK#task1', data: { ...taskData, entries: [entry] } } } },
       ]);
       const result = await addEntryToTask('user1', 'task1', entry);
       expect(result.success).toBe(true);

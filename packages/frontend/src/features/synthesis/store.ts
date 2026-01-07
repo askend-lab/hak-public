@@ -10,6 +10,7 @@ interface SynthesisState {
   result: SynthesisResult | null;
   audioElement: HTMLAudioElement | null;
   isPlaying: boolean;
+  sentences: string[];
 }
 
 interface SynthesisActions {
@@ -20,6 +21,7 @@ interface SynthesisActions {
   setResult: (result: SynthesisResult | null) => void;
   setAudioElement: (audio: HTMLAudioElement | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
+  setSentences: (sentences: string[]) => void;
   reset: () => void;
 }
 
@@ -31,6 +33,7 @@ const initialState: SynthesisState = {
   result: null,
   audioElement: null,
   isPlaying: false,
+  sentences: [],
 };
 
 export const useSynthesisStore = create<SynthesisState & SynthesisActions>((set) => ({
@@ -42,5 +45,6 @@ export const useSynthesisStore = create<SynthesisState & SynthesisActions>((set)
   setResult: (result): void => { set({ result, phoneticText: result?.phoneticText ?? '' }); },
   setAudioElement: (audioElement): void => { set({ audioElement }); },
   setIsPlaying: (isPlaying): void => { set({ isPlaying }); },
+  setSentences: (sentences): void => { set({ sentences }); },
   reset: (): void => { set(initialState); },
 }));

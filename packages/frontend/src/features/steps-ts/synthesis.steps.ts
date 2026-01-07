@@ -144,8 +144,8 @@ Given('I have multiple sentence rows', async function (this: TestWorld) {
 
 Then('each sentence displays a drag handle', async function (this: TestWorld) {
   // Drag handles are grid of dots (6 dots in 2x3 grid)
-  // They use CSS class .drag-handle
-  const rows = this.container?.querySelectorAll('.drag-handle');
+  // They use CSS class .sentence-list-item__drag
+  const rows = this.container?.querySelectorAll('.sentence-list-item__drag');
   // Each sentence row has a drag handle grid
   assert.ok(rows && rows.length > 0, 'Should have drag handle elements');
 });

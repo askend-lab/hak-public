@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { PlayButton } from '../ui'
+import { SentenceListItem } from '../ui'
 import { WordChip } from './WordChip'
 import { VariantsPanel } from './VariantsPanel'
 import type { Variant } from './VariantsPanel'
@@ -12,6 +12,7 @@ interface SentenceRowProps {
   onPlay: () => void
   onRemove: () => void
   onExplorePhonetic?: () => void
+  onAddToTask?: (text: string) => void
   isLoading: boolean
   isLast: boolean
   index: number
@@ -23,7 +24,7 @@ interface SentenceRowProps {
   isDragOver?: boolean
 }
 
-export function SentenceRow({ value, onChange, onPlay, onRemove, onExplorePhonetic, isLoading, isLast, index, onDragStart, onDragOver, onDragEnd, onDrop, isDragging, isDragOver }: SentenceRowProps) {
+export function SentenceRow({ value, onChange, onPlay, onRemove, onExplorePhonetic, onAddToTask, isLoading, isLast, index, onDragStart, onDragOver, onDragEnd, onDrop, isDragging, isDragOver }: SentenceRowProps) {
   const { t } = useTranslation()
   const [selectedWord, setSelectedWord] = useState<string | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
@@ -33,24 +34,6 @@ export function SentenceRow({ value, onChange, onPlay, onRemove, onExplorePhonet
     value.trim() ? value.trim().split(/\s+/) : []
   )
   const inputRef = useRef<HTMLInputElement>(null)
-  
-  const rowClasses = [
-    'sentence-row',
-    !isLast && 'sentence-row--bordered',
-    isDragging && 'sentence-row--dragging',
-    isDragOver && 'sentence-row--drag-over'
-  ].filter(Boolean).join(' ')
-  
-  const handleDragOver = (e: React.DragEvent): void => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    onDragOver(index)
-  }
-  
-  const handleDrop = (e: React.DragEvent): void => {
-    e.preventDefault()
-    onDrop(index)
-  }
   
   const handleWordClick = (word: string): void => {
     setSelectedWord(word)
@@ -122,68 +105,51 @@ export function SentenceRow({ value, onChange, onPlay, onRemove, onExplorePhonet
     await playAudio(result.audioUrl)
   }
   
-  const rowRef = useRef<HTMLDivElement>(null)
-  
-  const handleDragStartFromHandle = (e: React.DragEvent): void => {
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('text/html', String(index))
-    // Set drag image to be the whole row
-    if (rowRef.current) {
-      e.dataTransfer.setDragImage(rowRef.current, 20, rowRef.current.offsetHeight / 2)
-      setTimeout(() => {
-        if (rowRef.current) rowRef.current.style.opacity = '0.5'
-      }, 0)
-    }
-    onDragStart(index)
-  }
-  
-  const handleDragEndWithOpacity = (): void => {
-    if (rowRef.current) rowRef.current.style.opacity = '1'
-    onDragEnd()
-  }
-  
   return (
-    <div
-      ref={rowRef}
-      className={rowClasses}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      <DragHandle 
-        draggable
-        onDragStart={handleDragStartFromHandle}
-        onDragEnd={handleDragEndWithOpacity}
-      />
-      <div className="sentence-row__words" onClick={handleContainerClick}>
-        {tags.map((word: string, index: number) => (
-          <WordChip
-            key={`${word}-${index}`}
-            word={word}
-            onClick={handleWordClick}
-            isSelected={selectedWord === word}
+    <>
+      <SentenceListItem
+        index={index}
+        onPlay={onPlay}
+        isLoading={isLoading}
+        isActive={value.trim().length > 0 || currentInput.trim().length > 0}
+        isLast={isLast}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDragEnd={onDragEnd}
+        onDrop={onDrop}
+        isDragging={isDragging}
+        isDragOver={isDragOver}
+        actions={<MoreButton onRemove={onRemove} onExplorePhonetic={onExplorePhonetic} onAddToTask={() => { onAddToTask?.(value || currentInput); }} isDisabled={!value.trim() && !currentInput.trim()} />}
+      >
+        <div className="sentence-list-item__content" onClick={handleContainerClick}>
+          {tags.map((word: string, idx: number) => (
+            <WordChip
+              key={`${word}-${idx}`}
+              word={word}
+              onClick={handleWordClick}
+              isSelected={selectedWord === word}
+            />
+          ))}
+          <input
+            ref={inputRef}
+            type="text"
+            value={currentInput}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder={tags.length === 0 && !currentInput ? t('input.placeholder') : ''}
+            className="sentence-row__input sentence-row__input--inline"
           />
-        ))}
-        <input
-          ref={inputRef}
-          type="text"
-          value={currentInput}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder={tags.length === 0 && !currentInput ? t('input.placeholder') : ''}
-          className="sentence-row__input sentence-row__input--inline"
-        />
-        {(tags.length > 0 || currentInput) && (
-          <button 
-            className="sentence-row__clear-btn" 
-            onClick={() => { setTags([]); setCurrentInput(''); onChange(''); }}
-            aria-label="Clear"
-          >
-            ✕
-          </button>
-        )}
-      </div>
-      <PlayButton onClick={onPlay} isLoading={isLoading} isActive={value.trim().length > 0 || currentInput.trim().length > 0} />
-      <MoreButton onRemove={onRemove} onExplorePhonetic={onExplorePhonetic} />
+          {(tags.length > 0 || currentInput) && (
+            <button 
+              className="sentence-row__clear-btn" 
+              onClick={() => { setTags([]); setCurrentInput(''); onChange(''); }}
+              aria-label="Clear"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </SentenceListItem>
       
       {selectedWord && (
         <VariantsPanel
@@ -195,37 +161,15 @@ export function SentenceRow({ value, onChange, onPlay, onRemove, onExplorePhonet
           onPlayVariant={handlePlayVariant}
         />
       )}
-    </div>
+    </>
   )
 }
 
-const DRAG_DOTS_COUNT = 6;
-
-interface DragHandleProps {
-  draggable?: boolean
-  onDragStart?: (e: React.DragEvent) => void
-  onDragEnd?: () => void
-}
-
-function DragHandle({ draggable, onDragStart, onDragEnd }: DragHandleProps) {
-  return (
-    <div 
-      className="drag-handle"
-      draggable={draggable}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-    >
-      {Array.from({ length: DRAG_DOTS_COUNT }).map((_, i) => (
-        <div key={i} className="drag-handle__dot" />
-      ))}
-    </div>
-  )
-}
-
-function MoreButton({ onRemove, onExplorePhonetic }: { onRemove: () => void; onExplorePhonetic?: (() => void) | undefined }) {
+function MoreButton({ onRemove, onExplorePhonetic, onAddToTask, isDisabled }: { onRemove: () => void; onExplorePhonetic?: (() => void) | undefined; onAddToTask?: (() => void) | undefined; isDisabled?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   
-  const handleAddToTask = (): void => { setIsOpen(false); /* TODO: implement */ }
+  const handleToggle = (): void => { if (!isDisabled) setIsOpen(!isOpen); }
+  const handleAddToTask = (): void => { setIsOpen(false); onAddToTask?.(); }
   const handleDownload = (): void => { setIsOpen(false); /* TODO: implement */ }
   const handleExplorePhonetic = (): void => { 
     setIsOpen(false)
@@ -239,9 +183,11 @@ function MoreButton({ onRemove, onExplorePhonetic }: { onRemove: () => void; onE
     }
   }
   
+  const triggerClasses = ['more-menu__trigger', isDisabled && 'more-menu__trigger--disabled'].filter(Boolean).join(' ')
+  
   return (
     <div className="more-menu" onBlur={handleBlur}>
-      <button onClick={() => setIsOpen(!isOpen)} className="more-menu__trigger">⋯</button>
+      <button onClick={handleToggle} className={triggerClasses}>⋯</button>
       {isOpen && (
         <div role="menu" className="more-menu__dropdown">
           <button role="menuitem" onClick={handleExplorePhonetic} className="more-menu__item">

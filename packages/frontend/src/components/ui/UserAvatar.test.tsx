@@ -154,4 +154,74 @@ describe('UserAvatar', () => {
     expect(screen.getByText('LMN')).toBeInTheDocument();
     expect(screen.getByText('Very Long User Name That Might Overflow')).toBeInTheDocument();
   });
+
+  describe('Dropdown actions', () => {
+    it('should call onLogout and close dropdown when logout button clicked', () => {
+      const mockLogout = vi.fn();
+      render(
+        <UserAvatar 
+          initials="MT" 
+          name="Test" 
+          onLogout={mockLogout}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button'));
+      fireEvent.click(screen.getByText('Logi välja'));
+
+      expect(mockLogout).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onReset and close dropdown when reset button clicked', () => {
+      const mockReset = vi.fn();
+      render(
+        <UserAvatar 
+          initials="MT" 
+          name="Test" 
+          onReset={mockReset}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button'));
+      fireEvent.click(screen.getByText('Kustuta kohalikud andmed'));
+
+      expect(mockReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onRefreshToken when refresh button clicked', async () => {
+      const mockRefresh = vi.fn().mockResolvedValue(undefined);
+      render(
+        <UserAvatar 
+          initials="MT" 
+          name="Test" 
+          onRefreshToken={mockRefresh}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button'));
+      fireEvent.click(screen.getByText('🧪 Test Token Refresh'));
+
+      expect(mockRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('should toggle dropdown open/close on button click', () => {
+      render(
+        <UserAvatar 
+          initials="MT" 
+          name="Test" 
+          onLogout={vi.fn()}
+        />
+      );
+
+      const button = screen.getByRole('button');
+      
+      // First click opens dropdown
+      fireEvent.click(button);
+      expect(screen.getByText('Logi välja')).toBeInTheDocument();
+
+      // Second click closes dropdown
+      fireEvent.click(button);
+      expect(screen.queryByText('Logi välja')).not.toBeInTheDocument();
+    });
+  });
 });

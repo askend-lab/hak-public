@@ -30,6 +30,11 @@ describe('logger', () => {
     expect(typeof logger.error).toBe('function');
   });
 
+  it('should call console.debug for debug level', () => {
+    logger.debug('Test debug message');
+    expect(console.debug).toHaveBeenCalled();
+  });
+
   it('should call console.info for info level', () => {
     logger.info('Test message');
     expect(console.info).toHaveBeenCalled();

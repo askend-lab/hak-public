@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 
-import { PlayButton } from '../ui';
+import { SentenceListItem } from '../ui';
 import { API_CONFIG } from '../../services/config';
 import { synthesizeText, playAudio } from '../../services/audio';
 import type { Task, TaskEntry } from '../../services/tasks';
@@ -29,7 +29,8 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
   const synthesizeAndPlay = async (entry: TaskEntry): Promise<void> => {
     setCurrentLoadingId(entry.id);
     try {
-      const result = await synthesizeText(entry.synthesis.phoneticText);
+      const textToSynthesize = entry.synthesis.phoneticText || entry.synthesis.originalText;
+      const result = await synthesizeText(textToSynthesize);
       setCurrentLoadingId(null);
       setCurrentPlayingId(entry.id);
       
@@ -125,7 +126,8 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
           } else {
             setCurrentLoadingId(entry.id);
             try {
-              const result = await synthesizeText(entry.synthesis.phoneticText);
+              const textToSynthesize = entry.synthesis.phoneticText || entry.synthesis.originalText;
+              const result = await synthesizeText(textToSynthesize);
               setCurrentLoadingId(null);
               setCurrentPlayingId(entry.id);
               await playAudio(result.audioUrl);
@@ -142,10 +144,6 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
     setCurrentPlayingId(null);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  };
 
   return (
     <div className="task-detail-view">
@@ -242,35 +240,46 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
         ) : (
           <div className="task-entries-list">
             {task.entries.map((entry, index) => (
-              <div key={entry.id} className="playlist-item">
-                <div className="playlist-item-drag">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="8" y1="6" x2="16" y2="6"/>
-                    <line x1="8" y1="12" x2="16" y2="12"/>
-                    <line x1="8" y1="18" x2="16" y2="18"/>
-                  </svg>
+              <SentenceListItem
+                key={entry.id}
+                index={index}
+                onPlay={() => { void handlePlayEntry(entry.id); }}
+                isActive={true}
+                isLoading={currentLoadingId === entry.id}
+                isPlaying={currentPlayingId === entry.id}
+                isLast={index === task.entries.length - 1}
+                actions={<MoreButton />}
+              >
+                <div className="sentence-list-item__content">
+                  <span className="sentence-list-item__text">{entry.synthesis.originalText}</span>
                 </div>
-                <div className="playlist-item-content">
-                  <span className="playlist-item-number">{index + 1}.</span>
-                  <span className="playlist-item-text">{entry.synthesis.originalText}</span>
-                </div>
-                <div className="playlist-item-meta">
-                  <span className="playlist-item-date">{formatDate(entry.addedAt)}</span>
-                </div>
-                <div className="playlist-item-actions">
-                  <PlayButton
-                    onClick={() => { void handlePlayEntry(entry.id); }}
-                    isActive={true}
-                    isLoading={currentLoadingId === entry.id}
-                    isPlaying={currentPlayingId === entry.id}
-                    size="small"
-                  />
-                </div>
-              </div>
+              </SentenceListItem>
             ))}
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function MoreButton() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleBlur = (e: React.FocusEvent): void => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <div className="more-menu" onBlur={handleBlur}>
+      <button onClick={() => setIsOpen(!isOpen)} className="more-menu__trigger">⋯</button>
+      {isOpen && (
+        <div role="menu" className="more-menu__dropdown">
+          <button role="menuitem" className="more-menu__item">Lae alla</button>
+          <button role="menuitem" className="more-menu__item more-menu__item--danger" onClick={() => setIsOpen(false)}>Eemalda</button>
+        </div>
+      )}
     </div>
   );
 }

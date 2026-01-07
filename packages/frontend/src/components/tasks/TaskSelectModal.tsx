@@ -10,7 +10,7 @@ interface TaskSelectModalProps { onClose?: () => void; }
 export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
   const { activeModal, closeModal, addNotification } = useUIStore();
   const { tasks, setTasks, setLoading, isLoading } = useTasksStore();
-  const { text, result } = useSynthesisStore();
+  const { text, sentences } = useSynthesisStore();
   const { user } = useAuth();
   
   const [mode, setMode] = useState<'create' | 'existing'>('create');
@@ -57,16 +57,18 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     }
   }, [isSubmitting, resetForm, closeModal, onClose]);
 
-  const createEntry = useCallback(() => {
-    if (!result) return null;
-    const synthesis = createSynthesisEntry({
-      originalText: text,
-      phoneticText: result.phoneticText,
-      audioHash: result.audioHash,
-      voiceModel: result.voiceModel,
+  const createEntries = useCallback(() => {
+    const textsToAdd = sentences.length > 0 ? sentences : (text ? [text] : []);
+    return textsToAdd.map((sentenceText, index) => {
+      const synthesis = createSynthesisEntry({
+        originalText: sentenceText,
+        phoneticText: '',
+        audioHash: '',
+        voiceModel: 'efm_s',
+      });
+      return createTaskEntry(synthesis, index);
     });
-    return createTaskEntry(synthesis, 0);
-  }, [result, text]);
+  }, [sentences, text]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +90,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
 
     try {
       const userId = user?.id ?? 'test-user';
-      const entry = createEntry();
+      const entries = createEntries();
 
       if (mode === 'create') {
         const createResponse = await createTask(userId, {
@@ -96,38 +98,36 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
           description: description.trim() || undefined,
         });
         if (createResponse.success && createResponse.data) {
-          if (entry) {
+          for (const entry of entries) {
             await addEntryToTask(userId, createResponse.data.id, entry);
           }
-          addNotification('success', `Ülesanne "${name}" loodud`);
+          addNotification('success', `Ülesanne "${name}" loodud (${entries.length} lauset)`);
           handleClose();
         } else {
           setError(createResponse.error ?? 'Viga ülesande loomisel');
         }
       } else {
-        if (!entry) return;
-        const response = await addEntryToTask(userId, selectedTaskId, entry);
+        if (entries.length === 0) return;
         const taskName = tasks.find(t => t.id === selectedTaskId)?.name ?? 'ülesanne';
-        if (response.success) {
-          addNotification('success', `Lisatud ülesandesse "${taskName}"`);
-          handleClose();
-        } else {
-          setError(response.error ?? 'Lisamine ebaõnnestus');
+        for (const entry of entries) {
+          await addEntryToTask(userId, selectedTaskId, entry);
         }
+        addNotification('success', `Lisatud ${entries.length} lauset ülesandesse "${taskName}"`);
+        handleClose();
       }
     } catch {
       setError('Võrgu viga');
     } finally {
       setIsSubmitting(false);
     }
-  }, [mode, name, description, selectedTaskId, user, tasks, createEntry, addNotification, handleClose]);
+  }, [mode, name, description, selectedTaskId, user, tasks, createEntries, addNotification, handleClose]);
 
   if (!isOpen) return null;
 
   return (
     <>
       <div className="task-modal-backdrop" onClick={handleClose} />
-      <div className="task-modal" role="dialog" aria-modal="true">
+      <div className="task-modal" role="dialog" aria-modal="true" data-testid="create-task-modal">
         <div className="task-modal-header">
           <h2 className="task-modal-title">Loo uus ülesanne</h2>
           <button onClick={handleClose} className="task-modal-close" disabled={isSubmitting} aria-label="Sulge">
@@ -175,6 +175,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
                   value={name}
                   onChange={(e) => { setName(e.target.value); }}
                   className="task-form-input"
+                  data-testid="create-task-name-input"
                   placeholder="Sisesta ülesande nimi"
                   disabled={isSubmitting}
                   autoFocus
@@ -223,12 +224,17 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
             </div>
           )}
 
-          {text && (
+          {(sentences.length > 0 || text) && (
             <div className="task-form-field">
               <div className="task-playlist-preview">
-                <p className="task-playlist-preview-title">Lisatavad lausungid (1 lausung):</p>
+                <p className="task-playlist-preview-title">
+                  Lisatavad lausungid ({sentences.length > 0 ? sentences.length : 1} lausung{(sentences.length > 1) ? 'it' : ''}):
+                </p>
                 <div className="task-playlist-preview-items">
-                  <div className="task-playlist-preview-item">1. {text}</div>
+                  {sentences.length > 0 
+                    ? sentences.map((s, i) => <div key={i} className="task-playlist-preview-item">{i + 1}. {s}</div>)
+                    : <div className="task-playlist-preview-item">1. {text}</div>
+                  }
                 </div>
               </div>
             </div>
@@ -243,6 +249,7 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
             <button
               type="submit"
               className="task-modal-submit"
+              data-testid="create-task-submit-btn"
               disabled={isSubmitting || (mode === 'create' ? !name.trim() : !selectedTaskId)}
             >
               {isSubmitting ? (mode === 'create' ? 'Loon...' : 'Salvestan...') : (mode === 'create' ? 'Loo ülesanne' : 'Salvesta')}

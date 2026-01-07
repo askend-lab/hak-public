@@ -370,4 +370,12 @@
     background: #C5CBD1;
     cursor: not-allowed;
   }
+
+  &-danger {
+    background: #C62828;
+
+    &:hover:not(:disabled) {
+      background: darken(#C62828, 10%);
+    }
+  }
 }

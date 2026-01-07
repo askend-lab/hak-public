@@ -35,4 +35,5 @@ export interface AuthContextValue extends AuthState {
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   handleCallback?: (tokens: TokenPayload) => void;
+  handleCodeCallback?: (code: string) => Promise<boolean>;
 }

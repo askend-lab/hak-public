@@ -140,12 +140,16 @@ describe('Header', () => {
     const navTabs = screen.getAllByTestId('nav-tab');
     
     // Check that tabs are rendered
-    expect(navTabs).toHaveLength(2);
+    expect(navTabs).toHaveLength(3);
     expect(navTabs[0]).toHaveTextContent('Kõnesüntees');
     expect(navTabs[1]).toHaveTextContent('Ülesanded');
+    expect(navTabs[2]).toHaveTextContent('Tests');
     
     // Click tasks tab - should not crash
     navTabs[1]?.click();
+    
+    // Click specs tab - should not crash
+    navTabs[2]?.click();
     
     // Click synthesis tab - should not crash
     navTabs[0]?.click();
@@ -170,6 +174,26 @@ describe('Header', () => {
       );
       const header = document.querySelector('.header');
       expect(header).toBeInTheDocument();
+    });
+
+    it('should have header__container for consistent width with footer', () => {
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: false,
+        user: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+        refreshSession: vi.fn(),
+        isLoading: false,
+        error: null,
+      });
+      
+      render(
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      );
+      const container = document.querySelector('.header__container');
+      expect(container).toBeInTheDocument();
     });
   });
 

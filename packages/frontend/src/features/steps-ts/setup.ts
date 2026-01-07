@@ -130,6 +130,7 @@ export class TestWorld extends World {
   }
 
   click(element: Element): void {
+    (element as HTMLElement).focus?.();
     fireEvent.click(element);
   }
 

@@ -92,13 +92,26 @@ Then('I see a login button', async function (this: TestWorld) {
   assert.ok(loginButton, 'Should find login button');
 });
 
+// Helper to create valid mock JWT with non-expired timestamp
+function createMockJwtForLogin(payload: Record<string, unknown> = {}): string {
+  const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const body = btoa(JSON.stringify({ 
+    sub: 'test-user-123', 
+    email: 'test@example.com',
+    exp: Math.floor(Date.now() / 1000) + 3600, // Expires in 1 hour
+    ...payload 
+  }));
+  return `${header}.${body}.mock-signature`;
+}
+
 When('I click the login button', async function (this: TestWorld) {
   clickButton(this.container, BUTTON_TEXTS.login, (el) => this.click(el));
   // Mock successful OAuth callback (OAuth redirect doesnt work in JSDOM)
   const { AuthStorage } = await import('../../services/auth/storage');
   AuthStorage.setUser({ id: 'test-user-123', email: 'test@example.com' });
-  AuthStorage.setAccessToken('mock-access-token');
-  AuthStorage.setIdToken('mock-id-token');
+  // Use valid JWT format with non-expired timestamp
+  AuthStorage.setAccessToken(createMockJwtForLogin());
+  AuthStorage.setIdToken(createMockJwtForLogin());
   // Re-render to pick up auth state change
   await this.renderApp();
 });
@@ -128,12 +141,25 @@ Then('the login button is not visible', async function (this: TestWorld) {
 
 // US-027: Logout
 
+// Helper to create valid mock JWT with non-expired timestamp
+function createMockJwt(payload: Record<string, unknown> = {}): string {
+  const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const body = btoa(JSON.stringify({ 
+    sub: 'test-user-123', 
+    email: 'test@example.com',
+    exp: Math.floor(Date.now() / 1000) + 3600, // Expires in 1 hour
+    ...payload 
+  }));
+  return `${header}.${body}.mock-signature`;
+}
+
 Given('I am logged in', async function (this: TestWorld) {
   // Mock authentication by setting storage directly (OAuth doesnt work in JSDOM)
   const { AuthStorage } = await import('../../services/auth/storage');
   AuthStorage.setUser({ id: 'test-user-123', email: 'test@example.com' });
-  AuthStorage.setAccessToken('mock-access-token');
-  AuthStorage.setIdToken('mock-id-token');
+  // Use valid JWT format with non-expired timestamp
+  AuthStorage.setAccessToken(createMockJwt());
+  AuthStorage.setIdToken(createMockJwt());
   
   await this.renderApp();
   await this.waitFor(() => {

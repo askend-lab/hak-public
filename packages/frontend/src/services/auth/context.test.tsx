@@ -43,7 +43,9 @@ describe('AuthProvider', () => {
 
   it('should restore user from storage', async () => {
     mockAuthStorage.getUser.mockReturnValue({ id: '1', email: 'stored@test.com' });
-    mockAuthStorage.getAccessToken.mockReturnValue('mock-token');
+    // Use valid JWT with non-expired timestamp
+    const validToken = createMockJwt({ exp: Math.floor(Date.now() / 1000) + 3600 });
+    mockAuthStorage.getAccessToken.mockReturnValue(validToken);
 
     render(
       <AuthProvider>
@@ -75,12 +77,14 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('loading')).toHaveTextContent('ready');
     });
 
-    act(() => {
+    await act(async () => {
       screen.getByText('Login').click();
     });
 
-    // Login should trigger redirect to OAuth
-    expect(window.location.href).toContain('cognito');
+    // Login should trigger redirect to OAuth (async with PKCE)
+    await waitFor(() => {
+      expect(window.location.href).toContain('cognito');
+    });
 
     // Restore
     Object.defineProperty(window, 'location', {
@@ -91,6 +95,9 @@ describe('AuthProvider', () => {
 
   it('should logout user', async () => {
     mockAuthStorage.getUser.mockReturnValue({ id: '1', email: 'test@test.com' });
+    // Use valid JWT with non-expired timestamp
+    const validToken = createMockJwt({ exp: Math.floor(Date.now() / 1000) + 3600 });
+    mockAuthStorage.getAccessToken.mockReturnValue(validToken);
 
     render(
       <AuthProvider>
@@ -126,3 +133,95 @@ describe('useAuth', () => {
     consoleError.mockRestore();
   });
 });
+
+describe('Token Refresh (Sliding Session)', () => {
+  const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAuthStorage.getUser.mockReturnValue({ id: '1', email: 'test@test.com' });
+    mockAuthStorage.getRefreshToken.mockReturnValue('mock-refresh-token');
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  it('should authenticate with valid non-expiring token', async () => {
+    // Token that expires in 1 hour (NOT expiring soon)
+    const validToken = createMockJwt({ exp: Math.floor(Date.now() / 1000) + 3600 });
+    mockAuthStorage.getAccessToken.mockReturnValue(validToken);
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('authenticated')).toHaveTextContent('yes');
+    });
+
+    // Token should not trigger refresh
+    expect(mockAuthStorage.getAccessToken).toHaveBeenCalled();
+  });
+
+  it('should refresh token when access token is expired', async () => {
+    // Expired access token
+    const expiredToken = createMockJwt({ exp: Math.floor(Date.now() / 1000) - 100 });
+    mockAuthStorage.getAccessToken.mockReturnValue(expiredToken);
+    mockAuthStorage.getRefreshToken.mockReturnValue('valid-refresh-token');
+
+    // Mock successful token refresh BEFORE render
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        access_token: 'new-access-token',
+        id_token: 'new-id-token',
+        expires_in: 3600,
+      }),
+    });
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(mockAuthStorage.setAccessToken).toHaveBeenCalledWith('new-access-token');
+    });
+  });
+
+  it('should logout user when refresh token is expired', async () => {
+    const expiredToken = createMockJwt({ exp: Math.floor(Date.now() / 1000) - 100 });
+    mockAuthStorage.getAccessToken.mockReturnValue(expiredToken);
+    mockAuthStorage.getRefreshToken.mockReturnValue('expired-refresh-token');
+
+    // Mock failed token refresh BEFORE render
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: () => Promise.resolve({ error: 'invalid_grant' }),
+    });
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      // Should clear auth and redirect to login
+      expect(mockAuthStorage.clear).toHaveBeenCalled();
+    });
+  });
+});
+
+// Helper to create mock JWT
+function createMockJwt(payload: { exp: number; sub?: string; email?: string }): string {
+  const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const body = btoa(JSON.stringify({ sub: '123', email: 'test@test.com', ...payload }));
+  const signature = 'mock-signature';
+  return `${header}.${body}.${signature}`;
+}

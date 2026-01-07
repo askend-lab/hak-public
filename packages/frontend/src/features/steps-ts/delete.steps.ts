@@ -18,6 +18,11 @@ Given('I have sentence rows in the list', async function (this: TestWorld) {
 
 When('I click the three-dots menu on a sentence', async function (this: TestWorld) {
   clickMenuButton(this.container, 0, (el) => this.click(el));
+  // Wait for menu to open
+  await this.waitFor(() => {
+    const dropdown = this.container?.querySelector('.more-menu__dropdown');
+    if (!dropdown) throw new Error('Menu dropdown should be visible');
+  });
 });
 
 Then('I see an {string} option in the dropdown', async function (this: TestWorld, optionText: string) {

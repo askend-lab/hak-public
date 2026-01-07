@@ -3,8 +3,10 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 0.75rem 0;
+  padding: 0.75rem 1rem;
   position: relative;
+  background: $color-white;
+  border-radius: $border-radius-sm;
 
   &--bordered {
     border-bottom: 1px solid $color-outlined-neutral;
@@ -20,6 +22,7 @@
     border-radius: $border-radius-sm;
     min-height: 48px;
     cursor: text;
+    background: $color-white;
 
     &:focus-within {
       border-color: $color-primary;

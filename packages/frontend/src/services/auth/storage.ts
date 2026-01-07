@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   USER: 'hak_user',
   ACCESS_TOKEN: 'hak_access_token',
   ID_TOKEN: 'hak_id_token',
+  REFRESH_TOKEN: 'hak_refresh_token',
 };
 
 export const AuthStorage = {
@@ -32,11 +33,20 @@ export const AuthStorage = {
     localStorage.setItem(STORAGE_KEYS.ID_TOKEN, token);
   },
 
+  getRefreshToken(): string | null {
+    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+  },
+
+  setRefreshToken(token: string): void {
+    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
+  },
+
   clear(): void {
     // Clear our keys
     localStorage.removeItem(STORAGE_KEYS.USER);
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.ID_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     
     // Clear ALL Cognito-related keys (from any client ID)
     const keysToRemove: string[] = [];
