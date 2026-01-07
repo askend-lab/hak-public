@@ -1,41 +1,32 @@
-# Merlin Worker
+# Merlin TTS Service
 
-SQS worker that processes audio synthesis requests using the Merlin TTS model.
+This directory contains only the Docker configuration for Merlin TTS.
 
-## Overview
+**Important:** The source code (`src/`) and models (`voices/`) are NOT stored in git.
+They are copied from `research/merlin/` during Docker build.
 
-This worker polls an SQS queue for synthesis requests, calls the Merlin API to generate audio, and uploads the result to S3.
+## Files in git:
+- `Dockerfile` - Docker image configuration
+- `app.py` - Flask API wrapper
+- `docker-entrypoint.sh` - Container startup script
+- `mrln_et.yml` - Conda environment specification
+- `README.md` - This file
 
-## Flow
+## Building:
 
-```
-SQS Queue → Worker → Merlin API → S3 Bucket
-```
+**IMPORTANT:** The build context MUST be the project root (not services/merlin/).
 
-1. Receive message from SQS (text + hash)
-2. Call Merlin API to synthesize audio
-3. Upload audio to S3 with hash as filename
-4. Delete message from queue
-
-## Configuration
-
-Environment variables:
-- `QUEUE_URL` - SQS queue URL
-- `BUCKET_NAME` - S3 bucket for audio files
-- `MERLIN_URL` - Merlin TTS API endpoint
-
-## Usage
+The Dockerfile copies files from `research/merlin/` which is NOT in git.
 
 ```bash
-# Run tests
-pnpm test
-
-# Deploy
-pnpm run deploy
+# From project root:
+docker build -f services/merlin/Dockerfile -t merlin:latest .
 ```
 
-## Exports
+Or use docker-compose which handles the context correctly.
 
-```typescript
-import { processMessage, WorkerConfig } from '@hak/merlin-worker';
-```
+### Why research/ is not in git:
+
+The merlin repository is ~600MB with models and compiled tools.
+To keep our git repo small, we clone it separately and copy files during Docker build.
+
