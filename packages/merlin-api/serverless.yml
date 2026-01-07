@@ -64,6 +64,7 @@ custom:
     createRoute53Record: true
     endpointType: REGIONAL
     hostedZoneId: Z0251725SXN1AR149FEI
+    apiType: http
 
 package:
   individually: true
