@@ -1,9 +1,15 @@
 # Vabamorf API Lambda with Lambda Web Adapter + API Gateway + Custom Domain
 # Uses Debian-based container with pre-built vmetajson binary
 
+variable "vabamorf_image_tag" {
+  description = "Docker image tag for vabamorf Lambda"
+  type        = string
+  default     = "latest"
+}
+
 locals {
   vabamorf_function_name = "vabamorf-api-${var.env}"
-  vabamorf_image_tag     = "latest"
+  vabamorf_image_tag     = var.vabamorf_image_tag
   vabamorf_domain_name   = var.env == "prod" ? "vabamorf.askend-lab.com" : "vabamorf-${var.env}.askend-lab.com"
 }
 
