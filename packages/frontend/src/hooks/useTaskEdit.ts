@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { updateTask } from '../services/tasks'
 import { useUserId } from './useUserId'
 import type { Task } from '../services/tasks'
@@ -17,6 +18,7 @@ interface UseTaskEditReturn {
 }
 
 export function useTaskEdit(onSuccess?: () => void): UseTaskEditReturn {
+  const { t } = useTranslation()
   const userId = useUserId()
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [editName, setEditName] = useState('')
@@ -34,7 +36,7 @@ export function useTaskEdit(onSuccess?: () => void): UseTaskEditReturn {
   const saveEdit = useCallback(async (): Promise<boolean> => {
     if (!editingTask) return false
     if (!editName.trim()) {
-      setEditError('Ülesande nimi on kohustuslik')
+      setEditError(t('errors.taskNameRequired'))
       return false
     }
     setIsEditing(true)
@@ -52,7 +54,7 @@ export function useTaskEdit(onSuccess?: () => void): UseTaskEditReturn {
     } finally {
       setIsEditing(false)
     }
-  }, [editingTask, editName, editDescription, userId, onSuccess])
+  }, [editingTask, editName, editDescription, userId, onSuccess, t])
 
   const cancelEdit = useCallback(() => {
     setEditingTask(null)
