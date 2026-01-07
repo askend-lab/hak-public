@@ -1,5 +1,6 @@
 export { NotificationContainer } from './Notification';
 export { Modal } from './Modal';
+export { ExtendedModal, ModalHeader, ModalBody, ModalFooter } from './ExtendedModal';
 export { ConfirmDialog } from './ConfirmDialog';
 export { DropdownMenu, MoreOptionsIcon } from './DropdownMenu';
 export type { DropdownMenuItem } from './DropdownMenu';
@@ -16,3 +17,6 @@ export { LogoWithText } from './LogoWithText';
 export { Card } from './Card';
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { SentenceListItem } from './SentenceListItem';
+export { FormField } from './FormField';
+export { Input } from './Input';
+export { Textarea } from './Textarea';

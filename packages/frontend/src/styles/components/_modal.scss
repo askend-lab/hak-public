@@ -379,3 +379,21 @@
     }
   }
 }
+
+// Modal size variants
+.modal {
+  &--small {
+    min-width: 400px;
+    max-width: 90vw;
+  }
+
+  &--medium {
+    min-width: 560px;
+    max-width: 90vw;
+  }
+
+  &--large {
+    min-width: 720px;
+    max-width: 90vw;
+  }
+}

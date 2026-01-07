@@ -11,6 +11,7 @@ interface ButtonProps {
   disabled?: boolean
   style?: CSSProperties
   className?: string
+  type?: 'button' | 'submit' | 'reset'
 }
 
 export function Button({
@@ -21,6 +22,7 @@ export function Button({
   disabled,
   style,
   className,
+  type = 'button',
 }: ButtonProps) {
   const classes = [
     'button',
@@ -35,6 +37,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       style={style}
+      type={type}
     >
       {children}
     </button>

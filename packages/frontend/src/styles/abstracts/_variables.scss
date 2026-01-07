@@ -6,3 +6,8 @@
 // Layer 2: App-specific variables (only if not available in vendor)
 // Note: $color-light-blue = $color-soft-primary-bg from vendor
 // Note: $border-radius-round already in vendor (10rem)
+
+// -------------------------------------------------------------------------
+// Layer 3: Design tokens for spacing, sizing, and common values
+// -------------------------------------------------------------------------
+@use 'design-tokens' as *;
