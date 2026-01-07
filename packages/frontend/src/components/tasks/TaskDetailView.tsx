@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 
 import { SentenceListItem } from '../ui';
-import { API_CONFIG } from '../../services/config';
 import { synthesizeText, playAudio } from '../../services/audio';
 import type { Task, TaskEntry } from '../../services/tasks';
 
@@ -17,14 +16,6 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
   const [isHeaderMenuOpen, setIsHeaderMenuOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const playAllAbortRef = useRef<boolean>(false);
-
-  const getAudioUrl = (entry: TaskEntry): string | null => {
-    const hash = entry.synthesis.audioHash;
-    if (hash && hash !== 'h1' && hash !== 'h2' && hash !== 'h3') {
-      return `${API_CONFIG.audioBucketUrl}/cache/${hash}.mp3`;
-    }
-    return null;
-  };
 
   const synthesizeAndPlay = async (entry: TaskEntry): Promise<void> => {
     setCurrentLoadingId(entry.id);
@@ -54,7 +45,6 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
   };
 
   const handlePlayEntry = async (entryId: string) => {
-    // Stop current audio if playing
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -68,27 +58,7 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
     const entry = task.entries.find(e => e.id === entryId);
     if (!entry) return;
 
-    const cachedUrl = getAudioUrl(entry);
-    
-    if (cachedUrl) {
-      setCurrentPlayingId(entryId);
-      const audio = new Audio(cachedUrl);
-      audioRef.current = audio;
-      
-      audio.onended = () => setCurrentPlayingId(null);
-      audio.onerror = () => {
-        // Fallback to synthesis if cached audio fails
-        void synthesizeAndPlay(entry);
-      };
-      
-      try {
-        await audio.play();
-      } catch {
-        void synthesizeAndPlay(entry);
-      }
-    } else {
-      await synthesizeAndPlay(entry);
-    }
+    await synthesizeAndPlay(entry);
   };
 
   const handlePlayAll = async () => {
@@ -114,27 +84,16 @@ export function TaskDetailView({ task, onBack }: TaskDetailViewProps) {
       
       await new Promise<void>((resolve) => {
         const playEntry = async () => {
-          const cachedUrl = getAudioUrl(entry);
-          
-          if (cachedUrl) {
+          setCurrentLoadingId(entry.id);
+          try {
+            const textToSynthesize = entry.synthesis.phoneticText || entry.synthesis.originalText;
+            const result = await synthesizeText(textToSynthesize);
+            setCurrentLoadingId(null);
             setCurrentPlayingId(entry.id);
-            const audio = new Audio(cachedUrl);
-            audioRef.current = audio;
-            audio.onended = () => { setCurrentPlayingId(null); resolve(); };
-            audio.onerror = () => { setCurrentPlayingId(null); resolve(); };
-            try { await audio.play(); } catch { resolve(); }
-          } else {
-            setCurrentLoadingId(entry.id);
-            try {
-              const textToSynthesize = entry.synthesis.phoneticText || entry.synthesis.originalText;
-              const result = await synthesizeText(textToSynthesize);
-              setCurrentLoadingId(null);
-              setCurrentPlayingId(entry.id);
-              await playAudio(result.audioUrl);
-              setCurrentPlayingId(null);
-              resolve();
-            } catch { setCurrentLoadingId(null); resolve(); }
-          }
+            await playAudio(result.audioUrl);
+            setCurrentPlayingId(null);
+            resolve();
+          } catch { setCurrentLoadingId(null); resolve(); }
         };
         void playEntry();
       });
