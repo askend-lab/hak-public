@@ -43,7 +43,7 @@ custom:
     endpointType: REGIONAL
     apiType: http
     createRoute53Record: true
-    hostedZoneId: Z08749823PH6RLXNTUZOF
+    hostedZoneId: Z0251725SXN1AR149FEI
   domainNames:
     dev: vabamorf-dev.askend-lab.com
     prod: vabamorf.askend-lab.com
