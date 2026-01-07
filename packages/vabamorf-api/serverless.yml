@@ -11,6 +11,8 @@ provider:
   environment:
     VMETAJSON_PATH: /var/task/vmetajson.bin
     DICT_PATH: /var/task
+    AWS_LWA_PORT: 8080
+    PORT: 8080
 
   ecr:
     images:
@@ -18,37 +20,18 @@ provider:
         path: ./
 
 functions:
-  analyze:
+  # Single function with Lambda Web Adapter - routes all requests to HTTP server
+  api:
     image:
       name: vabamorf
-      command:
-        - handler.analyzeHandler
     events:
       - http:
-          path: /analyze
-          method: post
+          path: /{proxy+}
+          method: any
           cors: true
-
-  variants:
-    image:
-      name: vabamorf
-      command:
-        - handler.variantsHandler
-    events:
       - http:
-          path: /variants
-          method: post
-          cors: true
-
-  health:
-    image:
-      name: vabamorf
-      command:
-        - handler.healthHandler
-    events:
-      - http:
-          path: /health
-          method: get
+          path: /
+          method: any
           cors: true
 
 resources:
