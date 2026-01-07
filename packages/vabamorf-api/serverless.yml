@@ -9,7 +9,7 @@ provider:
   region: ${opt:region, 'us-east-1'}
   
   environment:
-    VMETAJSON_PATH: /var/task/vmetajson
+    VMETAJSON_PATH: /var/task/vmetajson.bin
     DICT_PATH: /var/task
 
   ecr:
@@ -22,7 +22,7 @@ functions:
     image:
       name: vabamorf
       command:
-        - dist/handler.analyzeHandler
+        - handler.analyzeHandler
     events:
       - http:
           path: /analyze
@@ -33,7 +33,7 @@ functions:
     image:
       name: vabamorf
       command:
-        - dist/handler.variantsHandler
+        - handler.variantsHandler
     events:
       - http:
           path: /variants
@@ -44,7 +44,7 @@ functions:
     image:
       name: vabamorf
       command:
-        - dist/handler.healthHandler
+        - handler.healthHandler
     events:
       - http:
           path: /health
