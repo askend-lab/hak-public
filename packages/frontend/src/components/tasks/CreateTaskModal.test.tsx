@@ -37,8 +37,8 @@ describe('CreateTaskModal', () => {
 
   it('calls onClose when close button clicked', () => {
     render(<CreateTaskModal isOpen={true} onClose={mockOnClose} onSuccess={mockOnSuccess} />);
-    const closeButton = screen.getByLabelText('Sulge');
-    fireEvent.click(closeButton);
+    const closeButton = document.querySelector('.modal__close');
+    fireEvent.click(closeButton!);
     expect(mockOnClose).toHaveBeenCalled();
   });
 
@@ -64,7 +64,7 @@ describe('CreateTaskModal', () => {
 
   it('calls onClose when backdrop clicked', () => {
     render(<CreateTaskModal isOpen={true} onClose={mockOnClose} onSuccess={mockOnSuccess} />);
-    const backdrop = document.querySelector('.task-modal-backdrop');
+    const backdrop = document.querySelector('.modal-overlay');
     fireEvent.click(backdrop!);
     expect(mockOnClose).toHaveBeenCalled();
   });

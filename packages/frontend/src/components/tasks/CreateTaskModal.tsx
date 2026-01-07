@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Modal } from '../ui';
 import { useAuth } from '../../services/auth';
 import { createTask } from '../../services/tasks';
 import { TaskForm } from './TaskForm';
@@ -39,24 +40,18 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <>
-      <div className="task-modal-backdrop" onClick={onClose} />
-      <div className="task-modal" role="dialog" aria-modal="true">
-        <div className="task-modal-header">
-          <h2 className="task-modal-title">Lisa ülesanne</h2>
-          <button onClick={onClose} className="task-modal-close" disabled={isSubmitting} aria-label="Sulge">
-            ×
-          </button>
-        </div>
-        <TaskForm
-          onSubmit={(data) => { void handleSubmit(data); }}
-          isSubmitting={isSubmitting}
-          error={error}
-        />
-      </div>
-    </>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Lisa ülesanne"
+      className="task-modal"
+    >
+      <TaskForm
+        onSubmit={(data) => { void handleSubmit(data); }}
+        isSubmitting={isSubmitting}
+        error={error}
+      />
+    </Modal>
   );
 }

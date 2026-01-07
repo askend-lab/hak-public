@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import { Header, Footer, NotificationContainer } from '../components';
+import { Modal, ConfirmDialog } from '../components/ui';
 import { TaskDetailView } from '../components/tasks/TaskDetailView';
 import { TaskSelectModal, CreateTaskModal } from '../components/tasks';
 import { useAuth } from '../services/auth';
@@ -261,95 +262,68 @@ export function TasksPage() {
       <NotificationContainer />
       <TaskSelectModal />
 
-      {deleteConfirmTaskId && (
-        <>
-          <div className="task-modal-backdrop" onClick={handleCancelDelete} />
-          <div className="task-modal" role="dialog" aria-modal="true" data-testid="delete-confirm-modal">
-            <div className="task-modal-header">
-              <h2 className="task-modal-title">Kustuta ülesanne</h2>
-              <button onClick={handleCancelDelete} className="task-modal-close" disabled={isDeleting} aria-label="Sulge">
-                ×
-              </button>
-            </div>
-            <div className="task-modal-form">
-              <p>Kas olete kindel, et soovite selle ülesande kustutada?</p>
-              <p><strong>{tasks.find(t => t.id === deleteConfirmTaskId)?.name}</strong></p>
-              <div className="task-modal-actions">
-                <button type="button" onClick={handleCancelDelete} className="task-modal-cancel" disabled={isDeleting}>
-                  Tühista
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { void handleConfirmDelete(); }}
-                  className="task-modal-submit task-modal-submit-danger"
-                  data-testid="delete-confirm-btn"
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? 'Kustutan...' : 'Kustuta'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <ConfirmDialog
+        isOpen={!!deleteConfirmTaskId}
+        onClose={handleCancelDelete}
+        onConfirm={() => { void handleConfirmDelete(); }}
+        title="Kustuta ülesanne"
+        message={`Kas olete kindel, et soovite kustutada ülesande "${tasks.find(t => t.id === deleteConfirmTaskId)?.name}"?`}
+        confirmText={isDeleting ? 'Kustutan...' : 'Kustuta'}
+        cancelText="Tühista"
+        variant="danger"
+      />
 
-      {editingTask && (
-        <>
-          <div className="task-modal-backdrop" onClick={handleCancelEdit} />
-          <div className="task-modal" role="dialog" aria-modal="true" data-testid="edit-task-modal">
-            <div className="task-modal-header">
-              <h2 className="task-modal-title">Muuda ülesannet</h2>
-              <button onClick={handleCancelEdit} className="task-modal-close" disabled={isEditing} aria-label="Sulge">
-                ×
-              </button>
+      <Modal
+        isOpen={!!editingTask}
+        onClose={handleCancelEdit}
+        title="Muuda ülesannet"
+        className="task-modal"
+      >
+        <form className="task-modal-form" onSubmit={(e) => { e.preventDefault(); void handleSaveEdit(); }} data-testid="edit-task-modal">
+          {editError && (
+            <div className="task-form-error">
+              <p>{editError}</p>
             </div>
-            <form className="task-modal-form" onSubmit={(e) => { e.preventDefault(); void handleSaveEdit(); }}>
-              {editError && (
-                <div className="task-form-error">
-                  <p>{editError}</p>
-                </div>
-              )}
-              <div className="task-form-field">
-                <label className="task-form-label" htmlFor="edit-task-name">Ülesande nimi *</label>
-                <input
-                  id="edit-task-name"
-                  type="text"
-                  className="task-form-input"
-                  data-testid="edit-task-name-input"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  disabled={isEditing}
-                  placeholder="Sisesta ülesande nimi"
-                />
-              </div>
-              <div className="task-form-field">
-                <label className="task-form-label" htmlFor="edit-task-description">Kirjeldus</label>
-                <textarea
-                  id="edit-task-description"
-                  className="task-form-textarea"
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  disabled={isEditing}
-                  placeholder="Kirjelda ülesande eesmärki või sisu (valikuline)"
-                />
-              </div>
-              <div className="task-modal-actions">
-                <button type="button" onClick={handleCancelEdit} className="task-modal-cancel" disabled={isEditing}>
-                  Tühista
-                </button>
-                <button
-                  type="submit"
-                  className="task-modal-submit"
-                  data-testid="edit-task-save-btn"
-                  disabled={isEditing}
-                >
-                  {isEditing ? 'Salvestan...' : 'Salvesta'}
-                </button>
-              </div>
-            </form>
+          )}
+          <div className="task-form-field">
+            <label className="task-form-label" htmlFor="edit-task-name">Ülesande nimi *</label>
+            <input
+              id="edit-task-name"
+              type="text"
+              className="task-form-input"
+              data-testid="edit-task-name-input"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              disabled={isEditing}
+              placeholder="Sisesta ülesande nimi"
+            />
           </div>
-        </>
-      )}
+          <div className="task-form-field">
+            <label className="task-form-label" htmlFor="edit-task-description">Kirjeldus</label>
+            <textarea
+              id="edit-task-description"
+              className="task-form-textarea"
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              disabled={isEditing}
+              placeholder="Kirjelda ülesande eesmärki või sisu (valikuline)"
+            />
+          </div>
+          <div className="task-modal-actions">
+            <button type="button" onClick={handleCancelEdit} className="task-modal-cancel" disabled={isEditing}>
+              Tühista
+            </button>
+            <button
+              type="submit"
+              className="task-modal-submit"
+              data-testid="edit-task-save-btn"
+              disabled={isEditing}
+            >
+              {isEditing ? 'Salvestan...' : 'Salvesta'}
+            </button>
+          </div>
+        </form>
+      </Modal>
       <CreateTaskModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}

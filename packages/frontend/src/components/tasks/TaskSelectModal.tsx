@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 
+import { Modal } from '../ui';
 import { createSynthesisEntry, createTaskEntry } from '../../core';
 import { useSynthesisStore, useTasksStore, useUIStore } from '../../features';
 import { useAuth } from '../../services/auth';
@@ -122,20 +123,14 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
     }
   }, [mode, name, description, selectedTaskId, user, tasks, createEntries, addNotification, handleClose]);
 
-  if (!isOpen) return null;
-
   return (
-    <>
-      <div className="task-modal-backdrop" onClick={handleClose} />
-      <div className="task-modal" role="dialog" aria-modal="true" data-testid="create-task-modal">
-        <div className="task-modal-header">
-          <h2 className="task-modal-title">Loo uus ülesanne</h2>
-          <button onClick={handleClose} className="task-modal-close" disabled={isSubmitting} aria-label="Sulge">
-            ×
-          </button>
-        </div>
-
-        <form onSubmit={(e) => { void handleSubmit(e); }} className="task-modal-form">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Loo uus ülesanne"
+      className="task-modal"
+    >
+      <form onSubmit={(e) => { void handleSubmit(e); }} className="task-modal-form" data-testid="create-task-modal">
           <div className="task-form-field">
             <div className="task-mode-selection">
               <label className="task-mode-option">
@@ -256,7 +251,6 @@ export function TaskSelectModal({ onClose }: TaskSelectModalProps) {
             </button>
           </div>
         </form>
-      </div>
-    </>
+    </Modal>
   );
 }

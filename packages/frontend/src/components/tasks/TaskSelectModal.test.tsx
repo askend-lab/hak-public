@@ -91,7 +91,7 @@ describe('TaskSelectModal (Task Creation)', () => {
 
   it('has backdrop for closing', () => {
     const { container } = render(<TaskSelectModal />);
-    const backdrop = container.querySelector('.task-modal-backdrop');
+    const backdrop = container.querySelector('.modal-overlay');
     expect(backdrop).toBeInTheDocument();
   });
 
@@ -113,7 +113,7 @@ describe('TaskSelectModal (Task Creation)', () => {
 
   it('has close button', () => {
     render(<TaskSelectModal />);
-    const closeButton = screen.getByLabelText('Sulge');
+    const closeButton = document.querySelector('.modal__close');
     expect(closeButton).toBeInTheDocument();
   });
 
