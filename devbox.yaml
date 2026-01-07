@@ -3,18 +3,8 @@ extends: './defaults.yaml'
 
 project:
   name: 'HAK'
-  iterations_dir: iterations
-  docs_dir: docs
-
-methodology: none
-git_workflow: github-flow  # github-flow | gitflow | trunk-based
 
 # Incremental testing - only runs affected tests (requires module-level opt-in)
-
-# TDD enforcement
-tdd:
-  enabled: true
-  doc: 'docs/TDD.md'
 
 # Test modules with coverage requirements
 test_modules:
@@ -64,19 +54,16 @@ test_modules:
 # Global coverage settings
 coverage:
   min_total: 45
-  fail_on_decrease: true
 
 # Task Channel - Slack-based agent communication
 task_channel:
   active: false
-  mode: off  # off | warning | error
   channel_name: 'hak'
 
 # Hooks configuration - ALL parameters required
 hooks:
   markdown-size:
     active: true
-    mode: error  # off | warning | error
     max_lines: 200  # Temporarily raised - need to split large docs
     excludePaths:
       - 'docs/work/**'
@@ -93,7 +80,6 @@ hooks:
 
   language-check:
     active: true
-    mode: error  # off | warning | error
     allowed_languages:
       - en
     excludePaths:
@@ -102,9 +88,7 @@ hooks:
       - '.design/**'
 
   broken-links:
-    mode: error
     active: true
-    check_external: false
     excludePaths:
       - '**/test/fixtures/**'
       - '.design/**'
@@ -124,10 +108,8 @@ hooks:
 
   prettier-check:
     active: true
-    mode: error  # off | warning | error
 
   test-required:
-    mode: error
     active: true
     tdd: true  # Enable strict TDD enforcement for feat/fix commits
     patterns:
@@ -135,16 +117,13 @@ hooks:
       - '*.spec.js'
 
   metrics-required:
-    mode: error
     active: true
 
   run-lint:
-    mode: error
     active: true
     command: 'pnpm lint'
 
   run-typecheck:
-    mode: error
     active: true
     command: 'pnpm -r exec tsc --noEmit'
 
@@ -154,7 +133,6 @@ hooks:
 
   run-tests:
     active: true
-    mode: error  # Strict: test failures block commits
     command: 'node devbox test'
 
   run-build:
@@ -163,16 +141,10 @@ hooks:
     command: 'pnpm --filter @hak/frontend build'
 
   plan-validation:
-    mode: error
     active: true
-    strict: true
 
   jscpd:
-    mode: error
     active: true
-    threshold: 5
-    minLines: 5
-    minTokens: 50
     excludePaths:
       - '**/node_modules/**'
       - '**/dist/**'

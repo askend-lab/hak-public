@@ -23,4 +23,4 @@ ENV DICT_PATH=/app
 
 # For local testing - expose port and run simple server
 EXPOSE 8080
-CMD ["node", "index.js"]
+CMD ["node", "src/local-server.js"]
