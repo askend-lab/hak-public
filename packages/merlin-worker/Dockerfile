@@ -34,6 +34,15 @@ ENV PATH=/home/merlin_user/miniconda3/bin:$PATH
 # Clone Merlin from official repo
 RUN git clone --depth 1 https://github.com/ikiissel/mrln_spn.git merlin_repo
 
+# Download voice models from S3 (not included in git repo)
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_DEFAULT_REGION=eu-west-1
+
+RUN pip install awscli && \
+    aws s3 sync s3://hak-merlin-dev-audio/models/voices/ merlin_repo/voices/ --region eu-west-1 && \
+    aws s3 sync s3://hak-merlin-dev-audio/models/src/ merlin_repo/src/ --region eu-west-1
+
 # Copy conda environment file and create environment
 RUN cp merlin_repo/mrln_et.yml . && \
     conda env create -f mrln_et.yml && \
