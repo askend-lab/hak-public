@@ -113,7 +113,13 @@ jobs:
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       github.event_name == 'workflow_dispatch'
     
+    # Prevent concurrent Terraform runs to avoid state lock conflicts
+    concurrency:
+      group: vabamorf-deploy-${{ matrix.environment }}
+      cancel-in-progress: false
+    
     strategy:
+      max-parallel: 1
       matrix:
         include:
           - environment: dev
