@@ -15,8 +15,8 @@ describe('StandardizedTaskForm', () => {
   it('should render form with default values', () => {
     render(<StandardizedTaskForm {...defaultProps} />)
     
-    expect(screen.getByLabelText(/pealkiri/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/kirjeldus/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/pealkiri/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/kirjeldus/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /tühista/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /lisa/i })).toBeInTheDocument()
   })
@@ -30,8 +30,8 @@ describe('StandardizedTaskForm', () => {
       />
     )
     
-    const nameInput = screen.getByLabelText(/pealkiri/i) as HTMLInputElement
-    const descriptionInput = screen.getByLabelText(/kirjeldus/i) as HTMLTextAreaElement
+    const nameInput = screen.getByPlaceholderText(/pealkiri/i) as HTMLInputElement
+    const descriptionInput = screen.getByPlaceholderText(/kirjeldus/i) as HTMLTextAreaElement
     
     expect(nameInput.value).toBe('Initial Task')
     expect(descriptionInput.value).toBe('Initial Description')
@@ -41,8 +41,8 @@ describe('StandardizedTaskForm', () => {
     const user = userEvent.setup()
     render(<StandardizedTaskForm {...defaultProps} />)
     
-    const nameInput = screen.getByLabelText(/pealkiri/i)
-    const descriptionInput = screen.getByLabelText(/kirjeldus/i)
+    const nameInput = screen.getByPlaceholderText(/pealkiri/i)
+    const descriptionInput = screen.getByPlaceholderText(/kirjeldus/i)
     
     await user.type(nameInput, 'New Task')
     await user.type(descriptionInput, 'New Description')
@@ -55,8 +55,8 @@ describe('StandardizedTaskForm', () => {
     const user = userEvent.setup()
     render(<StandardizedTaskForm {...defaultProps} />)
     
-    const nameInput = screen.getByLabelText(/pealkiri/i)
-    const descriptionInput = screen.getByLabelText(/kirjeldus/i)
+    const nameInput = screen.getByPlaceholderText(/pealkiri/i)
+    const descriptionInput = screen.getByPlaceholderText(/kirjeldus/i)
     const submitButton = screen.getByRole('button', { name: /lisa/i })
     
     await user.type(nameInput, '  Task Name  ')
@@ -90,7 +90,7 @@ describe('StandardizedTaskForm', () => {
     const user = userEvent.setup()
     render(<StandardizedTaskForm {...defaultProps} />)
     
-    const nameInput = screen.getByLabelText(/pealkiri/i)
+    const nameInput = screen.getByPlaceholderText(/pealkiri/i)
     const submitButton = screen.getByRole('button', { name: /lisa/i })
     
     await user.type(nameInput, 'Task Name')
@@ -105,8 +105,8 @@ describe('StandardizedTaskForm', () => {
       />
     )
     
-    const nameInput = screen.getByLabelText(/pealkiri/i)
-    const descriptionInput = screen.getByLabelText(/kirjeldus/i)
+    const nameInput = screen.getByPlaceholderText(/pealkiri/i)
+    const descriptionInput = screen.getByPlaceholderText(/kirjeldus/i)
     const submitButton = screen.getByRole('button', { name: /lisa/i })
     const cancelButton = screen.getByRole('button', { name: /tühista/i })
     

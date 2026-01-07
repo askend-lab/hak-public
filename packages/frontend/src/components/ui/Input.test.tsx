@@ -25,9 +25,11 @@ describe('Input', () => {
   it('should apply error variant', () => {
     render(<Input variant="error" data-testid="test-input" />)
     
-    const wrapper = screen.getByTestId('test-input').closest('div')
+    const input = screen.getByTestId('test-input')
+    const wrapper = input.closest('div')
     expect(wrapper).toHaveAttribute('data-variant', 'error')
-    expect(wrapper).toHaveClass('input-wrapper', 'error')
+    expect(wrapper).toHaveClass('input-wrapper')
+    expect(input).toHaveClass('error')
   })
 
   it('should pass through all input props', () => {

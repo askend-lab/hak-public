@@ -15,7 +15,7 @@ describe('config', () => {
   it('uses development config in test environment', () => {
     expect(API_CONFIG.baseUrl).toBe('/api');
     expect(API_CONFIG.vabamorfUrl).toBe('/api/vabamorf/analyze');
-    expect(API_CONFIG.merlinUrl).toBe('/api/merlin/synthesize');
+    expect(API_CONFIG.merlinUrl).toBe('/api/merlin');
     expect(API_CONFIG.cacheUrl).toBe('/api/audio-cache');
     expect(API_CONFIG.audioApiUrl).toBe('/api/audio/generate');
   });

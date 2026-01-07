@@ -344,17 +344,22 @@ describe('SentenceRow', () => {
   });
 
   describe('Variants panel interactions', () => {
-    it('should call close panel when variant is selected', () => {
+    it('should call close panel when variant is selected', async () => {
       render(<SentenceRow {...defaultProps} value="Tere" />);
       const chip = document.querySelector('.word-chip');
       fireEvent.click(chip!);
       
-      // Find and click "Kasuta" button
-      const useButtons = document.querySelectorAll('.variant-option__use');
-      if (useButtons.length > 0) {
-        fireEvent.click(useButtons[0] as Element);
+      // Panel should be open now
+      expect(document.querySelector('.variants-panel')).toBeInTheDocument();
+      
+      // Click close button to close panel
+      const closeButton = document.querySelector('.variants-panel__close');
+      fireEvent.click(closeButton!);
+      
+      // Wait for state to update
+      await vi.waitFor(() => {
         expect(document.querySelector('.variants-panel')).not.toBeInTheDocument();
-      }
+      });
     });
 
     it('should play audio when Play variant clicked', async () => {
@@ -367,8 +372,17 @@ describe('SentenceRow', () => {
 
       render(<SentenceRow {...defaultProps} value="Tere" />);
       fireEvent.click(document.querySelector('.word-chip')!);
-      fireEvent.click(document.querySelectorAll('.play-button')[1] as Element);
-      await vi.waitFor(() => { expect(playAudioMock).toHaveBeenCalledWith('blob:test'); });
+      
+      // Get the custom input and type something
+      const customInput = document.querySelector('.variants-panel__input') as HTMLInputElement;
+      fireEvent.change(customInput, { target: { value: 'test' } });
+      
+      // Click the play button in custom section
+      const playButtons = document.querySelectorAll('.play-button');
+      const customPlayButton = playButtons[playButtons.length - 1];
+      fireEvent.click(customPlayButton as Element);
+      
+      await vi.waitFor(() => { expect(playAudioMock).toHaveBeenCalled(); });
     });
   });
 

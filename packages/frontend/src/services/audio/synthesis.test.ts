@@ -4,7 +4,7 @@ vi.mock('../config', () => ({
   API_CONFIG: {
     audioApiUrl: 'https://api.example.com/audio',
     audioBucketUrl: 'https://bucket.example.com',
-    merlinUrl: 'https://merlin.example.com/synthesize'
+    merlinUrl: 'https://merlin.example.com'
   }
 }));
 
@@ -23,14 +23,14 @@ vi.mock('./vabamorf', () => ({
   analyzeText: vi.fn(),
 }));
 
-vi.mock('./audio-api');
+vi.mock('./merlin');
 vi.mock('../../core/utils');
 vi.mock('../../core/retry');
 
 import { withRetry } from '../../core/retry';
 import { selectVoiceModel, countWords } from '../../core/utils';
 
-import { synthesizeViaApi } from './audio-api';
+import { synthesize } from './merlin';
 import { generateCacheKey } from './cache';
 import { synthesizeText, synthesizeWithRetry } from './synthesis';
 import { toPhoneticText } from './vabamorf';
@@ -39,7 +39,7 @@ import type { VabamorfResponse, SynthesisResult } from './types';
 import type { VoiceModel } from '../../core/schemas';
 
 // Mock dependencies
-const mockSynthesizeViaApi = synthesizeViaApi as MockedFunction<typeof synthesizeViaApi>;
+const mockSynthesize = synthesize as MockedFunction<typeof synthesize>;
 const mockSelectVoiceModel = selectVoiceModel as MockedFunction<typeof selectVoiceModel>;
 const mockCountWords = countWords as MockedFunction<typeof countWords>;
 const mockWithRetry = withRetry as MockedFunction<typeof withRetry>;
@@ -111,7 +111,7 @@ describe('synthesizeText', () => {
 
     mockCountWords.mockReturnValue(wordCount);
     mockSelectVoiceModel.mockReturnValue(voiceModel);
-    mockSynthesizeViaApi.mockResolvedValue(audioUrl);
+    mockSynthesize.mockResolvedValue({ audioUrl, duration: 0 });
 
     const result = await synthesizeText(text);
 
@@ -126,7 +126,7 @@ describe('synthesizeText', () => {
 
     expect(mockCountWords).toHaveBeenCalledWith(text);
     expect(mockSelectVoiceModel).toHaveBeenCalledWith(wordCount);
-    expect(mockSynthesizeViaApi).toHaveBeenCalledWith(text);
+    expect(mockSynthesize).toHaveBeenCalledWith({ text, voice: voiceModel });
   });
 
   it('should handle empty text', async () => {
@@ -137,7 +137,7 @@ describe('synthesizeText', () => {
 
     mockCountWords.mockReturnValue(wordCount);
     mockSelectVoiceModel.mockReturnValue(voiceModel);
-    mockSynthesizeViaApi.mockResolvedValue(audioUrl);
+    mockSynthesize.mockResolvedValue({ audioUrl, duration: 0 });
 
     const result = await synthesizeText(text);
 
@@ -174,7 +174,7 @@ describe('synthesizeWithRetry', () => {
       return fn();
     });
 
-    mockSynthesizeViaApi.mockResolvedValue(expectedResult.audioUrl);
+    mockSynthesize.mockResolvedValue({ audioUrl: expectedResult.audioUrl, duration: 0 });
     mockCountWords.mockReturnValue(1);
     mockSelectVoiceModel.mockReturnValue(voiceModel);
 
@@ -201,7 +201,7 @@ describe('synthesizeWithRetry', () => {
       return fn();
     });
 
-    mockSynthesizeViaApi.mockResolvedValue(expectedResult.audioUrl);
+    mockSynthesize.mockResolvedValue({ audioUrl: expectedResult.audioUrl, duration: 0 });
     mockCountWords.mockReturnValue(1);
     mockSelectVoiceModel.mockReturnValue(voiceModel);
 

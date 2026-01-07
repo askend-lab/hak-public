@@ -77,6 +77,9 @@ describe('ExtendedModal', () => {
     const user = userEvent.setup()
     render(<ExtendedModal {...defaultProps} />)
     
+    // Focus the overlay to receive keyboard events
+    const overlay = screen.getByRole('presentation')
+    overlay.focus()
     await user.keyboard('{Escape}')
     
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1)
