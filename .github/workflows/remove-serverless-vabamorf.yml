@@ -1,0 +1,42 @@
+name: Remove Serverless Vabamorf
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to remove'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  remove-serverless:
+    name: Remove Serverless Stack
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Install Serverless Framework
+        run: npm install -g serverless@3
+      
+      - name: Remove Serverless Stack
+        working-directory: packages/vabamorf-api
+        run: serverless remove --stage ${{ github.event.inputs.environment }} --region eu-west-1
+      
+      - name: Cleanup summary
+        run: echo "✅ Removed Serverless stack for ${{ github.event.inputs.environment }}"
