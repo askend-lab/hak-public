@@ -33,6 +33,50 @@ def log(message):
     print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {message}", flush=True)
 
 
+def check_tools():
+    """Check if required tools are available"""
+    tools_dir = os.path.join(MERLIN_DIR, 'tools')
+    bin_dir = os.path.join(tools_dir, 'bin')
+    
+    log(f"PATH: {os.environ.get('PATH', 'NOT SET')}")
+    log(f"MERLIN_DIR: {MERLIN_DIR}")
+    log(f"Tools dir exists: {os.path.exists(tools_dir)}")
+    log(f"Bin dir exists: {os.path.exists(bin_dir)}")
+    
+    # Check SPTK
+    sptk_bin = os.path.join(bin_dir, 'SPTK-3.9')
+    if os.path.exists(sptk_bin):
+        files = os.listdir(sptk_bin)
+        log(f"SPTK-3.9 bin: {len(files)} files")
+        # Check for key binary
+        if 'x2x' in files:
+            log("SPTK x2x: OK")
+        else:
+            log("SPTK x2x: MISSING!")
+    else:
+        log(f"SPTK-3.9 bin dir MISSING: {sptk_bin}")
+    
+    # Check WORLD
+    world_bin = os.path.join(bin_dir, 'WORLD')
+    if os.path.exists(world_bin):
+        files = os.listdir(world_bin)
+        log(f"WORLD bin: {files}")
+    else:
+        log(f"WORLD bin dir MISSING: {world_bin}")
+    
+    # Check genlab
+    genlab_bin = os.path.join(tools_dir, 'genlab', 'bin')
+    if os.path.exists(genlab_bin):
+        files = os.listdir(genlab_bin)
+        log(f"genlab bin: {files}")
+    else:
+        log(f"genlab bin dir MISSING: {genlab_bin}")
+
+
+# Run diagnostics at startup
+check_tools()
+
+
 def synthesize_audio(text, voice='efm_l', speed=1.0, pitch=0):
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, 
                                       dir=TEMP_DIR, encoding='utf-8') as f:
