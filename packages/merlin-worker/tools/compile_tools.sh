@@ -1,31 +1,14 @@
 #!/bin/bash
 
 #########################################
-######### Install Dependencies ##########
+######### Compile Tools (no downloads) ##
 #########################################
-#sudo apt-get install csh realpath
 
 tools_dir=$(dirname $0)
 cd $tools_dir
 
-install_sptk=true
-install_world=true
-install_genlab=true
-
-# 1. Get and compile SPTK
-if [ "$install_sptk" = true ]; then
-    echo "downloading SPTK-3.9..."
-    sptk_url=http://downloads.sourceforge.net/sp-tk/SPTK-3.9.tar.gz
-    if hash curl 2>/dev/null; then
-        curl -L -O $sptk_url
-    elif hash wget 2>/dev/null; then
-        wget $sptk_url
-    else
-        echo "please download the SPTK-3.9 from $sptk_url"
-        exit 1
-    fi
-    tar xzf SPTK-3.9.tar.gz
-
+# 1. Compile SPTK (source already in repo)
+if [ -d "SPTK-3.9" ]; then
     echo "compiling SPTK..."
     (
         cd SPTK-3.9;
@@ -33,12 +16,15 @@ if [ "$install_sptk" = true ]; then
         make;
         make install
     )
-
+else
+    echo "ERROR: SPTK-3.9 source not found!"
+    exit 1
 fi
 
 
 
-if [ "$install_world" = true ]; then
+# 2. Compile WORLD (source already in repo)
+if [ -d "WORLD" ]; then
     echo "compiling WORLD..."
     (
         cd WORLD;
@@ -46,10 +32,13 @@ if [ "$install_world" = true ]; then
         make analysis synth
         make clean
     )
+else
+    echo "ERROR: WORLD source not found!"
+    exit 1
 fi
 
-
-if [ "$install_genlab" = true ]; then
+# 3. Compile genlab (source already in repo)
+if [ -d "genlab" ]; then
     echo "compiling genlab..."
     (
         cd genlab;
@@ -57,6 +46,9 @@ if [ "$install_genlab" = true ]; then
         test -x configure || autoreconf -vif        
         make
     )
+else
+    echo "ERROR: genlab source not found!"
+    exit 1
 fi
 
 
@@ -66,9 +58,7 @@ SPTK_BIN_DIR=bin/SPTK-3.9
 WORLD_BIN_DIR=bin/WORLD
 
 
-# 5. Copy binaries
-echo "deleting downloaded tar files..."
-rm -rf $tools_dir/*.tar.gz
+# 4. Copy binaries to bin/
 
 
 
