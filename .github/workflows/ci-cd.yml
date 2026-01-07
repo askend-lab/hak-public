@@ -113,13 +113,7 @@ jobs:
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       github.event_name == 'workflow_dispatch'
     
-    # Prevent concurrent Terraform runs to avoid state lock conflicts
-    concurrency:
-      group: vabamorf-deploy-${{ matrix.environment }}
-      cancel-in-progress: false
-    
     strategy:
-      max-parallel: 1
       matrix:
         include:
           - environment: dev
@@ -174,42 +168,26 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.5.7
+      - name: Install Serverless Framework
+        run: npm install -g serverless@3
       
-      - name: Terraform Init
-        working-directory: infra
-        run: terraform init -backend-config="key=${{ matrix.environment }}/terraform.tfstate"
+      - name: Install serverless plugins
+        working-directory: packages/vabamorf-api
+        run: npm install --save-dev serverless-domain-manager
       
-      - name: Terraform Apply (Vabamorf)
-        working-directory: infra
-        run: |
-          terraform apply -auto-approve -lock-timeout=120s \
-            -var="env=${{ matrix.environment }}" \
-            -var="vabamorf_image_tag=${{ github.sha }}"
+      - name: Create custom domain (first deploy only)
+        working-directory: packages/vabamorf-api
+        continue-on-error: true
+        run: serverless create_domain --stage ${{ matrix.environment }}
       
-      - name: Force Lambda update with new image
-        run: |
-          aws lambda update-function-code \
-            --function-name vabamorf-api-${{ matrix.environment }} \
-            --image-uri 465168436856.dkr.ecr.eu-west-1.amazonaws.com/vabamorf-api:${{ github.sha }} \
-            --region eu-west-1
-          echo "Waiting for Lambda update..."
-          aws lambda wait function-updated --function-name vabamorf-api-${{ matrix.environment }} --region eu-west-1
-      
-      - name: Get API URL
-        id: api_url
-        working-directory: infra
-        run: |
-          URL=$(terraform output -raw vabamorf_api_url 2>/dev/null || echo "")
-          echo "url=$URL" >> $GITHUB_OUTPUT
-          echo "Vabamorf API URL: $URL"
+      - name: Deploy with Serverless
+        working-directory: packages/vabamorf-api
+        run: serverless deploy --stage ${{ matrix.environment }}
       
       - name: Deployment summary
         run: |
           echo "✅ Deployed Vabamorf API to ${{ matrix.environment }}"
+          echo "URL: https://vabamorf-${{ matrix.environment }}.askend-lab.com"
 
   build-audio-api:
     name: Build Audio API

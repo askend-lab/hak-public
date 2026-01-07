@@ -6,7 +6,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-1'}
+  region: eu-west-1
   
   environment:
     VMETAJSON_PATH: /var/task/vmetajson.bin
@@ -20,22 +20,36 @@ provider:
         path: ./
 
 functions:
-  # Single function with Lambda Web Adapter - routes all requests to HTTP server
   api:
     image:
       name: vabamorf
+    timeout: 30
+    memorySize: 1024
     events:
-      - http:
+      - httpApi:
           path: /{proxy+}
-          method: any
-          cors: true
-      - http:
+          method: ANY
+      - httpApi:
           path: /
-          method: any
-          cors: true
+          method: ANY
+
+plugins:
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: ${self:custom.domainNames.${self:provider.stage}}
+    certificateArn: arn:aws:acm:eu-west-1:465168436856:certificate/f91069e3-9ca9-4651-b912-765c9f49fc0d
+    endpointType: REGIONAL
+    apiType: http
+    createRoute53Record: true
+    hostedZoneId: Z08749823PH6RLXNTUZOF
+  domainNames:
+    dev: vabamorf-dev.askend-lab.com
+    prod: vabamorf.askend-lab.com
 
 resources:
   Outputs:
     ApiEndpoint:
       Description: Vabamorf API Gateway endpoint URL
-      Value: !Sub https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}
+      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
