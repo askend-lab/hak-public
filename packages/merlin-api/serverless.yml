@@ -7,6 +7,18 @@ provider:
   runtime: nodejs18.x
   region: eu-west-1
   stage: ${opt:stage, 'dev'}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://hak-dev.askend-lab.com
+        - https://hak.askend-lab.com
+      allowedMethods:
+        - GET
+        - POST
+        - OPTIONS
+      allowedHeaders:
+        - Content-Type
+        - Authorization
   
   environment:
     SQS_QUEUE_URL: https://sqs.eu-west-1.amazonaws.com/465168436856/hak-merlin-${self:provider.stage}-queue
