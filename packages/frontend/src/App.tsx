@@ -11,6 +11,7 @@ import { useAuth } from './contexts/AuthContext';
 import { useNotification } from './contexts/NotificationContext';
 import { useOnboarding } from './contexts/OnboardingContext';
 import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSentenceMenu } from './hooks';
+import { warmAudioWorker } from './utils/warmAudioWorker';
 
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
@@ -26,6 +27,9 @@ export default function Home() {
   const dragDrop = useDragAndDrop(synthesis.setSentences);
   const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences);
   const menu = useSentenceMenu();
+
+  // Pre-warm audio worker on page load
+  useEffect(() => { warmAudioWorker(); }, []);
 
   // Handle post-login redirect and logout
   useEffect(() => {

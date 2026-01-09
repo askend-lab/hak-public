@@ -62,6 +62,16 @@ describe('SQS Operations', () => {
       });
     });
 
+    it('should parse warm message', () => {
+      const message = {
+        Body: JSON.stringify({ type: 'warm', timestamp: Date.now() }),
+      };
+
+      const result = parseMessage(message);
+      
+      expect(result).toStrictEqual({ type: 'warm' });
+    });
+
     it('should throw error for invalid JSON', () => {
       const message = {
         Body: 'invalid json',

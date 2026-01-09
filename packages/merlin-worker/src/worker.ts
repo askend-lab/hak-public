@@ -4,7 +4,7 @@ import { createLogger } from '@hak/shared';
 
 import { synthesize } from './merlin';
 import { uploadAudio } from './s3';
-import { receiveMessage, parseMessage, deleteMessage } from './sqs';
+import { receiveMessage, parseMessage, deleteMessage, isWarmMessage } from './sqs';
 
 const logger = createLogger('info');
 
@@ -26,7 +26,15 @@ export async function processMessage(
   }
 
   try {
-    const { text, hash } = parseMessage(message);
+    const parsed = parseMessage(message);
+
+    if (isWarmMessage(parsed)) {
+      logger.info('Received warm-up message, acknowledging and continuing');
+      await deleteMessage(sqsClient, config.queueUrl, message.ReceiptHandle ?? '');
+      return true;
+    }
+
+    const { text, hash } = parsed;
     logger.info(`Processing: hash=${hash}, text="${text.substring(0, 50)}..."`);
 
     const audioBuffer = await synthesize(text, config.merlinUrl);

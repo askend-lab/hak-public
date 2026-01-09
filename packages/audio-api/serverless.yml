@@ -60,6 +60,14 @@ functions:
           method: get
           cors: true
 
+  warm:
+    handler: src/index.warmHandler
+    events:
+      - http:
+          path: /warm
+          method: post
+          cors: true
+
 resources:
   Outputs:
     ApiEndpoint:

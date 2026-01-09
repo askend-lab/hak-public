@@ -1,12 +1,13 @@
 import { synthesize } from '../src/merlin';
 import { uploadAudio } from '../src/s3';
-import { receiveMessage, parseMessage, deleteMessage } from '../src/sqs';
+import { receiveMessage, parseMessage, deleteMessage, isWarmMessage } from '../src/sqs';
 import { processMessage } from '../src/worker';
 
 jest.mock('../src/sqs', () => ({
   receiveMessage: jest.fn(),
   parseMessage: jest.fn(),
   deleteMessage: jest.fn(),
+  isWarmMessage: jest.fn(),
 }));
 
 jest.mock('../src/merlin', () => ({
@@ -54,6 +55,7 @@ describe('Worker', () => {
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
       (parseMessage as jest.Mock).mockReturnValue({ text: 'tere', hash: 'abc123' });
+      (isWarmMessage as unknown as jest.Mock).mockReturnValue(false);
       (synthesize as jest.Mock).mockResolvedValue(mockAudioBuffer);
       (uploadAudio as jest.Mock).mockResolvedValue(undefined);
       (deleteMessage as jest.Mock).mockResolvedValue(undefined);
@@ -76,6 +78,30 @@ describe('Worker', () => {
       );
     });
 
+    it('should handle warm message without synthesizing', async () => {
+      const mockMessage = {
+        MessageId: 'msg-warm',
+        Body: JSON.stringify({ type: 'warm', timestamp: Date.now() }),
+        ReceiptHandle: 'receipt-warm',
+      };
+
+      (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
+      (parseMessage as jest.Mock).mockReturnValue({ type: 'warm' });
+      (isWarmMessage as unknown as jest.Mock).mockReturnValue(true);
+      (deleteMessage as jest.Mock).mockResolvedValue(undefined);
+
+      const result = await processMessage(mockSqsClient, mockS3Client, config);
+
+      expect(result).toBe(true);
+      expect(synthesize).not.toHaveBeenCalled();
+      expect(uploadAudio).not.toHaveBeenCalled();
+      expect(deleteMessage).toHaveBeenCalledWith(
+        mockSqsClient,
+        config.queueUrl,
+        'receipt-warm'
+      );
+    });
+
     it('should throw error when synthesis fails', async () => {
       const mockMessage = {
         MessageId: 'msg-123',
@@ -85,6 +111,7 @@ describe('Worker', () => {
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
       (parseMessage as jest.Mock).mockReturnValue({ text: 'tere', hash: 'abc123' });
+      (isWarmMessage as unknown as jest.Mock).mockReturnValue(false);
       (synthesize as jest.Mock).mockRejectedValue(new Error('TTS failed'));
 
       await expect(processMessage(mockSqsClient, mockS3Client, config))

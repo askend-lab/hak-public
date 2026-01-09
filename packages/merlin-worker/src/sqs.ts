@@ -11,6 +11,16 @@ export interface AudioMessage {
   hash: string;
 }
 
+export interface WarmMessage {
+  type: 'warm';
+}
+
+export type ParsedMessage = AudioMessage | WarmMessage;
+
+export function isWarmMessage(msg: ParsedMessage): msg is WarmMessage {
+  return 'type' in msg && msg.type === 'warm';
+}
+
 export async function receiveMessage(
   client: SQSClient,
   queueUrl: string
@@ -32,17 +42,22 @@ export async function receiveMessage(
 }
 
 interface MessageBody {
+  type?: unknown;
   text?: unknown;
   hash?: unknown;
 }
 
-export function parseMessage(message: Message): AudioMessage {
+export function parseMessage(message: Message): ParsedMessage {
   const messageBody = message.Body ?? '';
   if (messageBody === '') {
     throw new Error('Message body is empty');
   }
 
   const body = JSON.parse(messageBody) as MessageBody;
+
+  if (body.type === 'warm') {
+    return { type: 'warm' };
+  }
 
   if (typeof body.text !== 'string' || body.text === '') {
     throw new Error('Missing text field');
