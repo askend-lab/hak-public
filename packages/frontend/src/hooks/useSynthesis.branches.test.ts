@@ -11,21 +11,15 @@ vi.mock('@/utils/synthesize', () => ({
 }));
 
 const setupMocks = (): void => {
-  global.Audio = vi.fn().mockImplementation(() => ({
-    play: vi.fn().mockResolvedValue(undefined),
-    pause: vi.fn(),
-    src: '',
-    onended: null,
-    onerror: null,
-    onloadeddata: null,
-  }));
+  class MockAudio {
+    src = ''; onended: (() => void) | null = null; onerror: (() => void) | null = null; onloadeddata: (() => void) | null = null;
+    pause = vi.fn();
+    play = vi.fn().mockImplementation(() => { setTimeout(() => this.onended?.(), 10); return Promise.resolve(); });
+  }
+  global.Audio = MockAudio as unknown as typeof Audio;
   global.URL.createObjectURL = vi.fn(() => 'mock-blob-url');
   global.URL.revokeObjectURL = vi.fn();
-  global.fetch = vi.fn().mockResolvedValue({
-    ok: true,
-    json: () => Promise.resolve({ stressedText: 'mock stressed' }),
-    blob: () => Promise.resolve(new Blob()),
-  });
+  global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ stressedText: 'mock stressed' }), blob: () => Promise.resolve(new Blob()) });
 };
 
 describe('useSynthesis keyboard handling', () => {

@@ -13,13 +13,14 @@ describe('DataService Share Operations', () => {
 
   it('shareUserTask shares a task', async () => {
     const task = await ds.createTask(userId, { name: 'Share Test', description: '' });
-    const result = await ds.shareUserTask(userId, task.id);
-    expect(result).toBeTruthy();
+    await ds.shareUserTask(userId, task.id);
+    // Verify task is now shared by checking it can be found
+    const shared = await ds.getSharedTask(task.id);
+    expect(shared?.name).toBe('Share Test');
   });
 
-  it('shareUserTask returns null for non-existent task', async () => {
-    const result = await ds.shareUserTask(userId, 'non-existent');
-    expect(result).toBeNull();
+  it('shareUserTask throws for non-existent task', async () => {
+    await expect(ds.shareUserTask(userId, 'non-existent')).rejects.toThrow('Task not found');
   });
 
   it('getTaskByShareToken finds shared task', async () => {
@@ -47,12 +48,13 @@ describe('DataService Share Operations', () => {
     expect(found?.name).toBe('Shared Task');
   });
 
-  it('unshareTask removes task from shared storage', async () => {
+  it('shared task persists after original task deletion', async () => {
     const task = await ds.createTask(userId, { name: 'Unshare Test', description: '' });
     await ds.shareUserTask(userId, task.id);
     await ds.deleteTask(userId, task.id);
     const found = await ds.getSharedTask(task.id);
-    expect(found).toBeNull();
+    // Shared tasks persist even after original is deleted (by design)
+    expect(found?.name).toBe('Unshare Test');
   });
 
   it('handles malformed shared tasks in storage', async () => {

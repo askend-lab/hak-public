@@ -14,13 +14,14 @@ describe('useSynthesis extra coverage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    global.Audio = vi.fn().mockImplementation(() => ({
-      play: vi.fn().mockResolvedValue(undefined),
-      pause: vi.fn(),
-      src: '',
-      onended: null,
-      onerror: null,
-    }));
+    class MockAudio {
+      src = '';
+      onended: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      pause = vi.fn();
+      play = vi.fn().mockImplementation(() => { setTimeout(() => this.onended?.(), 10); return Promise.resolve(); });
+    }
+    global.Audio = MockAudio as unknown as typeof Audio;
     global.URL.createObjectURL = vi.fn(() => 'mock-blob-url');
     global.URL.revokeObjectURL = vi.fn();
     global.fetch = vi.fn().mockResolvedValue({

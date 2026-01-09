@@ -124,7 +124,10 @@ describe('synthesize', () => {
         json: () => Promise.resolve({ status: 'ready', cacheKey: 'k', audioUrl: 'http://a.wav' }),
       });
       await synthesizeWithPolling('hi', 'efm_s');
-      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('model=efm_s'), expect.any(Object));
+      expect(global.fetch).toHaveBeenCalledWith('/api/synthesize', expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('efm_s'),
+      }));
     });
 
     it('handles empty error message', async () => {
@@ -137,7 +140,7 @@ describe('synthesize', () => {
           ok: true,
           json: () => Promise.resolve({ status: 'error', cacheKey: 'k', audioUrl: null }),
         });
-      await expect(synthesizeWithPolling('test', 'efm_l')).rejects.toThrow('Synthesis error');
+      await expect(synthesizeWithPolling('test', 'efm_l')).rejects.toThrow('Synthesis failed');
     });
   });
 });

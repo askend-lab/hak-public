@@ -24,13 +24,12 @@ describe('PronunciationVariants', () => {
     global.fetch = vi.fn();
     
     // Mock Audio
-    global.Audio = vi.fn().mockImplementation(() => ({
-      play: vi.fn().mockResolvedValue(undefined),
-      pause: vi.fn(),
-      onloadeddata: null,
-      onended: null,
-      onerror: null,
-    }));
+    class MockAudio {
+      src = ''; onloadeddata: (() => void) | null = null; onended: (() => void) | null = null; onerror: (() => void) | null = null;
+      pause = vi.fn();
+      play = vi.fn().mockImplementation(() => { setTimeout(() => this.onended?.(), 10); return Promise.resolve(); });
+    }
+    global.Audio = MockAudio as unknown as typeof Audio;
     
     // Mock URL.createObjectURL and revokeObjectURL
     global.URL.createObjectURL = vi.fn(() => 'mock-blob-url');

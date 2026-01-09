@@ -9,14 +9,12 @@ describe('useSynthesis', () => {
     localStorage.clear();
     
     // Mock Audio
-    global.Audio = vi.fn().mockImplementation(() => ({
-      play: vi.fn().mockResolvedValue(undefined),
-      pause: vi.fn(),
-      src: '',
-      onloadeddata: null,
-      onended: null,
-      onerror: null,
-    }));
+    class MockAudio {
+      src = ''; onloadeddata: (() => void) | null = null; onended: (() => void) | null = null; onerror: (() => void) | null = null;
+      pause = vi.fn();
+      play = vi.fn().mockImplementation(() => { setTimeout(() => this.onended?.(), 10); return Promise.resolve(); });
+    }
+    global.Audio = MockAudio as unknown as typeof Audio;
 
     // Mock URL.createObjectURL and revokeObjectURL
     global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
@@ -27,57 +25,33 @@ describe('useSynthesis', () => {
     vi.restoreAllMocks();
   });
 
-  it('should initialize with one empty sentence', () => {
+  it('should initialize with correct defaults', () => {
     const { result } = renderHook(() => useSynthesis());
-    
     expect(result.current.sentences).toHaveLength(1);
     expect(result.current.sentences[0]?.text).toBe('');
     expect(result.current.sentences[0]?.tags).toEqual([]);
-  });
-
-  it('should initialize with isPlayingAll as false', () => {
-    const { result } = renderHook(() => useSynthesis());
     expect(result.current.isPlayingAll).toBe(false);
-  });
-
-  it('should initialize with isLoadingPlayAll as false', () => {
-    const { result } = renderHook(() => useSynthesis());
     expect(result.current.isLoadingPlayAll).toBe(false);
   });
 
   it('should add a new sentence', () => {
     const { result } = renderHook(() => useSynthesis());
-    
-    act(() => {
-      result.current.handleAddSentence();
-    });
-
+    act(() => { result.current.handleAddSentence(); });
     expect(result.current.sentences).toHaveLength(2);
   });
 
   it('should update text input', () => {
     const { result } = renderHook(() => useSynthesis());
     const sentenceId = result.current.sentences[0]?.id || '';
-    
-    act(() => {
-      result.current.handleTextChange(sentenceId, 'Hello world');
-    });
-
+    act(() => { result.current.handleTextChange(sentenceId, 'Hello world'); });
     expect(result.current.sentences[0]?.currentInput).toBe('Hello world');
   });
 
   it('should clear a sentence', () => {
     const { result } = renderHook(() => useSynthesis());
     const sentenceId = result.current.sentences[0]?.id || '';
-    
-    act(() => {
-      result.current.handleTextChange(sentenceId, 'Hello');
-    });
-    
-    act(() => {
-      result.current.handleClearSentence(sentenceId);
-    });
-
+    act(() => { result.current.handleTextChange(sentenceId, 'Hello'); });
+    act(() => { result.current.handleClearSentence(sentenceId); });
     expect(result.current.sentences[0]?.currentInput).toBe('');
     expect(result.current.sentences[0]?.text).toBe('');
     expect(result.current.sentences[0]?.tags).toEqual([]);
@@ -85,17 +59,9 @@ describe('useSynthesis', () => {
 
   it('should remove a sentence when there are multiple', () => {
     const { result } = renderHook(() => useSynthesis());
-    
-    act(() => {
-      result.current.handleAddSentence();
-    });
-
+    act(() => { result.current.handleAddSentence(); });
     const firstId = result.current.sentences[0]?.id || '';
-    
-    act(() => {
-      result.current.handleRemoveSentence(firstId);
-    });
-
+    act(() => { result.current.handleRemoveSentence(firstId); });
     expect(result.current.sentences).toHaveLength(1);
   });
 
