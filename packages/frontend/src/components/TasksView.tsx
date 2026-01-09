@@ -1,6 +1,11 @@
 import TaskManager from './TaskManager';
 import TaskDetailView from './TaskDetailView';
-import { Task } from '@/types';
+interface Task {
+  id: string;
+  name: string;
+  description?: string;
+  shareToken?: string;
+}
 
 interface TasksViewProps {
   selectedTaskId: string | null;
@@ -17,7 +22,7 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
   if (selectedTaskId) {
     return (
       <div className="page-content">
-        <TaskDetailView taskId={selectedTaskId} onBack={onBack} onEditTask={onEditTask} onDeleteTask={onDeleteTask} onAddEntryFromInput={() => {}} onAddEntry={() => {}} />
+        <TaskDetailView taskId={selectedTaskId} onBack={onBack} onEditTask={(taskId) => onEditTask({ id: taskId, name: '' })} onDeleteTask={onDeleteTask} onAddEntryFromInput={() => {}} onAddEntry={() => {}} />
       </div>
     );
   }
@@ -31,7 +36,7 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
         </div>
       </div>
       <div className="page-content">
-        <TaskManager onCreateTask={onCreateTask} onEditTask={onEditTask} onViewTask={onViewTask} onDeleteTask={onDeleteTask} onShareTask={onShareTask} refreshTrigger={taskRefreshTrigger} />
+        <TaskManager onCreateTask={onCreateTask} onEditTask={(taskId) => onEditTask({ id: taskId, name: '' })} onViewTask={onViewTask} onDeleteTask={onDeleteTask} onShareTask={(taskId) => onShareTask({ id: taskId, name: '' })} refreshTrigger={taskRefreshTrigger} />
       </div>
     </>
   );

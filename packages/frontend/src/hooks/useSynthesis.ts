@@ -3,13 +3,25 @@ import { SentenceState, EditingTag, OpenTagMenu, getVoiceModel, convertTextToTag
 import { stripPhoneticMarkers } from '@/utils/phoneticMarkers';
 import { synthesizeWithPolling } from '@/utils/synthesize';
 
+// Helper to ensure optional properties are null instead of undefined
+const ensureSentenceState = (sentence: Partial<SentenceState> & Pick<SentenceState, 'id' | 'text' | 'tags' | 'isPlaying' | 'isLoading' | 'currentInput'>): SentenceState => ({
+  ...sentence,
+  phoneticText: sentence.phoneticText ?? null,
+  audioUrl: sentence.audioUrl ?? null,
+  stressedTags: sentence.stressedTags ?? null
+});
+
+
 const INITIAL_SENTENCE: SentenceState = {
   id: '1',
   text: '',
   tags: [],
   isPlaying: false,
   isLoading: false,
-  currentInput: ''
+  currentInput: '',
+  phoneticText: null,
+  audioUrl: null,
+  stressedTags: null
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
@@ -32,7 +44,7 @@ export function useSynthesis() {
           const transformed: SentenceState[] = entries.map((entry: { id?: string; text: string; stressedText?: string; audioUrl?: string }) => {
             const words = entry.text.trim().split(/\s+/).filter((w: string) => w.length > 0);
             const stressedWords = entry.stressedText?.trim().split(/\s+/).filter((w: string) => w.length > 0) || [];
-            return {
+            return ensureSentenceState({
               id: entry.id || `entry_${Date.now()}_${Math.random()}`,
               text: entry.text,
               tags: words,
@@ -40,9 +52,9 @@ export function useSynthesis() {
               isLoading: false,
               currentInput: '',
               stressedTags: stressedWords.length === words.length ? stressedWords : undefined,
-              audioUrl: entry.audioUrl || undefined,
-              phoneticText: entry.stressedText || undefined
-            };
+              audioUrl: entry.audioUrl,
+              phoneticText: entry.stressedText
+            });
           });
           setSentences(transformed);
           localStorage.removeItem('eki_playlist_entries');
@@ -56,8 +68,8 @@ export function useSynthesis() {
 
   const setDemoSentences = useCallback(() => {
     setSentences([
-      { id: 'demo-1', text: 'Noormees läks kooli', tags: ['Noormees', 'läks', 'kooli'], isPlaying: false, isLoading: false, currentInput: '' },
-      { id: 'demo-2', text: '', tags: [], isPlaying: false, isLoading: false, currentInput: '' }
+      { id: 'demo-1', text: 'Noormees läks kooli', tags: ['Noormees', 'läks', 'kooli'], isPlaying: false, isLoading: false, currentInput: '', phoneticText: null, audioUrl: null, stressedTags: null },
+      { id: 'demo-2', text: '', tags: [], isPlaying: false, isLoading: false, currentInput: '', phoneticText: null, audioUrl: null, stressedTags: null }
     ]);
   }, []);
 
@@ -67,12 +79,12 @@ export function useSynthesis() {
 
   const handleClearSentence = useCallback((id: string) => {
     setSentences(prev => prev.map(s => s.id === id ? { 
-      ...s, tags: [], currentInput: '', text: '', stressedTags: undefined, phoneticText: undefined, audioUrl: undefined
+      ...s, tags: [], currentInput: '', text: '', stressedTags: null, phoneticText: null, audioUrl: null
     } : s));
   }, []);
 
   const handleAddSentence = useCallback(() => {
-    setSentences(prev => [...prev, { id: Date.now().toString(), text: '', tags: [], isPlaying: false, isLoading: false, currentInput: '' }]);
+    setSentences(prev => [...prev, { id: Date.now().toString(), text: '', tags: [], isPlaying: false, isLoading: false, currentInput: '', phoneticText: null, audioUrl: null, stressedTags: null }]);
   }, []);
 
   const handleRemoveSentence = useCallback((id: string) => {

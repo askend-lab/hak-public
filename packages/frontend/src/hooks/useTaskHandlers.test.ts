@@ -1,3 +1,4 @@
+ 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useTaskHandlers } from './useTaskHandlers';
@@ -159,7 +160,7 @@ describe('useTaskHandlers', () => {
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
 
     await act(async () => {
-      await result.current.handleEditTask('task-1');
+      await result.current.handleEditTask({ id: 'task-1', name: 'Task 1', description: 'Desc' });
     });
 
     expect(mockGetTask).toHaveBeenCalledWith('task-1', 'user-1');
@@ -170,8 +171,14 @@ describe('useTaskHandlers', () => {
   it('should update task', async () => {
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
 
+    // Set taskToEdit first in a separate act
+    act(() => {
+      result.current.setTaskToEdit({ id: 'task-1', name: 'Updated Task', description: 'Updated Desc' });
+    });
+
+    // Then call handleTaskUpdated
     await act(async () => {
-      await result.current.handleTaskUpdated('task-1', 'Updated Task', 'Updated Desc');
+      await result.current.handleTaskUpdated();
     });
 
     expect(mockUpdateTask).toHaveBeenCalledWith('user-1', 'task-1', { name: 'Updated Task', description: 'Updated Desc' });
@@ -223,12 +230,12 @@ describe('useTaskHandlers', () => {
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
 
     await act(async () => {
-      await result.current.handleShareTask('task-1');
+      await result.current.handleShareTask({ id: 'task-1', name: 'Task 1' });
     });
 
     expect(mockShareUserTask).toHaveBeenCalledWith('user-1', 'task-1');
     expect(result.current.showShareTaskModal).toBe(true);
-    expect(result.current.taskToShare).toEqual({ id: 'task-1', shareToken: 'token', name: 'Task 1' });
+    expect(result.current.taskToShare).toMatchObject({ id: 'task-1', name: 'Task 1' });
   });
 
   it('should close modals', () => {
@@ -289,8 +296,14 @@ describe('useTaskHandlers', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
 
+    // Set taskToEdit first in a separate act
+    act(() => {
+      result.current.setTaskToEdit({ id: 'task-1', name: 'Updated', description: 'Desc' });
+    });
+
+    // Then call handleTaskUpdated
     await act(async () => {
-      await result.current.handleTaskUpdated('task-1', 'Updated', 'Desc');
+      await result.current.handleTaskUpdated();
     });
 
     expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));

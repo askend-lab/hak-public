@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 'use client';
 
 import { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
@@ -56,11 +57,11 @@ const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
         <Notification
           key={notification.id}
           type={notification.type}
-          color={notification.color}
+          color={notification.color ?? undefined}
           message={notification.message}
-          description={notification.description}
-          action={notification.action}
-          duration={notification.duration}
+          description={notification.description ?? undefined}
+          action={notification.action ?? undefined}
+          duration={notification.duration ?? undefined}
           onClose={() => removeNotification(notification.id)}
         />
       ))}

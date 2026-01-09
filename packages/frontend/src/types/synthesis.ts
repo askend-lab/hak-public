@@ -5,9 +5,9 @@ export type SentenceState = {
   isPlaying: boolean;
   isLoading: boolean;
   currentInput: string;
-  phoneticText?: string | undefined;
-  audioUrl?: string | undefined;
-  stressedTags?: string[] | undefined;
+  phoneticText?: string | null | undefined;
+  audioUrl?: string | null | undefined;
+  stressedTags?: string[] | null | undefined;
 };
 
 export type EditingTag = {

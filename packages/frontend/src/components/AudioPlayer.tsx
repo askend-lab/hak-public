@@ -31,6 +31,7 @@ const handleDownload = (audioUrl: string | null, text?: string) => {
   document.body.appendChild(link); link.click(); document.body.removeChild(link);
 };
 
+// eslint-disable-next-line complexity
 export default function AudioPlayer({ audioUrl, autoPlay = false, text, isLoading = false, onAddToPlaylist, onAddToTask, canAddToPlaylist = false, canAddToTask = false }: AudioPlayerProps) {
   const { audioRef, isPlaying, setIsPlaying, playbackRate, handlePlay, cycleSpeed } = useAudioPlayer(audioUrl, autoPlay);
   if (!audioUrl && !isLoading && !text) return <div className="audio-placeholder">Audio puudub. Sisesta tekst, et genereerida audio.</div>;

@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   userId: string;
   name: string;
-  description?: string | undefined;
+  description?: string | null;
   speechSequences: string[];
   entries: TaskEntry[];
   createdAt: Date;
@@ -23,20 +23,20 @@ export interface TaskEntry {
 
 export interface CreateTaskRequest {
   name: string;
-  description?: string | undefined;
-  speechSequences?: string[] | undefined;
-  speechEntries?: Array<{text: string; stressedText: string}> | undefined;
+  description?: string | null;
+  speechSequences?: string[] | null;
+  speechEntries?: Array<{text: string; stressedText: string}> | null;
 }
 
 export interface UpdateTaskRequest {
-  name?: string | undefined;
-  description?: string | undefined;
+  name?: string | null;
+  description?: string | null;
 }
 
 export interface TaskSummary {
   id: string;
   name: string;
-  description?: string | undefined;
+  description?: string | null;
   entryCount: number;
   createdAt: Date;
   updatedAt: Date;

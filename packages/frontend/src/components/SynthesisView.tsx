@@ -1,8 +1,24 @@
+/* eslint-disable max-lines-per-function, complexity */
 import SynthesisPageHeader from './SynthesisPageHeader';
 import SentenceMenu from './SentenceMenu';
 import SentenceSynthesisItem from './SentenceSynthesisItem';
-import { Sentence } from '@/types';
-import { Task } from '@/types';
+interface Sentence {
+  id: string;
+  text: string;
+  phoneticText?: string | null | undefined;
+  audioUrl?: string | null | undefined;
+  tags?: string[];
+  isPlaying?: boolean;
+  isLoading?: boolean;
+  currentInput?: string;
+  stressedTags?: string[] | null | undefined;
+}
+
+interface Task {
+  id: string;
+  name: string;
+  description?: string;
+}
 
 interface SynthesisViewProps {
   sentences: Sentence[];
@@ -37,17 +53,17 @@ interface SynthesisViewProps {
   onDrop: (e: React.DragEvent, id: string) => void;
   onTagMenuOpen: (sentenceId: string, tagIndex: number) => void;
   onTagMenuClose: () => void;
-  onOpenVariantsFromMenu: () => void;
-  onEditTag: () => void;
-  onDeleteTag: () => void;
+  onOpenVariantsFromMenu: (sentenceId: string, tagIndex: number, word: string) => void;
+  onEditTag: (sentenceId: string, tagIndex: number) => void;
+  onDeleteTag: (sentenceId: string, tagIndex: number) => void;
   onEditTagChange: (value: string) => void;
   onEditTagKeyDown: (e: React.KeyboardEvent) => void;
   onEditTagCommit: () => void;
   onInputChange: (id: string, value: string) => void;
   onInputKeyDown: (e: React.KeyboardEvent, id: string) => void;
-  onInputBlur: () => void;
+  onInputBlur: (id: string) => void;
   onClearSentence: (id: string) => void;
-  onMenuOpen: (id: string, el: HTMLElement) => void;
+  onMenuOpen: (event: React.MouseEvent<Element, MouseEvent>, id: string) => void;
   onMenuClose: () => void;
   onMenuSearchChange: (value: string) => void;
   onAddToTask: (sentenceId: string, taskId: string, taskName: string) => void;
@@ -59,14 +75,80 @@ interface SynthesisViewProps {
   onAddSentence: () => void;
 }
 
-const tagMenuItems = (p: SynthesisViewProps) => [{ label: 'Uuri variandid', onClick: p.onOpenVariantsFromMenu }, { label: 'Muuda', onClick: p.onEditTag }, { label: 'Kustuta', onClick: p.onDeleteTag, danger: true }];
+interface TagMenuItem {
+  label: string;
+  onClick: (sentenceId: string, tagIndex: number, word: string) => void;
+  danger?: boolean;
+}
 
-const SentenceItem = ({ sentence, sentenceIndex, p }: { sentence: Sentence; sentenceIndex: number; p: SynthesisViewProps }) => {
+const getTagMenuItems = (p: SynthesisViewProps): TagMenuItem[] => [
+  { label: 'Uuri variandid', onClick: (sid, tidx, w) => p.onOpenVariantsFromMenu(sid, tidx, w) },
+  { label: 'Muuda', onClick: (sid, tidx) => p.onEditTag(sid, tidx) },
+  { label: 'Kustuta', onClick: (sid, tidx) => p.onDeleteTag(sid, tidx), danger: true },
+];
+
+interface SentenceItemProps {
+  sentence: Sentence;
+  sentenceIndex: number;
+  p: SynthesisViewProps;
+}
+
+const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
   const isMenuOpen = p.menuOpenId === sentence.id && p.menuAnchorEl[sentence.id];
   const isTagSelected = (p.isVariantsPanelOpen || p.showSentencePhoneticPanel) && (p.variantsSelectedSentenceId === sentence.id || p.sentencePhoneticId === sentence.id);
   return (
-    <SentenceSynthesisItem key={sentence.id} id={sentence.id} text={sentence.text} tags={sentence.tags} mode="input" draggable={true} isDragging={p.draggedId === sentence.id} isDragOver={p.dragOverId === sentence.id} isPlaying={sentence.isPlaying} isLoading={sentence.isLoading} onPlay={p.onPlay} onDragStart={p.onDragStart} onDragEnd={p.onDragEnd} onDragOver={p.onDragOver} onDragLeave={p.onDragLeave} onDrop={p.onDrop} onTagMenuOpen={p.onTagMenuOpen} openTagMenu={p.openTagMenu} onTagMenuClose={p.onTagMenuClose} tagMenuItems={tagMenuItems(p)} selectedTagIndex={isTagSelected ? p.variantsSelectedTagIndex : null} isPronunciationPanelOpen={p.isVariantsPanelOpen || p.showSentencePhoneticPanel} editingTag={p.editingTag} onEditTagChange={p.onEditTagChange} onEditTagKeyDown={p.onEditTagKeyDown} onEditTagCommit={p.onEditTagCommit} currentInput={sentence.currentInput} onInputChange={p.onInputChange} onInputKeyDown={(e) => p.onInputKeyDown(e, sentence.id)} onInputBlur={p.onInputBlur} onClear={p.onClearSentence} sentenceIndex={sentenceIndex} onMenuOpenLegacy={p.onMenuOpen}
-      menuContent={isMenuOpen ? <SentenceMenu isAuthenticated={p.isAuthenticated} sentenceId={sentence.id} sentenceText={sentence.text} menuSearchQuery={p.menuSearchQuery} onSearchChange={p.onMenuSearchChange} isLoadingTasks={p.isLoadingMenuTasks} tasks={p.menuTasks} onAddToTask={p.onAddToTask} onCreateNewTask={p.onCreateNewTask} onExplorePhonetic={p.onExplorePhonetic} onDownload={p.onDownload} onRemove={p.onRemoveSentence} onLogin={p.onLogin} onClose={p.onMenuClose} /> : undefined}
+    <SentenceSynthesisItem
+      key={sentence.id}
+      id={sentence.id}
+      text={sentence.text}
+      tags={sentence.tags || []}
+      mode="input"
+      draggable={true}
+      isDragging={p.draggedId === sentence.id}
+      isDragOver={p.dragOverId === sentence.id}
+      isPlaying={sentence.isPlaying ?? false}
+      isLoading={sentence.isLoading ?? false}
+      onPlay={p.onPlay}
+      onDragStart={p.onDragStart}
+      onDragEnd={p.onDragEnd}
+      onDragOver={p.onDragOver}
+      onDragLeave={p.onDragLeave}
+      onDrop={p.onDrop}
+      onTagMenuOpen={p.onTagMenuOpen}
+      openTagMenu={p.openTagMenu}
+      onTagMenuClose={p.onTagMenuClose}
+      tagMenuItems={getTagMenuItems(p)}
+      selectedTagIndex={isTagSelected ? p.variantsSelectedTagIndex : null}
+      isPronunciationPanelOpen={p.isVariantsPanelOpen || p.showSentencePhoneticPanel}
+      editingTag={p.editingTag}
+      onEditTagChange={p.onEditTagChange}
+      onEditTagKeyDown={p.onEditTagKeyDown}
+      onEditTagCommit={p.onEditTagCommit}
+      currentInput={sentence.currentInput ?? ''}
+      onInputChange={p.onInputChange}
+      onInputKeyDown={(e) => p.onInputKeyDown(e, sentence.id)}
+      onInputBlur={() => p.onInputBlur(sentence.id)}
+      onClear={p.onClearSentence}
+      sentenceIndex={sentenceIndex}
+      onMenuOpenLegacy={p.onMenuOpen}
+      menuContent={isMenuOpen ? (
+        <SentenceMenu
+          isAuthenticated={p.isAuthenticated}
+          sentenceId={sentence.id}
+          sentenceText={sentence.text}
+          menuSearchQuery={p.menuSearchQuery}
+          onSearchChange={p.onMenuSearchChange}
+          isLoadingTasks={p.isLoadingMenuTasks}
+          tasks={p.menuTasks}
+          onAddToTask={p.onAddToTask}
+          onCreateNewTask={p.onCreateNewTask}
+          onExplorePhonetic={p.onExplorePhonetic}
+          onDownload={p.onDownload}
+          onRemove={p.onRemoveSentence}
+          onLogin={p.onLogin}
+          onClose={p.onMenuClose}
+        />
+      ) : undefined}
     />
   );
 };

@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
   variant?: 'danger' | 'warning' | 'info';
 }
 
+// eslint-disable-next-line max-lines-per-function
 export default function ConfirmDialog({
   isOpen,
   title,

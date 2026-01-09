@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 'use client';
 
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';

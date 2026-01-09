@@ -1,3 +1,4 @@
+ 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import TaskEditModal from './TaskEditModal';
@@ -10,6 +11,7 @@ describe('TaskEditModal', () => {
         task={null}
         onClose={vi.fn()}
         onSave={vi.fn()}
+        setTaskToEdit={vi.fn()}
       />
     );
     
@@ -23,6 +25,7 @@ describe('TaskEditModal', () => {
         task={{ id: '1', name: 'Test Task', description: 'Test' }}
         onClose={vi.fn()}
         onSave={vi.fn()}
+        setTaskToEdit={vi.fn()}
       />
     );
     

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -67,10 +68,10 @@ describe('SentencePhoneticPanel', () => {
 
     it('renders marker buttons', () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByTitle('Kolmas välde')).toBeInTheDocument();
-      expect(screen.getByTitle('Rõhuline silp')).toBeInTheDocument();
-      expect(screen.getByTitle('Palatalisatsioon')).toBeInTheDocument();
-      expect(screen.getByTitle('Liitsõna piir')).toBeInTheDocument();
+      expect(screen.getByTitle('kolmas välde')).toBeInTheDocument();
+      expect(screen.getByTitle('ebareeglipärase rõhu märk')).toBeInTheDocument();
+      expect(screen.getByTitle('palatalisatsioon')).toBeInTheDocument();
+      expect(screen.getByTitle('liitsõnapiir')).toBeInTheDocument();
     });
 
     it('renders play button', () => {
@@ -115,7 +116,7 @@ describe('SentencePhoneticPanel', () => {
       textarea.focus();
       textarea.setSelectionRange(4, 4);
       
-      await user.click(screen.getByTitle('Kolmas välde'));
+      await user.click(screen.getByTitle('kolmas välde'));
       expect(textarea.value).toContain('`');
     });
   });

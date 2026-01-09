@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useState, useEffect } from 'react';
 import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';
@@ -85,7 +86,7 @@ export default function Home() {
                 onOpenVariantsFromMenu={variants.handleOpenVariantsFromMenu} onEditTag={synthesis.handleEditTag} onDeleteTag={synthesis.handleDeleteTag}
                 onEditTagChange={synthesis.handleEditTagChange} onEditTagKeyDown={synthesis.handleEditTagKeyDown} onEditTagCommit={synthesis.handleEditTagCommit}
                 onInputChange={synthesis.handleTextChange} onInputKeyDown={synthesis.handleKeyDown} onInputBlur={synthesis.handleInputBlur}
-                onClearSentence={synthesis.handleClearSentence} onMenuOpen={menu.handleMenuOpen} onMenuClose={menu.handleMenuClose}
+                onClearSentence={synthesis.handleClearSentence} onMenuOpen={(event: React.MouseEvent<Element, MouseEvent>, id: string) => menu.handleMenuOpen(event, id)} onMenuClose={menu.handleMenuClose}
                 onMenuSearchChange={menu.setMenuSearchQuery} onAddToTask={taskHandlers.handleAddSentenceToExistingTask}
                 onCreateNewTask={taskHandlers.handleCreateNewTaskFromMenu} onExplorePhonetic={variants.handleExplorePhonetic}
                 onDownload={synthesis.handleDownload} onRemoveSentence={synthesis.handleRemoveSentence}

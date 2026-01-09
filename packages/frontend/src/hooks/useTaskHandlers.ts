@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
 import { DataService } from '@/services/dataService';
+import { CreateTaskRequest } from '@/types/task';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
-import { CreateTaskRequest } from '@/types/task';
 import { SentenceState } from '@/types/synthesis';
+
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useTaskHandlers(
@@ -19,8 +20,8 @@ export function useTaskHandlers(
   const [showAddToTaskDropdown, setShowAddToTaskDropdown] = useState(false);
   const [showTaskEditModal, setShowTaskEditModal] = useState(false);
   const [showShareTaskModal, setShowShareTaskModal] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<{ id: string; name: string; description?: string } | null>(null);
-  const [taskToShare, setTaskToShare] = useState<{ id: string; shareToken: string; name: string } | null>(null);
+  const [taskToEdit, setTaskToEdit] = useState<{ id: string; name: string; description?: string | null } | null>(null);
+  const [taskToShare, setTaskToShare] = useState<{ id: string; shareToken?: string; name: string } | null>(null);
   const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<{ id: string; name: string } | null>(null);
@@ -101,9 +102,9 @@ export function useTaskHandlers(
       const dataService = DataService.getInstance();
       const playlistEntries = sentences.filter(s => s.text.trim()).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
       const newTask = await dataService.createTask(user.id, {
-        name: title, description: description || undefined,
+        name: title, description: description || null,
         speechSequences: playlistEntries.map(e => e.text),
-        speechEntries: playlistEntries.length > 0 ? playlistEntries : undefined
+        speechEntries: playlistEntries.length > 0 ? playlistEntries : null
       });
       setShowAddTaskModal(false);
       setTaskRefreshTrigger(prev => prev + 1);
@@ -117,14 +118,14 @@ export function useTaskHandlers(
     }
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 
-  const handleEditTask = useCallback(async (taskId: string) => {
+  const handleEditTask = useCallback(async (task: { id: string; name: string; description?: string | null }) => {
     if (!isAuthenticated) { setShowLoginModal(true); return; }
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
-      const task = await dataService.getTask(taskId, user.id);
-      if (task) {
-        setTaskToEdit({ id: task.id, name: task.name, ...(task.description !== undefined && { description: task.description }) });
+      const fullTask = await dataService.getTask(task.id, user.id);
+      if (fullTask) {
+        setTaskToEdit({ id: task.id, name: task.name, ...(task.description !== null && { description: task.description }) });
         setShowTaskEditModal(true);
       }
     } catch (error) {
@@ -132,28 +133,28 @@ export function useTaskHandlers(
     }
   }, [isAuthenticated, user, setShowLoginModal]);
 
-  const handleTaskUpdated = useCallback(async (taskId: string, name: string, description?: string) => {
-    if (!user) return;
+  const handleTaskUpdated = useCallback(async (): Promise<void> => {
+    if (!user || !taskToEdit) return;
     try {
       const dataService = DataService.getInstance();
-      await dataService.updateTask(user.id, taskId, { name, description });
+      await dataService.updateTask(user.id, taskToEdit.id, { name: taskToEdit.name, ...(taskToEdit.description !== null && { description: taskToEdit.description }) });
       setShowTaskEditModal(false);
       setTaskToEdit(null);
       setTaskRefreshTrigger(prev => prev + 1);
-      showNotification('success', `Ülesanne "${name}" uuendatud!`, undefined, undefined, 'success');
+      showNotification('success', `Ülesanne "${taskToEdit.name}" uuendatud!`, undefined, undefined, 'success');
     } catch (error) {
       console.error('Failed to update task:', error);
       showNotification('error', 'Ülesande uuendamine ebaõnnestus');
     }
-  }, [user, showNotification]);
+  }, [user, taskToEdit, showNotification]);
 
   const handleDeleteTask = useCallback(async (taskId: string) => {
     if (!isAuthenticated) { setShowLoginModal(true); return; }
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
-      const task = await dataService.getTask(taskId, user.id);
-      if (task) { setTaskToDelete({ id: taskId, name: task.name }); setShowDeleteConfirmation(true); }
+      const fullTask = await dataService.getTask(taskId, user.id);
+      if (fullTask) { setTaskToDelete({ id: taskId, name: fullTask.name }); setShowDeleteConfirmation(true); }
     } catch (error) {
       console.error('Failed to load task:', error);
     }
@@ -178,14 +179,14 @@ export function useTaskHandlers(
 
   const handleCancelDelete = useCallback(() => { setShowDeleteConfirmation(false); setTaskToDelete(null); }, []);
 
-  const handleShareTask = useCallback(async (taskId: string) => {
+  const handleShareTask = useCallback(async (task: { id: string; name: string; shareToken?: string }) => {
     if (!isAuthenticated) { setShowLoginModal(true); return; }
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
-      await dataService.shareUserTask(user.id, taskId);
-      const task = await dataService.getTask(taskId, user.id);
-      if (task) { setTaskToShare({ id: task.id, shareToken: task.shareToken, name: task.name }); setShowShareTaskModal(true); }
+      await dataService.shareUserTask(user.id, task.id);
+      const fullTask = await dataService.getTask(task.id, user.id);
+      if (fullTask) { setTaskToShare(task.shareToken ? { id: task.id, shareToken: task.shareToken, name: task.name } : { id: task.id, name: task.name }); setShowShareTaskModal(true); }
     } catch (error) {
       console.error('Failed to share task:', error);
     }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -5,16 +6,18 @@ import BaseModal from './BaseModal';
 
 interface TaskEditModalProps {
   isOpen: boolean;
-  task: { id: string; name: string; description?: string } | null;
+  task: { id: string; name: string; description?: string | null } | null;
   onClose: () => void;
-  onSave: (taskId: string, name: string, description?: string) => Promise<void>;
+  onSave: () => Promise<void>;
+  setTaskToEdit: (task: { id: string; name: string; description?: string | null } | null) => void;
 }
 
 export default function TaskEditModal({
   isOpen,
   task,
   onClose,
-  onSave
+  onSave,
+  setTaskToEdit
 }: TaskEditModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -43,8 +46,11 @@ export default function TaskEditModal({
     setIsSubmitting(true);
     setError(null);
 
+    // Update the task in the hook state
+    setTaskToEdit({ ...task, name: name.trim(), description: description.trim() || null });
+
     try {
-      await onSave(task.id, name.trim(), description.trim() || undefined);
+      await onSave();
       handleClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Viga ülesande muutmisel');

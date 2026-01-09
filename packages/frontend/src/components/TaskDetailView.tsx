@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function, max-lines, complexity, max-depth */
 'use client';
 
 import { useState, useEffect } from 'react';

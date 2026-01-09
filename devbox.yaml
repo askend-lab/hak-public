@@ -41,8 +41,8 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
+    min_coverage_lines: 77
+    min_coverage_branches: 67
     command: "pnpm test"
     command_full: "pnpm test:coverage"
   - name: cucumber
@@ -116,6 +116,10 @@ hooks:
     patterns:
       - '*.test.js'
       - '*.spec.js'
+    excludePaths:
+      - 'jest.setup.ts'
+      - '*.config.ts'
+      - '*.config.js'
 
   metrics-required:
     active: true

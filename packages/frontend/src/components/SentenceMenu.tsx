@@ -1,4 +1,9 @@
-import { Task } from '@/types';
+interface Task {
+  id: string;
+  name: string;
+  description?: string;
+  shareToken?: string;
+}
 
 interface SentenceMenuProps {
   isAuthenticated: boolean;

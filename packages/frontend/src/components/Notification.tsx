@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 'use client';
 
 import { useEffect } from 'react';
@@ -5,7 +6,7 @@ import { useEffect } from 'react';
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 export type NotificationColor = 'primary' | 'success' | 'danger' | 'warning' | 'neutral';
 export interface NotificationAction { label: string; onClick: () => void; }
-export interface NotificationProps { type: NotificationType; color?: NotificationColor; message: string; description?: string; action?: NotificationAction; duration?: number; onClose: () => void; }
+export interface NotificationProps { type: NotificationType; color?: NotificationColor | undefined; message: string; description?: string | undefined; action?: NotificationAction | undefined; duration?: number | undefined; onClose: () => void; }
 
 const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
 

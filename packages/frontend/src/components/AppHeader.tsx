@@ -1,5 +1,9 @@
 import UserProfile from './UserProfile';
-import { User } from '@/types';
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
 
 interface AppHeaderProps {
   currentView: 'synthesis' | 'tasks';

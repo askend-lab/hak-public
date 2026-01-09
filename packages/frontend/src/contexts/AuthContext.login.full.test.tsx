@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
@@ -59,7 +60,7 @@ describe('AuthContext login', () => {
     render(<AuthProvider><ModalCheck /></AuthProvider>);
     await act(async () => { screen.getByText('open').click(); });
     expect(screen.getByTestId('modal')).toHaveTextContent('open');
-    await act(async () => { screen.getByText('login').click(); await new Promise(r => setTimeout(r, 1600)); });
-    await waitFor(() => expect(screen.getByTestId('modal')).toHaveTextContent('closed'));
+    await act(async () => { screen.getByText('login').click(); });
+    await waitFor(() => expect(screen.getByTestId('modal')).toHaveTextContent('closed'), { timeout: 3000 });
   });
 });

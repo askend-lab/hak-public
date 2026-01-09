@@ -133,7 +133,7 @@ export class DataService {
     return activeTasks.map(task => ({
       id: task.id,
       name: task.name,
-      description: task.description,
+      description: task.description ?? null,
       entryCount: task.entries?.length || 0,
       createdAt: new Date(task.createdAt),
       updatedAt: new Date(task.updatedAt)
@@ -148,7 +148,7 @@ export class DataService {
     return userTasks.map(task => ({
       id: task.id,
       name: task.name,
-      description: task.description,
+      description: task.description ?? null,
       entryCount: task.entries?.length || 0,
       createdAt: new Date(task.createdAt),
       updatedAt: new Date(task.updatedAt)
@@ -266,7 +266,7 @@ export class DataService {
       id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       userId,
       name: taskData.name,
-      description: taskData.description,
+      description: taskData.description ?? null,
       speechSequences: taskData.speechSequences || [],
       entries: taskData.speechEntries?.map((entry, index) => ({
         id: `entry_${Date.now()}_${index}`,
