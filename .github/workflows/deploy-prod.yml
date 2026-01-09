@@ -1,0 +1,161 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_id:
+        description: 'Build ID to deploy (from build workflow output)'
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  validate-build:
+    name: Validate Build
+    runs-on: ubuntu-latest
+    
+    outputs:
+      build_id: ${{ inputs.build_id }}
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Verify build exists
+        run: |
+          BUILD_ID="${{ inputs.build_id }}"
+          S3_PATH="s3://askend-lab-artifacts/hak/builds/${BUILD_ID}"
+          
+          echo "Checking build ${BUILD_ID}..."
+          
+          if ! aws s3 ls "${S3_PATH}/build-meta.json" > /dev/null 2>&1; then
+            echo "❌ Build ${BUILD_ID} not found in S3"
+            echo "Available builds:"
+            aws s3 ls s3://askend-lab-artifacts/hak/builds/ | tail -10
+            exit 1
+          fi
+          
+          echo "✅ Build ${BUILD_ID} found"
+          aws s3 cp "${S3_PATH}/build-meta.json" -
+      
+      - name: Build info
+        run: |
+          echo "## Production Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build ID**: ${{ inputs.build_id }}" >> $GITHUB_STEP_SUMMARY
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: validate-build
+    runs-on: ubuntu-latest
+    environment: prod
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Download build artifacts from S3
+        run: |
+          BUILD_ID="${{ needs.validate-build.outputs.build_id }}"
+          S3_PATH="s3://askend-lab-artifacts/hak/builds/${BUILD_ID}"
+          
+          echo "Downloading build ${BUILD_ID}..."
+          
+          mkdir -p artifacts
+          aws s3 sync ${S3_PATH}/frontend/ artifacts/frontend/
+          aws s3 sync ${S3_PATH}/simplestore/ artifacts/simplestore/
+          aws s3 sync ${S3_PATH}/audio-api/ artifacts/audio-api/
+          aws s3 sync ${S3_PATH}/merlin-api/ artifacts/merlin-api/
+          aws s3 sync ${S3_PATH}/vabamorf-api/ artifacts/vabamorf-api/
+          
+          echo "✅ Artifacts downloaded"
+      
+      - name: Deploy Frontend to S3
+        run: |
+          aws s3 sync artifacts/frontend/ s3://hak-prod-website/ --delete
+      
+      - name: Install Serverless
+        run: npm install -g serverless@3
+      
+      - name: Deploy SimpleStore
+        working-directory: packages/simplestore
+        run: |
+          cp -r ../../artifacts/simplestore/* dist/ 2>/dev/null || mkdir -p dist
+          serverless deploy --stage prod --region eu-west-1
+      
+      - name: Deploy Audio API
+        working-directory: packages/audio-api
+        run: |
+          cp -r ../../artifacts/audio-api/* dist/ 2>/dev/null || mkdir -p dist
+          serverless deploy --stage prod --region eu-west-1
+      
+      - name: Deploy Merlin API
+        working-directory: packages/merlin-api
+        run: |
+          cp -r ../../artifacts/merlin-api/* dist/ 2>/dev/null || mkdir -p dist
+          serverless create_domain --stage prod || true
+          serverless deploy --stage prod
+      
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Deploy Vabamorf API
+        working-directory: packages/vabamorf-api
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          cp -r ../../artifacts/vabamorf-api/* dist/ 2>/dev/null || mkdir -p dist
+          npm ci
+          
+          # Get SHA from build metadata
+          BUILD_ID="${{ needs.validate-build.outputs.build_id }}"
+          BUILD_SHA=$(echo $BUILD_ID | cut -d'-' -f1)
+          
+          docker build -t $ECR_REGISTRY/vabamorf-api:${BUILD_SHA} -t $ECR_REGISTRY/vabamorf-api:prod-latest .
+          docker push $ECR_REGISTRY/vabamorf-api:${BUILD_SHA}
+          docker push $ECR_REGISTRY/vabamorf-api:prod-latest
+          
+          npm install --save-dev serverless-domain-manager
+          serverless create_domain --stage prod || true
+          serverless deploy --stage prod
+      
+      - name: Deployment summary
+        run: |
+          echo "## Production Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build ID**: ${{ needs.validate-build.outputs.build_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend**: https://hak.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+          echo "- **API**: https://hak-api.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+          echo "- **Merlin**: https://merlin-prod.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+          echo "- **Vabamorf**: https://vabamorf-prod.askend-lab.com" >> $GITHUB_STEP_SUMMARY
