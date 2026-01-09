@@ -6,16 +6,17 @@ interface User {
 }
 
 interface AppHeaderProps {
-  currentView: 'synthesis' | 'tasks';
+  currentView: 'synthesis' | 'tasks' | 'dashboard';
   isAuthenticated: boolean;
   user: User | null;
   onSynthesisClick: () => void;
   onTasksClick: () => void;
+  onDashboardClick: () => void;
   onHelpClick: () => void;
   onLoginClick: () => void;
 }
 
-export default function AppHeader({ currentView, isAuthenticated, user, onSynthesisClick, onTasksClick, onHelpClick, onLoginClick }: AppHeaderProps) {
+export default function AppHeader({ currentView, isAuthenticated, user, onSynthesisClick, onTasksClick, onDashboardClick, onHelpClick, onLoginClick }: AppHeaderProps) {
   return (
     <header className="page-layout__header">
       <div className="page-layout__header-content">
@@ -23,6 +24,7 @@ export default function AppHeader({ currentView, isAuthenticated, user, onSynthe
         <nav className="header-nav">
           <a href="#" className={`header-nav-link ${currentView === 'synthesis' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); onSynthesisClick(); }}>Kõnesüntees</a>
           <a href="#" className={`header-nav-link ${currentView === 'tasks' ? 'active' : ''}`} data-nav="tasks" onClick={(e) => { e.preventDefault(); onTasksClick(); }}>Ülesanded</a>
+          <a href="#" className={`header-nav-link ${currentView === 'dashboard' ? 'active' : ''}`} data-nav="dashboard" onClick={(e) => { e.preventDefault(); onDashboardClick(); }}>Töölaud</a>
         </nav>
         <div className="header-functions">
           <button className="header-help-button" onClick={onHelpClick} aria-label="Abi ja juhend" title="Näita juhendeid">

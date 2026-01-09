@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';
 import SynthesisView from './components/SynthesisView';
 import TasksView from './components/TasksView';
+import Dashboard from './components/Dashboard';
 import AppModals from './components/AppModals';
 import { RoleSelectionContent } from './components/onboarding';
 import { useAuth } from './contexts/AuthContext';
@@ -16,7 +17,7 @@ export default function Home() {
   const { showNotification } = useNotification();
   const { state: onboardingState, isWizardActive, resetOnboarding, isLoading: isOnboardingLoading } = useOnboarding();
 
-  const [currentView, setCurrentView] = useState<'synthesis' | 'tasks'>('synthesis');
+  const [currentView, setCurrentView] = useState<'synthesis' | 'tasks' | 'dashboard'>('synthesis');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
 
@@ -59,13 +60,14 @@ export default function Home() {
         currentView={currentView} isAuthenticated={isAuthenticated} user={user}
         onSynthesisClick={() => { setCurrentView('synthesis'); setSelectedTaskId(null); }}
         onTasksClick={() => { if (!isAuthenticated) { setPendingTasksViewAccess(true); setShowLoginModal(true); return; } setCurrentView('tasks'); }}
+        onDashboardClick={() => { setCurrentView('dashboard'); }}
         onHelpClick={resetOnboarding} onLoginClick={() => setShowLoginModal(true)}
       />
 
       <main className={`page-layout__main ${showRoleSelection ? 'role-selection-main' : ''}`}>
         {showRoleSelection ? <RoleSelectionContent /> : (
           <>
-            {currentView === 'synthesis' ? (
+            {currentView === 'synthesis' && (
               <SynthesisView
                 sentences={synthesis.sentences} isPlayingAll={synthesis.isPlayingAll} isLoadingPlayAll={synthesis.isLoadingPlayAll}
                 openTagMenu={synthesis.openTagMenu} editingTag={synthesis.editingTag}
@@ -92,11 +94,15 @@ export default function Home() {
                 onDownload={synthesis.handleDownload} onRemoveSentence={synthesis.handleRemoveSentence}
                 onLogin={() => setShowLoginModal(true)} onAddSentence={synthesis.handleAddSentence}
               />
-            ) : (
+            )}
+            {currentView === 'tasks' && (
               <TasksView selectedTaskId={selectedTaskId} taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
                 onBack={handleBackToTaskList} onViewTask={handleViewTask} onCreateTask={taskHandlers.handleCreateTask}
                 onEditTask={taskHandlers.handleEditTask} onDeleteTask={taskHandlers.handleDeleteTask} onShareTask={taskHandlers.handleShareTask}
               />
+            )}
+            {currentView === 'dashboard' && (
+              <Dashboard />
             )}
           </>
         )}
