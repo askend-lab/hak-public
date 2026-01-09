@@ -42,9 +42,13 @@ COPY --chown=merlin_user:merlin_user tools/ merlin_repo/tools/
 # Download voice models from S3 (267MB, too large for git)
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_SESSION_TOKEN
 ARG AWS_DEFAULT_REGION=eu-west-1
 
 RUN pip install awscli && \
+    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
     aws s3 sync s3://hak-merlin-dev-audio/models/voices/ merlin_repo/voices/ --region eu-west-1
 
 # Create conda environment

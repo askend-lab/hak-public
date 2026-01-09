@@ -30,6 +30,13 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       
+      - name: Get AWS credentials for Docker build
+        id: aws-creds
+        run: |
+          echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> $GITHUB_OUTPUT
+          echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_OUTPUT
+          echo "aws_session_token=$AWS_SESSION_TOKEN" >> $GITHUB_OUTPUT
+      
       - name: Build and push Docker image
         working-directory: packages/merlin-worker
         env:
@@ -37,7 +44,12 @@ jobs:
           ECR_REPOSITORY: merlin-worker
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker build \
+            --build-arg AWS_ACCESS_KEY_ID=${{ steps.aws-creds.outputs.aws_access_key_id }} \
+            --build-arg AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws_secret_access_key }} \
+            --build-arg AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws_session_token }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       
