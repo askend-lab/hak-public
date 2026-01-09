@@ -55,9 +55,9 @@ resource "aws_s3_bucket_cors_configuration" "audio" {
 # SQS Queue for audio generation requests
 resource "aws_sqs_queue" "audio_generation" {
   name                       = "hak-audio-generation-${var.env}"
-  visibility_timeout_seconds = 300  # 5 minutes for TTS processing
-  message_retention_seconds  = 86400  # 1 day
-  receive_wait_time_seconds  = 20  # Long polling
+  visibility_timeout_seconds = 300   # 5 minutes for TTS processing
+  message_retention_seconds  = 86400 # 1 day
+  receive_wait_time_seconds  = 20    # Long polling
 
   tags = {
     Project     = "hak"
@@ -69,7 +69,7 @@ resource "aws_sqs_queue" "audio_generation" {
 # Dead letter queue for failed messages
 resource "aws_sqs_queue" "audio_generation_dlq" {
   name                      = "hak-audio-generation-dlq-${var.env}"
-  message_retention_seconds = 1209600  # 14 days
+  message_retention_seconds = 1209600 # 14 days
 
   tags = {
     Project     = "hak"
@@ -306,7 +306,7 @@ resource "aws_ecs_task_definition" "audio_worker" {
     {
       name  = "audio-worker"
       image = "465168436856.dkr.ecr.eu-west-1.amazonaws.com/askend-lab:audio-worker-${var.env}-latest"
-      
+
       environment = [
         {
           name  = "QUEUE_URL"
@@ -321,7 +321,7 @@ resource "aws_ecs_task_definition" "audio_worker" {
           value = "https://swq24fqfiu.eu-west-1.awsapprunner.com/synthesize"
         }
       ]
-      
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -377,7 +377,7 @@ resource "aws_ecs_service" "audio_worker" {
   name            = "audio-worker"
   cluster         = aws_ecs_cluster.hak.id
   task_definition = aws_ecs_task_definition.audio_worker.arn
-  desired_count   = 1
+  desired_count   = 0 # Start scaled down, auto-scaling will manage
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -393,7 +393,107 @@ resource "aws_ecs_service" "audio_worker" {
   }
 
   lifecycle {
-    ignore_changes = [task_definition]
+    ignore_changes = [task_definition, desired_count]
+  }
+}
+
+# Application Auto Scaling for audio worker
+# Scales based on SQS queue depth - scale to 0 when idle
+resource "aws_appautoscaling_target" "audio_worker" {
+  max_capacity       = 1
+  min_capacity       = 0
+  resource_id        = "service/${aws_ecs_cluster.hak.name}/${aws_ecs_service.audio_worker.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+# Scale up policy - triggered when messages appear in queue
+resource "aws_appautoscaling_policy" "audio_worker_scale_up" {
+  name               = "hak-audio-worker-scale-up-${var.env}"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.audio_worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.audio_worker.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.audio_worker.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ExactCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      scaling_adjustment          = 1
+    }
+  }
+}
+
+# Scale down policy - triggered when queue is empty
+resource "aws_appautoscaling_policy" "audio_worker_scale_down" {
+  name               = "hak-audio-worker-scale-down-${var.env}"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.audio_worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.audio_worker.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.audio_worker.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ExactCapacity"
+    cooldown                = 300 # 5 minutes before scaling down
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_upper_bound = 0
+      scaling_adjustment          = 0
+    }
+  }
+}
+
+# CloudWatch alarm - SQS messages visible (scale up trigger)
+resource "aws_cloudwatch_metric_alarm" "audio_queue_messages_high" {
+  alarm_name          = "hak-audio-queue-messages-high-${var.env}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  period              = 60
+  statistic           = "Maximum"
+  threshold           = 1
+  alarm_description   = "Scale up audio worker when messages in queue"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.audio_generation.name
+  }
+
+  alarm_actions = [aws_appautoscaling_policy.audio_worker_scale_up.arn]
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+    Service     = "audio-worker"
+  }
+}
+
+# CloudWatch alarm - SQS empty for 5 minutes (scale down trigger)
+resource "aws_cloudwatch_metric_alarm" "audio_queue_messages_low" {
+  alarm_name          = "hak-audio-queue-messages-low-${var.env}"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 5 # 5 periods of 1 minute = 5 minutes
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  period              = 60
+  statistic           = "Maximum"
+  threshold           = 1
+  alarm_description   = "Scale down audio worker when queue empty for 5 min"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.audio_generation.name
+  }
+
+  alarm_actions = [aws_appautoscaling_policy.audio_worker_scale_down.arn]
+
+  tags = {
+    Project     = "hak"
+    Environment = var.env
+    Service     = "audio-worker"
   }
 }
 
