@@ -191,7 +191,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          cp -r ../../artifacts/vabamorf-api/* dist/ 2>/dev/null || mkdir -p dist
+          # Restore dist/ directory structure from artifacts
+          rm -rf dist
+          mkdir -p dist/src
+          cp -r ../../artifacts/vabamorf-api/* dist/src/
           npm ci
           docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} -t $ECR_REGISTRY/vabamorf-api:latest .
           docker push $ECR_REGISTRY/vabamorf-api:${{ github.sha }}
