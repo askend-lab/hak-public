@@ -138,6 +138,11 @@ jobs:
           terraform import -var="env=${{ matrix.environment }}" aws_dynamodb_table.single_table single-table-lambda-${{ matrix.environment }} 2>/dev/null || echo "Already imported or doesn't exist"
         continue-on-error: true
 
+      - name: Import ECR vabamorf-api (one-time)
+        run: |
+          terraform import -var="env=${{ matrix.environment }}" aws_ecr_repository.vabamorf_api vabamorf-api 2>/dev/null || echo "Already imported or doesn't exist"
+        continue-on-error: true
+
       - name: Terraform Apply (${{ matrix.environment }})
         run: terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
       
