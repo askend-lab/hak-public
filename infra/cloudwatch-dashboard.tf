@@ -194,10 +194,6 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
       }
     ]
   })
-
-  tags = merge(local.common_tags, {
-    Name = "hak-activity-dashboard-${var.env}"
-  })
 }
 
 output "cloudwatch_dashboard_url" {
