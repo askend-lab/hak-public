@@ -196,9 +196,10 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           # Restore dist/ directory structure from artifacts
+          # Note: Build uploads dist/ which contains src/, so artifacts has src/*.js
           rm -rf dist
-          mkdir -p dist/src
-          cp -r ../../artifacts/vabamorf-api/* dist/src/
+          mkdir -p dist
+          cp -r ../../artifacts/vabamorf-api/* dist/
           npm ci
           docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} -t $ECR_REGISTRY/vabamorf-api:latest .
           docker push $ECR_REGISTRY/vabamorf-api:${{ github.sha }}
