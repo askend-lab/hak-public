@@ -1,0 +1,228 @@
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// Paper component mixins available from main.scss cascade
+
+// =========================================================================
+// Task Manager Component
+// =========================================================================
+// BEM: .task-manager, .task-manager__*, .task-manager--*
+// Container for managing user tasks/playlists
+// =========================================================================
+
+.task-manager {
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-6;
+  box-shadow: 0 2px 8px $color-shadow-light;
+  border: 1px solid $color-outlined-neutral;
+}
+
+.task-manager__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-6;
+}
+
+.task-manager__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $color-primary;
+  margin: 0;
+}
+
+.task-manager__create-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-3 $spacing-5;
+  background: $color-primary;
+  color: $color-white;
+  border: none;
+  border-radius: $border-radius;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $color-soft-primary;
+    transform: translateY(-1px);
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.task-manager__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+}
+
+.task-manager__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid $color-outlined-neutral;
+  border-top: 3px solid $color-primary;
+  border-radius: $border-radius-full;
+  animation: spin 1s linear infinite;
+  margin-bottom: $spacing-4;
+}
+
+.task-manager__loading-text {
+  margin: 0;
+  color: $color-text-secondary;
+  font-size: 0.875rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.task-manager__error {
+  padding: $spacing-4;
+  background: $color-soft-danger-bg;
+  border: 1px solid $color-outlined-danger;
+  border-radius: $border-radius;
+  margin-bottom: $spacing-4;
+  
+  p {
+    margin: 0;
+    color: $color-soft-danger;
+    font-size: 0.875rem;
+  }
+}
+
+// Empty State
+.task-manager__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-16 $spacing-8;
+  text-align: center;
+  background: transparent;
+  margin: 0;
+  position: relative;
+  min-height: calc(100vh - 160px);
+}
+
+.task-manager__empty-image {
+  margin-bottom: $spacing-6;
+  position: relative;
+  z-index: 1;
+
+  img {
+    width: 213px;
+    height: 186px;
+    display: block;
+  }
+}
+
+.task-manager__empty-title {
+  margin: 0 0 $spacing-6 0;
+  font-family: $font-body;
+  font-size: $heading-page-title-size;
+  font-weight: $heading-page-title-weight;
+  line-height: $heading-page-title-line;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  position: relative;
+  z-index: 1;
+}
+
+.task-manager__empty-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  padding: 0 $spacing-6;
+  height: 36px;
+  background-color: $color-primary;
+  color: $color-white;
+  border: none;
+  border-radius: $border-radius-round;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-regular;
+  letter-spacing: $letter-spacing-normal;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: $font-body;
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    background-color: $color-soft-primary;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Responsive styles for task manager empty
+@media (max-width: 768px) {
+  .task-manager__empty {
+    padding: $spacing-12 $spacing-6;
+  }
+
+  .task-manager__empty-image {
+    margin-bottom: $spacing-4;
+
+    img {
+      width: 160px;
+      height: 140px;
+    }
+  }
+
+  .task-manager__empty-title {
+    font-size: 20px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Task Manager Dropdown Menu (uses Paper component)
+// ---------------------------------------------------------------------------
+
+.task-manager__menu-container {
+  position: relative;
+}
+
+.task-manager__menu-button {
+  @include menu-button;
+}
+
+.task-manager__menu-backdrop {
+  @include paper-backdrop;
+}
+
+.task-manager__dropdown-menu {
+  @include paper-base;
+  @include paper-dropdown;
+  @include paper-sm;
+}
+
+.task-manager__menu-item {
+  @include paper-item;
+
+  &--danger {
+    @include paper-item-danger;
+  }
+}
+
+.task-manager__menu-item-content {
+  @include paper-item-content;
+}
+
+// No legacy aliases - use BEM class names directly

@@ -1,0 +1,1009 @@
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// =========================================================================
+// Pronunciation Variants Component
+// =========================================================================
+// BEM: .pronunciation-variants, .pronunciation-variants__*
+// Sliding panel displaying pronunciation variant options
+// Uses: panel mixins (base component)
+// =========================================================================
+
+// Backdrop overlay - uses panel backdrop mixin
+.pronunciation-variants__backdrop {
+  @include panel-backdrop;
+}
+
+// Sliding panel from right - uses panel mixins
+.pronunciation-variants__panel {
+  @include panel-base;
+  @include panel-right;
+  @include panel-md;
+}
+
+// Panel header - uses panel header mixin with specific width
+.pronunciation-variants__header {
+  @include panel-header;
+  width: 518px;
+}
+
+.pronunciation-variants__title {
+  @include panel-title;
+}
+
+.pronunciation-variants__title-phonetic {
+  @include panel-title-secondary;
+}
+
+.pronunciation-variants__header-actions {
+  @include panel-header-actions;
+}
+
+// Guide toggle link - component-specific
+.pronunciation-variants__guide-toggle {
+  padding: 0;
+  background: transparent;
+  color: $color-outlined-primary;
+  border: none;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0;
+  text-align: right;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+
+  &:hover {
+    color: $color-soft-primary;
+    text-decoration: underline;
+  }
+
+  &--active {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
+.pronunciation-variants__close {
+  @include panel-close;
+}
+
+// Panel content - uses panel content mixin with specific width
+.pronunciation-variants__content {
+  @include panel-content;
+  width: 518px;
+  gap: $spacing-2;
+}
+
+// Loading and error states
+.pronunciation-variants__loading,
+.pronunciation-variants__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-8;
+  text-align: center;
+  color: $color-gray;
+}
+
+.pronunciation-variants__error {
+  color: $color-soft-danger;
+}
+
+// Variants list
+.pronunciation-variants__list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+// Individual variant item - Figma block specs
+.pronunciation-variants__item {
+  width: 100%;
+  min-height: 72px;
+  height: auto;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-xl;
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: $color-outlined-primary;
+  }
+
+  &--selected {
+    background: $color-input-bg-light;
+    border-color: $color-outlined-primary;
+  }
+}
+
+.pronunciation-variants__item-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: $spacing-2;
+  width: 100%;
+}
+
+.pronunciation-variants__item-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: $spacing-1;
+}
+
+.pronunciation-variants__item-text {
+  font-family: $font-body;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-primary;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pronunciation-variants__item-tags {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $spacing-1;
+  height: 22px;
+  flex-wrap: wrap;
+}
+
+.pronunciation-variants__item-tag {
+  height: 22px;
+  background: $color-secondary;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: 4px;
+  padding: 0 $spacing-1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-body;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: 0.4%;
+  text-align: center;
+  color: $color-primary;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pronunciation-variants__item-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-1;
+  width: 100%;
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-gray;
+}
+
+.pronunciation-variants__explanation-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: $color-gray;
+}
+
+.pronunciation-variants__item-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+// Create custom variant card
+.pronunciation-variants__custom-card {
+  background: linear-gradient(135deg, $color-soft-primary-bg, $color-surface-bg);
+  border: 1px solid $color-outlined-primary;
+  border-radius: $border-radius-xl;
+  padding: $spacing-6;
+  margin-bottom: $spacing-6;
+}
+
+.pronunciation-variants__custom-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-4;
+}
+
+.pronunciation-variants__custom-card-info {
+  flex: 1;
+  
+  h4 {
+    margin: 0 0 $spacing-1 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $color-primary;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    line-height: 1.4;
+  }
+}
+
+.pronunciation-variants__custom-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-3 $spacing-5;
+  background: $color-primary;
+  color: $color-white;
+  border: none;
+  border-radius: $border-radius-round;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.2);
+  
+  &:hover {
+    background: $color-soft-primary;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// Variants divider
+.pronunciation-variants__divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: $spacing-6 0;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: $color-outlined-neutral;
+    z-index: 1;
+  }
+  
+  span {
+    background: $color-white;
+    padding: 0 $spacing-4;
+    font-size: 0.875rem;
+    color: $color-gray;
+    font-weight: 500;
+    z-index: 2;
+    position: relative;
+  }
+}
+
+// Floating phonetic guide popover
+.pronunciation-variants__guide-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 1999;
+}
+
+.pronunciation-variants__guide-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: $spacing-2;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 2000;
+  max-height: 400px;
+  overflow-y: auto;
+  animation: popoverSlideIn 0.2s ease-out;
+  
+  @keyframes popoverSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.pronunciation-variants__guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-4 $spacing-2 $spacing-4;
+  border-bottom: 1px solid $color-outlined-neutral;
+  
+  h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $color-primary;
+  }
+}
+
+.pronunciation-variants__guide-close {
+  width: 28px;
+  height: 28px;
+  border-radius: $border-radius-full;
+  border: none;
+  background: transparent;
+  color: $color-gray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $color-soft-neutral-bg;
+    color: $color-primary;
+  }
+}
+
+.pronunciation-variants__guide-content {
+  padding: $spacing-4;
+  font-size: 0.875rem;
+}
+
+.pronunciation-variants__guide-section {
+  &:not(:last-child) {
+    margin-bottom: $spacing-5;
+  }
+  
+  h6 {
+    margin: 0 0 $spacing-2 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-primary;
+  }
+  
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  li {
+    padding: $spacing-1 0;
+    color: $color-text-secondary;
+    line-height: 1.4;
+    
+    code {
+      background: $color-soft-primary-bg;
+      color: $color-soft-primary;
+      padding: 2px $spacing-1;
+      border-radius: 4px;
+      font-family: $font-mono;
+      font-weight: 600;
+      margin-right: $spacing-2;
+    }
+  }
+}
+
+// Custom variant form - content frame (Figma specs)
+.pronunciation-variants__form {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-xl;
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.pronunciation-variants__form-title {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 18px;
+  font-weight: 600;
+  color: $color-primary;
+  line-height: 100%;
+  letter-spacing: 0;
+  white-space: nowrap;
+  height: 18px;
+}
+
+.pronunciation-variants__form-description {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 400;
+  color: $color-primary;
+  line-height: 140%;
+  letter-spacing: 0;
+  width: 486px;
+  height: 40px;
+}
+
+// Custom input container
+.pronunciation-variants__input-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-2;
+  align-items: center;
+  width: 486px;
+  height: 42px;
+  border-radius: $border-radius-xl;
+
+  .input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.pronunciation-variants__input {
+  flex: 1;
+  width: 100%;
+  padding: 11px 13px;
+  padding-right: 40px;
+  border: 1px solid $color-primary;
+  border-radius: 4px;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0;
+  background: $color-white;
+  color: $color-primary;
+  box-sizing: border-box;
+  height: 42px;
+
+  &:focus {
+    outline: none;
+    border-color: $color-outlined-primary;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+  }
+
+  &::placeholder {
+    color: $color-gray;
+    font-family: $font-body;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.pronunciation-variants__input-clear {
+  position: absolute;
+  right: 13px;
+  top: 12px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: $color-secondary;
+  border-radius: $border-radius-full;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $color-outlined-neutral;
+  }
+
+  img {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+}
+
+.pronunciation-variants__input-actions {
+  display: flex;
+  gap: $spacing-2;
+  align-items: center;
+}
+
+// Phonetic markers toolbar
+.pronunciation-variants__markers-toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-1;
+  align-items: center;
+  width: 486px;
+  height: auto;
+}
+
+.pronunciation-variants__marker-button {
+  width: 28px;
+  height: 36px;
+  padding: 0;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: 4px;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-primary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-outlined-neutral;
+    transform: translateY(1px);
+  }
+}
+
+// Custom variant section
+.pronunciation-variants__custom-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-4;
+  margin-top: $spacing-2;
+}
+
+// Toggle links for custom variant
+.pronunciation-variants__toggle-link {
+  background: none;
+  border: none;
+  color: $color-outlined-primary;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: $spacing-2 0;
+  
+  &:hover {
+    color: $color-soft-primary;
+  }
+}
+
+// Inline guide link in description
+.pronunciation-variants__guide-link {
+  background: none;
+  border: none;
+  color: $color-outlined-primary;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  
+  &:hover {
+    color: $color-soft-primary;
+  }
+}
+
+.pronunciation-variants__create-trigger {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  width: 100%;
+  padding: $spacing-3 $spacing-4;
+  background: transparent;
+  color: $color-gray;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  
+  &:hover {
+    background: $color-soft-primary-bg;
+    color: $color-primary;
+    border-color: $color-outlined-primary;
+  }
+  
+  svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  
+  span {
+    flex: 1;
+  }
+}
+
+.pronunciation-variants__collapse-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: $color-gray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $color-soft-neutral-bg;
+    color: $color-primary;
+  }
+}
+
+// Organic phonetic toolbar
+.pronunciation-variants__toolbar {
+  background: $color-soft-neutral-bg;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  padding: $spacing-3;
+  margin: $spacing-3 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.pronunciation-variants__toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.pronunciation-variants__toolbar-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: $color-primary;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.pronunciation-variants__toolbar-buttons {
+  display: flex;
+  gap: $spacing-1;
+  flex-wrap: wrap;
+}
+
+.pronunciation-variants__toolbar-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: 4px;
+  background: $color-white;
+  color: $color-primary;
+  font-family: $font-mono;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background: $color-soft-primary-bg;
+    border-color: $color-outlined-primary;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  &--help {
+    background: $color-soft-neutral-bg;
+    color: $color-gray;
+    font-family: inherit;
+    
+    &:hover {
+      background: $color-outlined-neutral;
+      color: $color-primary;
+    }
+  }
+}
+
+// Responsive layout for smaller spaces
+@media (max-width: 480px) {
+  .pronunciation-variants__toolbar-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-1;
+  }
+  
+  .pronunciation-variants__toolbar-label {
+    min-width: auto;
+  }
+}
+
+// Guide View
+.pronunciation-variants__guide-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pronunciation-variants__guide-view-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-6;
+  padding-bottom: $spacing-4;
+  border-bottom: 1px solid $color-outlined-neutral;
+
+  h4 {
+    font-family: $font-body;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 28px;
+    color: $color-primary;
+    margin: 0;
+  }
+}
+
+.pronunciation-variants__back-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  background: transparent;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-outlined-neutral;
+  }
+}
+
+.pronunciation-variants__guide-view-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: $spacing-2;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-soft-neutral-bg;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-outlined-neutral;
+    border-radius: 3px;
+
+    &:hover {
+      background: $color-gray;
+    }
+  }
+}
+
+.pronunciation-variants__guide-section-block {
+  margin-bottom: $spacing-8;
+
+  h5 {
+    font-family: $font-body;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    color: $color-primary;
+    margin: 0 0 $spacing-3 0;
+  }
+
+  &--tips {
+    background: $color-soft-neutral-bg;
+    border-radius: $border-radius;
+    padding: $spacing-4;
+    margin-bottom: 0;
+
+    ul {
+      margin: $spacing-2 0 0 0;
+      padding-left: $spacing-5;
+      list-style-type: disc;
+
+      li {
+        font-family: $font-body;
+        font-size: 14px;
+        line-height: 20px;
+        color: $color-text-secondary;
+        margin-bottom: $spacing-2;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+.pronunciation-variants__guide-warning {
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: $color-warning;
+  background: $color-soft-warning-bg;
+  border-left: 3px solid $color-warning;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $border-radius-sm;
+  margin: 0;
+}
+
+.pronunciation-variants__marker-item {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  padding: $spacing-4;
+  margin-bottom: $spacing-4;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $color-gray;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.pronunciation-variants__marker-symbol {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-3;
+
+  code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 $spacing-2;
+    background: $color-soft-neutral-bg;
+    border: 1px solid $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+    font-family: $font-mono;
+    font-size: 18px;
+    font-weight: 600;
+    color: $color-outlined-primary;
+  }
+}
+
+.pronunciation-variants__marker-name {
+  font-family: $font-body;
+  font-size: 15px;
+  font-weight: 600;
+  color: $color-primary;
+}
+
+.pronunciation-variants__marker-rule {
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 20px;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-3;
+
+  strong {
+    font-weight: 600;
+    color: $color-primary;
+  }
+}
+
+.pronunciation-variants__marker-examples {
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 20px;
+  color: $color-text-secondary;
+
+  strong {
+    font-weight: 600;
+    color: $color-primary;
+  }
+
+  ul {
+    margin: $spacing-2 0 0 0;
+    padding-left: $spacing-5;
+    list-style-type: none;
+
+    li {
+      margin-bottom: $spacing-1;
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+
+      &:before {
+        content: '•';
+        color: $color-gray;
+        font-size: 16px;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      code {
+        display: inline;
+        padding: 2px $spacing-1;
+        background: $color-soft-neutral-bg;
+        border: 1px solid $color-outlined-neutral;
+        border-radius: 4px;
+        font-family: $font-mono;
+        font-size: 13px;
+        color: $color-outlined-primary;
+      }
+    }
+  }
+}
+
+// Spin animation for loading spinners
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

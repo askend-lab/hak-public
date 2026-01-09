@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@hak/shared": ["../shared/src"],
-      "@hak/specifications": ["../specifications"]
+      "@hak/specifications": ["../specifications"],
+      "@/*": ["./src/*"]
     },
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],

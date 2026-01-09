@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, './src'),
       '@hak/shared': path.resolve(__dirname, '../shared/src'),
       '@hak/specifications': path.resolve(__dirname, '../specifications'),
     },
@@ -36,7 +37,21 @@ export default defineConfig({
       reporter: ['json-summary', 'text', 'lcov'],
       reportsDirectory: 'coverage',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/test/**', 'src/**/*.test.{ts,tsx}', 'src/features/steps-ts/**'],
+      exclude: [
+        'src/test/**',
+        'src/**/*.test.{ts,tsx}',
+        'src/features/steps-ts/**',
+        '**/testspecs/**',
+        'src/main.tsx',
+        'src/vite-env.d.ts',
+        'src/types/onboarding.ts',
+        'src/types/task.ts',
+        'src/hooks/index.ts',
+        'src/components/onboarding/index.ts',
+        '**/*.generated.ts',
+        '**/testspecs/**/index.ts',
+      ],
+      reportOnFailure: true,
     },
   },
 });

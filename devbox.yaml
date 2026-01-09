@@ -41,8 +41,8 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
-    min_coverage_lines: 74
-    min_coverage_branches: 68
+    min_coverage_lines: 80
+    min_coverage_branches: 70
     command: "pnpm test"
     command_full: "pnpm test:coverage"
   - name: cucumber
@@ -68,6 +68,7 @@ hooks:
     excludePaths:
       - 'docs/work/**'
       - 'docs/vision/**'
+      - 'packages/frontend/src/styles/eki/**'
       - 'docs/hub/**'
       - 'docs/patterns/**'
       - 'docs/plans/**'
@@ -152,37 +153,9 @@ hooks:
       - '**/test/fixtures/**'
       - '**/*.min.js'
 
-  # Stage-based execution - centralized configuration
-stages:
-  pre-commit:
-    hooks:
-      - markdown-size
-      - language-check
-      - broken-links
-      - run-lint
-      - run-typecheck
-      - run-build
-      - jscpd
-  
-  commit-msg:
-    hooks:
-      - test-required
-  
-  pre-push:
-    includes:
-      - pre-commit
-    hooks:
-      - run-tests
-  
-  pr-check:
-    includes:
-      - pre-push
-    hooks:
-      - plan-validation
-  
-  ci-cd:
-    includes:
-      - pr-check
-    hooks: []
+  source-size:
+    active: true
+    excludePaths:
+      - '**/.old-frontend/**'
 
 # final

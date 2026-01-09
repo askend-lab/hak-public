@@ -1,0 +1,89 @@
+// Layer 3: App-specific component (no vendor equivalent)
+// Phonetic guide modal styles
+.phonetic-guide-modal {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  &__content {
+    background: $color-white;
+    padding: 2rem;
+    border-radius: $border-radius;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: auto;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    margin: 0;
+    color: $color-primary;
+    font-weight: 700;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: $color-gray;
+    padding: 0;
+    line-height: 1;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__card {
+    padding: 16px;
+    background: $color-soft-neutral-bg;
+    border-radius: $border-radius-sm;
+  }
+
+  &__symbol-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  &__symbol {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $color-primary;
+    min-width: 2rem;
+    text-align: center;
+  }
+
+  &__name {
+    font-weight: 500;
+  }
+
+  &__description {
+    margin: 0 0 4px 0;
+    color: $color-text-secondary;
+    font-size: 0.875rem;
+  }
+
+  &__example {
+    margin: 0;
+    font-style: italic;
+    font-size: 0.875rem;
+  }
+}

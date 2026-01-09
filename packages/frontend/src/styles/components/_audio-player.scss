@@ -1,0 +1,231 @@
+// Audio Player Component Styles
+.audio-player {
+  width: 100%;
+}
+
+.audio-player__audio-element {
+  display: none;
+}
+
+.audio-placeholder {
+  padding: 2rem;
+  text-align: center;
+  background: $color-soft-neutral-bg;
+  border: 1px dashed $color-outlined-neutral;
+  border-radius: 8px;
+  color: $color-text-secondary;
+  font-size: 0.875rem;
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: $color-soft-neutral-bg;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  
+  @media (max-width: 768px) {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+}
+
+.audio-play-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: $color-primary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  
+  &:hover {
+    background: $color-soft-primary;
+    transform: scale(1.05);
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+  
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.audio-progress-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
+}
+
+.audio-time {
+  font-size: 0.875rem;
+  color: $color-text-secondary;
+  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  white-space: nowrap;
+  
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
+}
+
+.audio-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: $color-outlined-neutral;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: $color-primary;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: $color-soft-primary;
+      transform: scale(1.1);
+    }
+  }
+  
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: $color-primary;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: $color-soft-primary;
+      transform: scale(1.1);
+    }
+  }
+  
+  &::-webkit-slider-track {
+    background: linear-gradient(
+      to right,
+      $color-primary 0%,
+      $color-primary var(--progress, 0%),
+      $color-outlined-neutral var(--progress, 0%),
+      $color-outlined-neutral 100%
+    );
+    height: 6px;
+    border-radius: 3px;
+  }
+  
+  &::-moz-range-track {
+    background: $color-outlined-neutral;
+    height: 6px;
+    border-radius: 3px;
+    border: none;
+  }
+  
+  &::-moz-range-progress {
+    background: $color-primary;
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.audio-speed-button,
+.audio-download-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: 6px;
+  color: $color-primary;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  
+  &:hover {
+    background: $color-soft-primary-bg;
+    border-color: $color-outlined-primary;
+    transform: translateY(-1px);
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    
+    .speed-text {
+      display: none;
+    }
+  }
+}
+
+.audio-speed-button {
+  .speed-text {
+    font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+    font-weight: 600;
+  }
+}
+
+.audio-helper-text {
+  margin: 0;
+  font-size: 0.75rem;
+  color: $color-text-secondary;
+  text-align: center;
+  line-height: 1.4;
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .audio-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .audio-progress-container {
+    order: 3;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  
+  .audio-play-button {
+    order: 1;
+  }
+  
+  .audio-speed-button,
+  .audio-download-button {
+    order: 2;
+    flex: 1;
+    justify-content: center;
+  }
+}

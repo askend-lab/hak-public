@@ -1,0 +1,123 @@
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// =========================================================================
+// Task Edit Modal Component
+// =========================================================================
+// BEM: .task-edit-modal__*
+// Modal for editing task details
+// Uses BaseModal for structure, contains only content-specific styles
+// =========================================================================
+
+.task-edit-modal {
+  // Structure provided by BaseModal
+}
+
+.task-edit-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.task-edit-modal__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.task-edit-modal__input {
+  width: 100%;
+  height: 48px;
+  padding: 0 $spacing-4;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  font-family: $font-body;
+  font-size: 16px;
+  font-weight: $font-weight-regular;
+  color: $color-primary;
+  background: $color-white;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
+  }
+
+  &:disabled {
+    background: $color-soft-neutral-bg;
+    color: $color-gray;
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: $color-text-placeholder;
+    opacity: 0.64;
+  }
+}
+
+.task-edit-modal__textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: $spacing-3;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  font-family: $font-body;
+  font-size: 16px;
+  font-weight: $font-weight-regular;
+  color: $color-primary;
+  background: $color-white;
+  resize: vertical;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
+  }
+
+  &:disabled {
+    background: $color-soft-neutral-bg;
+    color: $color-gray;
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: $color-text-placeholder;
+    opacity: 0.64;
+  }
+}
+
+.task-edit-modal__error {
+  padding: $spacing-3 $spacing-4;
+  background: $color-soft-danger-bg;
+  border: 1px solid $color-outlined-danger;
+  border-radius: $border-radius;
+
+  p {
+    margin: 0;
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    color: $color-soft-danger;
+  }
+}
+
+.task-edit-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  margin-top: $spacing-2;
+}
+
+// Responsive design
+@media (max-width: 640px) {
+  .task-edit-modal__actions {
+    button {
+      width: 100%;
+    }
+  }
+}
+

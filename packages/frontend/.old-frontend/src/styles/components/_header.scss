@@ -1,0 +1,16 @@
+// Layer 3: Header layout (no vendor equivalent)
+.header {
+  background-color: $color-white;
+
+  &__container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__nav { display: flex; gap: 48px; }
+  &__actions { display: flex; align-items: center; gap: 24px; }
+}

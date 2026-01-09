@@ -1,0 +1,188 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import TaskEditModal from './TaskEditModal';
+
+describe('TaskEditModal', () => {
+  const mockOnClose = vi.fn();
+  const mockOnSave = vi.fn();
+  const mockTask = { id: 'task-1', name: 'Test Task', description: 'Test description' };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockOnSave.mockResolvedValue(undefined);
+  });
+
+  describe('rendering', () => {
+    it('returns null when not open', () => {
+      const { container } = render(
+        <TaskEditModal isOpen={false} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />
+      );
+      expect(container.firstChild).toBeNull();
+    });
+
+    it('returns null when no task', () => {
+      const { container } = render(
+        <TaskEditModal isOpen={true} task={null} onClose={mockOnClose} onSave={mockOnSave} />
+      );
+      expect(container.firstChild).toBeNull();
+    });
+
+    it('renders when open with task', () => {
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+      expect(screen.getByText('Muuda ülesannet')).toBeInTheDocument();
+    });
+
+    it('populates name field with task name', () => {
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+      expect(screen.getByPlaceholderText('Ülesande nimi (Kohustuslik)')).toHaveValue('Test Task');
+    });
+
+    it('populates description field with task description', () => {
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+      expect(screen.getByPlaceholderText('Kirjeldus')).toHaveValue('Test description');
+    });
+
+    it('handles task without description', () => {
+      const taskNoDesc = { id: 'task-1', name: 'Test Task' };
+      render(<TaskEditModal isOpen={true} task={taskNoDesc} onClose={mockOnClose} onSave={mockOnSave} />);
+      expect(screen.getByPlaceholderText('Kirjeldus')).toHaveValue('');
+    });
+
+    it('renders submit button', () => {
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+      expect(screen.getByRole('button', { name: 'Salvesta' })).toBeInTheDocument();
+    });
+  });
+
+  describe('input handling', () => {
+    it('updates name on input', async () => {
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      const input = screen.getByPlaceholderText('Ülesande nimi (Kohustuslik)');
+      await user.clear(input);
+      await user.type(input, 'New Name');
+      expect(input).toHaveValue('New Name');
+    });
+
+    it('updates description on input', async () => {
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      const textarea = screen.getByPlaceholderText('Kirjeldus');
+      await user.clear(textarea);
+      await user.type(textarea, 'New Description');
+      expect(textarea).toHaveValue('New Description');
+    });
+
+    it('disables submit with empty name', async () => {
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      const input = screen.getByPlaceholderText('Ülesande nimi (Kohustuslik)');
+      await user.clear(input);
+      expect(screen.getByRole('button', { name: 'Salvesta' })).toBeDisabled();
+    });
+  });
+
+  describe('form submission', () => {
+    it('calls onSave with trimmed values', async () => {
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      const input = screen.getByPlaceholderText('Ülesande nimi (Kohustuslik)');
+      await user.clear(input);
+      await user.type(input, '  New Name  ');
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      await waitFor(() => {
+        expect(mockOnSave).toHaveBeenCalledWith('task-1', 'New Name', 'Test description');
+      });
+    });
+
+    it('closes modal on successful save', async () => {
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      await waitFor(() => {
+        expect(mockOnClose).toHaveBeenCalled();
+      });
+    });
+
+    it('shows loading state during save', async () => {
+      mockOnSave.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      expect(screen.getByText('Salvestan...')).toBeInTheDocument();
+    });
+
+    it('disables inputs during save', async () => {
+      mockOnSave.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      expect(screen.getByPlaceholderText('Ülesande nimi (Kohustuslik)')).toBeDisabled();
+      expect(screen.getByPlaceholderText('Kirjeldus')).toBeDisabled();
+    });
+
+    it('passes undefined for empty description', async () => {
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      const textarea = screen.getByPlaceholderText('Kirjeldus');
+      await user.clear(textarea);
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      await waitFor(() => {
+        expect(mockOnSave).toHaveBeenCalledWith('task-1', 'Test Task', undefined);
+      });
+    });
+  });
+
+  describe('error handling', () => {
+    it('shows error on save failure', async () => {
+      mockOnSave.mockRejectedValue(new Error('Save failed'));
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Save failed')).toBeInTheDocument();
+      });
+    });
+
+    it('shows generic error for non-Error rejection', async () => {
+      mockOnSave.mockRejectedValue('unknown');
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Viga ülesande muutmisel')).toBeInTheDocument();
+      });
+    });
+
+    it('does not close on error', async () => {
+      mockOnSave.mockRejectedValue(new Error('Failed'));
+      const user = userEvent.setup();
+      render(<TaskEditModal isOpen={true} task={mockTask} onClose={mockOnClose} onSave={mockOnSave} />);
+
+      await user.click(screen.getByRole('button', { name: 'Salvesta' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed')).toBeInTheDocument();
+      });
+      expect(mockOnClose).not.toHaveBeenCalled();
+    });
+  });
+});

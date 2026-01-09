@@ -1,0 +1,314 @@
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// =========================================================================
+// Paper Component (Base)
+// =========================================================================
+// BEM: .paper, .paper__*, .paper--*
+// Surface container for dropdowns, popovers, cards, and floating elements
+// 
+// Usage:
+//   <div class="paper paper--dropdown">
+//     <div class="paper__item">Item 1</div>
+//     <div class="paper__item">Item 2</div>
+//   </div>
+// =========================================================================
+
+// ---------------------------------------------------------------------------
+// Mixins (for extending in other components)
+// ---------------------------------------------------------------------------
+
+@mixin paper-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: transparent;
+}
+
+@mixin paper-base {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  box-shadow: 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: $spacing-1;
+}
+
+@mixin paper-dropdown {
+  position: absolute;
+  z-index: 1000;
+  top: calc(100% + 4px);
+  right: 0;
+}
+
+@mixin paper-xs {
+  min-width: 120px;
+  max-width: 180px;
+}
+
+@mixin paper-sm {
+  min-width: 144px;
+  max-width: 250px;
+}
+
+@mixin paper-md {
+  min-width: 250px;
+  max-width: 320px;
+}
+
+@mixin paper-lg {
+  min-width: 320px;
+  max-width: 480px;
+}
+
+@mixin paper-auto {
+  width: max-content;
+}
+
+@mixin paper-elevated {
+  box-shadow: 0 4px 20px rgba(23, 49, 72, 0.12);
+}
+
+@mixin paper-item {
+  width: 100%;
+  padding: 6px $spacing-4;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.15s ease;
+  box-sizing: border-box;
+  border-radius: $border-radius-sm;
+
+  &:hover:not(:disabled) {
+    background-color: $color-secondary;
+  }
+
+  &:active:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
+@mixin paper-item-content {
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: 0.15px;
+  color: rgba(0, 0, 0, 0.87);
+  white-space: nowrap;
+}
+
+@mixin paper-item-danger {
+  .paper__item-content,
+  .playlist__menu-item-content,
+  .menu-item-content,
+  .synthesis__menu-item-content,
+  .sentence-synthesis-item__tag-menu-item-content,
+  .sentence-synthesis-item__menu-item-content,
+  .task-manager__menu-item-content,
+  .task-detail__menu-item-content,
+  .user-profile__action-button-content {
+    color: $color-menu-danger;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: $color-menu-danger-bg;
+  }
+}
+
+@mixin paper-footer {
+  padding: $spacing-2;
+  border-top: 1px solid $color-outlined-neutral;
+}
+
+@mixin paper-empty {
+  padding: $spacing-4;
+  text-align: center;
+  font-family: $font-body;
+  font-size: 14px;
+  color: $color-gray;
+}
+
+@mixin paper-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-6;
+}
+
+@mixin paper-divider {
+  height: 1px;
+  background: $color-outlined-neutral;
+  margin: $spacing-1 0;
+}
+
+@mixin paper-scroll {
+  max-height: 240px;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-outlined-neutral;
+    border-radius: 2px;
+
+    &:hover {
+      background: $color-gray;
+    }
+  }
+  
+  scrollbar-width: thin;
+  scrollbar-color: $color-outlined-neutral transparent;
+}
+
+// ---------------------------------------------------------------------------
+// Base Classes (using mixins)
+// ---------------------------------------------------------------------------
+
+.paper__backdrop {
+  @include paper-backdrop;
+}
+
+.paper {
+  @include paper-base;
+}
+
+.paper--dropdown {
+  @include paper-dropdown;
+}
+
+.paper--dropdown-left {
+  right: auto;
+  left: 0;
+}
+
+.paper--dropdown-center {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.paper--popover {
+  position: absolute;
+  z-index: 1000;
+}
+
+.paper--fixed {
+  position: fixed;
+}
+
+.paper--xs {
+  min-width: 120px;
+  max-width: 180px;
+}
+
+.paper--sm {
+  @include paper-sm;
+}
+
+.paper--md {
+  @include paper-md;
+}
+
+.paper--lg {
+  min-width: 320px;
+  max-width: 480px;
+}
+
+.paper--auto {
+  @include paper-auto;
+}
+
+.paper--flat {
+  box-shadow: none;
+}
+
+.paper--elevated {
+  @include paper-elevated;
+}
+
+.paper--raised {
+  box-shadow: 0 8px 32px rgba(23, 49, 72, 0.16);
+}
+
+.paper__item {
+  @include paper-item;
+}
+
+.paper__item-content {
+  @include paper-item-content;
+}
+
+.paper__item--danger {
+  @include paper-item-danger;
+}
+
+.paper__item--selected {
+  background-color: $color-soft-primary-bg;
+  
+  .paper__item-content {
+    font-weight: 500;
+    color: $color-primary;
+  }
+}
+
+.paper__divider {
+  height: 1px;
+  background: $color-outlined-neutral;
+  margin: $spacing-1 0;
+}
+
+.paper__header {
+  padding: $spacing-4;
+  border-bottom: 1px solid $color-outlined-neutral;
+  background: $color-soft-neutral-bg;
+}
+
+.paper__header-title {
+  font-family: $font-body;
+  font-weight: 600;
+  font-size: 14px;
+  color: $color-primary;
+  margin: 0;
+}
+
+.paper__content {
+  padding: $spacing-2;
+}
+
+.paper__content--padded {
+  padding: $spacing-4;
+}
+
+.paper__footer {
+  @include paper-footer;
+}
+
+.paper__empty {
+  @include paper-empty;
+}
+
+.paper__loading {
+  @include paper-loading;
+}
+
+.paper__scroll {
+  @include paper-scroll;
+}

@@ -10,7 +10,7 @@
     "test:full": "vitest run",
     "test": "vitest run --changed",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage --coverage.reporter=json-summary --coverage.reporter=text --coverage.reportOnFailure",
     "test:cucumber": "NODE_OPTIONS='--import tsx' cucumber-js --config cucumber.cjs",
     "cucumber:coverage": "NODE_OPTIONS='--import tsx' c8 --reporter=json-summary --reports-dir=coverage-cucumber --include='src/**/*.ts' --include='src/**/*.tsx' --exclude='src/**/*.test.*' cucumber-js --config cucumber.cjs --profile coverage",
     "sync-features": "node scripts/sync-features.js",
@@ -19,6 +19,9 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix --max-warnings=0"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@hak/shared": "workspace:*",
     "@hak/specifications": "workspace:*",
     "@tanstack/react-query": "^5.60.0",

@@ -1,4 +1,5 @@
-export { useAsyncAction } from './useAsyncAction';
-export { useAudioPlayback } from './useAudioPlayback';
-export { useSentences } from './useSentences';
-export { useExpandedState } from './useExpandedState';
+export { useSynthesis } from './useSynthesis';
+export { useTaskHandlers } from './useTaskHandlers';
+export { useDragAndDrop } from './useDragAndDrop';
+export { useVariantsPanel } from './useVariantsPanel';
+export { useSentenceMenu } from './useSentenceMenu';

@@ -1,0 +1,44 @@
+// Layer 3: App-specific component (no vendor equivalent)
+// Confirm dialog styles
+.confirm-dialog {
+  padding: 1rem;
+
+  &__message {
+    margin: 0;
+    color: $color-gray;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 1.5rem;
+  }
+
+  &__btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: $border-radius-sm;
+    font-weight: 500;
+    cursor: pointer;
+
+    &--cancel {
+      background: transparent;
+      border: 1px solid $color-outlined-neutral;
+      color: $color-gray;
+    }
+
+    &--confirm {
+      background: $color-primary;
+      border: none;
+      color: $color-white;
+
+      &--danger {
+        background: $color-error;
+      }
+
+      &--warning {
+        background: $color-warning;
+      }
+    }
+  }
+}

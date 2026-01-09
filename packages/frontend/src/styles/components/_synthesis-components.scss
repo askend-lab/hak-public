@@ -1,0 +1,278 @@
+// =========================================================================
+// Synthesis Page Components
+// =========================================================================
+// BEM: .sentences-section, .sentence-row, .tag, etc.
+// Components specific to the text synthesis page
+// =========================================================================
+
+@import '../tokens/breakpoints';
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/opacity';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// Sentences section container
+.sentences-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+// =========================================================================
+// NOTE: Sentence row, tags, and input styles moved to:
+// _sentence-synthesis-item.scss (unified component)
+// =========================================================================
+
+// Play button specific states (extends button component)
+.button--circular {
+  // Loading state inherited from button component mixin
+  
+  &.playing {
+    background-color: $color-primary;
+  }
+
+  // Play icon visual centering
+  svg:not(.pause-icon) path {
+    margin-left: 2px;
+  }
+}
+
+// Keyframe animation for loader
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Menu container
+.menu-container {
+  position: relative;
+}
+
+// Menu button (3 dots) - uses shared mixin
+.menu-button {
+  @include menu-button;
+}
+
+// Menu backdrop
+.menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  background: transparent;
+  cursor: default;
+}
+
+// Dropdown menu (extends Paper component pattern)
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 1000;
+  min-width: 144px;
+  width: max-content;
+  max-width: 250px;
+  height: auto;
+  padding: $spacing-1;
+  background-color: $color-white;
+  border: 1px solid $color-border-neutral-light;
+  border-radius: $border-radius-sm;
+  box-shadow: 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Dropdown with search variant
+.dropdown-menu-with-search {
+  width: 250px;
+}
+
+// Menu item
+.menu-item {
+  width: 100%;
+  height: auto;
+  padding: 6px $spacing-4;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  border-radius: $border-radius-sm;
+
+  &:hover:not(:disabled) {
+    background-color: $color-secondary;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $color-secondary;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+
+    .menu-item-content {
+      color: $color-text-disabled !important;
+      opacity: 0.4 !important;
+    }
+  }
+
+  // Danger variant
+  &.menu-item-danger {
+    .menu-item-content {
+      color: $color-menu-danger;
+    }
+
+    &:hover {
+      background-color: $color-menu-danger-bg;
+
+      .menu-item-content {
+        color: $color-menu-danger;
+      }
+    }
+  }
+
+  // Create new item variant
+  &.menu-item-create {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .menu-item-create-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background-color: $color-primary;
+      border-radius: 20px;
+      flex-shrink: 0;
+
+      svg {
+        width: 10px;
+        height: 10px;
+        color: $color-white;
+        stroke-width: 2;
+      }
+    }
+
+    .menu-item-content {
+      font-weight: 700;
+    }
+  }
+
+  // Loading state
+  &.menu-item-loading {
+    cursor: default;
+    
+    .menu-item-content {
+      color: $color-gray;
+    }
+  }
+}
+
+// Menu item content
+.menu-item-content {
+  width: auto;
+  height: auto;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  white-space: nowrap;
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: 0.15px;
+  color: $color-text-dark;
+  opacity: 0.87;
+}
+
+// Menu divider
+.menu-divider {
+  height: 1px;
+  background-color: $color-border-neutral;
+  margin: 4px 0;
+}
+
+// Menu search section
+.menu-search {
+  position: relative;
+  padding: 12px $spacing-4 8px $spacing-4;
+}
+
+// Menu search input
+.menu-search-input {
+  width: 100%;
+  height: 36px;
+  padding: 5px 36px 5px 8px;
+  border: 1px solid $color-primary;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $color-primary;
+  background: $color-white;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
+  }
+
+  &::placeholder {
+    font-family: $font-body;
+    font-size: 16px;
+    font-weight: 400;
+    color: rgba(23, 49, 72, 0.5);
+  }
+}
+
+// Menu search icon
+.menu-search-icon {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+// Menu task list
+.menu-task-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+// Menu create section
+.menu-create-section {
+  border-top: 1px solid $color-border-neutral;
+  padding-top: 4px;
+}
+
+// Add sentence button wrapper
+.add-sentence-button-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+// Add to task container
+.add-to-task-container {
+  position: relative;
+  display: inline-flex;
+}

@@ -1,30 +1,47 @@
 import '@testing-library/jest-dom';
-import { TextEncoder, TextDecoder } from 'util';
 import { vi } from 'vitest';
 
-// Polyfill TextEncoder/TextDecoder for react-router-dom v7
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder as typeof global.TextDecoder;
+// Mock localStorage with actual storage
+const createLocalStorageMock = (): Storage => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string): string | null => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string): void => { store[key] = value; }),
+    removeItem: vi.fn((key: string): void => { delete store[key]; }),
+    clear: vi.fn((): void => { store = {}; }),
+    get length(): number { return Object.keys(store).length; },
+    key: vi.fn((i: number): string | null => Object.keys(store)[i] ?? null),
+  };
+};
+const localStorageMock = createLocalStorageMock();
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// Make vi available globally for jest.fn() compatibility
-globalThis.jest = vi as unknown as typeof jest;
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
 
-// Mock HTMLAudioElement for jsdom
-class MockAudio {
-  src = '';
-  currentTime = 0;
-  onended: (() => void) | null = null;
-  onerror: (() => void) | null = null;
-  
-  constructor(src?: string) {
-    if (src) this.src = src;
-  }
-  
-  play(): Promise<void> {
-    return Promise.resolve();
-  }
-  
-  pause(): void {}
-}
+// Mock Audio
+window.HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined);
+window.HTMLMediaElement.prototype.pause = vi.fn();
+window.HTMLMediaElement.prototype.load = vi.fn();
 
-global.Audio = MockAudio as unknown as typeof Audio;
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = vi.fn();
+
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));

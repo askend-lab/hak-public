@@ -1,0 +1,941 @@
+// Simplified layout styles for the new design
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+@import '../tokens/opacity';
+
+.eki-app-simple {
+  height: 100vh; // Changed from min-height to height for proper flex constraints
+  display: flex;
+  flex-direction: column;
+  background-color: $color-secondary; // #D7E5F2
+  overflow: hidden; // Prevent page from scrolling, only scroll within containers
+}
+
+// Header - Exact specs from design
+.eki-header-simple {
+  background-color: $color-white; // #FFFFFF
+  border-bottom: none;
+  padding: 0 24px; // Left/right: 24px
+  height: 60px; // Fixed height: 60px
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+
+  .header-content {
+    width: 100%; // Fill (1,277px in design)
+    display: grid;
+    grid-template-columns: auto 1fr auto; // Logo | Center space | Functions
+    align-items: center;
+    height: 100%;
+  }
+
+  // Logo - Using PNG image
+  .eki-logo {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    justify-self: start; // Align logo to the left
+
+    img {
+      height: auto;
+      max-height: 40px;
+    }
+  }
+
+  // Menu - Navigation tabs container (centered)
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 40px; // Gap: 40px between tabs
+    height: 100%;
+    justify-self: center; // Center the menu tabs
+  }
+
+  // Tab button specs
+  .header-nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    height: 100%;
+    position: relative;
+
+    // Tab text specs
+    font-family: 'Inter', sans-serif;
+    font-weight: 400; // Regular
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0.15%;
+    color: $color-primary; // Tekst-tumesinine (#173148)
+
+    transition: all 0.2s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    // Active tab - Line 3 (underline)
+    &.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 83px; // Width: 83px
+      height: 4px; // Border: 4px
+      background-color: $color-primary; // #173148
+      margin: 0 auto;
+    }
+  }
+
+  // Functions section (Logi sisse + menu button) - Right aligned
+  .header-functions {
+    display: flex;
+    align-items: center;
+    gap: 24px; // Gap: 24px between login and menu button
+    height: 36px; // Hug (159px in design width, 36px height)
+    justify-self: end; // Align to the right
+  }
+
+  // Primary Button - Logi sisse
+  .header-login-button {
+    // Button specs
+    width: 119px; // Fixed: 119px
+    height: 36px; // Fixed: 36px
+    padding: 0 24px; // Right: 24px, Left: 24px
+    border-radius: 20px;
+    gap: 10px;
+    background-color: $color-primary; // Tekst-tumesinine (#173148)
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    // Text specs for "Logi sisse"
+    font-family: 'Inter', sans-serif;
+    font-weight: 400; // Regular
+    font-size: 14px;
+    line-height: 140%;
+    letter-spacing: 0;
+    text-align: center;
+    color: $color-white; // Valge (#FFFFFF)
+
+    &:hover {
+      background-color: $color-soft-primary;
+      transform: translateY(-1px);
+    }
+  }
+
+  // Extra menu button (9 dots icon)
+  .header-menu-button {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Main content
+.eki-main-simple {
+  flex: 1;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // Allow flexbox to shrink below content size
+
+  .main-content {
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+    box-sizing: border-box;
+    flex: 1; // Grow to fill available space
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Allow flexbox to shrink below content size
+
+    @media (min-width: 952px) {
+      // At 920px content + 32px padding = 952px, remove padding
+      padding: 0;
+    }
+  }
+
+  // Hero Section - Content component specs
+  .hero-section {
+    // Content layout specs
+    display: flex;
+    flex-direction: row; // Changed to row for button group
+    align-items: flex-end; // Align to bottom
+    justify-content: space-between; // Space between text and buttons
+    width: 100%; // Fill parent container
+    min-height: 120px; // Changed to min-height for flexibility
+    padding: 36px 0 16px 0; // Top: 36px, Bottom: 16px - gaps only within
+    gap: 24px; // Gap between text and button group
+    box-sizing: border-box;
+
+    // Text container
+    > div:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      min-width: 0; // Allow shrinking
+    }
+
+    // Heading - "Teksti kõnesüntees"
+    .page-title {
+      max-width: 219px; // Max width: 219px
+      margin: 0;
+
+      // Typography
+      font-family: 'Inter', sans-serif;
+      font-weight: 400; // Regular
+      font-size: 24px;
+      line-height: 100%;
+      letter-spacing: 0;
+      text-align: left; // Left-aligned
+      color: $color-primary; // Tekst-tumesinine (#173148)
+    }
+
+    // Body text - Subtitle
+    .page-subtitle {
+      max-width: 661px; // Max width: 661px
+      margin: 0;
+
+      // Typography
+      font-family: 'Inter', sans-serif;
+      font-weight: 400; // Regular
+      font-size: 16px;
+      line-height: 140%;
+      letter-spacing: 0;
+      text-align: left; // Left-aligned
+      color: $color-primary; // Tekst-tumesinine (#173148)
+    }
+
+    // Hero actions - button group
+    .hero-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0; // Don't shrink buttons
+    }
+  }
+
+  // Button styles removed - using storybook .button.button--primary
+
+  .sentences-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  // Outer Frame - White container with border and rounded corners
+  .sentence-row {
+    background-color: $color-white;
+    border: 1px solid #A8C4DDBF;
+    border-radius: 16px; // Rounded corners from screenshot
+    padding: 16px; // Equal padding all around
+    display: flex;
+    align-items: center;
+    gap: 16px; // Space between elements
+    width: 100%; // Fill parent container
+    min-height: 72px; // Height from screenshot
+    box-sizing: border-box;
+    cursor: move;
+    transition: all 0.2s ease;
+
+    // Visual feedback during drag
+    &.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+
+    &.drag-over {
+      border-color: $color-primary;
+      border-width: 2px;
+      box-shadow: 0 4px 12px rgba(23, 49, 72, 0.15);
+    }
+  }
+
+  // Icon Button - Drag Handle (6 dots)
+  .drag-handle {
+    background: none;
+    border: none;
+    cursor: grab;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    color: $color-primary; // #173148
+    flex-shrink: 0;
+    user-select: none; // Prevent text selection on drag handle
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    svg {
+      display: block;
+      pointer-events: none; // Ensure drag works
+    }
+  }
+
+  // Sentence content container - wraps input or tags
+  .sentence-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  // Text Input - Large text field
+  .sentence-input {
+    width: 100%;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 12px 16px;
+    color: $color-primary;
+    background-color: $color-white;
+    outline: none;
+    font-family: $font-body;
+    min-width: 0;
+    transition: border-color 0.2s ease;
+
+    // Text specs from design
+    font-family: 'Inter', sans-serif;
+    font-weight: 500; // Medium
+    font-size: 14px;
+    line-height: 140%;
+    letter-spacing: 0;
+    color: #173148; // Tekst-tumesinine
+
+    &::placeholder {
+      // Placeholder text specs
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 140%;
+      letter-spacing: 0;
+      color: #747676;
+    }
+
+    &:focus {
+      border-color: $color-primary;
+      outline: none;
+    }
+  }
+
+  // Tags group container - from design specs (Group 1153)
+  .tags-group {
+    // Layout specs
+    position: relative; // For clear button positioning
+    width: 100%; // Width: 750px (responsive)
+    min-height: 42px; // Height: 42px minimum
+    padding: 10px 36px 10px 12px; // Right padding for clear button
+    border-radius: 4px; // Radius: 4px
+    border: 1px solid #173148; // Border: 1px, color #173148
+    background-color: $color-white; // Fill: #FFFFFF
+    box-sizing: border-box;
+
+    // Flexbox for tags layout
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px; // Gap between tags
+    align-items: center;
+  }
+
+  // Individual tag - from design specs
+  .tag {
+    // Layout specs from design
+    position: relative; // For dropdown positioning
+    width: auto; // Auto width based on content
+    height: 22px; // Fixed height: 22px
+    padding: 0 8px 0 12px; // Left: 12px, Right: 8px (less on right for chevron)
+    border-radius: 4px; // Radius: 4px
+    border: 1px solid #BED3E5; // Border: 1px, color #BED3E5
+    background-color: #F6FBFF; // Fill: #F6FBFF
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px; // Gap between text and chevron
+    box-sizing: border-box;
+    flex-shrink: 0; // Don't shrink tags
+
+    // Typography specs from design
+    font-family: 'Inter', sans-serif;
+    font-weight: 500; // Medium
+    font-size: 14px;
+    line-height: 140%;
+    letter-spacing: 0;
+    color: #173148; // Tekst-tumesinine
+    white-space: nowrap; // Keep words on one line
+
+    // Tag text (clickable for pronunciation panel)
+    .tag-text {
+      cursor: pointer;
+      
+      &:focus {
+        outline: none;
+      }
+    }
+
+    // Chevron button (opens dropdown menu)
+    .tag-chevron {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: inherit;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      svg {
+        display: block;
+      }
+    }
+
+    // Tag dropdown menu positioning
+    .tag-dropdown-menu {
+      left: 0;
+      right: auto;
+      top: calc(100% + 4px);
+      z-index: 1001; // Higher than other elements
+    }
+
+    // When tag has open menu, raise its z-index
+    &:has(.tag-dropdown-menu) {
+      z-index: 100;
+    }
+
+    // Clickable tag styles
+    &.tag-clickable {
+      transition: all 0.2s ease;
+      box-shadow: 0px 2px 6px 0px #00339940;
+
+      &:hover {
+        background-color: #E3F2FF; // Slightly darker on hover
+        border-color: #4A90E2; // Blue border on hover
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+        background-color: #D0E8FF;
+      }
+    }
+
+    // Selected tag styles (when pronunciation panel is open)
+    &.tag-selected {
+      background: #173148;
+      border: 1px solid #173148;
+      color: #FFFFFF;
+      font-weight: 500;
+      box-shadow: 0px 2px 6px 0px #00339940;
+
+      &:hover {
+        background: #1a3a52;
+        border-color: #1a3a52;
+      }
+
+      .tag-chevron {
+        color: #FFFFFF;
+      }
+    }
+  }
+
+  // Inline input field within tags group
+  .tag-input {
+    flex: 1;
+    min-width: 120px; // Minimum width for typing
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    height: 22px; // Match tag height
+
+    // Typography matching tags
+    font-family: 'Inter', sans-serif;
+    font-weight: 500; // Medium
+    font-size: 14px;
+    line-height: 140%;
+    letter-spacing: 0;
+    color: #173148; // Tekst-tumesinine
+
+    &::placeholder {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 140%;
+      letter-spacing: 0;
+      color: #747676;
+    }
+  }
+
+  // Clear button for tags group
+  .tags-clear-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    background: #D7E5F2;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background: darken(#D7E5F2, 8%);
+    }
+
+    img {
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  // Inline edit input for individual tags (replaces tag when editing)
+  .tag-edit-input {
+    height: 22px;
+    width: auto;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid #E8EFF5;
+    background-color: #FAFCFE;
+    box-sizing: content-box; // Let size attribute control width
+    flex-shrink: 0;
+
+    // Typography matching tags
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 140%;
+    letter-spacing: 0;
+    color: #173148;
+
+    &:focus {
+      outline: none;
+      border-color: #D7E5F2;
+    }
+  }
+
+  // Icon Button - Play Button (circular, filled)
+  .play-button {
+    background-color: $color-primary;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $color-white;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    padding: 0;
+    position: relative;
+
+    &:hover:not(:disabled) {
+      background-color: $color-soft-primary;
+    }
+
+    &:disabled {
+      background-color: #CCC;
+      cursor: not-allowed;
+    }
+
+    &.loading {
+      cursor: wait;
+      background-color: #D6E9F7; // Light blue background from design
+    }
+
+    &.playing {
+      background-color: $color-primary;
+    }
+
+    svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+
+    // Play icon gets a slight left margin to center visually
+    svg:not(.pause-icon) path {
+      margin-left: 2px;
+    }
+
+    // Custom loader spinner - replaces GIF
+    .loader-spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid transparent; // Transparent base
+      border-top-color: #4A90E2; // Blue spinner color
+      border-right-color: #4A90E2; // Blue spinner color
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+  }
+
+  // Keyframe animation for loader
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Menu container - wraps button and dropdown
+  .menu-container {
+    position: relative;
+  }
+
+  // Icon Button - More Options (3 dots)
+  .menu-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 20px;
+    color: $color-text-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &:disabled {
+      opacity: $opacity-menu-disabled;
+      cursor: not-allowed;
+    }
+
+    svg {
+      display: block;
+    }
+  }
+
+  // Backdrop for closing menu when clicking outside
+  .menu-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    background: transparent;
+    cursor: default;
+  }
+
+  // Dropdown menu (Paper component from design)
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px); // 4px below the button
+    right: 0;
+    z-index: 1000;
+
+    // Paper specs from design
+    min-width: 144px; // Minimum width, grows with content
+    width: max-content; // Expand to fit content
+    max-width: 250px; // Maximum width to prevent too wide menus
+    height: auto; // Hug (82px based on content)
+    padding: 4px;
+    background-color: #FFFFFF; // White background (#FFFFFF)
+    border: 1px solid #C5CBD1; // Border: 1px, color #C5CBD1
+    border-radius: 4px; // Updated border-radius
+    box-shadow: 0 3px 14px 2px rgba(0, 0, 0, 0.12); // Drop shadow: X=0, Y=3, Blur=14, Spread=2, 12% opacity
+
+    display: flex;
+    flex-direction: column; // Vertical flow
+    overflow: hidden;
+  }
+
+  // Menu item (MenuItem component from design)
+  .menu-item {
+    // Layout specs from MenuItem
+    width: 100%; // Fill parent (144px)
+    height: auto; // Hug (33px based on content)
+    padding: 6px 16px; // MenuItem padding - important for clickable area
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+
+    &:hover:not(:disabled) {
+      background-color: #D7E5F2;
+    }
+
+    &:active:not(:disabled) {
+      background-color: #D7E5F2;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+
+      .menu-item-content {
+        color: #999999 !important;
+        opacity: 0.4 !important;
+      }
+    }
+
+    &.menu-item-danger {
+      .menu-item-content {
+        color: #C74848DE;
+      }
+
+      &:hover {
+        background-color: #F2D9D7;
+
+        .menu-item-content {
+          color: #C74848DE;
+        }
+      }
+    }
+
+    // Container within MenuItem (holds the text)
+    .menu-item-content {
+      // Layout specs from Container
+      width: auto; // Hug width (110px based on text "Eemalda")
+      height: auto; // Hug height (21px based on text)
+      display: flex;
+      align-items: center;
+      flex-direction: row; // Horizontal flow
+      white-space: nowrap; // Prevent text wrapping
+
+      // Typography specs from design - Text/Value
+      font-family: 'Inter', sans-serif;
+      font-weight: 400; // Regular (fontWeightRegular)
+      font-size: 14px;
+      line-height: 150%;
+      letter-spacing: 0.15px;
+      color: #000000; // text/primary with 87% opacity
+      opacity: $opacity-subtle;
+    }
+
+    // Create new task menu item with icon
+    &.menu-item-create {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .menu-item-create-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        background-color: $color-primary;
+        border-radius: 20px;
+        flex-shrink: 0;
+
+        svg {
+          width: 10px;
+          height: 10px;
+          color: white;
+          stroke-width: 2;
+        }
+      }
+
+      .menu-item-content {
+        font-weight: 700;
+      }
+    }
+
+    // Loading state
+    &.menu-item-loading {
+      cursor: default;
+      
+      .menu-item-content {
+        color: #666;
+      }
+    }
+  }
+
+  // Menu divider line
+  .menu-divider {
+    height: 1px;
+    background-color: #E8EAED;
+    margin: 4px 0;
+  }
+
+  // Dropdown menu with search
+  .dropdown-menu-with-search {
+    width: 250px;
+  }
+
+  // Menu search section
+  .menu-search {
+    position: relative;
+    padding: 12px 16px 8px 16px;
+  }
+
+  .menu-search-input {
+    width: 100%;
+    height: 36px;
+    padding: 5px 36px 5px 8px;
+    border: 1px solid #173148;
+    border-radius: 4px;
+    font-family: $font-body;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 100%;
+    color: $color-primary;
+    background: white;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
+    }
+
+    &::placeholder {
+      font-family: $font-body;
+      font-size: 16px;
+      font-weight: 400;
+      color: rgba(23, 49, 72, 0.5);
+    }
+  }
+
+  .menu-search-icon {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  // Menu task list
+  .menu-task-list {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  // Menu create section
+  .menu-create-section {
+    border-top: 1px solid #E8EAED;
+    padding-top: 4px;
+  }
+
+  .add-sentence-button-wrapper {
+    display: flex;
+    justify-content: center; // Center the button
+    width: 100%;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .eki-header-simple {
+    padding: 1rem;
+
+    .header-content {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .header-actions {
+      justify-content: space-between;
+    }
+  }
+
+  .eki-main-simple {
+    padding: 2rem 1rem;
+
+    .hero-section {
+      margin-bottom: 2rem;
+
+      .page-title {
+        font-size: 1.5rem;
+      }
+
+      .page-subtitle {
+        font-size: 0.9rem;
+      }
+    }
+
+    .sentence-row {
+      gap: 0.5rem;
+      padding: 0.75rem;
+    }
+
+    .drag-handle {
+      padding: 0.25rem;
+    }
+
+    .sentence-input {
+      font-size: 0.9rem;
+    }
+
+    .play-button {
+      width: 40px;
+      height: 40px;
+    }
+  }
+}

@@ -1,0 +1,461 @@
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// =========================================================================
+// Sentence Phonetic Panel Component
+// =========================================================================
+// BEM: .sentence-phonetic-panel, .sentence-phonetic-panel__*
+// Sliding panel for editing sentence phonetics
+// Uses: panel mixins (base component)
+// =========================================================================
+
+// Panel container - uses panel mixins
+.sentence-phonetic-panel {
+  @include panel-base;
+  @include panel-right;
+  @include panel-md;
+}
+
+// Panel header - uses panel header mixin with specific width
+.sentence-phonetic-panel__header {
+  @include panel-header;
+  width: 518px;
+}
+
+// Title section - component-specific (multi-line with subtitle)
+.sentence-phonetic-panel__title-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  min-width: 0;
+  flex: 1;
+}
+
+.sentence-phonetic-panel__title {
+  @include panel-title;
+}
+
+.sentence-phonetic-panel__subtitle {
+  font-family: $font-body;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: $color-gray;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sentence-phonetic-panel__header-actions {
+  @include panel-header-actions;
+}
+
+// Guide toggle link - component-specific
+.sentence-phonetic-panel__guide-toggle {
+  padding: 0;
+  background: transparent;
+  color: $color-outlined-primary;
+  border: none;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0;
+  text-align: right;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+
+  &:hover {
+    color: $color-soft-primary;
+    text-decoration: underline;
+  }
+
+  &--active {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
+.sentence-phonetic-panel__close {
+  @include panel-close;
+}
+
+// Panel content - uses panel content mixin
+.sentence-phonetic-panel__content {
+  @include panel-content;
+}
+
+// Phonetic edit section
+.sentence-phonetic-panel__edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.sentence-phonetic-panel__label {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-primary;
+  line-height: 24px;
+}
+
+.sentence-phonetic-panel__description {
+  margin: 0;
+  width: 518px;
+  height: 44px;
+  font-family: $font-body;
+  font-size: 16px;
+  font-weight: 400;
+  color: $color-primary;
+  line-height: 140%;
+  letter-spacing: 0;
+}
+
+.sentence-phonetic-panel__guide-link {
+  background: none;
+  border: none;
+  color: $color-outlined-primary;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  
+  &:hover {
+    color: $color-soft-primary;
+  }
+}
+
+.sentence-phonetic-panel__input-container {
+  position: relative;
+}
+
+.sentence-phonetic-panel__textarea {
+  width: 518px;
+  height: 84px;
+  padding: $spacing-3;
+  border: 1px solid $color-primary;
+  border-radius: 4px;
+  font-family: $font-body;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: 0;
+  background: $color-white;
+  color: $color-primary;
+  box-sizing: border-box;
+  resize: none;
+
+  &:focus {
+    outline: none;
+    border-color: $color-outlined-primary;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+  }
+
+  &::placeholder {
+    color: $color-gray;
+    font-weight: 400;
+  }
+}
+
+// Phonetic markers toolbar
+.sentence-phonetic-panel__markers-toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-1;
+  align-items: center;
+}
+
+.sentence-phonetic-panel__marker-button {
+  width: 28px;
+  height: 36px;
+  padding: 0;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-primary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-secondary;
+    transform: translateY(1px);
+  }
+}
+
+// Actions
+.sentence-phonetic-panel__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  padding: 0 $spacing-4;
+}
+
+// Guide view
+.sentence-phonetic-panel__guide-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sentence-phonetic-panel__guide-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-6;
+  padding-bottom: $spacing-4;
+  border-bottom: 1px solid $color-outlined-neutral;
+
+  h4 {
+    font-family: $font-body;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 28px;
+    color: $color-primary;
+    margin: 0;
+  }
+}
+
+.sentence-phonetic-panel__back-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  background: transparent;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-outlined-neutral;
+  }
+}
+
+.sentence-phonetic-panel__guide-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: $spacing-2;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-soft-neutral-bg;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-outlined-neutral;
+    border-radius: 3px;
+
+    &:hover {
+      background: $color-gray;
+    }
+  }
+}
+
+.sentence-phonetic-panel__guide-section {
+  margin-bottom: $spacing-6;
+
+  h5 {
+    font-family: $font-body;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    color: $color-primary;
+    margin: 0 0 $spacing-3 0;
+  }
+
+  &--tips {
+    background: $color-soft-neutral-bg;
+    border-radius: $border-radius;
+    padding: $spacing-4;
+    margin-bottom: 0;
+
+    ul {
+      margin: $spacing-2 0 0 0;
+      padding-left: $spacing-5;
+      list-style-type: disc;
+
+      li {
+        font-family: $font-body;
+        font-size: 14px;
+        line-height: 20px;
+        color: $color-text-secondary;
+        margin-bottom: $spacing-2;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+.sentence-phonetic-panel__guide-intro {
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 20px;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+.sentence-phonetic-panel__marker-item {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  padding: $spacing-4;
+  margin-bottom: $spacing-4;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $color-gray;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sentence-phonetic-panel__marker-symbol {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-3;
+
+  code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 $spacing-2;
+    background: $color-soft-neutral-bg;
+    border: 1px solid $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+    font-family: $font-mono;
+    font-size: 18px;
+    font-weight: 600;
+    color: $color-outlined-primary;
+  }
+}
+
+.sentence-phonetic-panel__marker-name {
+  font-family: $font-body;
+  font-size: 15px;
+  font-weight: 600;
+  color: $color-primary;
+}
+
+.sentence-phonetic-panel__marker-rule {
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 20px;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-3;
+
+  strong {
+    font-weight: 600;
+    color: $color-primary;
+  }
+}
+
+.sentence-phonetic-panel__marker-examples {
+  font-family: $font-body;
+  font-size: 14px;
+  line-height: 20px;
+  color: $color-text-secondary;
+
+  strong {
+    font-weight: 600;
+    color: $color-primary;
+  }
+
+  ul {
+    margin: $spacing-2 0 0 0;
+    padding-left: $spacing-5;
+    list-style-type: none;
+
+    li {
+      margin-bottom: $spacing-1;
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+
+      &:before {
+        content: '•';
+        color: $color-gray;
+        font-size: 16px;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      code {
+        display: inline;
+        padding: 2px $spacing-1;
+        background: $color-soft-neutral-bg;
+        border: 1px solid $color-outlined-neutral;
+        border-radius: 4px;
+        font-family: $font-mono;
+        font-size: 13px;
+        color: $color-outlined-primary;
+      }
+    }
+  }
+}
+
+// Spin animation for loading spinners
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

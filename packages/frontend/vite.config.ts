@@ -21,6 +21,7 @@ export default defineConfig({
     alias: {
       '@hak/specifications': path.resolve(__dirname, '../specifications/index.ts'),
       '@hak/shared': path.resolve(__dirname, '../shared/src/index.ts'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {
@@ -53,6 +54,50 @@ export default defineConfig({
         target: 'https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/audio/, '/dev'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+            proxyReq.removeHeader('Cookie');
+          });
+        },
+      },
+      '/api/analyze': {
+        target: 'https://vabamorf-dev.askend-lab.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+            proxyReq.removeHeader('Cookie');
+          });
+        },
+      },
+      '/api/variants': {
+        target: 'https://vabamorf-dev.askend-lab.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+            proxyReq.removeHeader('Cookie');
+          });
+        },
+      },
+      '/api/synthesize': {
+        target: 'https://merlin-dev.askend-lab.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+            proxyReq.removeHeader('Cookie');
+          });
+        },
+      },
+      '/api/status': {
+        target: 'https://merlin-dev.askend-lab.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq) => {
             proxyReq.removeHeader('cookie');

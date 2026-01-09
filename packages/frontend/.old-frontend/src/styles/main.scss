@@ -1,0 +1,31 @@
+// Variables are injected via Vite additionalData
+// Note: @import deprecation warnings silenced in vite.config.ts
+// Full migration to @use requires SCSS architecture restructuring
+@import 'components/app';
+@import 'components/app-page';
+@import 'components/header';
+@import 'components/button';
+@import 'components/card';
+@import 'components/nav-tab';
+@import 'components/section-heading';
+@import 'components/logo';
+@import 'components/logo-with-text';
+@import 'components/footer-link';
+@import 'components/social-link';
+@import 'components/user-avatar';
+@import 'components/play-button';
+@import 'components/waffle-menu';
+@import 'components/confirm-dialog';
+@import 'components/auth-display';
+@import 'components/user-profile';
+@import 'components/feedback-modal';
+@import 'components/phonetic-guide-modal';
+@import 'components/sentence-row';
+@import 'components/sentence-list-item';
+@import 'components/share-task-modal';
+@import 'components/modal';
+@import 'components/tasks-page';
+@import 'components/specs-page';
+@import 'components/main';
+@import 'components/footer';
+@import 'components/placeholders';
