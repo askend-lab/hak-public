@@ -1,4 +1,4 @@
-@tasks @US-019
+@tasks @US-019 @ready
 Feature: Delete task (US-019)
   As a language teacher
   I want to delete tasks I no longer need

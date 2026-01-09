@@ -1,4 +1,4 @@
-@tasks @US-016
+@tasks @US-016 @ready
 Feature: View task list (US-016)
   As a language teacher
   I want to view all my created tasks

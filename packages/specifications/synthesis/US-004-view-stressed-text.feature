@@ -1,4 +1,4 @@
-@synthesis @US-004
+@synthesis @US-004 @ready
 Feature: View text with stress markers (US-004)
   As a language learner
   I want to see the Estonian text with stress markers visually indicated

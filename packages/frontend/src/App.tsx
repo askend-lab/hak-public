@@ -1,9 +1,10 @@
-/* eslint-disable max-lines-per-function */
+/* eslint-disable max-lines-per-function, complexity */
 import { useState, useEffect } from 'react';
 import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';
 import SynthesisView from './components/SynthesisView';
 import TasksView from './components/TasksView';
+import SpecsPage from './components/SpecsPage';
 import Dashboard from './components/Dashboard';
 import AppModals from './components/AppModals';
 import { RoleSelectionContent } from './components/onboarding';
@@ -18,7 +19,7 @@ export default function Home() {
   const { showNotification } = useNotification();
   const { state: onboardingState, isWizardActive, resetOnboarding, isLoading: isOnboardingLoading } = useOnboarding();
 
-  const [currentView, setCurrentView] = useState<'synthesis' | 'tasks' | 'dashboard'>('synthesis');
+  const [currentView, setCurrentView] = useState<'synthesis' | 'tasks' | 'specs' | 'dashboard'>('synthesis');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
 
@@ -64,6 +65,7 @@ export default function Home() {
         currentView={currentView} isAuthenticated={isAuthenticated} user={user}
         onSynthesisClick={() => { setCurrentView('synthesis'); setSelectedTaskId(null); }}
         onTasksClick={() => { if (!isAuthenticated) { setPendingTasksViewAccess(true); setShowLoginModal(true); return; } setCurrentView('tasks'); }}
+        onSpecsClick={() => setCurrentView('specs')}
         onDashboardClick={() => { setCurrentView('dashboard'); }}
         onHelpClick={resetOnboarding} onLoginClick={() => setShowLoginModal(true)}
       />
@@ -104,6 +106,9 @@ export default function Home() {
                 onBack={handleBackToTaskList} onViewTask={handleViewTask} onCreateTask={taskHandlers.handleCreateTask}
                 onEditTask={taskHandlers.handleEditTask} onDeleteTask={taskHandlers.handleDeleteTask} onShareTask={taskHandlers.handleShareTask}
               />
+            )}
+            {currentView === 'specs' && (
+              <SpecsPage onBack={() => setCurrentView('synthesis')} />
             )}
             {currentView === 'dashboard' && (
               <Dashboard />

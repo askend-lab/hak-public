@@ -1,4 +1,4 @@
-@tasks @US-017
+@tasks @US-017 @ready
 Feature: View task details (US-017)
   As a language teacher
   I want to view detailed information about a specific task

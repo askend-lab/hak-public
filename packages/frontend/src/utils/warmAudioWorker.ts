@@ -2,7 +2,7 @@ let warmed = false;
 
 export async function warmAudioWorker(): Promise<void> {
   if (warmed) return;
-  if (typeof window === 'undefined' || import.meta.env.MODE === 'test') return;
+  if (typeof window === 'undefined' || import.meta.env?.MODE === 'test') return;
   
   try {
     const response = await fetch('/api/audio/warm', {

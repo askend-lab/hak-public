@@ -1,4 +1,4 @@
-@tasks @US-018
+@tasks @US-018 @ready
 Feature: Edit task metadata (US-018)
   As a language teacher
   I want to edit task name and description

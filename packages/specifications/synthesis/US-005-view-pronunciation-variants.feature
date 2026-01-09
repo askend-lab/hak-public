@@ -1,4 +1,4 @@
-@synthesis @US-005
+@synthesis @US-005 @ready
 Feature: View pronunciation variants (US-005)
   As a language learner
   I want to see alternative pronunciation variants for ambiguous words

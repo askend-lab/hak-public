@@ -1,4 +1,4 @@
-@synthesis @US-008
+@synthesis @US-008 @ready
 Feature: Save phonetic text edits (US-008)
   As a language teacher
   I want to save my phonetic text edits

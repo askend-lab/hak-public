@@ -1,4 +1,4 @@
-@tasks @US-015
+@tasks @US-015 @ready
 Feature: Create new task (US-015)
   As a language teacher
   I want to create a new pronunciation task
