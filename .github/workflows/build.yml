@@ -184,7 +184,7 @@ jobs:
         run: |
           cp -r ../../artifacts/merlin-api/* dist/ 2>/dev/null || mkdir -p dist
           serverless create_domain --stage dev || true
-          serverless deploy --stage dev
+          serverless deploy --stage dev --force
       
       - name: Login to ECR
         id: login-ecr
