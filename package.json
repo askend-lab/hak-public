@@ -19,7 +19,7 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@askend-lab/devbox": "file:../../boxer/devbox",
+    "@askend-lab/devbox": "^0.20251222.121450",
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
     "@babel/preset-react": "^7.24.0",
