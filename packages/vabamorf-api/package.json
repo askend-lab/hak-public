@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "tsc",
     "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
     "test:full": "jest --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
