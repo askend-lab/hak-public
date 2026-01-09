@@ -1,0 +1,55 @@
+name: Auto Update PRs
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-prs:
+    name: Update PR branches
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Update all open PRs with main
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            
+            // Get all open PRs targeting main
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              base: 'main'
+            });
+            
+            console.log(`Found ${pullRequests.length} open PRs targeting main`);
+            
+            for (const pr of pullRequests) {
+              // Skip PRs that have auto-merge disabled (manual PRs)
+              // Only update PRs that have auto-merge enabled
+              if (!pr.auto_merge) {
+                console.log(`PR #${pr.number}: Skipping - no auto-merge enabled`);
+                continue;
+              }
+              
+              try {
+                await github.rest.pulls.updateBranch({
+                  owner,
+                  repo,
+                  pull_number: pr.number
+                });
+                console.log(`PR #${pr.number}: Updated successfully`);
+              } catch (error) {
+                if (error.status === 422) {
+                  console.log(`PR #${pr.number}: Already up to date or has conflicts`);
+                } else {
+                  console.error(`PR #${pr.number}: Failed - ${error.message}`);
+                }
+              }
+            }
