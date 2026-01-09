@@ -1,15 +1,9 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import { PlayIcon, PauseIcon, SpeedIcon, DownloadIcon, PlusCircleIcon, DocumentPlusIcon } from './ui/Icons';
 
 interface AudioPlayerProps { audioUrl: string | null; autoPlay?: boolean; text?: string; isLoading?: boolean; onAddToPlaylist?: () => void; onAddToTask?: () => void; canAddToPlaylist?: boolean; canAddToTask?: boolean; }
-
-const PlayIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>;
-const PauseIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>;
-const SpeedIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>;
-const DownloadIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
-const AddPlaylistIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>;
-const AddTaskIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>;
 
 const playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -49,8 +43,8 @@ export default function AudioPlayer({ audioUrl, autoPlay = false, text, isLoadin
       </div>
       {(onAddToPlaylist || onAddToTask) && (audioUrl || text) && (
         <div className="audio-player-actions">
-          {onAddToPlaylist && <button onClick={onAddToPlaylist} disabled={!canAddToPlaylist || isLoading} className="phonetic-add-button-secondary"><AddPlaylistIcon /><span>Lisa kõnevooru</span></button>}
-          {onAddToTask && <button onClick={onAddToTask} disabled={!canAddToTask || isLoading} className="phonetic-add-button-secondary"><AddTaskIcon /><span>Lisa ülesandesse</span></button>}
+          {onAddToPlaylist && <button onClick={onAddToPlaylist} disabled={!canAddToPlaylist || isLoading} className="phonetic-add-button-secondary"><PlusCircleIcon /><span>Lisa kõnevooru</span></button>}
+          {onAddToTask && <button onClick={onAddToTask} disabled={!canAddToTask || isLoading} className="phonetic-add-button-secondary"><DocumentPlusIcon /><span>Lisa ülesandesse</span></button>}
         </div>
       )}
     </div>
