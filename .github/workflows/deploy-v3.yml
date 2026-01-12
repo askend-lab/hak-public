@@ -97,17 +97,21 @@ jobs:
             echo '{"modules":{}}' > /tmp/current-state.json
           fi
           
-          BUILD_FRONTEND=$(grep -o '"frontend":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          BUILD_SIMPLESTORE=$(grep -o '"simplestore":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          BUILD_AUDIO_API=$(grep -o '"audio-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          BUILD_MERLIN_API=$(grep -o '"merlin-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          BUILD_VABAMORF_API=$(grep -o '"vabamorf-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          # Extract values handling both "key": "value" and "key":"value" formats
+          BUILD_FRONTEND=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          BUILD_SIMPLESTORE=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          BUILD_AUDIO_API=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          BUILD_MERLIN_API=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          BUILD_VABAMORF_API=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
           
-          CURRENT_FRONTEND=$(grep -o '"frontend":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
-          CURRENT_SIMPLESTORE=$(grep -o '"simplestore":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
-          CURRENT_AUDIO_API=$(grep -o '"audio-api":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
-          CURRENT_MERLIN_API=$(grep -o '"merlin-api":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
-          CURRENT_VABAMORF_API=$(grep -o '"vabamorf-api":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
+          CURRENT_FRONTEND=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
+          CURRENT_SIMPLESTORE=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
+          CURRENT_AUDIO_API=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
+          CURRENT_MERLIN_API=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
+          CURRENT_VABAMORF_API=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
+          
+          echo "BUILD versions: frontend=$BUILD_FRONTEND simplestore=$BUILD_SIMPLESTORE"
+          echo "CURRENT versions: frontend=$CURRENT_FRONTEND simplestore=$CURRENT_SIMPLESTORE"
           
           echo "deploy_frontend=$( [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo true || echo false )" >> $GITHUB_OUTPUT
           echo "deploy_simplestore=$( [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo true || echo false )" >> $GITHUB_OUTPUT
@@ -201,12 +205,12 @@ jobs:
           BUILD_ID="${{ inputs.build_id }}"
           ENV="${{ inputs.environment }}"
           
-          # Extract module versions from manifest (handle multiline JSON)
-          FRONTEND=$(grep -o '"frontend":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          SIMPLESTORE=$(grep -o '"simplestore":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          AUDIO_API=$(grep -o '"audio-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          MERLIN_API=$(grep -o '"merlin-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
-          VABAMORF_API=$(grep -o '"vabamorf-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          # Extract module versions from manifest (handle spaces in JSON)
+          FRONTEND=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          SIMPLESTORE=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          AUDIO_API=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          MERLIN_API=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          VABAMORF_API=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
           
           cat > /tmp/deployment-state.json << EOF
           {

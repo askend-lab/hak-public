@@ -162,7 +162,7 @@ jobs:
             FRONTEND_SHA="${{ github.sha }}"
           elif [ -n "$LAST_BUILD" ]; then
             aws s3 sync ${LAST_S3}/frontend/ ${S3_PATH}/frontend/ --sse AES256
-            FRONTEND_SHA=$(grep -o '"frontend":"[^"]*"' /tmp/last-manifest.json | cut -d'"' -f4)
+            FRONTEND_SHA=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
           fi
           
           if [ "${{ steps.detect.outputs.simplestore }}" == "true" ]; then
@@ -170,7 +170,7 @@ jobs:
             SIMPLESTORE_SHA="${{ github.sha }}"
           elif [ -n "$LAST_BUILD" ]; then
             aws s3 sync ${LAST_S3}/simplestore/ ${S3_PATH}/simplestore/ --sse AES256
-            SIMPLESTORE_SHA=$(grep -o '"simplestore":"[^"]*"' /tmp/last-manifest.json | cut -d'"' -f4)
+            SIMPLESTORE_SHA=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
           fi
           
           if [ "${{ steps.detect.outputs.audio-api }}" == "true" ]; then
@@ -178,7 +178,7 @@ jobs:
             AUDIO_API_SHA="${{ github.sha }}"
           elif [ -n "$LAST_BUILD" ]; then
             aws s3 sync ${LAST_S3}/audio-api/ ${S3_PATH}/audio-api/ --sse AES256
-            AUDIO_API_SHA=$(grep -o '"audio-api":"[^"]*"' /tmp/last-manifest.json | cut -d'"' -f4)
+            AUDIO_API_SHA=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
           fi
           
           if [ "${{ steps.detect.outputs.merlin-api }}" == "true" ]; then
@@ -186,7 +186,7 @@ jobs:
             MERLIN_API_SHA="${{ github.sha }}"
           elif [ -n "$LAST_BUILD" ]; then
             aws s3 sync ${LAST_S3}/merlin-api/ ${S3_PATH}/merlin-api/ --sse AES256
-            MERLIN_API_SHA=$(grep -o '"merlin-api":"[^"]*"' /tmp/last-manifest.json | cut -d'"' -f4)
+            MERLIN_API_SHA=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
           fi
           
           if [ "${{ steps.detect.outputs.vabamorf-api }}" == "true" ]; then
@@ -194,7 +194,7 @@ jobs:
             VABAMORF_API_SHA="${{ github.sha }}"
           elif [ -n "$LAST_BUILD" ]; then
             aws s3 sync ${LAST_S3}/vabamorf-api/ ${S3_PATH}/vabamorf-api/ --sse AES256
-            VABAMORF_API_SHA=$(grep -o '"vabamorf-api":"[^"]*"' /tmp/last-manifest.json | cut -d'"' -f4)
+            VABAMORF_API_SHA=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
           fi
           
           cat > /tmp/manifest.json << EOF
