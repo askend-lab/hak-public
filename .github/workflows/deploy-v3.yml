@@ -1,0 +1,228 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      build_id:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+  
+  workflow_dispatch:
+    inputs:
+      build_id:
+        description: 'Build ID to deploy (e.g., BUILD-20260112123456)'
+        required: true
+        type: string
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  ARTIFACTS_BUCKET: askend-lab-artifacts
+  ARTIFACTS_PREFIX: hak/builds
+  DEPLOYMENTS_PREFIX: hak/deployments
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.build_id }} to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Get build manifest and current state
+        id: state
+        run: |
+          BUILD_ID="${{ inputs.build_id }}"
+          ENV="${{ inputs.environment }}"
+          
+          S3_BUILD="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
+          if ! aws s3 cp ${S3_BUILD}/manifest.json /tmp/build-manifest.json; then
+            echo "❌ Build $BUILD_ID not found"
+            exit 1
+          fi
+          
+          echo "Build manifest:"
+          cat /tmp/build-manifest.json
+          
+          S3_DEPLOY="s3://$ARTIFACTS_BUCKET/$DEPLOYMENTS_PREFIX/${ENV}.json"
+          if aws s3 cp ${S3_DEPLOY} /tmp/current-state.json 2>/dev/null; then
+            echo "Current deployment state:"
+            cat /tmp/current-state.json
+          else
+            echo "No existing deployment, will deploy all"
+            echo '{"modules":{}}' > /tmp/current-state.json
+          fi
+          
+          BUILD_FRONTEND=$(grep -o '"frontend":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          BUILD_SIMPLESTORE=$(grep -o '"simplestore":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          BUILD_AUDIO_API=$(grep -o '"audio-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          BUILD_MERLIN_API=$(grep -o '"merlin-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          BUILD_VABAMORF_API=$(grep -o '"vabamorf-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          
+          CURRENT_FRONTEND=$(grep -o '"frontend":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
+          CURRENT_SIMPLESTORE=$(grep -o '"simplestore":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
+          CURRENT_AUDIO_API=$(grep -o '"audio-api":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
+          CURRENT_MERLIN_API=$(grep -o '"merlin-api":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
+          CURRENT_VABAMORF_API=$(grep -o '"vabamorf-api":"[^"]*"' /tmp/current-state.json | cut -d'"' -f4)
+          
+          echo "deploy_frontend=$( [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_simplestore=$( [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_audio_api=$( [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_merlin_api=$( [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_vabamorf_api=$( [ "$BUILD_VABAMORF_API" != "$CURRENT_VABAMORF_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          
+          echo "=== Deployment Plan ==="
+          [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo "frontend: DEPLOY" || echo "frontend: skip"
+          [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo "simplestore: DEPLOY" || echo "simplestore: skip"
+          [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo "audio-api: DEPLOY" || echo "audio-api: skip"
+          [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo "merlin-api: DEPLOY" || echo "merlin-api: skip"
+          [ "$BUILD_VABAMORF_API" != "$CURRENT_VABAMORF_API" ] && echo "vabamorf-api: DEPLOY" || echo "vabamorf-api: skip"
+      
+      - name: Download build artifacts
+        run: |
+          BUILD_ID="${{ inputs.build_id }}"
+          S3_BUILD="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
+          mkdir -p artifacts
+          
+          [ "${{ steps.state.outputs.deploy_frontend }}" == "true" ] && aws s3 sync ${S3_BUILD}/frontend/ artifacts/frontend/
+          [ "${{ steps.state.outputs.deploy_simplestore }}" == "true" ] && aws s3 sync ${S3_BUILD}/simplestore/ artifacts/simplestore/
+          [ "${{ steps.state.outputs.deploy_audio_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/audio-api/ artifacts/audio-api/
+          [ "${{ steps.state.outputs.deploy_merlin_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/merlin-api/ artifacts/merlin-api/
+          [ "${{ steps.state.outputs.deploy_vabamorf_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/vabamorf-api/ artifacts/vabamorf-api/
+          
+          echo "✅ Downloaded artifacts"
+      
+      - name: Deploy Frontend
+        if: steps.state.outputs.deploy_frontend == 'true'
+        run: |
+          ENV="${{ inputs.environment }}"
+          if [ "$ENV" == "prod" ]; then
+            BUCKET="hak-prod-website"
+            CF_DIST_ID="EXXXXXXXXXX"
+          else
+            BUCKET="hak-${ENV}-website"
+            CF_DIST_ID="E232G8TMX7360Y"
+          fi
+          
+          aws s3 sync artifacts/frontend/ s3://${BUCKET}/ --delete
+          aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*" || true
+          echo "✅ Frontend deployed"
+      
+      - name: Install Serverless
+        if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_audio_api == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true'
+        run: npm install -g serverless@3
+      
+      - name: Deploy SimpleStore
+        if: steps.state.outputs.deploy_simplestore == 'true'
+        working-directory: packages/simplestore
+        run: |
+          mkdir -p dist && cp -r ../../artifacts/simplestore/* dist/ 2>/dev/null || true
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
+          echo "✅ SimpleStore deployed"
+      
+      - name: Deploy Audio API
+        if: steps.state.outputs.deploy_audio_api == 'true'
+        working-directory: packages/audio-api
+        run: |
+          mkdir -p dist && cp -r ../../artifacts/audio-api/* dist/ 2>/dev/null || true
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
+          echo "✅ Audio API deployed"
+      
+      - name: Deploy Merlin API
+        if: steps.state.outputs.deploy_merlin_api == 'true'
+        working-directory: packages/merlin-api
+        run: |
+          mkdir -p dist && cp -r ../../artifacts/merlin-api/* dist/ 2>/dev/null || true
+          serverless create_domain --stage ${{ inputs.environment }} || true
+          serverless deploy --stage ${{ inputs.environment }}
+          echo "✅ Merlin API deployed"
+      
+      - name: Login to ECR
+        if: steps.state.outputs.deploy_vabamorf_api == 'true'
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Deploy Vabamorf API
+        if: steps.state.outputs.deploy_vabamorf_api == 'true'
+        working-directory: packages/vabamorf-api
+        run: |
+          mkdir -p dist/src && cp -r ../../artifacts/vabamorf-api/* dist/src/ 2>/dev/null || true
+          npm ci
+          npm install --save-dev serverless-domain-manager
+          serverless create_domain --stage ${{ inputs.environment }} || true
+          serverless deploy --stage ${{ inputs.environment }}
+          echo "✅ Vabamorf API deployed"
+      
+      - name: Update deployment state
+        run: |
+          BUILD_ID="${{ inputs.build_id }}"
+          ENV="${{ inputs.environment }}"
+          
+          cat > /tmp/deployment-state.json << EOF
+          {
+            "environment": "$ENV",
+            "build_id": "$BUILD_ID",
+            "deployed_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "modules": $(grep -o '"modules":{[^}]*}' /tmp/build-manifest.json | sed 's/"modules"://')
+          }
+          EOF
+          
+          aws s3 cp /tmp/deployment-state.json s3://$ARTIFACTS_BUCKET/$DEPLOYMENTS_PREFIX/${ENV}.json --sse AES256
+          echo "✅ Deployment state updated"
+      
+      - name: Summary
+        run: |
+          ENV="${{ inputs.environment }}"
+          echo "## Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: $ENV" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build ID**: ${{ inputs.build_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Modules:" >> $GITHUB_STEP_SUMMARY
+          [ "${{ steps.state.outputs.deploy_frontend }}" == "true" ] && echo "- ✅ frontend" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ frontend (unchanged)" >> $GITHUB_STEP_SUMMARY
+          [ "${{ steps.state.outputs.deploy_simplestore }}" == "true" ] && echo "- ✅ simplestore" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ simplestore (unchanged)" >> $GITHUB_STEP_SUMMARY
+          [ "${{ steps.state.outputs.deploy_audio_api }}" == "true" ] && echo "- ✅ audio-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ audio-api (unchanged)" >> $GITHUB_STEP_SUMMARY
+          [ "${{ steps.state.outputs.deploy_merlin_api }}" == "true" ] && echo "- ✅ merlin-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ merlin-api (unchanged)" >> $GITHUB_STEP_SUMMARY
+          [ "${{ steps.state.outputs.deploy_vabamorf_api }}" == "true" ] && echo "- ✅ vabamorf-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ vabamorf-api (unchanged)" >> $GITHUB_STEP_SUMMARY
