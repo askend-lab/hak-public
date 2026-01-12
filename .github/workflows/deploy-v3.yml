@@ -201,17 +201,31 @@ jobs:
           BUILD_ID="${{ inputs.build_id }}"
           ENV="${{ inputs.environment }}"
           
+          # Extract module versions from manifest (handle multiline JSON)
+          FRONTEND=$(grep -o '"frontend":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          SIMPLESTORE=$(grep -o '"simplestore":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          AUDIO_API=$(grep -o '"audio-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          MERLIN_API=$(grep -o '"merlin-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          VABAMORF_API=$(grep -o '"vabamorf-api":"[^"]*"' /tmp/build-manifest.json | cut -d'"' -f4)
+          
           cat > /tmp/deployment-state.json << EOF
           {
             "environment": "$ENV",
             "build_id": "$BUILD_ID",
             "deployed_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "modules": $(grep -o '"modules":{[^}]*}' /tmp/build-manifest.json | sed 's/"modules"://')
+            "modules": {
+              "frontend": "$FRONTEND",
+              "simplestore": "$SIMPLESTORE",
+              "audio-api": "$AUDIO_API",
+              "merlin-api": "$MERLIN_API",
+              "vabamorf-api": "$VABAMORF_API"
+            }
           }
           EOF
           
           aws s3 cp /tmp/deployment-state.json s3://$ARTIFACTS_BUCKET/$DEPLOYMENTS_PREFIX/${ENV}.json --sse AES256
           echo "✅ Deployment state updated"
+          cat /tmp/deployment-state.json
       
       - name: Summary
         run: |
