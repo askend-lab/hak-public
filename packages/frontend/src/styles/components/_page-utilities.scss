@@ -1,0 +1,57 @@
+// =========================================================================
+// Page Responsive Utilities
+// =========================================================================
+// Visibility helpers for different breakpoints
+// =========================================================================
+
+@import '../tokens/breakpoints';
+
+// =============================================================================
+// RESPONSIVE UTILITIES
+// =============================================================================
+
+// Hide on mobile
+.hide-mobile {
+  @include respond-below($breakpoint-md) {
+    display: none !important;
+  }
+}
+
+// Hide on tablet and below
+.hide-tablet {
+  @include respond-below($breakpoint-lg) {
+    display: none !important;
+  }
+}
+
+// Hide on desktop and above
+.hide-desktop {
+  @include desktop {
+    display: none !important;
+  }
+}
+
+// Show only on mobile
+.show-mobile-only {
+  @include tablet {
+    display: none !important;
+  }
+}
+
+// Show only on tablet
+.show-tablet-only {
+  display: none !important;
+  
+  @include respond-between($breakpoint-md, $breakpoint-lg) {
+    display: block !important;
+  }
+}
+
+// Show only on desktop
+.show-desktop-only {
+  display: none !important;
+  
+  @include desktop {
+    display: block !important;
+  }
+}

@@ -61,7 +61,7 @@ Feature: Download synthesized audio (US-003)
     And the format is WAV
 `,
 
-  'US-004-view-stressed-text': `@synthesis @US-004
+  'US-004-view-stressed-text': `@synthesis @US-004 @ready
 Feature: View text with stress markers (US-004)
   As a language learner
   I want to see the Estonian text with stress markers visually indicated
@@ -86,7 +86,7 @@ Feature: View text with stress markers (US-004)
     And the differences are highlighted
 `,
 
-  'US-005-view-pronunciation-variants': `@synthesis @US-005
+  'US-005-view-pronunciation-variants': `@synthesis @US-005 @ready
 Feature: View pronunciation variants (US-005)
   As a language learner
   I want to see alternative pronunciation variants for ambiguous words
@@ -148,7 +148,7 @@ Feature: Edit phonetic text manually (US-007)
     Then the audio uses the edited phonetic form
 `,
 
-  'US-008-save-phonetic-edits': `@synthesis @US-008
+  'US-008-save-phonetic-edits': `@synthesis @US-008 @ready
 Feature: Save phonetic text edits (US-008)
   As a language teacher
   I want to save my phonetic text edits

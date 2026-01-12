@@ -1,0 +1,234 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      build_id:
+        required: true
+        type: string
+      modules:
+        required: true
+        type: string
+        description: 'Comma-separated list of modules to deploy'
+  
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      build_id:
+        description: 'Build ID to deploy'
+        required: true
+        type: string
+      modules:
+        description: 'Modules to deploy (comma-separated, or "all")'
+        required: false
+        type: string
+        default: 'all'
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+# Prevent concurrent deployments to the same environment
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate Build
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.validate.outputs.modules }}
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Validate build and modules
+        id: validate
+        run: |
+          BUILD_ID="${{ inputs.build_id }}"
+          S3_PATH="s3://askend-lab-artifacts/hak/builds/${BUILD_ID}"
+          
+          echo "Checking build ${BUILD_ID}..."
+          
+          if ! aws s3 ls "${S3_PATH}/build-meta.json" > /dev/null 2>&1; then
+            echo "❌ Build ${BUILD_ID} not found in S3"
+            aws s3 ls s3://askend-lab-artifacts/hak/builds/ | tail -10
+            exit 1
+          fi
+          
+          # Get build metadata
+          aws s3 cp "${S3_PATH}/build-meta.json" /tmp/build-meta.json
+          cat /tmp/build-meta.json
+          
+          # Determine modules to deploy
+          INPUT_MODULES="${{ inputs.modules }}"
+          if [ "$INPUT_MODULES" == "all" ] || [ -z "$INPUT_MODULES" ]; then
+            # Use modules from build metadata
+            MODULES=$(jq -r '.modules' /tmp/build-meta.json)
+          else
+            MODULES="$INPUT_MODULES"
+          fi
+          
+          echo "modules=$MODULES" >> $GITHUB_OUTPUT
+          echo "✅ Will deploy modules: $MODULES"
+
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure npm registry auth
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Download build artifacts
+        run: |
+          BUILD_ID="${{ inputs.build_id }}"
+          S3_PATH="s3://askend-lab-artifacts/hak/builds/${BUILD_ID}"
+          MODULES="${{ needs.validate.outputs.modules }}"
+          
+          mkdir -p artifacts
+          
+          # Download only needed modules
+          [[ "$MODULES" == *"frontend"* ]] && aws s3 sync ${S3_PATH}/frontend/ artifacts/frontend/
+          [[ "$MODULES" == *"simplestore"* ]] && aws s3 sync ${S3_PATH}/simplestore/ artifacts/simplestore/
+          [[ "$MODULES" == *"audio-api"* ]] && aws s3 sync ${S3_PATH}/audio-api/ artifacts/audio-api/
+          [[ "$MODULES" == *"merlin-api"* ]] && aws s3 sync ${S3_PATH}/merlin-api/ artifacts/merlin-api/
+          [[ "$MODULES" == *"vabamorf-api"* ]] && aws s3 sync ${S3_PATH}/vabamorf-api/ artifacts/vabamorf-api/
+          
+          echo "✅ Downloaded artifacts for: $MODULES"
+      
+      - name: Deploy Frontend
+        if: contains(needs.validate.outputs.modules, 'frontend')
+        run: |
+          ENV="${{ inputs.environment }}"
+          BUCKET="hak-${ENV}-website"
+          [ "$ENV" == "prod" ] && BUCKET="hak-prod-website"
+          
+          aws s3 sync artifacts/frontend/ s3://${BUCKET}/ --delete
+          
+          # CloudFront invalidation
+          if [ "$ENV" == "dev" ]; then
+            aws cloudfront create-invalidation --distribution-id E232G8TMX7360Y --paths "/*"
+          fi
+          # TODO: Add prod CloudFront distribution ID
+          
+          echo "✅ Frontend deployed to ${BUCKET}"
+      
+      - name: Install Serverless
+        if: contains(needs.validate.outputs.modules, 'simplestore') || contains(needs.validate.outputs.modules, 'audio-api') || contains(needs.validate.outputs.modules, 'merlin-api') || contains(needs.validate.outputs.modules, 'vabamorf-api')
+        run: npm install -g serverless@3
+      
+      - name: Deploy SimpleStore
+        if: contains(needs.validate.outputs.modules, 'simplestore')
+        working-directory: packages/simplestore
+        run: |
+          cp -r ../../artifacts/simplestore/* dist/ 2>/dev/null || mkdir -p dist
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
+          echo "✅ SimpleStore deployed"
+      
+      - name: Deploy Audio API
+        if: contains(needs.validate.outputs.modules, 'audio-api')
+        working-directory: packages/audio-api
+        run: |
+          cp -r ../../artifacts/audio-api/* dist/ 2>/dev/null || mkdir -p dist
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
+          echo "✅ Audio API deployed"
+      
+      - name: Deploy Merlin API
+        if: contains(needs.validate.outputs.modules, 'merlin-api')
+        working-directory: packages/merlin-api
+        run: |
+          cp -r ../../artifacts/merlin-api/* dist/ 2>/dev/null || mkdir -p dist
+          serverless create_domain --stage ${{ inputs.environment }} || true
+          serverless deploy --stage ${{ inputs.environment }}
+          echo "✅ Merlin API deployed"
+      
+      - name: Login to ECR
+        if: contains(needs.validate.outputs.modules, 'vabamorf-api')
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Deploy Vabamorf API
+        if: contains(needs.validate.outputs.modules, 'vabamorf-api')
+        working-directory: packages/vabamorf-api
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          rm -rf dist
+          mkdir -p dist/src
+          cp -r ../../artifacts/vabamorf-api/* dist/src/
+          npm ci
+          
+          ENV="${{ inputs.environment }}"
+          TAG_SUFFIX=""
+          [ "$ENV" == "prod" ] && TAG_SUFFIX="prod-"
+          
+          docker build -t $ECR_REGISTRY/vabamorf-api:${{ inputs.build_id }} -t $ECR_REGISTRY/vabamorf-api:${TAG_SUFFIX}latest .
+          docker push $ECR_REGISTRY/vabamorf-api:${{ inputs.build_id }}
+          docker push $ECR_REGISTRY/vabamorf-api:${TAG_SUFFIX}latest
+          
+          npm install --save-dev serverless-domain-manager
+          serverless create_domain --stage ${{ inputs.environment }} || true
+          serverless deploy --stage ${{ inputs.environment }}
+          echo "✅ Vabamorf API deployed"
+      
+      - name: Deployment summary
+        run: |
+          ENV="${{ inputs.environment }}"
+          echo "## Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${ENV}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build ID**: ${{ inputs.build_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Modules**: ${{ needs.validate.outputs.modules }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$ENV" == "dev" ]; then
+            echo "### URLs" >> $GITHUB_STEP_SUMMARY
+            echo "- Frontend: https://hak-dev.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+            echo "- API: https://hak-api-dev.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+          elif [ "$ENV" == "prod" ]; then
+            echo "### URLs" >> $GITHUB_STEP_SUMMARY
+            echo "- Frontend: https://hak.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+            echo "- API: https://hak-api.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+          fi

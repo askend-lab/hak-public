@@ -37,7 +37,11 @@
 @import 'components/button';
 
 // Layout Components
-@import 'components/page-layouts';
+@import 'components/page-layout-base';
+@import 'components/page-header-variants';
+@import 'components/page-content';
+@import 'components/page-footer';
+@import 'components/page-utilities';
 @import 'components/header';
 @import 'components/footer';
 
