@@ -146,7 +146,7 @@ jobs:
           ENV="${{ inputs.environment }}"
           if [ "$ENV" == "prod" ]; then
             BUCKET="hak-prod-website"
-            CF_DIST_ID="EXXXXXXXXXX"
+            CF_DIST_ID="E2D4DEJKUQ1SXC"
           else
             BUCKET="hak-${ENV}-website"
             CF_DIST_ID="E232G8TMX7360Y"
