@@ -152,7 +152,7 @@ jobs:
             CF_DIST_ID="E232G8TMX7360Y"
           fi
           
-          aws s3 sync artifacts/frontend/ s3://${BUCKET}/ --delete
+          aws s3 cp artifacts/frontend/ s3://${BUCKET}/ --recursive
           aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*" || true
           echo "✅ Frontend deployed"
       
