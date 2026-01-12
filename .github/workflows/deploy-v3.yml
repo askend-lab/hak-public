@@ -46,6 +46,9 @@ env:
   ARTIFACTS_BUCKET: askend-lab-artifacts
   ARTIFACTS_PREFIX: hak/builds
   DEPLOYMENTS_PREFIX: hak/deployments
+  # CloudFront distribution IDs per environment
+  CF_DIST_DEV: E232G8TMX7360Y
+  CF_DIST_PROD: E2D4DEJKUQ1SXC
 
 jobs:
   deploy:
@@ -87,65 +90,48 @@ jobs:
         run: |
           BUILD_ID="${{ inputs.build_id }}"
           ENV="${{ inputs.environment }}"
+          FORCE="${{ inputs.force }}"
           
+          # Download build manifest
           S3_BUILD="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
           if ! aws s3 cp ${S3_BUILD}/manifest.json /tmp/build-manifest.json; then
             echo "❌ Build $BUILD_ID not found"
             exit 1
           fi
+          echo "Build manifest:" && cat /tmp/build-manifest.json
           
-          echo "Build manifest:"
-          cat /tmp/build-manifest.json
-          
+          # Download current deployment state
           S3_DEPLOY="s3://$ARTIFACTS_BUCKET/$DEPLOYMENTS_PREFIX/${ENV}.json"
-          if aws s3 cp ${S3_DEPLOY} /tmp/current-state.json 2>/dev/null; then
-            echo "Current deployment state:"
-            cat /tmp/current-state.json
-          else
+          if ! aws s3 cp ${S3_DEPLOY} /tmp/current-state.json 2>/dev/null; then
             echo "No existing deployment, will deploy all"
             echo '{"modules":{}}' > /tmp/current-state.json
           fi
           
-          # Extract values handling both "key": "value" and "key":"value" formats
-          BUILD_FRONTEND=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          BUILD_SIMPLESTORE=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          BUILD_AUDIO_API=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          BUILD_MERLIN_API=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          BUILD_VABAMORF_API=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          # Use jq for reliable JSON parsing
+          get_module() { jq -r ".modules.\"$1\" // \"\"" "$2"; }
           
-          CURRENT_FRONTEND=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
-          CURRENT_SIMPLESTORE=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
-          CURRENT_AUDIO_API=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
-          CURRENT_MERLIN_API=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
-          CURRENT_VABAMORF_API=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/current-state.json | grep -o '"[^"]*"$' | tr -d '"' || echo "")
-          
-          echo "BUILD versions: frontend=$BUILD_FRONTEND simplestore=$BUILD_SIMPLESTORE"
-          echo "CURRENT versions: frontend=$CURRENT_FRONTEND simplestore=$CURRENT_SIMPLESTORE"
-          
-          FORCE="${{ inputs.force }}"
-          
-          # For frontend: compare actual S3 content hash (ETag) instead of deployment state
-          # This ensures true content-based comparison for any build to any env
-          BUILD_ETAG=$(aws s3api head-object --bucket $ARTIFACTS_BUCKET --key $ARTIFACTS_PREFIX/$BUILD_ID/frontend/index.html --query ETag --output text 2>/dev/null || echo "")
-          if [ "$ENV" == "prod" ]; then
-            TARGET_BUCKET="hak-prod-website"
-          else
-            TARGET_BUCKET="hak-${ENV}-website"
-          fi
-          CURRENT_ETAG=$(aws s3api head-object --bucket $TARGET_BUCKET --key index.html --query ETag --output text 2>/dev/null || echo "")
-          echo "Frontend ETags: build=$BUILD_ETAG current=$CURRENT_ETAG"
-          echo "deploy_frontend=$( [ "$FORCE" == "true" ] || [ "$BUILD_ETAG" != "$CURRENT_ETAG" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_simplestore=$( [ "$FORCE" == "true" ] || [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_audio_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_merlin_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_vabamorf_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_VABAMORF_API" != "$CURRENT_VABAMORF_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          
-          echo "=== Deployment Plan ==="
-          [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo "frontend: DEPLOY" || echo "frontend: skip"
-          [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo "simplestore: DEPLOY" || echo "simplestore: skip"
-          [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo "audio-api: DEPLOY" || echo "audio-api: skip"
-          [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo "merlin-api: DEPLOY" || echo "merlin-api: skip"
-          [ "$BUILD_VABAMORF_API" != "$CURRENT_VABAMORF_API" ] && echo "vabamorf-api: DEPLOY" || echo "vabamorf-api: skip"
+          # Compare modules and determine what to deploy
+          for module in frontend simplestore audio-api merlin-api vabamorf-api; do
+            BUILD_SHA=$(get_module "$module" /tmp/build-manifest.json)
+            CURRENT_SHA=$(get_module "$module" /tmp/current-state.json)
+            
+            # Special handling for frontend: use S3 ETag for true content comparison
+            if [ "$module" == "frontend" ]; then
+              BUILD_ETAG=$(aws s3api head-object --bucket $ARTIFACTS_BUCKET --key $ARTIFACTS_PREFIX/$BUILD_ID/frontend/index.html --query ETag --output text 2>/dev/null || echo "")
+              TARGET_BUCKET="hak-${ENV}-website"
+              [ "$ENV" == "prod" ] && TARGET_BUCKET="hak-prod-website"
+              CURRENT_ETAG=$(aws s3api head-object --bucket $TARGET_BUCKET --key index.html --query ETag --output text 2>/dev/null || echo "")
+              SHOULD_DEPLOY=$( [ "$FORCE" == "true" ] || [ "$BUILD_ETAG" != "$CURRENT_ETAG" ] && echo true || echo false )
+              echo "Frontend ETags: build=$BUILD_ETAG current=$CURRENT_ETAG"
+            else
+              SHOULD_DEPLOY=$( [ "$FORCE" == "true" ] || [ "$BUILD_SHA" != "$CURRENT_SHA" ] && echo true || echo false )
+            fi
+            
+            # Convert module name to output variable format (audio-api -> deploy_audio_api)
+            OUTPUT_NAME="deploy_$(echo $module | tr '-' '_')"
+            echo "$OUTPUT_NAME=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
+            echo "$module: BUILD=$BUILD_SHA CURRENT=$CURRENT_SHA -> $( [ "$SHOULD_DEPLOY" == "true" ] && echo DEPLOY || echo skip )"
+          done
       
       - name: Download build artifacts
         run: |
@@ -165,17 +151,13 @@ jobs:
         if: steps.state.outputs.deploy_frontend == 'true'
         run: |
           ENV="${{ inputs.environment }}"
-          if [ "$ENV" == "prod" ]; then
-            BUCKET="hak-prod-website"
-            CF_DIST_ID="E2D4DEJKUQ1SXC"
-          else
-            BUCKET="hak-${ENV}-website"
-            CF_DIST_ID="E232G8TMX7360Y"
-          fi
+          BUCKET="hak-${ENV}-website"
+          [ "$ENV" == "prod" ] && BUCKET="hak-prod-website"
+          CF_DIST_ID="$( [ "$ENV" == "prod" ] && echo $CF_DIST_PROD || echo $CF_DIST_DEV )"
           
           aws s3 cp artifacts/frontend/ s3://${BUCKET}/ --recursive
-          aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*" || true
-          echo "✅ Frontend deployed"
+          aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*"
+          echo "✅ Frontend deployed to $BUCKET"
       
       - name: Install Serverless
         if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_audio_api == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true'
@@ -226,30 +208,18 @@ jobs:
           BUILD_ID="${{ inputs.build_id }}"
           ENV="${{ inputs.environment }}"
           
-          # Extract module versions from manifest (handle spaces in JSON)
-          FRONTEND=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          SIMPLESTORE=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          AUDIO_API=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          MERLIN_API=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          VABAMORF_API=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/build-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          
-          cat > /tmp/deployment-state.json << EOF
-          {
-            "environment": "$ENV",
-            "build_id": "$BUILD_ID",
-            "deployed_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "modules": {
-              "frontend": "$FRONTEND",
-              "simplestore": "$SIMPLESTORE",
-              "audio-api": "$AUDIO_API",
-              "merlin-api": "$MERLIN_API",
-              "vabamorf-api": "$VABAMORF_API"
+          # Build deployment state from manifest using jq
+          jq --arg env "$ENV" --arg build "$BUILD_ID" --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '
+            {
+              environment: $env,
+              build_id: $build,
+              deployed_at: $time,
+              modules: .modules
             }
-          }
-          EOF
+          ' /tmp/build-manifest.json > /tmp/deployment-state.json
           
           aws s3 cp /tmp/deployment-state.json s3://$ARTIFACTS_BUCKET/$DEPLOYMENTS_PREFIX/${ENV}.json --sse AES256
-          echo "✅ Deployment state updated"
+          echo "✅ Deployment state updated:"
           cat /tmp/deployment-state.json
       
       - name: Summary

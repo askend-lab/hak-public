@@ -147,73 +147,75 @@ jobs:
       
       - name: Create full build artifact
         id: build
+        env:
+          FRONTEND_CHANGED: ${{ steps.detect.outputs.frontend }}
+          SIMPLESTORE_CHANGED: ${{ steps.detect.outputs.simplestore }}
+          AUDIO_API_CHANGED: ${{ steps.detect.outputs.audio-api }}
+          MERLIN_API_CHANGED: ${{ steps.detect.outputs.merlin-api }}
+          VABAMORF_API_CHANGED: ${{ steps.detect.outputs.vabamorf-api }}
         run: |
-          BUILD_NUM=$(date +%Y%m%d%H%M%S)
-          BUILD_ID="BUILD-${BUILD_NUM}"
+          BUILD_ID="BUILD-$(date +%Y%m%d%H%M%S)"
           echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
           
           S3_PATH="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
           LAST_BUILD="${{ steps.detect.outputs.last_build }}"
           LAST_S3="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$LAST_BUILD"
           
-          # Upload each module - new build or copy from previous
-          if [ "${{ steps.detect.outputs.frontend }}" == "true" ]; then
-            aws s3 sync packages/frontend/dist/ ${S3_PATH}/frontend/ --sse AES256
-            FRONTEND_SHA="${{ github.sha }}"
-          elif [ -n "$LAST_BUILD" ]; then
-            aws s3 sync ${LAST_S3}/frontend/ ${S3_PATH}/frontend/ --sse AES256
-            FRONTEND_SHA=$(grep -o '"frontend"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          fi
+          # Helper to get module SHA from last manifest
+          get_last_sha() { jq -r ".modules.\"$1\" // \"unknown\"" /tmp/last-manifest.json; }
           
-          if [ "${{ steps.detect.outputs.simplestore }}" == "true" ]; then
-            aws s3 sync packages/simplestore/dist/ ${S3_PATH}/simplestore/ --sse AES256
-            SIMPLESTORE_SHA="${{ github.sha }}"
-          elif [ -n "$LAST_BUILD" ]; then
-            aws s3 sync ${LAST_S3}/simplestore/ ${S3_PATH}/simplestore/ --sse AES256
-            SIMPLESTORE_SHA=$(grep -o '"simplestore"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          fi
+          # Module config: name|local_path|changed_var
+          MODULES="frontend|packages/frontend/dist|FRONTEND_CHANGED
+          simplestore|packages/simplestore/dist|SIMPLESTORE_CHANGED
+          audio-api|packages/audio-api/dist|AUDIO_API_CHANGED
+          merlin-api|packages/merlin-api/dist|MERLIN_API_CHANGED
+          vabamorf-api|packages/vabamorf-api/dist|VABAMORF_API_CHANGED"
           
-          if [ "${{ steps.detect.outputs.audio-api }}" == "true" ]; then
-            aws s3 sync packages/audio-api/dist/ ${S3_PATH}/audio-api/ --sse AES256
-            AUDIO_API_SHA="${{ github.sha }}"
-          elif [ -n "$LAST_BUILD" ]; then
-            aws s3 sync ${LAST_S3}/audio-api/ ${S3_PATH}/audio-api/ --sse AES256
-            AUDIO_API_SHA=$(grep -o '"audio-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          fi
+          # Initialize manifest modules
+          declare -A MODULE_SHAS
           
-          if [ "${{ steps.detect.outputs.merlin-api }}" == "true" ]; then
-            aws s3 sync packages/merlin-api/dist/ ${S3_PATH}/merlin-api/ --sse AES256
-            MERLIN_API_SHA="${{ github.sha }}"
-          elif [ -n "$LAST_BUILD" ]; then
-            aws s3 sync ${LAST_S3}/merlin-api/ ${S3_PATH}/merlin-api/ --sse AES256
-            MERLIN_API_SHA=$(grep -o '"merlin-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          fi
+          echo "$MODULES" | while IFS='|' read -r name path changed_var; do
+            CHANGED=$(eval echo \$$changed_var)
+            if [ "$CHANGED" == "true" ]; then
+              aws s3 sync "$path/" "${S3_PATH}/$name/" --sse AES256
+              MODULE_SHAS[$name]="${{ github.sha }}"
+              echo "$name: built (SHA: ${{ github.sha }})"
+            elif [ -n "$LAST_BUILD" ]; then
+              aws s3 sync "${LAST_S3}/$name/" "${S3_PATH}/$name/" --sse AES256
+              MODULE_SHAS[$name]=$(get_last_sha "$name")
+              echo "$name: copied from $LAST_BUILD (SHA: ${MODULE_SHAS[$name]})"
+            else
+              MODULE_SHAS[$name]="unknown"
+              echo "$name: no previous build, marking unknown"
+            fi
+          done
           
-          if [ "${{ steps.detect.outputs.vabamorf-api }}" == "true" ]; then
-            aws s3 sync packages/vabamorf-api/dist/ ${S3_PATH}/vabamorf-api/ --sse AES256
-            VABAMORF_API_SHA="${{ github.sha }}"
-          elif [ -n "$LAST_BUILD" ]; then
-            aws s3 sync ${LAST_S3}/vabamorf-api/ ${S3_PATH}/vabamorf-api/ --sse AES256
-            VABAMORF_API_SHA=$(grep -o '"vabamorf-api"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/last-manifest.json | grep -o '"[^"]*"$' | tr -d '"')
-          fi
-          
-          cat > /tmp/manifest.json << EOF
-          {
-            "build_id": "$BUILD_ID",
-            "git_sha": "${{ github.sha }}",
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "modules": {
-              "frontend": "${FRONTEND_SHA:-unknown}",
-              "simplestore": "${SIMPLESTORE_SHA:-unknown}",
-              "audio-api": "${AUDIO_API_SHA:-unknown}",
-              "merlin-api": "${MERLIN_API_SHA:-unknown}",
-              "vabamorf-api": "${VABAMORF_API_SHA:-unknown}"
-            }
-          }
-          EOF
+          # Build manifest using jq for proper JSON
+          jq -n \
+            --arg id "$BUILD_ID" \
+            --arg sha "${{ github.sha }}" \
+            --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg frontend "$( [ "$FRONTEND_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha frontend )" \
+            --arg simplestore "$( [ "$SIMPLESTORE_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha simplestore )" \
+            --arg audio "$( [ "$AUDIO_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha audio-api )" \
+            --arg merlin "$( [ "$MERLIN_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha merlin-api )" \
+            --arg vabamorf "$( [ "$VABAMORF_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha vabamorf-api )" \
+            '{
+              build_id: $id,
+              git_sha: $sha,
+              timestamp: $time,
+              modules: {
+                frontend: $frontend,
+                simplestore: $simplestore,
+                "audio-api": $audio,
+                "merlin-api": $merlin,
+                "vabamorf-api": $vabamorf
+              }
+            }' > /tmp/manifest.json
           
           aws s3 cp /tmp/manifest.json ${S3_PATH}/manifest.json --sse AES256
           echo "✅ Build $BUILD_ID created"
+          cat /tmp/manifest.json
       
       - name: Build summary
         run: |
