@@ -225,14 +225,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Deploy command:" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "gh workflow run deploy-v3.yml -f build_id=${{ steps.build.outputs.build_id }} -f environment=dev" >> $GITHUB_STEP_SUMMARY
+          echo "gh workflow run deploy.yml -f build_id=${{ steps.build.outputs.build_id }} -f environment=dev" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
   deploy-dev:
     name: Deploy to Dev
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: ./.github/workflows/deploy-v3.yml
+    uses: ./.github/workflows/deploy.yml
     with:
       build_id: ${{ needs.build.outputs.build_id }}
       environment: dev
