@@ -123,7 +123,9 @@ jobs:
           echo "CURRENT versions: frontend=$CURRENT_FRONTEND simplestore=$CURRENT_SIMPLESTORE"
           
           FORCE="${{ inputs.force }}"
-          echo "deploy_frontend=$( [ "$FORCE" == "true" ] || [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          # Frontend is always deployed - it's just S3 copy + CloudFront invalidation (~10 seconds)
+          # This ensures rollbacks work correctly without needing force flag
+          echo "deploy_frontend=true" >> $GITHUB_OUTPUT
           echo "deploy_simplestore=$( [ "$FORCE" == "true" ] || [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo true || echo false )" >> $GITHUB_OUTPUT
           echo "deploy_audio_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
           echo "deploy_merlin_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
