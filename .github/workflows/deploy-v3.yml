@@ -9,6 +9,10 @@ on:
       environment:
         required: true
         type: string
+      force:
+        required: false
+        type: boolean
+        default: false
   
   workflow_dispatch:
     inputs:
@@ -23,6 +27,11 @@ on:
         options:
           - dev
           - prod
+      force:
+        description: 'Force deploy all modules (bypass smart diff)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -113,11 +122,12 @@ jobs:
           echo "BUILD versions: frontend=$BUILD_FRONTEND simplestore=$BUILD_SIMPLESTORE"
           echo "CURRENT versions: frontend=$CURRENT_FRONTEND simplestore=$CURRENT_SIMPLESTORE"
           
-          echo "deploy_frontend=$( [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_simplestore=$( [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_audio_api=$( [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_merlin_api=$( [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "deploy_vabamorf_api=$( [ "$BUILD_VABAMORF_API" != "$CURRENT_VABAMORF_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          FORCE="${{ inputs.force }}"
+          echo "deploy_frontend=$( [ "$FORCE" == "true" ] || [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_simplestore=$( [ "$FORCE" == "true" ] || [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_audio_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_merlin_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "deploy_vabamorf_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_VABAMORF_API" != "$CURRENT_VABAMORF_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
           
           echo "=== Deployment Plan ==="
           [ "$BUILD_FRONTEND" != "$CURRENT_FRONTEND" ] && echo "frontend: DEPLOY" || echo "frontend: skip"
