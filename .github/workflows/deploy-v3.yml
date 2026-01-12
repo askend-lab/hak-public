@@ -123,9 +123,18 @@ jobs:
           echo "CURRENT versions: frontend=$CURRENT_FRONTEND simplestore=$CURRENT_SIMPLESTORE"
           
           FORCE="${{ inputs.force }}"
-          # Frontend is always deployed - it's just S3 copy + CloudFront invalidation (~10 seconds)
-          # This ensures rollbacks work correctly without needing force flag
-          echo "deploy_frontend=true" >> $GITHUB_OUTPUT
+          
+          # For frontend: compare actual S3 content hash (ETag) instead of deployment state
+          # This ensures true content-based comparison for any build to any env
+          BUILD_ETAG=$(aws s3api head-object --bucket $ARTIFACTS_BUCKET --key $ARTIFACTS_PREFIX/$BUILD_ID/frontend/index.html --query ETag --output text 2>/dev/null || echo "")
+          if [ "$ENV" == "prod" ]; then
+            TARGET_BUCKET="hak-prod-website"
+          else
+            TARGET_BUCKET="hak-${ENV}-website"
+          fi
+          CURRENT_ETAG=$(aws s3api head-object --bucket $TARGET_BUCKET --key index.html --query ETag --output text 2>/dev/null || echo "")
+          echo "Frontend ETags: build=$BUILD_ETAG current=$CURRENT_ETAG"
+          echo "deploy_frontend=$( [ "$FORCE" == "true" ] || [ "$BUILD_ETAG" != "$CURRENT_ETAG" ] && echo true || echo false )" >> $GITHUB_OUTPUT
           echo "deploy_simplestore=$( [ "$FORCE" == "true" ] || [ "$BUILD_SIMPLESTORE" != "$CURRENT_SIMPLESTORE" ] && echo true || echo false )" >> $GITHUB_OUTPUT
           echo "deploy_audio_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_AUDIO_API" != "$CURRENT_AUDIO_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
           echo "deploy_merlin_api=$( [ "$FORCE" == "true" ] || [ "$BUILD_MERLIN_API" != "$CURRENT_MERLIN_API" ] && echo true || echo false )" >> $GITHUB_OUTPUT
