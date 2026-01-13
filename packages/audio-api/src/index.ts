@@ -22,7 +22,7 @@ export async function lambdaHandler(event: { body: string }): Promise<{ statusCo
   };
 }
 
-export function healthHandler(): { statusCode: number; body: string; headers: Record<string, string> } {
+export async function healthHandler(): Promise<{ statusCode: number; body: string; headers: Record<string, string> }> {
   return {
     statusCode: 200,
     headers: {
