@@ -1,5 +1,22 @@
-const isProd = typeof import.meta !== 'undefined' && import.meta.env?.PROD || false;
-const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV || false;
+export function getRedirectUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:5180/auth/callback';
+  }
+  if (hostname === 'hak-dev.askend-lab.com') {
+    return 'https://hak-dev.askend-lab.com/auth/callback';
+  }
+  return 'https://hak.askend-lab.com/auth/callback';
+}
+
+export function getLogoutUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:5180';
+  }
+  if (hostname === 'hak-dev.askend-lab.com') {
+    return 'https://hak-dev.askend-lab.com';
+  }
+  return 'https://hak.askend-lab.com';
+}
 
 export const cognitoConfig = {
   region: 'eu-west-1',
@@ -7,17 +24,13 @@ export const cognitoConfig = {
   clientId: '64tf6nf61n6sgftqif6q975hka',
   domain: 'askend-lab-auth.auth.eu-west-1.amazoncognito.com',
   
-  redirectUri: isDev 
-    ? 'http://localhost:5180/auth/callback'
-    : isProd 
-      ? 'https://hak.askend-lab.com/auth/callback'
-      : 'https://hak-dev.askend-lab.com/auth/callback',
+  get redirectUri(): string {
+    return getRedirectUri();
+  },
   
-  logoutUri: isDev
-    ? 'http://localhost:5180'
-    : isProd
-      ? 'https://hak.askend-lab.com'
-      : 'https://hak-dev.askend-lab.com',
+  get logoutUri(): string {
+    return getLogoutUri();
+  },
   
   scopes: ['email', 'openid', 'profile'],
 };

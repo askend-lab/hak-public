@@ -21,6 +21,26 @@ describe('cognitoConfig', () => {
   });
 });
 
+describe('getRedirectUri - environment detection', () => {
+  it('should redirect to dev when on hak-dev.askend-lab.com', async () => {
+    const { getRedirectUri } = await import('./config');
+    const uri = getRedirectUri('hak-dev.askend-lab.com');
+    expect(uri).toBe('https://hak-dev.askend-lab.com/auth/callback');
+  });
+
+  it('should redirect to prod when on hak.askend-lab.com', async () => {
+    const { getRedirectUri } = await import('./config');
+    const uri = getRedirectUri('hak.askend-lab.com');
+    expect(uri).toBe('https://hak.askend-lab.com/auth/callback');
+  });
+
+  it('should redirect to localhost when on localhost', async () => {
+    const { getRedirectUri } = await import('./config');
+    const uri = getRedirectUri('localhost');
+    expect(uri).toBe('http://localhost:5180/auth/callback');
+  });
+});
+
 describe('getLoginUrl', () => {
   beforeEach(() => {
     sessionStorage.clear();
