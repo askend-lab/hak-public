@@ -151,13 +151,37 @@ jobs:
         if: steps.state.outputs.deploy_frontend == 'true'
         run: |
           ENV="${{ inputs.environment }}"
+          BUILD_ID="${{ inputs.build_id }}"
           BUCKET="hak-${ENV}-website"
           [ "$ENV" == "prod" ] && BUCKET="hak-prod-website"
           CF_DIST_ID="$( [ "$ENV" == "prod" ] && echo $CF_DIST_PROD || echo $CF_DIST_DEV )"
           
+          # Generate build-info.json from manifest
+          MANIFEST="/tmp/build-manifest.json"
+          GIT_SHA=$(jq -r '.git_sha' $MANIFEST)
+          BUILD_TIME=$(jq -r '.timestamp' $MANIFEST)
+          DEPLOY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Get commit info from git
+          COMMIT_MSG=$(git log -1 --format=%s $GIT_SHA 2>/dev/null || echo "")
+          BRANCH=$(git branch --contains $GIT_SHA --format='%(refname:short)' 2>/dev/null | head -1 || echo "main")
+          
+          cat > artifacts/frontend/build-info.json << EOF
+          {
+            "buildId": "$BUILD_ID",
+            "commitHash": "${GIT_SHA:0:7}",
+            "commitHashFull": "$GIT_SHA",
+            "branch": "$BRANCH",
+            "message": "$COMMIT_MSG",
+            "builtAt": "$BUILD_TIME",
+            "deployedAt": "$DEPLOY_TIME",
+            "environment": "$ENV"
+          }
+          EOF
+          
           aws s3 cp artifacts/frontend/ s3://${BUCKET}/ --recursive
           aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*"
-          echo "✅ Frontend deployed to $BUCKET"
+          echo "✅ Frontend deployed to $BUCKET with build-info.json"
       
       - name: Install Serverless
         if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_audio_api == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true'
