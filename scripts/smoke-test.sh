@@ -118,7 +118,7 @@ echo ""
 echo "=== Audio API ==="
 # Audio API uses API Gateway directly
 if [ "$ENV" == "prod" ]; then
-  AUDIO_URL="https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/prod"
+  AUDIO_URL="https://l1hu7ny66c.execute-api.eu-west-1.amazonaws.com/prod"
 else
   AUDIO_URL="https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/dev"
 fi
