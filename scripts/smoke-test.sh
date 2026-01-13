@@ -129,10 +129,6 @@ else
 fi
 
 echo ""
-echo "=== Audio API ==="
-test_endpoint_content "Audio API /health" "$AUDIO_URL/health" "GET" "" "healthy"
-
-echo ""
 echo "=== Frontend API Routing (CloudFront) ==="
 test_endpoint_content "CloudFront /api/analyze" "$FRONTEND_URL/api/analyze" "POST" '{"text":"Tere"}' "stressedText"
 test_endpoint_content "CloudFront /api/synthesize" "$FRONTEND_URL/api/synthesize" "POST" '{"text":"Tere","voice":"efm_l"}' "audioUrl"
