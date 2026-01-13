@@ -99,7 +99,7 @@ test_endpoint_content "Vabamorf /analyze" "$VABAMORF_URL/analyze" "POST" '{"text
 
 echo ""
 echo "=== Merlin API ==="
-test_endpoint_content "Merlin /synthesize" "$MERLIN_URL/synthesize" "POST" '{"text":"Tere","voice":"mari"}' "audioUrl"
+test_endpoint_content "Merlin /synthesize" "$MERLIN_URL/synthesize" "POST" '{"text":"Tere","voice":"efm_l"}' "audioUrl"
 
 echo ""
 echo "=== Audio API ==="
@@ -108,7 +108,7 @@ test_endpoint_content "Audio API /health" "$AUDIO_URL/health" "GET" "" "healthy"
 echo ""
 echo "=== Frontend API Routing (CloudFront) ==="
 test_endpoint_content "CloudFront /api/analyze" "$FRONTEND_URL/api/analyze" "POST" '{"text":"Tere"}' "stressedText"
-test_endpoint_content "CloudFront /api/synthesize" "$FRONTEND_URL/api/synthesize" "POST" '{"text":"Tere","voice":"mari"}' "audioUrl"
+test_endpoint_content "CloudFront /api/synthesize" "$FRONTEND_URL/api/synthesize" "POST" '{"text":"Tere","voice":"efm_l"}' "audioUrl"
 test_endpoint_content "CloudFront /api/status/*" "$FRONTEND_URL/api/status/test-key" "GET" "" "status"
 
 echo ""
