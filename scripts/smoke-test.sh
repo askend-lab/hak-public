@@ -17,12 +17,10 @@ echo ""
 # Color codes
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 PASSED=0
 FAILED=0
-WARNINGS=0
 
 # Test function
 test_endpoint() {
@@ -72,18 +70,13 @@ test_endpoint_content() {
   fi
   
   if echo "$response" | grep -q "$contains"; then
-    echo -e "${GREEN}✓${NC} $name - contains '$contains'"
+    echo -e "${GREEN}✓${NC} $name"
     ((PASSED++))
     return 0
-  elif echo "$response" | grep -qi "error\|internal server"; then
-    echo -e "${RED}✗${NC} $name - Error response"
-    echo "  Response: ${response:0:200}"
-    ((FAILED++))
-    return 1
   else
-    echo -e "${YELLOW}?${NC} $name - Response doesn't contain '$contains'"
-    echo "  Response: ${response:0:200}"
-    ((WARNINGS++))
+    echo -e "${RED}✗${NC} $name - expected '$contains'"
+    echo "  Response: ${response:0:100}"
+    ((FAILED++))
     return 1
   fi
 }
@@ -132,12 +125,18 @@ fi
 test_endpoint_content "Audio API /health" "$AUDIO_URL/health" "GET" "" "healthy"
 
 echo ""
+echo "=== Frontend API Routing (CloudFront) ==="
+# Test that frontend domain correctly routes /api/* to backends
+# This catches misconfigured CloudFront behaviors
+test_endpoint_content "CloudFront /api/analyze" "$FRONTEND_URL/api/analyze" "POST" '{"text":"Tere"}' "stressedText"
+test_endpoint_content "CloudFront /api/synthesize" "$FRONTEND_URL/api/synthesize" "POST" '{"text":"Tere","voice":"mari"}' "audioUrl"
+
+echo ""
 echo "=============================================="
 echo "  SUMMARY"
 echo "=============================================="
-echo -e "${GREEN}Passed:${NC}   $PASSED"
-echo -e "${RED}Failed:${NC}   $FAILED"
-echo -e "${YELLOW}Warnings:${NC} $WARNINGS"
+echo -e "${GREEN}Passed:${NC}  $PASSED"
+echo -e "${RED}Failed:${NC}  $FAILED"
 echo ""
 
 if [ $FAILED -gt 0 ]; then
