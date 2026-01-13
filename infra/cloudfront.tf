@@ -1,3 +1,20 @@
+# CloudFront Function to rewrite /api/* paths
+resource "aws_cloudfront_function" "api_rewrite" {
+  name    = "${local.app_name}-${var.env}-api-rewrite"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = <<-EOF
+    function handler(event) {
+      var request = event.request;
+      // Rewrite /api/xxx to /xxx for backend APIs
+      if (request.uri.startsWith('/api/')) {
+        request.uri = request.uri.substring(4);
+      }
+      return request;
+    }
+  EOF
+}
+
 # CloudFront Origin Access Control
 resource "aws_cloudfront_origin_access_control" "website" {
   name                              = "${local.app_name}-${var.env}-oac"
@@ -59,6 +76,11 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.api_rewrite.arn
+    }
+
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 0
@@ -78,6 +100,11 @@ resource "aws_cloudfront_distribution" "website" {
       cookies {
         forward = "none"
       }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.api_rewrite.arn
     }
 
     viewer_protocol_policy = "redirect-to-https"
