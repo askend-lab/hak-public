@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/services/auth';
 import { DataService } from '@/services/dataService';
 
 export function useSentenceMenu(): {

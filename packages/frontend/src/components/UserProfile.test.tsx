@@ -4,17 +4,17 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import UserProfile from './UserProfile';
 
-vi.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/services/auth', () => ({
   useAuth: vi.fn(() => ({
     logout: vi.fn(),
   })),
 }));
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/services/auth';
 
 describe('UserProfile', () => {
   const mockUser = {
-    id: '38001085718',
+    id: 'user-123',
     name: 'Margus Tamm',
     email: 'margus@test.ee'
   };
@@ -40,7 +40,7 @@ describe('UserProfile', () => {
 
     it('renders user id', () => {
       render(<UserProfile user={mockUser} />);
-      expect(screen.getByText('38001085718')).toBeInTheDocument();
+      expect(screen.getByText('user-123')).toBeInTheDocument();
     });
 
     it('dropdown is closed by default', () => {
@@ -67,7 +67,7 @@ describe('UserProfile', () => {
       await user.click(screen.getByRole('button'));
       
       expect(screen.getByText('margus@test.ee')).toBeInTheDocument();
-      expect(screen.getByText('Isikukood: 38001085718')).toBeInTheDocument();
+      expect(screen.getByText('ID: user-123')).toBeInTheDocument();
     });
 
     it('closes dropdown when backdrop clicked', async () => {
@@ -107,6 +107,11 @@ describe('UserProfile', () => {
     it('handles multiple names', () => {
       render(<UserProfile user={{ ...mockUser, name: 'Margus Erik Tamm' }} />);
       expect(screen.getByText('MET')).toBeInTheDocument();
+    });
+
+    it('handles user without name', () => {
+      render(<UserProfile user={{ id: 'user-456', email: 'test@example.com' }} />);
+      expect(screen.getByText('T')).toBeInTheDocument();
     });
   });
 });

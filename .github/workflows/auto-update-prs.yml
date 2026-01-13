@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   update-prs:
@@ -45,6 +46,16 @@ jobs:
                   pull_number: pr.number
                 });
                 console.log(`PR #${pr.number}: Updated successfully`);
+                
+                // Trigger Build workflow on the updated branch
+                // API-triggered commits don't trigger workflows, so we do it manually
+                await github.rest.actions.createWorkflowDispatch({
+                  owner,
+                  repo,
+                  workflow_id: 'build.yml',
+                  ref: pr.head.ref
+                });
+                console.log(`PR #${pr.number}: Build workflow triggered`);
               } catch (error) {
                 if (error.status === 422) {
                   console.log(`PR #${pr.number}: Already up to date or has conflicts`);

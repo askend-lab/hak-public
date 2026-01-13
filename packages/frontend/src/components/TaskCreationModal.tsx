@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { TaskSummary } from '@/types/task';
 import { DataService } from '@/services/dataService';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/services/auth';
 import BaseModal from './BaseModal';
 
 type Mode = 'create' | 'existing';

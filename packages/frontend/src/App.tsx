@@ -8,7 +8,7 @@ import SpecsPage from './components/SpecsPage';
 import Dashboard from './components/Dashboard';
 import AppModals from './components/AppModals';
 import { RoleSelectionContent } from './components/onboarding';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './services/auth';
 import { useNotification } from './contexts/NotificationContext';
 import { useOnboarding } from './contexts/OnboardingContext';
 import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSentenceMenu } from './hooks';

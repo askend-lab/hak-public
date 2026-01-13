@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { DataService } from '@/services/dataService';
 import { CreateTaskRequest } from '@/types/task';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/services/auth';
 import { useNotification } from '@/contexts/NotificationContext';
 import { SentenceState } from '@/types/synthesis';
 
