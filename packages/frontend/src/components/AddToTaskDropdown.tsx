@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { TaskSummary } from '@/types/task';
 import { DataService } from '@/services/dataService';
 import { useAuth } from '@/contexts/AuthContext';
+import { SearchIcon, AddIcon } from './ui/Icons';
 
 interface AddToTaskDropdownProps { isOpen: boolean; onClose: () => void; onSelectTask: (taskId: string, taskName: string) => void; onCreateNew: () => void; anchorRef?: React.RefObject<HTMLElement>; }
 
@@ -28,9 +29,9 @@ export default function AddToTaskDropdown({ isOpen, onClose, onSelectTask, onCre
     <>
       <div className="add-to-task-backdrop" onClick={onClose} />
       <div className="add-to-task-dropdown" ref={dropdownRef}>
-        <div className="add-to-task-search"><input ref={searchInputRef} type="text" className="add-to-task-search-input" placeholder="Otsi" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /><img className="add-to-task-search-icon" src="/icons/ic_search.svg" alt="Otsi" /></div>
+        <div className="add-to-task-search"><input ref={searchInputRef} type="text" className="add-to-task-search-input" placeholder="Otsi" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /><SearchIcon size="2xl" className="add-to-task-search-icon" /></div>
         <div className="add-to-task-list"><TaskList isLoading={isLoading} filteredTasks={filteredTasks} searchQuery={searchQuery} onSelect={handleSelect} /></div>
-        <div className="add-to-task-create"><button className="add-to-task-create-button" onClick={handleCreate}><span className="add-to-task-create-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span><span className="add-to-task-create-text">Loo uus ülesanne</span></button></div>
+        <div className="add-to-task-create"><button className="add-to-task-create-button" onClick={handleCreate}><span className="add-to-task-create-icon"><AddIcon size="sm" /></span><span className="add-to-task-create-text">Loo uus ülesanne</span></button></div>
       </div>
     </>
   );

@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import 'input';
 
 // =========================================================================
 // Task Modal Component
@@ -39,70 +40,13 @@
 }
 
 .task-modal__input {
-  width: 100%;
-  height: 40px;
-  padding: 0 $spacing-3;
-  border: 1px solid $color-outlined-neutral;
-  border-radius: $border-radius;
-  font-family: $font-body;
-  font-size: 16px;
-  font-weight: $font-weight-regular;
-  line-height: $line-height-none;
-  color: $color-primary;
-  background: $color-white;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
-  }
-
-  &:disabled {
-    background: $color-soft-neutral-bg;
-    color: $color-gray;
-    cursor: not-allowed;
-  }
-
-  &::placeholder {
-    font-family: $font-body;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-medium;
-    line-height: $line-height-normal;
-    letter-spacing: 0.0025em;
-    color: $color-tertiary;
-    opacity: 0.64;
-  }
+  @include input-base;
+  @include input-medium;
 }
 
 .task-modal__textarea {
-  width: 100%;
-  height: 120px;
-  padding: $spacing-3;
-  border: 1px solid $color-outlined-neutral;
-  border-radius: $border-radius;
-  font-family: $font-body;
-  font-size: 16px;
-  font-weight: $font-weight-regular;
-  line-height: $line-height-none;
-  color: $color-primary;
-  background: $color-white;
-  resize: none;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
-  }
-
-  &:disabled {
-    background: $color-soft-neutral-bg;
-    color: $color-gray;
-    cursor: not-allowed;
-  }
+  @include textarea-base;
+  resize: none; // Fixed height for this modal
 
   &::placeholder {
     font-family: $font-body;

@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { WizardStep } from '@/types/onboarding';
+import { CloseIcon, BackIcon, ArrowForwardIcon } from '../ui/Icons';
 
 interface WizardTooltipProps {
   step: WizardStep;
@@ -187,10 +188,7 @@ export default function WizardTooltip({
           onClick={onSkip} 
           aria-label="Sulge juhend"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <CloseIcon size="2xl" />
         </button>
         
         <h3 id="wizard-title" className="wizard__title">
@@ -213,24 +211,14 @@ export default function WizardTooltip({
               disabled={isFirst}
               aria-label="Eelmine samm"
             >
-              <img 
-                src="/icons/arrow_backward.svg" 
-                alt="" 
-                width="24" 
-                height="24"
-              />
+              <BackIcon size="2xl" />
             </button>
             <button 
               className="wizard__nav-button wizard__nav-button--primary"
               onClick={isLast ? onSkip : onNext}
               aria-label={isLast ? "Lõpeta juhend" : "Järgmine samm"}
             >
-              <img 
-                src="/icons/arrow_forward.svg" 
-                alt="" 
-                width="24" 
-                height="24"
-              />
+              <ArrowForwardIcon size="2xl" />
             </button>
           </div>
         </div>

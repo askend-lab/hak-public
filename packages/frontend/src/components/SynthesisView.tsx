@@ -40,6 +40,7 @@ interface SynthesisViewProps {
   sentencePhoneticId: string | null;
   isVariantsPanelOpen: boolean;
   showSentencePhoneticPanel: boolean;
+  loadingVariantsTag: { sentenceId: string; tagIndex: number } | null;
   onAddAllClick: () => void;
   onPlayAllClick: () => void;
   onDropdownClose: () => void;
@@ -118,6 +119,7 @@ const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
       openTagMenu={p.openTagMenu}
       onTagMenuClose={p.onTagMenuClose}
       tagMenuItems={getTagMenuItems(p)}
+      loadingTagIndex={p.loadingVariantsTag?.sentenceId === sentence.id ? p.loadingVariantsTag.tagIndex : null}
       selectedTagIndex={isTagSelected ? p.variantsSelectedTagIndex : null}
       isPronunciationPanelOpen={p.isVariantsPanelOpen || p.showSentencePhoneticPanel}
       editingTag={p.editingTag}

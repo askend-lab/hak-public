@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { transformToUI, transformToVabamorf } from '@/utils/phoneticMarkers';
 import { synthesizeWithPolling } from '@/utils/synthesize';
+import { CloseIcon, BackIcon, PlayIcon, PauseIcon, VolumeIcon } from './ui/Icons';
 
 interface Variant {
   text: string;
@@ -28,7 +29,7 @@ export default function PronunciationVariants({
   customPhoneticForm
 }: PronunciationVariantsProps) {
   const [variants, setVariants] = useState<Variant[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [playingVariant, setPlayingVariant] = useState<string | null>(null);
   const [loadingVariant, setLoadingVariant] = useState<string | null>(null);
@@ -261,16 +262,18 @@ export default function PronunciationVariants({
   return (
     <>
       <div className="pronunciation-variants__panel">
-        <div className="pronunciation-variants__header">
-          <h3 className="pronunciation-variants__title">
-            {word}
-          </h3>
-          <div className="pronunciation-variants__header-actions">
-            <button onClick={onClose} className="pronunciation-variants__close" aria-label="Close">
-              <img src="/icons/Close%20X.svg" alt="Close" />
-            </button>
+        {!showGuide && (
+          <div className="pronunciation-variants__header">
+            <h3 className="pronunciation-variants__title">
+              {word}
+            </h3>
+            <div className="pronunciation-variants__header-actions">
+              <button onClick={onClose} className="pronunciation-variants__close" aria-label="Close">
+                <CloseIcon size="2xl" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="pronunciation-variants__content">
           {showGuide ? (
@@ -278,120 +281,91 @@ export default function PronunciationVariants({
               <div className="pronunciation-variants__guide-view-header">
                 <button
                   onClick={() => setShowGuide(false)}
-                  className="pronunciation-variants__back-button"
+                  className="pronunciation-variants__back-button--icon-only"
                   aria-label="Tagasi variantide juurde"
+                  type="button"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                  </svg>
-                  Tagasi
+                  <BackIcon size="2xl" />
                 </button>
                 <h4>Foneetiliste märkide juhend</h4>
+                <button onClick={onClose} className="pronunciation-variants__close" aria-label="Close" type="button">
+                  <CloseIcon size="2xl" />
+                </button>
               </div>
 
               <div className="pronunciation-variants__guide-view-content">
-                <div className="pronunciation-variants__guide-section-block">
-                  <p>Foneetilised märgid aitavad täpsustada sõna hääldust. Klõpsa märgil, et lisada see kursori asukohta.</p>
-                </div>
+                <p className="pronunciation-variants__guide-intro">
+                  Foneetilised märgid aitavad täpsustada sõna hääldust. Klõpsa märgil, et lisada see kursori asukohta.
+                </p>
 
-                <div className="pronunciation-variants__guide-section-block">
-                  <div className="pronunciation-variants__marker-item">
-                    <div className="pronunciation-variants__marker-symbol">
-                      <code>`</code>
-                      <span className="pronunciation-variants__marker-name">kolmas välde</span>
-                    </div>
-                    <div className="pronunciation-variants__marker-rule">
-                      <strong>Reegel:</strong> Paikneb kolmandavältelise silbi esimese vokaali ees ainult täishääliku ees.
-                    </div>
-                    <div className="pronunciation-variants__marker-examples">
-                      <strong>Näited:</strong>
-                      <ul>
-                        <li><code>k`ätte</code></li>
-                        <li><code>par`ool</code></li>
-                      </ul>
-                    </div>
+                <div className="pronunciation-variants__marker-item">
+                  <div className="pronunciation-variants__marker-symbol">
+                    <code>`</code>
+                    <span className="pronunciation-variants__marker-name">kolmas välde</span>
                   </div>
-
-                  <div className="pronunciation-variants__marker-item">
-                    <div className="pronunciation-variants__marker-symbol">
-                      <code>´</code>
-                      <span className="pronunciation-variants__marker-name">ebareeglipärase rõhu märk</span>
-                    </div>
-                    <div className="pronunciation-variants__marker-rule">
-                      <strong>Reegel:</strong> Kasutatakse ainult kui rõhk ei ole reeglipärane ehk esimesel silbil. Paikneb pearõhulise silbi esimese vokaali ees.
-                    </div>
-                    <div className="pronunciation-variants__marker-examples">
-                      <strong>Näited:</strong>
-                      <ul>
-                        <li><code>selj´anka</code></li>
-                        <li><code>dial´ektika</code></li>
-                      </ul>
-                    </div>
+                  <div className="pronunciation-variants__marker-rule">
+                    Paikneb kolmandavältelise silbi esimese vokaali ees ainult täishääliku ees.
                   </div>
-
-                  <div className="pronunciation-variants__marker-item">
-                    <div className="pronunciation-variants__marker-symbol">
-                      <code>'</code>
-                      <span className="pronunciation-variants__marker-name">palatalisatsioon</span>
-                    </div>
-                    <div className="pronunciation-variants__marker-rule">
-                      <strong>Reegel:</strong> Võib paikneda konsonantide d, l, n, s ja t järel. Kahetähelise pika hääliku puhul on see märk vaid esimese tähe järel.
-                    </div>
-                    <div className="pronunciation-variants__marker-examples">
-                      <strong>Näited:</strong>
-                      <ul>
-                        <li><code>pad'ja</code></li>
-                        <li><code>p`an't</code></li>
-                        <li><code>k`as't</code></li>
-                        <li><code>s`al'l</code></li>
-                        <li><code>kas'si</code></li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="pronunciation-variants__marker-item">
-                    <div className="pronunciation-variants__marker-symbol">
-                      <code>+</code>
-                      <span className="pronunciation-variants__marker-name">liitsõnapiir</span>
-                    </div>
-                    <div className="pronunciation-variants__marker-rule">
-                      <strong>Reegel:</strong> Märgib liitsõna osade vahelist piiri.
-                    </div>
-                    <div className="pronunciation-variants__marker-examples">
-                      <strong>Näited:</strong>
-                      <ul>
-                        <li><code>maja+uks</code></li>
-                        <li><code>auto+juhт</code></li>
-                      </ul>
-                    </div>
+                  <div className="pronunciation-variants__marker-examples">
+                    <span className="pronunciation-variants__item-tag">k`ätte</span>
+                    <span className="pronunciation-variants__item-tag">par`ool</span>
                   </div>
                 </div>
 
-                <div className="pronunciation-variants__guide-section-block pronunciation-variants__guide-section-block--tips">
-                  <h5>Kasulikud näpunäited:</h5>
-                  <ul>
-                    <li>Märke saad sisestada nuppudega sisestusvälja all</li>
-                    <li>Kuula oma varianti enne kasutamist, et kontrollida hääldust</li>
-                    <li>Kui oled rahul, vajuta "Kasuta" et rakendada variant lausesse</li>
-                  </ul>
+                <div className="pronunciation-variants__marker-item">
+                  <div className="pronunciation-variants__marker-symbol">
+                    <code>´</code>
+                    <span className="pronunciation-variants__marker-name">ebareeglipärase rõhu märk</span>
+                  </div>
+                  <div className="pronunciation-variants__marker-rule">
+                    Kasutatakse ainult kui rõhk ei ole reeglipärane ehk esimesel silbil. Paikneb pearõhulise silbi esimese vokaali ees.
+                  </div>
+                  <div className="pronunciation-variants__marker-examples">
+                    <span className="pronunciation-variants__item-tag">selj´anka</span>
+                    <span className="pronunciation-variants__item-tag">dial´ektika</span>
+                  </div>
+                </div>
+
+                <div className="pronunciation-variants__marker-item">
+                  <div className="pronunciation-variants__marker-symbol">
+                    <code>'</code>
+                    <span className="pronunciation-variants__marker-name">palatalisatsioon</span>
+                  </div>
+                  <div className="pronunciation-variants__marker-rule">
+                    Võib paikneda konsonantide d, l, n, s ja t järel. Kahetähelise pika hääliku puhul on see märk vaid esimese tähe järel.
+                  </div>
+                  <div className="pronunciation-variants__marker-examples">
+                    <span className="pronunciation-variants__item-tag">pad'ja</span>
+                    <span className="pronunciation-variants__item-tag">p`an't</span>
+                    <span className="pronunciation-variants__item-tag">k`as't</span>
+                    <span className="pronunciation-variants__item-tag">s`al'l</span>
+                  </div>
+                </div>
+
+                <div className="pronunciation-variants__marker-item">
+                  <div className="pronunciation-variants__marker-symbol">
+                    <code>+</code>
+                    <span className="pronunciation-variants__marker-name">liitsõnapiir</span>
+                  </div>
+                  <div className="pronunciation-variants__marker-rule">
+                    Märgib liitsõna osade vahelist piiri.
+                  </div>
+                  <div className="pronunciation-variants__marker-examples">
+                    <span className="pronunciation-variants__item-tag">maja+uks</span>
+                    <span className="pronunciation-variants__item-tag">auto+juht</span>
+                  </div>
                 </div>
               </div>
             </div>
           ) : (
             <>
-              {isLoading && (
-                <div className="pronunciation-variants__loading">
-                  <p>Laen variante...</p>
-                </div>
-              )}
-
               {error && (
                 <div className="pronunciation-variants__error">
                   <p>Viga: {error}</p>
                 </div>
               )}
 
-              {!isLoading && !error && variants.length > 0 && (
+              {!error && variants.length > 0 && (
             <div className="pronunciation-variants__list">
               {/* Existing variants */}
               {variants.map((variant, index) => {
@@ -422,14 +396,9 @@ export default function PronunciationVariants({
                       {loadingVariant === variant.text ? (
                         <div className="loader-spinner"></div>
                       ) : playingVariant === variant.text ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                          <rect x="6" y="4" width="4" height="16"/>
-                          <rect x="14" y="4" width="4" height="16"/>
-                        </svg>
+                        <PauseIcon size="2xl" />
                       ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                          <polygon points="5,3 19,12 5,21"/>
-                        </svg>
+                        <PlayIcon size="2xl" />
                       )}
                     </button>
                     <button
@@ -442,11 +411,7 @@ export default function PronunciationVariants({
                   </div>
                   {generatePronunciationExplanation(transformToUI(variant.text ?? '') ?? '') && (
                     <div className="pronunciation-variants__item-explanation">
-                      <svg className="pronunciation-variants__explanation-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 6L8 10H4V14H8L12 18V6Z"/>
-                        <path d="M16 9C16.5 9.5 17 10.5 17 12C17 13.5 16.5 14.5 16 15"/>
-                        <path d="M19 6C20.5 7.5 21.5 9.5 21.5 12C21.5 14.5 20.5 16.5 19 18"/>
-                      </svg>
+                      <VolumeIcon size="md" className="pronunciation-variants__explanation-icon" />
                       <span>{generatePronunciationExplanation(transformToUI(variant.text ?? '') ?? '')}</span>
                     </div>
                   )}
@@ -493,7 +458,7 @@ export default function PronunciationVariants({
                               className="pronunciation-variants__input-clear"
                               aria-label="Clear input"
                             >
-                              <img src="/icons/Close_SM.svg" alt="Clear" />
+                              <CloseIcon size="sm" />
                             </button>
                           )}
                         </div>
@@ -508,14 +473,9 @@ export default function PronunciationVariants({
                             {isCustomLoading ? (
                               <div className="loader-spinner"></div>
                             ) : isCustomPlaying ? (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <rect x="6" y="4" width="4" height="16"/>
-                                <rect x="14" y="4" width="4" height="16"/>
-                              </svg>
+                              <PauseIcon size="2xl" />
                             ) : (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="5,3 19,12 5,21"/>
-                              </svg>
+                              <PlayIcon size="2xl" />
                             )}
                           </button>
                           <button

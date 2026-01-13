@@ -3,7 +3,7 @@
 // Group: auth
 
 export const FEATURES_AUTH: Record<string, string> = {
-  'US-025-login-eid': `@auth @US-025
+  'US-025-login-eid': `@auth @US-025 @ready
 Feature: Login with eID (US-025)
   As a registered user
   I want to log in using Estonian eID via Cognito
@@ -49,7 +49,7 @@ Feature: View user profile (US-026)
     Then I see my recent tasks
 `,
 
-  'US-027-logout': `@auth @US-027
+  'US-027-logout': `@auth @US-027 @ready
 Feature: Logout from system (US-027)
   As an authenticated user
   I want to log out of the application

@@ -1,4 +1,5 @@
 import UserProfile from './UserProfile';
+import { HelpIcon, MenuIcon } from './ui/Icons';
 interface User {
   id: string;
   email: string;
@@ -30,10 +31,10 @@ export default function AppHeader({ currentView, isAuthenticated, user, onSynthe
         </nav>
         <div className="header-functions">
           <button className="header-help-button" onClick={onHelpClick} aria-label="Abi ja juhend" title="Näita juhendeid">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+            <HelpIcon size="2xl" />
           </button>
           {isAuthenticated && user ? <UserProfile user={user} /> : <button className="header-login-button" onClick={onLoginClick}>Logi sisse</button>}
-          <button className="header-menu-button" aria-label="Menu"><img src="/icons/Group.svg" alt="Menu" /></button>
+          <button className="header-menu-button" aria-label="Menu"><MenuIcon size="2xl" /></button>
         </div>
       </div>
     </header>

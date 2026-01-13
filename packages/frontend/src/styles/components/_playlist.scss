@@ -14,8 +14,8 @@
   background: $color-white;
   border-radius: $border-radius-lg;
   padding: 0;
-  box-shadow: 0 2px 8px rgba(23, 49, 72, 0.08);
-  border: 1px solid rgba(23, 49, 72, 0.1);
+  box-shadow: 0 2px 8px $color-shadow-primary-xs;
+  border: 1px solid $color-outlined-neutral;
   overflow: hidden;
 }
 

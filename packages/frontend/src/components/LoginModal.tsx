@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { validateIsikukood } from '@/utils/isikukood';
 import BaseModal from './BaseModal';
+import { ErrorIcon } from './ui/Icons';
 
 interface LoginModalProps { isOpen: boolean; onClose: () => void; message?: string; }
 type AuthMethod = 'smartid' | 'mobileid' | 'idcard';
@@ -18,7 +19,7 @@ const AuthTabs = ({ authMethod, isLoading, onChange }: { authMethod: AuthMethod;
   </div>
 );
 
-const ErrorDisplay = ({ error }: { error: string }) => <div className="login-modal__error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>{error}</p></div>;
+const ErrorDisplay = ({ error }: { error: string }) => <div className="login-modal__error"><ErrorIcon size="md" /><p>{error}</p></div>;
 
 const LoadingDisplay = ({ authMethod }: { authMethod: AuthMethod }) => <div className="login-modal__loading"><div className="login-modal__loading-spinner"></div><p className="login-modal__loading-text">{loadingTexts[authMethod]}</p><p className="login-modal__loading-subtext">Palun kinnita sisselogimine oma seadmes</p></div>;
 

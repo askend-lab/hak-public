@@ -51,12 +51,6 @@
     opacity: $opacity-menu-disabled;
     cursor: not-allowed;
   }
-  
-  svg {
-    width: 24px;
-    height: 24px;
-    flex-shrink: 0;
-  }
 }
 
 // Drag handle mixin (reusable drag-and-drop handle)
@@ -95,6 +89,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px; // Space between icon and text
   padding: 8px 24px;
   height: 36px;
   cursor: pointer;
@@ -157,12 +152,12 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(23, 49, 72, 0.15);
+    box-shadow: 0 2px 8px $color-shadow-primary-sm;
 
     &:hover:not(:disabled) {
       background: $color-soft-primary;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(23, 49, 72, 0.2);
+      box-shadow: 0 4px 12px $color-shadow-primary-md;
     }
 
     &.playing-all {
@@ -243,7 +238,7 @@
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0 12px;
+    // Gap inherited from base .button class (8px)
   }
 
   &--icon-only {

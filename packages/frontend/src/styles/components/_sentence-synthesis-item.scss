@@ -43,7 +43,7 @@
   &--drag-over {
     border-color: $color-primary;
     border-width: 2px;
-    box-shadow: 0 4px 12px rgba(23, 49, 72, 0.15);
+    box-shadow: 0 4px 12px $color-shadow-primary-sm;
   }
 }
 
@@ -150,6 +150,26 @@
 
     svg {
       display: block;
+    }
+  }
+
+  // Spinner for loading variants
+  &-spinner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+
+    &::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border: 2px solid $color-outlined-neutral;
+      border-top-color: $color-primary;
+      border-radius: 50%;
+      animation: tagSpinner 0.8s linear infinite;
     }
   }
 
@@ -430,5 +450,15 @@
     &__menu-container {
       order: 4;
     }
+  }
+}
+
+// =========================================================================
+// Keyframe Animations
+// =========================================================================
+
+@keyframes tagSpinner {
+  to {
+    transform: rotate(360deg);
   }
 }

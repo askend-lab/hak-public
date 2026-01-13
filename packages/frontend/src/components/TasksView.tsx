@@ -1,5 +1,6 @@
 import TaskManager from './TaskManager';
 import TaskDetailView from './TaskDetailView';
+import { AddIcon } from './ui/Icons';
 interface Task {
   id: string;
   name: string;
@@ -32,7 +33,10 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
       <div className="page-header page-header--with-actions">
         <h1 className="page-header__title">Ülesanded</h1>
         <div className="page-header__actions">
-          <button onClick={onCreateTask} className="button button--primary">Lisa</button>
+          <button onClick={onCreateTask} className="button button--primary">
+            <AddIcon size="2xl" />
+            Loo uus ülesanne
+          </button>
         </div>
       </div>
       <div className="page-content">

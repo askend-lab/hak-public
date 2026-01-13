@@ -17,6 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import PlaylistItem from './PlaylistItem';
+import { TaskIcon, MusicNoteIcon, StopIcon, PlayIcon, PlusCircleIcon } from './ui/Icons';
 
 interface PlaylistEntry {
   id: string;
@@ -80,13 +81,7 @@ export default function Playlist({
               className="playlist-task-button"
               title="Lisa ülesandesse"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14,2 14,8 20,8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10,9 9,9 8,9"/>
-              </svg>
+              <TaskIcon size="md" />
               <span>Lisa ülesandesse ({entries.length})</span>
             </button>
           )}
@@ -96,11 +91,7 @@ export default function Playlist({
       {entries.length === 0 ? (
         <div className="playlist-empty-state">
           <div className="playlist-empty-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9 18V5l12-2v13"/>
-              <circle cx="6" cy="18" r="3"/>
-              <circle cx="18" cy="16" r="3"/>
-            </svg>
+            <MusicNoteIcon size="2xl" />
           </div>
           <h4 className="playlist-empty-title">Kõnevoor on tühi</h4>
           <p className="playlist-empty-description">
@@ -116,16 +107,12 @@ export default function Playlist({
             >
               {isPlayingAll ? (
                 <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="4" width="12" height="16"/>
-                  </svg>
+                  <StopIcon size="md" />
                   <span>Peata</span>
                 </>
               ) : (
                 <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5,3 19,12 5,21"/>
-                  </svg>
+                  <PlayIcon size="md" />
                   <span>Kuula kõik</span>
                 </>
               )}
@@ -169,11 +156,7 @@ export default function Playlist({
             onClick={onAddEntry}
             className="playlist-add-button"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="16"/>
-              <line x1="8" y1="12" x2="16" y2="12"/>
-            </svg>
+            <PlusCircleIcon size="md" />
             <span>Lisa kõnevoor</span>
           </button>
         </div>

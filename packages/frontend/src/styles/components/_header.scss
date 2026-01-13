@@ -123,13 +123,7 @@
   border-radius: 50%;
 
   &:hover {
-    opacity: 0.7;
-    background-color: rgba(0, 0, 0, 0.04);
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
+    background-color: $color-menu-hover;
   }
 }
 

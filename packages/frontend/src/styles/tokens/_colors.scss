@@ -119,6 +119,11 @@
   --color-spinner-secondary: #4A90E2; // Secondary spinner color
   --color-shadow-light: rgba(0, 0, 0, 0.12); // Light shadow
   --color-shadow-medium: rgba(0, 51, 57, 0.25); // Medium shadow
+  --color-shadow-primary-xs: rgba(23, 49, 72, 0.08); // Primary shadow extra small
+  --color-shadow-primary-sm: rgba(23, 49, 72, 0.15); // Primary shadow small
+  --color-shadow-primary-md: rgba(23, 49, 72, 0.2); // Primary shadow medium
+  --color-shadow-primary-lg: rgba(23, 49, 72, 0.25); // Primary shadow large
+  --color-shadow-focus: rgba(23, 49, 72, 0.1); // Focus ring shadow
   
   // Additional hover states
   --color-primary-hover: #1a3a52; // Primary color hover (slightly lighter)
@@ -238,6 +243,11 @@ $color-spinner-primary: var(--color-spinner-primary);
 $color-spinner-secondary: var(--color-spinner-secondary);
 $color-shadow-light: var(--color-shadow-light);
 $color-shadow-medium: var(--color-shadow-medium);
+$color-shadow-primary-xs: var(--color-shadow-primary-xs);
+$color-shadow-primary-sm: var(--color-shadow-primary-sm);
+$color-shadow-primary-md: var(--color-shadow-primary-md);
+$color-shadow-primary-lg: var(--color-shadow-primary-lg);
+$color-shadow-focus: var(--color-shadow-focus);
 
 // Additional hover states
 $color-primary-hover: var(--color-primary-hover);

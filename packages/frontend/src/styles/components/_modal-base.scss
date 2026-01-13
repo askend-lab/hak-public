@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import 'panel';
 
 // =========================================================================
 // Base Modal Component
@@ -74,38 +75,12 @@
 }
 
 .base-modal__close {
-  width: 19px;
-  height: 19px;
-  border: none;
-  background: transparent;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.7;
-  }
+  @include panel-close;
+  color: $color-primary;
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-
-  img {
-    width: 19px;
-    height: 19px;
-    display: block;
-  }
-
-  svg {
-    width: 19px;
-    height: 19px;
-    stroke: $color-primary;
-    stroke-width: 2;
   }
 }
 
