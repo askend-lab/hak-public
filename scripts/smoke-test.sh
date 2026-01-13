@@ -110,7 +110,7 @@ echo ""
 echo "=== Merlin API ==="
 MERLIN_URL="https://merlin-${ENV}.askend-lab.com"
 if [ "$ENV" == "prod" ]; then
-  MERLIN_URL="https://merlin.askend-lab.com"
+  MERLIN_URL="https://merlin-prod.askend-lab.com"
 fi
 test_endpoint_content "Merlin /synthesize" "$MERLIN_URL/synthesize" "POST" '{"text":"Tere","voice":"mari"}' "audioUrl"
 

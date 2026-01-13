@@ -39,7 +39,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   # Vabamorf API origin
   origin {
-    domain_name = "vabamorf-${var.env}.askend-lab.com"
+    domain_name = var.env == "prod" ? "vabamorf.askend-lab.com" : "vabamorf-${var.env}.askend-lab.com"
     origin_id   = "vabamorf-api"
     custom_origin_config {
       http_port              = 80
