@@ -168,7 +168,7 @@ jobs:
         working-directory: packages/simplestore
         run: |
           mkdir -p dist && cp -r ../../artifacts/simplestore/* dist/ 2>/dev/null || true
-          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1 --force
           echo "✅ SimpleStore deployed"
       
       - name: Deploy Audio API
@@ -176,7 +176,7 @@ jobs:
         working-directory: packages/audio-api
         run: |
           mkdir -p dist && cp -r ../../artifacts/audio-api/* dist/ 2>/dev/null || true
-          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1 --force
           echo "✅ Audio API deployed"
       
       - name: Deploy Merlin API
@@ -185,7 +185,7 @@ jobs:
         run: |
           mkdir -p dist && cp -r ../../artifacts/merlin-api/* dist/ 2>/dev/null || true
           serverless create_domain --stage ${{ inputs.environment }} || true
-          serverless deploy --stage ${{ inputs.environment }}
+          serverless deploy --stage ${{ inputs.environment }} --force
           echo "✅ Merlin API deployed"
       
       - name: Login to ECR

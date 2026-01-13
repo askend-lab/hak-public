@@ -124,15 +124,12 @@ test_endpoint_content "Merlin /synthesize" "$MERLIN_URL/synthesize" "POST" '{"te
 echo ""
 echo "=== Audio API ==="
 # Audio API uses API Gateway directly
-# TODO: Audio API returns 502 - needs investigation (serverless-esbuild issue)
 if [ "$ENV" == "prod" ]; then
   AUDIO_URL="https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/prod"
 else
   AUDIO_URL="https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com/dev"
 fi
-# Temporarily accept any response (502 is known issue)
-echo -e "${YELLOW}⚠${NC} Audio API /health - skipped (known 502 issue, needs investigation)"
-((WARNINGS++))
+test_endpoint_content "Audio API /health" "$AUDIO_URL/health" "GET" "" "healthy"
 
 echo ""
 echo "=============================================="
