@@ -98,8 +98,35 @@ echo "=== Vabamorf API ==="
 test_endpoint_content "Vabamorf /analyze" "$VABAMORF_URL/analyze" "POST" '{"text":"Tere"}' "stressedText"
 
 echo ""
-echo "=== Merlin API ==="
-test_endpoint_content "Merlin /synthesize" "$MERLIN_URL/synthesize" "POST" '{"text":"Tere","voice":"efm_l"}' "audioUrl"
+echo "=== Merlin API (real generation) ==="
+SYNTH_RESP=$(curl -s -m 10 -X POST -H "Content-Type: application/json" -d '{"text":"Test","voice":"efm_l"}' "$MERLIN_URL/synthesize")
+if echo "$SYNTH_RESP" | grep -q '"status":"ready"'; then
+  AUDIO_URL=$(echo "$SYNTH_RESP" | grep -o '"audioUrl":"[^"]*"' | cut -d'"' -f4)
+  if [ -n "$AUDIO_URL" ] && curl -s -I "$AUDIO_URL" 2>/dev/null | grep -qi "audio/\|wav"; then
+    echo -e "${GREEN}✓${NC} Merlin audio generated"; ((PASSED++))
+  else
+    echo -e "${RED}✗${NC} Merlin audio URL invalid"; ((FAILED++))
+  fi
+elif echo "$SYNTH_RESP" | grep -q '"status":"pending"'; then
+  STATUS_URL=$(echo "$SYNTH_RESP" | grep -o '"audioUrl":"[^"]*"' | cut -d'"' -f4)
+  AUDIO_OK=false
+  for i in 1 2 3 4 5 6; do
+    sleep 5
+    STAT=$(curl -s "$STATUS_URL" 2>/dev/null)
+    if echo "$STAT" | grep -q '"status":"ready"\|"status":"completed"'; then
+      AUDIO_OK=true; break
+    elif echo "$STAT" | grep -q '"status":"error"'; then
+      break
+    fi
+  done
+  if $AUDIO_OK; then
+    echo -e "${GREEN}✓${NC} Merlin audio generated"; ((PASSED++))
+  else
+    echo -e "${RED}✗${NC} Merlin audio generation failed"; ((FAILED++))
+  fi
+else
+  echo -e "${RED}✗${NC} Merlin API error: $SYNTH_RESP"; ((FAILED++))
+fi
 
 echo ""
 echo "=== Audio API ==="
