@@ -316,17 +316,14 @@ resource "aws_ecs_task_definition" "merlin_worker" {
 }
 
 # =============================================================================
-# ECS Service (Phase 1: always running, 1 task)
+# ECS Service with Auto-Scaling (scale-to-zero when idle)
 # =============================================================================
-
-# Note: For Phase 1, we use desired_count = 1 (always running)
-# Phase 2 will add auto-scaling with scale-to-zero capability
 
 resource "aws_ecs_service" "merlin_worker" {
   name            = "merlin-worker"
   cluster         = aws_ecs_cluster.merlin.id
   task_definition = aws_ecs_task_definition.merlin_worker.arn
-  desired_count   = 1
+  desired_count   = 0  # Start scaled down, auto-scaling manages this
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -336,6 +333,100 @@ resource "aws_ecs_service" "merlin_worker" {
   }
   
   tags = local.tags
+
+  lifecycle {
+    ignore_changes = [desired_count]  # Let auto-scaling manage this
+  }
+}
+
+# =============================================================================
+# Auto-Scaling (scale to 0 when idle, scale up on SQS messages)
+# =============================================================================
+
+resource "aws_appautoscaling_target" "merlin_worker" {
+  max_capacity       = 1
+  min_capacity       = 0
+  resource_id        = "service/${aws_ecs_cluster.merlin.name}/${aws_ecs_service.merlin_worker.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "merlin_scale_up" {
+  name               = "${local.name_prefix}-scale-up"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ExactCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_lower_bound = 0
+      scaling_adjustment          = 1
+    }
+  }
+}
+
+resource "aws_appautoscaling_policy" "merlin_scale_down" {
+  name               = "${local.name_prefix}-scale-down"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ExactCapacity"
+    cooldown                = 300  # 5 minutes before scaling down
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_upper_bound = 0
+      scaling_adjustment          = 0
+    }
+  }
+}
+
+# CloudWatch alarm - scale up when messages in queue
+resource "aws_cloudwatch_metric_alarm" "merlin_queue_high" {
+  alarm_name          = "${local.name_prefix}-queue-high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  period              = 60
+  statistic           = "Maximum"
+  threshold           = 1
+  alarm_description   = "Scale up Merlin worker when messages in queue"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.merlin.name
+  }
+
+  alarm_actions = [aws_appautoscaling_policy.merlin_scale_up.arn]
+  tags          = local.tags
+}
+
+# CloudWatch alarm - scale down when queue empty for 5 min
+resource "aws_cloudwatch_metric_alarm" "merlin_queue_low" {
+  alarm_name          = "${local.name_prefix}-queue-low"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 5
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  period              = 60
+  statistic           = "Maximum"
+  threshold           = 1
+  alarm_description   = "Scale down Merlin worker when queue empty for 5 min"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.merlin.name
+  }
+
+  alarm_actions = [aws_appautoscaling_policy.merlin_scale_down.arn]
+  tags          = local.tags
 }
 
 # =============================================================================
