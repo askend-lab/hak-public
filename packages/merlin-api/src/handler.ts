@@ -1,9 +1,11 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { S3Client, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { ECSClient, UpdateServiceCommand, DescribeServicesCommand } from '@aws-sdk/client-ecs';
 import { createHash } from 'crypto';
 
 const sqsClient = new SQSClient({ region: process.env.AWS_REGION_NAME });
 const s3Client = new S3Client({ region: process.env.AWS_REGION_NAME });
+const ecsClient = new ECSClient({ region: process.env.AWS_REGION_NAME });
 
 const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL ?? '';
 const S3_BUCKET = process.env.S3_BUCKET ?? '';
@@ -144,4 +146,56 @@ export async function health(): Promise<LambdaResponse> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'ok', version: '1.0.0' })
   };
+}
+
+export async function warmup(): Promise<LambdaResponse> {
+  const cluster = process.env.ECS_CLUSTER ?? '';
+  const service = process.env.ECS_SERVICE ?? '';
+
+  if (!cluster || !service) {
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Missing ECS config' })
+    };
+  }
+
+  try {
+    // Check current state
+    const describe = await ecsClient.send(new DescribeServicesCommand({
+      cluster,
+      services: [service]
+    }));
+
+    const currentDesired = describe.services?.[0]?.desiredCount ?? 0;
+    const running = describe.services?.[0]?.runningCount ?? 0;
+
+    if (currentDesired >= 1) {
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'already_warm', running, desired: currentDesired })
+      };
+    }
+
+    // Scale up to 1
+    await ecsClient.send(new UpdateServiceCommand({
+      cluster,
+      service,
+      desiredCount: 1
+    }));
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'warming', running: 0, desired: 1 })
+    };
+  } catch (error) {
+    console.error('Warmup error:', error);
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Failed to warmup' })
+    };
+  }
 }

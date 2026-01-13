@@ -38,6 +38,11 @@ provider:
             - s3:GetObject
             - s3:HeadObject
           Resource: arn:aws:s3:::hak-merlin-${self:provider.stage}-audio/*
+        - Effect: Allow
+          Action:
+            - ecs:UpdateService
+            - ecs:DescribeServices
+          Resource: arn:aws:ecs:eu-west-1:465168436856:service/hak-merlin-${self:provider.stage}/merlin-worker
 
 functions:
   synthesize:
@@ -63,6 +68,17 @@ functions:
       - httpApi:
           path: /health
           method: GET
+  
+  warmup:
+    handler: dist/handler.warmup
+    timeout: 10
+    environment:
+      ECS_CLUSTER: hak-merlin-${self:provider.stage}
+      ECS_SERVICE: merlin-worker
+    events:
+      - httpApi:
+          path: /warmup
+          method: POST
 
 plugins:
   - serverless-domain-manager

@@ -389,7 +389,7 @@ resource "aws_appautoscaling_policy" "merlin_scale_down" {
   }
 }
 
-# CloudWatch alarm - scale up when messages in queue
+# CloudWatch alarm - scale up when messages in queue (fallback for warmup)
 resource "aws_cloudwatch_metric_alarm" "merlin_queue_high" {
   alarm_name          = "${local.name_prefix}-queue-high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -399,7 +399,7 @@ resource "aws_cloudwatch_metric_alarm" "merlin_queue_high" {
   period              = 60
   statistic           = "Maximum"
   threshold           = 1
-  alarm_description   = "Scale up Merlin worker when messages in queue"
+  alarm_description   = "Scale up Merlin worker when messages in queue (fallback)"
 
   dimensions = {
     QueueName = aws_sqs_queue.merlin.name
@@ -409,17 +409,17 @@ resource "aws_cloudwatch_metric_alarm" "merlin_queue_high" {
   tags          = local.tags
 }
 
-# CloudWatch alarm - scale down when queue empty for 5 min
+# CloudWatch alarm - scale down when queue empty for 15 min
 resource "aws_cloudwatch_metric_alarm" "merlin_queue_low" {
   alarm_name          = "${local.name_prefix}-queue-low"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 5
+  evaluation_periods  = 15
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
   period              = 60
   statistic           = "Maximum"
   threshold           = 1
-  alarm_description   = "Scale down Merlin worker when queue empty for 5 min"
+  alarm_description   = "Scale down Merlin worker when queue empty for 15 min"
 
   dimensions = {
     QueueName = aws_sqs_queue.merlin.name
