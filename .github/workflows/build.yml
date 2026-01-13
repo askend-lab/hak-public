@@ -162,35 +162,32 @@ jobs:
           LAST_S3="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$LAST_BUILD"
           
           # Helper to get module SHA from last manifest
-          get_last_sha() { jq -r ".modules.\"$1\" // \"unknown\"" /tmp/last-manifest.json; }
+          get_last_sha() { jq -r ".modules.\"$1\" // \"unknown\"" /tmp/last-manifest.json 2>/dev/null || echo "unknown"; }
           
-          # Module config: name|local_path|changed_var
-          MODULES="frontend|packages/frontend/dist|FRONTEND_CHANGED
-          simplestore|packages/simplestore/dist|SIMPLESTORE_CHANGED
-          audio-api|packages/audio-api/dist|AUDIO_API_CHANGED
-          merlin-api|packages/merlin-api/dist|MERLIN_API_CHANGED
-          vabamorf-api|packages/vabamorf-api/dist|VABAMORF_API_CHANGED"
-          
-          # Initialize manifest modules
-          declare -A MODULE_SHAS
-          
-          echo "$MODULES" | while IFS='|' read -r name path changed_var; do
-            CHANGED=$(eval echo \$$changed_var)
-            if [ "$CHANGED" == "true" ]; then
+          # Upload each module explicitly (no subshell issues)
+          upload_module() {
+            local name="$1"
+            local path="$2"
+            local changed="$3"
+            
+            if [ "$changed" == "true" ]; then
+              echo "$name: uploading from $path"
               aws s3 sync "$path/" "${S3_PATH}/$name/" --sse AES256
-              MODULE_SHAS[$name]="${{ github.sha }}"
-              echo "$name: built (SHA: ${{ github.sha }})"
             elif [ -n "$LAST_BUILD" ]; then
+              echo "$name: copying from $LAST_BUILD"
               aws s3 sync "${LAST_S3}/$name/" "${S3_PATH}/$name/" --sse AES256
-              MODULE_SHAS[$name]=$(get_last_sha "$name")
-              echo "$name: copied from $LAST_BUILD (SHA: ${MODULE_SHAS[$name]})"
             else
-              MODULE_SHAS[$name]="unknown"
-              echo "$name: no previous build, marking unknown"
+              echo "$name: skipping (no previous build)"
             fi
-          done
+          }
           
-          # Build manifest using jq for proper JSON
+          upload_module "frontend" "packages/frontend/dist" "$FRONTEND_CHANGED"
+          upload_module "simplestore" "packages/simplestore/dist" "$SIMPLESTORE_CHANGED"
+          upload_module "audio-api" "packages/audio-api/dist" "$AUDIO_API_CHANGED"
+          upload_module "merlin-api" "packages/merlin-api/dist" "$MERLIN_API_CHANGED"
+          upload_module "vabamorf-api" "packages/vabamorf-api/dist/src" "$VABAMORF_API_CHANGED"
+          
+          # Build manifest using jq
           jq -n \
             --arg id "$BUILD_ID" \
             --arg sha "${{ github.sha }}" \
