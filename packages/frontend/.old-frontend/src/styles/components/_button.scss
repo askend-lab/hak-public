@@ -1,9 +1,0 @@
-// Layer 1: Import base button styles from EKI Storybook vendor
-@import '../../../../vendor/eki-storybook/src/stories/assets/scss/components/button';
-
-// Layer 3: Only truly necessary overrides
-.button {
-  &[disabled] { cursor: not-allowed; }
-  &--outline { @extend .button--secondary; border-color: $color-outlined-neutral; }
-  &--small { white-space: nowrap; }
-}
