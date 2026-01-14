@@ -4,9 +4,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import * as Sentry from '@sentry/react'
 
 Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_DSN,
+  dsn: 'https://74c44413767ff0bf2853d9f0e4f4b9d4@o4510500722376704.ingest.de.sentry.io/4510709250261072',
   environment: import.meta.env.MODE,
-  enabled: import.meta.env.PROD,
+  enabled: true,
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
