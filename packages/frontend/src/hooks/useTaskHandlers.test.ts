@@ -364,3 +364,35 @@ describe('useTaskHandlers', () => {
     expect(result.current.showAddToTaskDropdown).toBe(true);
   });
 });
+
+describe('useTaskHandlers edge cases', () => {
+  const sentences: SentenceState[] = [
+    { id: '1', text: 'Hello', tags: ['Hello'], isPlaying: false, isLoading: false, currentInput: '', phoneticText: 'Hello' },
+  ];
+  const setView = vi.fn();
+  const setTaskId = vi.fn();
+
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('does not add sentence when not found', async () => {
+    const { result } = renderHook(() => useTaskHandlers(sentences, setView, setTaskId));
+    await act(async () => { await result.current.handleAddSentenceToExistingTask('nonexistent', 'task-1', 'Task 1'); });
+    expect(mockAddTextEntriesToTask).not.toHaveBeenCalled();
+  });
+
+  it('does not add sentence with empty text', async () => {
+    const empty: SentenceState[] = [{ id: '1', text: '   ', tags: [], isPlaying: false, isLoading: false, currentInput: '' }];
+    const { result } = renderHook(() => useTaskHandlers(empty, setView, setTaskId));
+    await act(async () => { await result.current.handleAddSentenceToExistingTask('1', 'task-1', 'Task 1'); });
+    expect(mockAddTextEntriesToTask).not.toHaveBeenCalled();
+  });
+
+  it('handles error when adding single sentence', async () => {
+    mockAddTextEntriesToTask.mockRejectedValueOnce(new Error('Failed'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { result } = renderHook(() => useTaskHandlers(sentences, setView, setTaskId));
+    await act(async () => { await result.current.handleAddSentenceToExistingTask('1', 'task-1', 'Task 1'); });
+    expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));
+  });
+
+});

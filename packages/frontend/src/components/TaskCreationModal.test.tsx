@@ -136,3 +136,42 @@ describe('TaskCreationModal', () => {
   });
 
 });
+
+describe('TaskCreationModal with playlist', () => {
+  const props = {
+    isOpen: true, onClose: vi.fn(), onCreateTask: vi.fn().mockResolvedValue(undefined),
+    onAddToExistingTask: vi.fn().mockResolvedValue(undefined),
+    playlistEntries: [
+      { id: '1', text: 'Hello', stressedText: 'Hello' },
+      { id: '2', text: 'World', stressedText: 'World' },
+    ],
+  };
+
+  it('shows mode selector with playlist', () => {
+    render(<TaskCreationModal {...props} />);
+    expect(screen.getByText('Lisa olemasolevas ülesandesse')).toBeInTheDocument();
+  });
+
+  it('shows playlist preview', () => {
+    render(<TaskCreationModal {...props} />);
+    expect(screen.getByText(/2 lausungit/)).toBeInTheDocument();
+  });
+
+  it('shows more indicator for many entries', () => {
+    const manyEntries = Array.from({ length: 5 }, (_, i) => ({ id: `${i}`, text: `Entry ${i}`, stressedText: `Entry ${i}` }));
+    render(<TaskCreationModal {...props} playlistEntries={manyEntries} />);
+    expect(screen.getByText(/\+2 veel/)).toBeInTheDocument();
+  });
+});
+
+describe('TaskCreationModal single entry', () => {
+  it('shows singular text for one entry', () => {
+    const props = {
+      isOpen: true, onClose: vi.fn(), onCreateTask: vi.fn().mockResolvedValue(undefined),
+      onAddToExistingTask: vi.fn().mockResolvedValue(undefined),
+      playlistEntries: [{ id: '1', text: 'Hello', stressedText: 'Hello' }],
+    };
+    render(<TaskCreationModal {...props} />);
+    expect(screen.getByText(/1 lausung/)).toBeInTheDocument();
+  });
+});

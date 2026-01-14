@@ -66,4 +66,31 @@ describe('BaseModal', () => {
     
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it('prevents backdrop close when preventBackdropClose is true', () => {
+    const onClose = vi.fn();
+    const { container } = render(
+      <BaseModal isOpen={true} onClose={onClose} preventBackdropClose={true}><p>Content</p></BaseModal>
+    );
+    const backdrop = container.querySelector('.base-modal__backdrop');
+    if (backdrop) fireEvent.click(backdrop);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('hides close button when showCloseButton is false', () => {
+    render(<BaseModal isOpen={true} onClose={vi.fn()} showCloseButton={false}><p>Content</p></BaseModal>);
+    expect(screen.queryByRole('button', { name: /sulge/i })).not.toBeInTheDocument();
+  });
+
+  it('closes on Escape key', () => {
+    const onClose = vi.fn();
+    render(<BaseModal isOpen={true} onClose={onClose}><p>Content</p></BaseModal>);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('renders without title', () => {
+    render(<BaseModal isOpen={true} onClose={vi.fn()} title={null}><p>Content</p></BaseModal>);
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  });
 });
