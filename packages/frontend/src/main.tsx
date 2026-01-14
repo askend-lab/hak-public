@@ -21,6 +21,7 @@ import { AuthProvider } from './services/auth'
 import { NotificationProvider } from './contexts/NotificationContext'
 import { OnboardingProvider } from './contexts/OnboardingContext'
 import { AuthCallbackPage } from './pages/AuthCallbackPage'
+import { DebugPage } from './pages/DebugPage'
 import './styles/main.scss'
 
 const rootElement = document.getElementById('root');
@@ -34,6 +35,7 @@ createRoot(rootElement).render(
           <BrowserRouter>
             <Routes>
               <Route path="/auth/callback" element={<AuthCallbackPage />} />
+              <Route path="/debug-x7k9m" element={<DebugPage />} />
               <Route path="*" element={<App />} />
             </Routes>
           </BrowserRouter>

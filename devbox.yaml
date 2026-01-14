@@ -130,6 +130,10 @@ hooks:
       - 'AppHeader.tsx'
       - '**/merlin/*.py'  # Legacy TTS Python code
       - 'main.tsx'  # Entry point configuration
+      - 'DebugPage.tsx'  # Debug utility
+      - '**/debug/**'  # Debug endpoints
+      - 'handler.ts'  # Lambda handler (infrastructure)
+      - 'routes.ts'  # Lambda routes (infrastructure)
 
   metrics-required:
     active: true
