@@ -19,11 +19,11 @@ variable "merlin_image_tag" {
 variable "merlin_cpu" {
   description = "CPU units for Fargate task (1024 = 1 vCPU)"
   type        = number
-  default     = 1024
+  default     = 4096
 }
 
 variable "merlin_memory" {
   description = "Memory in MB for Fargate task"
   type        = number
-  default     = 4096
+  default     = 8192
 }
