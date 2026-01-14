@@ -39,18 +39,7 @@
 
 import pickle
 import os, sys, errno
-import time
 import numpy.distutils.__config__
-
-def log_time(msg, start_time=None):
-    """Log timing information"""
-    now = time.time()
-    if start_time:
-        elapsed = (now - start_time) * 1000
-        print(f'[TIMING] {msg}: {elapsed:.0f}ms', flush=True)
-    else:
-        print(f'[TIMING] {msg}', flush=True)
-    return now
 
 from frontend.label_normalisation import HTSLabelNormalisation
 from frontend.silence_remover import SilenceRemover
@@ -324,36 +313,27 @@ if __name__ == '__main__':
     in_text = sys.argv[4]
     out_wav = sys.argv[5]
 
-    total_start = log_time('=== TTS Pipeline Start ===')
-
-    t0 = log_time('Cleanup start')
     run_process("mkdir -p " + TempDir + "/prompt-lab")    
     run_process("rm -f " + TempDir + "/gen-lab/*.*")
     run_process("rm -f " + TempDir + "/wav/*.*")
     run_process("rm -f " + TempDir + "/prompt-lab/*.*")
-    log_time('Cleanup done', t0)
     
-    t1 = log_time('Genlab (text->phonemes) start')
     genlab_dir = full_path_dir + "/tools/genlab/"
     t = genlab_dir + "bin/genlab -lex " + genlab_dir + "dct/et.dct -lexd " + genlab_dir + "dct/et3.dct -o " + TempDir + "/ -f " + in_text
-    run_process(t)
-    log_time('Genlab done', t1)
+    run_process(t)        
+#    sys.exit(1)
 
-    t2 = log_time('Duration model start')
+    
+    
+    
+    #config_file = os.path.abspath(config_file)
+    #cfg.configure(config_file)
     AcousticModel = False
     main_function(AcousticModel, full_path_dir, TempDir, voice_name)
-    log_time('Duration model done', t2)
-
-    t3 = log_time('Acoustic model start')
     AcousticModel = True
     main_function(AcousticModel, full_path_dir, TempDir, voice_name)
-    log_time('Acoustic model done', t3)
     
-    t4 = log_time('Sox concat start')
     run_process("sox " + TempDir + "/wav/*.wav " + out_wav)
-    log_time('Sox concat done', t4)
-
-    log_time('=== TTS Pipeline Complete ===', total_start)
 
     sys.exit(0)
     
