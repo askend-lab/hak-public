@@ -53,10 +53,18 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       
-      - name: Update ECS service
+      - name: Update ECS service (dev)
         run: |
           aws ecs update-service \
             --cluster hak-merlin-dev \
+            --service merlin-worker \
+            --force-new-deployment \
+            --region eu-west-1
+      
+      - name: Update ECS service (prod)
+        run: |
+          aws ecs update-service \
+            --cluster hak-merlin-prod \
             --service merlin-worker \
             --force-new-deployment \
             --region eu-west-1
