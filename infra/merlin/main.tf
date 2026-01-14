@@ -166,6 +166,18 @@ resource "aws_ecs_cluster" "merlin" {
   tags = local.tags
 }
 
+resource "aws_ecs_cluster_capacity_providers" "merlin" {
+  cluster_name = aws_ecs_cluster.merlin.name
+
+  capacity_providers = ["FARGATE_SPOT", "FARGATE"]
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 100
+    base              = 0
+  }
+}
+
 # =============================================================================
 # IAM Role for ECS Task Execution
 # =============================================================================
@@ -324,7 +336,12 @@ resource "aws_ecs_service" "merlin_worker" {
   cluster         = aws_ecs_cluster.merlin.id
   task_definition = aws_ecs_task_definition.merlin_worker.arn
   desired_count   = 0  # Start scaled down, auto-scaling manages this
-  launch_type     = "FARGATE"
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 100
+    base              = 0
+  }
 
   network_configuration {
     subnets          = data.aws_subnets.default.ids
@@ -333,6 +350,8 @@ resource "aws_ecs_service" "merlin_worker" {
   }
   
   tags = local.tags
+
+  depends_on = [aws_ecs_cluster_capacity_providers.merlin]
 
   lifecycle {
     ignore_changes = [desired_count]  # Let auto-scaling manage this
@@ -427,6 +446,39 @@ resource "aws_cloudwatch_metric_alarm" "merlin_queue_low" {
 
   alarm_actions = [aws_appautoscaling_policy.merlin_scale_down.arn]
   tags          = local.tags
+}
+
+# =============================================================================
+# Scheduled Scaling: Keep 1 instance running 9:00-21:00 GMT+2 (7:00-19:00 UTC)
+# Outside these hours, WakeUpper handles on-demand scaling
+# =============================================================================
+
+resource "aws_appautoscaling_scheduled_action" "merlin_morning_scale_up" {
+  name               = "${local.name_prefix}-morning-scale-up"
+  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
+  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
+  schedule           = "cron(0 7 ? * MON-FRI *)"
+  timezone           = "UTC"
+
+  scalable_target_action {
+    min_capacity = 1
+    max_capacity = 1
+  }
+}
+
+resource "aws_appautoscaling_scheduled_action" "merlin_evening_scale_down" {
+  name               = "${local.name_prefix}-evening-scale-down"
+  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
+  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
+  schedule           = "cron(0 19 ? * MON-FRI *)"
+  timezone           = "UTC"
+
+  scalable_target_action {
+    min_capacity = 0
+    max_capacity = 1
+  }
 }
 
 # =============================================================================
