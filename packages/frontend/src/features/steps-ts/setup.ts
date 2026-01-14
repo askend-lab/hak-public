@@ -98,7 +98,7 @@ export class TestWorld extends World {
 
   async renderApp(): Promise<void> {
     const { default: App } = await import('../../App');
-    const { AuthProvider } = await import('../../contexts/AuthContext');
+    const { AuthProvider } = await import('../../services/auth');
     const { NotificationProvider } = await import('../../contexts/NotificationContext');
     const { OnboardingProvider } = await import('../../contexts/OnboardingContext');
     

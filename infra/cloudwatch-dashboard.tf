@@ -64,54 +64,7 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
           view = "timeSeries"
         }
       },
-      # Row 2: Fargate/ECS Metrics
-      {
-        type   = "metric"
-        x      = 0
-        y      = 7
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Fargate Running Tasks"
-          region = local.region
-          metrics = [
-            ["ECS/ContainerInsights", "RunningTaskCount", "ClusterName", aws_ecs_cluster.hak.name, "ServiceName", aws_ecs_service.audio_worker.name, { stat = "Average", period = 60 }]
-          ]
-          view   = "timeSeries"
-          yAxis  = { left = { min = 0, max = 2 } }
-        }
-      },
-      {
-        type   = "metric"
-        x      = 8
-        y      = 7
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Fargate CPU Utilization"
-          region = local.region
-          metrics = [
-            ["AWS/ECS", "CPUUtilization", "ClusterName", aws_ecs_cluster.hak.name, "ServiceName", aws_ecs_service.audio_worker.name, { stat = "Average", period = 60 }]
-          ]
-          view = "timeSeries"
-        }
-      },
-      {
-        type   = "metric"
-        x      = 16
-        y      = 7
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Fargate Memory Utilization"
-          region = local.region
-          metrics = [
-            ["AWS/ECS", "MemoryUtilization", "ClusterName", aws_ecs_cluster.hak.name, "ServiceName", aws_ecs_service.audio_worker.name, { stat = "Average", period = 60 }]
-          ]
-          view = "timeSeries"
-        }
-      },
-      # Row 3: Lambda Metrics
+      # Row 2: Lambda Metrics
       {
         type   = "metric"
         x      = 0

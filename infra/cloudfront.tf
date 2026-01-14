@@ -1,3 +1,20 @@
+# CloudFront Function to rewrite /api/* paths
+resource "aws_cloudfront_function" "api_rewrite" {
+  name    = "${local.app_name}-${var.env}-api-rewrite"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = <<-EOF
+    function handler(event) {
+      var request = event.request;
+      // Rewrite /api/xxx to /xxx for backend APIs
+      if (request.uri.startsWith('/api/')) {
+        request.uri = request.uri.substring(4);
+      }
+      return request;
+    }
+  EOF
+}
+
 # CloudFront Origin Access Control
 resource "aws_cloudfront_origin_access_control" "website" {
   name                              = "${local.app_name}-${var.env}-oac"
@@ -18,6 +35,134 @@ resource "aws_cloudfront_distribution" "website" {
     domain_name              = aws_s3_bucket.website.bucket_regional_domain_name
     origin_id                = "S3-${local.website_bucket_name}"
     origin_access_control_id = aws_cloudfront_origin_access_control.website.id
+  }
+
+  # Vabamorf API origin
+  origin {
+    domain_name = var.env == "prod" ? "vabamorf.askend-lab.com" : "vabamorf-${var.env}.askend-lab.com"
+    origin_id   = "vabamorf-api"
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  # Merlin API origin
+  origin {
+    domain_name = "merlin-${var.env}.askend-lab.com"
+    origin_id   = "merlin-api"
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  # /api/analyze -> Vabamorf API
+  ordered_cache_behavior {
+    path_pattern     = "/api/analyze"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "vabamorf-api"
+
+    forwarded_values {
+      query_string = true
+      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
+      cookies {
+        forward = "none"
+      }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.api_rewrite.arn
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+  }
+
+  # /api/synthesize -> Merlin API  
+  ordered_cache_behavior {
+    path_pattern     = "/api/synthesize"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "merlin-api"
+
+    forwarded_values {
+      query_string = true
+      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
+      cookies {
+        forward = "none"
+      }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.api_rewrite.arn
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+  }
+
+  # /api/status/* -> Merlin API (for polling)
+  ordered_cache_behavior {
+    path_pattern     = "/api/status/*"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "merlin-api"
+
+    forwarded_values {
+      query_string = true
+      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
+      cookies {
+        forward = "none"
+      }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.api_rewrite.arn
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+  }
+
+  # /api/warmup -> Merlin API (for worker warm-up)
+  ordered_cache_behavior {
+    path_pattern     = "/api/warmup"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "merlin-api"
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
+      cookies {
+        forward = "none"
+      }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.api_rewrite.arn
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
   }
 
   default_cache_behavior {

@@ -1,0 +1,76 @@
+// =========================================================================
+// Page Footer
+// =========================================================================
+// Footer layout and responsive styling
+// =========================================================================
+
+@import '../tokens/breakpoints';
+@import '../tokens/colors';
+@import '../tokens/spacing';
+
+// =============================================================================
+// FOOTER (Always full width, below content)
+// =============================================================================
+
+.page-layout__footer {
+  margin-top: auto;
+  background-color: $color-white;
+  width: 100%;
+  border-top: 1px solid rgba(23, 49, 72, 0.1);
+}
+
+.page-footer--full {
+  // Mobile
+  padding: 24px 16px 20px 16px;
+  
+  // Mobile landscape
+  @include mobile-landscape {
+    padding: 28px 20px 24px 20px;
+  }
+  
+  // Tablet
+  @include tablet {
+    padding: 32px 24px 28px 24px;
+  }
+  
+  // Desktop
+  @include desktop {
+    padding: 36px 32px 24px 32px;
+  }
+
+  .page-footer__content {
+    max-width: $content-full;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 32px;
+    
+    @include tablet {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    
+    @include desktop {
+      flex-wrap: nowrap;
+      gap: 40px;
+    }
+  }
+
+  .footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-6;
+    width: 100%;
+    
+    @include tablet {
+      width: calc(50% - 12px);
+    }
+    
+    @include desktop {
+      width: auto;
+      flex: 0 0 auto;
+    }
+  }
+}

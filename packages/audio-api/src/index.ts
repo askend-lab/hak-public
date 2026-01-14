@@ -1,6 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { SQSClient } from '@aws-sdk/client-sqs';
 
+
 import { handler } from './handler';
 import { publishWarmMessage } from './sqs';
 
@@ -21,7 +22,7 @@ export async function lambdaHandler(event: { body: string }): Promise<{ statusCo
   };
 }
 
-export function healthHandler(): { statusCode: number; body: string; headers: Record<string, string> } {
+export async function healthHandler(): Promise<{ statusCode: number; body: string; headers: Record<string, string> }> {
   return {
     statusCode: 200,
     headers: {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { TaskSummary } from '@/types/task';
 import { DataService } from '@/services/dataService';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/services/auth';
 import { SearchIcon, AddIcon } from './ui/Icons';
 
 interface AddToTaskDropdownProps { isOpen: boolean; onClose: () => void; onSelectTask: (taskId: string, taskName: string) => void; onCreateNew: () => void; anchorRef?: React.RefObject<HTMLElement>; }

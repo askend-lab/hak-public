@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import TaskCreationModal from './TaskCreationModal';
 
-vi.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/services/auth', () => ({
   useAuth: vi.fn(() => ({
     user: { id: '38001085718', name: 'Test User', email: 'test@test.ee' },
   })),

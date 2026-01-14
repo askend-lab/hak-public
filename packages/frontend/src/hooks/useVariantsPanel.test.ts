@@ -180,12 +180,14 @@ describe('useVariantsPanel', () => {
 
     // Resolve the fetch
     await act(async () => {
-      resolvePromise!({
-        ok: true,
-        json: () => Promise.resolve({ variants: [{ text: 'test' }] }),
-      });
+      if (resolvePromise) {
+        resolvePromise({
+          ok: true,
+          json: () => Promise.resolve({ variants: [{ text: 'test' }] }),
+        });
+      }
       await vi.advanceTimersByTimeAsync(500);
-      await promise!;
+      if (promise) await promise;
     });
 
     // Loading state should be cleared

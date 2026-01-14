@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AddToTaskDropdown from './AddToTaskDropdown';
 
-vi.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/services/auth', () => ({
   useAuth: vi.fn(() => ({
     user: { id: '38001085718', name: 'Test User', email: 'test@test.ee' },
   })),

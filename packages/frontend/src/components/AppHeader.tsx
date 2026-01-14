@@ -1,10 +1,6 @@
 import UserProfile from './UserProfile';
 import { HelpIcon, MenuIcon } from './ui/Icons';
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+import type { User } from '@/services/auth';
 
 interface AppHeaderProps {
   currentView: 'synthesis' | 'tasks' | 'specs' | 'dashboard';

@@ -42,7 +42,11 @@
 @import 'components/icons';
 
 // Layout Components
-@import 'components/page-layouts';
+@import 'components/page-layout-base';
+@import 'components/page-header-variants';
+@import 'components/page-content';
+@import 'components/page-footer';
+@import 'components/page-utilities';
 @import 'components/header';
 @import 'components/footer';
 
@@ -90,6 +94,9 @@
 
 // Dashboard Components
 @import 'components/dashboard';
+
+// Build Info
+@import 'components/build-info';
 
 // -------------------------------------------------------------------------
 // 5. Global Styles

@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 'use client';
 
 import { useEffect } from 'react';

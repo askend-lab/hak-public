@@ -1,8 +1,33 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { execSync } from 'child_process'
+
+function getGitInfo(): { commitHash: string; commitMessage: string; branch: string; commitDate: string } {
+  try {
+    const commitHash = execSync('git rev-parse --short HEAD').toString().trim();
+    const commitMessage = execSync('git log -1 --format=%s').toString().trim();
+    const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+    const commitDate = execSync('git log -1 --format=%ci').toString().trim();
+    return { commitHash, commitMessage, branch, commitDate };
+  } catch {
+    return { commitHash: 'unknown', commitMessage: '', branch: 'unknown', commitDate: '' };
+  }
+}
+
+const gitInfo = getGitInfo();
 
 export default defineConfig({
+  define: {
+    __BUILD_INFO__: JSON.stringify({
+      commitHash: gitInfo.commitHash,
+      commitMessage: gitInfo.commitMessage,
+      branch: gitInfo.branch,
+      commitDate: gitInfo.commitDate,
+      buildTime: new Date().toISOString(),
+      workingDir: process.cwd(),
+    }),
+  },
   plugins: [react()],
   css: {
     preprocessorOptions: {

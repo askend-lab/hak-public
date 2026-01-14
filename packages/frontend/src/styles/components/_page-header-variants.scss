@@ -1,0 +1,252 @@
+// =========================================================================
+// Page Header Variants
+// =========================================================================
+// 4 header types: minimal, full, with-actions, none
+// =========================================================================
+
+@import '../tokens/breakpoints';
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+
+// Base container for all headers
+.page-header {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  
+  // Mobile: 320px - 639px
+  padding: 0 16px;
+  max-width: 100%;
+  
+  // Mobile landscape: 640px+
+  @include mobile-landscape {
+    padding: 0 20px;
+  }
+  
+  // Tablet: 768px+
+  @include tablet {
+    padding: 0 24px;
+    max-width: $content-default;
+  }
+  
+  // Desktop: 1024px+
+  @include desktop {
+    padding: 0 32px;
+  }
+  
+  // Large desktop: 1280px+ (remove side padding when max-width reached)
+  @include respond-above($content-default + 64px) {
+    padding: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// VARIANT 1: Starting Page / Role Selection
+// ---------------------------------------------------------------------------
+
+.page-header--minimal {
+  padding-top: 24px;
+  padding-bottom: 16px;
+  
+  @include tablet {
+    padding-top: 32px;
+    padding-bottom: 20px;
+  }
+  
+  @include desktop {
+    padding-top: 36px;
+    padding-bottom: 24px;
+  }
+
+  .page-header__title {
+    font-family: $font-body;
+    font-weight: $heading-page-title-weight;
+    line-height: $heading-page-title-line;
+    color: $color-primary;
+    margin: 0;
+    font-size: $heading-page-title-size-mobile;
+    
+    @include tablet {
+      font-size: $heading-page-title-size;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// VARIANT 2: Synthesis / Task Details
+// ---------------------------------------------------------------------------
+
+.page-header--full {
+  display: flex;
+  gap: 16px;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: stretch;
+  padding-top: 24px;
+  padding-bottom: 16px;
+  min-height: auto;
+  
+  @include tablet {
+    padding-top: 32px;
+    padding-bottom: 16px;
+    gap: 20px;
+  }
+  
+  @include desktop {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-top: 36px;
+    padding-bottom: 16px;
+    gap: 24px;
+    min-height: 120px;
+  }
+
+  .page-header__content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 12px;
+    
+    @include tablet {
+      gap: 16px;
+    }
+    
+    @include desktop {
+      flex: 1;
+    }
+  }
+
+  .page-header__title {
+    font-family: $font-body;
+    font-weight: $heading-page-title-weight;
+    line-height: $heading-page-title-line;
+    color: $color-primary;
+    margin: 0;
+    font-size: $heading-page-title-size-mobile;
+    max-width: 100%;
+    
+    @include tablet {
+      font-size: $heading-page-title-size;
+      max-width: 400px;
+    }
+    
+    @include desktop {
+      max-width: none;
+    }
+  }
+
+  .page-header__description {
+    font-family: $font-body;
+    font-weight: $heading-page-description-weight;
+    line-height: $heading-page-description-line;
+    color: $color-primary;
+    margin: 0;
+    font-size: $heading-page-description-size-mobile;
+    max-width: 100%;
+    
+    @include tablet {
+      font-size: $heading-page-description-size;
+      max-width: 600px;
+    }
+    
+    @include desktop {
+      max-width: 661px;
+    }
+  }
+
+  .page-header__actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    
+    @include mobile-landscape {
+      flex-direction: row;
+      width: auto;
+    }
+    
+    @include desktop {
+      flex-shrink: 0;
+    }
+    
+    > * {
+      @include respond-below($breakpoint-sm) {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// VARIANT 3: Tasks List
+// ---------------------------------------------------------------------------
+
+.page-header--with-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  padding-top: 24px;
+  padding-bottom: 16px;
+  
+  @include tablet {
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: 32px;
+    gap: 20px;
+  }
+  
+  @include desktop {
+    padding-top: 36px;
+    padding-bottom: 16px;
+    gap: 24px;
+  }
+
+  .page-header__title {
+    font-family: $font-body;
+    font-weight: $heading-page-title-weight;
+    line-height: $heading-page-title-line;
+    color: $color-primary;
+    margin: 0;
+    font-size: $heading-page-title-size-mobile;
+    
+    @include tablet {
+      font-size: $heading-page-title-size;
+    }
+  }
+
+  .page-header__actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    
+    @include mobile-landscape {
+      flex-direction: row;
+      width: auto;
+    }
+    
+    @include desktop {
+      flex-shrink: 0;
+    }
+    
+    > * {
+      @include respond-below($breakpoint-sm) {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// VARIANT 4: Empty State (no header)
+// ---------------------------------------------------------------------------
+
+.page-header--none {
+  display: none;
+}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import FeedbackModal from './FeedbackModal';
+import BuildInfo from './BuildInfo';
 
 const FooterLogo = () => <div className="footer-section footer-logo"><img src="/icons/logo.svg" alt="EKI Logo" className="footer-logo-image" /><div className="footer-contact"><p>Roosikrantsi 6, 10119 Tallinn Reg-kood: 70004011 Keelenõu 631 3731 Üldkontakt 617 7500 eki@eki.ee</p></div></div>;
 const FooterLinks = () => <div className="footer-section"><h3 className="footer-heading">Hääldusabiline</h3><ul className="footer-links"><li><a href="#">Portaaliest</a></li><li><a href="#">Versiooniajalugu</a></li><li><a href="#">Kasutus- ja privaatsustingimused</a></li></ul></div>;
@@ -18,7 +19,7 @@ export default function Footer() {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <div className="page-footer__content"><FooterLogo /><FooterLinks /><SocialLinks /><FeedbackSection onClick={() => setIsOpen(true)} /></div>
+      <div className="page-footer__content"><FooterLogo /><FooterLinks /><SocialLinks /><FeedbackSection onClick={() => setIsOpen(true)} /><div className="footer-build-info"><BuildInfo /></div></div>
       <FeedbackModal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={handleFeedbackSubmit} />
     </>
   );

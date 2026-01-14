@@ -2,11 +2,20 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth, User } from '@/contexts/AuthContext';
+import { useAuth, type User } from '@/services/auth';
 import { ChevronDownIcon } from './ui/Icons';
 
 interface UserProfileProps {
   user: User;
+}
+
+function getInitials(user: User): string {
+  const name = user.name ?? user.email?.split('@')[0] ?? '';
+  return name.split(' ').map(n => n[0] ?? '').join('').toUpperCase() || '?';
+}
+
+function getDisplayName(user: User): string {
+  return user.name ?? user.email?.split('@')[0] ?? 'User';
 }
 
 export default function UserProfile({ user }: UserProfileProps) {
@@ -38,10 +47,10 @@ export default function UserProfile({ user }: UserProfileProps) {
         className="user-profile__button"
       >
         <div className="user-profile__avatar">
-          {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+          {getInitials(user)}
         </div>
         <div className="user-profile__info">
-          <div className="user-profile__name">{user.name}</div>
+          <div className="user-profile__name">{getDisplayName(user)}</div>
           <div className="user-profile__id">{user.id}</div>
         </div>
         <ChevronDownIcon size="md" className={`user-profile__arrow ${isDropdownOpen ? 'user-profile__arrow--open' : ''}`} />
@@ -56,12 +65,12 @@ export default function UserProfile({ user }: UserProfileProps) {
           <div className="user-profile__dropdown">
             <div className="user-profile__header">
               <div className="user-profile__avatar user-profile__avatar--large">
-                {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                {getInitials(user)}
               </div>
               <div className="user-profile__details">
-                <div className="user-profile__name--large">{user.name}</div>
+                <div className="user-profile__name--large">{getDisplayName(user)}</div>
                 <div className="user-profile__email">{user.email}</div>
-                <div className="user-profile__id--formatted">Isikukood: {user.id}</div>
+                <div className="user-profile__id--formatted">ID: {user.id}</div>
               </div>
             </div>
             

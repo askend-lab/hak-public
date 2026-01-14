@@ -1,0 +1,77 @@
+// =========================================================================
+// Page Layout Base Structure
+// =========================================================================
+// Core page layout: base container, header, main content area
+// =========================================================================
+
+@import '../tokens/breakpoints';
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// =============================================================================
+// BASE PAGE STRUCTURE (Used by all pages)
+// =============================================================================
+
+.page-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $color-secondary;
+}
+
+// =============================================================================
+// STICKY HEADER (Shared across all pages)
+// =============================================================================
+
+.page-layout__header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: $color-white;
+  border-bottom: 1px solid rgba(23, 49, 72, 0.1);
+  box-sizing: border-box;
+  
+  // Mobile: 320px - 639px
+  padding: 0 16px;
+  height: 56px;
+  
+  // Mobile landscape: 640px+
+  @include mobile-landscape {
+    padding: 0 20px;
+    height: 60px;
+  }
+  
+  // Tablet: 768px+
+  @include tablet {
+    padding: 0 24px;
+    height: 60px;
+  }
+  
+  // Desktop: 1024px+
+  @include desktop {
+    padding: 0 32px;
+  }
+
+  .page-layout__header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-width: $content-full;
+    margin: 0 auto;
+  }
+}
+
+// =============================================================================
+// MAIN CONTENT AREA (Scrollable, flexible)
+// =============================================================================
+
+.page-layout__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
+}

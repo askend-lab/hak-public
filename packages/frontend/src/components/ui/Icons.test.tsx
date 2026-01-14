@@ -6,39 +6,33 @@ import { PlayIcon, PauseIcon, CloseIcon, EditIcon, TrashIcon } from './Icons';
 describe('Icon component', () => {
   it('renders with name prop', () => {
     const { container } = render(<Icon name="play_arrow" />);
-    const span = container.querySelector('.icon');
-    expect(span).toBeTruthy();
-    expect(span?.textContent).toBe('play_arrow');
+    expect(container.querySelector('.icon')).toBeTruthy();
+    expect(container.querySelector('.icon')?.textContent).toBe('play_arrow');
   });
 
   it('renders with custom size', () => {
     const { container } = render(<Icon name="close" size="xl" />);
-    const span = container.querySelector('.icon');
-    expect(span?.classList.contains('icon--xl')).toBe(true);
+    expect(container.querySelector('.icon')?.classList.contains('icon--xl')).toBe(true);
   });
 
   it('renders with custom weight', () => {
     const { container } = render(<Icon name="edit" weight="bold" />);
-    const span = container.querySelector('.icon');
-    expect(span?.classList.contains('icon--bold')).toBe(true);
+    expect(container.querySelector('.icon')?.classList.contains('icon--bold')).toBe(true);
   });
 
   it('renders with filled modifier', () => {
     const { container } = render(<Icon name="check" filled />);
-    const span = container.querySelector('.icon');
-    expect(span?.classList.contains('icon--filled')).toBe(true);
+    expect(container.querySelector('.icon')?.classList.contains('icon--filled')).toBe(true);
   });
 
   it('renders with custom className', () => {
     const { container } = render(<Icon name="search" className="custom-class" />);
-    const span = container.querySelector('.icon');
-    expect(span?.classList.contains('custom-class')).toBe(true);
+    expect(container.querySelector('.icon')?.classList.contains('custom-class')).toBe(true);
   });
 
   it('has aria-hidden attribute', () => {
     const { container } = render(<Icon name="help" />);
-    const span = container.querySelector('.icon');
-    expect(span?.getAttribute('aria-hidden')).toBe('true');
+    expect(container.querySelector('.icon')?.getAttribute('aria-hidden')).toBe('true');
   });
 });
 

@@ -5,27 +5,34 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   id-token: write
   contents: read
   packages: read
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ARTIFACTS_BUCKET: askend-lab-artifacts
+  ARTIFACTS_PREFIX: hak/builds
+
 jobs:
   build:
-    name: Build All
+    name: Build
     runs-on: ubuntu-latest
     
     outputs:
-      build_id: ${{ steps.build-id.outputs.id }}
+      build_id: ${{ steps.build.outputs.build_id }}
     
     steps:
-      - name: Generate build ID
-        id: build-id
-        run: echo "id=${{ github.sha }}-$(date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
-      
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -45,172 +52,186 @@ jobs:
       
       - name: Install dependencies
         run: pnpm install
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          aws-region: eu-west-1
+      
+      - name: Detect changes and prepare build
+        id: detect
+        run: |
+          LAST_BUILD=$(aws s3 ls s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/ --recursive | grep manifest.json | sort | tail -1 | awk '{print $4}' | cut -d'/' -f3)
+          
+          if [ -n "$LAST_BUILD" ]; then
+            echo "Last build: $LAST_BUILD"
+            aws s3 cp s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$LAST_BUILD/manifest.json /tmp/last-manifest.json || echo "{}" > /tmp/last-manifest.json
+          else
+            echo "No previous build found"
+            echo "{}" > /tmp/last-manifest.json
+          fi
+          echo "last_build=$LAST_BUILD" >> $GITHUB_OUTPUT
+          
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+          fi
+          
+          if [ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]; then
+            echo "Initial commit - building all"
+            echo "frontend=true" >> $GITHUB_OUTPUT
+            echo "simplestore=true" >> $GITHUB_OUTPUT
+            echo "audio-api=true" >> $GITHUB_OUTPUT
+            echo "merlin-api=true" >> $GITHUB_OUTPUT
+            echo "vabamorf-api=true" >> $GITHUB_OUTPUT
+          else
+            CHANGED=$(git diff --name-only $BASE_SHA HEAD)
+            echo "Changed files: $CHANGED"
+            
+            echo "frontend=$(echo "$CHANGED" | grep -q "^packages/frontend/" && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "simplestore=$(echo "$CHANGED" | grep -q "^packages/simplestore/" && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "audio-api=$(echo "$CHANGED" | grep -q "^packages/audio-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "merlin-api=$(echo "$CHANGED" | grep -q "^packages/merlin-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "vabamorf-api=$(echo "$CHANGED" | grep -q "^packages/vabamorf-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
+            
+            if echo "$CHANGED" | grep -qE "^(package\.json|pnpm-lock\.yaml|tsconfig\.json)$"; then
+              echo "Root config changed - building all"
+              echo "frontend=true" >> $GITHUB_OUTPUT
+              echo "simplestore=true" >> $GITHUB_OUTPUT
+              echo "audio-api=true" >> $GITHUB_OUTPUT
+              echo "merlin-api=true" >> $GITHUB_OUTPUT
+              echo "vabamorf-api=true" >> $GITHUB_OUTPUT
+            fi
+          fi
       
       - name: Run tests
         run: pnpm exec jest --passWithNoTests
       
       - name: Build frontend
+        if: steps.detect.outputs.frontend == 'true'
         run: pnpm --filter @hak/frontend build
       
       - name: Build SimpleStore
+        if: steps.detect.outputs.simplestore == 'true'
         run: pnpm --filter simplestore build
       
       - name: Build Audio API
+        if: steps.detect.outputs.audio-api == 'true'
         run: pnpm --filter audio-api build
       
       - name: Build Merlin API
+        if: steps.detect.outputs.merlin-api == 'true'
         run: pnpm --filter merlin-api build
       
       - name: Build Vabamorf API
+        if: steps.detect.outputs.vabamorf-api == 'true'
         working-directory: packages/vabamorf-api
         run: |
           npm ci
           npx tsc
       
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
-          aws-region: eu-west-1
-      
-      - name: Upload all artifacts to S3
-        run: |
-          BUILD_ID="${{ steps.build-id.outputs.id }}"
-          S3_PATH="s3://askend-lab-artifacts/hak/builds/${BUILD_ID}"
-          
-          echo "Uploading build ${BUILD_ID} to S3..."
-          
-          # Frontend
-          aws s3 sync packages/frontend/dist/ ${S3_PATH}/frontend/ --sse AES256
-          
-          # SimpleStore
-          aws s3 sync packages/simplestore/dist/ ${S3_PATH}/simplestore/ --sse AES256
-          
-          # Audio API
-          aws s3 sync packages/audio-api/dist/ ${S3_PATH}/audio-api/ --sse AES256
-          
-          # Merlin API
-          aws s3 sync packages/merlin-api/dist/ ${S3_PATH}/merlin-api/ --sse AES256
-          
-          # Vabamorf API
-          aws s3 sync packages/vabamorf-api/dist/ ${S3_PATH}/vabamorf-api/ --sse AES256
-          
-          # Save build metadata
-          echo "{\"sha\": \"${{ github.sha }}\", \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"ref\": \"${{ github.ref }}\"}" > /tmp/build-meta.json
-          aws s3 cp /tmp/build-meta.json ${S3_PATH}/build-meta.json --sse AES256
-          
-          echo "✅ Build ${BUILD_ID} uploaded to S3"
-      
-      - name: Build summary
-        run: |
-          echo "## Build Complete" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build ID**: ${{ steps.build-id.outputs.id }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **SHA**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Artifacts**: s3://askend-lab-artifacts/hak/builds/${{ steps.build-id.outputs.id }}/" >> $GITHUB_STEP_SUMMARY
-
-  deploy-dev:
-    name: Deploy to Dev
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    environment: dev
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      
-      - name: Configure npm registry auth
-        run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
-      
-      - name: Install dependencies
-        run: pnpm install
-      
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
-          aws-region: eu-west-1
-      
-      - name: Download build artifacts from S3
-        run: |
-          BUILD_ID="${{ needs.build.outputs.build_id }}"
-          S3_PATH="s3://askend-lab-artifacts/hak/builds/${BUILD_ID}"
-          
-          mkdir -p artifacts
-          aws s3 sync ${S3_PATH}/frontend/ artifacts/frontend/
-          aws s3 sync ${S3_PATH}/simplestore/ artifacts/simplestore/
-          aws s3 sync ${S3_PATH}/audio-api/ artifacts/audio-api/
-          aws s3 sync ${S3_PATH}/merlin-api/ artifacts/merlin-api/
-          aws s3 sync ${S3_PATH}/vabamorf-api/ artifacts/vabamorf-api/
-      
-      - name: Deploy Frontend to S3
-        run: |
-          aws s3 sync artifacts/frontend/ s3://hak-dev-website/ --delete
-      
-      - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation --distribution-id E232G8TMX7360Y --paths "/*"
-      
-      - name: Install Serverless
-        run: npm install -g serverless@3
-      
-      - name: Deploy SimpleStore
-        working-directory: packages/simplestore
-        run: |
-          cp -r ../../artifacts/simplestore/* dist/ 2>/dev/null || mkdir -p dist
-          serverless deploy --stage dev --region eu-west-1
-      
-      - name: Deploy Audio API
-        working-directory: packages/audio-api
-        run: |
-          cp -r ../../artifacts/audio-api/* dist/ 2>/dev/null || mkdir -p dist
-          serverless deploy --stage dev --region eu-west-1
-      
-      - name: Deploy Merlin API
-        working-directory: packages/merlin-api
-        run: |
-          cp -r ../../artifacts/merlin-api/* dist/ 2>/dev/null || mkdir -p dist
-          serverless create_domain --stage dev || true
-          serverless deploy --stage dev --force
-      
       - name: Login to ECR
+        if: steps.detect.outputs.vabamorf-api == 'true'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       
-      - name: Deploy Vabamorf API
+      - name: Build Vabamorf Docker image
+        if: steps.detect.outputs.vabamorf-api == 'true'
         working-directory: packages/vabamorf-api
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          # Restore dist/ directory structure from artifacts
-          # Note: Build uploads dist/ which contains src/, so artifacts has src/*.js
-          rm -rf dist
-          mkdir -p dist
-          cp -r ../../artifacts/vabamorf-api/* dist/
-          npm ci
-          docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} -t $ECR_REGISTRY/vabamorf-api:latest .
+          docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} .
           docker push $ECR_REGISTRY/vabamorf-api:${{ github.sha }}
-          docker push $ECR_REGISTRY/vabamorf-api:latest
-          npm install --save-dev serverless-domain-manager
-          serverless create_domain --stage dev || true
-          serverless deploy --stage dev
       
-      - name: Deployment summary
+      - name: Create full build artifact
+        id: build
+        env:
+          FRONTEND_CHANGED: ${{ steps.detect.outputs.frontend }}
+          SIMPLESTORE_CHANGED: ${{ steps.detect.outputs.simplestore }}
+          AUDIO_API_CHANGED: ${{ steps.detect.outputs.audio-api }}
+          MERLIN_API_CHANGED: ${{ steps.detect.outputs.merlin-api }}
+          VABAMORF_API_CHANGED: ${{ steps.detect.outputs.vabamorf-api }}
         run: |
-          echo "## Dev Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build ID**: ${{ needs.build.outputs.build_id }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Frontend**: https://hak-dev.askend-lab.com" >> $GITHUB_STEP_SUMMARY
-          echo "- **API**: https://hak-api-dev.askend-lab.com" >> $GITHUB_STEP_SUMMARY
+          BUILD_ID="BUILD-$(date +%Y%m%d%H%M%S)"
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          
+          S3_PATH="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
+          LAST_BUILD="${{ steps.detect.outputs.last_build }}"
+          LAST_S3="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$LAST_BUILD"
+          
+          # Helper to get module SHA from last manifest
+          get_last_sha() { jq -r ".modules.\"$1\" // \"unknown\"" /tmp/last-manifest.json 2>/dev/null || echo "unknown"; }
+          
+          # Upload each module explicitly (no subshell issues)
+          upload_module() {
+            local name="$1"
+            local path="$2"
+            local changed="$3"
+            
+            if [ "$changed" == "true" ]; then
+              echo "$name: uploading from $path"
+              aws s3 sync "$path/" "${S3_PATH}/$name/" --sse AES256
+            elif [ -n "$LAST_BUILD" ]; then
+              echo "$name: copying from $LAST_BUILD"
+              aws s3 sync "${LAST_S3}/$name/" "${S3_PATH}/$name/" --sse AES256
+            else
+              echo "$name: skipping (no previous build)"
+            fi
+          }
+          
+          upload_module "frontend" "packages/frontend/dist" "$FRONTEND_CHANGED"
+          upload_module "simplestore" "packages/simplestore/dist" "$SIMPLESTORE_CHANGED"
+          upload_module "audio-api" "packages/audio-api/dist" "$AUDIO_API_CHANGED"
+          upload_module "merlin-api" "packages/merlin-api/dist" "$MERLIN_API_CHANGED"
+          upload_module "vabamorf-api" "packages/vabamorf-api/dist/src" "$VABAMORF_API_CHANGED"
+          
+          # Build manifest using jq
+          jq -n \
+            --arg id "$BUILD_ID" \
+            --arg sha "${{ github.sha }}" \
+            --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg frontend "$( [ "$FRONTEND_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha frontend )" \
+            --arg simplestore "$( [ "$SIMPLESTORE_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha simplestore )" \
+            --arg audio "$( [ "$AUDIO_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha audio-api )" \
+            --arg merlin "$( [ "$MERLIN_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha merlin-api )" \
+            --arg vabamorf "$( [ "$VABAMORF_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha vabamorf-api )" \
+            '{
+              build_id: $id,
+              git_sha: $sha,
+              timestamp: $time,
+              modules: {
+                frontend: $frontend,
+                simplestore: $simplestore,
+                "audio-api": $audio,
+                "merlin-api": $merlin,
+                "vabamorf-api": $vabamorf
+              }
+            }' > /tmp/manifest.json
+          
+          aws s3 cp /tmp/manifest.json ${S3_PATH}/manifest.json --sse AES256
+          echo "✅ Build $BUILD_ID created"
+          cat /tmp/manifest.json
+      
+      - name: Build summary
+        run: |
+          echo "## Build Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build ID**: ${{ steps.build.outputs.build_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SHA**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deploy command:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "gh workflow run deploy.yml -f build_id=${{ steps.build.outputs.build_id }} -f environment=dev" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  deploy-dev:
+    name: Deploy to Dev
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      build_id: ${{ needs.build.outputs.build_id }}
+      environment: dev
+    secrets: inherit
