@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+import { CloseIcon, CheckCircleIcon, PlayIcon } from './ui/Icons';
 
 interface TextInputProps {
   value: string;
@@ -47,10 +48,7 @@ export default function TextInput({ value, onChange, onSubmit, onAddToPlaylist: 
               title="Kustuta tekst"
               type="button"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
+              <CloseIcon size="2xl" />
             </button>
           )}
         </div>
@@ -60,10 +58,7 @@ export default function TextInput({ value, onChange, onSubmit, onAddToPlaylist: 
             <span className="example-text">"Printsess eestlanna elab lossis"</span>
           </div>
           <div className="input-hint">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="m9,12 2,2 4,-4"/>
-            </svg>
+            <CheckCircleIcon size="md" />
             <span>Kuula hääldust ja uuri erinevaid variante</span>
           </div>
         </div>
@@ -75,9 +70,7 @@ export default function TextInput({ value, onChange, onSubmit, onAddToPlaylist: 
           disabled={isLoading || !value.trim()}
           className="button button--play-primary"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5,3 19,12 5,21"/>
-          </svg>
+          <PlayIcon size="md" />
           <span>{isLoading ? 'Sünteseerin...' : 'Kuula'}</span>
         </button>
       </div>

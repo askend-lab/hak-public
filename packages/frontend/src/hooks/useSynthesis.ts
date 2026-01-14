@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { SentenceState, EditingTag, OpenTagMenu, getVoiceModel, convertTextToTags } from '@/types/synthesis';
 import { stripPhoneticMarkers } from '@/utils/phoneticMarkers';
 import { synthesizeWithPolling } from '@/utils/synthesize';
@@ -27,6 +27,10 @@ const INITIAL_SENTENCE: SentenceState = {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useSynthesis() {
   const [sentences, setSentences] = useState<SentenceState[]>([INITIAL_SENTENCE]);
+  // Ref to always have access to the latest sentences value (avoids stale closure issues)
+  const sentencesRef = useRef<SentenceState[]>(sentences);
+  sentencesRef.current = sentences;
+  
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const [isPlayingAll, setIsPlayingAll] = useState(false);
   const [isLoadingPlayAll, setIsLoadingPlayAll] = useState(false);
@@ -164,7 +168,8 @@ export function useSynthesis() {
   }, [sentences]);
 
   const synthesizeAndPlay = useCallback(async (id: string) => {
-    const sentence = sentences.find(s => s.id === id);
+    // Use ref to get the latest sentences value (avoids stale closure when called after state updates)
+    const sentence = sentencesRef.current.find(s => s.id === id);
     if (!sentence?.text.trim()) return;
 
     if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; setCurrentAudio(null); }
@@ -217,7 +222,7 @@ export function useSynthesis() {
       console.error('Failed to synthesize:', error);
       setSentences(prev => prev.map(s => s.id === id ? { ...s, isLoading: false, isPlaying: false } : s));
     }
-  }, [sentences, currentAudio]);
+  }, [currentAudio]);
 
   const handlePlayAll = useCallback(async () => {
     if (isPlayingAll || isLoadingPlayAll) {
@@ -413,7 +418,9 @@ export function useSynthesis() {
     const { sentenceId, tagIndex, value } = editingTag;
     const trimmedValue = value.trim();
 
-    setSentences(prev => prev.map(s => {
+    // Compute the new sentences array and update the ref IMMEDIATELY
+    // so that synthesizeAndPlay can access the updated value before React re-renders
+    const newSentences = sentencesRef.current.map(s => {
       if (s.id !== sentenceId) return s;
       if (trimmedValue === '') {
         const newTags = s.tags.filter((_, i) => i !== tagIndex);
@@ -425,7 +432,12 @@ export function useSynthesis() {
         const newStressedTags = s.stressedTags ? [...s.stressedTags.slice(0, tagIndex), ...newWords.map(() => undefined as unknown as string), ...s.stressedTags.slice(tagIndex + 1)].filter(t => t !== undefined) : undefined;
         return { ...s, tags: newTags, text: newTags.join(' '), stressedTags: newStressedTags, phoneticText: undefined, audioUrl: undefined };
       }
-    }));
+    });
+    
+    // Update ref BEFORE setSentences so synthesizeAndPlay sees the new value immediately
+    sentencesRef.current = newSentences;
+    
+    setSentences(newSentences);
     setEditingTag(null);
   }, [editingTag]);
 

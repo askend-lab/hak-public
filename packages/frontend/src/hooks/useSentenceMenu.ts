@@ -20,7 +20,10 @@ export function useSentenceMenu(): {
   const [menuSearchQuery, setMenuSearchQuery] = useState('');
 
   const handleMenuOpen = useCallback(async (event: React.MouseEvent, id: string) => {
-    setMenuAnchorEl(prev => ({ ...prev, [id]: event.currentTarget as HTMLElement }));
+    // Capture currentTarget synchronously before any async work
+    // (React synthetic events are pooled and currentTarget becomes null after the event handler returns)
+    const target = event.currentTarget as HTMLElement;
+    setMenuAnchorEl(prev => ({ ...prev, [id]: target }));
     setOpenMenuId(id);
 
     if (isAuthenticated && user) {

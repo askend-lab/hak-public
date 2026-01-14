@@ -26,7 +26,7 @@ export default function Home() {
   const synthesis = useSynthesis();
   const taskHandlers = useTaskHandlers(synthesis.sentences, setCurrentView, setSelectedTaskId);
   const dragDrop = useDragAndDrop(synthesis.setSentences);
-  const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences);
+  const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences, showNotification);
   const menu = useSentenceMenu();
 
   // Pre-warm audio worker on page load
@@ -84,6 +84,7 @@ export default function Home() {
                 variantsSelectedSentenceId={variants.selectedSentenceId} variantsSelectedTagIndex={variants.selectedTagIndex}
                 sentencePhoneticId={variants.sentencePhoneticId} isVariantsPanelOpen={variants.isVariantsPanelOpen}
                 showSentencePhoneticPanel={variants.showSentencePhoneticPanel}
+                loadingVariantsTag={variants.loadingVariantsTag}
                 onAddAllClick={taskHandlers.handleAddAllSentencesToTask} onPlayAllClick={synthesis.handlePlayAll}
                 onDropdownClose={() => taskHandlers.setShowAddToTaskDropdown(false)}
                 onSelectTask={taskHandlers.handleSelectTaskFromDropdown} onCreateNew={taskHandlers.handleCreateNewFromDropdown}

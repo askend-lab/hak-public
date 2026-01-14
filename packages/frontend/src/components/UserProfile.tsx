@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useAuth, type User } from '@/services/auth';
+import { ChevronDownIcon } from './ui/Icons';
 
 interface UserProfileProps {
   user: User;
@@ -52,17 +53,7 @@ export default function UserProfile({ user }: UserProfileProps) {
           <div className="user-profile__name">{getDisplayName(user)}</div>
           <div className="user-profile__id">{user.id}</div>
         </div>
-        <svg 
-          width="16" 
-          height="16" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="2"
-          className={`user-profile__arrow ${isDropdownOpen ? 'user-profile__arrow--open' : ''}`}
-        >
-          <polyline points="6,9 12,15 18,9"/>
-        </svg>
+        <ChevronDownIcon size="md" className={`user-profile__arrow ${isDropdownOpen ? 'user-profile__arrow--open' : ''}`} />
       </button>
 
       {isDropdownOpen && (

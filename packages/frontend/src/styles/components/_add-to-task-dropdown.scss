@@ -5,6 +5,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import 'input';
 
 // Backdrop - uses Paper mixin
 .add-to-task-backdrop {
@@ -26,43 +27,19 @@
 
 // Search input - field spec from design
 .add-to-task-search-input {
+  @include input-base;
+  @include input-search;
   width: 218px; // Fixed width from spec
-  height: 36px; // Fixed height from spec
-  padding: 5px 8px; // Top/Bottom=5px, Left/Right=8px from spec
-  padding-right: 36px; // Extra padding for search icon
-  border: 1px solid #173148; // Tekst-tumesinine border from spec
-  border-radius: 4px; // Radius from spec
-  font-family: $font-body;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 100%;
-  color: $color-primary;
-  background: white;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
-  }
-
-  &::placeholder {
-    font-family: $font-body;
-    font-size: 16px;
-    font-weight: 400;
-    color: rgba(23, 49, 72, 0.5);
-  }
 }
 
 .add-to-task-search-icon {
   position: absolute;
   right: 24px;
-  top: 50%;
+  // Center within the 36px input (16px top padding + 18px half of input height)
+  top: calc(16px + 18px);
   transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
   pointer-events: none;
+  color: $color-primary;
 }
 
 // Task list - uses Paper scroll mixin
@@ -125,13 +102,7 @@
   background-color: $color-primary;
   border-radius: 20px; // From spec
   flex-shrink: 0;
-
-  svg {
-    width: 12px;
-    height: 12px;
-    color: white;
-    stroke-width: 2;
-  }
+  color: $color-white;
 }
 
 .add-to-task-create-text {

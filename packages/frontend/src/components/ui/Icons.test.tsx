@@ -1,28 +1,69 @@
 import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import * as Icons from './Icons';
+import { Icon } from './Icon';
+import { PlayIcon, PauseIcon, CloseIcon, EditIcon, TrashIcon } from './Icons';
 
-const iconNames = Object.keys(Icons) as (keyof typeof Icons)[];
-
-describe('Icons', () => {
-  it.each(iconNames)('%s renders with default props', (name) => {
-    const Component = Icons[name];
-    const { container } = render(<Component />);
-    expect(container.querySelector('svg')).toBeTruthy();
+describe('Icon component', () => {
+  it('renders with name prop', () => {
+    const { container } = render(<Icon name="play_arrow" />);
+    expect(container.querySelector('.icon')).toBeTruthy();
+    expect(container.querySelector('.icon')?.textContent).toBe('play_arrow');
   });
 
-  it.each(iconNames)('%s renders with custom size', (name) => {
-    const Component = Icons[name];
-    const { container } = render(<Component size={32} />);
-    const svg = container.querySelector('svg');
-    expect(svg?.getAttribute('width')).toBe('32');
-    expect(svg?.getAttribute('height')).toBe('32');
+  it('renders with custom size', () => {
+    const { container } = render(<Icon name="close" size="xl" />);
+    expect(container.querySelector('.icon')?.classList.contains('icon--xl')).toBe(true);
   });
 
-  it.each(iconNames)('%s renders with custom className', (name) => {
-    const Component = Icons[name];
-    const { container } = render(<Component className="custom-class" />);
-    const svg = container.querySelector('svg');
-    expect(svg?.classList.contains('custom-class')).toBe(true);
+  it('renders with custom weight', () => {
+    const { container } = render(<Icon name="edit" weight="bold" />);
+    expect(container.querySelector('.icon')?.classList.contains('icon--bold')).toBe(true);
+  });
+
+  it('renders with filled modifier', () => {
+    const { container } = render(<Icon name="check" filled />);
+    expect(container.querySelector('.icon')?.classList.contains('icon--filled')).toBe(true);
+  });
+
+  it('renders with custom className', () => {
+    const { container } = render(<Icon name="search" className="custom-class" />);
+    expect(container.querySelector('.icon')?.classList.contains('custom-class')).toBe(true);
+  });
+
+  it('has aria-hidden attribute', () => {
+    const { container } = render(<Icon name="help" />);
+    expect(container.querySelector('.icon')?.getAttribute('aria-hidden')).toBe('true');
+  });
+});
+
+describe('Named icon components', () => {
+  it('PlayIcon renders correctly', () => {
+    const { container } = render(<PlayIcon />);
+    const span = container.querySelector('.icon');
+    expect(span?.textContent).toBe('play_arrow');
+  });
+
+  it('PauseIcon renders correctly', () => {
+    const { container } = render(<PauseIcon />);
+    const span = container.querySelector('.icon');
+    expect(span?.textContent).toBe('pause');
+  });
+
+  it('CloseIcon renders correctly', () => {
+    const { container } = render(<CloseIcon />);
+    const span = container.querySelector('.icon');
+    expect(span?.textContent).toBe('close');
+  });
+
+  it('EditIcon renders with custom size', () => {
+    const { container } = render(<EditIcon size="2xl" />);
+    const span = container.querySelector('.icon');
+    expect(span?.classList.contains('icon--2xl')).toBe(true);
+  });
+
+  it('TrashIcon renders with custom weight', () => {
+    const { container } = render(<TrashIcon weight="medium" />);
+    const span = container.querySelector('.icon');
+    expect(span?.classList.contains('icon--medium')).toBe(true);
   });
 });

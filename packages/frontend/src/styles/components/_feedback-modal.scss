@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import 'input';
 
 // =========================================================================
 // Feedback Modal Component
@@ -50,36 +51,8 @@
 }
 
 .feedback-modal__textarea {
-  width: 100%;
-  min-height: 150px;
-  padding: $spacing-3;
-  border: 1px solid $color-outlined-neutral;
-  border-radius: $border-radius;
-  font-family: $font-body;
-  font-size: 16px;
-  font-weight: $font-weight-regular;
-  color: $color-primary;
-  background: $color-white;
-  resize: vertical;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
-  }
-
-  &:disabled {
-    background: $color-soft-neutral-bg;
-    color: $color-gray;
-    cursor: not-allowed;
-  }
-
-  &::placeholder {
-    color: $color-text-placeholder;
-    opacity: 0.64;
-  }
+  @include textarea-base;
+  min-height: 150px; // Taller for feedback
 }
 
 .feedback-modal__input {

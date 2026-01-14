@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import 'panel';
 
 // =========================================================================
 // Onboarding Wizard Component
@@ -84,28 +85,11 @@
 }
 
 .wizard__close {
+  @include panel-close;
   position: absolute;
   top: $spacing-3;
   right: $spacing-3;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: $spacing-1;
   color: $color-primary;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    color: $color-primary;
-    background: $color-soft-neutral-bg;
-  }
-
-  svg {
-    display: block;
-  }
 }
 
 .wizard__title {

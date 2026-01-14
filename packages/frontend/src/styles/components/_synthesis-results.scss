@@ -1193,13 +1193,7 @@
   background-color: $color-primary;
   border-radius: 50%;
   flex-shrink: 0;
-
-  svg {
-    width: 12px;
-    height: 12px;
-    color: $color-white;
-    stroke-width: 2;
-  }
+  color: $color-white;
 }
 
 .synthesis__menu-search {
@@ -1208,43 +1202,18 @@
 }
 
 .synthesis__menu-search-input {
-  width: 100%;
-  height: 36px;
-  padding: 5px 8px;
-  padding-right: 36px;
-  border: 1px solid $color-primary;
-  border-radius: 4px;
-  font-family: $font-body;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 100%;
-  color: $color-primary;
-  background: $color-white;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
-  }
-
-  &::placeholder {
-    font-family: $font-body;
-    font-size: 16px;
-    font-weight: 400;
-    color: rgba(23, 49, 72, 0.5);
-  }
+  @include input-base;
+  @include input-search;
 }
 
 .synthesis__menu-search-icon {
   position: absolute;
   right: 24px;
-  top: 50%;
+  // Center within the 36px input (16px top padding + 18px half of input height)
+  top: calc(16px + 18px);
   transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
   pointer-events: none;
+  color: $color-primary;
 }
 
 .synthesis__menu-task-list {

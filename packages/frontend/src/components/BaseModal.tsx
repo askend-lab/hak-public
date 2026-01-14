@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { CloseIcon } from './ui/Icons';
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -18,7 +19,7 @@ interface BaseModalProps {
 const ModalHeader = ({ title, showCloseButton, onClose, headerClasses }: { title?: string | null | undefined; showCloseButton: boolean; onClose: () => void; headerClasses: string }) => (
   <div className={headerClasses}>
     {title && <h2 className="base-modal__title">{title}</h2>}
-    {showCloseButton && <button onClick={onClose} className="base-modal__close" aria-label="Sulge" type="button"><img src="/icons/Menucross.svg" alt="Close" /></button>}
+    {showCloseButton && <button onClick={onClose} className="base-modal__close" aria-label="Sulge" type="button"><CloseIcon size="2xl" /></button>}
   </div>
 );
 

@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/services/auth';
 import BaseModal from './BaseModal';
+import { ErrorIcon } from './ui/Icons';
 
 interface LoginModalProps { isOpen: boolean; onClose: () => void; message?: string; }
 
@@ -15,16 +16,7 @@ const LoginIntro = () => (
   </div>
 );
 
-const ErrorDisplay = ({ error }: { error: string }) => (
-  <div className="login-modal__error">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="12"/>
-      <line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <p>{error}</p>
-  </div>
-);
+const ErrorDisplay = ({ error }: { error: string }) => <div className="login-modal__error"><ErrorIcon size="md" /><p>{error}</p></div>;
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

@@ -24,6 +24,7 @@ describe('useVariantsPanel', () => {
     expect(result.current.variantsWord).toBeNull();
     expect(result.current.selectedSentenceId).toBeNull();
     expect(result.current.selectedTagIndex).toBeNull();
+    expect(result.current.loadingVariantsTag).toBeNull();
   });
 
   it('should open variants panel with existing stressedTags', async () => {
@@ -82,18 +83,116 @@ describe('useVariantsPanel', () => {
     expect(result.current.selectedTagIndex).toBeNull();
   });
 
-  it('should open variants from menu', async () => {
+  it('should open variants from menu when variants exist', async () => {
+    vi.useFakeTimers();
     const sentences = createMockSentences();
     const setSentences = vi.fn();
-    const { result } = renderHook(() => useVariantsPanel(sentences, setSentences));
-
-    await act(async () => {
-      await result.current.handleOpenVariantsFromMenu('2', 1, 'sentence');
+    const showNotification = vi.fn();
+    
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ variants: [{ text: 'séntence', description: 'test' }] }),
     });
 
+    const { result } = renderHook(() => useVariantsPanel(sentences, setSentences, showNotification));
+
+    await act(async () => {
+      const promise = result.current.handleOpenVariantsFromMenu('2', 1, 'sentence');
+      // Fast-forward the 500ms minimum display timer
+      await vi.advanceTimersByTimeAsync(500);
+      await promise;
+    });
+
+    expect(global.fetch).toHaveBeenCalledWith('/api/variants', expect.any(Object));
     expect(result.current.isVariantsPanelOpen).toBe(true);
     expect(result.current.variantsWord).toBe('sentence');
     expect(result.current.selectedTagIndex).toBe(1);
+    expect(showNotification).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('should show warning notification when no variants found', async () => {
+    vi.useFakeTimers();
+    const sentences = createMockSentences();
+    const setSentences = vi.fn();
+    const showNotification = vi.fn();
+    
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ variants: [] }),
+    });
+
+    const { result } = renderHook(() => useVariantsPanel(sentences, setSentences, showNotification));
+
+    await act(async () => {
+      const promise = result.current.handleOpenVariantsFromMenu('2', 1, 'sentence');
+      await vi.advanceTimersByTimeAsync(500);
+      await promise;
+    });
+
+    expect(result.current.isVariantsPanelOpen).toBe(false);
+    expect(showNotification).toHaveBeenCalledWith('warning', 'Variante ei leitud', 'Sõna ei leidu eesti keeles või on valesti kirjutatud.');
+    vi.useRealTimers();
+  });
+
+  it('should show error notification on API failure', async () => {
+    vi.useFakeTimers();
+    const sentences = createMockSentences();
+    const setSentences = vi.fn();
+    const showNotification = vi.fn();
+    
+    (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
+
+    const { result } = renderHook(() => useVariantsPanel(sentences, setSentences, showNotification));
+
+    await act(async () => {
+      const promise = result.current.handleOpenVariantsFromMenu('2', 1, 'sentence');
+      await vi.advanceTimersByTimeAsync(500);
+      await promise;
+    });
+
+    expect(result.current.isVariantsPanelOpen).toBe(false);
+    expect(showNotification).toHaveBeenCalledWith('error', 'Viga', 'Variantide laadimine ebaõnnestus.');
+    vi.useRealTimers();
+  });
+
+  it('should set and clear loadingVariantsTag during fetch', async () => {
+    vi.useFakeTimers();
+    const sentences = createMockSentences();
+    const setSentences = vi.fn();
+    const showNotification = vi.fn();
+    
+    let resolvePromise: (value: unknown) => void;
+    const fetchPromise = new Promise(resolve => { resolvePromise = resolve; });
+    
+    (global.fetch as ReturnType<typeof vi.fn>).mockReturnValueOnce(fetchPromise);
+
+    const { result } = renderHook(() => useVariantsPanel(sentences, setSentences, showNotification));
+
+    // Start the fetch
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.handleOpenVariantsFromMenu('2', 1, 'sentence');
+    });
+
+    // Loading state should be set
+    expect(result.current.loadingVariantsTag).toEqual({ sentenceId: '2', tagIndex: 1 });
+
+    // Resolve the fetch
+    await act(async () => {
+      if (resolvePromise) {
+        resolvePromise({
+          ok: true,
+          json: () => Promise.resolve({ variants: [{ text: 'test' }] }),
+        });
+      }
+      await vi.advanceTimersByTimeAsync(500);
+      if (promise) await promise;
+    });
+
+    // Loading state should be cleared
+    expect(result.current.loadingVariantsTag).toBeNull();
+    vi.useRealTimers();
   });
 
   it('should open sentence phonetic panel', async () => {

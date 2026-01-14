@@ -17,6 +17,10 @@
 // -------------------------------------------------------------------------
 @import 'abstracts/storybook-imports';
 
+// EKI Storybook Components (used as-is per design system guidelines)
+// Path resolved via vite loadPaths: [packages/]
+@import 'vendor/eki-storybook/src/stories/assets/scss/components/modal';
+
 // -------------------------------------------------------------------------
 // 3. Base Styles
 // -------------------------------------------------------------------------
@@ -35,6 +39,7 @@
 @import 'components/input';
 @import 'components/textarea';
 @import 'components/button';
+@import 'components/icons';
 
 // Layout Components
 @import 'components/page-layout-base';

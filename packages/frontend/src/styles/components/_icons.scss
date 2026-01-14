@@ -1,0 +1,74 @@
+// Material Symbols base styles
+// Uses typography tokens for sizes (design system compliant)
+
+.icon {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+  user-select: none;
+  
+  // Default: regular weight (400), no fill
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: $font-size-lg; // 18px default
+  
+  // Size modifiers (using typography tokens)
+  &--xs {
+    font-size: $font-size-xs; // 12px
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 12;
+  }
+  
+  &--sm {
+    font-size: $font-size-sm; // 14px
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 14;
+  }
+  
+  &--md {
+    font-size: $font-size-md; // 16px
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+  }
+  
+  &--lg {
+    font-size: $font-size-lg; // 18px
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+  }
+  
+  &--xl {
+    font-size: $font-size-xl; // 20px
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  }
+  
+  &--2xl {
+    font-size: $font-size-2xl; // 24px
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  // Weight modifiers
+  &--light {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  &--regular {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  &--medium {
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  &--bold {
+    font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  // Fill modifier
+  &--filled {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
