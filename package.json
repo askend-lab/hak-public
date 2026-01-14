@@ -10,7 +10,7 @@
     "test:coverage": "jest --coverage --json --outputFile=tmp/jest-results.json",
     "lint": "eslint --ext .js,.ts,.tsx . --max-warnings=0 && npx gherkin-lint 'packages/specifications/**/*.feature'",
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
-    "kill-ports": "lsof -ti:5180 | xargs -r kill -9 2>/dev/null; sleep 0.5; true",
+    "kill-ports": "lsof -ti:5181 | xargs -r kill -9 2>/dev/null; sleep 0.5; true",
     "start:frontend": "pnpm --filter @hak/frontend dev",
     "start:backend": "pnpm exec tsc --noEmit && pnpm --filter simplestore dev",
     "start": "pnpm run kill-ports && pnpm run start:frontend"

@@ -50,7 +50,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5180,
+    port: 5181,
     strictPort: true,
     proxy: {
       '/api/vabamorf': {
