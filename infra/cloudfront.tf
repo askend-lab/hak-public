@@ -49,9 +49,9 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-  # Merlin API origin
+  # Merlin API origin (can be overridden to use prod for dev environment)
   origin {
-    domain_name = "merlin-${var.env}.askend-lab.com"
+    domain_name = var.use_prod_merlin ? "merlin-prod.askend-lab.com" : "merlin-${var.env}.askend-lab.com"
     origin_id   = "merlin-api"
     custom_origin_config {
       http_port              = 80

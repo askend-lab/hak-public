@@ -68,7 +68,13 @@ jobs:
 
       - name: Terraform Plan (${{ matrix.environment }})
         id: plan
-        run: terraform plan -var="env=${{ matrix.environment }}" -no-color -input=false
+        run: |
+          # Dev uses prod Merlin for audio generation (saves resources)
+          if [ "${{ matrix.environment }}" = "dev" ]; then
+            terraform plan -var="env=${{ matrix.environment }}" -var="use_prod_merlin=true" -no-color -input=false
+          else
+            terraform plan -var="env=${{ matrix.environment }}" -no-color -input=false
+          fi
         continue-on-error: true
 
       - name: Comment PR
@@ -144,7 +150,13 @@ jobs:
         continue-on-error: true
 
       - name: Terraform Apply (${{ matrix.environment }})
-        run: terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
+        run: |
+          # Dev uses prod Merlin for audio generation (saves resources)
+          if [ "${{ matrix.environment }}" = "dev" ]; then
+            terraform apply -var="env=${{ matrix.environment }}" -var="use_prod_merlin=true" -auto-approve -input=false
+          else
+            terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
+          fi
       
       - name: Deployment Summary
         run: |
