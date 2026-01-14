@@ -64,7 +64,23 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
           view = "timeSeries"
         }
       },
-      # Row 2: Lambda Metrics
+      # Row 2: ECS/Fargate Metrics
+      {
+        type   = "metric"
+        x      = 0
+        y      = 7
+        width  = 8
+        height = 6
+        properties = {
+          title  = "Fargate Running Tasks"
+          region = local.region
+          metrics = [
+            ["AWS/ECS", "RunningTaskCount", "ClusterName", "hak-merlin-${var.env}", "ServiceName", "merlin-worker", { stat = "Average", period = 60 }]
+          ]
+          view = "timeSeries"
+        }
+      },
+      # Row 3: Lambda Metrics
       {
         type   = "metric"
         x      = 0
