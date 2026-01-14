@@ -135,34 +135,19 @@ test_endpoint_content "CloudFront /api/synthesize" "$FRONTEND_URL/api/synthesize
 test_endpoint_content "CloudFront /api/status/*" "$FRONTEND_URL/api/status/test-key" "GET" "" "status"
 
 echo ""
-echo "=== Merlin Auto-Scaling ==="
-# Dev may use prod Merlin, so check prod cluster for dev environment
-MERLIN_CLUSTER="hak-merlin-${ENV}"
-AUTOSCALING=$(aws application-autoscaling describe-scalable-targets \
+echo "=== Merlin Configuration ==="
+# Prod runs 24x7 with min=1, dev uses prod Merlin
+PROD_SCALING=$(aws application-autoscaling describe-scalable-targets \
   --service-namespace ecs \
-  --resource-ids "service/${MERLIN_CLUSTER}/merlin-worker" \
+  --resource-ids "service/hak-merlin-prod/merlin-worker" \
   --query 'ScalableTargets[0].MinCapacity' \
   --output text 2>/dev/null)
 
-if [[ "$AUTOSCALING" == "0" ]]; then
-  echo -e "${GREEN}✓${NC} Merlin auto-scaling (min=0)"
+if [[ "$PROD_SCALING" == "1" ]]; then
+  echo -e "${GREEN}✓${NC} Merlin prod running 24x7 (min=1)"
   ((PASSED++))
-elif [[ "$ENV" == "dev" && "$AUTOSCALING" == "None" ]]; then
-  # Dev uses prod Merlin - check prod auto-scaling instead
-  PROD_AUTOSCALING=$(aws application-autoscaling describe-scalable-targets \
-    --service-namespace ecs \
-    --resource-ids "service/hak-merlin-prod/merlin-worker" \
-    --query 'ScalableTargets[0].MinCapacity' \
-    --output text 2>/dev/null)
-  if [[ "$PROD_AUTOSCALING" == "0" ]]; then
-    echo -e "${GREEN}✓${NC} Merlin auto-scaling (dev uses prod, prod min=0)"
-    ((PASSED++))
-  else
-    echo -e "${RED}✗${NC} Merlin auto-scaling NOT configured (prod min=0 required, got: $PROD_AUTOSCALING)"
-    ((FAILED++))
-  fi
 else
-  echo -e "${RED}✗${NC} Merlin auto-scaling NOT configured (min=0 required, got: $AUTOSCALING)"
+  echo -e "${RED}✗${NC} Merlin prod NOT configured for 24x7 (min=1 required, got: $PROD_SCALING)"
   ((FAILED++))
 fi
 

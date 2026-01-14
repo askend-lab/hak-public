@@ -48,13 +48,7 @@ jobs:
       - name: Terraform Plan
         working-directory: infra/merlin
         run: |
-          ENV="${{ github.event.inputs.environment || 'dev' }}"
-          # Dev Merlin is disabled - audio generation uses prod
-          if [ "$ENV" = "dev" ]; then
-            terraform plan -var="env=$ENV" -var="enabled=false" -out=tfplan
-          else
-            terraform plan -var="env=$ENV" -out=tfplan
-          fi
+          terraform plan -var="env=${{ github.event.inputs.environment || 'dev' }}" -out=tfplan
       
       - name: Terraform Apply
         working-directory: infra/merlin
