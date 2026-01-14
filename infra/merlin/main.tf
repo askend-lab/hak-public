@@ -359,12 +359,12 @@ resource "aws_ecs_service" "merlin_worker" {
 }
 
 # =============================================================================
-# Simple setup: 1 instance running 24x7 on Fargate Spot
+# Auto-scaling: prod runs 24x7, dev is disabled (uses prod Merlin)
 # =============================================================================
 
 resource "aws_appautoscaling_target" "merlin_worker" {
-  max_capacity       = 1
-  min_capacity       = 1  # Always keep 1 instance running
+  max_capacity       = var.env == "dev" ? 0 : 1
+  min_capacity       = var.env == "dev" ? 0 : 1  # Dev disabled, prod 24x7
   resource_id        = "service/${aws_ecs_cluster.merlin.name}/${aws_ecs_service.merlin_worker.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
