@@ -13,3 +13,10 @@ variable "use_prod_merlin" {
   type        = bool
   default     = false
 }
+
+variable "slack_webhook_url" {
+  description = "Slack webhook URL for CloudWatch alerts (create at https://api.slack.com/apps)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

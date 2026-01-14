@@ -111,6 +111,8 @@ jobs:
       
       - name: Build frontend
         if: steps.detect.outputs.frontend == 'true'
+        env:
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
         run: pnpm --filter @hak/frontend build
       
       - name: Build SimpleStore

@@ -7,7 +7,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { Store, ServerContext, StorageAdapter } from '../core';
 import { InMemoryAdapter } from '../adapters';
-import { handleSave, handleGet, handleDelete, handleQuery, createResponse, HTTP_STATUS, HTTP_ERRORS } from './routes';
+import { handleSave, handleGet, handleDelete, handleQuery, handleDebugError, createResponse, HTTP_STATUS, HTTP_ERRORS } from './routes';
 
 /** Shared adapter instance for persistence across calls */
 let sharedAdapter: StorageAdapter | null = null;
@@ -85,6 +85,11 @@ const routes: Route[] = [
  * Main Lambda handler
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  // Debug endpoint - no auth required
+  if (event.httpMethod === 'POST' && event.resource === '/debug/error') {
+    return handleDebugError();
+  }
+
   const userId = getUserId(event);
   if (!userId) {
     return createResponse(HTTP_STATUS.UNAUTHORIZED, { error: HTTP_ERRORS.UNAUTHORIZED });

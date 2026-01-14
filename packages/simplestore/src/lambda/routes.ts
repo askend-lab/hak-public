@@ -119,3 +119,11 @@ export async function handleQuery(event: APIGatewayProxyEvent, store: Store): Pr
     ? createResponse(HTTP_STATUS.OK, { items: result.items }) 
     : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_ERROR);
 }
+
+export async function handleDebugError(): Promise<APIGatewayProxyResult> {
+  console.error('[DEBUG] Intentional 500 error triggered for monitoring test');
+  return createResponse(HTTP_STATUS.INTERNAL_ERROR, { 
+    error: 'Intentional test error for monitoring',
+    timestamp: new Date().toISOString()
+  });
+}

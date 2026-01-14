@@ -68,6 +68,8 @@ jobs:
 
       - name: Terraform Plan (${{ matrix.environment }})
         id: plan
+        env:
+          TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           # Dev uses prod Merlin for audio generation (saves resources)
           if [ "${{ matrix.environment }}" = "dev" ]; then
@@ -150,6 +152,8 @@ jobs:
         continue-on-error: true
 
       - name: Terraform Apply (${{ matrix.environment }})
+        env:
+          TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           # Dev uses prod Merlin for audio generation (saves resources)
           if [ "${{ matrix.environment }}" = "dev" ]; then
