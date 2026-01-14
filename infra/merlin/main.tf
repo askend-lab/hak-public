@@ -354,49 +354,20 @@ resource "aws_ecs_service" "merlin_worker" {
   depends_on = [aws_ecs_cluster_capacity_providers.merlin]
 
   lifecycle {
-    ignore_changes = [desired_count]  # Let scheduled scaling manage this
+    ignore_changes = [desired_count]  # Let auto-scaling target manage this
   }
 }
 
 # =============================================================================
-# Scheduled Scaling: 1 instance 9:00-21:00 GMT+2 (7:00-19:00 UTC) on weekdays
-# Simple approach: no complex auto-scaling, just scheduled on/off
+# Simple setup: 1 instance running 24x7 on Fargate Spot
 # =============================================================================
 
 resource "aws_appautoscaling_target" "merlin_worker" {
   max_capacity       = 1
-  min_capacity       = 0
+  min_capacity       = 1  # Always keep 1 instance running
   resource_id        = "service/${aws_ecs_cluster.merlin.name}/${aws_ecs_service.merlin_worker.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-}
-
-resource "aws_appautoscaling_scheduled_action" "merlin_morning_scale_up" {
-  name               = "${local.name_prefix}-morning-scale-up"
-  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
-  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
-  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
-  schedule           = "cron(0 7 ? * MON-FRI *)"
-  timezone           = "UTC"
-
-  scalable_target_action {
-    min_capacity = 1
-    max_capacity = 1
-  }
-}
-
-resource "aws_appautoscaling_scheduled_action" "merlin_evening_scale_down" {
-  name               = "${local.name_prefix}-evening-scale-down"
-  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
-  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
-  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
-  schedule           = "cron(0 19 ? * MON-FRI *)"
-  timezone           = "UTC"
-
-  scalable_target_action {
-    min_capacity = 0
-    max_capacity = 1
-  }
 }
 
 # =============================================================================
