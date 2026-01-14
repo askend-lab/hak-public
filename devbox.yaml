@@ -169,5 +169,6 @@ hooks:
     active: true
     excludePaths:
       - '**/.old-frontend/**'
+      - '**/.esbuild/**'
 
 # final
