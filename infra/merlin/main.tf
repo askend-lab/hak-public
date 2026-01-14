@@ -328,14 +328,14 @@ resource "aws_ecs_task_definition" "merlin_worker" {
 }
 
 # =============================================================================
-# ECS Service with Auto-Scaling (scale-to-zero when idle)
+# ECS Service on Fargate Spot
 # =============================================================================
 
 resource "aws_ecs_service" "merlin_worker" {
   name            = "merlin-worker"
   cluster         = aws_ecs_cluster.merlin.id
   task_definition = aws_ecs_task_definition.merlin_worker.arn
-  desired_count   = 0  # Start scaled down, auto-scaling manages this
+  desired_count   = 0  # Scheduled scaling manages this
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
@@ -354,104 +354,22 @@ resource "aws_ecs_service" "merlin_worker" {
   depends_on = [aws_ecs_cluster_capacity_providers.merlin]
 
   lifecycle {
-    ignore_changes = [desired_count]  # Let auto-scaling manage this
+    ignore_changes = [desired_count]  # Let scheduled scaling manage this
   }
 }
 
 # =============================================================================
-# Auto-Scaling (scale to 0 when idle, scale up on SQS messages)
+# Scheduled Scaling: 1 instance 9:00-21:00 GMT+2 (7:00-19:00 UTC) on weekdays
+# Simple approach: no complex auto-scaling, just scheduled on/off
 # =============================================================================
 
 resource "aws_appautoscaling_target" "merlin_worker" {
-  max_capacity       = var.enabled ? 1 : 0  # When disabled, can't scale up at all
+  max_capacity       = 1
   min_capacity       = 0
   resource_id        = "service/${aws_ecs_cluster.merlin.name}/${aws_ecs_service.merlin_worker.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
-
-resource "aws_appautoscaling_policy" "merlin_scale_up" {
-  name               = "${local.name_prefix}-scale-up"
-  policy_type        = "StepScaling"
-  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
-  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
-
-  step_scaling_policy_configuration {
-    adjustment_type         = "ExactCapacity"
-    cooldown                = 60
-    metric_aggregation_type = "Maximum"
-
-    step_adjustment {
-      metric_interval_lower_bound = 0
-      scaling_adjustment          = 1
-    }
-  }
-}
-
-resource "aws_appautoscaling_policy" "merlin_scale_down" {
-  name               = "${local.name_prefix}-scale-down"
-  policy_type        = "StepScaling"
-  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
-  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
-
-  step_scaling_policy_configuration {
-    adjustment_type         = "ExactCapacity"
-    cooldown                = 300  # 5 minutes before scaling down
-    metric_aggregation_type = "Maximum"
-
-    step_adjustment {
-      metric_interval_upper_bound = 0
-      scaling_adjustment          = 0
-    }
-  }
-}
-
-# CloudWatch alarm - scale up when messages in queue (fallback for warmup)
-resource "aws_cloudwatch_metric_alarm" "merlin_queue_high" {
-  alarm_name          = "${local.name_prefix}-queue-high"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 1
-  metric_name         = "ApproximateNumberOfMessagesVisible"
-  namespace           = "AWS/SQS"
-  period              = 60
-  statistic           = "Maximum"
-  threshold           = 1
-  alarm_description   = "Scale up Merlin worker when messages in queue (fallback)"
-
-  dimensions = {
-    QueueName = aws_sqs_queue.merlin.name
-  }
-
-  alarm_actions = [aws_appautoscaling_policy.merlin_scale_up.arn]
-  tags          = local.tags
-}
-
-# CloudWatch alarm - scale down when queue empty for 15 min
-resource "aws_cloudwatch_metric_alarm" "merlin_queue_low" {
-  alarm_name          = "${local.name_prefix}-queue-low"
-  comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 15
-  metric_name         = "ApproximateNumberOfMessagesVisible"
-  namespace           = "AWS/SQS"
-  period              = 60
-  statistic           = "Maximum"
-  threshold           = 1
-  alarm_description   = "Scale down Merlin worker when queue empty for 15 min"
-
-  dimensions = {
-    QueueName = aws_sqs_queue.merlin.name
-  }
-
-  alarm_actions = [aws_appautoscaling_policy.merlin_scale_down.arn]
-  tags          = local.tags
-}
-
-# =============================================================================
-# Scheduled Scaling: Keep 1 instance running 9:00-21:00 GMT+2 (7:00-19:00 UTC)
-# Outside these hours, WakeUpper handles on-demand scaling
-# =============================================================================
 
 resource "aws_appautoscaling_scheduled_action" "merlin_morning_scale_up" {
   name               = "${local.name_prefix}-morning-scale-up"
