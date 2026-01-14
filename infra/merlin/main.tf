@@ -363,7 +363,7 @@ resource "aws_ecs_service" "merlin_worker" {
 # =============================================================================
 
 resource "aws_appautoscaling_target" "merlin_worker" {
-  max_capacity       = 1
+  max_capacity       = var.enabled ? 1 : 0  # When disabled, can't scale up at all
   min_capacity       = 0
   resource_id        = "service/${aws_ecs_cluster.merlin.name}/${aws_ecs_service.merlin_worker.name}"
   scalable_dimension = "ecs:service:DesiredCount"

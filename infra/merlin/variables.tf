@@ -27,3 +27,9 @@ variable "merlin_memory" {
   type        = number
   default     = 4096
 }
+
+variable "enabled" {
+  description = "Whether Merlin worker is enabled (false = completely disabled, can't scale up)"
+  type        = bool
+  default     = true
+}
