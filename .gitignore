@@ -4,6 +4,7 @@ package-lock.json
 
 # Temporary files
 tmp/
+.serverless/
 .test-runner-state.json
 **/coverage/
 **/jest-results*.json
