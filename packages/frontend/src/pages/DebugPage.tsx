@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react'
 
 const btnStyle = { padding: '1rem 2rem', fontSize: '1rem', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }
+const apiBase = window.location.hostname.includes('dev') ? 'https://hak-api-dev.askend-lab.com' : 'https://hak-api-prod.askend-lab.com'
 
 export function DebugPage() {
   return (
@@ -11,7 +12,7 @@ export function DebugPage() {
         <button onClick={() => { throw new Error('Test frontend error') }} style={{ ...btnStyle, backgroundColor: '#dc3545' }}>
           🔴 Trigger Frontend Error (Sentry)
         </button>
-        <button onClick={() => fetch('/api/debug/error', { method: 'POST' }).then(r => alert(`Backend: ${r.status}`))} style={{ ...btnStyle, backgroundColor: '#fd7e14' }}>
+        <button onClick={() => fetch(`${apiBase}/api/debug/error`, { method: 'POST' }).then(r => alert(`Backend: ${r.status}`))} style={{ ...btnStyle, backgroundColor: '#fd7e14' }}>
           🟠 Trigger Backend 500 (CloudWatch → Slack)
         </button>
         <button onClick={() => { Sentry.captureMessage('Test message', 'info'); alert('Sent!') }} style={{ ...btnStyle, backgroundColor: '#6f42c1' }}>
