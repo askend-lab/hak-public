@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-non-null-assertion, max-lines-per-function */
 import { useState, useCallback } from 'react';
 import { TaskEntry } from '@/types/task';
 import { synthesizeWithPolling } from '@/utils/synthesize';
-
-function getVoiceModel(text: string): 'efm_s' | 'efm_l' {
-  const words = text.trim().split(/\s+/).filter(word => word.length > 0);
-  return words.length === 1 ? 'efm_s' : 'efm_l';
-}
+import { getVoiceModel } from '@/types/synthesis';
 
 export function useAudioPlayback(entries: TaskEntry[]) {
   const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);

@@ -1,18 +1,8 @@
-/* eslint-disable max-lines-per-function, complexity */
+ 
 import SynthesisPageHeader from './SynthesisPageHeader';
 import SentenceMenu from './SentenceMenu';
 import SentenceSynthesisItem from './SentenceSynthesisItem';
-interface Sentence {
-  id: string;
-  text: string;
-  phoneticText?: string | null | undefined;
-  audioUrl?: string | null | undefined;
-  tags?: string[];
-  isPlaying?: boolean;
-  isLoading?: boolean;
-  currentInput?: string;
-  stressedTags?: string[] | null | undefined;
-}
+import { SentenceState } from '@/types/synthesis';
 
 interface Task {
   id: string;
@@ -21,7 +11,7 @@ interface Task {
 }
 
 interface SynthesisViewProps {
-  sentences: Sentence[];
+  sentences: SentenceState[];
   isPlayingAll: boolean;
   isLoadingPlayAll: boolean;
   openTagMenu: { sentenceId: string; tagIndex: number } | null;
@@ -89,7 +79,7 @@ const getTagMenuItems = (p: SynthesisViewProps): TagMenuItem[] => [
 ];
 
 interface SentenceItemProps {
-  sentence: Sentence;
+  sentence: SentenceState;
   sentenceIndex: number;
   p: SynthesisViewProps;
 }

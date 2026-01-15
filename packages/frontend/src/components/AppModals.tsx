@@ -9,6 +9,8 @@ import SentencePhoneticPanel from './SentencePhoneticPanel';
 import { OnboardingWizard } from './onboarding';
 import { DataService } from '@/services/dataService';
 import { CreateTaskRequest } from '@/types/task';
+import { SentenceState, filterNonEmptySentences } from '@/types/synthesis';
+
 interface User {
   id: string;
   email: string;
@@ -22,35 +24,23 @@ interface Task {
   shareToken?: string;
 }
 
-interface Sentence {
-  id: string;
-  text: string;
-  phoneticText?: string | null | undefined;
-  audioUrl?: string | null | undefined;
-  tags?: string[];
-  isPlaying?: boolean;
-  isLoading?: boolean;
-  currentInput?: string;
-  stressedTags?: string[] | null | undefined;
-}
-
 
 interface AppModalsProps {
   user: User | null;
-  sentences: Sentence[];
+  sentences: SentenceState[];
   showLoginModal: boolean;
   setShowLoginModal: (v: boolean) => void;
   showNotification: (type: 'success' | 'error', title: string, desc?: string) => void;
   isWizardActive: boolean;
   variants: { variantsWord: string | null; isVariantsPanelOpen: boolean; handleCloseVariants: () => void; variantsCustomPhonetic: string | null; setVariantsCustomPhonetic: (v: string | null) => void; sentencePhoneticId: string | null; showSentencePhoneticPanel: boolean; handleCloseSentencePhonetic: () => void; };
-  synthesis: { sentences: Sentence[]; handleSentencePhoneticApply: (id: string, text: string) => void; };
+  synthesis: { sentences: SentenceState[]; handleSentencePhoneticApply: (id: string, text: string) => void; };
   taskHandlers: { showAddTaskModal: boolean; setShowAddTaskModal: (v: boolean) => void; handleAddTask: (t: string, d: string) => Promise<void>; showTaskCreationModal: boolean; setShowTaskCreationModal: (v: boolean) => void; handleTaskCreated: (taskData: CreateTaskRequest) => Promise<void>; taskToEdit: Task | null; showTaskEditModal: boolean; setShowTaskEditModal: (v: boolean) => void; setTaskToEdit: (t: Task | null) => void; handleTaskUpdated: () => void; taskToShare: Task | null; showShareTaskModal: boolean; setShowShareTaskModal: (v: boolean) => void; setTaskToShare: (t: Task | null) => void; showDeleteConfirmation: boolean; taskToDelete: Task | null; handleConfirmDelete: () => void; handleCancelDelete: () => void; };
   onUseVariant: (text: string) => void;
 }
 
-// eslint-disable-next-line complexity
+ 
 export default function AppModals({ user, sentences, showLoginModal, setShowLoginModal, showNotification, isWizardActive, variants, synthesis, taskHandlers, onUseVariant }: AppModalsProps) {
-  const playlistEntries = sentences.filter(s => s.text.trim()).map(s => ({ id: s.id, text: s.text, stressedText: s.phoneticText || s.text, audioUrl: s.audioUrl || null, audioBlob: null }));
+  const playlistEntries = filterNonEmptySentences(sentences).map(s => ({ id: s.id, text: s.text, stressedText: s.phoneticText || s.text, audioUrl: s.audioUrl || null, audioBlob: null }));
   const handleAddToExisting = async (taskId: string, entries: { text: string; stressedText: string }[], taskName: string) => {
     if (!user) return;
     try { await DataService.getInstance().addTextEntriesToTask(user.id, taskId, entries); taskHandlers.setShowTaskCreationModal(false); showNotification('success', 'Lisatud ülesandesse', `${entries.length} lauset lisatud ülesandesse ${taskName}!`); }

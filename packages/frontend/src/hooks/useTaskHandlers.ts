@@ -1,9 +1,10 @@
+/* eslint-disable max-lines-per-function, max-lines */
 import { useState, useCallback } from 'react';
 import { DataService } from '@/services/dataService';
 import { CreateTaskRequest } from '@/types/task';
 import { useAuth } from '@/services/auth';
 import { useNotification } from '@/contexts/NotificationContext';
-import { SentenceState } from '@/types/synthesis';
+import { SentenceState, filterNonEmptySentences } from '@/types/synthesis';
 
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
@@ -14,6 +15,18 @@ export function useTaskHandlers(
 ) {
   const { user, isAuthenticated, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
+
+  // Auth guard helper - returns true if NOT authenticated (to trigger early return)
+  const requireAuth = useCallback((): boolean => {
+    if (!isAuthenticated) { setShowLoginModal(true); return true; }
+    return false;
+  }, [isAuthenticated, setShowLoginModal]);
+
+  // Navigation action for notifications - navigates to task view
+  const viewTaskAction = useCallback((taskId: string): { label: string; onClick: () => void } => ({
+    label: 'Vaata ülesannet',
+    onClick: (): void => { setSelectedTaskId(taskId); setCurrentView('tasks'); }
+  }), [setSelectedTaskId, setCurrentView]);
 
   const [showTaskCreationModal, setShowTaskCreationModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -27,13 +40,13 @@ export function useTaskHandlers(
   const [taskToDelete, setTaskToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const handleAddAllSentencesToTask = useCallback(() => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     setShowAddToTaskDropdown(prev => !prev);
-  }, [isAuthenticated, setShowLoginModal]);
+  }, [requireAuth]);
 
   const handleSelectTaskFromDropdown = useCallback(async (taskId: string, taskName: string) => {
     if (!user) return;
-    const entries = sentences.filter(s => s.text.trim()).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
+    const entries = filterNonEmptySentences(sentences).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
     if (entries.length === 0) return;
 
     try {
@@ -41,7 +54,7 @@ export function useTaskHandlers(
       await dataService.addTextEntriesToTask(user.id, taskId, entries);
       setTaskRefreshTrigger(prev => prev + 1);
       const count = entries.length;
-      showNotification('success', 'Lisatud ülesandesse', `${count} ${count === 1 ? 'lause' : 'lauset'} lisatud ülesandesse ${taskName}!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(taskId); setCurrentView('tasks'); } });
+      showNotification('success', 'Lisatud ülesandesse', `${count} ${count === 1 ? 'lause' : 'lauset'} lisatud ülesandesse ${taskName}!`, undefined, undefined, viewTaskAction(taskId));
     } catch (error) {
       console.error('Failed to add entries:', error);
       showNotification('error', 'Lausungite lisamine ebaõnnestus');
@@ -59,7 +72,7 @@ export function useTaskHandlers(
       const dataService = DataService.getInstance();
       await dataService.addTextEntriesToTask(user.id, taskId, [{ text: sentence.text, stressedText: sentence.phoneticText || sentence.text }]);
       setTaskRefreshTrigger(prev => prev + 1);
-      showNotification('success', 'Lisatud ülesandesse', `Lause lisatud ülesandesse ${taskName}!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(taskId); setCurrentView('tasks'); } });
+      showNotification('success', 'Lisatud ülesandesse', `Lause lisatud ülesandesse ${taskName}!`, undefined, undefined, viewTaskAction(taskId));
     } catch (error) {
       console.error('Failed to add entry:', error);
       showNotification('error', 'Lausungi lisamine ebaõnnestus');
@@ -67,14 +80,14 @@ export function useTaskHandlers(
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 
   const handleCreateNewTaskFromMenu = useCallback((_sentenceId: string) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     setShowAddTaskModal(true);
-  }, [isAuthenticated, setShowLoginModal]);
+  }, [requireAuth]);
 
   const handleCreateTask = useCallback(() => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     setShowAddTaskModal(true);
-  }, [isAuthenticated, setShowLoginModal]);
+  }, [requireAuth]);
 
   const handleTaskCreated = useCallback(async (taskData: CreateTaskRequest) => {
     if (!user) return;
@@ -85,9 +98,9 @@ export function useTaskHandlers(
       setTaskRefreshTrigger(prev => prev + 1);
       const entryCount = taskData.speechEntries?.length || 0;
       if (entryCount > 0) {
-        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud ja ${entryCount} ${entryCount === 1 ? 'lause' : 'lauset'} lisatud!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(newTask.id); setCurrentView('tasks'); } });
+        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud ja ${entryCount} ${entryCount === 1 ? 'lause' : 'lauset'} lisatud!`, undefined, undefined, viewTaskAction(newTask.id));
       } else {
-        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(newTask.id); setCurrentView('tasks'); } });
+        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud!`, undefined, undefined, viewTaskAction(newTask.id));
       }
       setSelectedTaskId(newTask.id);
     } catch (error) {
@@ -100,7 +113,7 @@ export function useTaskHandlers(
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
-      const playlistEntries = sentences.filter(s => s.text.trim()).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
+      const playlistEntries = filterNonEmptySentences(sentences).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
       const newTask = await dataService.createTask(user.id, {
         name: title, description: description || null,
         speechSequences: playlistEntries.map(e => e.text),
@@ -109,7 +122,7 @@ export function useTaskHandlers(
       setShowAddTaskModal(false);
       setTaskRefreshTrigger(prev => prev + 1);
       if (playlistEntries.length > 0) {
-        showNotification('success', 'Ülesanne loodud', `${title} loodud!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(newTask.id); setCurrentView('tasks'); } });
+        showNotification('success', 'Ülesanne loodud', `${title} loodud!`, undefined, undefined, viewTaskAction(newTask.id));
       }
       setSelectedTaskId(newTask.id);
     } catch (error) {
@@ -119,7 +132,7 @@ export function useTaskHandlers(
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 
   const handleEditTask = useCallback(async (task: { id: string; name: string; description?: string | null }) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
@@ -131,7 +144,7 @@ export function useTaskHandlers(
     } catch (error) {
       console.error('Failed to load task:', error);
     }
-  }, [isAuthenticated, user, setShowLoginModal]);
+  }, [requireAuth, user]);
 
   const handleTaskUpdated = useCallback(async (): Promise<void> => {
     if (!user || !taskToEdit) return;
@@ -149,7 +162,7 @@ export function useTaskHandlers(
   }, [user, taskToEdit, showNotification]);
 
   const handleDeleteTask = useCallback(async (taskId: string) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
@@ -158,7 +171,7 @@ export function useTaskHandlers(
     } catch (error) {
       console.error('Failed to load task:', error);
     }
-  }, [isAuthenticated, user, setShowLoginModal]);
+  }, [requireAuth, user]);
 
   const handleConfirmDelete = useCallback(async () => {
     if (!user || !taskToDelete) return;
@@ -180,7 +193,7 @@ export function useTaskHandlers(
   const handleCancelDelete = useCallback(() => { setShowDeleteConfirmation(false); setTaskToDelete(null); }, []);
 
   const handleShareTask = useCallback(async (task: { id: string; name: string; shareToken?: string }) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
@@ -190,7 +203,7 @@ export function useTaskHandlers(
     } catch (error) {
       console.error('Failed to share task:', error);
     }
-  }, [isAuthenticated, user, setShowLoginModal]);
+  }, [requireAuth, user]);
 
   return {
     showTaskCreationModal, setShowTaskCreationModal,

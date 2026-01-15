@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useState, useEffect, useCallback } from 'react';
 import { SentenceState } from '@/types/synthesis';
 

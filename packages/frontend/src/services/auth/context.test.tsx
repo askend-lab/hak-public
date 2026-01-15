@@ -1,4 +1,4 @@
-/* eslint-disable max-lines-per-function, max-lines */
+ 
 import { vi } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 

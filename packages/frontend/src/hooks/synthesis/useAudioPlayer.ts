@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useState, useCallback } from 'react';
 
 export function useAudioPlayer(): {

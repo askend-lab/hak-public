@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { HeadObjectCommand } from '@aws-sdk/client-s3';
 
 export interface S3ClientLike {

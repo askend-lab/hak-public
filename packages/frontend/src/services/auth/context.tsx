@@ -1,4 +1,4 @@
-/* eslint-disable max-lines-per-function */
+ 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 import { AuthStorage } from './storage';

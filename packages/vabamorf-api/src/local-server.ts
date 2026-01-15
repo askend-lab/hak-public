@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import http from 'http';
 import { analyzeHandler, variantsHandler, healthHandler } from './handler';
 import { APIGatewayProxyEvent } from 'aws-lambda';

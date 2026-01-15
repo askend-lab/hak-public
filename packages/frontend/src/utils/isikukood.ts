@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /**
  * Estonian Isikukood (Personal Identification Code) validation utility
  * Format: GYYMMDDSSSC

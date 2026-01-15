@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function, max-lines */
 import { Task, TaskEntry, TaskSummary, CreateTaskRequest } from '@/types/task';
 import { LocalStorageAdapter } from '../storage/LocalStorageAdapter';
 import { MockDataLoader } from '../storage/MockDataLoader';

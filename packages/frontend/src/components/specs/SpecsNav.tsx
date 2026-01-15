@@ -39,7 +39,7 @@ function getFeatureStats(feature: ParsedFeature, testSuites: TestSuite[]) {
   return { passed, total };
 }
 
-// eslint-disable-next-line max-lines-per-function
+ 
 export default function SpecsNav({ groups, testSuites, selectedFeature, expandedGroups, expandedFeatures, onToggleGroup, onToggleFeature, onSelectFeature }: SpecsNavProps) {
   const totalFeatures = groups.flatMap(g => g.features).length;
 
@@ -50,7 +50,7 @@ export default function SpecsNav({ groups, testSuites, selectedFeature, expanded
         <span className="specs-page__nav-count">{totalFeatures} total</span>
       </div>
       
-      {/* eslint-disable-next-line max-lines-per-function */}
+      { }
       {groups.map((group) => {
         const isGroupExpanded = expandedGroups.has(group.name);
         const groupStats = group.features.reduce(

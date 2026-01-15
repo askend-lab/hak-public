@@ -1,4 +1,4 @@
-/* eslint-disable max-lines-per-function, complexity */
+ 
 import { useState, useEffect } from 'react';
 import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';

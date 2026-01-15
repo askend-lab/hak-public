@@ -1,14 +1,14 @@
-/* eslint-disable max-lines-per-function, complexity */
+ 
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { transformToUI, transformToVabamorf } from '@/utils/phoneticMarkers';
 import { synthesizeWithPolling } from '@/utils/synthesize';
+import { createAudioPlayer } from '@/utils/audioPlayer';
+import { getVoiceModel } from '@/types/synthesis';
 import { BackIcon, PlayIcon, PauseIcon, CloseIcon } from './ui/Icons';
 
 interface SentencePhoneticPanelProps { sentenceText: string; phoneticText: string | null; isOpen: boolean; onClose: () => void; onApply: (newPhoneticText: string) => void; }
-
-const getVoiceModel = (text: string): 'efm_s' | 'efm_l' => text.trim().split(/\s+/).filter(w => w.length > 0).length === 1 ? 'efm_s' : 'efm_l';
 
 const markerData = [
   { symbol: '`', name: 'kolmas välde', rule: 'Paikneb kolmandavältelise silbi esimese vokaali ees ainult täishääliku ees.', examples: ['k`ätte', 'par`ool'] },
@@ -78,9 +78,14 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     setIsLoading(true); setIsPlaying(false);
     try {
-      const vt = transformToVabamorf(editedText); const url = await synthesizeWithPolling(vt || '', getVoiceModel(vt || '')); const audio = new Audio(url); audioRef.current = audio;
-      audio.onloadeddata = () => { setIsLoading(false); setIsPlaying(true); };
-      audio.onended = audio.onerror = () => { setIsPlaying(false); setIsLoading(false); URL.revokeObjectURL(url); audioRef.current = null; };
+      const vt = transformToVabamorf(editedText);
+      const url = await synthesizeWithPolling(vt || '', getVoiceModel(vt || ''));
+      const { audio } = createAudioPlayer(url, {
+        onLoaded: () => { setIsLoading(false); setIsPlaying(true); },
+        onEnded: () => { setIsPlaying(false); setIsLoading(false); audioRef.current = null; },
+        onError: () => { setIsPlaying(false); setIsLoading(false); audioRef.current = null; },
+      });
+      audioRef.current = audio;
       await audio.play();
     } catch (e) { console.error('Failed to play:', e); setIsPlaying(false); setIsLoading(false); }
   };
