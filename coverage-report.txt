@@ -1,0 +1,3479 @@
+
+> @hak/frontend@0.1.0 test:coverage /home/alex/users/bob/hak/packages/frontend
+> vitest run --coverage --coverage.reporter=json-summary --coverage.reporter=text --coverage.reportOnFailure
+
+[1m[43m DEPRECATED [49m[22m [33m`test.poolOptions` was removed in Vitest 4. All previous `poolOptions` are now top-level options. Please, refer to the migration guide: https://vitest.dev/guide/migration#pool-rework[39m
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/home/alex/users/bob/hak/packages/frontend[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+[90mstderr[2m | src/components/TaskManager.test.tsx[2m > [22m[2mTaskManager[2m > [22m[2mshould render loading state initially
+[22m[39mAn update to TaskManager inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskManager inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/PronunciationVariants.full.test.tsx[2m > [22m[2mPronunciationVariants Full[2m > [22m[2mrenders when open
+[22m[39mAn update to PronunciationVariants inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PronunciationVariants inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/PronunciationVariants.test.tsx[2m > [22m[2mPronunciationVariants[2m > [22m[2mrendering[2m > [22m[2mrenders panel when open
+[22m[39mAn update to PronunciationVariants inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PronunciationVariants inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/PronunciationVariants.test.tsx[2m > [22m[2mPronunciationVariants[2m > [22m[2mrendering[2m > [22m[2mrenders close button
+[22m[39mAn update to PronunciationVariants inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PronunciationVariants inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/PlaylistAudioPlayer.test.tsx [2m([22m[2m25 tests[22m[2m)[22m[33m 808[2mms[22m[39m
+[90mstdout[2m | src/components/TaskManager.test.tsx[2m > [22m[2mTaskManager[2m > [22m[2mshould call onShareTask when share clicked
+[22m[39mTaskManager handleShare called with taskId: task-1
+
+[90mstderr[2m | src/components/TaskDetailView.full.test.tsx[2m > [22m[2mTaskDetailView Full[2m > [22m[2mshows loading state initially
+[22m[39mAn update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/TaskDetailView.full.test.tsx[2m > [22m[2mTaskDetailView Full[2m > [22m[2mrenders with taskId prop
+[22m[39mAn update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/TaskManager.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 1292[2mms[22m[39m
+ [32m✓[39m src/components/TaskCreationModal.full.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1288[2mms[22m[39m
+     [33m[2m✓[22m[39m allows adding description [33m 446[2mms[22m[39m
+[90mstderr[2m | src/components/TaskDetailView.full.test.tsx[2m > [22m[2mTaskDetailView Full[2m > [22m[2mhandles API error gracefully
+[22m[39mAn update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/SentencePhoneticPanel.full.test.tsx [2m([22m[2m18 tests[22m[2m)[22m[33m 1239[2mms[22m[39m
+[90mstderr[2m | src/components/TaskDetailView.full.test.tsx[2m > [22m[2mTaskDetailView Full[2m > [22m[2mhandles entry with audioUrl
+[22m[39mAn update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/AudioPlayer.test.tsx [2m([22m[2m31 tests[22m[2m)[22m[33m 1101[2mms[22m[39m
+ [32m✓[39m src/components/FeedbackModal.full.test.tsx [2m([22m[2m15 tests[22m[2m)[22m[33m 2119[2mms[22m[39m
+       [33m[2m✓[22m[39m enables submit button when message entered [33m 374[2mms[22m[39m
+       [33m[2m✓[22m[39m calls onSubmit with message and email [33m 597[2mms[22m[39m
+ [32m✓[39m src/components/SentenceSynthesisItem.test.tsx [2m([22m[2m39 tests[22m[2m)[22m[33m 1885[2mms[22m[39m
+ [32m✓[39m src/components/PronunciationVariants.test.tsx [2m([22m[2m20 tests[22m[2m)[22m[33m 1606[2mms[22m[39m
+ [32m✓[39m src/components/TaskDetailView.full.test.tsx [2m([22m[2m16 tests[22m[2m)[22m[33m 1028[2mms[22m[39m
+ [32m✓[39m src/components/PronunciationVariants.full.test.tsx [2m([22m[2m13 tests[22m[2m)[22m[33m 1995[2mms[22m[39m
+     [33m[2m✓[22m[39m clears custom input when clear button clicked [33m 461[2mms[22m[39m
+ [32m✓[39m src/components/TaskEditModal.full.test.tsx [2m([22m[2m18 tests[22m[2m)[22m[33m 1728[2mms[22m[39m
+       [33m[2m✓[22m[39m calls setTaskToEdit with trimmed values and onSave [33m 381[2mms[22m[39m
+ [32m✓[39m src/components/AddEntryModal.test.tsx [2m([22m[2m18 tests[22m[2m)[22m[33m 2917[2mms[22m[39m
+       [33m[2m✓[22m[39m allows entering description [33m 301[2mms[22m[39m
+       [33m[2m✓[22m[39m calls onAdd with trimmed values [33m 514[2mms[22m[39m
+ [32m✓[39m src/components/Playlist.test.tsx [2m([22m[2m34 tests[22m[2m)[22m[33m 951[2mms[22m[39m
+ [32m✓[39m src/components/TaskCreationModal.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 928[2mms[22m[39m
+       [33m[2m✓[22m[39m calls onCreateTask when form submitted with name [33m 505[2mms[22m[39m
+ [32m✓[39m src/components/PlaylistItem.test.tsx [2m([22m[2m27 tests[22m[2m)[22m[33m 1083[2mms[22m[39m
+ [32m✓[39m src/components/TaskDetailView/TaskDetailHeader.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 917[2mms[22m[39m
+ [32m✓[39m src/components/Footer.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 714[2mms[22m[39m
+ [32m✓[39m src/contexts/AuthContext.login.full.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 6684[2mms[22m[39m
+     [33m[2m✓[22m[39m logs in with valid code from database [33m 1634[2mms[22m[39m
+     [33m[2m✓[22m[39m creates user if not in database [33m 1647[2mms[22m[39m
+     [33m[2m✓[22m[39m handles fetch error [33m 1625[2mms[22m[39m
+     [33m[2m✓[22m[39m closes modal on successful login [33m 1631[2mms[22m[39m
+[90mstdout[2m | src/components/Footer.full.test.tsx[2m > [22m[2mFooter[2m > [22m[2mfeedback modal[2m > [22m[2mmakes API call with correct payload on submit
+[22m[39mFeedback submitted successfully
+
+ [32m✓[39m src/components/Footer.full.test.tsx [2m([22m[2m13 tests[22m[2m)[22m[33m 1021[2mms[22m[39m
+ [32m✓[39m src/components/onboarding/WizardTooltip.full.test.tsx [2m([22m[2m26 tests[22m[2m)[22m[33m 1242[2mms[22m[39m
+ [32m✓[39m src/components/UserProfile.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 442[2mms[22m[39m
+ [32m✓[39m src/components/LoginModal.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 673[2mms[22m[39m
+ [32m✓[39m src/components/TextInput.full.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 914[2mms[22m[39m
+ [32m✓[39m src/components/AddToTaskDropdown.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 1320[2mms[22m[39m
+ [32m✓[39m src/components/Dashboard.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 464[2mms[22m[39m
+ [32m✓[39m src/components/UserProfile.full.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 203[2mms[22m[39m
+ [32m✓[39m src/App.test.tsx [2m([22m[2m20 tests[22m[2m)[22m[33m 956[2mms[22m[39m
+ [32m✓[39m src/components/ConfirmationModal.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 267[2mms[22m[39m
+ [32m✓[39m src/components/SentenceMenu.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 533[2mms[22m[39m
+ [32m✓[39m src/components/ConfirmDialog.full.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 311[2mms[22m[39m
+[90mstderr[2m | src/pages/AuthCallbackPage.test.tsx[2m > [22m[2mAuthCallbackPage[2m > [22m[2mshows error from query params
+[22m[39mAuth callback error: access_denied User denied
+
+ [32m✓[39m src/hooks/useSynthesis.branches.test.ts [2m([22m[2m25 tests[22m[2m)[22m[32m 209[2mms[22m[39m
+ [32m✓[39m src/pages/AuthCallbackPage.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 333[2mms[22m[39m
+ [32m✓[39m src/components/onboarding/RoleSelectionPage.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 325[2mms[22m[39m
+ [32m✓[39m src/components/SentencePhoneticPanel.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 585[2mms[22m[39m
+ [32m✓[39m src/components/ShareTaskModal.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 494[2mms[22m[39m
+ [32m✓[39m src/contexts/AuthContext.full.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 314[2mms[22m[39m
+ [32m✓[39m src/components/specs/SpecsNav.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 820[2mms[22m[39m
+     [33m[2m✓[22m[39m shows total features count [33m 335[2mms[22m[39m
+ [32m✓[39m src/contexts/OnboardingContext.full.test.tsx [2m([22m[2m15 tests[22m[2m)[22m[33m 484[2mms[22m[39m
+ [32m✓[39m src/components/AudioPlayer.full.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[32m 181[2mms[22m[39m
+ [32m✓[39m src/components/TaskDetailView/TaskDetailStates.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 426[2mms[22m[39m
+ [32m✓[39m src/components/onboarding/RoleMascot.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[32m 206[2mms[22m[39m
+ [32m✓[39m src/hooks/useTaskHandlers.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 299[2mms[22m[39m
+ [32m✓[39m src/components/ui/Icons.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[32m 230[2mms[22m[39m
+ [32m✓[39m src/components/onboarding/RoleSelectionPage.render.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 280[2mms[22m[39m
+ [32m✓[39m src/services/auth/context.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[32m 279[2mms[22m[39m
+ [32m✓[39m src/components/BuildInfo.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 365[2mms[22m[39m
+ [32m✓[39m src/components/onboarding/WizardTooltip.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 386[2mms[22m[39m
+ [32m✓[39m src/hooks/useSynthesis.full.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 265[2mms[22m[39m
+[90mstderr[2m | src/components/TaskDetailView.test.tsx[2m > [22m[2mTaskDetailView[2m > [22m[2mshould render loading state initially
+[22m[39mAn update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TaskDetailView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/Notification.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 139[2mms[22m[39m
+ [32m✓[39m src/components/TaskDetailView.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 359[2mms[22m[39m
+[90mstderr[2m | src/hooks/useSynthesis.test.ts[2m > [22m[2museSynthesis[2m > [22m[2mshould handle play with input
+[22m[39mFailed to synthesize: TypeError: Cannot read properties of undefined (reading 'ok')
+    at [90m/home/alex/users/bob/hak/packages/frontend/[39msrc/hooks/synthesis/useSynthesisAPI.ts:23:19
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at Object.synthesizeText [90m(/home/alex/users/bob/hak/packages/frontend/[39msrc/hooks/synthesis/useSynthesisAPI.ts:37:32[90m)[39m
+    at [90m/home/alex/users/bob/hak/packages/frontend/[39msrc/hooks/synthesis/useSynthesisOrchestrator.ts:152:22
+An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/hooks/useSynthesis.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 251[2mms[22m[39m
+ [32m✓[39m src/contexts/AuthContext.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 192[2mms[22m[39m
+ [32m✓[39m src/components/specs/SpecsContent.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 290[2mms[22m[39m
+ [32m✓[39m src/components/TextInput.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 331[2mms[22m[39m
+ [32m✓[39m src/hooks/useSynthesis.playback.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 292[2mms[22m[39m
+ [32m✓[39m src/components/TaskDetailView/TaskDetailEmpty.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 197[2mms[22m[39m
+ [32m✓[39m src/components/TaskEditModal.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 419[2mms[22m[39m
+[90mstderr[2m | src/components/TaskDetailView/hooks/useAudioPlayback.test.ts[2m > [22m[2museAudioPlayback handlePlayAll[2m > [22m[2mstarts loading when called with entries
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/SpecsPage.test.tsx[2m > [22m[2mSpecsPage[2m > [22m[2mrenders specs page container
+[22m[39mAn update to SpecsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/SpecsPage.test.tsx[2m > [22m[2mSpecsPage[2m > [22m[2mrenders header with title
+[22m[39mAn update to SpecsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/SpecsPage.test.tsx[2m > [22m[2mSpecsPage[2m > [22m[2mrenders back button with text
+[22m[39mAn update to SpecsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | src/components/SpecsPage.test.tsx[2m > [22m[2mSpecsPage[2m > [22m[2mcalls onBack when back button clicked
+[22m[39mAn update to SpecsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/TaskDetailView/hooks/useAudioPlayback.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 164[2mms[22m[39m
+[90mstderr[2m | src/components/SpecsPage.test.tsx[2m > [22m[2mSpecsPage[2m > [22m[2mshows loading text initially
+[22m[39mAn update to SpecsPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/components/SpecsPage.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 214[2mms[22m[39m
+ [32m✓[39m src/hooks/useDragAndDrop.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 254[2mms[22m[39m
+ [32m✓[39m src/components/BaseModal.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[32m 221[2mms[22m[39m
+ [32m✓[39m src/contexts/AuthContext.login.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 166[2mms[22m[39m
+[90mstderr[2m | src/hooks/useVariantsPanel.test.ts[2m > [22m[2museVariantsPanel[2m > [22m[2mshould close sentence phonetic panel
+[22m[39mFailed to analyze text: TypeError: Cannot read properties of undefined (reading 'ok')
+    at analyzeText [90m(/home/alex/users/bob/hak/packages/frontend/[39msrc/utils/analyzeApi.ts:26:19[90m)[39m
+    at Object.handleExplorePhonetic [90m(/home/alex/users/bob/hak/packages/frontend/[39msrc/hooks/useVariantsPanel.ts:113:28[90m)[39m
+    at [90m/home/alex/users/bob/hak/packages/frontend/[39msrc/hooks/useVariantsPanel.test.ts:223:7
+
+[90mstderr[2m | src/hooks/useVariantsPanel.test.ts[2m > [22m[2museVariantsPanel[2m > [22m[2mshould handle fetch error gracefully
+[22m[39mFailed to analyze text: Error: Network error
+    at [90m/home/alex/users/bob/hak/packages/frontend/[39msrc/hooks/useVariantsPanel.test.ts:252:70
+    at file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest[24m/runner/dist/index.js:145:11
+    at file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest[24m/runner/dist/index.js:915:26
+    at file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest[24m/runner/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest[24m/runner/dist/index.js:1209:10)
+    at file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest[24m/runner/dist/index.js:1653:37
+    at Traces.$ (file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@25.0.3_happy-dom@20.0.11_jsdom@27.3.0_sass@1.97.1_tsx@4.21.0_yaml@2.8.2/node_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27)
+    at trace (file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@25.0.3_happy-dom@20.0.11_jsdom@27.3.0_sass@1.97.1_tsx@4.21.0_yaml@2.8.2/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21)
+    at runTest (file:///home/alex/users/bob/hak/node_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest[24m/runner/dist/index.js:1653:12)
+
+ [32m✓[39m src/hooks/useVariantsPanel.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 353[2mms[22m[39m
+ [32m✓[39m src/components/FeedbackModal.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 129[2mms[22m[39m
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mupdateTaskEntry[2m > [22m[2mupdates entry in user task
+[22m[39mCreating task for userId: 38001085718
+Task data: {
+  name: [32m'Entry Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Original'[39m ]
+}
+Generated new task: {
+  id: [32m'task_1768492688277_cfl56okil'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Entry Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Original'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492688277_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Original'[39m,
+      stressedText: [32m'Original'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:08.277Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:08.277Z[39m,
+  updatedAt: [35m2026-01-15T15:58:08.277Z[39m,
+  shareToken: [32m'73f5e1e30dfecc35'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492688277_cfl56okil'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Entry Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [ [32m'Original'[39m ],
+    entries: [ [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:08.277Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.277Z'[39m,
+    shareToken: [32m'73f5e1e30dfecc35'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492688277_cfl56okil'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Entry Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Original'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492688277_0'[39m,
+      taskId: [32m'task_1768492688277_cfl56okil'[39m,
+      text: [32m'Original'[39m,
+      stressedText: [32m'Original'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:08.277Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:08.277Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.277Z'[39m,
+  shareToken: [32m'73f5e1e30dfecc35'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mupdateTaskEntry[2m > [22m[2mthrows when updating non-existent entry
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Test'[39m, description: [32m''[39m, speechSequences: [ [32m'Text'[39m ] }
+Generated new task: {
+  id: [32m'task_1768492688291_50gslg7h1'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Text'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492688291_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Text'[39m,
+      stressedText: [32m'Text'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:08.291Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:08.291Z[39m,
+  updatedAt: [35m2026-01-15T15:58:08.291Z[39m,
+  shareToken: [32m'adf03bda1965be2a'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492688291_50gslg7h1'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [ [32m'Text'[39m ],
+    entries: [ [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:08.291Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.291Z'[39m,
+    shareToken: [32m'adf03bda1965be2a'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492688291_50gslg7h1'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Text'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492688291_0'[39m,
+      taskId: [32m'task_1768492688291_50gslg7h1'[39m,
+      text: [32m'Text'[39m,
+      stressedText: [32m'Text'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:08.291Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:08.291Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.291Z'[39m,
+  shareToken: [32m'adf03bda1965be2a'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2mfinds task by share token in shared storage
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Shareable Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492688295_bze0es2pk'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shareable Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:08.295Z[39m,
+  updatedAt: [35m2026-01-15T15:58:08.295Z[39m,
+  shareToken: [32m'b3e40d7e5adea326'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492688295_bze0es2pk'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shareable Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+    shareToken: [32m'b3e40d7e5adea326'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492688295_bze0es2pk'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shareable Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+  shareToken: [32m'b3e40d7e5adea326'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2mfinds task by share token in shared storage
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492688295_bze0es2pk'[39m,
+  task: {
+    id: [32m'task_1768492688295_bze0es2pk'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shareable Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+    shareToken: [32m'b3e40d7e5adea326'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492688295_bze0es2pk'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shareable Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+  shareToken: [32m'b3e40d7e5adea326'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492688295_bze0es2pk'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shareable Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+    shareToken: [32m'b3e40d7e5adea326'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2mfinds task by share token in shared storage
+[22m[39mLooking for share token: b3e40d7e5adea326
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2mfinds task by share token in shared storage
+[22m[39mChecking global shared tasks storage
+Found shared task with share token: {
+  id: [32m'task_1768492688295_bze0es2pk'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shareable Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.295Z'[39m,
+  shareToken: [32m'b3e40d7e5adea326'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through all user task keys
+[22m[39mCreating task for userId: user1
+Task data: { name: [32m'User1 Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492688308_itba1didg'[39m,
+  userId: [32m'user1'[39m,
+  name: [32m'User1 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:08.308Z[39m,
+  updatedAt: [35m2026-01-15T15:58:08.308Z[39m,
+  shareToken: [32m'b07316514fdb631f'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_user1
+Tasks after save: [
+  {
+    id: [32m'task_1768492688308_itba1didg'[39m,
+    userId: [32m'user1'[39m,
+    name: [32m'User1 Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.308Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.308Z'[39m,
+    shareToken: [32m'b07316514fdb631f'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492688308_itba1didg'[39m,
+  userId: [32m'user1'[39m,
+  name: [32m'User1 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.308Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.308Z'[39m,
+  shareToken: [32m'b07316514fdb631f'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through all user task keys
+[22m[39mCreating task for userId: user2
+Task data: { name: [32m'User2 Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492688310_cjqp8brg3'[39m,
+  userId: [32m'user2'[39m,
+  name: [32m'User2 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:08.310Z[39m,
+  updatedAt: [35m2026-01-15T15:58:08.310Z[39m,
+  shareToken: [32m'6ca9a80d761ac15d'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_user2
+Tasks after save: [
+  {
+    id: [32m'task_1768492688310_cjqp8brg3'[39m,
+    userId: [32m'user2'[39m,
+    name: [32m'User2 Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.310Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.310Z'[39m,
+    shareToken: [32m'6ca9a80d761ac15d'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492688310_cjqp8brg3'[39m,
+  userId: [32m'user2'[39m,
+  name: [32m'User2 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.310Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.310Z'[39m,
+  shareToken: [32m'6ca9a80d761ac15d'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through all user task keys
+[22m[39mLooking for share token: 6ca9a80d761ac15d
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through all user task keys
+[22m[39mChecking global shared tasks storage
+Checking user task keys: [ [32m'eki_user_tasks_user1'[39m, [32m'eki_user_tasks_user2'[39m ]
+Found user task with share token: {
+  id: [32m'task_1768492688310_cjqp8brg3'[39m,
+  userId: [32m'user2'[39m,
+  name: [32m'User2 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.310Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.310Z'[39m,
+  shareToken: [32m'6ca9a80d761ac15d'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns baseline task by ID
+[22m[39mGetting shared task: task-001
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns baseline task by ID
+[22m[39mFound baseline task: {
+  id: [32m'task-001'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Eesti keele põhihääldus'[39m,
+  description: [32m'Põhilised eesti keele hääldusreeglid ja harjutused'[39m,
+  entries: [
+    {
+      id: [32m'entry-001'[39m,
+      text: [32m'Tere, kuidas teil läheb?'[39m,
+      stressedText: [32m'tere kuidas t<e+il lähe+b'[39m,
+      audioUrl: [1mnull[22m,
+      order: [33m1[39m,
+      taskId: [32m'task-001'[39m,
+      audioBlob: [1mnull[22m,
+      createdAt: [35m2024-01-15T10:00:00.000Z[39m
+    },
+    {
+      id: [32m'entry-002'[39m,
+      text: [32m'Ma elan Tallinnas'[39m,
+      stressedText: [32m'ma ela+n T<al]linna+s'[39m,
+      audioUrl: [1mnull[22m,
+      order: [33m2[39m,
+      taskId: [32m'task-001'[39m,
+      audioBlob: [1mnull[22m,
+      createdAt: [35m2024-01-15T10:00:00.000Z[39m
+    }
+  ],
+  createdAt: [35m2024-01-15T10:00:00.000Z[39m,
+  updatedAt: [35m2024-01-20T14:30:00.000Z[39m,
+  shareToken: [32m'abc123def456'[39m,
+  speechSequences: [ [32m'Tere, kuidas teil läheb?'[39m, [32m'Ma elan Tallinnas'[39m ]
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared user task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'To Share'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492688324_zptbjcdhe'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'To Share'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:08.324Z[39m,
+  updatedAt: [35m2026-01-15T15:58:08.324Z[39m,
+  shareToken: [32m'f84c0391e3fe4c66'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492688324_zptbjcdhe'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'To Share'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    shareToken: [32m'f84c0391e3fe4c66'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492688324_zptbjcdhe'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'To Share'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+  shareToken: [32m'f84c0391e3fe4c66'[39m
+}
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared user task
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492688324_zptbjcdhe'[39m,
+  task: {
+    id: [32m'task_1768492688324_zptbjcdhe'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'To Share'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    shareToken: [32m'f84c0391e3fe4c66'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492688324_zptbjcdhe'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'To Share'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+  shareToken: [32m'f84c0391e3fe4c66'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492688324_zptbjcdhe'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'To Share'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    shareToken: [32m'f84c0391e3fe4c66'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared user task
+[22m[39mGetting shared task: task_1768492688324_zptbjcdhe
+
+[90mstdout[2m | src/services/dataService.baseline.test.ts[2m > [22m[2mDataService Baseline Task Operations[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared user task
+[22m[39mShared tasks storage: [
+  {
+    id: [32m'task_1768492688324_zptbjcdhe'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'To Share'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+    shareToken: [32m'f84c0391e3fe4c66'[39m
+  }
+]
+Found shared task: {
+  id: [32m'task_1768492688324_zptbjcdhe'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'To Share'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:08.324Z'[39m,
+  shareToken: [32m'f84c0391e3fe4c66'[39m
+}
+
+ [32m✓[39m src/components/NotificationContainer.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 417[2mms[22m[39m
+ [32m✓[39m src/services/dataService.baseline.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 75[2mms[22m[39m
+ [32m✓[39m src/components/onboarding/OnboardingWizard.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 77[2mms[22m[39m
+ [32m✓[39m src/hooks/useSynthesis.extra.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 307[2mms[22m[39m
+ [32m✓[39m src/hooks/useSentenceMenu.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 122[2mms[22m[39m
+ [32m✓[39m src/components/ConfirmDialog.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 174[2mms[22m[39m
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddEntryToTask[2m > [22m[2madds entry to user task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Test Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492689186_ss2kdsr2m'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.186Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.186Z[39m,
+  shareToken: [32m'00ea4d4413f624a0'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689186_ss2kdsr2m'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Test Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.186Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.186Z'[39m,
+    shareToken: [32m'00ea4d4413f624a0'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689186_ss2kdsr2m'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.186Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.186Z'[39m,
+  shareToken: [32m'00ea4d4413f624a0'[39m
+}
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple string entries
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Test Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492689201_98bkevzv4'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.201Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.201Z[39m,
+  shareToken: [32m'74ee81e71246adba'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689201_98bkevzv4'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Test Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.201Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.201Z'[39m,
+    shareToken: [32m'74ee81e71246adba'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689201_98bkevzv4'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.201Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.201Z'[39m,
+  shareToken: [32m'74ee81e71246adba'[39m
+}
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple string entries
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492689201_98bkevzv4'[39m,
+  textEntries: [ [32m'Entry 1'[39m, [32m'Entry 2'[39m, [32m'Entry 3'[39m ]
+}
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple string entries
+[22m[39mFound task: {
+  id: [32m'task_1768492689201_98bkevzv4'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.201Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.201Z'[39m,
+  shareToken: [32m'74ee81e71246adba'[39m
+}
+Is user task: [33mtrue[39m User tasks count: [33m1[39m
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds entries with stressed text
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Test Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492689207_klnp4rxfo'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.207Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.207Z[39m,
+  shareToken: [32m'031726e52daa2246'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689207_klnp4rxfo'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Test Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.207Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.207Z'[39m,
+    shareToken: [32m'031726e52daa2246'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689207_klnp4rxfo'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.207Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.207Z'[39m,
+  shareToken: [32m'031726e52daa2246'[39m
+}
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds entries with stressed text
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492689207_klnp4rxfo'[39m,
+  textEntries: [
+    { text: [32m'Hello'[39m, stressedText: [32m'Hel·lo'[39m },
+    { text: [32m'World'[39m, stressedText: [32m'World'[39m }
+  ]
+}
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds entries with stressed text
+[22m[39mFound task: {
+  id: [32m'task_1768492689207_klnp4rxfo'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.207Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.207Z'[39m,
+  shareToken: [32m'031726e52daa2246'[39m
+}
+Is user task: [33mtrue[39m User tasks count: [33m1[39m
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mcalculates correct order numbers
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Test Task'[39m, description: [32m''[39m, speechSequences: [ [32m'Existing'[39m ] }
+Generated new task: {
+  id: [32m'task_1768492689214_why2amqpa'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Existing'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689214_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Existing'[39m,
+      stressedText: [32m'Existing'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:09.214Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:09.214Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.214Z[39m,
+  shareToken: [32m'd4984de111704fc5'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689214_why2amqpa'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Test Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [ [32m'Existing'[39m ],
+    entries: [ [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:09.214Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.214Z'[39m,
+    shareToken: [32m'd4984de111704fc5'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689214_why2amqpa'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Existing'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689214_0'[39m,
+      taskId: [32m'task_1768492689214_why2amqpa'[39m,
+      text: [32m'Existing'[39m,
+      stressedText: [32m'Existing'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:09.214Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:09.214Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.214Z'[39m,
+  shareToken: [32m'd4984de111704fc5'[39m
+}
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mcalculates correct order numbers
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492689214_why2amqpa'[39m,
+  textEntries: [ [32m'New 1'[39m, [32m'New 2'[39m ]
+}
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mcalculates correct order numbers
+[22m[39mFound task: {
+  id: [32m'task_1768492689214_why2amqpa'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [ [32m'Existing'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689214_0'[39m,
+      taskId: [32m'task_1768492689214_why2amqpa'[39m,
+      text: [32m'Existing'[39m,
+      stressedText: [32m'Existing'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:09.214Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:09.214Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.214Z'[39m,
+  shareToken: [32m'd4984de111704fc5'[39m
+}
+Is user task: [33mtrue[39m User tasks count: [33m1[39m
+
+[90mstdout[2m | src/services/dataService.entries.full.test.ts[2m > [22m[2mDataService Entry Operations[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mthrows for non-existent task
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'non-existent'[39m,
+  textEntries: [ [32m'Test'[39m ]
+}
+
+ [32m✓[39m src/services/dataService.entries.full.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mlocalStorage error handling[2m > [22m[2mhandles localStorage.setItem throwing error
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Test'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492689471_7gkzus0fw'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.471Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.471Z[39m,
+  shareToken: [32m'1479b3662d47981b'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: []
+Newly saved task found: [90mundefined[39m
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddEntryToTask[2m > [22m[2madds entry to user-created task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Task with Entry'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492689497_4509p3g47'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task with Entry'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.497Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.497Z[39m,
+  shareToken: [32m'92cb1a4708dbaefb'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689497_4509p3g47'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task with Entry'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.497Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.497Z'[39m,
+    shareToken: [32m'92cb1a4708dbaefb'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689497_4509p3g47'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task with Entry'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.497Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.497Z'[39m,
+  shareToken: [32m'92cb1a4708dbaefb'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple string entries
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Multi Entry Task'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492689515_ak8gv3n8i'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Multi Entry Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.515Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.515Z[39m,
+  shareToken: [32m'6c171cc1dc601025'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689515_ak8gv3n8i'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Multi Entry Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.515Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.515Z'[39m,
+    shareToken: [32m'6c171cc1dc601025'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689515_ak8gv3n8i'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Multi Entry Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.515Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.515Z'[39m,
+  shareToken: [32m'6c171cc1dc601025'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple string entries
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492689515_ak8gv3n8i'[39m,
+  textEntries: [ [32m'Entry 1'[39m, [32m'Entry 2'[39m, [32m'Entry 3'[39m ]
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple string entries
+[22m[39mFound task: {
+  id: [32m'task_1768492689515_ak8gv3n8i'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Multi Entry Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.515Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.515Z'[39m,
+  shareToken: [32m'6c171cc1dc601025'[39m
+}
+Is user task: [33mtrue[39m User tasks count: [33m1[39m
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple object entries with stressed text
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Stressed Entry Task'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492689533_x5ez4cyvc'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Stressed Entry Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.533Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.533Z[39m,
+  shareToken: [32m'fa2c556aeb74abce'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689533_x5ez4cyvc'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Stressed Entry Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.533Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.533Z'[39m,
+    shareToken: [32m'fa2c556aeb74abce'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689533_x5ez4cyvc'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Stressed Entry Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.533Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.533Z'[39m,
+  shareToken: [32m'fa2c556aeb74abce'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple object entries with stressed text
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492689533_x5ez4cyvc'[39m,
+  textEntries: [
+    { text: [32m'Hello'[39m, stressedText: [32m'Hel·lo'[39m },
+    { text: [32m'World'[39m, stressedText: [32m'World'[39m }
+  ]
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2madds multiple object entries with stressed text
+[22m[39mFound task: {
+  id: [32m'task_1768492689533_x5ez4cyvc'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Stressed Entry Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.533Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.533Z'[39m,
+  shareToken: [32m'fa2c556aeb74abce'[39m
+}
+Is user task: [33mtrue[39m User tasks count: [33m1[39m
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mthrows when adding entries to non-existent task
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'non-existent'[39m,
+  textEntries: [ [32m'Entry'[39m ]
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mcalculates correct order for new entries
+[22m[39mCreating task for userId: 38001085718
+Task data: {
+  name: [32m'Order Test'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Existing 1'[39m, [32m'Existing 2'[39m ]
+}
+Generated new task: {
+  id: [32m'task_1768492689582_gf1nhtfuh'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Order Test'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Existing 1'[39m, [32m'Existing 2'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689582_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Existing 1'[39m,
+      stressedText: [32m'Existing 1'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:09.582Z[39m
+    },
+    {
+      id: [32m'entry_1768492689582_1'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Existing 2'[39m,
+      stressedText: [32m'Existing 2'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m2[39m,
+      createdAt: [35m2026-01-15T15:58:09.582Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:09.582Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.582Z[39m,
+  shareToken: [32m'93d6a11b6c1695f3'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689582_gf1nhtfuh'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Order Test'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [ [32m'Existing 1'[39m, [32m'Existing 2'[39m ],
+    entries: [ [36m[Object][39m, [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:09.582Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.582Z'[39m,
+    shareToken: [32m'93d6a11b6c1695f3'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689582_gf1nhtfuh'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Order Test'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Existing 1'[39m, [32m'Existing 2'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689582_0'[39m,
+      taskId: [32m'task_1768492689582_gf1nhtfuh'[39m,
+      text: [32m'Existing 1'[39m,
+      stressedText: [32m'Existing 1'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:09.582Z'[39m
+    },
+    {
+      id: [32m'entry_1768492689582_1'[39m,
+      taskId: [32m'task_1768492689582_gf1nhtfuh'[39m,
+      text: [32m'Existing 2'[39m,
+      stressedText: [32m'Existing 2'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m2[39m,
+      createdAt: [32m'2026-01-15T15:58:09.582Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:09.582Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.582Z'[39m,
+  shareToken: [32m'93d6a11b6c1695f3'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mcalculates correct order for new entries
+[22m[39mAdding text entries to task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492689582_gf1nhtfuh'[39m,
+  textEntries: [ [32m'New 1'[39m, [32m'New 2'[39m ]
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2maddTextEntriesToTask[2m > [22m[2mcalculates correct order for new entries
+[22m[39mFound task: {
+  id: [32m'task_1768492689582_gf1nhtfuh'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Order Test'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Existing 1'[39m, [32m'Existing 2'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689582_0'[39m,
+      taskId: [32m'task_1768492689582_gf1nhtfuh'[39m,
+      text: [32m'Existing 1'[39m,
+      stressedText: [32m'Existing 1'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:09.582Z'[39m
+    },
+    {
+      id: [32m'entry_1768492689582_1'[39m,
+      taskId: [32m'task_1768492689582_gf1nhtfuh'[39m,
+      text: [32m'Existing 2'[39m,
+      stressedText: [32m'Existing 2'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m2[39m,
+      createdAt: [32m'2026-01-15T15:58:09.582Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:09.582Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.582Z'[39m,
+  shareToken: [32m'93d6a11b6c1695f3'[39m
+}
+Is user task: [33mtrue[39m User tasks count: [33m1[39m
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mupdateTaskEntry[2m > [22m[2mupdates entry in user-created task
+[22m[39mCreating task for userId: 38001085718
+Task data: {
+  name: [32m'Entry Update Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Original text'[39m ]
+}
+Generated new task: {
+  id: [32m'task_1768492689585_02zz83g9o'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Entry Update Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Original text'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689585_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Original text'[39m,
+      stressedText: [32m'Original text'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:09.585Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:09.585Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.585Z[39m,
+  shareToken: [32m'9e9242b13ed4198c'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689585_02zz83g9o'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Entry Update Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [ [32m'Original text'[39m ],
+    entries: [ [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:09.585Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.585Z'[39m,
+    shareToken: [32m'9e9242b13ed4198c'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689585_02zz83g9o'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Entry Update Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Original text'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689585_0'[39m,
+      taskId: [32m'task_1768492689585_02zz83g9o'[39m,
+      text: [32m'Original text'[39m,
+      stressedText: [32m'Original text'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:09.585Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:09.585Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.585Z'[39m,
+  shareToken: [32m'9e9242b13ed4198c'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mupdateTaskEntry[2m > [22m[2mthrows when entry not found
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Task'[39m, description: [32m'Test'[39m, speechSequences: [ [32m'Text'[39m ] }
+Generated new task: {
+  id: [32m'task_1768492689597_wjmur26ie'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Text'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689597_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Text'[39m,
+      stressedText: [32m'Text'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:09.597Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:09.597Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.597Z[39m,
+  shareToken: [32m'7f3ff6089cc303c4'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689597_wjmur26ie'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [ [32m'Text'[39m ],
+    entries: [ [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:09.597Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.597Z'[39m,
+    shareToken: [32m'7f3ff6089cc303c4'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689597_wjmur26ie'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [ [32m'Text'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492689597_0'[39m,
+      taskId: [32m'task_1768492689597_wjmur26ie'[39m,
+      text: [32m'Text'[39m,
+      stressedText: [32m'Text'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:09.597Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:09.597Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.597Z'[39m,
+  shareToken: [32m'7f3ff6089cc303c4'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetSharedTask error handling[2m > [22m[2mhandles invalid JSON in shared tasks storage
+[22m[39mGetting shared task: some-id
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetSharedTask error handling[2m > [22m[2mhandles invalid JSON in shared tasks storage
+[22m[39mShared tasks storage: []
+No shared task found for ID: some-id
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2mhandles error when searching user tasks
+[22m[39mLooking for share token: some-token
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2mhandles error when searching user tasks
+[22m[39mChecking global shared tasks storage
+Checking user task keys: [ [32m'eki_user_tasks_invalid'[39m ]
+No task found with share token: some-token
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through multiple user task keys
+[22m[39mCreating task for userId: user1
+Task data: { name: [32m'User1 Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492689614_wktfc9ld0'[39m,
+  userId: [32m'user1'[39m,
+  name: [32m'User1 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.614Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.614Z[39m,
+  shareToken: [32m'83c2af23fa8fdcbc'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_user1
+Tasks after save: [
+  {
+    id: [32m'task_1768492689614_wktfc9ld0'[39m,
+    userId: [32m'user1'[39m,
+    name: [32m'User1 Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.614Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.614Z'[39m,
+    shareToken: [32m'83c2af23fa8fdcbc'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689614_wktfc9ld0'[39m,
+  userId: [32m'user1'[39m,
+  name: [32m'User1 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.614Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.614Z'[39m,
+  shareToken: [32m'83c2af23fa8fdcbc'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through multiple user task keys
+[22m[39mCreating task for userId: user2
+Task data: { name: [32m'User2 Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492689616_7u9bffm1b'[39m,
+  userId: [32m'user2'[39m,
+  name: [32m'User2 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.616Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.616Z[39m,
+  shareToken: [32m'13833a6f852fab82'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_user2
+Tasks after save: [
+  {
+    id: [32m'task_1768492689616_7u9bffm1b'[39m,
+    userId: [32m'user2'[39m,
+    name: [32m'User2 Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.616Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.616Z'[39m,
+    shareToken: [32m'13833a6f852fab82'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689616_7u9bffm1b'[39m,
+  userId: [32m'user2'[39m,
+  name: [32m'User2 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.616Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.616Z'[39m,
+  shareToken: [32m'13833a6f852fab82'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through multiple user task keys
+[22m[39mLooking for share token: 13833a6f852fab82
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mgetTaskByShareToken edge cases[2m > [22m[2msearches through multiple user task keys
+[22m[39mChecking global shared tasks storage
+Checking user task keys: [ [32m'eki_user_tasks_user1'[39m, [32m'eki_user_tasks_user2'[39m ]
+Found user task with share token: {
+  id: [32m'task_1768492689616_7u9bffm1b'[39m,
+  userId: [32m'user2'[39m,
+  name: [32m'User2 Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.616Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.616Z'[39m,
+  shareToken: [32m'13833a6f852fab82'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mshareUserTask error handling[2m > [22m[2mhandles localStorage error during share
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Task to Share'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492689618_5d0rqjil3'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task to Share'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:09.618Z[39m,
+  updatedAt: [35m2026-01-15T15:58:09.618Z[39m,
+  shareToken: [32m'2097d2d569b06292'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492689618_5d0rqjil3'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task to Share'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+    shareToken: [32m'2097d2d569b06292'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492689618_5d0rqjil3'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task to Share'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+  shareToken: [32m'2097d2d569b06292'[39m
+}
+
+[90mstdout[2m | src/services/dataService.errors.test.ts[2m > [22m[2mDataService Error Handling and Edge Cases[2m > [22m[2mshareUserTask error handling[2m > [22m[2mhandles localStorage error during share
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492689618_5d0rqjil3'[39m,
+  task: {
+    id: [32m'task_1768492689618_5d0rqjil3'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task to Share'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+    shareToken: [32m'2097d2d569b06292'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492689618_5d0rqjil3'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task to Share'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:09.618Z'[39m,
+  shareToken: [32m'2097d2d569b06292'[39m
+}
+Current shared tasks: []
+
+ [32m✓[39m src/services/dataService.errors.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 193[2mms[22m[39m
+[90mstderr[2m | src/services/auth/config.test.ts[2m > [22m[2mexchangeCodeForTokens[2m > [22m[2mshould return null if no code verifier in sessionStorage
+[22m[39m[Auth] Missing PKCE code verifier
+
+[90mstderr[2m | src/services/auth/config.test.ts[2m > [22m[2mexchangeCodeForTokens[2m > [22m[2mshould return null on token exchange failure
+[22m[39m[Auth] Token exchange failed: [90mundefined[39m error
+
+ [32m✓[39m src/services/auth/config.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 119[2mms[22m[39m
+ [32m✓[39m src/components/TaskDetailView/hooks/useDragAndDrop.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 157[2mms[22m[39m
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mcreateTask[2m > [22m[2mcreates a new task with basic data
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Test Task'[39m, description: [32m'Test Description'[39m }
+Generated new task: {
+  id: [32m'task_1768492690193_t9o7x76he'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m'Test Description'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.193Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.193Z[39m,
+  shareToken: [32m'47c0fe51b063acf8'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690193_t9o7x76he'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Test Task'[39m,
+    description: [32m'Test Description'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.193Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.193Z'[39m,
+    shareToken: [32m'47c0fe51b063acf8'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690193_t9o7x76he'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Test Task'[39m,
+  description: [32m'Test Description'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.193Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.193Z'[39m,
+  shareToken: [32m'47c0fe51b063acf8'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mcreateTask[2m > [22m[2mcreates task with speech sequences
+[22m[39mCreating task for userId: 38001085718
+Task data: {
+  name: [32m'Speech Task'[39m,
+  description: [32m'With sequences'[39m,
+  speechSequences: [ [32m'Hello'[39m, [32m'World'[39m ]
+}
+Generated new task: {
+  id: [32m'task_1768492690214_nue1fh31v'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Speech Task'[39m,
+  description: [32m'With sequences'[39m,
+  speechSequences: [ [32m'Hello'[39m, [32m'World'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492690214_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Hello'[39m,
+      stressedText: [32m'Hello'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:10.214Z[39m
+    },
+    {
+      id: [32m'entry_1768492690215_1'[39m,
+      taskId: [32m''[39m,
+      text: [32m'World'[39m,
+      stressedText: [32m'World'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m2[39m,
+      createdAt: [35m2026-01-15T15:58:10.215Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:10.215Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.215Z[39m,
+  shareToken: [32m'd8f0fe56b1207822'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690214_nue1fh31v'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Speech Task'[39m,
+    description: [32m'With sequences'[39m,
+    speechSequences: [ [32m'Hello'[39m, [32m'World'[39m ],
+    entries: [ [36m[Object][39m, [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:10.215Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.215Z'[39m,
+    shareToken: [32m'd8f0fe56b1207822'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690214_nue1fh31v'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Speech Task'[39m,
+  description: [32m'With sequences'[39m,
+  speechSequences: [ [32m'Hello'[39m, [32m'World'[39m ],
+  entries: [
+    {
+      id: [32m'entry_1768492690214_0'[39m,
+      taskId: [32m'task_1768492690214_nue1fh31v'[39m,
+      text: [32m'Hello'[39m,
+      stressedText: [32m'Hello'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:10.214Z'[39m
+    },
+    {
+      id: [32m'entry_1768492690215_1'[39m,
+      taskId: [32m'task_1768492690214_nue1fh31v'[39m,
+      text: [32m'World'[39m,
+      stressedText: [32m'World'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m2[39m,
+      createdAt: [32m'2026-01-15T15:58:10.215Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:10.215Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.215Z'[39m,
+  shareToken: [32m'd8f0fe56b1207822'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mcreateTask[2m > [22m[2mcreates task with speech entries
+[22m[39mCreating task for userId: 38001085718
+Task data: {
+  name: [32m'Entry Task'[39m,
+  description: [32m'With entries'[39m,
+  speechEntries: [
+    { text: [32m'Hello'[39m, stressedText: [32m'Hel·lo'[39m },
+    { text: [32m'World'[39m, stressedText: [32m'World'[39m }
+  ]
+}
+Generated new task: {
+  id: [32m'task_1768492690227_952b1odi6'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Entry Task'[39m,
+  description: [32m'With entries'[39m,
+  speechSequences: [],
+  entries: [
+    {
+      id: [32m'entry_1768492690227_0'[39m,
+      taskId: [32m''[39m,
+      text: [32m'Hello'[39m,
+      stressedText: [32m'Hel·lo'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [35m2026-01-15T15:58:10.227Z[39m
+    },
+    {
+      id: [32m'entry_1768492690227_1'[39m,
+      taskId: [32m''[39m,
+      text: [32m'World'[39m,
+      stressedText: [32m'World'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m2[39m,
+      createdAt: [35m2026-01-15T15:58:10.227Z[39m
+    }
+  ],
+  createdAt: [35m2026-01-15T15:58:10.227Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.227Z[39m,
+  shareToken: [32m'a2473a2a79a0f753'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690227_952b1odi6'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Entry Task'[39m,
+    description: [32m'With entries'[39m,
+    speechSequences: [],
+    entries: [ [36m[Object][39m, [36m[Object][39m ],
+    createdAt: [32m'2026-01-15T15:58:10.227Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.227Z'[39m,
+    shareToken: [32m'a2473a2a79a0f753'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690227_952b1odi6'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Entry Task'[39m,
+  description: [32m'With entries'[39m,
+  speechSequences: [],
+  entries: [
+    {
+      id: [32m'entry_1768492690227_0'[39m,
+      taskId: [32m'task_1768492690227_952b1odi6'[39m,
+      text: [32m'Hello'[39m,
+      stressedText: [32m'Hel·lo'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m1[39m,
+      createdAt: [32m'2026-01-15T15:58:10.227Z'[39m
+    },
+    {
+      id: [32m'entry_1768492690227_1'[39m,
+      taskId: [32m'task_1768492690227_952b1odi6'[39m,
+      text: [32m'World'[39m,
+      stressedText: [32m'World'[39m,
+      audioUrl: [1mnull[22m,
+      audioBlob: [1mnull[22m,
+      order: [33m2[39m,
+      createdAt: [32m'2026-01-15T15:58:10.227Z'[39m
+    }
+  ],
+  createdAt: [32m'2026-01-15T15:58:10.227Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.227Z'[39m,
+  shareToken: [32m'a2473a2a79a0f753'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mcreateTask[2m > [22m[2msaves task to localStorage
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Saved Task'[39m, description: [32m'Should be saved'[39m }
+Generated new task: {
+  id: [32m'task_1768492690235_6brbvio0c'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Saved Task'[39m,
+  description: [32m'Should be saved'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.235Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.235Z[39m,
+  shareToken: [32m'4a476e716f824e48'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690235_6brbvio0c'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Saved Task'[39m,
+    description: [32m'Should be saved'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.235Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.235Z'[39m,
+    shareToken: [32m'4a476e716f824e48'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690235_6brbvio0c'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Saved Task'[39m,
+  description: [32m'Should be saved'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.235Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.235Z'[39m,
+  shareToken: [32m'4a476e716f824e48'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mgetTask[2m > [22m[2mreturns user-created task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'User Task'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492690238_l2teksz37'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'User Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.238Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.238Z[39m,
+  shareToken: [32m'bb62b8736288c766'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690238_l2teksz37'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'User Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.238Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.238Z'[39m,
+    shareToken: [32m'bb62b8736288c766'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690238_l2teksz37'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'User Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.238Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.238Z'[39m,
+  shareToken: [32m'bb62b8736288c766'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mupdateTask[2m > [22m[2mupdates user-created task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Original'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492690251_0o629xoi8'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Original'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.251Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.251Z[39m,
+  shareToken: [32m'c815bc0076045c7c'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690251_0o629xoi8'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Original'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.251Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.251Z'[39m,
+    shareToken: [32m'c815bc0076045c7c'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690251_0o629xoi8'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Original'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.251Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.251Z'[39m,
+  shareToken: [32m'c815bc0076045c7c'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mdeleteTask[2m > [22m[2mdeletes user-created task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'To Delete'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492690270_p1iz2dpz4'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'To Delete'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.270Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.270Z[39m,
+  shareToken: [32m'3bb381fb53c47f44'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690270_p1iz2dpz4'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'To Delete'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.270Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.270Z'[39m,
+    shareToken: [32m'3bb381fb53c47f44'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690270_p1iz2dpz4'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'To Delete'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.270Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.270Z'[39m,
+  shareToken: [32m'3bb381fb53c47f44'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mgetUserTasks[2m > [22m[2mreturns user-created tasks
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Task 1'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690288_f6xx2cq3z'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task 1'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.288Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.288Z[39m,
+  shareToken: [32m'784c55d8ddb795d7'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690288_f6xx2cq3z'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task 1'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+    shareToken: [32m'784c55d8ddb795d7'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690288_f6xx2cq3z'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task 1'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+  shareToken: [32m'784c55d8ddb795d7'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mgetUserTasks[2m > [22m[2mreturns user-created tasks
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Task 2'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690293_dfki5cl70'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task 2'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.293Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.293Z[39m,
+  shareToken: [32m'dd33e656e2b1f653'[39m
+}
+Existing user tasks before save: [
+  {
+    id: [32m'task_1768492690288_f6xx2cq3z'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task 1'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+    shareToken: [32m'784c55d8ddb795d7'[39m
+  }
+]
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690288_f6xx2cq3z'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task 1'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.288Z'[39m,
+    shareToken: [32m'784c55d8ddb795d7'[39m
+  },
+  {
+    id: [32m'task_1768492690293_dfki5cl70'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task 2'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.293Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.293Z'[39m,
+    shareToken: [32m'dd33e656e2b1f653'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690293_dfki5cl70'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task 2'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.293Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.293Z'[39m,
+  shareToken: [32m'dd33e656e2b1f653'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mgetUserCreatedTasks[2m > [22m[2mreturns only user-created tasks
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'User Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690303_jiv4qpw4k'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'User Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.303Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.303Z[39m,
+  shareToken: [32m'07436931aaa611c7'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690303_jiv4qpw4k'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'User Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.303Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.303Z'[39m,
+    shareToken: [32m'07436931aaa611c7'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690303_jiv4qpw4k'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'User Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.303Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.303Z'[39m,
+  shareToken: [32m'07436931aaa611c7'[39m
+}
+
+[90mstdout[2m | src/services/dataService.crud.test.ts[2m > [22m[2mDataService CRUD Operations[2m > [22m[2mgetModifiableTasks[2m > [22m[2mreturns user-created tasks only
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Modifiable'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690307_3afxhdbdl'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Modifiable'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.307Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.307Z[39m,
+  shareToken: [32m'63241cbcd2d20b13'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690307_3afxhdbdl'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Modifiable'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.307Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.307Z'[39m,
+    shareToken: [32m'63241cbcd2d20b13'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690307_3afxhdbdl'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Modifiable'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.307Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.307Z'[39m,
+  shareToken: [32m'63241cbcd2d20b13'[39m
+}
+
+ [32m✓[39m src/services/dataService.crud.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 153[2mms[22m[39m
+ [32m✓[39m src/utils/phoneticMarkers.full.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshareUserTask shares a task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Share Test'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Share Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.910Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.910Z[39m,
+  shareToken: [32m'750bdcb526f1f5ad'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Share Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    shareToken: [32m'750bdcb526f1f5ad'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Share Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+  shareToken: [32m'750bdcb526f1f5ad'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshareUserTask shares a task
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492690910_hlnfm6b7f'[39m,
+  task: {
+    id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Share Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    shareToken: [32m'750bdcb526f1f5ad'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Share Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+  shareToken: [32m'750bdcb526f1f5ad'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Share Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    shareToken: [32m'750bdcb526f1f5ad'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshareUserTask shares a task
+[22m[39mGetting shared task: task_1768492690910_hlnfm6b7f
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshareUserTask shares a task
+[22m[39mShared tasks storage: [
+  {
+    id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Share Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+    shareToken: [32m'750bdcb526f1f5ad'[39m
+  }
+]
+Found shared task: {
+  id: [32m'task_1768492690910_hlnfm6b7f'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Share Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.910Z'[39m,
+  shareToken: [32m'750bdcb526f1f5ad'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetTaskByShareToken finds shared task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Token Test'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690925_cou8f8iuq'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Token Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.925Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.925Z[39m,
+  shareToken: [32m'528033fcf2237c4b'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690925_cou8f8iuq'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Token Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+    shareToken: [32m'528033fcf2237c4b'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690925_cou8f8iuq'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Token Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+  shareToken: [32m'528033fcf2237c4b'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetTaskByShareToken finds shared task
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492690925_cou8f8iuq'[39m,
+  task: {
+    id: [32m'task_1768492690925_cou8f8iuq'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Token Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+    shareToken: [32m'528033fcf2237c4b'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492690925_cou8f8iuq'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Token Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+  shareToken: [32m'528033fcf2237c4b'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492690925_cou8f8iuq'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Token Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+    shareToken: [32m'528033fcf2237c4b'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetTaskByShareToken finds shared task
+[22m[39mLooking for share token: 528033fcf2237c4b
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetTaskByShareToken finds shared task
+[22m[39mChecking global shared tasks storage
+Found shared task with share token: {
+  id: [32m'task_1768492690925_cou8f8iuq'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Token Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.925Z'[39m,
+  shareToken: [32m'528033fcf2237c4b'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetTaskByShareToken returns null for invalid token
+[22m[39mLooking for share token: invalid-token
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetTaskByShareToken returns null for invalid token
+[22m[39mChecking global shared tasks storage
+Checking user task keys: []
+No task found with share token: invalid-token
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetSharedTask returns null for non-shared task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Not Shared'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690930_cpyhwphio'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Not Shared'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.930Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.930Z[39m,
+  shareToken: [32m'f74c963a0a711a58'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690930_cpyhwphio'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Not Shared'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.930Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.930Z'[39m,
+    shareToken: [32m'f74c963a0a711a58'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690930_cpyhwphio'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Not Shared'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.930Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.930Z'[39m,
+  shareToken: [32m'f74c963a0a711a58'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetSharedTask returns null for non-shared task
+[22m[39mGetting shared task: task_1768492690930_cpyhwphio
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetSharedTask returns null for non-shared task
+[22m[39mShared tasks storage: []
+No shared task found for ID: task_1768492690930_cpyhwphio
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetSharedTask finds shared task by id
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Shared Task'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.937Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.937Z[39m,
+  shareToken: [32m'a843def9a82191d7'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    shareToken: [32m'a843def9a82191d7'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+  shareToken: [32m'a843def9a82191d7'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetSharedTask finds shared task by id
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492690937_ix2i1kuv3'[39m,
+  task: {
+    id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    shareToken: [32m'a843def9a82191d7'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+  shareToken: [32m'a843def9a82191d7'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    shareToken: [32m'a843def9a82191d7'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetSharedTask finds shared task by id
+[22m[39mGetting shared task: task_1768492690937_ix2i1kuv3
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mgetSharedTask finds shared task by id
+[22m[39mShared tasks storage: [
+  {
+    id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+    shareToken: [32m'a843def9a82191d7'[39m
+  }
+]
+Found shared task: {
+  id: [32m'task_1768492690937_ix2i1kuv3'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.937Z'[39m,
+  shareToken: [32m'a843def9a82191d7'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshared task persists after original task deletion
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Unshare Test'[39m, description: [32m''[39m }
+Generated new task: {
+  id: [32m'task_1768492690941_qc2lpe02m'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Unshare Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:10.941Z[39m,
+  updatedAt: [35m2026-01-15T15:58:10.941Z[39m,
+  shareToken: [32m'29b27d1c259c79f6'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492690941_qc2lpe02m'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Unshare Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    shareToken: [32m'29b27d1c259c79f6'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492690941_qc2lpe02m'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Unshare Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+  shareToken: [32m'29b27d1c259c79f6'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshared task persists after original task deletion
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492690941_qc2lpe02m'[39m,
+  task: {
+    id: [32m'task_1768492690941_qc2lpe02m'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Unshare Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    shareToken: [32m'29b27d1c259c79f6'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492690941_qc2lpe02m'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Unshare Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+  shareToken: [32m'29b27d1c259c79f6'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492690941_qc2lpe02m'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Unshare Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    shareToken: [32m'29b27d1c259c79f6'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshared task persists after original task deletion
+[22m[39mGetting shared task: task_1768492690941_qc2lpe02m
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mshared task persists after original task deletion
+[22m[39mShared tasks storage: [
+  {
+    id: [32m'task_1768492690941_qc2lpe02m'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Unshare Test'[39m,
+    description: [32m''[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+    shareToken: [32m'29b27d1c259c79f6'[39m
+  }
+]
+Found shared task: {
+  id: [32m'task_1768492690941_qc2lpe02m'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Unshare Test'[39m,
+  description: [32m''[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:10.941Z'[39m,
+  shareToken: [32m'29b27d1c259c79f6'[39m
+}
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mhandles malformed shared tasks in storage
+[22m[39mLooking for share token: any-token
+
+[90mstderr[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mhandles malformed shared tasks in storage
+[22m[39mFailed to load shared tasks: SyntaxError: Unexpected token 'i', "invalid-json" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at LocalStorageAdapter.loadSharedTasks [90m(/home/alex/users/bob/hak/packages/frontend/[39msrc/services/storage/LocalStorageAdapter.ts:77:28[90m)[39m
+    at ShareService.getTaskByShareToken [90m(/home/alex/users/bob/hak/packages/frontend/[39msrc/services/storage/ShareService.ts:70:38[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mhandles malformed shared tasks in storage
+[22m[39mChecking global shared tasks storage
+Checking user task keys: []
+No task found with share token: any-token
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mhandles empty shared tasks array
+[22m[39mLooking for share token: any-token
+
+[90mstdout[2m | src/services/dataService.share.test.ts[2m > [22m[2mDataService Share Operations[2m > [22m[2mhandles empty shared tasks array
+[22m[39mChecking global shared tasks storage
+Checking user task keys: []
+No task found with share token: any-token
+
+ [32m✓[39m src/services/dataService.share.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 69[2mms[22m[39m
+ [32m✓[39m src/contexts/NotificationContext.types.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 86[2mms[22m[39m
+ [32m✓[39m src/utils/synthesize.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m src/services/specs/index.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mshareUserTask[2m > [22m[2mshares a user task to global storage
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Task to Share'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492691242_b9sjqszqd'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task to Share'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:11.242Z[39m,
+  updatedAt: [35m2026-01-15T15:58:11.242Z[39m,
+  shareToken: [32m'3342667b5074ccc8'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492691242_b9sjqszqd'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task to Share'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+    shareToken: [32m'3342667b5074ccc8'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492691242_b9sjqszqd'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task to Share'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+  shareToken: [32m'3342667b5074ccc8'[39m
+}
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mshareUserTask[2m > [22m[2mshares a user task to global storage
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492691242_b9sjqszqd'[39m,
+  task: {
+    id: [32m'task_1768492691242_b9sjqszqd'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task to Share'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+    shareToken: [32m'3342667b5074ccc8'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492691242_b9sjqszqd'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task to Share'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+  shareToken: [32m'3342667b5074ccc8'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492691242_b9sjqszqd'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task to Share'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.242Z'[39m,
+    shareToken: [32m'3342667b5074ccc8'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mshareUserTask[2m > [22m[2mupdates existing shared task
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Task v1'[39m, description: [32m'Original'[39m }
+Generated new task: {
+  id: [32m'task_1768492691262_oagiex93v'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task v1'[39m,
+  description: [32m'Original'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:11.262Z[39m,
+  updatedAt: [35m2026-01-15T15:58:11.262Z[39m,
+  shareToken: [32m'37cd16e4ab332822'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492691262_oagiex93v'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task v1'[39m,
+    description: [32m'Original'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    shareToken: [32m'37cd16e4ab332822'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492691262_oagiex93v'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task v1'[39m,
+  description: [32m'Original'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+  shareToken: [32m'37cd16e4ab332822'[39m
+}
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mshareUserTask[2m > [22m[2mupdates existing shared task
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492691262_oagiex93v'[39m,
+  task: {
+    id: [32m'task_1768492691262_oagiex93v'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task v1'[39m,
+    description: [32m'Original'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    shareToken: [32m'37cd16e4ab332822'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492691262_oagiex93v'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task v1'[39m,
+  description: [32m'Original'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+  shareToken: [32m'37cd16e4ab332822'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492691262_oagiex93v'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task v1'[39m,
+    description: [32m'Original'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    shareToken: [32m'37cd16e4ab332822'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mshareUserTask[2m > [22m[2mupdates existing shared task
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492691262_oagiex93v'[39m,
+  task: {
+    id: [32m'task_1768492691262_oagiex93v'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task v2'[39m,
+    description: [32m'Original'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.265Z'[39m,
+    shareToken: [32m'37cd16e4ab332822'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492691262_oagiex93v'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Task v2'[39m,
+  description: [32m'Original'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.265Z'[39m,
+  shareToken: [32m'37cd16e4ab332822'[39m
+}
+Current shared tasks: [
+  {
+    id: [32m'task_1768492691262_oagiex93v'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task v1'[39m,
+    description: [32m'Original'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    shareToken: [32m'37cd16e4ab332822'[39m
+  }
+]
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492691262_oagiex93v'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Task v2'[39m,
+    description: [32m'Original'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.262Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.265Z'[39m,
+    shareToken: [32m'37cd16e4ab332822'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared task by ID
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Shared Task'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492691275_qmbdg601u'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:11.276Z[39m,
+  updatedAt: [35m2026-01-15T15:58:11.276Z[39m,
+  shareToken: [32m'3ec342e5f17e8c69'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492691275_qmbdg601u'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    shareToken: [32m'3ec342e5f17e8c69'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492691275_qmbdg601u'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+  shareToken: [32m'3ec342e5f17e8c69'[39m
+}
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared task by ID
+[22m[39mSharing task: {
+  userId: [32m'38001085718'[39m,
+  taskId: [32m'task_1768492691275_qmbdg601u'[39m,
+  task: {
+    id: [32m'task_1768492691275_qmbdg601u'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    shareToken: [32m'3ec342e5f17e8c69'[39m
+  }
+}
+Sharing task: {
+  id: [32m'task_1768492691275_qmbdg601u'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+  shareToken: [32m'3ec342e5f17e8c69'[39m
+}
+Current shared tasks: []
+Task shared successfully. New shared tasks: [
+  {
+    id: [32m'task_1768492691275_qmbdg601u'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    shareToken: [32m'3ec342e5f17e8c69'[39m
+  }
+]
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared task by ID
+[22m[39mGetting shared task: task_1768492691275_qmbdg601u
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns shared task by ID
+[22m[39mShared tasks storage: [
+  {
+    id: [32m'task_1768492691275_qmbdg601u'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Shared Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+    shareToken: [32m'3ec342e5f17e8c69'[39m
+  }
+]
+Found shared task: {
+  id: [32m'task_1768492691275_qmbdg601u'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Shared Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.276Z'[39m,
+  shareToken: [32m'3ec342e5f17e8c69'[39m
+}
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns null for non-shared task
+[22m[39mGetting shared task: non-existent
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetSharedTask[2m > [22m[2mreturns null for non-shared task
+[22m[39mShared tasks storage: []
+No shared task found for ID: non-existent
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetTaskByShareToken[2m > [22m[2mreturns task by share token
+[22m[39mCreating task for userId: 38001085718
+Task data: { name: [32m'Token Task'[39m, description: [32m'Test'[39m }
+Generated new task: {
+  id: [32m'task_1768492691289_9tsg7lgdm'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Token Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [35m2026-01-15T15:58:11.289Z[39m,
+  updatedAt: [35m2026-01-15T15:58:11.289Z[39m,
+  shareToken: [32m'fa744568f10da326'[39m
+}
+Existing user tasks before save: []
+Task saved to localStorage with key: eki_user_tasks_38001085718
+Tasks after save: [
+  {
+    id: [32m'task_1768492691289_9tsg7lgdm'[39m,
+    userId: [32m'38001085718'[39m,
+    name: [32m'Token Task'[39m,
+    description: [32m'Test'[39m,
+    speechSequences: [],
+    entries: [],
+    createdAt: [32m'2026-01-15T15:58:11.289Z'[39m,
+    updatedAt: [32m'2026-01-15T15:58:11.289Z'[39m,
+    shareToken: [32m'fa744568f10da326'[39m
+  }
+]
+Newly saved task found: {
+  id: [32m'task_1768492691289_9tsg7lgdm'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Token Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.289Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.289Z'[39m,
+  shareToken: [32m'fa744568f10da326'[39m
+}
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetTaskByShareToken[2m > [22m[2mreturns task by share token
+[22m[39mLooking for share token: fa744568f10da326
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetTaskByShareToken[2m > [22m[2mreturns task by share token
+[22m[39mChecking global shared tasks storage
+Checking user task keys: [ [32m'eki_user_tasks_38001085718'[39m ]
+Found user task with share token: {
+  id: [32m'task_1768492691289_9tsg7lgdm'[39m,
+  userId: [32m'38001085718'[39m,
+  name: [32m'Token Task'[39m,
+  description: [32m'Test'[39m,
+  speechSequences: [],
+  entries: [],
+  createdAt: [32m'2026-01-15T15:58:11.289Z'[39m,
+  updatedAt: [32m'2026-01-15T15:58:11.289Z'[39m,
+  shareToken: [32m'fa744568f10da326'[39m
+}
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetTaskByShareToken[2m > [22m[2mreturns null for invalid token
+[22m[39mLooking for share token: invalid-token
+
+[90mstdout[2m | src/services/dataService.sharing.test.ts[2m > [22m[2mDataService Sharing[2m > [22m[2mgetTaskByShareToken[2m > [22m[2mreturns null for invalid token
+[22m[39mChecking global shared tasks storage
+Checking user task keys: []
+No task found with share token: invalid-token
+
+ [32m✓[39m src/services/dataService.sharing.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m src/types/synthesis.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/utils/isikukood.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/services/auth/storage.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m src/utils/phoneticMarkers.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m85 passed[39m[22m[90m (85)[39m
+[2m      Tests [22m [1m[32m1000 passed[39m[22m[90m (1000)[39m
+[2m   Start at [22m 15:57:43
+[2m   Duration [22m 27.94s[2m (transform 13.54s, setup 29.98s, import 73.55s, tests 51.28s, environment 106.62s)[22m
+
+JSON report written to /home/alex/users/bob/hak/packages/frontend/jest-results.json
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   76.94 |    71.18 |   74.04 |   80.16 |                   
+ src               |    64.7 |    76.47 |   36.84 |   71.05 |                   
+  App.tsx          |    64.7 |    76.47 |   36.84 |   71.05 | ...6,68-69,89-112 
+ src/components    |   75.46 |    75.25 |   71.73 |   81.86 |                   
+  ...ntryModal.tsx |   84.37 |    78.57 |   85.71 |     100 | 21-24             
+  ...kDropdown.tsx |    97.5 |      100 |   92.85 |     100 |                   
+  AppHeader.tsx    |   33.33 |    83.33 |      40 |      40 | 23,25-26          
+  AppModals.tsx    |   13.04 |       25 |    8.33 |      25 | 45-47,52-57       
+  AudioPlayer.tsx  |   68.42 |    89.47 |   61.53 |   76.19 | 22-25,41          
+  BaseModal.tsx    |     100 |      100 |     100 |     100 |                   
+  BuildInfo.tsx    |     100 |    86.48 |    92.3 |     100 | 16,36,44-46,73    
+  ...irmDialog.tsx |     100 |      100 |     100 |     100 |                   
+  ...tionModal.tsx |     100 |      100 |     100 |     100 |                   
+  Dashboard.tsx    |   96.66 |       90 |    90.9 |     100 | 47                
+  ...backModal.tsx |   81.48 |       70 |   83.33 |     100 | 19-25             
+  Footer.tsx       |   94.11 |       50 |     100 |     100 | 14                
+  LoginModal.tsx   |   86.95 |       80 |   83.33 |   85.71 | 47-49             
+  Notification.tsx |   76.92 |       80 |      75 |     100 | 16,20             
+  ...Container.tsx |   76.47 |      100 |   55.55 |   84.61 | 25,65             
+  Playlist.tsx     |     100 |      100 |     100 |     100 |                   
+  ...dioPlayer.tsx |   68.96 |       80 |    61.9 |      96 | 48                
+  PlaylistItem.tsx |     100 |    98.03 |     100 |     100 | 77                
+  SentenceMenu.tsx |   90.47 |      100 |   83.33 |   91.66 | 29                
+  ...eticPanel.tsx |   64.28 |     61.4 |    82.6 |   64.86 | 77-90             
+  ...hesisItem.tsx |      44 |    73.91 |   33.33 |      44 | ...52,217-219,259 
+  ...TaskModal.tsx |   85.71 |      100 |     100 |     100 |                   
+  SpecsPage.tsx    |      54 |    33.33 |   54.54 |   63.41 | ...55,61-63,78-83 
+  ...ageHeader.tsx |     100 |    14.28 |     100 |     100 | 24-33             
+  ...hesisView.tsx |   64.28 |    54.54 |      50 |   61.53 | 76-78,121-122     
+  ...tionModal.tsx |   70.58 |    61.66 |   47.61 |   85.29 | 17-18,28-31,59    
+  ...etailView.tsx |       0 |        0 |       0 |       0 |                   
+  ...EditModal.tsx |   91.42 |    88.46 |     100 |   93.93 | 42-43             
+  TaskManager.tsx  |   78.18 |    52.94 |   82.35 |   78.18 | ...65,174,211-219 
+  TasksView.tsx    |   33.33 |       50 |   16.66 |      40 | 24-26,43          
+  TextInput.tsx    |     100 |      100 |     100 |     100 |                   
+  UserProfile.tsx  |   76.47 |     62.5 |    87.5 |      75 | 31-39             
+ ...iationVariants |   76.38 |       72 |   75.67 |   80.95 |                   
+  ...riantForm.tsx |   78.94 |    68.18 |   66.66 |   83.33 | 107-121           
+  ...eticGuide.tsx |     100 |      100 |     100 |     100 |                   
+  ...nVariants.tsx |   68.67 |    77.77 |   66.66 |   72.85 | ...7,81-83,90-105 
+  VariantItem.tsx  |     100 |    72.72 |     100 |     100 | 33-35,52-53,57    
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  ...ticHelpers.ts |    86.2 |       65 |     100 |      92 | 37,41             
+ ...tenceSynthesis |      60 |    69.31 |      60 |   58.49 |                   
+  PlayButton.tsx   |     100 |      100 |     100 |     100 |                   
+  RowMenu.tsx      |   38.09 |    23.07 |   42.85 |   38.09 | 38-55,85-90       
+  TagsInput.tsx    |      55 |    66.66 |      50 |      55 | ...11-138,145-146 
+  TagsList.tsx     |     100 |    88.88 |     100 |     100 | 34                
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...TaskDetailView |   74.62 |       75 |   58.33 |   78.94 |                   
+  ...tailEmpty.tsx |     100 |      100 |     100 |     100 |                   
+  ...ailHeader.tsx |     100 |      100 |     100 |     100 |                   
+  ...ailStates.tsx |     100 |      100 |     100 |     100 |                   
+  ...etailView.tsx |   68.51 |    59.37 |   33.33 |   74.46 | ...96-104,145-159 
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ ...tailView/hooks |   48.48 |    38.52 |      40 |   51.73 |                   
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  ...ioPlayback.ts |   58.08 |    53.03 |   47.36 |   62.71 | ...31-134,140-151 
+  ...ragAndDrop.ts |   97.14 |    85.71 |     100 |     100 | 41-45             
+  ...neticPanel.ts |   15.38 |        0 |   11.11 |   17.14 | 18-43,47-48,52-77 
+  ...onVariants.ts |   16.66 |        0 |    7.69 |   19.14 | 19-27,31-35,39-81 
+ ...nts/onboarding |   94.78 |    88.13 |     100 |   96.39 |                   
+  ...ingWizard.tsx |   71.42 |    66.66 |     100 |   71.42 | 23,29             
+  RoleMascot.tsx   |     100 |      100 |     100 |     100 |                   
+  ...ctionPage.tsx |     100 |      100 |     100 |     100 |                   
+  ...rdTooltip.tsx |      95 |     87.5 |     100 |   97.36 | 90,94             
+ ...mponents/specs |   93.87 |    94.44 |   89.47 |      95 |                   
+  SpecsContent.tsx |     100 |      100 |     100 |     100 |                   
+  SpecsNav.tsx     |   91.17 |    90.62 |   84.61 |   92.59 | 76,85             
+  index.ts         |       0 |        0 |       0 |       0 |                   
+ src/components/ui |   90.47 |      100 |   80.64 |     100 |                   
+  Icon.tsx         |     100 |      100 |     100 |     100 |                   
+  Icons.tsx        |      90 |      100 |      80 |     100 |                   
+ src/config        |     100 |      100 |     100 |     100 |                   
+  ...dingConfig.ts |     100 |      100 |     100 |     100 |                   
+ src/contexts      |   94.39 |    88.57 |   96.29 |   94.11 |                   
+  AuthContext.tsx  |   97.82 |    94.11 |     100 |   97.72 | 97                
+  ...onContext.tsx |   77.77 |       50 |   66.66 |   77.77 | 24,38             
+  ...ngContext.tsx |   94.23 |     87.5 |     100 |   93.87 | 67,86-87          
+ src/hooks         |   89.23 |       70 |   87.64 |    95.1 |                   
+  ...ragAndDrop.ts |   97.14 |    85.71 |     100 |     100 | 48-52             
+  ...ntenceMenu.ts |      92 |       75 |     100 |    91.3 | 36-37             
+  useSynthesis.ts  |   91.97 |    79.62 |   83.87 |   94.78 | 40-42,89-90,108   
+  ...skHandlers.ts |   85.11 |    62.16 |   96.55 |   94.61 | ...29,144,171,203 
+  ...iantsPanel.ts |   88.88 |     64.7 |   66.66 |   95.71 | 33-34,99          
+ ...ooks/synthesis |   71.42 |    62.89 |   67.05 |   72.75 |                   
+  ...udioPlayer.ts |   56.66 |    33.33 |      60 |   57.62 | ...14-116,120-124 
+  ...istControl.ts |   73.52 |       75 |     100 |   76.66 | 20-26             
+  ...tenceState.ts |   94.54 |    86.66 |   88.88 |   97.43 | 106               
+  ...nthesisAPI.ts |      85 |    64.28 |     100 |   84.21 | 24,35,59          
+  ...chestrator.ts |   51.04 |       40 |   32.14 |   54.54 | ...33-145,156,164 
+  useTagEditor.ts  |      96 |    82.85 |     100 |     100 | 32-59,85-88       
+ src/pages         |   72.97 |    71.42 |   33.33 |   79.41 |                   
+  ...lbackPage.tsx |    93.1 |    83.33 |      75 |   96.42 | 50                
+  DebugPage.tsx    |       0 |        0 |       0 |       0 | 3-18              
+ src/services      |     100 |     87.5 |     100 |     100 |                   
+  dataService.ts   |     100 |     87.5 |     100 |     100 | 83                
+ src/services/auth |   76.66 |    73.84 |      90 |   77.46 |                   
+  config.ts        |   93.02 |    86.36 |     100 |   93.02 | 16,124-125        
+  context.tsx      |    61.9 |    62.16 |   72.72 |   62.82 | ...18-150,155-158 
+  index.ts         |       0 |        0 |       0 |       0 |                   
+  storage.ts       |     100 |      100 |     100 |     100 |                   
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...ces/repository |   73.46 |    57.14 |   96.66 |   72.51 |                   
+  ...Repository.ts |   73.46 |    57.14 |   96.66 |   72.51 | ...69-272,305-320 
+ ...services/specs |     100 |      100 |     100 |     100 |                   
+  index.ts         |     100 |      100 |     100 |     100 |                   
+ ...specs/features |     100 |      100 |     100 |     100 |                   
+  index.ts         |     100 |      100 |     100 |     100 |                   
+ ...rvices/storage |   84.39 |       75 |   83.87 |    83.7 |                   
+  ...ageAdapter.ts |   84.21 |    92.85 |   81.81 |   83.92 | 45-49,65-69,104   
+  ...DataLoader.ts |   62.06 |       55 |   66.66 |   62.06 | ...44,60-63,69-76 
+  ShareService.ts  |   96.36 |       90 |     100 |      96 | 66-67             
+ src/types         |     100 |      100 |     100 |     100 |                   
+  synthesis.ts     |     100 |      100 |     100 |     100 |                   
+ src/utils         |   73.85 |       71 |   62.96 |   73.91 |                   
+  analyzeApi.ts    |   53.84 |       25 |      50 |   53.84 | 27,43-54          
+  audioPlayer.ts   |      50 |       50 |   33.33 |      50 | 40,49-50,65-82    
+  isikukood.ts     |   83.33 |    70.73 |     100 |   84.61 | 51-59             
+  ...ticMarkers.ts |   93.54 |    92.85 |      80 |   92.85 | 59,151            
+  synthesize.ts    |   86.36 |    94.11 |   66.66 |   88.88 | 29-31             
+  ...udioWorker.ts |      52 |    57.14 |      80 |      50 | 9-19,26-30        
+-------------------|---------|----------|---------|---------|-------------------
