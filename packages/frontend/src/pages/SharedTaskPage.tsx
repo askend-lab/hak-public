@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DataService } from '@/services/dataService';
 import { Task } from '@/types/task';
+import TaskDetailView from '@/components/TaskDetailView';
+import AppHeader from '@/components/AppHeader';
 import Footer from '@/components/Footer';
-import { useNotification } from '@/contexts/NotificationContext';
 
 export function SharedTaskPage() {
   const { token } = useParams<{ token: string }>();
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { showNotification } = useNotification();
 
   useEffect(() => {
     async function loadTask() {
@@ -40,20 +40,10 @@ export function SharedTaskPage() {
     loadTask();
   }, [token]);
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      showNotification('success', 'Link kopeeritud!', undefined, undefined, 'success');
-    } catch (e) {
-      console.error('Failed to copy link:', e);
-      showNotification('error', 'Viga lingi kopeerimisel');
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="shared-task-page">
-        <div className="loader-spinner" />
+      <div className="shared-task-loading">
+        <div className="loading-spinner" />
         <p>Laadimine...</p>
       </div>
     );
@@ -61,7 +51,7 @@ export function SharedTaskPage() {
 
   if (error || !task) {
     return (
-      <div className="shared-task-page shared-task-page--error">
+      <div className="shared-task-error">
         <h2>{error || 'Ülesannet ei leitud'}</h2>
         <p>Kontrolli, kas jagamislink on õige.</p>
       </div>
@@ -69,49 +59,45 @@ export function SharedTaskPage() {
   }
 
   return (
-    <div className="shared-task-page-wrapper">
-      <header className="shared-task-header">
-        <div className="shared-task-header__logo">
-          <img src="/icons/logo.svg" alt="EKI Logo" />
-        </div>
-        <div className="shared-task-header__nav">
-          <a href="/">Kõnesüntees</a>
-          <a href="/tasks">Ülesanded</a>
-        </div>
-        <div className="shared-task-header__auth">
-          <a href="/" className="shared-task-login-btn">Logi sisse</a>
-        </div>
-      </header>
+    <div className="page-layout">
+      <AppHeader 
+        isAuthenticated={false}
+        user={null}
+        onTasksClick={() => {}}
+        onHelpClick={() => {}}
+        onLoginClick={() => window.location.href = '/'}
+      />
+      
+      <div className="page-layout__content">
+        <div className="shared-task-view">
+          <div className="shared-task-info-banner shared-task-info-banner--inline">
+            <div className="shared-task-info-banner-content">
+              <div className="shared-task-info-banner-text">
+                <div className="shared-task-info-banner-title">Jagatud ülesanne</div>
+                <div className="shared-task-info-banner-description">
+                  Kopeeri link ja et teised saaksid ülesannet vaadata. Sisselogimine pole vajalik.
+                </div>
+              </div>
+              <button 
+                className="button button--secondary"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(window.location.href);
+                }}
+              >
+                Kopeeri
+              </button>
+            </div>
+          </div>
 
-      <main className="shared-task-content">
-        <div className="shared-task-hero">
-          <h1>Eesti keele põhihääldus</h1>
-          <p>Põhilised eesti keele hääldusreeglid ja harjutused</p>
-          <button className="play-all-btn">▶ Mängi kõik</button>
+          <TaskDetailView
+            taskId={task.id}
+            onBack={() => window.history.back()}
+            onEditTask={() => {}}
+            onDeleteTask={() => {}}
+            onAddEntryFromInput={() => {}}
+          />
         </div>
-
-        <div className="shared-task-info">
-          <h2>Jagatud ülesanne</h2>
-          <p>Kopeeri link ja et teised saaksid ülesannet vaadata. Sisselogimine pole vajalik.</p>
-          <button className="copy-link-btn" onClick={handleCopyLink}>Kopeeri</button>
-        </div>
-
-        <div className="shared-task-entries">
-          {task.name && <h3 className="task-title">{task.name}</h3>}
-          {task.entries && task.entries.length > 0 ? (
-            <ul className="task-entries-list">
-              {task.entries.map((entry, index) => (
-                <li key={entry.id || index} className="task-entry-item">
-                  <button className="play-entry-btn">▶</button>
-                  <span className="entry-text">{entry.text}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>See ülesanne ei sisalda ühtegi kirjet.</p>
-          )}
-        </div>
-      </main>
+      </div>
 
       <footer className="page-footer">
         <Footer />

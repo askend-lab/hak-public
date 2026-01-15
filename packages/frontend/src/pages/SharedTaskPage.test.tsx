@@ -5,24 +5,36 @@ import userEvent from '@testing-library/user-event';
 import { SharedTaskPage } from './SharedTaskPage';
 
 const mockGetTaskByShareToken = vi.fn();
-const mockShowNotification = vi.fn();
+const mockGetTask = vi.fn();
 
 vi.mock('@/services/dataService', () => ({
   DataService: {
     getInstance: vi.fn(() => ({
       getTaskByShareToken: mockGetTaskByShareToken,
+      getTask: mockGetTask,
     })),
   },
 }));
 
-vi.mock('@/contexts/NotificationContext', () => ({
-  useNotification: vi.fn(() => ({
-    showNotification: mockShowNotification,
+vi.mock('@/services/auth', () => ({
+  useAuth: vi.fn(() => ({
+    user: null,
+    isAuthenticated: false,
   })),
 }));
 
 vi.mock('@/components/Footer', () => ({
   default: () => <div data-testid="footer">Footer</div>,
+}));
+
+vi.mock('@/components/AppHeader', () => ({
+  default: () => <div data-testid="app-header">AppHeader</div>,
+}));
+
+vi.mock('@/components/TaskDetailView', () => ({
+  default: ({ taskId }: { taskId: string }) => (
+    <div data-testid="task-detail-view" data-task-id={taskId}>TaskDetailView</div>
+  ),
 }));
 
 describe('SharedTaskPage', () => {
@@ -44,15 +56,12 @@ describe('SharedTaskPage', () => {
     expect(screen.getByText(/Laadimine/i)).toBeInTheDocument();
   });
 
-  it('renders public page with task entries', async () => {
+  it('renders page with existing components', async () => {
     const mockTask = {
       id: 'task-123',
       name: 'Test Task',
       shareToken: 'abc123',
-      entries: [
-        { id: 'e1', text: 'Entry 1', stressedText: 'Entry 1', order: 0 },
-        { id: 'e2', text: 'Entry 2', stressedText: 'Entry 2', order: 1 },
-      ],
+      entries: [],
     };
     
     mockGetTaskByShareToken.mockResolvedValue(mockTask);
@@ -66,11 +75,11 @@ describe('SharedTaskPage', () => {
     );
     
     await waitFor(() => {
-      expect(screen.getByText('Test Task')).toBeInTheDocument();
+      expect(screen.getByTestId('app-header')).toBeInTheDocument();
     });
     
-    expect(screen.getByText('Entry 1')).toBeInTheDocument();
-    expect(screen.getByText('Entry 2')).toBeInTheDocument();
+    expect(screen.getByTestId('task-detail-view')).toBeInTheDocument();
+    expect(screen.getByTestId('task-detail-view')).toHaveAttribute('data-task-id', 'task-123');
     expect(screen.getByText('Jagatud ülesanne')).toBeInTheDocument();
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
@@ -164,6 +173,5 @@ describe('SharedTaskPage', () => {
     await user.click(copyButton);
     
     expect(writeTextMock).toHaveBeenCalled();
-    expect(mockShowNotification).toHaveBeenCalledWith('success', 'Link kopeeritud!', undefined, undefined, 'success');
   });
 });
