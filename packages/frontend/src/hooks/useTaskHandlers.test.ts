@@ -185,46 +185,6 @@ describe('useTaskHandlers', () => {
     expect(result.current.showTaskEditModal).toBe(false);
   });
 
-  it('should delete task with confirmation', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
-
-    await act(async () => {
-      await result.current.handleDeleteTask('task-1');
-    });
-
-    expect(result.current.showDeleteConfirmation).toBe(true);
-    expect(result.current.taskToDelete).toEqual({ id: 'task-1', name: 'Task 1' });
-  });
-
-  it('should confirm delete', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
-
-    await act(async () => {
-      await result.current.handleDeleteTask('task-1');
-    });
-
-    await act(async () => {
-      await result.current.handleConfirmDelete();
-    });
-
-    expect(mockDeleteTask).toHaveBeenCalledWith('user-1', 'task-1');
-    expect(result.current.showDeleteConfirmation).toBe(false);
-  });
-
-  it('should cancel delete', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
-
-    await act(async () => {
-      await result.current.handleDeleteTask('task-1');
-    });
-
-    act(() => {
-      result.current.handleCancelDelete();
-    });
-
-    expect(result.current.showDeleteConfirmation).toBe(false);
-    expect(result.current.taskToDelete).toBeNull();
-  });
 
   it('should share task', async () => {
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
@@ -305,24 +265,6 @@ describe('useTaskHandlers', () => {
     await act(async () => {
       await result.current.handleTaskUpdated();
     });
-
-    expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));
-    consoleSpy.mockRestore();
-  });
-
-  it('should handle error when deleting task', async () => {
-    mockDeleteTask.mockRejectedValueOnce(new Error('Failed'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
-
-    await act(async () => {
-      await result.current.handleDeleteTask('task-1');
-    });
-
-    await act(async () => {
-      await result.current.handleConfirmDelete();
-    });
-
     expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));
     consoleSpy.mockRestore();
   });

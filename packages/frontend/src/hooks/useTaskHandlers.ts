@@ -181,6 +181,8 @@ export function useTaskHandlers(
       await dataService.deleteTask(user.id, taskToDelete.id);
       setTaskRefreshTrigger(prev => prev + 1);
       showNotification('success', `Ülesanne "${taskName}" kustutatud!`, undefined, undefined, 'success');
+      setSelectedTaskId(null);
+      setCurrentView('tasks');
     } catch (error) {
       console.error('Failed to delete task:', error);
       showNotification('error', 'Ülesande kustutamine ebaõnnestus');
@@ -188,7 +190,7 @@ export function useTaskHandlers(
       setShowDeleteConfirmation(false);
       setTaskToDelete(null);
     }
-  }, [user, taskToDelete, showNotification]);
+  }, [user, taskToDelete, showNotification, setSelectedTaskId, setCurrentView]);
 
   const handleCancelDelete = useCallback(() => { setShowDeleteConfirmation(false); setTaskToDelete(null); }, []);
 
