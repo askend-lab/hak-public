@@ -29,7 +29,7 @@ export default function AppHeader({ currentView, isAuthenticated, user, onSynthe
           <button className="header-help-button" onClick={onHelpClick} aria-label="Abi ja juhend" title="Näita juhendeid">
             <HelpIcon size="2xl" />
           </button>
-          {isAuthenticated && user ? <UserProfile user={user} /> : <button className="header-login-button" onClick={onLoginClick}>Logi sisse</button>}
+          {isAuthenticated && user ? <UserProfile user={user} /> : <button className="button button--primary" onClick={onLoginClick}>Logi sisse</button>}
           <button className="header-menu-button" aria-label="Menu"><MenuIcon size="2xl" /></button>
         </div>
       </div>

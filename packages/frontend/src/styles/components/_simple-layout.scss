@@ -104,37 +104,6 @@
     justify-self: end; // Align to the right
   }
 
-  // Primary Button - Logi sisse
-  .header-login-button {
-    // Button specs
-    width: 119px; // Fixed: 119px
-    height: 36px; // Fixed: 36px
-    padding: 0 24px; // Right: 24px, Left: 24px
-    border-radius: 20px;
-    gap: 10px;
-    background-color: $color-primary; // Tekst-tumesinine (#173148)
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-
-    // Text specs for "Logi sisse"
-    font-family: 'Inter', sans-serif;
-    font-weight: 400; // Regular
-    font-size: 14px;
-    line-height: 140%;
-    letter-spacing: 0;
-    text-align: center;
-    color: $color-white; // Valge (#FFFFFF)
-
-    &:hover {
-      background-color: $color-soft-primary;
-      transform: translateY(-1px);
-    }
-  }
-
   // Extra menu button (9 dots icon)
   .header-menu-button {
     width: 36px;

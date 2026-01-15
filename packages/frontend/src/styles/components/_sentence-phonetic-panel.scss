@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../abstracts/mixins';
 
 // =========================================================================
 // Sentence Phonetic Panel Component
@@ -281,19 +282,7 @@
   margin-bottom: $spacing-3;
 
   code {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 32px;
-    height: 32px;
-    padding: 0 $spacing-2;
-    background: $color-soft-neutral-bg;
-    border: 1px solid $color-outlined-neutral;
-    border-radius: $border-radius-sm;
-    font-family: $font-mono;
-    font-size: 18px;
-    font-weight: 600;
-    color: $color-outlined-primary;
+    @include phonetic-marker-badge;
   }
 }
 
