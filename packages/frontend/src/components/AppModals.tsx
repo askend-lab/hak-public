@@ -9,7 +9,7 @@ import SentencePhoneticPanel from './SentencePhoneticPanel';
 import { OnboardingWizard } from './onboarding';
 import { DataService } from '@/services/dataService';
 import { CreateTaskRequest } from '@/types/task';
-import { SentenceState } from '@/types/synthesis';
+import { SentenceState, filterNonEmptySentences } from '@/types/synthesis';
 
 interface User {
   id: string;
@@ -40,7 +40,7 @@ interface AppModalsProps {
 
 // eslint-disable-next-line complexity
 export default function AppModals({ user, sentences, showLoginModal, setShowLoginModal, showNotification, isWizardActive, variants, synthesis, taskHandlers, onUseVariant }: AppModalsProps) {
-  const playlistEntries = sentences.filter(s => s.text.trim()).map(s => ({ id: s.id, text: s.text, stressedText: s.phoneticText || s.text, audioUrl: s.audioUrl || null, audioBlob: null }));
+  const playlistEntries = filterNonEmptySentences(sentences).map(s => ({ id: s.id, text: s.text, stressedText: s.phoneticText || s.text, audioUrl: s.audioUrl || null, audioBlob: null }));
   const handleAddToExisting = async (taskId: string, entries: { text: string; stressedText: string }[], taskName: string) => {
     if (!user) return;
     try { await DataService.getInstance().addTextEntriesToTask(user.id, taskId, entries); taskHandlers.setShowTaskCreationModal(false); showNotification('success', 'Lisatud ülesandesse', `${entries.length} lauset lisatud ülesandesse ${taskName}!`); }
