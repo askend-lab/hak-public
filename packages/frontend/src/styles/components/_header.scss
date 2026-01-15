@@ -127,40 +127,6 @@
   }
 }
 
-// Login button
-.header-login-button {
-  height: 36px;
-  padding: 0 $spacing-6;
-  border-radius: 20px;
-  background-color: $color-primary;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  font-family: $font-body;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 140%;
-  text-align: center;
-  color: $color-white;
-  white-space: nowrap;
-  
-  // Mobile: Compact
-  min-width: 80px;
-  
-  // Desktop: Full width
-  @include desktop {
-    width: 119px;
-  }
-
-  &:hover {
-    background-color: $color-soft-primary;
-    transform: translateY(-1px);
-  }
-}
-
 // Menu button (9 dots icon) - uses shared mixin with custom icon size
 .header-menu-button {
   @include menu-button;
