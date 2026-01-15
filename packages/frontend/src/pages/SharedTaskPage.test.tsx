@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 import { SharedTaskPage } from './SharedTaskPage';
 
 const mockGetTaskByShareToken = vi.fn();
+const mockShowNotification = vi.fn();
 
 vi.mock('@/services/dataService', () => ({
   DataService: {
@@ -13,10 +15,14 @@ vi.mock('@/services/dataService', () => ({
   },
 }));
 
-vi.mock('@/components/TaskDetailView', () => ({
-  default: ({ taskId }: { taskId: string }) => (
-    <div data-testid="task-detail-view" data-task-id={taskId}>TaskDetailView</div>
-  ),
+vi.mock('@/contexts/NotificationContext', () => ({
+  useNotification: vi.fn(() => ({
+    showNotification: mockShowNotification,
+  })),
+}));
+
+vi.mock('@/components/Footer', () => ({
+  default: () => <div data-testid="footer">Footer</div>,
 }));
 
 describe('SharedTaskPage', () => {
@@ -38,12 +44,15 @@ describe('SharedTaskPage', () => {
     expect(screen.getByText(/Laadimine/i)).toBeInTheDocument();
   });
 
-  it('renders task detail when task is found', async () => {
+  it('renders public page with task entries', async () => {
     const mockTask = {
       id: 'task-123',
-      name: 'Shared Task',
+      name: 'Test Task',
       shareToken: 'abc123',
-      entries: [],
+      entries: [
+        { id: 'e1', text: 'Entry 1', stressedText: 'Entry 1', order: 0 },
+        { id: 'e2', text: 'Entry 2', stressedText: 'Entry 2', order: 1 },
+      ],
     };
     
     mockGetTaskByShareToken.mockResolvedValue(mockTask);
@@ -57,10 +66,13 @@ describe('SharedTaskPage', () => {
     );
     
     await waitFor(() => {
-      expect(screen.getByTestId('task-detail-view')).toBeInTheDocument();
+      expect(screen.getByText('Test Task')).toBeInTheDocument();
     });
     
-    expect(screen.getByTestId('task-detail-view')).toHaveAttribute('data-task-id', 'task-123');
+    expect(screen.getByText('Entry 1')).toBeInTheDocument();
+    expect(screen.getByText('Entry 2')).toBeInTheDocument();
+    expect(screen.getByText('Jagatud ülesanne')).toBeInTheDocument();
+    expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
   it('renders error message when task not found', async () => {
@@ -80,7 +92,12 @@ describe('SharedTaskPage', () => {
   });
 
   it('calls getTaskByShareToken with correct token', async () => {
-    mockGetTaskByShareToken.mockResolvedValue({ id: 'task-1', shareToken: 'test-token' });
+    mockGetTaskByShareToken.mockResolvedValue({ 
+      id: 'task-1', 
+      name: 'Task',
+      shareToken: 'test-token',
+      entries: [] 
+    });
     
     render(
       <MemoryRouter initialEntries={['/shared/task/test-token']}>
@@ -112,5 +129,41 @@ describe('SharedTaskPage', () => {
     });
     
     consoleSpy.mockRestore();
+  });
+
+  it('copies link to clipboard when copy button clicked', async () => {
+    const user = userEvent.setup();
+    const mockTask = {
+      id: 'task-1',
+      name: 'Task',
+      shareToken: 'abc123',
+      entries: [],
+    };
+    
+    mockGetTaskByShareToken.mockResolvedValue(mockTask);
+    
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: writeTextMock },
+      writable: true,
+    });
+    
+    render(
+      <MemoryRouter initialEntries={['/shared/task/abc123']}>
+        <Routes>
+          <Route path="/shared/task/:token" element={<SharedTaskPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    
+    await waitFor(() => {
+      expect(screen.getByText('Jagatud ülesanne')).toBeInTheDocument();
+    });
+    
+    const copyButton = screen.getByRole('button', { name: /kopeeri/i });
+    await user.click(copyButton);
+    
+    expect(writeTextMock).toHaveBeenCalled();
+    expect(mockShowNotification).toHaveBeenCalledWith('success', 'Link kopeeritud!', undefined, undefined, 'success');
   });
 });
