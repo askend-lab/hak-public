@@ -13,7 +13,6 @@ import { useAuth } from './services/auth';
 import { useNotification } from './contexts/NotificationContext';
 import { useOnboarding } from './contexts/OnboardingContext';
 import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSentenceMenu } from './hooks';
-import { warmAudioWorker } from './utils/warmAudioWorker';
 
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
@@ -38,9 +37,6 @@ export default function Home() {
     : 'synthesis';
   const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
   const selectedTaskId: string | null = taskIdMatch?.[1] || null;
-
-  // Pre-warm audio worker on page load
-  useEffect(() => { warmAudioWorker(); }, []);
 
   // Handle post-login redirect
   useEffect(() => {
