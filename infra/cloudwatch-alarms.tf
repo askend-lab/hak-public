@@ -31,6 +31,7 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
   
   dimensions = {
     ApiName = "${var.env}-simplestore"
+    Stage   = var.env
   }
   
   tags = local.common_tags
@@ -53,6 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
   
   dimensions = {
     ApiName = "${var.env}-simplestore"
+    Stage   = var.env
   }
   
   tags = local.common_tags
@@ -75,6 +77,7 @@ resource "aws_cloudwatch_metric_alarm" "audio_api_5xx_errors" {
   
   dimensions = {
     ApiName = "${var.env}-audio-api"
+    Stage   = var.env
   }
   
   tags = local.common_tags
@@ -158,7 +161,8 @@ resource "aws_cloudwatch_metric_alarm" "api_high_latency" {
   ok_actions          = [aws_sns_topic.alerts.arn]
   
   dimensions = {
-    ApiName = "hak-api-${var.env}"
+    ApiName = "${var.env}-simplestore"
+    Stage   = var.env
   }
   
   tags = local.common_tags
