@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
   period              = 60
   statistic           = "Sum"
   threshold           = 0
-  alarm_description   = "🚨 CRITICAL: API Gateway 5XX errors detected"
+  alarm_description   = "CRITICAL: API Gateway 5XX errors detected"
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
   period              = 300
   statistic           = "Sum"
   threshold           = 10
-  alarm_description   = "⚠️ WARNING: High rate of API Gateway 4XX errors"
+  alarm_description   = "WARNING: High rate of API Gateway 4XX errors"
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "audio_api_5xx_errors" {
   period              = 60
   statistic           = "Sum"
   threshold           = 0
-  alarm_description   = "🚨 CRITICAL: Audio API 5XX errors detected"
+  alarm_description   = "CRITICAL: Audio API 5XX errors detected"
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
