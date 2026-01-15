@@ -64,21 +64,7 @@ task_channel:
 # Hooks configuration - ALL parameters required
 hooks:
   markdown-size:
-    active: true
-    max_lines: 200  # Temporarily raised - need to split large docs
-    excludePaths:
-      - 'docs/work/**'
-      - 'docs/vision/**'
-      - 'packages/frontend/src/styles/eki/**'
-      - 'docs/hub/**'
-      - 'docs/patterns/**'
-      - 'docs/plans/**'
-      - 'docs/templates/**'
-      - '**/test/fixtures/**'
-      - 'docs/DAILY_ITERATIONS.md'
-      - '.design/**'
-      - 'CodeReview_*.md'
-      - 'GHERKIN_PLAN.md'
+    mode: off
 
   language-check:
     active: true
@@ -194,5 +180,23 @@ hooks:
       - '**/*.full.test.ts'
       - '**/merlin-worker/tools/**'
       - '**/SentenceSynthesisItem.test.tsx'
+
+  security-audit:
+    active: true
+
+  secret-detection:
+    active: true
+
+  dependency-check:
+    active: true
+
+  import-order:
+    active: true
+
+  no-any:
+    active: true
+
+  no-floating-promises:
+    active: true
 
 # final

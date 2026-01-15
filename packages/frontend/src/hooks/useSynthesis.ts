@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function, max-lines */
 import { useState, useCallback, useRef } from 'react';
 import { EditingTag, OpenTagMenu } from '@/types/synthesis';
 import { stripPhoneticMarkers } from '@/utils/phoneticMarkers';

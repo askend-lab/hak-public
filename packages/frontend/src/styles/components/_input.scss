@@ -16,9 +16,10 @@
   border: 1px solid $color-primary;
   border-radius: $border-radius;
   font-family: $font-body;
-  font-size: $font-size-md;
-  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
   line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
   color: $color-primary;
   background: $color-white;
   transition: all 0.2s ease;
@@ -26,9 +27,9 @@
 
   &::placeholder {
     font-family: $font-body;
-    font-size: $font-size-md;
-    font-weight: $font-weight-regular;
-    color: $color-tertiary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-placeholder;
   }
 
   &:focus {

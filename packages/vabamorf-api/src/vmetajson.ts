@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { spawn, ChildProcess } from 'child_process';
 
 import { VmetajsonInput, VmetajsonResponse } from './types';

@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { useCallback, useRef } from 'react';
 import { convertTextToTags } from '@/types/synthesis';
 import { useSentenceState } from './useSentenceState';
