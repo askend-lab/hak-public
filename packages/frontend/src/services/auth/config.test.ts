@@ -37,7 +37,7 @@ describe('getRedirectUri - environment detection', () => {
   it('should redirect to localhost when on localhost', async () => {
     const { getRedirectUri } = await import('./config');
     const uri = getRedirectUri('localhost');
-    expect(uri).toBe('http://localhost:5180/auth/callback');
+    expect(uri).toBe('http://localhost:5181/auth/callback');
   });
 });
 

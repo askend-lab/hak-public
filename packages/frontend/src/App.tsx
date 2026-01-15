@@ -1,5 +1,6 @@
  
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';
 import SynthesisView from './components/SynthesisView';
@@ -12,34 +13,38 @@ import { useAuth } from './services/auth';
 import { useNotification } from './contexts/NotificationContext';
 import { useOnboarding } from './contexts/OnboardingContext';
 import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSentenceMenu } from './hooks';
-import { warmAudioWorker } from './utils/warmAudioWorker';
 
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
   const { state: onboardingState, isWizardActive, resetOnboarding, isLoading: isOnboardingLoading } = useOnboarding();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [currentView, setCurrentView] = useState<'synthesis' | 'tasks' | 'specs' | 'dashboard'>('synthesis');
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
 
   const synthesis = useSynthesis();
-  const taskHandlers = useTaskHandlers(synthesis.sentences, setCurrentView, setSelectedTaskId);
+  const taskHandlers = useTaskHandlers(synthesis.sentences, () => navigate('/tasks'), () => {});
   const dragDrop = useDragAndDrop(synthesis.setSentences);
   const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences, showNotification);
   const menu = useSentenceMenu();
 
-  // Pre-warm audio worker on page load
-  useEffect(() => { warmAudioWorker(); }, []);
+  // Determine current view and task ID from location
+  const pathname = location.pathname;
+  const currentView = pathname.startsWith('/tasks') ? 'tasks' 
+    : pathname.startsWith('/specs') ? 'specs'
+    : pathname.startsWith('/dashboard') ? 'dashboard'
+    : 'synthesis';
+  const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
+  const selectedTaskId: string | null = taskIdMatch?.[1] || null;
 
-  // Handle post-login redirect and logout
+  // Handle post-login redirect
   useEffect(() => {
-    if (isAuthenticated && pendingTasksViewAccess) { setCurrentView('tasks'); setPendingTasksViewAccess(false); }
-  }, [isAuthenticated, pendingTasksViewAccess]);
-
-  useEffect(() => {
-    if (!isAuthenticated && currentView === 'tasks') setCurrentView('synthesis');
-  }, [isAuthenticated, currentView]);
+    if (isAuthenticated && pendingTasksViewAccess) { 
+      navigate('/tasks'); 
+      setPendingTasksViewAccess(false); 
+    }
+  }, [isAuthenticated, pendingTasksViewAccess, navigate]);
 
   useEffect(() => {
     if (isWizardActive && onboardingState.selectedRole) synthesis.setDemoSentences();
@@ -50,8 +55,12 @@ export default function Home() {
     variants.setVariantsCustomPhonetic(variantText);
   };
 
-  const handleBackToTaskList = () => setSelectedTaskId(null);
-  const handleViewTask = (taskId: string) => setSelectedTaskId(taskId);
+  const handleTasksClick = () => {
+    if (!isAuthenticated) {
+      setPendingTasksViewAccess(true);
+      setShowLoginModal(true);
+    }
+  };
 
   if (isOnboardingLoading) {
     return <div className="page-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="loader-spinner" style={{ width: 48, height: 48 }}></div></div>;
@@ -62,12 +71,11 @@ export default function Home() {
   return (
     <div className="page-layout">
       <AppHeader
-        currentView={currentView} isAuthenticated={isAuthenticated} user={user}
-        onSynthesisClick={() => { setCurrentView('synthesis'); setSelectedTaskId(null); }}
-        onTasksClick={() => { if (!isAuthenticated) { setPendingTasksViewAccess(true); setShowLoginModal(true); return; } setCurrentView('tasks'); }}
-        onSpecsClick={() => setCurrentView('specs')}
-        onDashboardClick={() => { setCurrentView('dashboard'); }}
-        onHelpClick={resetOnboarding} onLoginClick={() => setShowLoginModal(true)}
+        isAuthenticated={isAuthenticated} 
+        user={user}
+        onTasksClick={handleTasksClick}
+        onHelpClick={resetOnboarding} 
+        onLoginClick={() => setShowLoginModal(true)}
       />
 
       <main className={`page-layout__main ${showRoleSelection ? 'role-selection-main' : ''}`}>
@@ -103,13 +111,19 @@ export default function Home() {
               />
             )}
             {currentView === 'tasks' && (
-              <TasksView selectedTaskId={selectedTaskId} taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
-                onBack={handleBackToTaskList} onViewTask={handleViewTask} onCreateTask={taskHandlers.handleCreateTask}
-                onEditTask={taskHandlers.handleEditTask} onDeleteTask={taskHandlers.handleDeleteTask} onShareTask={taskHandlers.handleShareTask}
+              <TasksView 
+                selectedTaskId={selectedTaskId}
+                taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
+                onBack={() => navigate('/tasks')}
+                onViewTask={(id) => navigate(`/tasks/${id}`)}
+                onCreateTask={taskHandlers.handleCreateTask}
+                onEditTask={taskHandlers.handleEditTask}
+                onDeleteTask={taskHandlers.handleDeleteTask}
+                onShareTask={taskHandlers.handleShareTask}
               />
             )}
             {currentView === 'specs' && (
-              <SpecsPage onBack={() => setCurrentView('synthesis')} />
+              <SpecsPage onBack={() => navigate('/synthesis')} />
             )}
             {currentView === 'dashboard' && (
               <Dashboard />

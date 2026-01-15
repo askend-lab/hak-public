@@ -101,6 +101,7 @@ export class TestWorld extends World {
     const { AuthProvider } = await import('../../services/auth');
     const { NotificationProvider } = await import('../../contexts/NotificationContext');
     const { OnboardingProvider } = await import('../../contexts/OnboardingContext');
+    const { MemoryRouter } = await import('react-router-dom');
     
     const element = createElement(
       NotificationProvider,
@@ -111,7 +112,11 @@ export class TestWorld extends World {
         createElement(
           OnboardingProvider,
           null,
-          createElement(App)
+          createElement(
+            MemoryRouter,
+            { initialEntries: ['/synthesis'] },
+            createElement(App)
+          )
         )
       )
     );

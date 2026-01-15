@@ -22,6 +22,7 @@ import { NotificationProvider } from './contexts/NotificationContext'
 import { OnboardingProvider } from './contexts/OnboardingContext'
 import { AuthCallbackPage } from './pages/AuthCallbackPage'
 import { DebugPage } from './pages/DebugPage'
+import { SharedTaskPage } from './pages/SharedTaskPage'
 import './styles/main.scss'
 
 const rootElement = document.getElementById('root');
@@ -36,6 +37,7 @@ createRoot(rootElement).render(
             <Routes>
               <Route path="/auth/callback" element={<AuthCallbackPage />} />
               <Route path="/debug-x7k9m" element={<DebugPage />} />
+              <Route path="/shared/task/:token" element={<SharedTaskPage />} />
               <Route path="*" element={<App />} />
             </Routes>
           </BrowserRouter>

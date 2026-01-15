@@ -8,7 +8,7 @@ interface TaskEditModalProps {
   isOpen: boolean;
   task: { id: string; name: string; description?: string | null } | null;
   onClose: () => void;
-  onSave: () => Promise<void>;
+  onSave: (updatedTask: { id: string; name: string; description?: string | null }) => Promise<void>;
   setTaskToEdit: (task: { id: string; name: string; description?: string | null } | null) => void;
 }
 
@@ -46,11 +46,14 @@ export default function TaskEditModal({
     setIsSubmitting(true);
     setError(null);
 
+    const updatedTask = { ...task, name: name.trim(), description: description.trim() || null };
+    
     // Update the task in the hook state
-    setTaskToEdit({ ...task, name: name.trim(), description: description.trim() || null });
+    setTaskToEdit(updatedTask);
 
     try {
-      await onSave();
+      // Pass updated task data directly to avoid race condition
+      await onSave(updatedTask);
       handleClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Viga ülesande muutmisel');
