@@ -21,6 +21,12 @@ export function useTaskHandlers(
     return false;
   }, [isAuthenticated, setShowLoginModal]);
 
+  // Navigation action for notifications - navigates to task view
+  const viewTaskAction = useCallback((taskId: string): { label: string; onClick: () => void } => ({
+    label: 'Vaata ülesannet',
+    onClick: (): void => { setSelectedTaskId(taskId); setCurrentView('tasks'); }
+  }), [setSelectedTaskId, setCurrentView]);
+
   const [showTaskCreationModal, setShowTaskCreationModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showAddToTaskDropdown, setShowAddToTaskDropdown] = useState(false);
@@ -47,7 +53,7 @@ export function useTaskHandlers(
       await dataService.addTextEntriesToTask(user.id, taskId, entries);
       setTaskRefreshTrigger(prev => prev + 1);
       const count = entries.length;
-      showNotification('success', 'Lisatud ülesandesse', `${count} ${count === 1 ? 'lause' : 'lauset'} lisatud ülesandesse ${taskName}!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(taskId); setCurrentView('tasks'); } });
+      showNotification('success', 'Lisatud ülesandesse', `${count} ${count === 1 ? 'lause' : 'lauset'} lisatud ülesandesse ${taskName}!`, undefined, undefined, viewTaskAction(taskId));
     } catch (error) {
       console.error('Failed to add entries:', error);
       showNotification('error', 'Lausungite lisamine ebaõnnestus');
@@ -65,7 +71,7 @@ export function useTaskHandlers(
       const dataService = DataService.getInstance();
       await dataService.addTextEntriesToTask(user.id, taskId, [{ text: sentence.text, stressedText: sentence.phoneticText || sentence.text }]);
       setTaskRefreshTrigger(prev => prev + 1);
-      showNotification('success', 'Lisatud ülesandesse', `Lause lisatud ülesandesse ${taskName}!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(taskId); setCurrentView('tasks'); } });
+      showNotification('success', 'Lisatud ülesandesse', `Lause lisatud ülesandesse ${taskName}!`, undefined, undefined, viewTaskAction(taskId));
     } catch (error) {
       console.error('Failed to add entry:', error);
       showNotification('error', 'Lausungi lisamine ebaõnnestus');
@@ -91,9 +97,9 @@ export function useTaskHandlers(
       setTaskRefreshTrigger(prev => prev + 1);
       const entryCount = taskData.speechEntries?.length || 0;
       if (entryCount > 0) {
-        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud ja ${entryCount} ${entryCount === 1 ? 'lause' : 'lauset'} lisatud!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(newTask.id); setCurrentView('tasks'); } });
+        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud ja ${entryCount} ${entryCount === 1 ? 'lause' : 'lauset'} lisatud!`, undefined, undefined, viewTaskAction(newTask.id));
       } else {
-        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(newTask.id); setCurrentView('tasks'); } });
+        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud!`, undefined, undefined, viewTaskAction(newTask.id));
       }
       setSelectedTaskId(newTask.id);
     } catch (error) {
@@ -115,7 +121,7 @@ export function useTaskHandlers(
       setShowAddTaskModal(false);
       setTaskRefreshTrigger(prev => prev + 1);
       if (playlistEntries.length > 0) {
-        showNotification('success', 'Ülesanne loodud', `${title} loodud!`, undefined, undefined, { label: 'Vaata ülesannet', onClick: () => { setSelectedTaskId(newTask.id); setCurrentView('tasks'); } });
+        showNotification('success', 'Ülesanne loodud', `${title} loodud!`, undefined, undefined, viewTaskAction(newTask.id));
       }
       setSelectedTaskId(newTask.id);
     } catch (error) {
