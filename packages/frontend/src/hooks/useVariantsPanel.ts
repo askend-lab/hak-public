@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { SentenceState } from '@/types/synthesis';
 import { NotificationType } from '@/components/Notification';
+import { analyzeText } from '@/utils/analyzeApi';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useVariantsPanel(
@@ -24,34 +25,22 @@ export function useVariantsPanel(
     const sentence = sentences.find(s => s.id === sentenceId);
 
     if (!sentence?.stressedTags) {
-      try {
-        const fullText = sentence?.tags.join(' ') || '';
-        const analyzeResponse = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: fullText })
-        });
+      const fullText = sentence?.tags.join(' ') || '';
+      const stressedText = await analyzeText(fullText);
+      if (stressedText) {
+        const stressedWords = stressedText.trim().split(/\s+/).filter((w: string) => w.length > 0);
+        setSentences(prev => prev.map(s => {
+          if (s.id !== sentenceId) return s;
+          return { ...s, stressedTags: stressedWords.length === s.tags.length ? stressedWords : undefined };
+        }));
 
-        if (analyzeResponse.ok) {
-          const { stressedText } = await analyzeResponse.json();
-          if (stressedText) {
-            const stressedWords = stressedText.trim().split(/\s+/).filter((w: string) => w.length > 0);
-            setSentences(prev => prev.map(s => {
-              if (s.id !== sentenceId) return s;
-              return { ...s, stressedTags: stressedWords.length === s.tags.length ? stressedWords : undefined };
-            }));
-
-            const customPhoneticForm = stressedWords.length === sentence?.tags.length ? stressedWords[tagIndex] : null;
-            setSelectedSentenceId(sentenceId);
-            setSelectedTagIndex(tagIndex);
-            setVariantsWord(word);
-            setVariantsCustomPhonetic(customPhoneticForm || null);
-            setIsVariantsPanelOpen(true);
-            return;
-          }
-        }
-      } catch (error) {
-        console.error('Failed to analyze sentence:', error);
+        const customPhoneticForm = stressedWords.length === sentence?.tags.length ? stressedWords[tagIndex] : null;
+        setSelectedSentenceId(sentenceId);
+        setSelectedTagIndex(tagIndex);
+        setVariantsWord(word);
+        setVariantsCustomPhonetic(customPhoneticForm || null);
+        setIsVariantsPanelOpen(true);
+        return;
       }
     }
 
@@ -121,21 +110,9 @@ export function useVariantsPanel(
     if (!sentence || !sentence.text.trim()) return;
 
     if (!sentence.phoneticText) {
-      try {
-        const analyzeResponse = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: sentence.text })
-        });
-
-        if (analyzeResponse.ok) {
-          const { stressedText } = await analyzeResponse.json();
-          if (stressedText) {
-            setSentences(prev => prev.map(s => s.id === sentenceId ? { ...s, phoneticText: stressedText } : s));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to analyze sentence:', error);
+      const stressedText = await analyzeText(sentence.text);
+      if (stressedText) {
+        setSentences(prev => prev.map(s => s.id === sentenceId ? { ...s, phoneticText: stressedText } : s));
       }
     }
 
