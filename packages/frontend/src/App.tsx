@@ -1,5 +1,6 @@
  
 import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
 import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';
 import SynthesisView from './components/SynthesisView';
@@ -14,17 +15,34 @@ import { useOnboarding } from './contexts/OnboardingContext';
 import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSentenceMenu } from './hooks';
 import { warmAudioWorker } from './utils/warmAudioWorker';
 
+function TasksRoute({ taskHandlers }: { taskHandlers: ReturnType<typeof useTaskHandlers> }) {
+  const { taskId } = useParams<{ taskId?: string }>();
+  const navigate = useNavigate();
+  
+  return (
+    <TasksView 
+      selectedTaskId={taskId || null}
+      taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
+      onBack={() => navigate('/tasks')}
+      onViewTask={(id) => navigate(`/tasks/${id}`)}
+      onCreateTask={taskHandlers.handleCreateTask}
+      onEditTask={taskHandlers.handleEditTask}
+      onDeleteTask={taskHandlers.handleDeleteTask}
+      onShareTask={taskHandlers.handleShareTask}
+    />
+  );
+}
+
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
   const { state: onboardingState, isWizardActive, resetOnboarding, isLoading: isOnboardingLoading } = useOnboarding();
+  const navigate = useNavigate();
 
-  const [currentView, setCurrentView] = useState<'synthesis' | 'tasks' | 'specs' | 'dashboard'>('synthesis');
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
 
   const synthesis = useSynthesis();
-  const taskHandlers = useTaskHandlers(synthesis.sentences, setCurrentView, setSelectedTaskId);
+  const taskHandlers = useTaskHandlers(synthesis.sentences, () => navigate('/tasks'), () => {});
   const dragDrop = useDragAndDrop(synthesis.setSentences);
   const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences, showNotification);
   const menu = useSentenceMenu();
@@ -32,14 +50,13 @@ export default function Home() {
   // Pre-warm audio worker on page load
   useEffect(() => { warmAudioWorker(); }, []);
 
-  // Handle post-login redirect and logout
+  // Handle post-login redirect
   useEffect(() => {
-    if (isAuthenticated && pendingTasksViewAccess) { setCurrentView('tasks'); setPendingTasksViewAccess(false); }
-  }, [isAuthenticated, pendingTasksViewAccess]);
-
-  useEffect(() => {
-    if (!isAuthenticated && currentView === 'tasks') setCurrentView('synthesis');
-  }, [isAuthenticated, currentView]);
+    if (isAuthenticated && pendingTasksViewAccess) { 
+      navigate('/tasks'); 
+      setPendingTasksViewAccess(false); 
+    }
+  }, [isAuthenticated, pendingTasksViewAccess, navigate]);
 
   useEffect(() => {
     if (isWizardActive && onboardingState.selectedRole) synthesis.setDemoSentences();
@@ -50,8 +67,12 @@ export default function Home() {
     variants.setVariantsCustomPhonetic(variantText);
   };
 
-  const handleBackToTaskList = () => setSelectedTaskId(null);
-  const handleViewTask = (taskId: string) => setSelectedTaskId(taskId);
+  const handleTasksClick = () => {
+    if (!isAuthenticated) {
+      setPendingTasksViewAccess(true);
+      setShowLoginModal(true);
+    }
+  };
 
   if (isOnboardingLoading) {
     return <div className="page-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="loader-spinner" style={{ width: 48, height: 48 }}></div></div>;
@@ -62,18 +83,18 @@ export default function Home() {
   return (
     <div className="page-layout">
       <AppHeader
-        currentView={currentView} isAuthenticated={isAuthenticated} user={user}
-        onSynthesisClick={() => { setCurrentView('synthesis'); setSelectedTaskId(null); }}
-        onTasksClick={() => { if (!isAuthenticated) { setPendingTasksViewAccess(true); setShowLoginModal(true); return; } setCurrentView('tasks'); }}
-        onSpecsClick={() => setCurrentView('specs')}
-        onDashboardClick={() => { setCurrentView('dashboard'); }}
-        onHelpClick={resetOnboarding} onLoginClick={() => setShowLoginModal(true)}
+        isAuthenticated={isAuthenticated} 
+        user={user}
+        onTasksClick={handleTasksClick}
+        onHelpClick={resetOnboarding} 
+        onLoginClick={() => setShowLoginModal(true)}
       />
 
       <main className={`page-layout__main ${showRoleSelection ? 'role-selection-main' : ''}`}>
         {showRoleSelection ? <RoleSelectionContent /> : (
-          <>
-            {currentView === 'synthesis' && (
+          <Routes>
+            <Route path="/" element={<Navigate to="/synthesis" replace />} />
+            <Route path="/synthesis" element={
               <SynthesisView
                 sentences={synthesis.sentences} isPlayingAll={synthesis.isPlayingAll} isLoadingPlayAll={synthesis.isLoadingPlayAll}
                 openTagMenu={synthesis.openTagMenu} editingTag={synthesis.editingTag}
@@ -101,20 +122,12 @@ export default function Home() {
                 onDownload={synthesis.handleDownload} onRemoveSentence={synthesis.handleRemoveSentence}
                 onLogin={() => setShowLoginModal(true)} onAddSentence={synthesis.handleAddSentence}
               />
-            )}
-            {currentView === 'tasks' && (
-              <TasksView selectedTaskId={selectedTaskId} taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
-                onBack={handleBackToTaskList} onViewTask={handleViewTask} onCreateTask={taskHandlers.handleCreateTask}
-                onEditTask={taskHandlers.handleEditTask} onDeleteTask={taskHandlers.handleDeleteTask} onShareTask={taskHandlers.handleShareTask}
-              />
-            )}
-            {currentView === 'specs' && (
-              <SpecsPage onBack={() => setCurrentView('synthesis')} />
-            )}
-            {currentView === 'dashboard' && (
-              <Dashboard />
-            )}
-          </>
+            } />
+            <Route path="/tasks" element={<TasksRoute taskHandlers={taskHandlers} />} />
+            <Route path="/tasks/:taskId" element={<TasksRoute taskHandlers={taskHandlers} />} />
+            <Route path="/specs" element={<SpecsPage onBack={() => navigate('/synthesis')} />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
         )}
       </main>
 
