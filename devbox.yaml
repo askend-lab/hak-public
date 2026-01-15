@@ -79,15 +79,6 @@ hooks:
       - '.design/**'
       - 'CodeReview_*.md'
       - 'GHERKIN_PLAN.md'
-      - 'docs/02-DESIGN-SYSTEM/DESIGN_SYSTEM_ARCHITECTURE.md'
-      - 'docs/02-DESIGN-SYSTEM/DESIGN_SYSTEM_QUICK_REFERENCE.md'
-      - 'docs/02-DESIGN-SYSTEM/DESIGN_SYSTEM_ONBOARDING.md'
-      - 'docs/01-SPECIFICATIONS/QA-REVIEW-REPORT.md'
-      - 'docs/01-SPECIFICATIONS/00-FEATURE-MAP.md'
-      - 'docs/01-SPECIFICATIONS/00-TEST-PLAN.md'
-      - 'docs/01-SPECIFICATIONS/04-TEST-DATA/estonian-phrases.md'
-      - 'packages/frontend/src/styles/README.md'
-      - 'packages/frontend/src/styles/tokens/README.md'
 
   language-check:
     active: true
