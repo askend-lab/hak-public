@@ -3,7 +3,7 @@ import { DataService } from '@/services/dataService';
 import { CreateTaskRequest } from '@/types/task';
 import { useAuth } from '@/services/auth';
 import { useNotification } from '@/contexts/NotificationContext';
-import { SentenceState } from '@/types/synthesis';
+import { SentenceState, filterNonEmptySentences } from '@/types/synthesis';
 
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
@@ -33,7 +33,7 @@ export function useTaskHandlers(
 
   const handleSelectTaskFromDropdown = useCallback(async (taskId: string, taskName: string) => {
     if (!user) return;
-    const entries = sentences.filter(s => s.text.trim()).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
+    const entries = filterNonEmptySentences(sentences).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
     if (entries.length === 0) return;
 
     try {
@@ -100,7 +100,7 @@ export function useTaskHandlers(
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
-      const playlistEntries = sentences.filter(s => s.text.trim()).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
+      const playlistEntries = filterNonEmptySentences(sentences).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
       const newTask = await dataService.createTask(user.id, {
         name: title, description: description || null,
         speechSequences: playlistEntries.map(e => e.text),
