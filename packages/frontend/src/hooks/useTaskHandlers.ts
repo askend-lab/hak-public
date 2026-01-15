@@ -15,6 +15,12 @@ export function useTaskHandlers(
   const { user, isAuthenticated, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
 
+  // Auth guard helper - returns true if NOT authenticated (to trigger early return)
+  const requireAuth = useCallback((): boolean => {
+    if (!isAuthenticated) { setShowLoginModal(true); return true; }
+    return false;
+  }, [isAuthenticated, setShowLoginModal]);
+
   const [showTaskCreationModal, setShowTaskCreationModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showAddToTaskDropdown, setShowAddToTaskDropdown] = useState(false);
@@ -27,9 +33,9 @@ export function useTaskHandlers(
   const [taskToDelete, setTaskToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const handleAddAllSentencesToTask = useCallback(() => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     setShowAddToTaskDropdown(prev => !prev);
-  }, [isAuthenticated, setShowLoginModal]);
+  }, [requireAuth]);
 
   const handleSelectTaskFromDropdown = useCallback(async (taskId: string, taskName: string) => {
     if (!user) return;
@@ -67,14 +73,14 @@ export function useTaskHandlers(
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 
   const handleCreateNewTaskFromMenu = useCallback((_sentenceId: string) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     setShowAddTaskModal(true);
-  }, [isAuthenticated, setShowLoginModal]);
+  }, [requireAuth]);
 
   const handleCreateTask = useCallback(() => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     setShowAddTaskModal(true);
-  }, [isAuthenticated, setShowLoginModal]);
+  }, [requireAuth]);
 
   const handleTaskCreated = useCallback(async (taskData: CreateTaskRequest) => {
     if (!user) return;
@@ -119,7 +125,7 @@ export function useTaskHandlers(
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 
   const handleEditTask = useCallback(async (task: { id: string; name: string; description?: string | null }) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
@@ -131,7 +137,7 @@ export function useTaskHandlers(
     } catch (error) {
       console.error('Failed to load task:', error);
     }
-  }, [isAuthenticated, user, setShowLoginModal]);
+  }, [requireAuth, user]);
 
   const handleTaskUpdated = useCallback(async (): Promise<void> => {
     if (!user || !taskToEdit) return;
@@ -149,7 +155,7 @@ export function useTaskHandlers(
   }, [user, taskToEdit, showNotification]);
 
   const handleDeleteTask = useCallback(async (taskId: string) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
@@ -158,7 +164,7 @@ export function useTaskHandlers(
     } catch (error) {
       console.error('Failed to load task:', error);
     }
-  }, [isAuthenticated, user, setShowLoginModal]);
+  }, [requireAuth, user]);
 
   const handleConfirmDelete = useCallback(async () => {
     if (!user || !taskToDelete) return;
@@ -180,7 +186,7 @@ export function useTaskHandlers(
   const handleCancelDelete = useCallback(() => { setShowDeleteConfirmation(false); setTaskToDelete(null); }, []);
 
   const handleShareTask = useCallback(async (task: { id: string; name: string; shareToken?: string }) => {
-    if (!isAuthenticated) { setShowLoginModal(true); return; }
+    if (requireAuth()) return;
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
@@ -190,7 +196,7 @@ export function useTaskHandlers(
     } catch (error) {
       console.error('Failed to share task:', error);
     }
-  }, [isAuthenticated, user, setShowLoginModal]);
+  }, [requireAuth, user]);
 
   return {
     showTaskCreationModal, setShowTaskCreationModal,
