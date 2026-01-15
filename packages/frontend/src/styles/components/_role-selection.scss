@@ -93,30 +93,6 @@
   flex-grow: 1;
 }
 
-.role-card-button {
-  background: $color-primary;
-  color: $color-white;
-  border: none;
-  border-radius: 20px;
-  padding: 12px 24px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 140%;
-  letter-spacing: 0%;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-  white-space: nowrap;
-  
-  &:hover {
-    background: $color-soft-primary;
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-}
 
 // Responsive styles
 @media (max-width: 920px) {

@@ -47,7 +47,7 @@ export default function RoleSelectionContent() {
             </p>
             
             <button 
-              className="role-card-button"
+              className="button button--primary"
               onClick={() => handleRoleSelect(role.id)}
             >
               {role.ctaText}

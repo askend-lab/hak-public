@@ -1,0 +1,35 @@
+// =========================================================================
+// Mixins
+// =========================================================================
+// Reusable style patterns for consistent component styling
+// =========================================================================
+
+@import '../tokens/colors';
+@import '../tokens/typography';
+@import '../tokens/spacing';
+@import '../tokens/borders';
+
+// ---------------------------------------------------------------------------
+// Phonetic Marker Badge
+// ---------------------------------------------------------------------------
+// Styling for phonetic marker symbols displayed in guide views
+// Used in: pronunciation-variants, sentence-phonetic-panel
+// ---------------------------------------------------------------------------
+
+@mixin phonetic-marker-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 $spacing-2;
+  background: transparent;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-none;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+}
