@@ -1,5 +1,4 @@
-/* eslint-disable max-lines-per-function */
-import http from 'http';
+import * as http from 'http';
 import { analyzeHandler, variantsHandler, healthHandler } from './handler';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
@@ -22,7 +21,7 @@ function createEvent(body: string, path: string, method: string): APIGatewayProx
   };
 }
 
-const server = http.createServer(async (req, res) => {
+const server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -40,7 +39,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   let body = '';
-  req.on('data', (chunk) => { body += chunk; });
+  req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
   req.on('end', async () => {
     const event = createEvent(body, path, req.method || 'GET');
     let result;

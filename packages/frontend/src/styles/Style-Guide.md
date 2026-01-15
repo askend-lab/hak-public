@@ -2,7 +2,7 @@
 
 This document describes the CSS/SCSS conventions used in this application, aligned with the EKI Storybook design system.
 
-> **📚 For complete architecture overview, see [Design System Architecture](../docs/DESIGN_SYSTEM_ARCHITECTURE.md)**
+> **📚 For complete architecture overview, see [Design System Architecture](../../../docs/02-DESIGN-SYSTEM/README.md)**
 
 ## Architecture
 
@@ -28,7 +28,7 @@ All design values are defined in `styles/tokens/`:
 - `_spacing.scss` - Spacing scale (4px grid)
 - `_borders.scss` - Border radii and widths
 
-For detailed token governance (naming conventions, when to add tokens, etc.), see [`styles/tokens/README.md`](tokens/README.md).
+For detailed token governance (naming conventions, when to add tokens, etc.), see [`styles/tokens/README.md`](tokens/Token-Governance.md).
 
 ### Usage
 
@@ -116,7 +116,7 @@ The app uses a universal layout system with 4 variants:
 3. **With Actions**: List pages with title and actions (task list)
 4. **Empty State**: Error/empty pages
 
-See [Layout System Documentation](../docs/DESIGN_SYSTEM_ARCHITECTURE.md#responsive-layout-system) for details.
+See [Layout System Documentation](../../../docs/02-DESIGN-SYSTEM/05-Responsive-Layout.md) for details.
 
 ### Breakpoints
 
@@ -146,58 +146,8 @@ Mobile-first approach with 6 breakpoints:
    - Good: `.card__title`, `.card__actions`
    - Bad: `.card__header__title`
 
-## Color Usage
+---
 
-### Never hardcode colors
-
-```scss
-// Bad
-.my-component {
-  color: #173148;
-  background: #D7E5F2;
-}
-
-// Good
-.my-component {
-  color: $color-primary;
-  background: $color-secondary;
-}
-```
-
-### Available color tokens
-
-| Token | Usage |
-|-------|-------|
-| `$color-primary` | Main brand color |
-| `$color-secondary` | Secondary brand color |
-| `$color-text-primary` | Primary text |
-| `$color-text-secondary` | Secondary text |
-| `$color-surface-bg` | Page background |
-| `$color-error` | Error states |
-| `$color-warning` | Warning states |
-| `$color-success` | Success states |
-| `$color-soft-*-bg` | Soft variant backgrounds |
-| `$color-outlined-*` | Outlined variant colors |
-
-## Storybook Components
-
-These components are from EKI Storybook and should be used as-is:
-
-- **Button**: `.button`, `.button--primary`, `.button--secondary`
-- **Input**: `.input`, `.input-wrapper`, `.input-label`
-- **Avatar**: `.avatar`, `.avatar__initials`
-- **Modal**: `.modal` (for notifications/toasts only)
-- **Checkbox**: `.checkbox-btn`
-- **Radio Button**: `.radio-btn`
-- **Select**: `.select`
-
-## App-Specific Components
-
-Components unique to this app (documented in `STORYBOOK-BACKLOG.md` for future proposal):
-
-- Task Manager
-- Audio Player
-- Playlist
-- Panel (sliding panels)
-- Paper (dropdown surfaces)
-- Modal (dialog windows - different from notification modals)
+**See also:**
+- [Color Usage Guide](./Style-Guide-Colors.md) - Color tokens and usage
+- [Token Governance](./tokens/Token-Governance.md) - Token management rules
