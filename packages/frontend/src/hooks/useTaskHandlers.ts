@@ -146,20 +146,20 @@ export function useTaskHandlers(
     }
   }, [requireAuth, user]);
 
-  const handleTaskUpdated = useCallback(async (): Promise<void> => {
-    if (!user || !taskToEdit) return;
+  const handleTaskUpdated = useCallback(async (updatedTask: { id: string; name: string; description?: string | null }): Promise<void> => {
+    if (!user) return;
     try {
       const dataService = DataService.getInstance();
-      await dataService.updateTask(user.id, taskToEdit.id, { name: taskToEdit.name, ...(taskToEdit.description !== null && { description: taskToEdit.description }) });
+      await dataService.updateTask(user.id, updatedTask.id, { name: updatedTask.name, ...(updatedTask.description !== null && { description: updatedTask.description }) });
       setShowTaskEditModal(false);
       setTaskToEdit(null);
       setTaskRefreshTrigger(prev => prev + 1);
-      showNotification('success', `Ülesanne "${taskToEdit.name}" uuendatud!`, undefined, undefined, 'success');
+      showNotification('success', `Ülesanne "${updatedTask.name}" uuendatud!`, undefined, undefined, 'success');
     } catch (error) {
       console.error('Failed to update task:', error);
       showNotification('error', 'Ülesande uuendamine ebaõnnestus');
     }
-  }, [user, taskToEdit, showNotification]);
+  }, [user, showNotification]);
 
   const handleDeleteTask = useCallback(async (taskId: string) => {
     if (requireAuth()) return;

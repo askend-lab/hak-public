@@ -171,14 +171,11 @@ describe('useTaskHandlers', () => {
   it('should update task', async () => {
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
 
-    // Set taskToEdit first in a separate act
-    act(() => {
-      result.current.setTaskToEdit({ id: 'task-1', name: 'Updated Task', description: 'Updated Desc' });
-    });
+    const updatedTask = { id: 'task-1', name: 'Updated Task', description: 'Updated Desc' };
 
-    // Then call handleTaskUpdated
+    // Call handleTaskUpdated with updated task data
     await act(async () => {
-      await result.current.handleTaskUpdated();
+      await result.current.handleTaskUpdated(updatedTask);
     });
 
     expect(mockUpdateTask).toHaveBeenCalledWith('user-1', 'task-1', { name: 'Updated Task', description: 'Updated Desc' });
@@ -261,9 +258,11 @@ describe('useTaskHandlers', () => {
       result.current.setTaskToEdit({ id: 'task-1', name: 'Updated', description: 'Desc' });
     });
 
+    const updatedTask = { id: 'task-1', name: 'Updated', description: 'Desc' };
+    
     // Then call handleTaskUpdated
     await act(async () => {
-      await result.current.handleTaskUpdated();
+      await result.current.handleTaskUpdated(updatedTask);
     });
     expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));
     consoleSpy.mockRestore();
