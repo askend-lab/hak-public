@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { S3Client, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { ECSClient, UpdateServiceCommand, DescribeServicesCommand } from '@aws-sdk/client-ecs';

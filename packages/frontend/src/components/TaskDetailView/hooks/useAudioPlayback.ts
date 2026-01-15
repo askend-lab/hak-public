@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-non-null-assertion, max-lines-per-function */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-non-null-assertion */
 import { useState, useCallback } from 'react';
 import { TaskEntry } from '@/types/task';
 import { synthesizeWithPolling } from '@/utils/synthesize';

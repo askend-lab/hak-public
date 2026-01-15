@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function, max-lines */
 import { useState, useCallback } from 'react';
 import { DataService } from '@/services/dataService';
 import { CreateTaskRequest } from '@/types/task';

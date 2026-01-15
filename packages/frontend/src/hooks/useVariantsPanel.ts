@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { useState, useCallback } from 'react';
 import { SentenceState } from '@/types/synthesis';
 import { NotificationType } from '@/components/Notification';

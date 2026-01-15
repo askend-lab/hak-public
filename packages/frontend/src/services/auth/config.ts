@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 export function getRedirectUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:5180/auth/callback';

@@ -197,4 +197,22 @@ hooks:
       - '**/merlin-worker/tools/**'
       - '**/SentenceSynthesisItem.test.tsx'
 
+  security-audit:
+    active: true
+
+  secret-detection:
+    active: true
+
+  dependency-check:
+    active: true
+
+  import-order:
+    active: true
+
+  no-any:
+    active: true
+
+  no-floating-promises:
+    active: true
+
 # final
