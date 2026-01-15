@@ -88,6 +88,8 @@ hooks:
       - '**/drafts/**'
       - '**/test/fixtures/**'
       - '.design/**'
+      - '.project/plans/**'
+      - 'docs/01-SPECIFICATIONS/04-TEST-DATA/**'
 
   broken-links:
     active: true
@@ -177,5 +179,22 @@ hooks:
     excludePaths:
       - '**/.old-frontend/**'
       - '**/.esbuild/**'
+      - '**/.serverless/**'
+      - '**/cucumber-results.json'
+      - '**/jscpd-report.json'
+      - '**/report/**'
+      - '**/reports/**'
+      - '**/coverage/**'
+      - '**/jest-results.json'
+      - '**/*.generated.ts'
+      - '**/mock-tasks.json'
+      - '**/styles/**'
+      - '**/eki/**'
+      - '**/merlin/**/*.py'
+      - '**/cucumber-report.json'
+      - '**/*.full.test.tsx'
+      - '**/*.full.test.ts'
+      - '**/merlin-worker/tools/**'
+      - '**/SentenceSynthesisItem.test.tsx'
 
 # final
