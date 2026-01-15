@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 export function getRedirectUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:5180/auth/callback';
+    return 'http://localhost:5181/auth/callback';
   }
   if (hostname === 'hak-dev.askend-lab.com') {
     return 'https://hak-dev.askend-lab.com/auth/callback';
@@ -11,7 +11,7 @@ export function getRedirectUri(hostname: string = typeof window !== 'undefined' 
 
 export function getLogoutUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:5180';
+    return 'http://localhost:5181';
   }
   if (hostname === 'hak-dev.askend-lab.com') {
     return 'https://hak-dev.askend-lab.com';
