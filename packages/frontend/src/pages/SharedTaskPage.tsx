@@ -99,7 +99,7 @@ export function SharedTaskPage() {
         </div>
       </div>
 
-      <footer className="page-footer">
+      <footer className="page-layout__footer page-footer--full">
         <Footer />
       </footer>
     </div>
