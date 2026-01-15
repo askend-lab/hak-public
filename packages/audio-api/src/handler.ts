@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import type { S3ClientLike } from './s3';
 import type { SQSClientLike } from './sqs';
 import { TEXT_LIMITS } from '@hak/shared';

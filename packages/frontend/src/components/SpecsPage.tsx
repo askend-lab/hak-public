@@ -39,7 +39,7 @@ function useSpecsData() {
   return { groups, testSuites, loading };
 }
 
-// eslint-disable-next-line max-lines-per-function
+ 
 export default function SpecsPage({ onBack }: SpecsPageProps) {
   const { groups, testSuites, loading } = useSpecsData();
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);

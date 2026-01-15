@@ -38,7 +38,7 @@ interface AppModalsProps {
   onUseVariant: (text: string) => void;
 }
 
-// eslint-disable-next-line complexity
+ 
 export default function AppModals({ user, sentences, showLoginModal, setShowLoginModal, showNotification, isWizardActive, variants, synthesis, taskHandlers, onUseVariant }: AppModalsProps) {
   const playlistEntries = filterNonEmptySentences(sentences).map(s => ({ id: s.id, text: s.text, stressedText: s.phoneticText || s.text, audioUrl: s.audioUrl || null, audioBlob: null }));
   const handleAddToExisting = async (taskId: string, entries: { text: string; stressedText: string }[], taskName: string) => {

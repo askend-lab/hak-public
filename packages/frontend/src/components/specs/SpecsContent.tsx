@@ -18,7 +18,7 @@ function getTestResult(testSuites: TestSuite[], scenarioName: string) {
   return null;
 }
 
-// eslint-disable-next-line max-lines-per-function
+ 
 export default function SpecsContent({ feature, testSuites }: SpecsContentProps) {
   if (!feature) {
     return <p className="specs-page__empty">Vali feature, et näha üksikasju.</p>;

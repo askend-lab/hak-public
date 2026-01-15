@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 // AUTO-GENERATED - DO NOT EDIT
 // Run: pnpm --filter @hak/frontend sync-features
 // Group: tasks

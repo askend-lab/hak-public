@@ -1,4 +1,4 @@
-/* eslint-disable max-lines-per-function, complexity */
+ 
 'use client';
 
 import { Task } from '@/types/task';

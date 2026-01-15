@@ -23,7 +23,7 @@ const ModalHeader = ({ title, showCloseButton, onClose, headerClasses }: { title
   </div>
 );
 
-// eslint-disable-next-line complexity
+ 
 export default function BaseModal({ isOpen, onClose, title, showCloseButton = true, size = 'medium', children, className = '', headerClassName = '', contentClassName = '', preventBackdropClose = false }: BaseModalProps) {
   useEffect(() => {
     if (!isOpen) return;

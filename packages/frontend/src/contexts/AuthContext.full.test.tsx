@@ -1,4 +1,4 @@
-/* eslint-disable max-lines-per-function */
+ 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { AuthProvider, useAuth } from './AuthContext';

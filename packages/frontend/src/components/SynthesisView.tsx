@@ -1,4 +1,4 @@
-/* eslint-disable max-lines-per-function, complexity */
+ 
 import SynthesisPageHeader from './SynthesisPageHeader';
 import SentenceMenu from './SentenceMenu';
 import SentenceSynthesisItem from './SentenceSynthesisItem';
