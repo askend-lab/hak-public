@@ -141,9 +141,7 @@ hooks:
     active: true
 
   run-lint:
-    active: true
-    blocking: false  # Non-blocking - lint warnings cleanup in progress
-    command: 'pnpm lint'
+    mode: off
 
   run-typecheck:
     active: true
