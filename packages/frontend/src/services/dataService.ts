@@ -1,16 +1,23 @@
-/**
- * DataService - Facade class for task data operations
- * Split from 640-line monolith into modules for SOLID compliance
- * 
- * Modules: storage.ts, queries.ts, mutations.ts
- */
 import { Task, TaskSummary, TaskEntry, CreateTaskRequest } from '@/types/task';
-import * as queries from './dataService/queries';
-import * as mutations from './dataService/mutations';
+import { LocalStorageAdapter } from './storage/LocalStorageAdapter';
+import { MockDataLoader } from './storage/MockDataLoader';
+import { ShareService } from './storage/ShareService';
+import { TaskRepository } from './repository/TaskRepository';
 
 export class DataService {
   private static instance: DataService;
+  private storage: LocalStorageAdapter;
+  private mockLoader: MockDataLoader;
+  private shareService: ShareService;
+  private repository: TaskRepository;
   
+  private constructor() {
+    this.storage = new LocalStorageAdapter();
+    this.mockLoader = new MockDataLoader();
+    this.shareService = new ShareService(this.storage, this.mockLoader);
+    this.repository = new TaskRepository(this.storage, this.mockLoader, this.shareService);
+  }
+
   static getInstance(): DataService {
     if (!DataService.instance) {
       DataService.instance = new DataService();
@@ -19,54 +26,75 @@ export class DataService {
   }
 
   async getUserTasks(userId: string): Promise<TaskSummary[]> {
-    return queries.getUserTasks(userId);
+    return this.repository.getUserTasks(userId);
   }
 
   async getUserCreatedTasks(userId: string): Promise<TaskSummary[]> {
-    return queries.getUserCreatedTasks(userId);
+    return this.repository.getUserCreatedTasks(userId);
   }
 
   async getModifiableTasks(userId: string): Promise<TaskSummary[]> {
-    return queries.getModifiableTasks(userId);
+    return this.repository.getModifiableTasks(userId);
   }
 
   async getTask(taskId: string, userId: string): Promise<Task | null> {
-    return queries.getTask(taskId, userId);
+    return this.repository.getTask(taskId, userId);
   }
 
   async getSharedTask(taskId: string): Promise<Task | null> {
-    return queries.getSharedTask(taskId);
-  }
-
-  async getTaskByShareToken(shareToken: string): Promise<Task | null> {
-    return queries.getTaskByShareToken(shareToken);
+    return this.shareService.getSharedTask(taskId);
   }
 
   async shareUserTask(userId: string, taskId: string): Promise<void> {
-    return mutations.shareUserTask(userId, taskId);
+    const task = await this.repository.getTask(taskId, userId);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    console.log('Sharing task:', { userId, taskId, task });
+    await this.shareService.shareUserTask(task);
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
-    return mutations.createTask(userId, taskData);
+    return this.repository.createTask(userId, taskData);
   }
 
   async updateTask(userId: string, taskId: string, updates: Partial<Task>): Promise<Task | null> {
-    return mutations.updateTask(userId, taskId, updates);
+    return this.repository.updateTask(userId, taskId, updates);
   }
 
   async deleteTask(userId: string, taskId: string): Promise<boolean> {
-    return mutations.deleteTask(userId, taskId);
+    return this.repository.deleteTask(userId, taskId);
   }
 
   async addEntryToTask(userId: string, taskId: string, entryData: Omit<TaskEntry, 'id' | 'taskId' | 'createdAt'>): Promise<TaskEntry> {
-    return mutations.addEntryToTask(userId, taskId, entryData);
+    const task = await this.repository.getTask(taskId, userId);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const newEntry: TaskEntry = {
+      id: `entry_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      taskId,
+      ...entryData,
+      createdAt: new Date()
+    };
+
+    const updatedEntries = [...(task.entries || []), newEntry];
+    await this.repository.updateTask(userId, taskId, { entries: updatedEntries });
+
+    return newEntry;
   }
 
   async addTextEntriesToTask(userId: string, taskId: string, textEntries: string[] | Array<{text: string; stressedText: string}>): Promise<TaskEntry[]> {
-    return mutations.addTextEntriesToTask(userId, taskId, textEntries);
+    return this.repository.addTextEntriesToTask(userId, taskId, textEntries);
+  }
+
+  async getTaskByShareToken(shareToken: string): Promise<Task | null> {
+    return this.shareService.getTaskByShareToken(shareToken);
   }
 
   async updateTaskEntry(userId: string, taskId: string, entryId: string, updates: Partial<Omit<TaskEntry, 'id' | 'taskId' | 'createdAt'>>): Promise<TaskEntry | null> {
-    return mutations.updateTaskEntry(userId, taskId, entryId, updates);
+    return this.repository.updateTaskEntry(userId, taskId, entryId, updates);
   }
 }
