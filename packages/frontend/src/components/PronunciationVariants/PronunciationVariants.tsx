@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { transformToVabamorf } from '@/utils/phoneticMarkers';
 import { synthesizeWithPolling } from '@/utils/synthesize';
+import { createAudioPlayer } from '@/utils/audioPlayer';
 import { CloseIcon } from '../ui/Icons';
 import PhoneticGuide from './PhoneticGuide';
 import { VariantItem } from './VariantItem';
@@ -70,10 +71,11 @@ export default function PronunciationVariants({ word, isOpen, onClose, onUseVari
     setPlayingVariant(null);
     try {
       const audioUrl = await synthesizeWithPolling(variant.text, 'efm_s');
-      const audio = new Audio(audioUrl);
-      audio.onloadeddata = () => { setLoadingVariant(null); setPlayingVariant(variant.text); };
-      audio.onended = () => { setPlayingVariant(null); setLoadingVariant(null); URL.revokeObjectURL(audioUrl); };
-      audio.onerror = () => { setPlayingVariant(null); setLoadingVariant(null); URL.revokeObjectURL(audioUrl); };
+      const { audio } = createAudioPlayer(audioUrl, {
+        onLoaded: () => { setLoadingVariant(null); setPlayingVariant(variant.text); },
+        onEnded: () => { setPlayingVariant(null); setLoadingVariant(null); },
+        onError: () => { setPlayingVariant(null); setLoadingVariant(null); },
+      });
       await audio.play();
     } catch (error) {
       console.error('Failed to play variant:', error);
@@ -91,10 +93,11 @@ export default function PronunciationVariants({ word, isOpen, onClose, onUseVari
     try {
       const vabamorfText = transformToVabamorf(customVariant);
       const audioUrl = await synthesizeWithPolling(vabamorfText || '', 'efm_s');
-      const audio = new Audio(audioUrl);
-      audio.onloadeddata = () => { setIsCustomLoading(false); setIsCustomPlaying(true); };
-      audio.onended = () => { setIsCustomPlaying(false); setIsCustomLoading(false); URL.revokeObjectURL(audioUrl); };
-      audio.onerror = () => { setIsCustomPlaying(false); setIsCustomLoading(false); URL.revokeObjectURL(audioUrl); };
+      const { audio } = createAudioPlayer(audioUrl, {
+        onLoaded: () => { setIsCustomLoading(false); setIsCustomPlaying(true); },
+        onEnded: () => { setIsCustomPlaying(false); setIsCustomLoading(false); },
+        onError: () => { setIsCustomPlaying(false); setIsCustomLoading(false); },
+      });
       await audio.play();
     } catch (error) {
       console.error('Failed to play custom variant:', error);

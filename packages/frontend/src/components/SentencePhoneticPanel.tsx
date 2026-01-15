@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { transformToUI, transformToVabamorf } from '@/utils/phoneticMarkers';
 import { synthesizeWithPolling } from '@/utils/synthesize';
+import { createAudioPlayer } from '@/utils/audioPlayer';
 import { BackIcon, PlayIcon, PauseIcon, CloseIcon } from './ui/Icons';
 
 interface SentencePhoneticPanelProps { sentenceText: string; phoneticText: string | null; isOpen: boolean; onClose: () => void; onApply: (newPhoneticText: string) => void; }
@@ -78,9 +79,14 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     setIsLoading(true); setIsPlaying(false);
     try {
-      const vt = transformToVabamorf(editedText); const url = await synthesizeWithPolling(vt || '', getVoiceModel(vt || '')); const audio = new Audio(url); audioRef.current = audio;
-      audio.onloadeddata = () => { setIsLoading(false); setIsPlaying(true); };
-      audio.onended = audio.onerror = () => { setIsPlaying(false); setIsLoading(false); URL.revokeObjectURL(url); audioRef.current = null; };
+      const vt = transformToVabamorf(editedText);
+      const url = await synthesizeWithPolling(vt || '', getVoiceModel(vt || ''));
+      const { audio } = createAudioPlayer(url, {
+        onLoaded: () => { setIsLoading(false); setIsPlaying(true); },
+        onEnded: () => { setIsPlaying(false); setIsLoading(false); audioRef.current = null; },
+        onError: () => { setIsPlaying(false); setIsLoading(false); audioRef.current = null; },
+      });
+      audioRef.current = audio;
       await audio.play();
     } catch (e) { console.error('Failed to play:', e); setIsPlaying(false); setIsLoading(false); }
   };
