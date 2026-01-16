@@ -85,9 +85,6 @@ export class TaskRepository {
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
-    console.log('Creating task for userId:', userId);
-    console.log('Task data:', taskData);
-    
     const newTask: Task = {
       id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       userId,
@@ -118,22 +115,13 @@ export class TaskRepository {
       shareToken: this.shareService.generateShareToken()
     };
 
-    console.log('Generated new task:', newTask);
-
     newTask.entries.forEach(entry => {
       entry.taskId = newTask.id;
     });
 
     const userTasks = this.storage.loadUserTasks(userId);
-    console.log('Existing user tasks before save:', userTasks);
     userTasks.push(newTask);
     this.storage.saveUserTasks(userId, userTasks);
-    console.log('Task saved to localStorage with key:', `eki_user_tasks_${userId}`);
-    
-    const savedTasks = this.storage.loadUserTasks(userId);
-    console.log('Tasks after save:', savedTasks);
-    const savedTask = savedTasks.find(t => t.id === newTask.id);
-    console.log('Newly saved task found:', savedTask);
 
     return newTask;
   }
@@ -226,19 +214,13 @@ export class TaskRepository {
   }
 
   async addTextEntriesToTask(userId: string, taskId: string, textEntries: string[] | Array<{text: string; stressedText: string}>): Promise<TaskEntry[]> {
-    console.log('Adding text entries to task:', { userId, taskId, textEntries });
-    
     const task = await this.getTask(taskId, userId);
     if (!task) {
       throw new Error('Task not found');
     }
 
-    console.log('Found task:', task);
-
     const userTasks = this.storage.loadUserTasks(userId);
     const isUserTask = userTasks.some(t => t.id === taskId);
-    
-    console.log('Is user task:', isUserTask, 'User tasks count:', userTasks.length);
     
     const currentEntries = task.entries || [];
     const maxOrder = currentEntries.length > 0 ? Math.max(...currentEntries.map(e => e.order)) : 0;
