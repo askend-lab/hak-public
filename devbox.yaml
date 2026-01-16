@@ -127,7 +127,9 @@ hooks:
     active: true
 
   run-lint:
-    mode: off
+    active: true
+    blocking: true
+    command: 'pnpm lint'
 
   run-typecheck:
     active: true

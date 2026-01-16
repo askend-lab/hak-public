@@ -37,7 +37,7 @@ export const mockTaskHandlers = () => ({
   taskRefreshTrigger: 0, showAddTaskModal: false, setShowAddTaskModal: vi.fn(),
   handleAddTask: vi.fn(), showTaskCreationModal: false, setShowTaskCreationModal: vi.fn(),
   handleTaskCreated: vi.fn(), showTaskEditModal: false, setShowTaskEditModal: vi.fn(),
-  taskToEdit: null, setTaskToEdit: vi.fn(), handleTaskUpdated: vi.fn(),
+  taskToEdit: null, setTaskToEdit: vi.fn(), handleTaskUpdated: vi.fn().mockResolvedValue(undefined),
   showShareTaskModal: false, setShowShareTaskModal: vi.fn(), taskToShare: null,
   setTaskToShare: vi.fn(), showDeleteConfirmation: false, taskToDelete: null,
   handleConfirmDelete: vi.fn(), handleCancelDelete: vi.fn(),
