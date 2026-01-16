@@ -41,8 +41,8 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
+    min_coverage_lines: 82
+    min_coverage_branches: 72
     command: "pnpm test"
     command_full: "pnpm test:coverage"
   - name: cucumber

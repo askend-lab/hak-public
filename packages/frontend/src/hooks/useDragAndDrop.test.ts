@@ -11,7 +11,6 @@ describe('useDragAndDrop', () => {
     { id: '3', text: 'Test', tags: ['Test'], stressedTags: ['Test'], currentInput: '', isPlaying: false, isLoading: false },
   ];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockSetSentences: any;
 
   beforeEach(() => {

@@ -30,7 +30,9 @@ export default [
     files: TEST_FILE_PATTERNS,
     rules: {
       'jest/no-standalone-expect': 'off',
-      'jest/no-disabled-tests': 'off'
+      'jest/no-disabled-tests': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off'
     }
   },
 
