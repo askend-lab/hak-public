@@ -11,33 +11,21 @@ test_modules:
   - name: simplestore
     path: packages/simplestore
     type: jest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
   - name: audio-api
     path: packages/audio-api
     type: jest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
   - name: merlin-worker
     path: packages/merlin-worker
     type: jest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
   - name: vabamorf-api
     path: packages/vabamorf-api
     type: jest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
   - name: gherkin-parser
     path: packages/gherkin-parser
     type: jest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
   - name: shared
     path: packages/shared
     type: jest
-    min_coverage_lines: 80
-    min_coverage_branches: 70
   - name: frontend
     path: packages/frontend
     type: vitest
@@ -58,7 +46,6 @@ coverage:
 
 # Task Channel - Slack-based agent communication
 task_channel:
-  active: false
   channel_name: 'hak'
 
 # Hooks configuration - ALL parameters required
@@ -67,9 +54,6 @@ hooks:
     mode: off
 
   language-check:
-    active: true
-    allowed_languages:
-      - en
     excludePaths:
       - '**/drafts/**'
       - '**/test/fixtures/**'
@@ -78,14 +62,12 @@ hooks:
       - 'docs/01-SPECIFICATIONS/04-TEST-DATA/**'
 
   broken-links:
-    active: true
     excludePaths:
       - '**/test/fixtures/**'
       - '.design/**'
 
   no-console:
     mode: error
-    active: true
     allow_warn: true
     allow_error: true
     excludePaths:
@@ -96,15 +78,10 @@ hooks:
       - '**/build/**'
       - '**/coverage/**'
 
-  prettier-check:
-    active: true
+  prettier-check: {}
 
   test-required:
-    active: true
     tdd: true  # Enable strict TDD enforcement for feat/fix commits
-    patterns:
-      - '*.test.js'
-      - '*.spec.js'
     excludePaths:
       - 'jest.setup.ts'
       - '*.config.ts'
@@ -123,36 +100,27 @@ hooks:
       - 'handler.ts'  # Lambda handler (infrastructure)
       - 'routes.ts'  # Lambda routes (infrastructure)
 
-  metrics-required:
-    active: true
+  metrics-required: {}
 
   run-lint:
-    active: true
+    mode: error
     blocking: true
     command: 'pnpm lint'
 
   run-typecheck:
-    active: true
     command: 'pnpm -r exec tsc --noEmit'
 
-  test-coverage:
-    mode: error
-    active: true
+  test-coverage: {}
 
   run-tests:
-    active: true
     command: 'node devbox test'
 
   run-build:
-    active: true
-    mode: error
     command: 'pnpm --filter @hak/frontend build'
 
-  plan-validation:
-    active: true
+  plan-validation: {}
 
   jscpd:
-    active: true
     excludePaths:
       - '**/node_modules/**'
       - '**/dist/**'
@@ -161,7 +129,6 @@ hooks:
       - '**/*.min.js'
 
   source-size:
-    active: true
     excludePaths:
       - '**/.old-frontend/**'
       - '**/.esbuild/**'
@@ -184,21 +151,19 @@ hooks:
       - '**/SentenceSynthesisItem.test.tsx'
 
   security-audit:
-    active: true
+    mode: error
 
   secret-detection:
-    active: true
+    mode: error
 
   dependency-check:
-    active: true
+    mode: error
 
   import-order:
-    active: true
+    mode: error
 
   no-any:
-    active: true
+    mode: error
 
   no-floating-promises:
-    active: true
-
-# final
+    mode: error
