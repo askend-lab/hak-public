@@ -142,6 +142,8 @@ hooks:
     excludePaths:
       - '**/.old-frontend/**'
       - '**/.esbuild/**'
+      - '**/.serverless/**'
+      - '**/steps-ts/**'
       - '**/PronunciationVariants.tsx'
       - '**/TaskDetailView.tsx'
 
