@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { toHaveNoViolations } from 'jest-axe';
+
+// Extend expect with jest-axe matchers for accessibility testing
+expect.extend(toHaveNoViolations);
 
 // Mock localStorage with actual storage
 const createLocalStorageMock = (): Storage => {

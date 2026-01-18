@@ -1,3 +1,8 @@
+@import '../tokens/colors';
+@import '../tokens/spacing';
+@import '../tokens/typography';
+@import '../tokens/borders';
+
 .dashboard {
   padding: $spacing-lg;
   max-width: 1200px;
@@ -45,12 +50,12 @@
     transition: box-shadow 0.2s ease;
 
     &:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 12px $color-shadow-subtle;
     }
   }
 
   &__metric-icon {
-    font-size: 2rem;
+    font-size: $font-size-4xl;
     line-height: 1;
   }
 
@@ -168,7 +173,7 @@
   }
 
   &__quick-link-icon {
-    font-size: 1.25rem;
+    font-size: $font-size-xl;
   }
 
   &__auth-prompt {

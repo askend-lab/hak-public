@@ -60,12 +60,22 @@ export function RowMenu({
     return undefined;
   }, [isOpen]);
 
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent): void => {
+    if (e.key === 'Escape') {
+      onClose();
+      menuButtonRef.current?.focus();
+    }
+  };
+
   return (
     <div className="sentence-synthesis-item__menu-container">
       <button
         ref={menuButtonRef}
         className="sentence-synthesis-item__menu-button"
-        aria-label="More options"
+        aria-label="Rohkem valikuid"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
         onClick={() => onOpen(id)}
         data-onboarding-target={onboardingTarget}
       >
@@ -76,22 +86,27 @@ export function RowMenu({
           <div
             className="sentence-synthesis-item__menu-backdrop"
             onClick={onClose}
+            aria-hidden="true"
           />
           <div
             className="sentence-synthesis-item__dropdown-menu sentence-synthesis-item__dropdown-menu--fixed"
             style={{ top: `${dropdownPosition.top}px`, right: `${dropdownPosition.right}px` }}
+            role="menu"
+            aria-label="Lausungi valikud"
+            onKeyDown={handleKeyDown}
           >
             {items.map((item, index) => (
               <button
                 key={index}
                 className={`sentence-synthesis-item__menu-item ${item.danger ? 'sentence-synthesis-item__menu-item--danger' : ''}`}
+                role="menuitem"
                 onClick={() => {
                   item.onClick(id);
                   onClose();
                 }}
               >
                 {item.icon && (
-                  <span className="sentence-synthesis-item__menu-item-icon">{item.icon}</span>
+                  <span className="sentence-synthesis-item__menu-item-icon" aria-hidden="true">{item.icon}</span>
                 )}
                 <div className="sentence-synthesis-item__menu-item-content">{item.label}</div>
               </button>

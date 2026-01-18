@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 
 // =========================================================================
 // Share Task Modal Component
@@ -53,11 +54,15 @@
   box-sizing: border-box;
   transition: all 0.2s ease;
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
+    border-color: $color-input-border-focus;
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
     background: $color-white;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 }
 
@@ -70,7 +75,7 @@
 }
 
 // Responsive design
-@media (max-width: 640px) {
+@media (max-width: $breakpoint-sm) {
   .share-task-modal__actions {
     button {
       width: 100%;

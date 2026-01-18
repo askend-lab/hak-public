@@ -49,7 +49,7 @@ describe('TaskDetailView Full', () => {
     onBack: vi.fn(),
     onEditTask: vi.fn(),
     onDeleteTask: vi.fn(),
-    onAddEntryFromInput: vi.fn(),
+    onNavigateToSynthesis: vi.fn(),
   };
 
   beforeEach(() => {

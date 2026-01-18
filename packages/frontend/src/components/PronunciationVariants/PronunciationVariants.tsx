@@ -134,7 +134,7 @@ export default function PronunciationVariants({ word, isOpen, onClose, onUseVari
           ) : (
             <>
               {isLoading && <div className="pronunciation-variants__loading"><p>Laen variante...</p></div>}
-              {error && <div className="pronunciation-variants__error"><p>Viga: {error}</p></div>}
+              {error && <div className="pronunciation-variants__error" role="alert"><p>Viga: {error}</p></div>}
               {!isLoading && !error && variants.length > 0 && (
                 <div className="pronunciation-variants__list">
                   {variants.map((variant, index) => (

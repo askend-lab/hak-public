@@ -1,10 +1,7 @@
- 
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { TaskSummary } from '@/types/task';
-import { DataService } from '@/services/dataService';
-import { useAuth } from '@/services/auth';
 import { MoreIcon } from './ui/Icons';
 
 interface TaskRowProps {
@@ -133,71 +130,26 @@ function TaskRow({
 }
 
 interface TaskManagerProps {
-  onCreateTask: () => void;
+  tasks: TaskSummary[];
   onEditTask: (taskId: string) => void;
   onViewTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
   onShareTask: (taskId: string) => void;
-  refreshTrigger?: number; // Add optional refresh trigger
 }
 
 export default function TaskManager({
-  onCreateTask,
+  tasks,
   onEditTask,
   onViewTask,
   onDeleteTask,
-  onShareTask,
-  refreshTrigger = 0
+  onShareTask
 }: TaskManagerProps) {
-  const { user } = useAuth();
-  const [tasks, setTasks] = useState<TaskSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
-  // Load tasks when user changes or refresh is triggered
-  useEffect(() => {
-    const loadTasks = async () => {
-      if (!user) {
-        setTasks([]);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        const dataService = DataService.getInstance();
-        const userTasks = await dataService.getUserTasks(user.id);
-        setTasks(userTasks);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Viga ülesannete laadimisel');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadTasks();
-  }, [user, refreshTrigger]);
-
   const handleShare = (taskId: string) => {
-    console.log('TaskManager handleShare called with taskId:', taskId);
     onShareTask(taskId);
   };
-
-  if (isLoading) {
-    return (
-      <div className="task-manager">
-        <div className="task-manager-header">
-          <h2 className="task-manager-title">Minu ülesanded</h2>
-        </div>
-        <div className="task-manager-loading">
-          <div className="loading-spinner"></div>
-          <p>Laen ülesandeid...</p>
-        </div>
-      </div>
-    );
-  }
 
   const handleMenuOpen = (taskId: string) => {
     setOpenMenuId(openMenuId === taskId ? null : taskId);
@@ -221,47 +173,22 @@ export default function TaskManager({
   };
 
   return (
-    <>
-      <div className="task-manager-simple">
-        {error && (
-          <div className="task-manager-error">
-            <p>Viga ülesannete laadimisel: {error}</p>
-          </div>
-        )}
-
-        {tasks.length === 0 ? (
-          <div className="task-manager-empty">
-            <div className="task-manager-empty-image">
-              <img src="/icons/avatar_task_empty.png" alt="Ülesanded puuduvad" />
-            </div>
-            <h4 className="task-manager-empty-title">Ülesanded puuduvad</h4>
-            <button
-              onClick={onCreateTask}
-              className="task-manager-empty-cta"
-            >
-              Lisa ülesanne
-            </button>
-          </div>
-        ) : (
-          <>
-            {tasks.map((task) => (
-              <TaskRow
-                key={task.id}
-                task={task}
-                isExpanded={expandedTasks.has(task.id)}
-                onToggleExpand={toggleExpanded}
-                onViewTask={onViewTask}
-                onEditTask={onEditTask}
-                onDeleteTask={onDeleteTask}
-                onShareTask={handleShare}
-                openMenuId={openMenuId}
-                onMenuOpen={handleMenuOpen}
-                onMenuClose={handleMenuClose}
-              />
-            ))}
-          </>
-        )}
-      </div>
-    </>
+    <div className="task-manager-simple">
+      {tasks.map((task) => (
+        <TaskRow
+          key={task.id}
+          task={task}
+          isExpanded={expandedTasks.has(task.id)}
+          onToggleExpand={toggleExpanded}
+          onViewTask={onViewTask}
+          onEditTask={onEditTask}
+          onDeleteTask={onDeleteTask}
+          onShareTask={handleShare}
+          openMenuId={openMenuId}
+          onMenuOpen={handleMenuOpen}
+          onMenuClose={handleMenuClose}
+        />
+      ))}
+    </div>
   );
 }

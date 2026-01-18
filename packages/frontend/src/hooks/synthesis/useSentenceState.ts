@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { SentenceState } from '@/types/synthesis';
+
+const STORAGE_KEY = 'eki_synthesis_state';
 
 const ensureSentenceState = (sentence: Partial<SentenceState> & Pick<SentenceState, 'id' | 'text' | 'tags' | 'isPlaying' | 'isLoading' | 'currentInput'>): SentenceState => ({
   ...sentence,
@@ -20,6 +22,51 @@ const INITIAL_SENTENCE: SentenceState = {
   stressedTags: null
 };
 
+// Helper to sanitize sentences for storage (strip transient UI state)
+const sanitizeForStorage = (sentences: SentenceState[]): Partial<SentenceState>[] => {
+  return sentences.map(s => ({
+    id: s.id,
+    text: s.text,
+    tags: s.tags,
+    currentInput: s.currentInput,
+    phoneticText: s.phoneticText,
+    audioUrl: s.audioUrl,
+    stressedTags: s.stressedTags
+    // Intentionally omit isPlaying and isLoading - these are transient UI state
+  }));
+};
+
+// Helper to restore sentences from storage
+const restoreFromStorage = (stored: Partial<SentenceState>[]): SentenceState[] => {
+  return stored.map(s => ensureSentenceState({
+    id: s.id || `entry_${Date.now()}_${Math.random()}`,
+    text: s.text || '',
+    tags: s.tags || [],
+    isPlaying: false,
+    isLoading: false,
+    currentInput: s.currentInput || '',
+    phoneticText: s.phoneticText,
+    audioUrl: s.audioUrl,
+    stressedTags: s.stressedTags
+  }));
+};
+
+// Helper to load initial state from localStorage
+const loadInitialState = (): SentenceState[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return restoreFromStorage(parsed);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load synthesis state from localStorage:', error);
+  }
+  return [INITIAL_SENTENCE];
+};
+
 export function useSentenceState(): {
   sentences: SentenceState[];
   setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>;
@@ -32,8 +79,24 @@ export function useSentenceState(): {
   updateAllSentences: (updates: Partial<SentenceState>) => void;
   getSentence: (id: string) => SentenceState | undefined;
 } {
-  const [sentences, setSentences] = useState<SentenceState[]>([INITIAL_SENTENCE]);
+  const [sentences, setSentences] = useState<SentenceState[]>(loadInitialState);
+  const isInitialMount = useRef(true);
 
+  // Persist sentences to localStorage whenever they change (skip initial mount)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    try {
+      const toStore = sanitizeForStorage(sentences);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+    } catch (error) {
+      console.error('Failed to save synthesis state to localStorage:', error);
+    }
+  }, [sentences]);
+
+  // Legacy migration from eki_playlist_entries
   useEffect(() => {
     try {
       const storedPlaylist = localStorage.getItem('eki_playlist_entries');

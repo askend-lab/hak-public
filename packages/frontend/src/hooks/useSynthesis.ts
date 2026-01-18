@@ -161,8 +161,26 @@ export function useSynthesis() {
       e.preventDefault();
       if (editingTag) {
         const sentenceId = editingTag.sentenceId;
+        const tagIndex = editingTag.tagIndex;
+        const trimmedValue = editingTag.value.trim();
+        // Compute the new text BEFORE commit clears editingTag
+        const sentence = sentencesRef.current.find(s => s.id === sentenceId);
+        let newText = '';
+        if (sentence) {
+          if (trimmedValue === '') {
+            const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
+            newText = newTags.join(' ');
+          } else {
+            const newWords = trimmedValue.split(/\s+/).filter(w => w.length > 0);
+            const newTags = [...sentence.tags.slice(0, tagIndex), ...newWords, ...sentence.tags.slice(tagIndex + 1)];
+            newText = newTags.join(' ');
+          }
+        }
         handleEditTagCommit();
-        synthesizeAndPlay(sentenceId);
+        // Use synthesizeWithText to pass the correct text directly, bypassing stale ref
+        if (newText) {
+          synthesizeWithText(sentenceId, newText);
+        }
       }
     } else if (e.key === ' ') {
       e.preventDefault();
@@ -171,7 +189,7 @@ export function useSynthesis() {
       e.preventDefault();
       setEditingTag(null);
     }
-  }, [editingTag, handleEditTagCommit, synthesizeAndPlay]);
+  }, [editingTag, handleEditTagCommit, synthesizeWithText]);
 
   const handleUseVariant = useCallback((variantText: string, selectedSentenceId: string | null, selectedTagIndex: number | null) => {
     if (selectedSentenceId !== null && selectedTagIndex !== null) {

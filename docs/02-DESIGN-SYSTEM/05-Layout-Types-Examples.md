@@ -126,6 +126,58 @@
 - Icon, title, description, call-to-action
 - Vertically and horizontally centered
 
+## Layout Type 5: Two-Column
+
+**Use for:** Synthesis page with side panel, dashboard layouts, pages with primary content and sidebar
+
+```tsx
+<div className="page-layout">
+  <header className="page-layout__header">...</header>
+  
+  <main className="page-layout__main">
+    <div className="page-header page-header--full">
+      <div className="page-header__content">
+        <h1 className="page-header__title">Teksti kõnesüntees</h1>
+        <p className="page-header__description">
+          Sisesta tekst või sõna, et kuulata selle hääldust ja uurida variante
+        </p>
+      </div>
+      <div className="page-header__actions">
+        <button className="btn-secondary">Lisa ülesandesse</button>
+        <button className="btn-primary">Mängi kõik</button>
+      </div>
+    </div>
+    
+    <div className="page-content page-content--two-column">
+      <div className="page-content__primary">
+        {/* Main content area - sentences, forms, etc. */}
+      </div>
+      <div className="page-content__secondary">
+        {/* Sidebar - playlist, settings, etc. */}
+        {/* Sticky on desktop, stacks below on mobile */}
+      </div>
+    </div>
+  </main>
+  
+  <footer className="page-layout__footer page-footer--full">...</footer>
+</div>
+```
+
+**Features:**
+- Two-column grid layout (1.4fr / 1fr ratio)
+- Primary column on left, secondary (sticky sidebar) on right
+- Responsive: stacks to single column below 1024px
+- Secondary column becomes static on mobile
+- Optional `.page-content__full` class for full-width content rows
+
+**Responsive Behavior:**
+
+| Breakpoint | Columns | Secondary Position |
+|------------|---------|-------------------|
+| Desktop (1280px+) | 1.4fr / 1fr | Sticky sidebar |
+| Desktop (1024px+) | 1.2fr / 1fr | Sticky sidebar |
+| Below 1024px | Single column | Stacks below primary |
+
 ---
 
 **See also:**

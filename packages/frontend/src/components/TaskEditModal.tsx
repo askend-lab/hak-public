@@ -90,8 +90,10 @@ export default function TaskEditModal({
             onChange={(e) => setName(e.target.value)}
             className="task-edit-modal__input"
             placeholder="Ülesande nimi (Kohustuslik)"
+            aria-label="Ülesande nimi (Kohustuslik)"
             disabled={isSubmitting}
             autoFocus
+            aria-required="true"
           />
         </div>
 
@@ -102,12 +104,13 @@ export default function TaskEditModal({
             onChange={(e) => setDescription(e.target.value)}
             className="task-edit-modal__textarea"
             placeholder="Kirjeldus"
+            aria-label="Kirjeldus"
             disabled={isSubmitting}
           />
         </div>
 
         {error && (
-          <div className="task-edit-modal__error">
+          <div className="task-edit-modal__error" role="alert">
             <p>{error}</p>
           </div>
         )}

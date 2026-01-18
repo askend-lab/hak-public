@@ -69,7 +69,7 @@ export default function TaskCreationModal({ isOpen, onClose, onCreateTask, onAdd
         {hasPlaylist && <ModeSelector mode={mode} onChange={setMode} disabled={isSubmitting} />}
         {isCreateMode ? <CreateForm name={name} description={description} setName={setName} setDescription={setDescription} disabled={isSubmitting} /> : <TaskSelector tasks={existingTasks} selectedId={selectedTaskId} onChange={setSelectedTaskId} isLoading={isLoadingTasks} disabled={isSubmitting} />}
         <PlaylistPreview entries={playlistEntries} />
-        {error && <div className="task-modal__error"><p>{error}</p></div>}
+        {error && <div className="task-modal__error" role="alert"><p>{error}</p></div>}
         <div className="task-modal__actions"><button type="button" onClick={handleClose} className="button button--secondary" disabled={isSubmitting}>Tühista</button><button type="submit" className="button button--primary" disabled={isSubmitting || (isCreateMode ? !name.trim() : !selectedTaskId)}>{isSubmitting ? (isCreateMode ? 'Loon...' : 'Salvestan...') : (isCreateMode ? 'Loo ülesanne' : 'Salvesta')}</button></div>
       </form>
     </BaseModal>

@@ -68,36 +68,38 @@ export function SharedTaskPage() {
         onLoginClick={() => window.location.href = '/'}
       />
       
-      <div className="page-layout__content">
-        <div className="shared-task-view">
-          <div className="shared-task-info-banner shared-task-info-banner--inline">
-            <div className="shared-task-info-banner-content">
-              <div className="shared-task-info-banner-text">
-                <div className="shared-task-info-banner-title">Jagatud ülesanne</div>
-                <div className="shared-task-info-banner-description">
-                  Kopeeri link ja et teised saaksid ülesannet vaadata. Sisselogimine pole vajalik.
+      <main className="page-layout__main">
+        <div className="page-content">
+          <div className="shared-task-view">
+            <div className="shared-task-info-banner shared-task-info-banner--inline">
+              <div className="shared-task-info-banner-content">
+                <div className="shared-task-info-banner-text">
+                  <div className="shared-task-info-banner-title">Jagatud ülesanne</div>
+                  <div className="shared-task-info-banner-description">
+                    Kopeeri link ja et teised saaksid ülesannet vaadata. Sisselogimine pole vajalik.
+                  </div>
                 </div>
+                <button 
+                  className="button button--secondary"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(window.location.href);
+                  }}
+                >
+                  Kopeeri
+                </button>
               </div>
-              <button 
-                className="button button--secondary"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(window.location.href);
-                }}
-              >
-                Kopeeri
-              </button>
             </div>
-          </div>
 
-          <TaskDetailView
-            taskId={task.id}
-            onBack={() => window.history.back()}
-            onEditTask={() => {}}
-            onDeleteTask={() => {}}
-            onAddEntryFromInput={() => {}}
-          />
+            <TaskDetailView
+              taskId={task.id}
+              onBack={() => window.history.back()}
+              onEditTask={() => {}}
+              onDeleteTask={() => {}}
+              onNavigateToSynthesis={() => window.location.href = '/synthesis'}
+            />
+          </div>
         </div>
-      </div>
+      </main>
 
       <footer className="page-layout__footer page-footer--full">
         <Footer />

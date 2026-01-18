@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 
 // =========================================================================
 // Phonetic Guide Modal Component
@@ -39,7 +40,7 @@
 .phonetic-guide-modal__section-title {
   margin: 0 0 $spacing-3 0;
   font-family: $font-body;
-  font-size: 16px;
+  font-size: $font-size-md;
   font-weight: $font-weight-medium;
   line-height: $line-height-normal;
   color: $color-primary;
@@ -92,7 +93,7 @@
 
 .phonetic-guide-modal__symbol-code {
   font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
-  font-size: 20px;
+  font-size: $font-size-xl;
   font-weight: $font-weight-bold;
   color: $color-primary;
 }
@@ -106,7 +107,7 @@
   background: $color-success;
   color: $color-white;
   border-radius: $border-radius-full;
-  font-size: 12px;
+  font-size: $font-size-xs;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +132,7 @@
 
 .phonetic-guide-modal__symbol-example {
   font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
-  font-size: 12px;
+  font-size: $font-size-xs;
   font-weight: $font-weight-regular;
   color: $color-text-secondary;
 }
@@ -207,7 +208,7 @@
 }
 
 // Responsive design
-@media (max-width: 640px) {
+@media (max-width: $breakpoint-sm) {
   .phonetic-guide-modal__symbol-item {
     flex-direction: column;
     align-items: stretch;

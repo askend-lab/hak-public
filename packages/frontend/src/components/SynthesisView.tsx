@@ -139,6 +139,7 @@ const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
           onRemove={p.onRemoveSentence}
           onLogin={p.onLogin}
           onClose={p.onMenuClose}
+          anchorEl={p.menuAnchorEl[sentence.id]}
         />
       ) : undefined}
     />

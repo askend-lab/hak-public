@@ -3,6 +3,7 @@
 @import '../tokens/spacing';
 @import '../tokens/borders';
 @import '../tokens/opacity';
+@import '../tokens/breakpoints';
 
 // Info Banner for Shared Task - Subtle notification about readonly status
 .shared-task-info-banner {
@@ -45,7 +46,7 @@
 
   .shared-task-info-banner-title {
     font-family: $font-body;
-    font-size: 0.8125rem;
+    font-size: $font-size-xs;
     font-weight: 600;
     color: $color-primary;
     line-height: 1.4;
@@ -54,7 +55,7 @@
 
   .shared-task-info-banner-description {
     font-family: $font-body;
-    font-size: 0.8125rem;
+    font-size: $font-size-xs;
     font-weight: 400;
     color: $color-text-secondary;
     line-height: 1.5;
@@ -69,7 +70,7 @@
 
   // Button now uses storybook .button.button--secondary
 
-  @media (max-width: 768px) {
+  @include respond-below($breakpoint-md) {
     padding: 0 16px;
 
     .shared-task-info-banner-content {
@@ -94,11 +95,11 @@
     }
 
     .shared-task-info-banner-title {
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
     }
 
     .shared-task-info-banner-description {
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
 
       &::before {
         display: none; // Remove bullet on mobile
@@ -163,7 +164,7 @@
 
   // Button now uses storybook .button.button--secondary
 
-  @media (max-width: 768px) {
+  @include respond-below($breakpoint-md) {
     padding: $spacing-4;
 
     .shared-task-info-banner-content {
@@ -219,14 +220,14 @@
 
   .shared-entries-empty-title {
     margin: 0 0 0.75rem 0;
-    font-size: 1.125rem;
+    font-size: $font-size-lg;
     font-weight: 600;
     color: $color-primary;
   }
 
   .shared-entries-empty-description {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     color: $color-text-secondary;
     line-height: 1.5;
     max-width: 320px;
@@ -292,7 +293,7 @@
   p {
     margin: 0;
     color: $color-text-secondary;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
   }
 }
 
@@ -307,7 +308,7 @@
   }
   
   h2 {
-    font-size: 1.25rem;
+    font-size: $font-size-xl;
     font-weight: 600;
     color: $color-primary;
     margin: 0 0 0.75rem 0;
@@ -321,10 +322,10 @@
   .error-home-button {
     padding: 0.75rem 1.5rem;
     background: $color-primary;
-    color: white;
+    color: $color-white;
     border: none;
     border-radius: 25px;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -342,7 +343,7 @@
 }
 
 // Responsive design
-@media (max-width: 768px) {
+@include respond-below($breakpoint-md) {
   .shared-task-view {
     padding: $spacing-4;
   }

@@ -21,12 +21,11 @@ interface TaskDetailViewProps {
   onBack: () => void;
   onEditTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
-  onAddEntryFromInput: (text: string, stressedText: string, audioUrl: string, audioBlob: Blob) => void;
-  onAddEntry?: () => void;
+  onNavigateToSynthesis: () => void;
 }
 
 export default function TaskDetailView({
-  taskId, onBack, onEditTask, onDeleteTask, onAddEntryFromInput, onAddEntry: _onAddEntry
+  taskId, onBack, onEditTask, onDeleteTask, onNavigateToSynthesis
 }: TaskDetailViewProps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
@@ -76,7 +75,7 @@ export default function TaskDetailView({
     const entryToDelete = entries.find(e => e.id === id);
     setEntries(prev => prev.filter(e => e.id !== id));
     if (entryToDelete) {
-      showNotification('success', 'Lausung kustutatud', undefined, undefined, 'success');
+      showNotification('success', 'Lause kustutatud', undefined, undefined, 'success');
     }
   };
 
@@ -99,10 +98,10 @@ export default function TaskDetailView({
         onDeleteTask={onDeleteTask}
       />
 
-      <div className="task-detail__entries">
-        {entries.length === 0 ? (
-          <TaskDetailEmpty task={task} onAddEntry={() => onAddEntryFromInput('', '', '', new Blob())} />
-        ) : (
+      {entries.length === 0 ? (
+        <TaskDetailEmpty task={task} onNavigateToSynthesis={onNavigateToSynthesis} />
+      ) : (
+        <div className="task-detail__entries">
           <div className="task-detail__entries-list">
             {entries.map((entry) => (
               <SentenceSynthesisItem
@@ -135,8 +134,8 @@ export default function TaskDetailView({
               />
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <ShareTaskModal
         isOpen={isShareModalOpen}

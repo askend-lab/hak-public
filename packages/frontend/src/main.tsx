@@ -25,6 +25,13 @@ import { DebugPage } from './pages/DebugPage'
 import { SharedTaskPage } from './pages/SharedTaskPage'
 import './styles/main.scss'
 
+// Enable accessibility checking in development mode
+if (import.meta.env.DEV) {
+  import('./utils/a11y-dev').then(({ initA11yDevMode }) => {
+    initA11yDevMode();
+  });
+}
+
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
 

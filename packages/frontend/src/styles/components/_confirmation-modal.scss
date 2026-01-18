@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 
 // =========================================================================
 // Confirmation Modal Component
@@ -18,7 +19,7 @@
 .confirmation-modal__message {
   margin: 0 0 $spacing-5 0;
   font-family: $font-body;
-  font-size: 16px;
+  font-size: $font-size-md;
   font-weight: $font-weight-regular;
   line-height: $line-height-normal;
   color: $color-primary;
@@ -31,7 +32,7 @@
 }
 
 // Responsive design
-@media (max-width: 640px) {
+@media (max-width: $breakpoint-sm) {
   .confirmation-modal__actions {
     flex-direction: column-reverse;
     gap: $spacing-2;

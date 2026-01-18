@@ -152,7 +152,7 @@ describe('useVariantsPanel', () => {
     });
 
     expect(result.current.isVariantsPanelOpen).toBe(false);
-    expect(showNotification).toHaveBeenCalledWith('error', 'Viga', 'Variantide laadimine ebaõnnestus.');
+    expect(showNotification).toHaveBeenCalledWith('error', 'Variantide laadimine ebaõnnestus', 'Sõna ei leidu eesti keeles või on valesti kirjutatud.');
     vi.useRealTimers();
   });
 

@@ -16,7 +16,7 @@ So that **I can learn how to use the application**
 - [ ] **AC-3:** Each step has Next/Back navigation
 - [ ] **AC-4:** Wizard can be skipped at any time
 - [ ] **AC-5:** Completing wizard marks onboarding as done
-- [ ] **AC-6:** Help button (?) in header restarts wizard
+- [ ] **AC-6:** Help button (?) in header navigates to `/role-selection`
 - [ ] **AC-7:** Demo sentences are pre-filled during wizard
 - [ ] **AC-8:** Wizard overlay dims background content
 
@@ -94,9 +94,12 @@ sentences = [
 ### Restart Wizard
 
 1. User clicks ? (help) button in header
-2. Onboarding resets
+2. User is navigated to `/role-selection` (localStorage is NOT cleared)
 3. Role selection page appears
-4. User can go through wizard again
+4. User selects a role → navigates to `/synthesis` → wizard starts
+5. User can go through wizard again
+
+**Note:** For returning users, localStorage still has `completed: true`, so if they navigate away without selecting a role, they won't see role selection on their next visit.
 
 ### Completing Wizard
 

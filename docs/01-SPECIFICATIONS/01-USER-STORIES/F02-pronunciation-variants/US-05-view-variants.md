@@ -104,7 +104,7 @@ After error:   [kooli ▼]  ← Chevron restored, toast appears
 |----------|------|-------|-------|-------------|
 | No variants found | Warning | Orange | "Variante ei leitud" | "Sõna ei leidu eesti keeles või on valesti kirjutatud." |
 | Request timeout | Error | Red | "Päring aegus" | "Variantide laadimine võttis liiga kaua." |
-| Network/API error | Error | Red | "Viga" | "Variantide laadimine ebaõnnestus." |
+| Network/API error | Error | Red | "Variantide laadimine ebaõnnestus" | "Sõna ei leidu eesti keeles või on valesti kirjutatud." |
 
 ## Related Test Cases
 

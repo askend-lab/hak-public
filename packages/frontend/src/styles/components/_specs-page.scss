@@ -1,4 +1,9 @@
 // Specs page styles
+@import '../tokens/colors';
+@import '../tokens/spacing';
+@import '../tokens/typography';
+@import '../tokens/borders';
+
 .specs-page {
   min-height: calc(100vh - 200px);
   padding: 1rem;
@@ -11,7 +16,7 @@
     
     h1 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: $font-size-2xl;
       color: $color-primary;
     }
   }
@@ -22,7 +27,7 @@
     border-radius: $border-radius-sm;
     padding: 0.5rem 1rem;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     color: $color-text-secondary;
     transition: all 0.15s;
 
@@ -30,6 +35,13 @@
       background: $color-soft-neutral-bg;
       color: $color-primary;
     }
+  }
+
+  &__loading-text {
+    padding: $spacing-8;
+    text-align: center;
+    color: $color-text-secondary;
+    font-size: $font-size-md;
   }
 
   &__layout {
@@ -65,7 +77,7 @@
   }
 
   &__nav-count {
-    font-size: 0.8rem;
+    font-size: $font-size-xs;
     color: $color-gray;
   }
 
@@ -81,13 +93,13 @@
 
   &__feature-title {
     margin: 0 0 0.5rem 0;
-    font-size: 1.25rem;
+    font-size: $font-size-xl;
     color: $color-primary;
   }
 
   &__feature-desc {
     color: $color-text-secondary;
-    font-size: 0.9rem;
+    font-size: $font-size-sm;
     margin: 0 0 1.5rem 0;
     white-space: pre-line;
     line-height: 1.5;
@@ -105,7 +117,7 @@
     border-bottom: 1px solid $color-outlined-neutral;
     background: $color-soft-neutral-bg;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: $font-size-sm;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: background 0.15s;
@@ -147,7 +159,7 @@
   }
 
   &__name {
-    font-size: 0.85rem;
+    font-size: $font-size-sm;
     font-weight: 500;
   }
 }
@@ -156,7 +168,7 @@
   &__item {
     padding: 0.5rem 1rem 0.5rem 2.5rem;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     border-bottom: 1px solid $color-soft-neutral-bg;
     display: flex;
     align-items: center;
@@ -193,7 +205,7 @@
 
 .specs-step {
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   color: $color-text-secondary;
   padding: 0.25rem 0;
   line-height: 1.6;
@@ -209,7 +221,7 @@
   display: inline-block;
   padding: 0.15rem 0.4rem;
   border-radius: $border-radius-sm;
-  font-size: 0.7rem;
+  font-size: $font-size-2xs;
   font-weight: 500;
 
   &--passed {

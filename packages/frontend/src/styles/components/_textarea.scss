@@ -28,7 +28,7 @@
 .textarea-label,
 .textarea-helper-text {
   display: block;
-  font-size: 12px;
+  font-size: $font-size-xs;
 }
 
 .textarea-label {
@@ -44,7 +44,7 @@
 .textarea {
   width: 100%;
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-family: $font-body;
   border: 1px solid $color-primary;
   border-radius: .5rem;
@@ -53,13 +53,17 @@
   min-height: 120px;
 
   &::placeholder {
-    font-size: 14px;
+    font-size: $font-size-sm;
     color: $color-trietary;
   }
 
-  &:focus {
+  &:focus-visible {
     background-color: $color-secondary;
-    border: 2px solid $color-primary;
+    border: 2px solid $color-input-border-focus;
+    outline: none;
+  }
+
+  &:focus:not(:focus-visible) {
     outline: none;
   }
 

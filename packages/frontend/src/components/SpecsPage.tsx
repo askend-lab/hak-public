@@ -70,7 +70,7 @@ export default function SpecsPage({ onBack }: SpecsPageProps) {
     return (
       <div className="specs-page">
         <div className="specs-page__header"><button className="specs-page__back" onClick={onBack}>← Tagasi</button><h1>Testid</h1></div>
-        <p style={{ padding: '2rem', textAlign: 'center' }}>Laen spetsifikatsioone...</p>
+        <p className="specs-page__loading-text">Laen spetsifikatsioone...</p>
       </div>
     );
   }

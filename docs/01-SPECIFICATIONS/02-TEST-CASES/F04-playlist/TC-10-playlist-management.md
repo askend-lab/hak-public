@@ -61,8 +61,18 @@ Verify adding, reordering, and managing multiple sentences.
 | 2 | Click ⋯ menu, select "Eemalda" | Sentence cleared (not removed) | ☐ |
 | 3 | Verify | Empty sentence row remains | ☐ |
 
+### Session Persistence
+
+| # | Action | Expected Result | Pass |
+|---|--------|-----------------|------|
+| 1 | Enter text in a sentence | Text/tags visible | ☐ |
+| 2 | Refresh the page (F5) | Sentence content restored | ☐ |
+| 3 | Close browser tab | Tab closed | ☐ |
+| 4 | Reopen application | Sentence content restored | ☐ |
+| 5 | Verify isPlaying/isLoading state | These reset to false on reload | ☐ |
+
 ## Notes
 
-- Order persists in session but not between reloads
+- Order and content persist in localStorage between page reloads and browser sessions
 - Clear is quick action (no confirmation)
 - Remove is in menu (slightly hidden)

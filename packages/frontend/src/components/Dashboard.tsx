@@ -69,7 +69,7 @@ function useDashboardData() {
 
 export default function Dashboard() {
   const { metrics, recentActivity, isLoading, isAuthenticated } = useDashboardData();
-  if (isLoading) return <div className="dashboard"><div className="dashboard__loading"><div className="loader-spinner" style={{ width: 48, height: 48 }}></div></div></div>;
+  if (isLoading) return <div className="dashboard"><div className="dashboard__loading"><div className="loader-spinner loader-spinner--lg"></div></div></div>;
   return (
     <div className="dashboard">
       <div className="dashboard__header"><h1 className="dashboard__title">Töölaud</h1><p className="dashboard__subtitle">Rakenduse aktiivsuse ülevaade</p></div>

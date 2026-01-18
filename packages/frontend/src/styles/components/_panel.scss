@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 
 // =========================================================================
 // Panel Component (Base)
@@ -27,7 +28,7 @@
 @mixin panel-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: $color-shadow-backdrop;
   backdrop-filter: blur(2px);
   z-index: 1000;
   cursor: pointer;
@@ -44,19 +45,19 @@
   padding: $spacing-6 $spacing-4;
   gap: $spacing-4;
   box-sizing: border-box;
-  box-shadow: -2px 0 20px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: -2px 0 20px 0 $color-shadow-primary-lg;
 }
 
 @mixin panel-right {
   right: 0;
   animation: panelSlideInRight 0.3s ease-out;
-  box-shadow: -2px 0 20px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: -2px 0 20px 0 $color-shadow-primary-lg;
 }
 
 @mixin panel-left {
   left: 0;
   animation: panelSlideInLeft 0.3s ease-out;
-  box-shadow: 2px 0 20px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 2px 0 20px 0 $color-shadow-primary-lg;
 }
 
 @mixin panel-sm {
@@ -85,7 +86,7 @@
 @mixin panel-title {
   font-family: $font-body;
   font-weight: 600;
-  font-size: 18px;
+  font-size: $font-size-lg;
   line-height: 28px;
   color: $color-primary;
   margin: 0;
@@ -249,7 +250,7 @@
 // Responsive
 // ---------------------------------------------------------------------------
 
-@media (max-width: 640px) {
+@include respond-below($breakpoint-sm) {
   .panel--sm,
   .panel--md,
   .panel--lg {

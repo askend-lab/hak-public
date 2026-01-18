@@ -94,7 +94,7 @@ Some notifications include action buttons:
 
 **Error:**
 ```
-[✗] Lausungi lisamine ebaõnnestus
+[✗] Lausete lisamine ebaõnnestus
 ```
 
 **Info:**

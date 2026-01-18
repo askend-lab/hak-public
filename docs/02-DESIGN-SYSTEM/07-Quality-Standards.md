@@ -74,6 +74,85 @@ Verification:
 - [ ] Visual regression check performed
 ```
 
+## Accessibility Standards (WCAG 2.1 AA)
+
+All components must meet WCAG 2.1 Level AA requirements:
+
+### Perceivable
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Non-text Content (1.1.1)** | All images need `alt` text; decorative icons use `aria-hidden="true"` |
+| **Info & Relationships (1.3.1)** | Form inputs must have associated `<label>` with `htmlFor`; use semantic HTML |
+| **Color Contrast (1.4.3)** | Minimum 4.5:1 for normal text, 3:1 for large text |
+| **Resize Text (1.4.4)** | Use relative units (`rem`); page must work at 200% zoom |
+
+### Operable
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Keyboard (2.1.1)** | All interactive elements must be keyboard accessible |
+| **Focus Visible (2.4.7)** | Use `:focus-visible` styles; never use `outline: none` without replacement |
+| **Focus Order (2.4.3)** | Tab order must be logical; use proper DOM order |
+| **Focus Trap** | Modals must trap focus; Escape key must close them |
+
+### Understandable
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Language (3.1.1)** | Set `lang="et"` on `<html>` element |
+| **Error Identification (3.3.1)** | Error messages must use `role="alert"` for screen reader announcement |
+| **Labels (3.3.2)** | All form fields need visible labels, not just placeholders |
+
+### Robust
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Name, Role, Value (4.1.2)** | Custom controls need ARIA: `role`, `aria-label`, `aria-expanded`, etc. |
+| **Modals** | Use `role="dialog"`, `aria-modal="true"`, `aria-labelledby` |
+| **Menus** | Use `role="menu"`, `role="menuitem"`, `aria-haspopup` |
+
+### Accessibility Checklist
+
+```markdown
+Before submitting a component:
+
+Perceivable:
+- [ ] Images have alt text (or aria-hidden if decorative)
+- [ ] Form inputs have proper <label> elements
+- [ ] Color contrast meets WCAG AA (4.5:1 for text)
+- [ ] Information is not conveyed by color alone
+
+Operable:
+- [ ] All functionality available via keyboard
+- [ ] Focus indicators are visible (:focus-visible styles)
+- [ ] No keyboard traps
+- [ ] Modals trap focus and close with Escape
+
+Understandable:
+- [ ] Error messages announce to screen readers (role="alert")
+- [ ] Labels are descriptive and associated with inputs
+- [ ] Page language is set correctly
+
+Robust:
+- [ ] Custom controls have appropriate ARIA attributes
+- [ ] Valid HTML structure
+- [ ] Tested with axe-core (npm run test:a11y)
+```
+
+### Accessibility Testing
+
+```bash
+# Run automated accessibility tests
+npm run test:a11y
+
+# Run unit tests with accessibility assertions
+npm run test:full
+
+# Check for a11y issues in development (enabled automatically)
+# Console will show axe-core warnings
+```
+
 ## Industry Standards Compliance
 
 Our design system achieves **Grade A** compliance with:
@@ -104,16 +183,25 @@ Our design system achieves **Grade A** compliance with:
 
 ## Validation Results
 
-Current status (as of January 2026):
+Current status (as of January 17, 2026):
 
 ```
-✅ Hardcoded colors: 0 instances
-✅ Variable conflicts: 0 instances
-✅ Inline styles: 2 (library-required exceptions)
+❌ Hardcoded colors: 97 instances (56 hex + 41 white keywords)
+❌ RGBA shadows: 84 instances (need shadow tokens)
+❌ Font sizes: 220 instances (need typography tokens)
+❌ Breakpoints: 54 instances (need breakpoint mixins)
+❌ Missing imports: 14 files (token imports needed)
+✅ Inline styles: 3 (+ library-required exceptions)
 ✅ Token structure: Complete
 ✅ Documentation: Complete
 ✅ BEM naming: 100% compliant
+✅ React Architecture: Properly refactored
 ✅ Build status: Passing
 
-Overall Grade: A (Full Compliance)
+Overall Grade: F (Token Compliance Work Needed)
+
+Run: npm run validate:design
+See: packages/frontend/DESIGN_SYSTEM_COMPLIANCE_REPORT.md
 ```
+
+**Note:** The design system architecture and documentation are complete. The remaining work is migrating existing SCSS files to use tokens consistently. See the compliance report for a prioritized remediation backlog.

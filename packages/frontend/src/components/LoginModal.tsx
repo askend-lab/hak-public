@@ -16,7 +16,7 @@ const LoginIntro = () => (
   </div>
 );
 
-const ErrorDisplay = ({ error }: { error: string }) => <div className="login-modal__error"><ErrorIcon size="md" /><p>{error}</p></div>;
+const ErrorDisplay = ({ error }: { error: string }) => <div className="login-modal__error" role="alert"><ErrorIcon size="md" /><p>{error}</p></div>;
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -61,15 +61,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="button button--primary login-modal__google-button"
+            className="button button--primary login-modal__google-button login-modal__google-button--flex"
             disabled={isLoading}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}
           >
             <GoogleIcon />
             {isLoading ? 'Suunan...' : 'Jätka Google\'iga'}
           </button>
         </div>
-        <p className="login-modal__privacy" style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
+        <p className="login-modal__privacy">
           Sisselogimisel nõustud meie kasutustingimustega
         </p>
       </div>

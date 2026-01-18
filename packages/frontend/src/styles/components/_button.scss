@@ -1,6 +1,7 @@
 @import '../tokens/colors';
 @import '../tokens/borders';
 @import '../tokens/opacity';
+@import '../tokens/typography';
 
 // =========================================================================
 // Button Component
@@ -96,7 +97,7 @@
   white-space: nowrap;
   
   // Typography
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 500;
   letter-spacing: .175px;
   font-family: $font-body;
@@ -145,10 +146,10 @@
     gap: 0.5rem;
     padding: 0.875rem 1.25rem;
     background: $color-primary;
-    color: white;
+    color: $color-white;
     border: none;
     border-radius: 50px; // Fully rounded like EKI style guide
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;

@@ -12,6 +12,7 @@
 :root {
   // Breakpoint values
   --breakpoint-xs: 375px;   // Small mobile (iPhone SE)
+  --breakpoint-mobile: 480px; // Mobile portrait max
   --breakpoint-sm: 640px;   // Mobile landscape / Small tablet
   --breakpoint-md: 768px;   // Tablet portrait
   --breakpoint-lg: 1024px;  // Tablet landscape / Small desktop
@@ -37,6 +38,7 @@
 // ---------------------------------------------------------------------------
 
 $breakpoint-xs: 375px;
+$breakpoint-mobile: 480px;
 $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;

@@ -72,7 +72,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     setState(prev => ({
       ...prev,
       selectedRole: role,
-      currentStep: 0
+      currentStep: 0,
+      completed: false  // Reset so wizard can run again (for returning users clicking help)
     }));
   }, []);
 

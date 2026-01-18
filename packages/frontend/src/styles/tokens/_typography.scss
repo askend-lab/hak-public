@@ -15,12 +15,16 @@
   --font-mono: 'Monaco', 'Menlo', monospace;
   
   // Font sizes (based on 16px base)
+  --font-size-2xs: 0.625rem;  // 10px
   --font-size-xs: 0.75rem;    // 12px
   --font-size-sm: 0.875rem;   // 14px
   --font-size-md: 1rem;       // 16px
   --font-size-lg: 1.125rem;   // 18px
   --font-size-xl: 1.25rem;    // 20px
   --font-size-2xl: 1.5rem;    // 24px
+  --font-size-3xl: 1.75rem;   // 28px
+  --font-size-4xl: 2rem;      // 32px
+  --font-size-5xl: 2.25rem;   // 36px
   
   // Font weights
   --font-weight-regular: 400;
@@ -65,12 +69,16 @@ $font-body: var(--font-body);
 $font-mono: var(--font-mono);
 
 // Font sizes
+$font-size-2xs: var(--font-size-2xs);
 $font-size-xs: var(--font-size-xs);
 $font-size-sm: var(--font-size-sm);
 $font-size-md: var(--font-size-md);
 $font-size-lg: var(--font-size-lg);
 $font-size-xl: var(--font-size-xl);
 $font-size-2xl: var(--font-size-2xl);
+$font-size-3xl: var(--font-size-3xl);
+$font-size-4xl: var(--font-size-4xl);
+$font-size-5xl: var(--font-size-5xl);
 
 // Font weights
 $font-weight-regular: var(--font-weight-regular);

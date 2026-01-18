@@ -190,6 +190,39 @@ describe('useSynthesis', () => {
     expect(result.current.sentences[0]?.tags[0]).toBe('NewWord');
   });
 
+  it('should update tag and synthesize with new value when Enter pressed after edit', () => {
+    const { result } = renderHook(() => useSynthesis());
+    
+    act(() => {
+      result.current.setDemoSentences();
+    });
+
+    const sentenceId = result.current.sentences[0]?.id || '';
+    const originalTag = result.current.sentences[0]?.tags[0];
+    
+    // Enter edit mode
+    act(() => {
+      result.current.handleEditTag(sentenceId, 0);
+    });
+
+    // Change the value
+    act(() => {
+      result.current.handleEditTagChange('ModifiedWord');
+    });
+
+    // Press Enter
+    const preventDefault = vi.fn();
+    act(() => {
+      result.current.handleEditTagKeyDown({ key: 'Enter', preventDefault } as unknown as React.KeyboardEvent);
+    });
+
+    // Verify tag was updated (not reverted to original)
+    expect(result.current.editingTag).toBeNull();
+    expect(result.current.sentences[0]?.tags[0]).toBe('ModifiedWord');
+    expect(result.current.sentences[0]?.tags[0]).not.toBe(originalTag);
+    expect(result.current.sentences[0]?.text).toContain('ModifiedWord');
+  });
+
   it('should handle use variant', () => {
     const { result } = renderHook(() => useSynthesis());
     

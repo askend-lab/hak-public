@@ -1,3 +1,4 @@
+@import '../tokens/breakpoints';
 @import '../tokens/colors';
 @import '../tokens/typography';
 @import '../tokens/spacing';
@@ -40,7 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: $font-size-xs;
   font-weight: 600;
   letter-spacing: 0.5px;
   flex-shrink: 0;
@@ -49,7 +50,7 @@
 .user-profile__avatar--large {
   width: 56px;
   height: 56px;
-  font-size: 18px;
+  font-size: $font-size-lg;
 }
 
 .user-profile__info {
@@ -58,7 +59,13 @@
   align-items: flex-start;
   text-align: left;
   gap: 1px;
-  min-width: 0;
+  min-width: 11ch;  // Minimum width of 11 characters
+  // Width is determined by content (the name)
+  
+  // Cap max width on smaller screens to prevent header overflow
+  @include respond-below($breakpoint-lg) {
+    max-width: 150px;
+  }
 }
 
 .user-profile__name {
@@ -69,9 +76,14 @@
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-primary;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
+  // Name is never truncated - it determines the container width
+  
+  // On mobile, allow truncation if max-width is hit on parent
+  @include respond-below($breakpoint-lg) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
 }
 
 .user-profile__id {
@@ -81,6 +93,13 @@
   line-height: $line-height-medium;   // 150%
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-text-primary;
+  
+  // Truncation: don't contribute to parent width, but fill it
+  width: 0;
+  min-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-profile__arrow {
@@ -118,7 +137,8 @@
 
 .user-profile__details {
   flex: 1;
-  min-width: 0;
+  min-width: 11ch;  // Minimum 11 characters
+  // Width determined by name
 }
 
 .user-profile__name--large {
@@ -129,6 +149,8 @@
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-primary;
   margin-bottom: $spacing-1;
+  white-space: nowrap;
+  // Name is never truncated - determines container width
 }
 
 .user-profile__email {
@@ -139,7 +161,13 @@
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-text-primary;
   margin-bottom: $spacing-1;
-  word-break: break-word;
+  
+  // Truncation: don't contribute to parent width, but fill it
+  width: 0;
+  min-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-profile__id--formatted {
@@ -149,6 +177,13 @@
   line-height: $line-height-medium;   // 150%
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-text-primary;
+  
+  // Truncation: don't contribute to parent width, but fill it
+  width: 0;
+  min-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-profile__actions {
@@ -181,7 +216,7 @@
   border: none;
   border-radius: $border-radius-round;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
