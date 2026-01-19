@@ -166,7 +166,7 @@ hooks:
       - '**/*.full.test.tsx'
       - '**/*.full.test.ts'
       - '**/cucumber-report.json'
-      - '**/label_normalisation.py'
+      - '**/merlin/**/*.py'
       - '**/test.scss'
 
 # final
