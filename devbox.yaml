@@ -29,6 +29,7 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
+    min_coverage_branches: 72
     command: "pnpm test"
     command_full: "pnpm test:coverage"
   - name: cucumber
@@ -49,7 +50,7 @@ task_channel:
 # Hooks configuration - ALL parameters required
 hooks:
   markdown-size:
-    max_lines: 200  # Temporarily raised - need to split large docs
+    max_lines: 200
     excludePaths:
       - 'docs/work/**'
       - 'docs/vision/**'
@@ -64,6 +65,7 @@ hooks:
       - 'CodeReview_*.md'
       - 'GHERKIN_PLAN.md'
       - 'docs/CUCUMBER_STEPS_CHECKLIST.md'
+      - 'audits/**'
 
   language-check:
     excludePaths:
@@ -114,7 +116,7 @@ hooks:
 
   run-lint:
     mode: warning
-    blocking: false  # Non-blocking - lint warnings cleanup in progress
+    blocking: false
     command: 'pnpm lint'
 
   run-typecheck:
@@ -147,4 +149,14 @@ hooks:
       - '**/PronunciationVariants.tsx'
       - '**/TaskDetailView.tsx'
 
-# final
+  security-audit: {}
+
+  secret-detection: {}
+
+  dependency-check: {}
+
+  import-order: {}
+
+  no-any: {}
+
+  no-floating-promises: {}
