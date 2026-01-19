@@ -75,6 +75,7 @@ hooks:
       - '**/drafts/**'
       - '**/test/fixtures/**'
       - '.design/**'
+      - '**/node_modules/**'
 
   broken-links:
     excludePaths:
