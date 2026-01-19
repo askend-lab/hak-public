@@ -76,9 +76,11 @@ hooks:
       - '**/test/fixtures/**'
       - '.design/**'
       - '**/node_modules/**'
-      - 'docs/CUCUMBER_STEPS_CHECKLIST.md'
+      - 'docs/**'
+      - '.project/**'
       - 'packages/frontend/DESIGN_SYSTEM_COMPLIANCE_REPORT.md'
       - 'packages/frontend/WCAG_AUDIT_REPORT.md'
+      - 'packages/frontend/AUDIT_FINDINGS.md'
 
   broken-links:
     excludePaths:
