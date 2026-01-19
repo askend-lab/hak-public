@@ -162,11 +162,11 @@ hooks:
       - '**/scripts/a11y-audit.mjs'
       - '**/useSynthesis.test.ts'
       - '**/SentenceSynthesisItem.test.tsx'
-      - '**/styles/base/_reset.scss'
-      - '**/styles/components/_eki-app.scss'
-      - '**/styles/components/_pronunciation-variants.scss'
-      - '**/styles/components/_sentence-synthesis-item.scss'
+      - '**/styles/**/*.scss'
       - '**/*.full.test.tsx'
       - '**/*.full.test.ts'
+      - '**/cucumber-report.json'
+      - '**/label_normalisation.py'
+      - '**/test.scss'
 
 # final
