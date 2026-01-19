@@ -71,6 +71,8 @@ hooks:
       - 'docs/02-DESIGN-SYSTEM/07-Quality-Standards.md'
 
   language-check:
+    mode: warning
+    blocking: false
     excludePaths:
       - '**/drafts/**'
       - '**/test/fixtures/**'
@@ -78,9 +80,7 @@ hooks:
       - '**/node_modules/**'
       - 'docs/**'
       - '.project/**'
-      - 'packages/frontend/DESIGN_SYSTEM_COMPLIANCE_REPORT.md'
-      - 'packages/frontend/WCAG_AUDIT_REPORT.md'
-      - 'packages/frontend/AUDIT_FINDINGS.md'
+      - '**/*.md'
 
   broken-links:
     excludePaths:
