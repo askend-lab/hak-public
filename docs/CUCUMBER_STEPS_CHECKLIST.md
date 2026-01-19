@@ -1,0 +1,408 @@
+]633;E;echo "# Cucumber Step Definitions Checklist";f4decc3d-4b26-46e3-ac8e-7a33d6e66cfd]633;C# Cucumber Step Definitions Checklist
+
+Total: 396 steps (Given: 93, When: 101, Then: 202)
+
+## Given Steps (93)
+
+- [ ] I am authenticated as a new user
+- [ ] I am authenticated
+- [ ] I am creating a custom variant
+- [ ] I am dragging a sentence
+- [ ] I am in the custom variant input field
+- [ ] I am logged in
+- [ ] I am not authenticated
+- [ ] I am not logged in
+- [ ] I am on the main page
+- [ ] I am on the synthesis page
+- [ ] I am on the tasks page
+- [ ] I am redirected to login
+- [ ] I am typing in the input field
+- [ ] I am using the application
+- [ ] I am viewing a baseline task
+- [ ] I am viewing a shared task
+- [ ] I am viewing a task detail
+- [ ] I am viewing a task with entries
+- [ ] I am viewing a task with multiple entries
+- [ ] I am viewing task details
+- [ ] I am viewing the synthesis page
+- [ ] I am viewing the task list
+- [ ] I have a sentence row
+- [ ] I have a sentence {string}
+- [ ] I have a shared task link
+- [ ] I have a task in the list
+- [ ] I have a task named {string} with description {string}
+- [ ] I have a task with {int} entries
+- [ ] I have a word in the sentence
+- [ ] I have an existing task
+- [ ] I have cached audio for a text
+- [ ] I have created a custom phonetic variant
+- [ ] I have downloaded the audio for {string}
+- [ ] I have edited the phonetic text
+- [ ] I have entered a custom phonetic variant {string}
+- [ ] I have entered {string} in the message field
+- [ ] I have entered {string} in the synthesis text field
+- [ ] I have entries in playlist
+- [ ] I have existing tags and empty input
+- [ ] I have logged out
+- [ ] I have modified the sentence text
+- [ ] I have multiple entries in playlist
+- [ ] I have multiple sentence rows
+- [ ] I have multiple tasks
+- [ ] I have no tasks
+- [ ] I have one sentence row with text {string}
+- [ ] I have only {int} sentence in the list
+- [ ] I have saved edited phonetic text
+- [ ] I have saved edits
+- [ ] I have saved phonetic edits
+- [ ] I have sentence rows in the list
+- [ ] I have sentence rows with text
+- [ ] I have sentence {string} and an empty sentence
+- [ ] I have sentences in order {string}, {string}, {string}
+- [ ] I have sentences {string} and {string}
+- [ ] I have synthesized audio for a text
+- [ ] I have synthesized audio
+- [ ] I have synthesized text containing {string}
+- [ ] I have synthesized text
+- [ ] I have synthesized {string}
+- [ ] I have tasks named {string} and {string}
+- [ ] I have two sentences {string} and {string}
+- [ ] I have {int} sentences in the list
+- [ ] I have {int} sentences with text
+- [ ] I open a baseline task
+- [ ] I see a baseline task I want to hide
+- [ ] I see multiple variants for {string}
+- [ ] I tried to save copied entries
+- [ ] I want to customize a baseline task
+- [ ] I want to download audio
+- [ ] I was redirected from a protected page
+- [ ] a notification is visible
+- [ ] a successful action occurs
+- [ ] an error occurs
+- [ ] audio URLs have been created
+- [ ] audio has been synthesized
+- [ ] authentication is not required
+- [ ] baseline tasks are available
+- [ ] cached audio fails to play
+- [ ] edit mode is active
+- [ ] multiple events occur
+- [ ] my cursor is at position {int}
+- [ ] sentence {string} is currently playing
+- [ ] sequential playback is in progress
+- [ ] the audio has been synthesized
+- [ ] the audio has not been synthesized yet
+- [ ] the feedback form is open
+- [ ] the phonetic guide is open
+- [ ] the phonetic guide modal is open
+- [ ] the pronunciation variants panel is open for a word
+- [ ] the pronunciation variants panel is open for {string}
+- [ ] the text input is empty
+- [ ] the variants panel is open
+
+## When Steps (101)
+
+- [ ] I add entry to task successfully
+- [ ] I add new entries
+- [ ] I add playlist to task successfully
+- [ ] I add playlist to task
+- [ ] I cancel the deletion
+- [ ] I change the task name to {string}
+- [ ] I clear the task name field
+- [ ] I click a phonetic marker button
+- [ ] I click its play button
+- [ ] I click on my user icon
+- [ ] I click on the task
+- [ ] I click on the word {string}
+- [ ] I click on the word
+- [ ] I click outside the dialog
+- [ ] I click play on an entry
+- [ ] I click play on sentence {string}
+- [ ] I click save
+- [ ] I click the close button
+- [ ] I click the edit button on phonetic text
+- [ ] I click the feedback button
+- [ ] I click the help icon \\(?) near the phonetic text
+- [ ] I click the login button
+- [ ] I click the logout button
+- [ ] I click the more options menu \\(⋮)
+- [ ] I click the notification close button
+- [ ] I click the phonetic guide button
+- [ ] I click the play button for custom variant
+- [ ] I click the play button for {string}
+- [ ] I click the play button next to a variant
+- [ ] I click the play button
+- [ ] I click the reset button
+- [ ] I click the save button
+- [ ] I click the stressed syllable marker button
+- [ ] I click the submit button
+- [ ] I click the three-dots menu on a sentence
+- [ ] I click the {string} button for custom variant
+- [ ] I click the {string} button
+- [ ] I click {string} \\(Use) on a specific variant
+- [ ] I click {string} on that sentence
+- [ ] I click {string} on the second sentence
+- [ ] I click {string} option
+- [ ] I close and reopen the task
+- [ ] I confirm the deletion
+- [ ] I copy entries and save to a task
+- [ ] I copy entries from shared task
+- [ ] I copy the baseline task
+- [ ] I delete the baseline task
+- [ ] I drag sentence {string} to position after {string}
+- [ ] I enter only whitespace in task name
+- [ ] I enter {string} in the synthesis text field
+- [ ] I enter {string} in the task description field
+- [ ] I enter {string} in the task name field
+- [ ] I generate a share link
+- [ ] I leave the task name field empty
+- [ ] I log in
+- [ ] I log out and log back in
+- [ ] I modify the text
+- [ ] I navigate away and return
+- [ ] I navigate to the Tasks view
+- [ ] I navigate to the tasks section
+- [ ] I open a shared task link
+- [ ] I open the downloaded file
+- [ ] I open the shared link
+- [ ] I play the same text again
+- [ ] I press Backspace
+- [ ] I press Space
+- [ ] I read through the content
+- [ ] I scroll to the custom variant section
+- [ ] I select a task
+- [ ] I select the existing task
+- [ ] I successfully log in
+- [ ] I trigger synthesis
+- [ ] I try to access a protected feature
+- [ ] I try to access a protected page
+- [ ] I try to edit task name
+- [ ] I try to save copied entries to a task
+- [ ] I type {string} in the search input
+- [ ] I view a symbol\'s explanation
+- [ ] I view my profile
+- [ ] I view synthesis results
+- [ ] I view the email field
+- [ ] I view the footer area
+- [ ] I view the navigation menu
+- [ ] I view the phonetic form
+- [ ] I view the sentence
+- [ ] I view the sentences section
+- [ ] I view the stressed text display
+- [ ] I view the synthesis page
+- [ ] I view the tasks page
+- [ ] I view the variant list
+- [ ] I visit the application
+- [ ] cached audio exists
+- [ ] caching the audio
+- [ ] component unmounts
+- [ ] playback error is detected
+- [ ] the drag is in progress
+- [ ] the login page loads
+- [ ] the synthesis is complete
+- [ ] the task detail view loads
+- [ ] the text changes
+- [ ] {int} seconds pass
+
+## Then Steps (202)
+
+- [ ] I am logged in successfully
+- [ ] I am prompted to log in again
+- [ ] I am redirected back to the original page
+- [ ] I am redirected to task list
+- [ ] I am redirected to the home page
+- [ ] I am redirected to the login page
+- [ ] I can customize its phonetic form
+- [ ] I can play all entries
+- [ ] I can see all task entries
+- [ ] I can see both original text and phonetic form
+- [ ] I can start typing text in the new row
+- [ ] I can still view the task content
+- [ ] I can submit without entering an email
+- [ ] I can type new words in the input field
+- [ ] I cannot delete the task
+- [ ] I cannot edit the task
+- [ ] I have two sentence rows in the list
+- [ ] I have {int} sentences remaining
+- [ ] I hear pronunciations
+- [ ] I hear that specific pronunciation
+- [ ] I hear the audio playback
+- [ ] I hear the synthesized audio
+- [ ] I only see tasks matching {string}
+- [ ] I return to the main synthesis view
+- [ ] I see a button for compound word boundary marker
+- [ ] I see a button for palatalization marker
+- [ ] I see a button for stressed syllable marker
+- [ ] I see a button for third quantity marker
+- [ ] I see a confirmation dialog
+- [ ] I see a custom phonetic input field
+- [ ] I see a feedback button or link
+- [ ] I see a field for task description
+- [ ] I see a field for task name
+- [ ] I see a list of entries
+- [ ] I see a login button
+- [ ] I see a login prompt
+- [ ] I see a logout button
+- [ ] I see a message explaining authentication is required
+- [ ] I see a message input field
+- [ ] I see a search input in the dialog
+- [ ] I see a success notification
+- [ ] I see a task card with name {string}
+- [ ] I see a task selection dialog
+- [ ] I see a thank you confirmation message
+- [ ] I see a validation error for required fields
+- [ ] I see a validation error for task name
+- [ ] I see a validation error
+- [ ] I see a {string} button at the bottom
+- [ ] I see a {string} button showing count {string}
+- [ ] I see a {string} button
+- [ ] I see an empty state message
+- [ ] I see an error notification
+- [ ] I see an option to create new task
+- [ ] I see an optional email field
+- [ ] I see an {string} button
+- [ ] I see an {string} option in the dropdown
+- [ ] I see baseline tasks in the list
+- [ ] I see example words using that symbol
+- [ ] I see explanation for + \\(compound word boundary)
+- [ ] I see explanation for \' \\(palatalization)
+- [ ] I see explanation for ` \\(third degree length)
+- [ ] I see explanation for ´ \\(stress marker)
+- [ ] I see explanations for phonetic symbols
+- [ ] I see instructions to create first task
+- [ ] I see multiple pronunciation options
+- [ ] I see my account creation date
+- [ ] I see my name
+- [ ] I see my profile dropdown
+- [ ] I see my profile information
+- [ ] I see my recent tasks
+- [ ] I see number of tasks created
+- [ ] I see pre-loaded example tasks
+- [ ] I see quick-insert buttons for phonetic markers
+- [ ] I see the creation date
+- [ ] I see the edit form
+- [ ] I see the entries in synthesis view
+- [ ] I see the entry count {string} next to the task
+- [ ] I see the phonetic guide modal
+- [ ] I see the phonetic text with stress markers
+- [ ] I see the share link in a dialog
+- [ ] I see the shared task details
+- [ ] I see the task description {string}
+- [ ] I see the task description
+- [ ] I see the task detail view
+- [ ] I see the task name
+- [ ] I see the tasks list page
+- [ ] I see total entries count
+- [ ] I see {string} in my tasks list
+- [ ] I see {string} label on baseline tasks
+- [ ] I still have {int} sentence row visible
+- [ ] a confirmation message appears
+- [ ] a new empty sentence row is added to the list
+- [ ] a new user-owned task is created
+- [ ] a unique shareable URL is generated
+- [ ] all playlist entries are added to the task
+- [ ] all sentences should be synthesized and played
+- [ ] audio data is preserved in copied entries
+- [ ] baseline tasks are visually distinguished
+- [ ] blob URLs are revoked to free memory
+- [ ] both audio blob and phonetic text are cached together
+- [ ] cached audio is cleared
+- [ ] changes are reflected in synthesis
+- [ ] compound word boundaries are marked with {string}
+- [ ] download uses cached version without re-synthesis
+- [ ] each entry shows text and phonetic form
+- [ ] each sentence displays a drag handle
+- [ ] each sentence has a unique ID
+- [ ] each sentence is played in order
+- [ ] each sentence row displays its own play button
+- [ ] each variant has a description or context tag
+- [ ] each variant has a play button
+- [ ] each variant shows its phonetic form
+- [ ] empty sentences are skipped
+- [ ] entries are copied to my local playlist
+- [ ] entries are saved to my task
+- [ ] entries are stored separately for my user
+- [ ] entries maintain their original order
+- [ ] existing words appear as clickable tags
+- [ ] it is clearly marked as optional
+- [ ] it is colored green
+- [ ] it is colored red
+- [ ] it is hidden from my view
+- [ ] it uses Estonian phonetic markers \\(`, ´, \', +)
+- [ ] its text appears in the input field
+- [ ] my cursor moves after the inserted marker
+- [ ] my edits are preserved
+- [ ] my feedback is submitted
+- [ ] my session is terminated
+- [ ] next playback triggers fresh synthesis
+- [ ] notifications stack without overlapping
+- [ ] only {string} is played
+- [ ] only {string} is synthesized and played
+- [ ] playback stops immediately
+- [ ] system invalidates cache and regenerates audio
+- [ ] tasks are sorted by creation date newest first
+- [ ] that variant replaces the word\'s phonetic form
+- [ ] the URL is copied to clipboard
+- [ ] the audio cache is invalidated
+- [ ] the audio file downloads to my device
+- [ ] the audio player shows the audio is playing
+- [ ] the audio plays correctly in a standard audio player
+- [ ] the audio uses the edited phonetic form
+- [ ] the button changes back to {string}
+- [ ] the button shows loading state during synthesis
+- [ ] the button shows pause icon during playback
+- [ ] the cache is automatically invalidated
+- [ ] the cached audio plays immediately
+- [ ] the current word becomes a tag
+- [ ] the custom variant is synthesized
+- [ ] the custom variant replaces the word phonetic form
+- [ ] the deletion is soft delete
+- [ ] the dialog closes
+- [ ] the differences are highlighted
+- [ ] the dragged sentence appears semi-transparent
+- [ ] the drop target shows a visual indicator
+- [ ] the edit option is not available for baseline tasks
+- [ ] the edited text is saved
+- [ ] the entry is added to the task
+- [ ] the examples show correct usage in context
+- [ ] the feedback modal opens
+- [ ] the filename contains the text {string}
+- [ ] the form is pre-filled with task description
+- [ ] the form is pre-filled with task name
+- [ ] the format is WAV
+- [ ] the guide explains available markers
+- [ ] the input field allows free text entry
+- [ ] the input field clears
+- [ ] the last tag is removed
+- [ ] the marker is inserted at cursor position
+- [ ] the marker is inserted at position {int}
+- [ ] the modal closes
+- [ ] the new task has same content as original
+- [ ] the next sentence starts after the previous finishes
+- [ ] the notification automatically disappears
+- [ ] the notification disappears
+- [ ] the order becomes {string}, {string}, {string}
+- [ ] the original task name is preserved
+- [ ] the pending save action executes
+- [ ] the phonetic guide modal opens
+- [ ] the phonetic text becomes editable
+- [ ] the phonetic text reverts to original
+- [ ] the pronunciation variants panel opens
+- [ ] the same baseline tasks are available
+- [ ] the same share link is available
+- [ ] the search input has placeholder {string}
+- [ ] the sentence is cleared to empty
+- [ ] the sentence is removed from the list
+- [ ] the stressed syllables are visually distinct
+- [ ] the system synthesizes the audio first
+- [ ] the task creation form opens
+- [ ] the task is copied to my task list
+- [ ] the task is deleted
+- [ ] the task is not deleted
+- [ ] the task is saved
+- [ ] the task name is updated to {string}
+- [ ] the variant audio plays using the synthesis API
+- [ ] the variants panel closes
+- [ ] the {string} button should be disabled
+- [ ] the {string} button shows login required
+- [ ] {string} is not affected
+- [ ] {string} playback stops
+- [ ] {string} starts playing

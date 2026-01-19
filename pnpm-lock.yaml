@@ -12,6 +12,9 @@ importers:
         specifier: ^19.2.3
         version: 19.2.3
     devDependencies:
+      '@aws-sdk/client-ecs':
+        specifier: ^3.967.0
+        version: 3.967.0
       '@babel/core':
         specifier: ^7.24.0
         version: 7.28.5
@@ -98,7 +101,7 @@ importers:
         version: 29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
       jest-cucumber:
         specifier: ^3.0.0
-        version: 3.0.2
+        version: 3.0.2(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
       jest-environment-jsdom:
         specifier: ^29.7.0
         version: 29.7.0
@@ -147,7 +150,7 @@ importers:
         version: 29.7.0(@types/node@20.19.27)(node-notifier@8.0.2)
       jest-cucumber:
         specifier: ^3.0.1
-        version: 3.0.2
+        version: 3.0.2(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
       serverless:
         specifier: ^3.38.0
         version: 3.40.0(@types/node@20.19.27)
@@ -178,9 +181,6 @@ importers:
       '@hak/specifications':
         specifier: workspace:*
         version: link:../specifications
-      '@sentry/react':
-        specifier: ^10.33.0
-        version: 10.33.0(react@19.2.3)
       '@tanstack/react-query':
         specifier: ^5.60.0
         version: 5.90.12(react@19.2.3)
@@ -215,6 +215,9 @@ importers:
       '@playwright/test':
         specifier: ^1.57.0
         version: 1.57.0
+      '@sentry/react':
+        specifier: ^10.33.0
+        version: 10.33.0(react@19.2.3)
       '@testing-library/jest-dom':
         specifier: ^6.6.0
         version: 6.9.1
@@ -313,7 +316,7 @@ importers:
         version: link:../simplestore
       ts-jest:
         specifier: ^29.2.0
-        version: 29.4.6(@babel/core@7.28.5)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.28.5))(jest-util@29.7.0)(jest@29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)))(typescript@5.9.3)
+        version: 29.4.6(@babel/core@7.28.5)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.28.5))(jest-util@29.7.0)(jest@29.7.0(@types/node@25.0.3)(node-notifier@8.0.2))(typescript@5.9.3)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
@@ -8819,13 +8822,13 @@ snapshots:
   '@aws-crypto/crc32@5.2.0':
     dependencies:
       '@aws-crypto/util': 5.2.0
-      '@aws-sdk/types': 3.957.0
+      '@aws-sdk/types': 3.965.0
       tslib: 2.8.1
 
   '@aws-crypto/crc32c@5.2.0':
     dependencies:
       '@aws-crypto/util': 5.2.0
-      '@aws-sdk/types': 3.957.0
+      '@aws-sdk/types': 3.965.0
       tslib: 2.8.1
 
   '@aws-crypto/sha1-browser@5.2.0':
@@ -8859,7 +8862,7 @@ snapshots:
 
   '@aws-crypto/util@5.2.0':
     dependencies:
-      '@aws-sdk/types': 3.957.0
+      '@aws-sdk/types': 3.965.0
       '@smithy/util-utf8': 2.3.0
       tslib: 2.8.1
 
@@ -9104,26 +9107,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.957.0
       '@aws-sdk/util-user-agent-node': 3.957.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -9574,26 +9577,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.947.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -9617,26 +9620,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.957.0
       '@aws-sdk/util-user-agent-node': 3.957.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -9660,26 +9663,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.957.0
       '@aws-sdk/util-user-agent-node': 3.957.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -9703,26 +9706,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.957.0
       '@aws-sdk/util-user-agent-node': 3.964.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -9790,26 +9793,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.947.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -9932,7 +9935,7 @@ snapshots:
       '@smithy/node-http-handler': 4.4.7
       '@smithy/property-provider': 4.2.5
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/util-stream': 4.5.6
       tslib: 2.8.1
@@ -9945,7 +9948,7 @@ snapshots:
       '@smithy/node-http-handler': 4.4.7
       '@smithy/property-provider': 4.2.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/util-stream': 4.5.8
       tslib: 2.8.1
@@ -9958,7 +9961,7 @@ snapshots:
       '@smithy/node-http-handler': 4.4.7
       '@smithy/property-provider': 4.2.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/util-stream': 4.5.8
       tslib: 2.8.1
@@ -10643,26 +10646,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.936.0
       '@aws-sdk/util-user-agent-node': 3.947.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -10686,26 +10689,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.957.0
       '@aws-sdk/util-user-agent-node': 3.957.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -10729,26 +10732,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.957.0
       '@aws-sdk/util-user-agent-node': 3.957.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -10772,26 +10775,26 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.957.0
       '@aws-sdk/util-user-agent-node': 3.964.0
       '@smithy/config-resolver': 4.4.5
-      '@smithy/core': 3.20.0
+      '@smithy/core': 3.20.3
       '@smithy/fetch-http-handler': 5.3.8
       '@smithy/hash-node': 4.2.7
       '@smithy/invalid-dependency': 4.2.7
       '@smithy/middleware-content-length': 4.2.7
-      '@smithy/middleware-endpoint': 4.4.1
-      '@smithy/middleware-retry': 4.4.17
+      '@smithy/middleware-endpoint': 4.4.4
+      '@smithy/middleware-retry': 4.4.20
       '@smithy/middleware-serde': 4.2.8
       '@smithy/middleware-stack': 4.2.7
       '@smithy/node-config-provider': 4.3.7
       '@smithy/node-http-handler': 4.4.7
       '@smithy/protocol-http': 5.3.7
-      '@smithy/smithy-client': 4.10.2
+      '@smithy/smithy-client': 4.10.5
       '@smithy/types': 4.11.0
       '@smithy/url-parser': 4.2.7
       '@smithy/util-base64': 4.3.0
       '@smithy/util-body-length-browser': 4.2.0
       '@smithy/util-body-length-node': 4.2.1
-      '@smithy/util-defaults-mode-browser': 4.3.16
-      '@smithy/util-defaults-mode-node': 4.2.19
+      '@smithy/util-defaults-mode-browser': 4.3.19
+      '@smithy/util-defaults-mode-node': 4.2.22
       '@smithy/util-endpoints': 3.2.7
       '@smithy/util-middleware': 4.2.7
       '@smithy/util-retry': 4.2.7
@@ -12549,43 +12552,6 @@ snapshots:
       jest-util: 29.7.0
       slash: 3.0.0
 
-  '@jest/core@26.6.3':
-    dependencies:
-      '@jest/console': 26.6.2
-      '@jest/reporters': 26.6.2
-      '@jest/test-result': 26.6.2
-      '@jest/transform': 26.6.2
-      '@jest/types': 26.6.2
-      '@types/node': 20.19.27
-      ansi-escapes: 4.3.2
-      chalk: 4.1.2
-      exit: 0.1.2
-      graceful-fs: 4.2.11
-      jest-changed-files: 26.6.2
-      jest-config: 26.6.3
-      jest-haste-map: 26.6.2
-      jest-message-util: 26.6.2
-      jest-regex-util: 26.0.0
-      jest-resolve: 26.6.2
-      jest-resolve-dependencies: 26.6.3
-      jest-runner: 26.6.3
-      jest-runtime: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
-      jest-snapshot: 26.6.2
-      jest-util: 26.6.2
-      jest-validate: 26.6.2
-      jest-watcher: 26.6.2
-      micromatch: 4.0.8
-      p-each-series: 2.2.0
-      rimraf: 3.0.2
-      slash: 3.0.0
-      strip-ansi: 6.0.1
-    transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - ts-node
-      - utf-8-validate
-
   '@jest/core@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))':
     dependencies:
       '@jest/console': 26.6.2
@@ -12815,24 +12781,10 @@ snapshots:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
       jest-haste-map: 26.6.2
-      jest-runner: 26.6.3
-      jest-runtime: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
-    transitivePeerDependencies:
-      - supports-color
-
-  '@jest/test-sequencer@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))':
-    dependencies:
-      '@jest/test-result': 26.6.2
-      graceful-fs: 4.2.11
-      jest-haste-map: 26.6.2
       jest-runner: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
       jest-runtime: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@29.7.0':
     dependencies:
@@ -16003,7 +15955,7 @@ snapshots:
       eslint: 9.39.2
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.50.1(@typescript-eslint/parser@8.50.1(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
-      jest: 29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)
+      jest: 29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -17356,28 +17308,6 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-cli@26.6.3:
-    dependencies:
-      '@jest/core': 26.6.3
-      '@jest/test-result': 26.6.2
-      '@jest/types': 26.6.2
-      chalk: 4.1.2
-      exit: 0.1.2
-      graceful-fs: 4.2.11
-      import-local: 3.2.0
-      is-ci: 2.0.0
-      jest-config: 26.6.3
-      jest-util: 26.6.2
-      jest-validate: 26.6.2
-      prompts: 2.4.2
-      yargs: 15.4.1
-    transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - ts-node
-      - utf-8-validate
-
   jest-cli@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
     dependencies:
       '@jest/core': 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
@@ -17442,7 +17372,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-config@26.6.3:
+  jest-config@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
     dependencies:
       '@babel/core': 7.28.5
       '@jest/test-sequencer': 26.6.3
@@ -17455,33 +17385,7 @@ snapshots:
       jest-environment-jsdom: 26.6.2
       jest-environment-node: 26.6.2
       jest-get-type: 26.3.0
-      jest-jasmine2: 26.6.3
-      jest-regex-util: 26.0.0
-      jest-resolve: 26.6.2
-      jest-util: 26.6.2
-      jest-validate: 26.6.2
-      micromatch: 4.0.8
-      pretty-format: 26.6.2
-    transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - utf-8-validate
-
-  jest-config@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
-    dependencies:
-      '@babel/core': 7.28.5
-      '@jest/test-sequencer': 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
-      '@jest/types': 26.6.2
-      babel-jest: 26.6.3(@babel/core@7.28.5)
-      chalk: 4.1.2
-      deepmerge: 4.3.1
-      glob: 7.2.3
-      graceful-fs: 4.2.11
-      jest-environment-jsdom: 26.6.2
-      jest-environment-node: 26.6.2
-      jest-get-type: 26.3.0
-      jest-jasmine2: 26.6.3
+      jest-jasmine2: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
       jest-regex-util: 26.0.0
       jest-resolve: 26.6.2
       jest-util: 26.6.2
@@ -17557,23 +17461,6 @@ snapshots:
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
-
-  jest-cucumber@3.0.2:
-    dependencies:
-      '@cucumber/gherkin': 17.0.2
-      '@types/glob': 7.2.0
-      '@types/jest': 26.0.24
-      '@types/node': 11.15.54
-      '@types/uuid': 8.3.4
-      callsites: 3.1.0
-      glob: 7.2.3
-      jest: 26.6.3
-    transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-cucumber@3.0.2(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
     dependencies:
@@ -17718,7 +17605,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  jest-jasmine2@26.6.3:
+  jest-jasmine2@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
     dependencies:
       '@babel/traverse': 7.28.5
       '@jest/environment': 26.6.2
@@ -17739,7 +17626,11 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-leak-detector@26.6.2:
     dependencies:
@@ -17849,35 +17740,6 @@ snapshots:
       resolve: 1.22.11
       resolve.exports: 2.0.3
       slash: 3.0.0
-
-  jest-runner@26.6.3:
-    dependencies:
-      '@jest/console': 26.6.2
-      '@jest/environment': 26.6.2
-      '@jest/test-result': 26.6.2
-      '@jest/types': 26.6.2
-      '@types/node': 20.19.27
-      chalk: 4.1.2
-      emittery: 0.7.2
-      exit: 0.1.2
-      graceful-fs: 4.2.11
-      jest-config: 26.6.3
-      jest-docblock: 26.0.0
-      jest-haste-map: 26.6.2
-      jest-leak-detector: 26.6.2
-      jest-message-util: 26.6.2
-      jest-resolve: 26.6.2
-      jest-runtime: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
-      jest-util: 26.6.2
-      jest-worker: 26.6.2
-      source-map-support: 0.5.21
-      throat: 5.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-runner@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
     dependencies:
@@ -18118,18 +17980,6 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jest@26.6.3:
-    dependencies:
-      '@jest/core': 26.6.3
-      import-local: 3.2.0
-      jest-cli: 26.6.3
-    transitivePeerDependencies:
-      - bufferutil
-      - canvas
-      - supports-color
-      - ts-node
-      - utf-8-validate
-
   jest@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
     dependencies:
       '@jest/core': 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
@@ -18148,20 +17998,6 @@ snapshots:
       '@jest/types': 29.6.3
       import-local: 3.2.0
       jest-cli: 29.7.0(@types/node@20.19.27)(node-notifier@8.0.2)
-    optionalDependencies:
-      node-notifier: 8.0.2
-    transitivePeerDependencies:
-      - '@types/node'
-      - babel-plugin-macros
-      - supports-color
-      - ts-node
-
-  jest@29.7.0(@types/node@25.0.3)(node-notifier@8.0.2):
-    dependencies:
-      '@jest/core': 29.7.0(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
-      '@jest/types': 29.6.3
-      import-local: 3.2.0
-      jest-cli: 29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
     optionalDependencies:
       node-notifier: 8.0.2
     transitivePeerDependencies:
@@ -20367,32 +20203,12 @@ snapshots:
       esbuild: 0.20.2
       jest-util: 29.7.0
 
-  ts-jest@29.4.6(@babel/core@7.28.5)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.28.5))(jest-util@29.7.0)(jest@29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)))(typescript@5.9.3):
-    dependencies:
-      bs-logger: 0.2.6
-      fast-json-stable-stringify: 2.1.0
-      handlebars: 4.7.8
-      jest: 29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
-      json5: 2.2.3
-      lodash.memoize: 4.1.2
-      make-error: 1.3.6
-      semver: 7.7.3
-      type-fest: 4.41.0
-      typescript: 5.9.3
-      yargs-parser: 21.1.1
-    optionalDependencies:
-      '@babel/core': 7.28.5
-      '@jest/transform': 29.7.0
-      '@jest/types': 29.6.3
-      babel-jest: 29.7.0(@babel/core@7.28.5)
-      jest-util: 29.7.0
-
   ts-jest@29.4.6(@babel/core@7.28.5)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.28.5))(jest-util@29.7.0)(jest@29.7.0(@types/node@25.0.3)(node-notifier@8.0.2))(typescript@5.9.3):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       handlebars: 4.7.8
-      jest: 29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)
+      jest: 29.7.0(@types/node@25.0.3)(node-notifier@8.0.2)(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
