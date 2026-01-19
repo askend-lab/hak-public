@@ -167,6 +167,7 @@ hooks:
       - '**/*.full.test.ts'
       - '**/cucumber-report.json'
       - '**/merlin/**/*.py'
+      - '**/merlin-worker/tools/**/*'
       - '**/test.scss'
 
 # final
