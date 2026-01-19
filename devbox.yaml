@@ -29,6 +29,7 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
+    min_coverage_branches: 58
     command: "pnpm test"
     command_full: "pnpm test:coverage"
   - name: cucumber
@@ -49,7 +50,7 @@ task_channel:
 # Hooks configuration - ALL parameters required
 hooks:
   markdown-size:
-    max_lines: 200  # Temporarily raised - need to split large docs
+    max_lines: 200
     excludePaths:
       - 'docs/work/**'
       - 'docs/vision/**'
@@ -69,6 +70,7 @@ hooks:
       - '**/DESIGN_SYSTEM_COMPLIANCE_REPORT.md'
       - '**/ACCESSIBILITY_REMEDIATION_BACKLOG.md'
       - 'docs/02-DESIGN-SYSTEM/07-Quality-Standards.md'
+      - 'audits/**'
 
   language-check:
     mode: warning
@@ -125,7 +127,7 @@ hooks:
 
   run-lint:
     mode: warning
-    blocking: false  # Non-blocking - lint warnings cleanup in progress
+    blocking: false
     command: 'pnpm lint'
     excludePaths:
       - '**/e2e/accessibility.spec.ts'
@@ -175,5 +177,17 @@ hooks:
       - '**/merlin/**/*.py'
       - '**/merlin-worker/tools/**/*'
       - '**/test.scss'
+
+  security-audit: {}
+
+  secret-detection: {}
+
+  dependency-check: {}
+
+  import-order: {}
+
+  no-any: {}
+
+  no-floating-promises: {}
 
 # final
