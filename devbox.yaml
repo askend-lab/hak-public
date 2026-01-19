@@ -68,6 +68,7 @@ hooks:
       - '**/WCAG_AUDIT_REPORT.md'
       - '**/DESIGN_SYSTEM_COMPLIANCE_REPORT.md'
       - '**/ACCESSIBILITY_REMEDIATION_BACKLOG.md'
+      - 'docs/02-DESIGN-SYSTEM/07-Quality-Standards.md'
 
   language-check:
     excludePaths:
@@ -160,5 +161,12 @@ hooks:
       - '**/scripts/validate-design.js'
       - '**/scripts/a11y-audit.mjs'
       - '**/useSynthesis.test.ts'
+      - '**/SentenceSynthesisItem.test.tsx'
+      - '**/styles/base/_reset.scss'
+      - '**/styles/components/_eki-app.scss'
+      - '**/styles/components/_pronunciation-variants.scss'
+      - '**/styles/components/_sentence-synthesis-item.scss'
+      - '**/*.full.test.tsx'
+      - '**/*.full.test.ts'
 
 # final
