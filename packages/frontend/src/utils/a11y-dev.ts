@@ -20,7 +20,7 @@
  * }
  * ```
  */
-export async function initA11yDevMode() {
+export async function initA11yDevMode(): Promise<void> {
   if (typeof window === 'undefined') return;
   
   try {
@@ -52,7 +52,7 @@ export async function initA11yDevMode() {
  * Run a one-time accessibility audit on the current page
  * Useful for debugging specific components
  */
-export async function runPageAudit() {
+export async function runPageAudit(): Promise<void> {
   try {
     const axeCore = await import('axe-core');
     
@@ -79,11 +79,8 @@ export async function runPageAudit() {
     } else {
       console.log('✅ No accessibility violations found!');
     }
-    
-    return results;
   } catch (error) {
     console.error('Failed to run accessibility audit:', error);
-    return null;
   }
 }
 

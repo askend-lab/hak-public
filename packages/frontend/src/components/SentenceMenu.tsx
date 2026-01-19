@@ -23,7 +23,7 @@ interface SentenceMenuProps {
   onRemove: (sentenceId: string) => void;
   onLogin: () => void;
   onClose: () => void;
-  anchorEl?: HTMLElement | null;
+  anchorEl?: HTMLElement | null | undefined;
 }
 
 const AuthenticatedMenu = ({ sentenceId, hasText, menuSearchQuery, onSearchChange, isLoadingTasks, filteredTasks, onAddToTask, onCreateNewTask, onClose }: { sentenceId: string; hasText: boolean; menuSearchQuery: string; onSearchChange: (v: string) => void; isLoadingTasks: boolean; filteredTasks: Task[]; onAddToTask: (sid: string, tid: string, tn: string) => void; onCreateNewTask: (sid: string) => void; onClose: () => void }) => (

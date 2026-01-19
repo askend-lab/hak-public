@@ -51,7 +51,7 @@ export const wcagAAConfig: JestAxeConfigureOptions = {
 export async function runA11yAudit(
   container: HTMLElement,
   options?: JestAxeConfigureOptions
-) {
+): Promise<Awaited<ReturnType<typeof axe>>> {
   const config = { ...wcagAAConfig, ...options };
   return axe(container, config);
 }
@@ -73,7 +73,7 @@ export async function runA11yAudit(
 export async function expectNoA11yViolations(
   container: HTMLElement,
   options?: JestAxeConfigureOptions
-) {
+): Promise<void> {
   const results = await runA11yAudit(container, options);
   expect(results).toHaveNoViolations();
 }
@@ -85,14 +85,14 @@ export async function expectNoA11yViolations(
 export async function checkA11y(
   renderResult: RenderResult,
   options?: JestAxeConfigureOptions
-) {
+): Promise<void> {
   await expectNoA11yViolations(renderResult.container, options);
 }
 
 /**
  * Get a summary of accessibility violations for debugging
  */
-export function formatA11yViolations(results: Awaited<ReturnType<typeof axe>>) {
+export function formatA11yViolations(results: Awaited<ReturnType<typeof axe>>): string {
   if (results.violations.length === 0) {
     return 'No accessibility violations found.';
   }

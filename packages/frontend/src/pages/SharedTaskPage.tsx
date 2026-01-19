@@ -95,7 +95,7 @@ export function SharedTaskPage() {
               onBack={() => window.history.back()}
               onEditTask={() => {}}
               onDeleteTask={() => {}}
-              onNavigateToSynthesis={() => window.location.href = '/synthesis'}
+              onAddEntryFromInput={() => {}}
             />
           </div>
         </div>

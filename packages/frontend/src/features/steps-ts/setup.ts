@@ -22,6 +22,21 @@ const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></
   pretendToBeVisual: true,
 });
 
+// Polyfill requestAnimationFrame for BaseModal and other components
+const rafPolyfill = (callback: FrameRequestCallback): number => {
+  return setTimeout(() => callback(Date.now()), 16) as unknown as number;
+};
+const cafPolyfill = (id: number): void => {
+  clearTimeout(id);
+};
+
+if (!dom.window.requestAnimationFrame) {
+  dom.window.requestAnimationFrame = rafPolyfill;
+}
+if (!dom.window.cancelAnimationFrame) {
+  dom.window.cancelAnimationFrame = cafPolyfill;
+}
+
 // Set globals
 Object.assign(global, {
   localStorage: dom.window.localStorage,
@@ -37,6 +52,8 @@ Object.assign(global, {
   KeyboardEvent: dom.window.KeyboardEvent,
   MouseEvent: dom.window.MouseEvent,
   Event: dom.window.Event,
+  requestAnimationFrame: rafPolyfill,
+  cancelAnimationFrame: cafPolyfill,
 });
 
 // Polyfill attachEvent/detachEvent for React DOM compatibility

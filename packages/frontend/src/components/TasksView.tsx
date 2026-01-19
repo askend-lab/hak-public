@@ -24,7 +24,7 @@ interface TasksViewProps {
   onNavigateToSynthesis: () => void;
 }
 
-export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, onViewTask, onCreateTask, onEditTask, onDeleteTask, onShareTask, onNavigateToSynthesis }: TasksViewProps) {
+export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, onViewTask, onCreateTask, onEditTask, onDeleteTask, onShareTask }: TasksViewProps) {
   const { user } = useAuth();
   const { tasks, isLoading, error, isEmpty } = useUserTasks(taskRefreshTrigger);
 
@@ -63,7 +63,7 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
   if (selectedTaskId) {
     return (
       <div className="page-content">
-        <TaskDetailView taskId={selectedTaskId} onBack={onBack} onEditTask={handleEditTask} onDeleteTask={onDeleteTask} onNavigateToSynthesis={onNavigateToSynthesis} />
+        <TaskDetailView taskId={selectedTaskId} onBack={onBack} onEditTask={handleEditTask} onDeleteTask={onDeleteTask} onAddEntryFromInput={() => {}} />
       </div>
     );
   }

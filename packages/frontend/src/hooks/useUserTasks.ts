@@ -17,7 +17,7 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadTasks = async () => {
+    const loadTasks = async (): Promise<void> => {
       if (!user) {
         setTasks([]);
         setIsLoading(false);

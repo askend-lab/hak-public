@@ -17,7 +17,7 @@ import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSen
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
-  const { state: onboardingState, isWizardActive, resetOnboarding, isLoading: isOnboardingLoading } = useOnboarding();
+  const { state: onboardingState, isWizardActive, isLoading: isOnboardingLoading } = useOnboarding();
   const navigate = useNavigate();
   const location = useLocation();
 

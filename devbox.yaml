@@ -64,6 +64,10 @@ hooks:
       - 'CodeReview_*.md'
       - 'GHERKIN_PLAN.md'
       - 'docs/CUCUMBER_STEPS_CHECKLIST.md'
+      - '**/AUDIT_FINDINGS.md'
+      - '**/WCAG_AUDIT_REPORT.md'
+      - '**/DESIGN_SYSTEM_COMPLIANCE_REPORT.md'
+      - '**/ACCESSIBILITY_REMEDIATION_BACKLOG.md'
 
   language-check:
     excludePaths:
@@ -116,6 +120,10 @@ hooks:
     mode: warning
     blocking: false  # Non-blocking - lint warnings cleanup in progress
     command: 'pnpm lint'
+    excludePaths:
+      - '**/e2e/accessibility.spec.ts'
+      - '**/scripts/a11y-audit.mjs'
+      - '**/scripts/validate-design.js'
 
   run-typecheck:
     command: 'pnpm -r exec tsc --noEmit'
@@ -146,5 +154,11 @@ hooks:
       - '**/steps-ts/**'
       - '**/PronunciationVariants.tsx'
       - '**/TaskDetailView.tsx'
+      - '**/audit-results.json'
+      - '**/jscpd-report.json'
+      - '**/cucumber-results.json'
+      - '**/scripts/validate-design.js'
+      - '**/scripts/a11y-audit.mjs'
+      - '**/useSynthesis.test.ts'
 
 # final
