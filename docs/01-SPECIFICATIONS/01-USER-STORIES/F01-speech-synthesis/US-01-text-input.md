@@ -18,6 +18,8 @@ So that **I can see my text organized as clickable words for easy manipulation**
 - [ ] **AC-5:** Pasting multi-word text creates multiple tags at once
 - [ ] **AC-6:** Word tags are displayed as clickable chips that can be selected
 - [ ] **AC-7:** Each tag shows the original word text (not phonetic form)
+- [ ] **AC-8:** Clicking a tag opens a menu with options: Uuri variandid, Muuda, Kustuta
+- [ ] **AC-9:** Selecting "Muuda" allows inline editing of the tag with Enter to confirm
 
 ## UI Behavior
 
@@ -31,11 +33,25 @@ So that **I can see my text organized as clickable words for easy manipulation**
 - Word becomes a tag/chip displayed before the input field
 - Input field clears for next word
 
-### Tag Editing
+### Tag Editing (via Backspace)
 - With empty input, user presses Backspace
 - Last tag content moves back to input field
 - Tag is removed from tag list
 - User can edit and re-add the word
+
+### Tag Menu Actions
+- Click on any word tag to open a dropdown menu with options:
+  - **Uuri variandid** - Opens pronunciation variants panel (see F02)
+  - **Muuda** - Enters inline edit mode for the tag
+  - **Kustuta** - Removes the tag from the sentence
+
+### Inline Tag Editing (via Menu)
+- User clicks on a tag and selects "Muuda"
+- Tag transforms into an editable input field
+- User edits the word text
+- Press Enter to confirm edit and synthesize audio
+- Press Space to confirm edit without synthesis
+- Press Escape to cancel and restore original value
 
 ### Multi-Word Paste
 - User pastes "Tere päevast kuidas läheb"
@@ -58,5 +74,6 @@ So that **I can see my text organized as clickable words for easy manipulation**
 ## Notes
 
 - Space key only creates tags when at least one tag already exists (first input is plain text)
-- Tags can be clicked to open pronunciation variants panel
+- Tags can be clicked to open a menu with pronunciation variants, edit, and delete options
 - Audio cache is invalidated when text changes
+- Inline tag editing allows modifying individual words without deleting the entire sentence

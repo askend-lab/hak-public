@@ -50,11 +50,6 @@
 @import 'components/header';
 @import 'components/footer';
 
-// Audio/Media Components
-@import 'components/audio-player';
-@import 'components/playlist';
-@import 'components/playlist-audio-player';
-
 // Phonetic/Text Components
 @import 'components/stressed-text';
 @import 'components/synthesis-results';
@@ -81,7 +76,6 @@
 
 // Feedback/Notification Components
 @import 'components/notification';
-@import 'components/confirm-dialog';
 @import 'components/confirmation-modal';
 @import 'components/feedback-modal';
 

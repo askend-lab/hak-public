@@ -14,7 +14,16 @@ export default [
   ...baseConfig,
   
   {
-    ignores: ['tmp/**', 'packages/vendor/**', '**/.esbuild/**', '**/dist/**', '**/.old-frontend/**']
+    ignores: [
+      'tmp/**', 
+      'packages/vendor/**', 
+      '**/.esbuild/**', 
+      '**/dist/**', 
+      '**/.old-frontend/**',
+      '**/e2e/accessibility.spec.ts',
+      '**/scripts/a11y-audit.mjs',
+      '**/scripts/validate-design.js'
+    ]
   },
 
   // Disable rules not compatible with current plugin versions

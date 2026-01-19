@@ -16,6 +16,57 @@
 // Used in: pronunciation-variants, sentence-phonetic-panel
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Focus Visible - WCAG 2.4.7 Compliant Focus Indicators
+// ---------------------------------------------------------------------------
+// Provides consistent, visible focus indicators for keyboard navigation
+// Use on all interactive elements: buttons, links, inputs, custom controls
+// ---------------------------------------------------------------------------
+
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid $color-input-border-focus;
+    outline-offset: 2px;
+  }
+  
+  // Remove outline for mouse interactions while keeping keyboard focus visible
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+// Alternative focus ring using box-shadow (for rounded elements)
+@mixin focus-visible-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px $color-white, 0 0 0 4px $color-input-border-focus;
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+// Focus ring for dark backgrounds
+@mixin focus-visible-light {
+  &:focus-visible {
+    outline: 2px solid $color-white;
+    outline-offset: 2px;
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Phonetic Marker Badge
+// ---------------------------------------------------------------------------
+// Styling for phonetic marker symbols displayed in guide views
+// Used in: pronunciation-variants, sentence-phonetic-panel
+// ---------------------------------------------------------------------------
+
 @mixin phonetic-marker-badge {
   display: inline-flex;
   align-items: center;

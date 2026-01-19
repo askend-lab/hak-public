@@ -44,12 +44,12 @@ export default function AppModals({ user, sentences, showLoginModal, setShowLogi
   const handleAddToExisting = async (taskId: string, entries: { text: string; stressedText: string }[], taskName: string) => {
     if (!user) return;
     try { await DataService.getInstance().addTextEntriesToTask(user.id, taskId, entries); taskHandlers.setShowTaskCreationModal(false); showNotification('success', 'Lisatud ülesandesse', `${entries.length} lauset lisatud ülesandesse ${taskName}!`); }
-    catch { showNotification('error', 'Lausungite lisamine ebaõnnestus'); }
+    catch { showNotification('error', 'Lausete lisamine ebaõnnestus'); }
   };
   return (
     <>
       <PronunciationVariants word={variants.variantsWord} isOpen={variants.isVariantsPanelOpen} onClose={variants.handleCloseVariants} onUseVariant={onUseVariant} customPhoneticForm={variants.variantsCustomPhonetic} />
-      {variants.sentencePhoneticId && <SentencePhoneticPanel sentenceText={synthesis.sentences.find(s => s.id === variants.sentencePhoneticId)?.text || ''} phoneticText={synthesis.sentences.find(s => s.id === variants.sentencePhoneticId)?.phoneticText || null} isOpen={variants.showSentencePhoneticPanel} onClose={variants.handleCloseSentencePhonetic} onApply={(newPhoneticText) => { synthesis.handleSentencePhoneticApply(variants.sentencePhoneticId!, newPhoneticText); showNotification('success', 'Lause foneetiline kuju rakendatud'); }} />}
+      {variants.sentencePhoneticId && <SentencePhoneticPanel sentenceText={synthesis.sentences.find(s => s.id === variants.sentencePhoneticId)?.text || ''} phoneticText={synthesis.sentences.find(s => s.id === variants.sentencePhoneticId)?.phoneticText || null} isOpen={variants.showSentencePhoneticPanel} onClose={variants.handleCloseSentencePhonetic} onApply={(newPhoneticText) => { synthesis.handleSentencePhoneticApply(variants.sentencePhoneticId!, newPhoneticText); showNotification('success', 'Lause uus häälduskuju rakendatud'); }} />}
       <AddEntryModal isOpen={taskHandlers.showAddTaskModal} onClose={() => taskHandlers.setShowAddTaskModal(false)} onAdd={taskHandlers.handleAddTask} />
       <TaskCreationModal isOpen={taskHandlers.showTaskCreationModal} onClose={() => taskHandlers.setShowTaskCreationModal(false)} onCreateTask={taskHandlers.handleTaskCreated} onAddToExistingTask={handleAddToExisting} playlistEntries={playlistEntries} />
       {taskHandlers.taskToEdit && <TaskEditModal isOpen={taskHandlers.showTaskEditModal} task={taskHandlers.taskToEdit} onClose={() => { taskHandlers.setShowTaskEditModal(false); taskHandlers.setTaskToEdit(null); }} onSave={async (updatedTask) => { await taskHandlers.handleTaskUpdated(updatedTask); }} setTaskToEdit={taskHandlers.setTaskToEdit} />}

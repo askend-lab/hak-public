@@ -77,7 +77,7 @@ Test each type is visually distinct:
 | Task deleted | Success: "Ülesanne kustutatud!" |
 | Entries added | Success: "X lauset lisatud ülesandesse" |
 | Link copied | Info: "Link kopeeritud!" |
-| Entry deleted | Success: "Lausung kustutatud" |
+| Entry deleted | Success: "Lause kustutatud" |
 | Error | Error: Relevant error message |
 
 ## Notes

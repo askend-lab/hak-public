@@ -11,14 +11,16 @@ So that **the application can provide relevant guidance**
 
 ## Acceptance Criteria
 
-- [ ] **AC-1:** Role selection page appears for new users
-- [ ] **AC-2:** Three role options are presented: Õppija, Õpetaja, Spetsialist
-- [ ] **AC-3:** Each role has a description and icon/mascot
-- [ ] **AC-4:** Clicking a role selects it
-- [ ] **AC-5:** After selection, onboarding wizard starts
+- [ ] **AC-1:** Role selection is available at `/role-selection` route
+- [ ] **AC-2:** First-time users are redirected to `/role-selection` when landing on synthesis
+- [ ] **AC-3:** Three role options are presented: Õppija, Õpetaja, Spetsialist
+- [ ] **AC-4:** Each role has a description and icon/mascot
+- [ ] **AC-5:** Clicking a role navigates to `/synthesis` and starts the wizard
 - [ ] **AC-6:** Role is stored in OnboardingContext
-- [ ] **AC-7:** Role persists in localStorage
-- [ ] **AC-8:** Returning users skip role selection
+- [ ] **AC-7:** Role persists in localStorage after wizard completion
+- [ ] **AC-8:** Returning users go directly to synthesis (skip role selection redirect)
+- [ ] **AC-9:** Users can navigate away from role selection using header navigation
+- [ ] **AC-10:** Help button navigates to `/role-selection` (does not reset localStorage)
 
 ## UI Behavior
 
@@ -57,13 +59,21 @@ Full-page display replacing main content:
 
 ### Selection Flow
 
-1. New user visits site
+1. New user visits site at `/` or `/synthesis`
 2. OnboardingContext shows no completed onboarding
-3. Role selection page displays
+3. User is redirected to `/role-selection`
 4. User clicks on a role card
-5. Role is stored in context
-6. Wizard starts with role-specific content
-7. Demo sentences are pre-filled
+5. Role is stored in context (with `completed: false`)
+6. User is navigated to `/synthesis`
+7. Wizard starts with role-specific content
+8. Demo sentences are pre-filled
+
+### Navigation from Role Selection
+
+Users can navigate away from role selection using the header navigation:
+
+- **First-time users:** Navigating away does NOT mark onboarding complete. They will be redirected back to role selection on their next visit.
+- **Returning users (via help button):** Their localStorage still has `completed: true`, so they won't be redirected on next visit.
 
 ### Role Persistence
 
@@ -77,9 +87,10 @@ localStorage.setItem('eki_onboarding', JSON.stringify({
 
 ### Returning User
 
-If `onboarding.completed === true`:
-- Skip role selection
+If `onboarding.completed === true` in localStorage:
+- No redirect to `/role-selection` on initial app load
 - Show main synthesis page directly
+- Can still access `/role-selection` via help button or direct URL
 
 ## Related Test Cases
 
@@ -89,4 +100,6 @@ If `onboarding.completed === true`:
 
 - Role affects wizard content
 - Demo sentences pre-filled after selection
-- Role can be changed by restarting onboarding (help button)
+- Role can be changed via help button (navigates to `/role-selection`)
+- Help button does NOT clear localStorage - returning users won't see role selection again on next visit unless they select a new role
+- Redirect to role selection only happens on initial app load (not when navigating within the app)

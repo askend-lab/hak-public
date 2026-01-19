@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 @import 'input';
 
 // =========================================================================
@@ -63,7 +64,7 @@
 }
 
 // Responsive design
-@media (max-width: 640px) {
+@media (max-width: $breakpoint-sm) {
   .task-edit-modal__actions {
     button {
       width: 100%;

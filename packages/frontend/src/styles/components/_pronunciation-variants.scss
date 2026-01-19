@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 @import '../abstracts/mixins';
 
 // =========================================================================
@@ -19,10 +20,11 @@
   @include panel-md;
 }
 
-// Panel header - uses panel header mixin with specific width
+// Panel header - uses panel header mixin
 .pronunciation-variants__header {
   @include panel-header;
-  width: 518px;
+  width: 100%;
+  max-width: 518px;
 }
 
 .pronunciation-variants__title {
@@ -37,10 +39,11 @@
   @include panel-close;
 }
 
-// Panel content - uses panel content mixin with specific width
+// Panel content - uses panel content mixin
 .pronunciation-variants__content {
   @include panel-content;
-  width: 518px;
+  width: 100%;
+  max-width: 518px;
   gap: $spacing-2;
 }
 
@@ -105,7 +108,7 @@
 .pronunciation-variants__item-text {
   font-family: $font-body;
   font-weight: 600;
-  font-size: 16px;
+  font-size: $font-size-md;
   line-height: 140%;
   letter-spacing: 0;
   color: $color-primary;
@@ -135,7 +138,7 @@
   justify-content: center;
   font-family: $font-body;
   font-weight: 500;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 100%;
   letter-spacing: 0.4%;
   text-align: center;
@@ -151,7 +154,7 @@
   width: 100%;
   font-family: $font-body;
   font-weight: 400;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 140%;
   letter-spacing: 0;
   color: $color-gray;
@@ -186,7 +189,7 @@
 .pronunciation-variants__form-title {
   margin: 0;
   font-family: $font-body;
-  font-size: 18px;
+  font-size: $font-size-lg;
   font-weight: 600;
   color: $color-primary;
   line-height: 100%;
@@ -198,13 +201,14 @@
 .pronunciation-variants__form-description {
   margin: 0;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 400;
   color: $color-primary;
   line-height: 140%;
   letter-spacing: 0;
-  width: 486px;
-  height: 40px;
+  width: 100%;
+  max-width: 486px;
+  min-height: 40px;
 }
 
 // Custom input container
@@ -214,7 +218,8 @@
   flex-direction: row;
   gap: $spacing-2;
   align-items: center;
-  width: 486px;
+  width: 100%;
+  max-width: 486px;
   height: 42px;
   border-radius: $border-radius-xl;
 
@@ -234,7 +239,7 @@
   border: 1px solid $color-primary;
   border-radius: 4px;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 500;
   line-height: 140%;
   letter-spacing: 0;
@@ -243,16 +248,20 @@
   box-sizing: border-box;
   height: 42px;
 
-  &:focus {
+  &:focus-visible {
     outline: none;
     border-color: $color-outlined-primary;
     box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
   }
 
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
   &::placeholder {
     color: $color-gray;
     font-family: $font-body;
-    font-size: 14px;
+    font-size: $font-size-sm;
     font-weight: 500;
   }
 }
@@ -294,9 +303,11 @@
 .pronunciation-variants__markers-toolbar {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: $spacing-1;
   align-items: center;
-  width: 486px;
+  width: 100%;
+  max-width: 486px;
   height: auto;
 }
 
@@ -308,7 +319,7 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: 4px;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 500;
   line-height: 140%;
   letter-spacing: 0;
@@ -347,7 +358,7 @@
   border: none;
   color: $color-outlined-primary;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 400;
   text-decoration: underline;
   cursor: pointer;
@@ -395,7 +406,7 @@
     flex: 1;
     font-family: $font-body;
     font-weight: 600;
-    font-size: 18px;
+    font-size: $font-size-lg;
     line-height: 28px;
     color: $color-primary;
     margin: 0;
@@ -411,7 +422,7 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: $border-radius-sm;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 500;
   color: $color-text-secondary;
   cursor: pointer;
@@ -496,7 +507,7 @@
 
 .pronunciation-variants__marker-name {
   font-family: $font-body;
-  font-size: 15px;
+  font-size: $font-size-sm;
   font-weight: 600;
   color: $color-primary;
 }
@@ -516,7 +527,7 @@
   flex-wrap: wrap;
   gap: $spacing-1;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 20px;
   color: $color-text-secondary;
 
@@ -541,7 +552,7 @@
       &:before {
         content: '•';
         color: $color-gray;
-        font-size: 16px;
+        font-size: $font-size-md;
       }
 
       &:last-child {
@@ -555,9 +566,66 @@
         border: 1px solid $color-outlined-neutral;
         border-radius: 4px;
         font-family: $font-mono;
-        font-size: 13px;
+        font-size: $font-size-xs;
         color: $color-outlined-primary;
       }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Responsive Styles
+// ---------------------------------------------------------------------------
+
+@include respond-below($breakpoint-md) {
+  .pronunciation-variants__panel {
+    width: 100vw;
+    max-width: none;
+    padding: $spacing-4 $spacing-3;
+  }
+
+  .pronunciation-variants__header,
+  .pronunciation-variants__content {
+    width: 100%;
+    max-width: none;
+  }
+
+  .pronunciation-variants__form-description,
+  .pronunciation-variants__input-container,
+  .pronunciation-variants__markers-toolbar {
+    max-width: none;
+  }
+
+  .pronunciation-variants__title {
+    font-size: $font-size-md;
+  }
+
+  .pronunciation-variants__form-title {
+    font-size: $font-size-md;
+  }
+
+  .pronunciation-variants__item {
+    padding: $spacing-3;
+  }
+}
+
+@include respond-below($breakpoint-sm) {
+  .pronunciation-variants__panel {
+    padding: $spacing-3 $spacing-2;
+  }
+
+  .pronunciation-variants__input-container {
+    flex-direction: column;
+    height: auto;
+    gap: $spacing-3;
+  }
+
+  .pronunciation-variants__input-actions {
+    width: 100%;
+    justify-content: stretch;
+    
+    > button {
+      flex: 1;
     }
   }
 }

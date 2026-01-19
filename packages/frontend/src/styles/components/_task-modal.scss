@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 @import 'input';
 
 // =========================================================================
@@ -70,7 +71,7 @@
 .task-modal__playlist-preview-title {
   margin: 0 0 $spacing-3 0;
   font-family: $font-body;
-  font-size: 12px;
+  font-size: $font-size-xs;
   font-weight: $font-weight-medium;
   line-height: $line-height-normal;
   color: $color-gray;
@@ -92,7 +93,7 @@
 
 .task-modal__playlist-preview-more {
   font-family: $font-body;
-  font-size: 12px;
+  font-size: $font-size-xs;
   font-weight: $font-weight-regular;
   color: $color-gray;
   margin-top: $spacing-1;
@@ -174,9 +175,13 @@
     }
   }
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 
   &:disabled {
@@ -312,9 +317,13 @@
     }
   }
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(23, 49, 72, 0.1);
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 
   &:disabled {
@@ -339,7 +348,7 @@
 
 .task-modal__selection-description {
   font-family: $font-body;
-  font-size: 12px;
+  font-size: $font-size-xs;
   font-weight: $font-weight-regular;
   line-height: $line-height-normal;
   color: $color-gray;
@@ -356,7 +365,7 @@
 }
 
 // Responsive design
-@media (max-width: 640px) {
+@media (max-width: $breakpoint-sm) {
   .task-modal__actions {
     flex-direction: column-reverse;
     gap: $spacing-2;

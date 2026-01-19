@@ -63,7 +63,7 @@
   width: 518px;
   height: 44px;
   font-family: $font-body;
-  font-size: 16px;
+  font-size: $font-size-md;
   font-weight: 400;
   color: $color-primary;
   line-height: 140%;
@@ -99,7 +99,7 @@
   border: 1px solid $color-primary;
   border-radius: 4px;
   font-family: $font-body;
-  font-size: 16px;
+  font-size: $font-size-md;
   font-weight: 500;
   line-height: 150%;
   letter-spacing: 0;
@@ -108,10 +108,14 @@
   box-sizing: border-box;
   resize: none;
 
-  &:focus {
+  &:focus-visible {
     outline: none;
     border-color: $color-outlined-primary;
     box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 
   &::placeholder {
@@ -137,7 +141,7 @@
   border-radius: 4px;
   box-sizing: border-box;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 500;
   line-height: 140%;
   letter-spacing: 0;
@@ -187,7 +191,7 @@
     flex: 1;
     font-family: $font-body;
     font-weight: 600;
-    font-size: 18px;
+    font-size: $font-size-lg;
     line-height: 28px;
     color: $color-primary;
     margin: 0;
@@ -203,7 +207,7 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: $border-radius-sm;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 500;
   color: $color-text-secondary;
   cursor: pointer;
@@ -288,7 +292,7 @@
 
 .sentence-phonetic-panel__marker-name {
   font-family: $font-body;
-  font-size: 15px;
+  font-size: $font-size-sm;
   font-weight: 600;
   color: $color-primary;
 }
@@ -308,7 +312,7 @@
   flex-wrap: wrap;
   gap: $spacing-1;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 20px;
   color: $color-text-secondary;
 
@@ -333,7 +337,7 @@
       &:before {
         content: '•';
         color: $color-gray;
-        font-size: 16px;
+        font-size: $font-size-md;
       }
 
       &:last-child {
@@ -347,7 +351,7 @@
         border: 1px solid $color-outlined-neutral;
         border-radius: 4px;
         font-family: $font-mono;
-        font-size: 13px;
+        font-size: $font-size-xs;
         color: $color-outlined-primary;
       }
     }
@@ -365,7 +369,7 @@
   justify-content: center;
   font-family: $font-body;
   font-weight: 500;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 100%;
   letter-spacing: 0.4%;
   text-align: center;

@@ -1,5 +1,5 @@
  
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';
@@ -17,7 +17,7 @@ import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSen
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
-  const { state: onboardingState, isWizardActive, resetOnboarding, isLoading: isOnboardingLoading } = useOnboarding();
+  const { state: onboardingState, isWizardActive, isLoading: isOnboardingLoading } = useOnboarding();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,12 +28,14 @@ export default function Home() {
   const dragDrop = useDragAndDrop(synthesis.setSentences);
   const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences, showNotification);
   const menu = useSentenceMenu();
+  const hasCheckedInitialRedirect = useRef(false);
 
   // Determine current view and task ID from location
   const pathname = location.pathname;
   const currentView = pathname.startsWith('/tasks') ? 'tasks' 
     : pathname.startsWith('/specs') ? 'specs'
     : pathname.startsWith('/dashboard') ? 'dashboard'
+    : pathname.startsWith('/role-selection') ? 'role-selection'
     : 'synthesis';
   const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
   const selectedTaskId: string | null = taskIdMatch?.[1] || null;
@@ -49,6 +51,19 @@ export default function Home() {
   useEffect(() => {
     if (isWizardActive && onboardingState.selectedRole) synthesis.setDemoSentences();
   }, [isWizardActive, onboardingState.selectedRole, synthesis.setDemoSentences]);
+
+  // Redirect first-time users to role selection on initial app load only
+  useEffect(() => {
+    if (isOnboardingLoading) return;
+    
+    // Only check on initial app load, not on subsequent navigation
+    if (!hasCheckedInitialRedirect.current) {
+      hasCheckedInitialRedirect.current = true;
+      if (!onboardingState.completed && !onboardingState.selectedRole && currentView === 'synthesis') {
+        navigate('/role-selection', { replace: true });
+      }
+    }
+  }, [isOnboardingLoading, onboardingState.completed, onboardingState.selectedRole, currentView, navigate]);
 
   const handleUseVariant = (variantText: string) => {
     synthesis.handleUseVariant(variantText, variants.selectedSentenceId, variants.selectedTagIndex);
@@ -66,7 +81,7 @@ export default function Home() {
     return <div className="page-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="loader-spinner" style={{ width: 48, height: 48 }}></div></div>;
   }
 
-  const showRoleSelection = !onboardingState.completed && !onboardingState.selectedRole;
+  const showRoleSelection = currentView === 'role-selection';
 
   return (
     <div className="page-layout">
@@ -74,7 +89,7 @@ export default function Home() {
         isAuthenticated={isAuthenticated} 
         user={user}
         onTasksClick={handleTasksClick}
-        onHelpClick={resetOnboarding} 
+        onHelpClick={() => navigate('/role-selection')} 
         onLoginClick={() => setShowLoginModal(true)}
       />
 
@@ -120,6 +135,7 @@ export default function Home() {
                 onEditTask={taskHandlers.handleEditTask}
                 onDeleteTask={taskHandlers.handleDeleteTask}
                 onShareTask={taskHandlers.handleShareTask}
+                onNavigateToSynthesis={() => navigate('/synthesis')}
               />
             )}
             {currentView === 'specs' && (

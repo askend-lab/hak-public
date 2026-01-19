@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 @import 'panel';
 
 // =========================================================================
@@ -18,7 +19,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: $color-shadow-backdrop;
   z-index: 1000;
   animation: modalFadeIn 0.2s ease;
 }
@@ -32,7 +33,7 @@
   background: $color-white;
   border-radius: $border-radius-xl;
   padding: 0;
-  box-shadow: 0 10px 40px rgba(23, 49, 72, 0.2);
+  box-shadow: 0 10px 40px $color-shadow-primary-md;
   z-index: 1001;
   max-height: calc(100vh - 120px);
   overflow: hidden;
@@ -66,7 +67,7 @@
 
 .base-modal__title {
   font-family: $font-body;
-  font-size: 28px;
+  font-size: $font-size-3xl;
   font-weight: $font-weight-regular;
   line-height: $line-height-none;
   color: $color-primary;
@@ -134,7 +135,7 @@
 }
 
 // Responsive design
-@media (max-width: 640px) {
+@include respond-below($breakpoint-sm) {
   .base-modal {
     top: 16px;
     width: calc(100vw - 32px) !important; // Override size variants

@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 @import 'panel';
 
 // =========================================================================
@@ -22,7 +23,7 @@
 .wizard__highlight {
   position: relative;
   z-index: 9999 !important;
-  box-shadow: 0 0 0 4px $color-primary, 0 0 0 8px rgba(23, 49, 72, 0.2) !important;
+  box-shadow: 0 0 0 4px $color-primary, 0 0 0 8px $color-shadow-primary-md !important;
   border-radius: $border-radius;
   background: $color-white !important;
 }
@@ -198,7 +199,7 @@
 }
 
 // Responsive styles
-@media (max-width: 640px) {
+@include respond-below($breakpoint-sm) {
   .wizard__tooltip {
     width: calc(100vw - 32px);
     max-width: 313px;

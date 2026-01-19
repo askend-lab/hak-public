@@ -238,7 +238,23 @@ textarea {
   margin: 0;
 }
 
-button {
+/* Focus styles - WCAG 2.4.7 requires visible focus indicators
+   Using :focus-visible for keyboard focus only (not mouse clicks)
+   ========================================================================== */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-input-border-focus, #4A90E2);
+  outline-offset: 2px;
+}
+
+/* Remove default outline only for mouse interactions */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -474,6 +490,44 @@ th {
 th {
   text-align: left;
   font-weight: bold;
+}
+
+/* Accessibility Utilities
+        ========================================================================== */
+
+/**
+ * Visually hidden - content is hidden visually but accessible to screen readers
+ * Use for labels, skip links, and other content that should be read but not seen
+ */
+.visually-hidden,
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/**
+ * Skip link - visible on focus for keyboard navigation
+ */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  z-index: 9999;
+  text-decoration: none;
+  
+  &:focus {
+    top: 0;
+  }
 }
 
 /* Misc

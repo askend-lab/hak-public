@@ -1,91 +1,44 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TaskManager from './TaskManager';
+import { TaskSummary } from '@/types/task';
 
-vi.mock('@/services/auth', () => ({
-  useAuth: vi.fn(() => ({
-    user: { id: 'user-1', name: 'Test User' },
-    isAuthenticated: true,
-  })),
-}));
-
-const mockTasks = [
-  { id: 'task-1', name: 'Task 1', description: 'Description 1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), shareToken: 'token1' },
-  { id: 'task-2', name: 'Task 2', description: 'Description 2', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), shareToken: 'token2' },
+const mockTasks: TaskSummary[] = [
+  { id: 'task-1', name: 'Task 1', description: 'Description 1', createdAt: new Date(), updatedAt: new Date(), entryCount: 5 },
+  { id: 'task-2', name: 'Task 2', description: 'Description 2', createdAt: new Date(), updatedAt: new Date(), entryCount: 3 },
 ];
-
-vi.mock('@/services/dataService', () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      getUserTasks: vi.fn().mockResolvedValue(mockTasks),
-    })),
-  },
-}));
 
 describe('TaskManager', () => {
   const defaultProps = {
-    onCreateTask: vi.fn(),
+    tasks: mockTasks,
     onEditTask: vi.fn(),
     onViewTask: vi.fn(),
     onDeleteTask: vi.fn(),
     onShareTask: vi.fn(),
-    refreshTrigger: 0,
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should render loading state initially', () => {
+  it('should render tasks', () => {
     render(<TaskManager {...defaultProps} />);
-    expect(screen.getByText('Laen ülesandeid...')).toBeInTheDocument();
-  });
-
-  it('should render tasks after loading', async () => {
-    render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
-    
+    expect(screen.getByText('Task 1')).toBeInTheDocument();
     expect(screen.getByText('Task 2')).toBeInTheDocument();
   });
 
   it('should call onViewTask when task is clicked', async () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
 
     await user.click(screen.getByText('Task 1'));
     expect(defaultProps.onViewTask).toHaveBeenCalledWith('task-1');
   });
 
-  it('should refresh tasks when refreshTrigger changes', async () => {
-    const { rerender } = render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
-
-    rerender(<TaskManager {...defaultProps} refreshTrigger={1} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
-  });
-
   it('should open menu when more options clicked', async () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
 
     const moreButtons = screen.getAllByLabelText('More options');
     await user.click(moreButtons[0]!);
@@ -100,10 +53,6 @@ describe('TaskManager', () => {
   it('should call onEditTask when edit clicked', async () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
 
     const moreButtons = screen.getAllByLabelText('More options');
     await user.click(moreButtons[0]!);
@@ -119,10 +68,6 @@ describe('TaskManager', () => {
   it('should call onShareTask when share clicked', async () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
 
     const moreButtons = screen.getAllByLabelText('More options');
     await user.click(moreButtons[0]!);
@@ -138,10 +83,6 @@ describe('TaskManager', () => {
   it('should call onDeleteTask when delete clicked', async () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
 
     const moreButtons = screen.getAllByLabelText('More options');
     await user.click(moreButtons[0]!);
@@ -157,10 +98,6 @@ describe('TaskManager', () => {
   it('should close menu when backdrop clicked', async () => {
     const user = userEvent.setup();
     const { container } = render(<TaskManager {...defaultProps} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-    });
 
     const moreButtons = screen.getAllByLabelText('More options');
     await user.click(moreButtons[0]!);
@@ -177,4 +114,8 @@ describe('TaskManager', () => {
     });
   });
 
+  it('should render empty when no tasks provided', () => {
+    render(<TaskManager {...defaultProps} tasks={[]} />);
+    expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
+  });
 });

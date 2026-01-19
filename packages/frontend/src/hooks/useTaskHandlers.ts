@@ -56,7 +56,7 @@ export function useTaskHandlers(
       showNotification('success', 'Lisatud ülesandesse', `${count} ${count === 1 ? 'lause' : 'lauset'} lisatud ülesandesse ${taskName}!`, undefined, undefined, viewTaskAction(taskId));
     } catch (error) {
       console.error('Failed to add entries:', error);
-      showNotification('error', 'Lausungite lisamine ebaõnnestus');
+      showNotification('error', 'Lausete lisamine ebaõnnestus');
     }
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 
@@ -74,7 +74,7 @@ export function useTaskHandlers(
       showNotification('success', 'Lisatud ülesandesse', `Lause lisatud ülesandesse ${taskName}!`, undefined, undefined, viewTaskAction(taskId));
     } catch (error) {
       console.error('Failed to add entry:', error);
-      showNotification('error', 'Lausungi lisamine ebaõnnestus');
+      showNotification('error', 'Lausete lisamine ebaõnnestus');
     }
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 

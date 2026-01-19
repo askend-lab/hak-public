@@ -85,6 +85,14 @@
   gap: 4px;
   align-items: center;
   overflow: visible; // Allow dropdown to overflow
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  
+  // Focus state on container when input is focused (WCAG 2.4.7 compliant)
+  // Using focus-within to show focus on parent container instead of nested input
+  &:focus-within {
+    border-color: $color-input-border-focus;
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
+  }
 }
 
 // =========================================================================
@@ -107,7 +115,7 @@
   flex-shrink: 0;
   font-family: $font-body;
   font-weight: 500;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 140%;
   color: $color-primary;
   white-space: nowrap;
@@ -230,7 +238,7 @@
   flex-shrink: 0;
   font-family: $font-body;
   font-weight: 500;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 140%;
   color: $color-primary;
 
@@ -254,14 +262,21 @@
   height: 22px;
   font-family: $font-body;
   font-weight: 500;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 140%;
   color: $color-primary;
+
+  // Override global focus-visible styles - parent container handles focus indication
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
 
   &::placeholder {
     font-family: $font-body;
     font-weight: 400;
-    font-size: 14px;
+    font-size: $font-size-sm;
     line-height: 140%;
     color: $color-text-placeholder;
   }
@@ -309,7 +324,7 @@
   padding: $spacing-2 $spacing-3;
   font-family: $font-body;
   font-weight: 500;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 140%;
   letter-spacing: 0;
   color: $color-primary;
@@ -419,7 +434,7 @@
 // Responsive Adjustments
 // =========================================================================
 
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-md) {
   .sentence-synthesis-item {
     padding: $spacing-3;
     gap: $spacing-3;
@@ -430,7 +445,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: $breakpoint-mobile) {
   .sentence-synthesis-item {
     flex-wrap: wrap;
     

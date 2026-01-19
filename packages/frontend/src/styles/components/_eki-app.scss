@@ -1,7 +1,12 @@
 // EKI App Layout - matching Figma design
+@import '../tokens/colors';
+@import '../tokens/spacing';
+@import '../tokens/typography';
+@import '../tokens/breakpoints';
+
 .eki-app {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #E3EFFB 0%, #F0F4F8 100%);
+  background: linear-gradient(to bottom, $color-soft-primary-bg 0%, $color-soft-neutral-bg 100%);
   font-family: $font-body;
 }
 
@@ -10,7 +15,7 @@
   margin: 0 auto;
   padding: 0 1rem;
   
-  @media (max-width: 768px) {
+  @include respond-below($breakpoint-md) {
     padding: 0 0.75rem;
   }
 }
@@ -30,13 +35,13 @@
       width: 48px;
       height: 48px;
       background-color: $color-primary;
-      color: white;
+      color: $color-white;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.875rem;
+      font-size: $font-size-sm;
       letter-spacing: 0.5px;
     }
     
@@ -46,14 +51,14 @@
       line-height: 1.1;
       
       .logo-title {
-        font-size: 0.875rem;
+        font-size: $font-size-sm;
         font-weight: 700;
         color: $color-primary;
         letter-spacing: 0.5px;
       }
       
       .logo-subtitle {
-        font-size: 0.75rem;
+        font-size: $font-size-xs;
         font-weight: 500;
         color: $color-primary;
         letter-spacing: 0.25px;
@@ -80,7 +85,7 @@
     border: 1px solid transparent;
     border-radius: 8px;
     color: $color-gray;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -92,7 +97,7 @@
     
     &.active {
       background: $color-primary;
-      color: white;
+      color: $color-white;
       border-color: $color-primary;
     }
   }
@@ -106,7 +111,7 @@
   text-align: center;
   margin-bottom: 2rem;
   
-  @media (max-width: 768px) {
+  @include respond-below($breakpoint-md) {
     margin-bottom: 1.5rem;
   }
 }
@@ -118,11 +123,11 @@
   align-items: start;
   min-height: 0; // Prevent grid overflow
   
-  @media (max-width: 1200px) {
+  @include respond-below($breakpoint-xl) {
     grid-template-columns: 1.2fr 1fr;
   }
   
-  @media (max-width: 1024px) {
+  @include respond-below($breakpoint-lg) {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
@@ -131,7 +136,7 @@
 .eki-primary-column {
   min-width: 0; // Prevents grid overflow
   
-  @media (max-width: 1024px) {
+  @include respond-below($breakpoint-lg) {
     order: 1; // Ensure primary content comes first on mobile
   }
 }
@@ -139,7 +144,7 @@
 .eki-secondary-column {
   min-width: 0; // Prevents grid overflow
   
-  @media (max-width: 1024px) {
+  @include respond-below($breakpoint-lg) {
     order: 2; // Ensure playlist comes after primary content on mobile
   }
 }
@@ -163,25 +168,25 @@
   position: sticky;
   top: 2rem;
   
-  @media (max-width: 1024px) {
+  @include respond-below($breakpoint-lg) {
     position: static;
   }
 }
 
 .eki-page-title {
-  font-size: 2rem;
+  font-size: $font-size-4xl;
   font-weight: 700;
   color: $color-primary;
   margin: 0 0 0.5rem 0;
   text-align: center;
   
-  @media (max-width: 768px) {
-    font-size: 1.75rem;
+  @include respond-below($breakpoint-md) {
+    font-size: $font-size-3xl;
   }
 }
 
 .eki-page-subtitle {
-  font-size: 1rem;
+  font-size: $font-size-md;
   color: $color-text-secondary;
   margin: 0 0 2rem 0;
   text-align: center;
@@ -189,12 +194,12 @@
 }
 
 .eki-input-card {
-  background: white;
+  background: $color-white;
   border-radius: 12px;
   padding: 0;
-  box-shadow: 0 2px 8px rgba(23, 49, 72, 0.08);
+  box-shadow: 0 2px 8px $color-shadow-primary-xs;
   margin-bottom: 1.5rem;
-  border: 1px solid rgba(23, 49, 72, 0.1);
+  border: 1px solid $color-shadow-focus;
   overflow: hidden;
 }
 
@@ -205,16 +210,16 @@
   .text-input-header {
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid $color-outlined-neutral;
-    background: linear-gradient(to right, $color-soft-primary-bg 0%, #f8fbff 100%);
+    background: linear-gradient(to right, $color-soft-primary-bg 0%, $color-gradient-light-end 100%);
     
     .text-input-title {
-      font-size: 1.125rem;
+      font-size: $font-size-lg;
       font-weight: 600;
       color: $color-primary;
       margin: 0;
     }
     
-    @media (max-width: 768px) {
+    @include respond-below($breakpoint-md) {
       padding: 1rem 1.25rem;
     }
   }
@@ -223,13 +228,13 @@
     padding: 2.25rem 1.5rem;
     width: 100%;
     
-    @media (max-width: 768px) {
+    @include respond-below($breakpoint-md) {
       padding: 1.75rem 1.25rem;
     }
     
     .input-label {
       display: block;
-      font-size: 1rem;
+      font-size: $font-size-md;
       font-weight: 600;
       color: $color-primary;
       margin-bottom: 0.5rem;
@@ -245,19 +250,23 @@
         padding: 1.25rem 3.5rem 1.25rem 1.5rem;
         border: 2px solid $color-outlined-neutral;
         border-radius: 8px;
-        font-size: 1rem;
+        font-size: $font-size-md;
         color: $color-primary;
-        background: white;
+        background: $color-white;
         transition: border-color 0.2s ease;
         
         &::placeholder {
           color: $color-gray;
         }
         
-        &:focus {
+        &:focus-visible {
           outline: none;
           border-color: $color-outlined-primary;
-          box-shadow: 0 0 0 3px rgba(11, 107, 203, 0.1);
+          box-shadow: 0 0 0 3px $color-focus-ring-blue;
+        }
+
+        &:focus:not(:focus-visible) {
+          outline: none;
         }
         
         &:disabled {
@@ -310,7 +319,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.875rem;
+        font-size: $font-size-sm;
         
         .example-label {
           color: $color-text-secondary;
@@ -330,7 +339,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.875rem;
+        font-size: $font-size-sm;
         color: $color-text-secondary;
         
         svg {
@@ -348,7 +357,7 @@
     flex-wrap: wrap;
     padding: 0.5rem 1.5rem 2.25rem;
     
-    @media (max-width: 768px) {
+    @include respond-below($breakpoint-md) {
       padding: 0.5rem 1.25rem 1.75rem;
     }
     
@@ -358,10 +367,10 @@
       gap: 0.5rem;
       padding: 0.75rem 1.5rem;
       background: $color-primary;
-      color: white;
+      color: $color-white;
       border: none;
       border-radius: 25px; // Fully rounded like in the image
-      font-size: 1rem;
+      font-size: $font-size-md;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -369,7 +378,7 @@
       &:hover:not(:disabled) {
         background: $color-soft-primary;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(23, 49, 72, 0.15);
+        box-shadow: 0 4px 12px $color-shadow-primary-sm;
       }
       
       &:disabled {
@@ -392,11 +401,11 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.75rem 1.5rem;
-      background: white;
+      background: $color-white;
       color: $color-primary;
       border: 2px solid $color-primary;
       border-radius: 25px;
-      font-size: 1rem;
+      font-size: $font-size-md;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -404,7 +413,7 @@
       &:hover:not(:disabled) {
         background: $color-soft-primary-bg;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(23, 49, 72, 0.15);
+        box-shadow: 0 4px 12px $color-shadow-primary-sm;
       }
       
       &:disabled {
@@ -431,18 +440,18 @@
   border-radius: 8px;
   margin-bottom: 1.5rem;
   border: 1px solid rgba(125, 18, 18, 0.2);
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
 }
 
 .eki-audio-section {
-  background: white;
+  background: $color-white;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(23, 49, 72, 0.08);
-  border: 1px solid rgba(23, 49, 72, 0.1);
+  box-shadow: 0 2px 8px $color-shadow-primary-xs;
+  border: 1px solid $color-shadow-focus;
   
   .section-title {
-    font-size: 1rem;
+    font-size: $font-size-md;
     font-weight: 600;
     color: $color-primary;
     margin: 0 0 1rem 0;
@@ -455,7 +464,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     color: $color-text-secondary;
     margin-bottom: 0.75rem;
     
@@ -466,9 +475,9 @@
       width: 24px;
       height: 24px;
       background: $color-primary;
-      color: white;
+      color: $color-white;
       border-radius: 50%;
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
       font-weight: 600;
     }
     
@@ -497,7 +506,26 @@
   
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(23, 49, 72, 0.12);
+    box-shadow: 0 4px 16px $color-shadow-dropdown;
   }
 }
 
+// ---------------------------------------------------------------------------
+// DEPRECATED: EKI Layout Classes
+// ---------------------------------------------------------------------------
+// These classes are deprecated in favor of page layout system classes.
+// Use the new .page-content--two-column, .page-content__primary, etc.
+// See: _page-layout-base.scss for the new layout system
+// ---------------------------------------------------------------------------
+
+// Deprecated - use .page-content--two-column instead
+// .eki-workspace { @extend .page-content--two-column; }
+
+// Deprecated - use .page-content__primary instead
+// .eki-primary-column { @extend .page-content__primary; }
+
+// Deprecated - use .page-content__secondary instead
+// .eki-secondary-column { @extend .page-content__secondary; }
+
+// Deprecated - use .page-content__full instead
+// .eki-full-column { @extend .page-content__full; }

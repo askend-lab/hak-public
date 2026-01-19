@@ -1,16 +1,21 @@
+// Build Info Component
+@import '../tokens/colors';
+@import '../tokens/spacing';
+@import '../tokens/typography';
+@import '../tokens/borders';
+
 .build-info-button {
-  background: rgba(0, 0, 0, 0.1);
+  background: $color-menu-hover;
   border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 11px;
-  color: inherit;
+  border-radius: $border-radius-sm;
+  padding: $spacing-1 $spacing-2;
+  font-size: $font-size-xs;
+  color: $color-gray; // Use gray color instead of opacity for WCAG AA contrast compliance
   cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s;
+  transition: color 0.2s;
 
   &:hover {
-    opacity: 1;
+    color: $color-text-primary;
   }
 
   .build-info-hash {
@@ -24,7 +29,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: $color-overlay;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,9 +37,9 @@
 }
 
 .build-info-modal {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: $color-white;
+  border-radius: $border-radius;
+  box-shadow: 0 4px 20px $color-shadow-primary-sm;
   max-width: 400px;
   width: 90%;
 
@@ -42,39 +47,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #eee;
+    padding: $spacing-4 $spacing-5;
+    border-bottom: 1px solid $color-border-neutral;
 
     h3 {
       margin: 0;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: $font-size-md;
+      font-weight: $font-weight-semibold;
     }
   }
 
   &__close {
     background: none;
     border: none;
-    font-size: 24px;
-    color: #666;
+    font-size: $font-size-2xl;
+    color: $color-gray;
     cursor: pointer;
     padding: 0;
     line-height: 1;
 
     &:hover {
-      color: #333;
+      color: $color-text-primary;
     }
   }
 
   &__content {
-    padding: 16px 20px;
+    padding: $spacing-4 $spacing-5;
   }
 }
 
 .build-info-row {
   display: flex;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: $spacing-2 0;
+  border-bottom: 1px solid $color-soft-neutral-bg;
 
   &:last-child {
     border-bottom: none;
@@ -84,36 +89,36 @@
 .build-info-label {
   width: 80px;
   flex-shrink: 0;
-  color: #666;
-  font-size: 13px;
+  color: $color-gray;
+  font-size: $font-size-sm;
 }
 
 .build-info-value {
   flex: 1;
-  font-size: 13px;
+  font-size: $font-size-sm;
   word-break: break-word;
 
   code {
-    background: #f5f5f5;
-    padding: 2px 6px;
-    border-radius: 3px;
+    background: $color-soft-neutral-bg;
+    padding: 2px $spacing-1;
+    border-radius: $border-radius-sm;
     font-family: monospace;
   }
 }
 
 .build-info-message {
-  color: #444;
+  color: $color-text-primary;
   font-style: italic;
 }
 
 .build-info-path {
   font-family: monospace;
-  font-size: 11px;
-  color: #666;
+  font-size: $font-size-xs;
+  color: $color-gray;
 }
 
 .footer-build-info {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
+  bottom: $spacing-4;
+  right: $spacing-4;
 }

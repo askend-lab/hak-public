@@ -32,10 +32,16 @@
     color: $color-text-placeholder;
   }
 
-  &:focus {
+  // Focus state with visible indicator for keyboard navigation (WCAG 2.4.7)
+  &:focus-visible {
     outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px $color-shadow-focus;
+    border-color: $color-input-border-focus;
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
+  }
+
+  // Remove focus ring for mouse interactions
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 
   &:disabled {
@@ -112,7 +118,7 @@
 .input-label,
 .input-helper-text {
   display: block;
-  font-size: 12px;
+  font-size: $font-size-xs;
 }
 
 .input-label {

@@ -67,7 +67,7 @@ Verify viewing and editing the full sentence phonetic form.
 |---|--------|-----------------|------|
 | 1 | Make phonetic edits | Text modified | ☐ |
 | 2 | Click "Rakenda" button | Panel closes | ☐ |
-| 3 | Verify notification | "Lause foneetiline kuju rakendatud" | ☐ |
+| 3 | Verify notification | "Lause uus häälduskuju rakendatud" | ☐ |
 | 4 | Synthesize sentence | Uses new phonetic form | ☐ |
 
 ### Close Without Saving

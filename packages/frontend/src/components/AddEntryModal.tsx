@@ -7,9 +7,13 @@ interface AddEntryModalProps { isOpen: boolean; onClose: () => void; onAdd: (tit
 
 const AddEntryForm = ({ title, description, isSubmitting, error, onTitleChange, onDescChange, onSubmit }: { title: string; description: string; isSubmitting: boolean; error: string | null; onTitleChange: (v: string) => void; onDescChange: (v: string) => void; onSubmit: (e: React.FormEvent) => void }) => (
   <form onSubmit={onSubmit} className="add-entry-modal__form">
-    <div className="add-entry-modal__field"><input id="entry-title" type="text" value={title} onChange={(e) => onTitleChange(e.target.value)} className="add-entry-modal__input" placeholder="Pealkiri (Kohustuslik)" disabled={isSubmitting} autoFocus /></div>
-    <div className="add-entry-modal__field"><textarea id="entry-description" value={description} onChange={(e) => onDescChange(e.target.value)} className="add-entry-modal__textarea" placeholder="Kirjeldus" disabled={isSubmitting} /></div>
-    {error && <div className="add-entry-modal__error"><p>{error}</p></div>}
+    <div className="add-entry-modal__field">
+      <input id="entry-title" type="text" value={title} onChange={(e) => onTitleChange(e.target.value)} className="add-entry-modal__input" placeholder="Pealkiri (Kohustuslik)" aria-label="Pealkiri (Kohustuslik)" disabled={isSubmitting} autoFocus aria-required="true" />
+    </div>
+    <div className="add-entry-modal__field">
+      <textarea id="entry-description" value={description} onChange={(e) => onDescChange(e.target.value)} className="add-entry-modal__textarea" placeholder="Kirjeldus" aria-label="Kirjeldus" disabled={isSubmitting} />
+    </div>
+    {error && <div className="add-entry-modal__error" role="alert"><p>{error}</p></div>}
     <div className="add-entry-modal__actions"><button type="submit" className="button button--primary" disabled={isSubmitting || !title.trim()}>{isSubmitting ? 'Lisaan...' : 'Lisa'}</button></div>
   </form>
 );

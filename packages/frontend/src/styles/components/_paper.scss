@@ -31,7 +31,7 @@
   background: $color-white;
   border: 1px solid $color-outlined-neutral;
   border-radius: $border-radius;
-  box-shadow: 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 14px 2px $color-shadow-light;
   overflow: hidden;
   box-sizing: border-box;
   padding: $spacing-1;
@@ -69,7 +69,7 @@
 }
 
 @mixin paper-elevated {
-  box-shadow: 0 4px 20px rgba(23, 49, 72, 0.12);
+  box-shadow: 0 4px 20px $color-shadow-dropdown;
 }
 
 @mixin paper-item {
@@ -90,7 +90,7 @@
   }
 
   &:active:not(:disabled) {
-    background-color: rgba(0, 0, 0, 0.08);
+    background-color: $color-shadow-subtle;
   }
 
   &:disabled {
@@ -102,7 +102,7 @@
 @mixin paper-item-content {
   font-family: $font-body;
   font-weight: 400;
-  font-size: 14px;
+  font-size: $font-size-sm;
   line-height: 150%;
   letter-spacing: 0.15px;
   color: rgba(0, 0, 0, 0.87);
@@ -136,7 +136,7 @@
   padding: $spacing-4;
   text-align: center;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   color: $color-gray;
 }
 
@@ -284,7 +284,7 @@
 .paper__header-title {
   font-family: $font-body;
   font-weight: 600;
-  font-size: 14px;
+  font-size: $font-size-sm;
   color: $color-primary;
   margin: 0;
 }

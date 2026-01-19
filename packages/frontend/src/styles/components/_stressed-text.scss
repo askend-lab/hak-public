@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 
 // =========================================================================
 // Stressed Text Display Component
@@ -19,7 +20,7 @@
 }
 
 .stressed-text__title {
-  font-size: 1.125rem;
+  font-size: $font-size-lg;
   font-weight: 600;
   color: $color-primary;
   margin: 0 0 $spacing-4 0;
@@ -36,7 +37,7 @@
   flex-direction: column;
   gap: $spacing-1;
   
-  @media (min-width: 768px) {
+  @media (min-width: $breakpoint-md) {
     flex-direction: row;
     align-items: flex-start;
     gap: $spacing-3;
@@ -49,7 +50,7 @@
   gap: $spacing-3;
   flex: 1;
   
-  @media (min-width: 768px) {
+  @media (min-width: $breakpoint-md) {
     flex-direction: row;
     align-items: center;
   }
@@ -68,7 +69,7 @@
   padding: $spacing-2 $spacing-3;
   border: none;
   border-radius: $border-radius-round;
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -141,7 +142,7 @@
 }
 
 .stressed-text__label {
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   font-weight: 500;
   color: $color-text-secondary;
   min-width: 140px;
@@ -161,7 +162,7 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: 4px;
   font-family: $font-body;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 400;
   line-height: 140%;
   color: $color-primary;
@@ -196,7 +197,7 @@
     border-radius: 4px;
     color: $color-white;
     font-family: $font-body;
-    font-size: 14px;
+    font-size: $font-size-sm;
     font-weight: 500;
     line-height: 140%;
     box-shadow: 0px 2px 6px 0px rgba(0, 51, 153, 0.25);
@@ -210,7 +211,7 @@
 }
 
 .stressed-text__value {
-  font-size: 1rem;
+  font-size: $font-size-md;
   color: $color-text-secondary;
   font-family: $font-body;
   background-color: $color-white;

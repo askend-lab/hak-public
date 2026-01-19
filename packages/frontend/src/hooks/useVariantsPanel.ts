@@ -98,7 +98,7 @@ export function useVariantsPanel(
       if (error instanceof Error && error.name === 'AbortError') {
         showNotification?.('error', 'Päring aegus', 'Variantide laadimine võttis liiga kaua.');
       } else {
-        showNotification?.('error', 'Viga', 'Variantide laadimine ebaõnnestus.');
+        showNotification?.('error', 'Variantide laadimine ebaõnnestus', 'Sõna ei leidu eesti keeles või on valesti kirjutatud.');
       }
     } finally {
       setLoadingVariantsTag(null);

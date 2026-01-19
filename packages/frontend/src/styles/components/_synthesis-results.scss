@@ -1,12 +1,16 @@
-// Token imports removed - using global imports from main.scss
-// Paper mixins are available through main.scss import order
+// Synthesis Results Component
+@import '../tokens/colors';
+@import '../tokens/spacing';
+@import '../tokens/typography';
+@import '../tokens/borders';
+@import '../tokens/breakpoints';
 
 // Unified Synthesis Results Section
 .eki-synthesis-results {
-  background: white;
+  background: $color-white;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(23, 49, 72, 0.08);
-  border: 1px solid rgba(23, 49, 72, 0.1);
+  box-shadow: 0 2px 8px $color-shadow-primary-xs;
+  border: 1px solid $color-shadow-focus;
   overflow: hidden;
 }
 
@@ -16,7 +20,7 @@
   background: linear-gradient(to right, $color-soft-primary-bg 0%, $color-gradient-light-end 100%);
   
   .synthesis-title {
-    font-size: 1.125rem;
+    font-size: $font-size-lg;
     font-weight: 600;
     color: $color-primary;
     margin: 0;
@@ -30,7 +34,7 @@
   background: $color-gradient-soft-bg;
   
   .section-label {
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -65,12 +69,12 @@
       gap: 1rem;
       
       .interaction-hint {
-        font-size: 0.75rem;
+        font-size: $font-size-xs;
         color: $color-gray;
         font-weight: 500;
         opacity: 0.8;
         
-        @media (max-width: 768px) {
+        @include respond-below($breakpoint-md) {
           display: none; // Hide on mobile to save space
         }
       }
@@ -84,7 +88,7 @@
     }
     
     .text-label {
-      font-size: 0.875rem;
+      font-size: $font-size-sm;
       font-weight: 600;
       color: $color-text-secondary;
     }
@@ -102,20 +106,20 @@
         background: $color-soft-neutral-bg;
         border: 1px solid $color-outlined-neutral;
         border-radius: 24px;
-        font-size: 1rem;
+        font-size: $font-size-md;
         color: $color-primary;
         transition: all 0.2s ease;
         
         &.clickable {
           cursor: pointer;
-          background: white;
+          background: $color-white;
           border-color: $color-outlined-primary;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+          box-shadow: 0 2px 4px $color-shadow-subtle;
           
           // Elegant chevron indicating sidebar direction
           &::after {
             content: "›";
-            font-size: 1rem;
+            font-size: $font-size-md;
             color: $color-primary;
             opacity: 0.7;
             margin-left: 0.25rem;
@@ -159,7 +163,7 @@
       
       .phonetic-value {
         font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
-        font-size: 1.125rem;
+        font-size: $font-size-lg;
         color: $color-text-secondary;
         font-weight: 500;
         letter-spacing: 0.25px;
@@ -176,7 +180,7 @@
       gap: 1rem;
       margin-top: 1.25rem;
       
-      @media (max-width: 768px) {
+      @include respond-below($breakpoint-md) {
         flex-direction: column;
         align-items: stretch;
         gap: 0.5rem;
@@ -190,17 +194,17 @@
         border-radius: 50px;
         border: none;
         background: $color-primary;
-        color: white;
-        font-size: 1rem;
+        color: $color-white;
+        font-size: $font-size-md;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(23, 49, 72, 0.15);
+        box-shadow: 0 2px 8px $color-shadow-primary-sm;
         
         &:hover:not(:disabled) {
           background: $color-soft-primary;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(23, 49, 72, 0.25);
+          box-shadow: 0 4px 12px $color-shadow-primary-lg;
         }
         
         &:disabled {
@@ -218,19 +222,19 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.875rem 1.25rem;
-        background: white;
+        background: $color-white;
         border: none;
         box-shadow: inset 0 0 0 1px $color-primary;
         border-radius: 50px;
         color: $color-primary;
-        font-size: 0.875rem;
+        font-size: $font-size-sm;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s ease;
         
         &:hover:not(:disabled) {
           background: $color-soft-primary-bg;
-          box-shadow: inset 0 0 0 1px $color-soft-primary, 0 2px 8px rgba(23, 49, 72, 0.1);
+          box-shadow: inset 0 0 0 1px $color-soft-primary, 0 2px 8px $color-shadow-focus;
           color: $color-soft-primary;
           transform: translateY(-1px);
         }
@@ -261,11 +265,11 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.375rem 0.75rem;
-  background: white;
+  background: $color-white;
   border: 1px solid $color-outlined-primary;
   border-radius: 6px;
   color: $color-primary;
-  font-size: 0.75rem;
+  font-size: $font-size-xs;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -273,7 +277,7 @@
   &:hover {
     background: $color-soft-primary-bg;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px $color-shadow-focus;
   }
   
   &:active {
@@ -308,7 +312,7 @@
     padding: 0.375rem 0.75rem;
     border: none;
     border-radius: 6px;
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -320,7 +324,7 @@
   
   .edit-save-button {
     background: $color-success;
-    color: white;
+    color: $color-white;
     
     &:hover {
       background: $color-success-hover;
@@ -341,7 +345,7 @@
 
 // Redesigned Phonetic Section with Better Information Hierarchy
 .phonetic-section-redesigned {
-  background: white;
+  background: $color-white;
   border: 1px solid $color-outlined-neutral;
   border-radius: 12px;
   overflow: hidden;
@@ -355,7 +359,7 @@
     border-bottom: 1px solid $color-outlined-neutral;
     
     .text-label {
-      font-size: 0.875rem;
+      font-size: $font-size-sm;
       font-weight: 600;
       color: $color-text-secondary;
       margin: 0;
@@ -367,11 +371,11 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.875rem;
-    background: white;
+    background: $color-white;
     border: 1px solid $color-outlined-primary;
     border-radius: 6px;
     color: $color-primary;
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -379,7 +383,7 @@
     &:hover {
       background: $color-soft-primary-bg;
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px $color-shadow-focus;
     }
     
     svg {
@@ -396,8 +400,8 @@
     border: none;
     border-radius: 6px;
     background: $color-success;
-    color: white;
-    font-size: 0.75rem;
+    color: $color-white;
+    font-size: $font-size-xs;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -421,8 +425,8 @@
     border: none;
     border-radius: 6px;
     background: $color-outlined-danger;
-    color: white;
-    font-size: 0.75rem;
+    color: $color-white;
+    font-size: $font-size-xs;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -474,7 +478,7 @@
   align-items: center;
   gap: 0.75rem;
   
-  @media (max-width: 768px) {
+  @include respond-below($breakpoint-md) {
     flex-direction: column;
     align-items: stretch;
     gap: 0.5rem;
@@ -489,17 +493,17 @@
   border-radius: 50px; // Fully rounded like style guide
   border: none;
   background: $color-primary;
-  color: white;
-  font-size: 1rem;
+  color: $color-white;
+  font-size: $font-size-md;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(23, 49, 72, 0.15);
+  box-shadow: 0 2px 8px $color-shadow-primary-sm;
   
   &:hover:not(:disabled) {
     background: $color-soft-primary;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(23, 49, 72, 0.25);
+    box-shadow: 0 4px 12px $color-shadow-primary-lg;
   }
   
   &:disabled {
@@ -517,12 +521,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.25rem;
-  background: white;
+  background: $color-white;
   border: none;
   box-shadow: inset 0 0 0 1px $color-primary; // Inside border to match button dimensions
   border-radius: 50px; // Fully rounded like style guide
   color: $color-primary; // Primary color text to match border
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -546,11 +550,11 @@
 .phonetic-edit-input {
   width: 100%;
   padding: 1rem 1.25rem;
-  background: white;
+  background: $color-white;
   border: 2px solid $color-outlined-primary;
   border-radius: 12px;
   font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
-  font-size: 1.125rem;
+  font-size: $font-size-lg;
   color: $color-soft-primary;
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -558,10 +562,14 @@
   min-height: 80px;
   transition: all 0.2s ease;
   
-  &:focus {
+  &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(11, 107, 203, 0.1);
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
     background: $color-soft-primary-bg-hover;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
   
   &::placeholder {
@@ -580,7 +588,7 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: 8px;
   
-  @media (max-width: 768px) {
+  @include respond-below($breakpoint-md) {
     flex-direction: column;
     gap: 1rem;
   }
@@ -592,7 +600,7 @@
   gap: 0.75rem;
   
   .toolbar-label {
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     font-weight: 600;
     color: $color-text-secondary;
     white-space: nowrap;
@@ -609,12 +617,12 @@
     width: 32px;
     height: 32px;
     border: 1px solid $color-outlined-neutral;
-    background: white;
+    background: $color-white;
     border-radius: 6px;
     color: $color-primary;
     font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: $font-size-md;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -625,7 +633,7 @@
       background: $color-soft-primary-bg;
       border-color: $color-outlined-primary;
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px $color-shadow-focus;
     }
     
     &:active {
@@ -637,7 +645,7 @@
     width: 32px;
     height: 32px;
     border: 1px solid $color-outlined-neutral;
-    background: white;
+    background: $color-white;
     border-radius: 6px;
     color: $color-gray;
     cursor: pointer;
@@ -651,7 +659,7 @@
       border-color: $color-outlined-primary;
       color: $color-primary;
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px $color-shadow-focus;
     }
     
     &:active {
@@ -682,10 +690,10 @@
     opacity: 1;
     background: $color-soft-neutral-bg;
     border-color: $color-outlined-primary;
-    box-shadow: 0 0 0 1px rgba(11, 107, 203, 0.1);
+    box-shadow: 0 0 0 1px $color-focus-ring-blue;
   }
   
-  @media (max-width: 1024px) {
+  @include respond-below($breakpoint-lg) {
     order: -1; // Show guide first on mobile
   }
 }
@@ -697,7 +705,7 @@
   
   h4 {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     font-weight: 600;
     color: $color-primary;
   }
@@ -718,7 +726,7 @@
   
   h5 {
     margin: 0 0 0.75rem 0;
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     font-weight: 600;
     color: $color-text-secondary;
     text-transform: uppercase;
@@ -738,7 +746,7 @@
   gap: 0.75rem;
   
   span {
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     color: $color-text-secondary;
     line-height: 1.3;
   }
@@ -748,12 +756,12 @@
   width: 24px;
   height: 24px;
   border: 1px solid $color-outlined-primary;
-  background: white;
+  background: $color-white;
   border-radius: 4px;
   color: $color-primary;
   font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -787,12 +795,12 @@
 
 .example-btn {
   padding: 0.5rem 0.75rem;
-  background: white;
+  background: $color-white;
   border: 1px solid $color-outlined-neutral;
   border-radius: 6px;
   color: $color-primary;
   font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
-  font-size: 0.75rem;
+  font-size: $font-size-xs;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -816,7 +824,7 @@
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
+@include respond-below($breakpoint-md) {
   .synthesis-results-header {
     padding: 1rem 1.25rem;
   }
@@ -855,14 +863,14 @@
   
   h4 {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     font-weight: 600;
     color: $color-primary;
   }
   
   .palette-hint {
     display: block;
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     color: $color-gray;
     font-weight: normal;
     margin-top: 0.25rem;
@@ -890,7 +898,7 @@
   
   h5 {
     margin: 0 0 0.75rem 0;
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     font-weight: 600;
     color: $color-text-secondary;
     text-transform: uppercase;
@@ -910,7 +918,7 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.75rem 0.5rem;
-  background: white;
+  background: $color-white;
   border: 1px solid $color-outlined-neutral;
   border-radius: 8px;
   cursor: pointer;
@@ -942,14 +950,14 @@
   
   .symbol {
     font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
-    font-size: 1.25rem;
+    font-size: $font-size-xl;
     font-weight: 600;
     color: $color-primary;
     line-height: 1;
   }
   
   .description {
-    font-size: 0.625rem;
+    font-size: $font-size-2xs;
     color: $color-text-secondary;
     line-height: 1.2;
     font-weight: 500;
@@ -968,14 +976,14 @@
   align-items: flex-start;
   gap: 0.25rem;
   padding: 0.75rem;
-  background: white;
+  background: $color-white;
   border: 1px solid $color-outlined-neutral;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
   font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
-  font-size: 1rem;
+  font-size: $font-size-md;
   color: $color-primary;
   font-weight: 500;
   
@@ -991,7 +999,7 @@
   
   .example-desc {
     font-family: var(--font-family-body);
-    font-size: 0.625rem;
+    font-size: $font-size-2xs;
     color: $color-text-secondary;
     font-weight: 500;
   }
@@ -1011,14 +1019,14 @@
     
     h4 {
       margin: 0;
-      font-size: 0.875rem;
+      font-size: $font-size-sm;
       font-weight: 600;
       color: $color-primary;
     }
     
     .help-hint {
       display: block;
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
       color: $color-gray;
       font-weight: normal;
       margin-top: 0.25rem;
@@ -1032,7 +1040,7 @@
   .help-section {
     h5 {
       margin: 0 0 0.75rem 0;
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
       font-weight: 600;
       color: $color-text-secondary;
       text-transform: uppercase;
@@ -1055,13 +1063,13 @@
     .help-symbol {
       width: 24px;
       height: 24px;
-      background: white;
+      background: $color-white;
       border: 1px solid $color-outlined-neutral;
       border-radius: 4px;
       color: $color-primary;
       font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
       font-weight: 600;
-      font-size: 0.875rem;
+      font-size: $font-size-sm;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1069,7 +1077,7 @@
     }
     
     .help-desc {
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
       color: $color-text-secondary;
       line-height: 1.3;
     }
@@ -1084,7 +1092,7 @@
     border: 1px solid $color-outlined-primary;
     border-radius: 8px;
     color: $color-primary;
-    font-size: 0.75rem;
+    font-size: $font-size-xs;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1151,6 +1159,16 @@
 
   &--with-search {
     @include paper-md;
+  }
+
+  // Fixed positioning variant for scrollable containers
+  // Prevents clipping by overflow:auto/hidden containers
+  // Position is calculated dynamically in component using getBoundingClientRect()
+  &--fixed {
+    position: fixed;
+    top: auto;
+    right: auto;
+    // top and left set via inline styles from component
   }
 }
 

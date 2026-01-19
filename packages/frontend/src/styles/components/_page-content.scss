@@ -87,9 +87,16 @@
       max-width: 480px;
     }
 
+    // SVG icon style (muted, smaller)
     .empty-state__icon {
-      color: $color-gray;
-      opacity: 0.5;
+      display: block;
+      
+      // For SVG icons: apply muted styling
+      &:not(img) {
+        color: $color-gray;
+        opacity: 0.5;
+      }
+      
       width: 60px;
       height: 60px;
       
@@ -101,6 +108,12 @@
       @include desktop {
         width: 80px;
         height: 80px;
+      }
+
+      // For img elements used as icons: allow larger sizes via inline styles
+      &[style] {
+        width: auto;
+        height: auto;
       }
     }
 

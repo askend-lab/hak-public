@@ -46,6 +46,7 @@ describe('TasksView - Edit Task Bug', () => {
   const mockOnEditTask = vi.fn();
   const mockOnDeleteTask = vi.fn();
   const mockOnShareTask = vi.fn();
+  const mockOnNavigateToSynthesis = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -70,6 +71,7 @@ describe('TasksView - Edit Task Bug', () => {
         onEditTask={mockOnEditTask}
         onDeleteTask={mockOnDeleteTask}
         onShareTask={mockOnShareTask}
+        onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />
     );
 
@@ -104,6 +106,7 @@ describe('TasksView - Edit Task Bug', () => {
         onEditTask={mockOnEditTask}
         onDeleteTask={mockOnDeleteTask}
         onShareTask={mockOnShareTask}
+        onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />
     );
 

@@ -2,6 +2,7 @@
 @import '../tokens/typography';
 @import '../tokens/spacing';
 @import '../tokens/borders';
+@import '../tokens/breakpoints';
 
 // =========================================================================
 // Task Detail View Component
@@ -47,7 +48,7 @@
   background: transparent;
   border: none;
   color: $color-primary;
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -133,7 +134,7 @@
 .task-detail__meta {
   display: flex;
   gap: $spacing-6;
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   color: $color-gray;
 }
 
@@ -162,7 +163,7 @@
   border-radius: $border-radius-round;
   padding: 0 $spacing-6;
   height: 36px;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 400;
   letter-spacing: 0;
   cursor: pointer;
@@ -214,7 +215,7 @@
   border-radius: $border-radius-round;
   padding: 0 $spacing-6;
   height: 36px;
-  font-size: 14px;
+  font-size: $font-size-sm;
   font-weight: 400;
   letter-spacing: 0;
   cursor: pointer;
@@ -264,7 +265,7 @@
   p {
     margin: 0;
     color: $color-text-secondary;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
   }
 }
 
@@ -305,7 +306,7 @@
 }
 
 .task-detail__entries-title {
-  font-size: 1.125rem;
+  font-size: $font-size-lg;
   font-weight: 600;
   color: $color-primary;
   margin: 0;
@@ -320,7 +321,7 @@
   color: $color-primary;
   border: none;
   border-radius: $border-radius-round;
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -335,106 +336,6 @@
 
   svg {
     flex-shrink: 0;
-  }
-}
-
-.task-detail__entries-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-16 $spacing-8;
-  text-align: center;
-  background: transparent;
-  margin: 0;
-  position: relative;
-  min-height: calc(100vh - 200px);
-}
-
-.task-detail__empty-icon {
-  margin-bottom: $spacing-8;
-  color: $color-primary;
-  opacity: 0.2;
-  position: relative;
-  z-index: 1;
-  padding: $spacing-6;
-  background: $color-white;
-  border-radius: $border-radius-full;
-  box-shadow: 0 4px 20px rgba(23, 49, 72, 0.08);
-
-  svg {
-    display: block;
-    width: 56px;
-    height: 56px;
-  }
-}
-
-.task-detail__empty-image {
-  margin-bottom: $spacing-6;
-  position: relative;
-  z-index: 1;
-
-  img {
-    width: 213px;
-    height: 186px;
-    display: block;
-  }
-}
-
-.task-detail__empty-title {
-  margin: 0 0 $spacing-4 0;
-  font-family: $font-body;
-  font-size: $heading-page-title-size;
-  font-weight: $heading-page-title-weight;
-  line-height: $heading-page-title-line;
-  letter-spacing: $letter-spacing-normal;
-  color: $color-primary;
-  position: relative;
-  z-index: 1;
-}
-
-.task-detail__empty-description {
-  margin: 0 0 $spacing-6 0;
-  font-family: $font-body;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 140%;
-  letter-spacing: 0;
-  text-align: center;
-  color: $color-text-secondary;
-  max-width: 380px;
-  position: relative;
-  z-index: 1;
-}
-
-.task-detail__empty-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: $spacing-2;
-  padding: 0 $spacing-6;
-  height: 36px;
-  background-color: $color-primary;
-  color: $color-white;
-  border: none;
-  border-radius: $border-radius-round;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: $font-body;
-  white-space: nowrap;
-  position: relative;
-  z-index: 1;
-
-  &:hover {
-    background-color: $color-soft-primary;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
   }
 }
 
@@ -483,13 +384,13 @@
     .playlist-item {
       border-color: $color-primary;
       border-width: 2px;
-      box-shadow: 0 4px 12px rgba(23, 49, 72, 0.15);
+      box-shadow: 0 4px 12px $color-shadow-primary-sm;
     }
   }
 }
 
 // Responsive design
-@media (max-width: 768px) {
+@include respond-below($breakpoint-md) {
   .task-detail__hero {
     padding: $spacing-6 0 $spacing-4 0;
   }
@@ -505,7 +406,7 @@
     align-items: flex-start;
 
     .task-detail__title {
-      font-size: 1.5rem;
+      font-size: $font-size-2xl;
     }
   }
 
@@ -524,38 +425,4 @@
     align-items: flex-start;
     gap: $spacing-3;
   }
-
-  .task-detail__entries-empty {
-    padding: $spacing-12 $spacing-6;
-    margin: $spacing-2 0;
-
-    .task-detail__empty-icon {
-      padding: $spacing-5;
-
-      svg {
-        width: 48px;
-        height: 48px;
-      }
-    }
-
-    .task-detail__empty-image {
-      margin-bottom: $spacing-4;
-
-      img {
-        width: 160px;
-        height: 140px;
-      }
-    }
-
-    .task-detail__empty-title {
-      font-size: 20px;
-    }
-
-    .task-detail__empty-description {
-      font-size: 13px;
-      max-width: 300px;
-    }
-  }
 }
-
-// No legacy aliases - use BEM class names directly
