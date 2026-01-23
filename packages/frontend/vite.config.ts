@@ -65,7 +65,7 @@ export default defineConfig({
         },
       },
       '/api/merlin': {
-        target: 'https://merlin-dev.askend-lab.com',
+        target: 'https://merlin-prod.askend-lab.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/merlin/, ''),
         configure: (proxy) => {
@@ -109,7 +109,7 @@ export default defineConfig({
         },
       },
       '/api/synthesize': {
-        target: 'https://merlin-dev.askend-lab.com',
+        target: 'https://merlin-prod.askend-lab.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy) => {
@@ -120,7 +120,7 @@ export default defineConfig({
         },
       },
       '/api/status': {
-        target: 'https://merlin-dev.askend-lab.com',
+        target: 'https://merlin-prod.askend-lab.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy) => {
