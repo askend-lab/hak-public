@@ -172,4 +172,35 @@ describe('DataService CRUD Operations', () => {
       expect(result[0]?.name).toBe('Modifiable');
     });
   });
+
+  describe('Task visibility after creation', () => {
+    it('newly created task is immediately visible in getUserTasks', async () => {
+      // RED TEST: Verifies task is visible immediately after creation
+      // Bug: User creates task but it doesn't appear in task list
+      const taskData = { name: 'New Task', description: 'Should be visible' };
+      
+      await dataService.createTask(mockUserId, taskData);
+      
+      // Task should be immediately visible
+      const tasks = await dataService.getUserTasks(mockUserId);
+      const taskNames = tasks.map(t => t.name);
+      
+      expect(taskNames).toContain('New Task');
+    });
+
+    it('newly created task is visible after fresh DataService instance', async () => {
+      // RED TEST: Verifies task persists and is visible after "page reload"
+      const taskData = { name: 'Persistent Task', description: 'Should persist' };
+      
+      await dataService.createTask(mockUserId, taskData);
+      
+      // Simulate page reload - get fresh DataService instance
+      const freshDataService = DataService.getInstance();
+      
+      const tasks = await freshDataService.getUserTasks(mockUserId);
+      const taskNames = tasks.map(t => t.name);
+      
+      expect(taskNames).toContain('Persistent Task');
+    });
+  });
 });

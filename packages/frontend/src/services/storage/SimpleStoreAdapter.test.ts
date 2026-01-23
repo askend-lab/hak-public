@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SimpleStoreAdapter } from './SimpleStoreAdapter';
 import { Task, TaskEntry } from '@/types/task';
 
+vi.mock('../auth/storage', () => ({
+  AuthStorage: {
+    getAccessToken: vi.fn(() => 'test-token'),
+  },
+}));
+
 describe('SimpleStoreAdapter', () => {
   let adapter: SimpleStoreAdapter;
   const mockFetch = vi.fn();
@@ -45,7 +51,9 @@ describe('SimpleStoreAdapter', () => {
 
       const result = await adapter.loadUserTasks('user-1');
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=tasks&sk=user-1&type=private');
+      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=tasks&sk=user-1&type=private', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
+      });
       expect(result).toEqual(tasks);
     });
 
@@ -78,7 +86,7 @@ describe('SimpleStoreAdapter', () => {
 
       expect(mockFetch).toHaveBeenCalledWith('/api/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
         body: expect.stringContaining('"pk":"tasks"'),
       });
     });
@@ -94,7 +102,9 @@ describe('SimpleStoreAdapter', () => {
 
       const result = await adapter.loadDeletedTaskIds('user-1');
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=tasks&sk=deleted-user-1&type=private');
+      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=tasks&sk=deleted-user-1&type=private', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
+      });
       expect(result).toEqual(taskIds);
     });
 
@@ -129,7 +139,9 @@ describe('SimpleStoreAdapter', () => {
 
       const result = await adapter.loadBaselineTaskAdditions('user-1');
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=tasks&sk=baseline-user-1&type=private');
+      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=tasks&sk=baseline-user-1&type=private', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
+      });
       expect(result).toEqual(additions);
     });
 
@@ -164,7 +176,9 @@ describe('SimpleStoreAdapter', () => {
 
       const result = await adapter.loadSharedTasks();
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=shared&sk=tasks&type=shared');
+      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=shared&sk=tasks&type=shared', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
+      });
       expect(result).toEqual(tasks);
     });
   });
