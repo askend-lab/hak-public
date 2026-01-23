@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import TaskDetailView from './TaskDetailView';
 
-vi.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/services/auth', () => ({
   useAuth: vi.fn(() => ({ user: { id: 'user-1', name: 'Test' }, isAuthenticated: true })),
 }));
 
@@ -187,5 +187,22 @@ describe('TaskDetailView Full', () => {
     await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
     rerender(<TaskDetailView {...props} taskId="task-2" />);
     await waitFor(() => expect(mockGetTask).toHaveBeenCalledWith('task-2', 'user-1'));
+  });
+
+  it('loads task with dynamically generated ID (e.g. task_timestamp_random)', async () => {
+    // RED TEST: Bug - navigation to task with generated ID fails
+    // URL pattern: /tasks/task_1769185807640_wublowec
+    const dynamicTaskId = 'task_1769185807640_wublowec';
+    const dynamicTask = { ...mockTask, id: dynamicTaskId };
+    mockGetTask.mockResolvedValue(dynamicTask);
+
+    render(<TaskDetailView {...props} taskId={dynamicTaskId} />);
+    
+    await waitFor(() => {
+      expect(mockGetTask).toHaveBeenCalledWith(dynamicTaskId, 'user-1');
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Test Task')).toBeInTheDocument();
+    });
   });
 });
