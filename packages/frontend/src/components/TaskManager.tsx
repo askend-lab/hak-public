@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { TaskSummary } from '@/types/task';
 import { MoreIcon } from './ui/Icons';
+import { formatDate } from '@/utils/formatDate';
 
 interface TaskRowProps {
   task: TaskSummary;
@@ -68,7 +69,7 @@ function TaskRow({
             [{task.entryCount}] {task.entryCount === 1 ? 'lauset' : 'lauset'}
           </span>
           <span className="task-row-date">
-            Loodud {new Date(task.createdAt).toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+            Loodud {formatDate(task.createdAt)}
           </span>
         </div>
       </div>
