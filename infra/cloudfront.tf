@@ -203,7 +203,7 @@ resource "aws_cloudfront_distribution" "website" {
     max_ttl                = 0
   }
 
-  # /api/save -> SimpleStore API
+  # /api/save -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
   ordered_cache_behavior {
     path_pattern     = "/api/save"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -218,18 +218,13 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 0
     max_ttl                = 0
   }
 
-  # /api/get -> SimpleStore API
+  # /api/get -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
   ordered_cache_behavior {
     path_pattern     = "/api/get"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -244,18 +239,13 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 0
     max_ttl                = 0
   }
 
-  # /api/delete -> SimpleStore API
+  # /api/delete -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
   ordered_cache_behavior {
     path_pattern     = "/api/delete"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -270,18 +260,13 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 0
     max_ttl                = 0
   }
 
-  # /api/query -> SimpleStore API
+  # /api/query -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
   ordered_cache_behavior {
     path_pattern     = "/api/query"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -294,11 +279,6 @@ resource "aws_cloudfront_distribution" "website" {
       cookies {
         forward = "none"
       }
-    }
-
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
     }
 
     viewer_protocol_policy = "redirect-to-https"
