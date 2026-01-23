@@ -4,7 +4,7 @@ import { Task, TaskEntry } from '@/types/task';
 
 vi.mock('../auth/storage', () => ({
   AuthStorage: {
-    getAccessToken: vi.fn(() => 'test-token'),
+    getIdToken: vi.fn(() => 'test-token'),
   },
 }));
 

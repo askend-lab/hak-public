@@ -14,7 +14,8 @@ export class SimpleStoreAdapter {
 
   private getAuthHeaders(): Record<string, string> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    const token = AuthStorage.getAccessToken();
+    // Cognito authorizer requires ID token, not access token
+    const token = AuthStorage.getIdToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
