@@ -8,7 +8,12 @@ type TagTransformer = (sentence: SentenceState) => Partial<SentenceState>;
  * Helper hook for updating sentence tags
  * Consolidates duplicate tag manipulation patterns in useSynthesis
  */
-export function useTagUpdater(setSentences: SentenceSetter) {
+export function useTagUpdater(setSentences: SentenceSetter): {
+  updateSentenceTags: (sentenceId: string, transformer: TagTransformer) => void;
+  deleteTag: (sentenceId: string, tagIndex: number) => void;
+  replaceTag: (sentenceId: string, tagIndex: number, newWords: string[]) => void;
+  updateStressedTag: (sentenceId: string, tagIndex: number, variantText: string) => void;
+} {
   /**
    * Update a single sentence's tags using a transformer function
    */
