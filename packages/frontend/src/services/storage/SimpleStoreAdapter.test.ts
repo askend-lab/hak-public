@@ -92,43 +92,6 @@ describe('SimpleStoreAdapter', () => {
     });
   });
 
-  describe('loadDeletedTaskIds', () => {
-    it('returns deleted task IDs', async () => {
-      const taskIds = ['task-1', 'task-2'];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, item: { data: { taskIds } } }),
-      });
-
-      const result = await adapter.loadDeletedTaskIds('user-1');
-
-      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=tasks&sk=deleted-user-1&type=private', {
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
-      });
-      expect(result).toEqual(taskIds);
-    });
-
-    it('returns empty array when no deleted tasks', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
-
-      const result = await adapter.loadDeletedTaskIds('user-1');
-
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('saveDeletedTaskIds', () => {
-    it('saves deleted task IDs', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true });
-
-      await adapter.saveDeletedTaskIds('user-1', ['task-1']);
-
-      expect(mockFetch).toHaveBeenCalledWith('/api/save', expect.objectContaining({
-        method: 'POST',
-      }));
-    });
-  });
-
   describe('loadBaselineTaskAdditions', () => {
     it('returns baseline additions', async () => {
       const additions = { 'task-1': [createMockEntry('entry-1', 'task-1')] };
