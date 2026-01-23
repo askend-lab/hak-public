@@ -22,6 +22,16 @@ vi.mock('@/services/auth', () => ({
   })),
 }));
 
+vi.mock('@/hooks', () => ({
+  useUserTasks: vi.fn(() => ({
+    tasks: [{ id: 'task-1', name: 'Test Task', description: 'Test Description' }],
+    isLoading: false,
+    error: null,
+    isEmpty: false,
+    refresh: vi.fn(),
+  })),
+}));
+
 vi.mock('./TaskManager', () => ({
   default: ({ onEditTask }: { onEditTask: (taskId: string) => void }) => (
     <div data-testid="task-manager">

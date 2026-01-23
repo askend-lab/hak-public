@@ -1,6 +1,6 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DataService } from './dataService';
+import { setupSimpleStoreMock, resetSimpleStoreMock, getStoredBaselineAdditions } from './__mocks__/simpleStoreMock';
 
 describe('DataService Baseline Task Operations', () => {
   let dataService: DataService;
@@ -8,7 +8,9 @@ describe('DataService Baseline Task Operations', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    resetSimpleStoreMock();
+    setupSimpleStoreMock();
+    (DataService as unknown as { instance: null }).instance = null;
     dataService = DataService.getInstance();
   });
 
@@ -58,8 +60,8 @@ describe('DataService Baseline Task Operations', () => {
         const entries = await dataService.addTextEntriesToTask(mockUserId, baselineTask.id, ['New Entry']);
         expect(entries).toHaveLength(1);
         
-        const stored = localStorage.getItem(`eki_baseline_additions_${mockUserId}`);
-        expect(stored).toBeTruthy();
+        const additions = getStoredBaselineAdditions(mockUserId);
+        expect(Object.keys(additions).length).toBeGreaterThan(0);
       }
     });
   });
@@ -134,9 +136,12 @@ describe('DataService Baseline Task Operations', () => {
       expect(found?.name).toBe('Shareable Task');
     });
 
-    it('searches through all user task keys', async () => {
+    it('searches through shared tasks from different users', async () => {
       await dataService.createTask('user1', { name: 'User1 Task', description: '' });
       const task2 = await dataService.createTask('user2', { name: 'User2 Task', description: '' });
+      
+      // Share task so it can be found via share token
+      await dataService.shareUserTask('user2', task2.id);
       
       const found = await dataService.getTaskByShareToken(task2.shareToken);
       expect(found?.name).toBe('User2 Task');

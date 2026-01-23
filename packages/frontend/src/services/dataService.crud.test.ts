@@ -1,6 +1,6 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DataService } from './dataService';
+import { setupSimpleStoreMock, resetSimpleStoreMock, getStoredUserTasks } from './__mocks__/simpleStoreMock';
 
 describe('DataService CRUD Operations', () => {
   let dataService: DataService;
@@ -8,7 +8,10 @@ describe('DataService CRUD Operations', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    resetSimpleStoreMock();
+    setupSimpleStoreMock();
+    // Reset singleton for fresh instance
+    (DataService as unknown as { instance: null }).instance = null;
     dataService = DataService.getInstance();
   });
 
@@ -60,7 +63,7 @@ describe('DataService CRUD Operations', () => {
       expect(result.entries[0]?.stressedText).toBe('Hel·lo');
     });
 
-    it('saves task to localStorage', async () => {
+    it('saves task to SimpleStore', async () => {
       const taskData = {
         name: 'Saved Task',
         description: 'Should be saved'
@@ -68,11 +71,9 @@ describe('DataService CRUD Operations', () => {
 
       await dataService.createTask(mockUserId, taskData);
 
-      const stored = localStorage.getItem(`eki_user_tasks_${mockUserId}`);
-      expect(stored).toBeDefined();
-      const tasks = JSON.parse(stored ?? '[]');
+      const tasks = getStoredUserTasks(mockUserId);
       expect(tasks).toHaveLength(1);
-      expect(tasks[0].name).toBe('Saved Task');
+      expect(tasks[0]?.name).toBe('Saved Task');
     });
   });
 

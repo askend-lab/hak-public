@@ -1,6 +1,6 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DataService } from './dataService';
+import { setupSimpleStoreMock, resetSimpleStoreMock } from './__mocks__/simpleStoreMock';
 
 describe('DataService Share Operations', () => {
   let ds: DataService;
@@ -8,7 +8,9 @@ describe('DataService Share Operations', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    resetSimpleStoreMock();
+    setupSimpleStoreMock();
+    (DataService as unknown as { instance: null }).instance = null;
     ds = DataService.getInstance();
   });
 
@@ -58,14 +60,15 @@ describe('DataService Share Operations', () => {
     expect(found?.name).toBe('Unshare Test');
   });
 
-  it('handles malformed shared tasks in storage', async () => {
-    localStorage.setItem('eki_shared_tasks', 'invalid-json');
+  it('handles fetch error for shared tasks', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const found = await ds.getTaskByShareToken('any-token');
     expect(found).toBeNull();
+    consoleSpy.mockRestore();
   });
 
-  it('handles empty shared tasks array', async () => {
-    localStorage.setItem('eki_shared_tasks', '[]');
+  it('handles empty shared tasks', async () => {
     const found = await ds.getTaskByShareToken('any-token');
     expect(found).toBeNull();
   });

@@ -1,11 +1,11 @@
 import { Task, TaskEntry, TaskSummary, CreateTaskRequest } from '@/types/task';
-import { LocalStorageAdapter } from '../storage/LocalStorageAdapter';
+import { SimpleStoreAdapter } from '../storage/SimpleStoreAdapter';
 import { MockDataLoader } from '../storage/MockDataLoader';
 import { ShareService } from '../storage/ShareService';
 
 export class TaskRepository {
   constructor(
-    private storage: LocalStorageAdapter,
+    private storage: SimpleStoreAdapter,
     private mockLoader: MockDataLoader,
     private shareService: ShareService
   ) {}
@@ -13,9 +13,9 @@ export class TaskRepository {
   async getUserTasks(userId: string): Promise<TaskSummary[]> {
     const [baselineTasks, userTasks, deletedTaskIds, baselineAdditions] = await Promise.all([
       this.mockLoader.loadBaselineTasks(),
-      Promise.resolve(this.storage.loadUserTasks(userId)),
-      Promise.resolve(this.storage.loadDeletedTaskIds(userId)),
-      Promise.resolve(this.storage.loadBaselineTaskAdditions(userId))
+      this.storage.loadUserTasks(userId),
+      this.storage.loadDeletedTaskIds(userId),
+      this.storage.loadBaselineTaskAdditions(userId)
     ]);
 
     const userBaselineTasks = baselineTasks
@@ -42,7 +42,7 @@ export class TaskRepository {
   }
 
   async getUserCreatedTasks(userId: string): Promise<TaskSummary[]> {
-    const userTasks = this.storage.loadUserTasks(userId);
+    const userTasks = await this.storage.loadUserTasks(userId);
 
     return userTasks.map(task => ({
       id: task.id,
@@ -61,8 +61,8 @@ export class TaskRepository {
   async getTask(taskId: string, userId: string): Promise<Task | null> {
     const [baselineTasks, userTasks, baselineAdditions] = await Promise.all([
       this.mockLoader.loadBaselineTasks(),
-      Promise.resolve(this.storage.loadUserTasks(userId)),
-      Promise.resolve(this.storage.loadBaselineTaskAdditions(userId))
+      this.storage.loadUserTasks(userId),
+      this.storage.loadBaselineTaskAdditions(userId)
     ]);
 
     const userTask = userTasks.find(task => task.id === taskId);
@@ -119,15 +119,15 @@ export class TaskRepository {
       entry.taskId = newTask.id;
     });
 
-    const userTasks = this.storage.loadUserTasks(userId);
+    const userTasks = await this.storage.loadUserTasks(userId);
     userTasks.push(newTask);
-    this.storage.saveUserTasks(userId, userTasks);
+    await this.storage.saveUserTasks(userId, userTasks);
 
     return newTask;
   }
 
   async updateTask(userId: string, taskId: string, updates: Partial<Task>): Promise<Task | null> {
-    const userTasks = this.storage.loadUserTasks(userId);
+    const userTasks = await this.storage.loadUserTasks(userId);
     const taskIndex = userTasks.findIndex(task => task.id === taskId);
 
     if (taskIndex !== -1) {
@@ -140,7 +140,7 @@ export class TaskRepository {
       };
 
       userTasks[taskIndex] = updatedTask;
-      this.storage.saveUserTasks(userId, userTasks);
+      await this.storage.saveUserTasks(userId, userTasks);
       return updatedTask;
     }
 
@@ -148,7 +148,7 @@ export class TaskRepository {
     const baselineTask = baselineTasks.find(task => task.id === taskId);
 
     if (baselineTask) {
-      const baselineAdditions = this.storage.loadBaselineTaskAdditions(userId);
+      const baselineAdditions = await this.storage.loadBaselineTaskAdditions(userId);
       const additionalEntries = baselineAdditions[taskId] || [];
 
       const mergedEntries = [
@@ -167,17 +167,17 @@ export class TaskRepository {
       };
 
       userTasks.push(taskCopy);
-      this.storage.saveUserTasks(userId, userTasks);
+      await this.storage.saveUserTasks(userId, userTasks);
 
-      const deletedTaskIds = this.storage.loadDeletedTaskIds(userId);
+      const deletedTaskIds = await this.storage.loadDeletedTaskIds(userId);
       if (!deletedTaskIds.includes(taskId)) {
         deletedTaskIds.push(taskId);
-        this.storage.saveDeletedTaskIds(userId, deletedTaskIds);
+        await this.storage.saveDeletedTaskIds(userId, deletedTaskIds);
       }
 
       if (baselineAdditions[taskId]) {
         delete baselineAdditions[taskId];
-        this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
+        await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
       }
 
       return taskCopy;
@@ -187,12 +187,12 @@ export class TaskRepository {
   }
 
   async deleteTask(userId: string, taskId: string): Promise<boolean> {
-    const userTasks = this.storage.loadUserTasks(userId);
+    const userTasks = await this.storage.loadUserTasks(userId);
     const taskIndex = userTasks.findIndex(task => task.id === taskId);
     
     if (taskIndex !== -1) {
       userTasks.splice(taskIndex, 1);
-      this.storage.saveUserTasks(userId, userTasks);
+      await this.storage.saveUserTasks(userId, userTasks);
       return true;
     }
     
@@ -202,10 +202,10 @@ export class TaskRepository {
     );
     
     if (isBaselineTask) {
-      const deletedTaskIds = this.storage.loadDeletedTaskIds(userId);
+      const deletedTaskIds = await this.storage.loadDeletedTaskIds(userId);
       if (!deletedTaskIds.includes(taskId)) {
         deletedTaskIds.push(taskId);
-        this.storage.saveDeletedTaskIds(userId, deletedTaskIds);
+        await this.storage.saveDeletedTaskIds(userId, deletedTaskIds);
       }
       return true;
     }
@@ -219,7 +219,7 @@ export class TaskRepository {
       throw new Error('Task not found');
     }
 
-    const userTasks = this.storage.loadUserTasks(userId);
+    const userTasks = await this.storage.loadUserTasks(userId);
     const isUserTask = userTasks.some(t => t.id === taskId);
     
     const currentEntries = task.entries || [];
@@ -248,10 +248,10 @@ export class TaskRepository {
         )]
       });
     } else {
-      const baselineAdditions = this.storage.loadBaselineTaskAdditions(userId);
+      const baselineAdditions = await this.storage.loadBaselineTaskAdditions(userId);
       const existingAdditions = baselineAdditions[taskId] || [];
       baselineAdditions[taskId] = [...existingAdditions, ...newEntries];
-      this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
+      await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
     }
 
     return newEntries;
@@ -278,7 +278,7 @@ export class TaskRepository {
     const updatedEntries = [...(task.entries ?? [])];
     updatedEntries[entryIndex] = updatedEntry;
 
-    const userTasks = this.storage.loadUserTasks(userId);
+    const userTasks = await this.storage.loadUserTasks(userId);
     const isUserTask = userTasks.some(t => t.id === taskId);
 
     if (isUserTask) {
@@ -288,7 +288,7 @@ export class TaskRepository {
       const baselineTask = baselineTasks.find(task => task.id === taskId);
 
       if (baselineTask) {
-        const baselineAdditions = this.storage.loadBaselineTaskAdditions(userId);
+        const baselineAdditions = await this.storage.loadBaselineTaskAdditions(userId);
         const baselineEntryCount = baselineTask.entries?.length || 0;
 
         if (entryIndex < baselineEntryCount) {
@@ -299,7 +299,7 @@ export class TaskRepository {
           if (additionIndex >= 0 && additionIndex < additions.length) {
             additions[additionIndex] = updatedEntry;
             baselineAdditions[taskId] = additions;
-            this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
+            await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
           }
         }
       }

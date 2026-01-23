@@ -7,13 +7,21 @@ import { mockAuthContext, mockNotificationContext, mockOnboardingContext, mockSy
 vi.mock('./services/auth', () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock('./contexts/NotificationContext', () => ({ useNotification: vi.fn(() => mockNotificationContext()) }));
 vi.mock('./contexts/OnboardingContext', () => ({ useOnboarding: vi.fn(() => mockOnboardingContext()) }));
-vi.mock('./hooks', () => ({
-  useSynthesis: vi.fn(() => mockSynthesis()),
-  useTaskHandlers: vi.fn(() => mockTaskHandlers()),
-  useDragAndDrop: vi.fn(() => mockDragAndDrop()),
-  useVariantsPanel: vi.fn(() => mockVariantsPanel()),
-  useSentenceMenu: vi.fn(() => mockSentenceMenu()),
-}));
+vi.mock('./hooks', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./hooks')>();
+  return {
+    ...actual,
+    useSynthesis: vi.fn(() => mockSynthesis()),
+    useTaskHandlers: vi.fn(() => mockTaskHandlers()),
+    useDragAndDrop: vi.fn(() => mockDragAndDrop()),
+    useVariantsPanel: vi.fn(() => mockVariantsPanel()),
+    useSentenceMenu: vi.fn(() => mockSentenceMenu()),
+    useUserTasks: vi.fn(() => ({ tasks: [], isLoading: false, error: null, refresh: vi.fn() })),
+    useUserId: vi.fn(() => '38001085718'),
+    useTaskForm: vi.fn(() => ({ form: {}, errors: {}, handleChange: vi.fn(), handleSubmit: vi.fn(), isValid: true })),
+    useModalState: vi.fn(() => ({ isOpen: false, open: vi.fn(), close: vi.fn() })),
+  };
+});
 vi.mock('./utils/warmAudioWorker', () => ({ warmAudioWorker: vi.fn() }));
 
 vi.mock('./components/Footer', () => ({ default: () => <div data-testid="footer">Footer</div> }));
@@ -173,7 +181,7 @@ describe('App Routing', () => {
       );
       
       const tasksView = screen.getByTestId('tasks-view');
-      expect(tasksView).toHaveAttribute('data-task-id', '');
+      expect(tasksView.getAttribute('data-task-id')).toBeFalsy();
     });
   });
 

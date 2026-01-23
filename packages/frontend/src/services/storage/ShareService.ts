@@ -1,10 +1,10 @@
 import { Task } from '@/types/task';
-import { LocalStorageAdapter } from './LocalStorageAdapter';
+import { SimpleStoreAdapter } from './SimpleStoreAdapter';
 import { MockDataLoader } from './MockDataLoader';
 
 export class ShareService {
   constructor(
-    private storage: LocalStorageAdapter,
+    private storage: SimpleStoreAdapter,
     private mockLoader: MockDataLoader
   ) {}
 
@@ -26,7 +26,7 @@ export class ShareService {
       return baselineTask;
     }
 
-    const sharedTasks = this.storage.loadSharedTasks();
+    const sharedTasks = await this.storage.loadSharedTasks();
     console.log('Shared tasks storage:', sharedTasks);
     
     const sharedTask = sharedTasks.find(task => task.id === taskId);
@@ -43,13 +43,13 @@ export class ShareService {
     console.log('Sharing task:', task);
 
     try {
-      const sharedTasks = this.storage.loadSharedTasks();
+      const sharedTasks = await this.storage.loadSharedTasks();
       console.log('Current shared tasks:', sharedTasks);
       
       const filteredTasks = sharedTasks.filter(t => t.id !== task.id);
       filteredTasks.push(task);
       
-      this.storage.saveSharedTasks(filteredTasks);
+      await this.storage.saveSharedTasks(filteredTasks);
       
       console.log('Task shared successfully. New shared tasks:', filteredTasks);
     } catch (error) {
@@ -67,7 +67,7 @@ export class ShareService {
       return baselineTask;
     }
 
-    const sharedTasks = this.storage.loadSharedTasks();
+    const sharedTasks = await this.storage.loadSharedTasks();
     console.log('Checking global shared tasks storage');
     const sharedTask = sharedTasks.find(task => task.shareToken === shareToken);
     if (sharedTask) {
@@ -75,11 +75,11 @@ export class ShareService {
       return sharedTask;
     }
 
-    const allUserTaskKeys = this.storage.findAllUserTaskKeys();
+    const allUserTaskKeys = await this.storage.findAllUserTaskKeys();
     console.log('Checking user task keys:', allUserTaskKeys);
 
     for (const key of allUserTaskKeys) {
-      const userTasks = this.storage.loadTasksByKey(key);
+      const userTasks = await this.storage.loadTasksByKey(key);
       const userTask = userTasks.find(task => task.shareToken === shareToken);
       if (userTask) {
         console.log('Found user task with share token:', userTask);

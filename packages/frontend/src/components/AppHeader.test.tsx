@@ -4,6 +4,14 @@ import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import AppHeader from './AppHeader';
 
+vi.mock('@/services/auth', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: '123', name: 'Test User', email: 'test@test.com' },
+    isAuthenticated: true,
+    logout: vi.fn(),
+  })),
+}));
+
 describe('AppHeader', () => {
   const mockOnTasksClick = vi.fn();
   const mockOnHelpClick = vi.fn();

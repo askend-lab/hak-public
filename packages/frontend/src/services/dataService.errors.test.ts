@@ -1,6 +1,6 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DataService } from './dataService';
+import { setupSimpleStoreMock, resetSimpleStoreMock } from './__mocks__/simpleStoreMock';
 
 describe('DataService Error Handling and Edge Cases', () => {
   let dataService: DataService;
@@ -8,34 +8,32 @@ describe('DataService Error Handling and Edge Cases', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    resetSimpleStoreMock();
+    setupSimpleStoreMock();
+    (DataService as unknown as { instance: null }).instance = null;
     dataService = DataService.getInstance();
   });
 
-  describe('localStorage error handling', () => {
-    it('handles localStorage.getItem throwing error for user tasks', async () => {
-      const originalGetItem = localStorage.getItem;
-      localStorage.getItem = vi.fn().mockImplementation((key: string) => {
-        if (key === `eki_user_tasks_${mockUserId}`) {
-          throw new Error('Storage error');
-        }
-        return originalGetItem.call(localStorage, key);
-      });
-
+  describe('SimpleStore error handling', () => {
+    it('handles fetch error for user tasks', async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      // Should return empty array on error
       const tasks = await dataService.getUserCreatedTasks(mockUserId);
       expect(tasks).toEqual([]);
 
       consoleSpy.mockRestore();
-      localStorage.getItem = originalGetItem;
     });
 
-    it('handles localStorage.setItem throwing error', async () => {
-      const originalSetItem = localStorage.setItem;
-      localStorage.setItem = vi.fn().mockImplementation(() => {
-        throw new Error('Storage full');
+    it('handles fetch error during save', async () => {
+      // First call succeeds (load), second fails (save)
+      let callCount = 0;
+      global.fetch = vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount <= 1) {
+          return Promise.resolve({ ok: false, status: 404 });
+        }
+        return Promise.reject(new Error('Save failed'));
       });
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -44,21 +42,10 @@ describe('DataService Error Handling and Edge Cases', () => {
       await dataService.createTask(mockUserId, { name: 'Test', description: '' });
 
       consoleSpy.mockRestore();
-      localStorage.setItem = originalSetItem;
     });
 
-    it('handles invalid JSON in localStorage for deleted tasks', async () => {
-      localStorage.setItem(`eki_deleted_tasks_${mockUserId}`, 'invalid json');
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      const tasks = await dataService.getUserTasks(mockUserId);
-      expect(Array.isArray(tasks)).toBe(true);
-
-      consoleSpy.mockRestore();
-    });
-
-    it('handles invalid JSON in localStorage for baseline additions', async () => {
-      localStorage.setItem(`eki_baseline_additions_${mockUserId}`, 'invalid json');
+    it('handles 404 responses gracefully', async () => {
+      global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 404 });
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const tasks = await dataService.getUserTasks(mockUserId);
@@ -215,12 +202,11 @@ describe('DataService Error Handling and Edge Cases', () => {
   });
 
   describe('getSharedTask error handling', () => {
-    it('handles invalid JSON in shared tasks storage', async () => {
-      localStorage.setItem('eki_shared_tasks', 'invalid json');
+    it('handles fetch error for shared tasks', async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await dataService.getSharedTask('some-id');
-      // Should return null and not throw
       expect(result === null || result !== undefined).toBe(true);
 
       consoleSpy.mockRestore();
@@ -228,9 +214,8 @@ describe('DataService Error Handling and Edge Cases', () => {
   });
 
   describe('getTaskByShareToken edge cases', () => {
-    it('handles error when searching user tasks', async () => {
-      // Store invalid JSON for a user tasks key
-      localStorage.setItem('eki_user_tasks_invalid', 'not valid json');
+    it('handles fetch error when searching user tasks', async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await dataService.getTaskByShareToken('some-token');
@@ -239,30 +224,29 @@ describe('DataService Error Handling and Edge Cases', () => {
       consoleSpy.mockRestore();
     });
 
-    it('searches through multiple user task keys', async () => {
-      // Create tasks for different users
-      await dataService.createTask('user1', { name: 'User1 Task', description: '' });
-      const task2 = await dataService.createTask('user2', { name: 'User2 Task', description: '' });
+    it('searches through shared tasks', async () => {
+      const task = await dataService.createTask(mockUserId, { name: 'Shared Task', description: '' });
+      await dataService.shareUserTask(mockUserId, task.id);
 
-      // Should find task by share token regardless of user
-      const result = await dataService.getTaskByShareToken(task2.shareToken);
-      expect(result?.name).toBe('User2 Task');
+      const result = await dataService.getTaskByShareToken(task.shareToken);
+      expect(result?.name).toBe('Shared Task');
     });
   });
 
   describe('shareUserTask error handling', () => {
-    it('handles localStorage error during share', async () => {
+    it('handles fetch error during share', async () => {
       const task = await dataService.createTask(mockUserId, {
         name: 'Task to Share',
         description: 'Test'
       });
 
-      const originalSetItem = localStorage.setItem;
-      localStorage.setItem = vi.fn().mockImplementation((key: string) => {
-        if (key === 'eki_shared_tasks') {
-          throw new Error('Storage error');
+      // Make save fail for shared tasks
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn().mockImplementation(async (url: string, options?: RequestInit) => {
+        if (options?.method === 'POST' && (options?.body as string)?.includes('"pk":"shared"')) {
+          return { ok: false, text: async (): Promise<string> => 'Save error' };
         }
-        // Don't call original for non-shared keys to avoid infinite loop
+        return originalFetch(url, options);
       });
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -272,7 +256,7 @@ describe('DataService Error Handling and Edge Cases', () => {
       ).rejects.toThrow('Failed to share task');
 
       consoleSpy.mockRestore();
-      localStorage.setItem = originalSetItem;
+      global.fetch = originalFetch;
     });
   });
 });
