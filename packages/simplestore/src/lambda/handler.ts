@@ -6,7 +6,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { Store, ServerContext, StorageAdapter } from '../core';
-import { InMemoryAdapter } from '../adapters';
+import { InMemoryAdapter, DynamoDBAdapter } from '../adapters';
 import { handleSave, handleGet, handleDelete, handleQuery, handleDebugError, createResponse, HTTP_STATUS, HTTP_ERRORS } from './routes';
 
 /** Shared adapter instance for persistence across calls */
@@ -20,7 +20,16 @@ export function setAdapter(adapter: StorageAdapter | null): void {
 /** Get or create adapter */
 function getAdapter(): StorageAdapter {
   if (!sharedAdapter) {
-    sharedAdapter = new InMemoryAdapter();
+    const tableName = process.env.TABLE_NAME;
+    const isOffline = process.env.IS_OFFLINE === 'true';
+    
+    if (tableName && !isOffline) {
+      // Production: use DynamoDB
+      sharedAdapter = new DynamoDBAdapter(tableName);
+    } else {
+      // Local/test: use in-memory
+      sharedAdapter = new InMemoryAdapter();
+    }
   }
   return sharedAdapter;
 }

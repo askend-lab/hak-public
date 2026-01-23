@@ -1,4 +1,5 @@
 import { Task, TaskEntry } from '@/types/task';
+import { AuthStorage } from '../auth/storage';
 
 interface SimpleStoreResponse {
   success: boolean;
@@ -11,10 +12,20 @@ export class SimpleStoreAdapter {
   private readonly baseUrl = '/api';
   private readonly ttl = 31536000; // 1 year in seconds
 
+  private getAuthHeaders(): Record<string, string> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    // Cognito authorizer requires ID token, not access token
+    const token = AuthStorage.getIdToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  }
+
   private async save(pk: string, sk: string, type: 'private' | 'shared', data: Record<string, unknown>): Promise<void> {
     const response = await fetch(`${this.baseUrl}/save`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.getAuthHeaders(),
       body: JSON.stringify({ pk, sk, type, ttl: this.ttl, data }),
     });
 
@@ -27,7 +38,9 @@ export class SimpleStoreAdapter {
 
   private async get(pk: string, sk: string, type: 'private' | 'shared'): Promise<Record<string, unknown> | null> {
     const params = new URLSearchParams({ pk, sk, type });
-    const response = await fetch(`${this.baseUrl}/get?${params}`);
+    const response = await fetch(`${this.baseUrl}/get?${params}`, {
+      headers: this.getAuthHeaders(),
+    });
 
     if (!response.ok) {
       if (response.status === 404) return null;
