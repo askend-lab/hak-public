@@ -71,24 +71,6 @@ export class SimpleStoreAdapter {
     }
   }
 
-  async loadDeletedTaskIds(userId: string): Promise<string[]> {
-    try {
-      const data = await this.get('tasks', `deleted-${userId}`, 'private');
-      return data ? (data.taskIds as string[]) : [];
-    } catch (error) {
-      console.error('Failed to load deleted task IDs:', error);
-      return [];
-    }
-  }
-
-  async saveDeletedTaskIds(userId: string, taskIds: string[]): Promise<void> {
-    try {
-      await this.save('tasks', `deleted-${userId}`, 'private', { taskIds });
-    } catch (error) {
-      console.error('Failed to save deleted task IDs:', error);
-    }
-  }
-
   async loadBaselineTaskAdditions(userId: string): Promise<Record<string, TaskEntry[]>> {
     try {
       const data = await this.get('tasks', `baseline-${userId}`, 'private');

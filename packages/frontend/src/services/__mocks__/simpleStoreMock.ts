@@ -3,13 +3,11 @@ import { Task, TaskEntry } from '@/types/task';
 
 // In-memory storage to simulate SimpleStore
 let userTasks: Record<string, Task[]> = {};
-let deletedTaskIds: Record<string, string[]> = {};
 let baselineAdditions: Record<string, Record<string, TaskEntry[]>> = {};
 let sharedTasks: Task[] = [];
 
 export function resetSimpleStoreMock(): void {
   userTasks = {};
-  deletedTaskIds = {};
   baselineAdditions = {};
   sharedTasks = [];
 }
@@ -25,11 +23,8 @@ export function setupSimpleStoreMock(): void {
       const body = JSON.parse(options.body as string);
       const { pk, sk, data } = body;
       
-      if (pk === 'tasks' && !sk.startsWith('deleted-') && !sk.startsWith('baseline-')) {
+      if (pk === 'tasks' && !sk.startsWith('baseline-')) {
         userTasks[sk] = data.tasks || [];
-      } else if (pk === 'tasks' && sk.startsWith('deleted-')) {
-        const userId = sk.replace('deleted-', '');
-        deletedTaskIds[userId] = data.taskIds || [];
       } else if (pk === 'tasks' && sk.startsWith('baseline-')) {
         const userId = sk.replace('baseline-', '');
         baselineAdditions[userId] = data.additions || {};
@@ -44,19 +39,12 @@ export function setupSimpleStoreMock(): void {
       const pk = urlObj.searchParams.get('pk');
       const sk = urlObj.searchParams.get('sk');
       
-      if (pk === 'tasks' && sk && !sk.startsWith('deleted-') && !sk.startsWith('baseline-')) {
+      if (pk === 'tasks' && sk && !sk.startsWith('baseline-')) {
         const tasks = userTasks[sk] || [];
         if (tasks.length === 0) {
           return { ok: false, status: 404 };
         }
         return { ok: true, json: async (): Promise<{ success: boolean; item: { data: { tasks: Task[] } } }> => ({ success: true, item: { data: { tasks } } }) };
-      } else if (pk === 'tasks' && sk?.startsWith('deleted-')) {
-        const userId = sk.replace('deleted-', '');
-        const taskIds = deletedTaskIds[userId] || [];
-        if (taskIds.length === 0) {
-          return { ok: false, status: 404 };
-        }
-        return { ok: true, json: async (): Promise<{ success: boolean; item: { data: { taskIds: string[] } } }> => ({ success: true, item: { data: { taskIds } } }) };
       } else if (pk === 'tasks' && sk?.startsWith('baseline-')) {
         const userId = sk.replace('baseline-', '');
         const additions = baselineAdditions[userId] || {};
@@ -80,10 +68,6 @@ export function setupSimpleStoreMock(): void {
 
 export function getStoredUserTasks(userId: string): Task[] {
   return userTasks[userId] || [];
-}
-
-export function getStoredDeletedTaskIds(userId: string): string[] {
-  return deletedTaskIds[userId] || [];
 }
 
 export function getStoredBaselineAdditions(userId: string): Record<string, TaskEntry[]> {

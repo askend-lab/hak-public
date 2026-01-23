@@ -11,10 +11,9 @@ export class TaskRepository {
   ) {}
 
   async getUserTasks(userId: string): Promise<TaskSummary[]> {
-    const [baselineTasks, userTasks, deletedTaskIds, baselineAdditions] = await Promise.all([
+    const [baselineTasks, userTasks, baselineAdditions] = await Promise.all([
       this.mockLoader.loadBaselineTasks(),
       this.storage.loadUserTasks(userId),
-      this.storage.loadDeletedTaskIds(userId),
       this.storage.loadBaselineTaskAdditions(userId)
     ]);
 
@@ -29,9 +28,8 @@ export class TaskRepository {
       }));
 
     const allTasks = [...userBaselineTasks, ...userTasks];
-    const activeTasks = allTasks.filter(task => !deletedTaskIds.includes(task.id));
 
-    return activeTasks.map(task => ({
+    return allTasks.map(task => ({
       id: task.id,
       name: task.name,
       description: task.description ?? null,
@@ -169,12 +167,6 @@ export class TaskRepository {
       userTasks.push(taskCopy);
       await this.storage.saveUserTasks(userId, userTasks);
 
-      const deletedTaskIds = await this.storage.loadDeletedTaskIds(userId);
-      if (!deletedTaskIds.includes(taskId)) {
-        deletedTaskIds.push(taskId);
-        await this.storage.saveDeletedTaskIds(userId, deletedTaskIds);
-      }
-
       if (baselineAdditions[taskId]) {
         delete baselineAdditions[taskId];
         await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
@@ -202,12 +194,8 @@ export class TaskRepository {
     );
     
     if (isBaselineTask) {
-      const deletedTaskIds = await this.storage.loadDeletedTaskIds(userId);
-      if (!deletedTaskIds.includes(taskId)) {
-        deletedTaskIds.push(taskId);
-        await this.storage.saveDeletedTaskIds(userId, deletedTaskIds);
-      }
-      return true;
+      // Baseline tasks cannot be deleted - they are read-only
+      throw new Error('Cannot delete baseline task');
     }
     
     throw new Error('Task not found');

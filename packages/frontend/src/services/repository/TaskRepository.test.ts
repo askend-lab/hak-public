@@ -10,8 +10,6 @@ describe('TaskRepository', () => {
   let storage: {
     loadUserTasks: ReturnType<typeof vi.fn>;
     saveUserTasks: ReturnType<typeof vi.fn>;
-    loadDeletedTaskIds: ReturnType<typeof vi.fn>;
-    saveDeletedTaskIds: ReturnType<typeof vi.fn>;
     loadBaselineTaskAdditions: ReturnType<typeof vi.fn>;
     saveBaselineTaskAdditions: ReturnType<typeof vi.fn>;
     loadSharedTasks: ReturnType<typeof vi.fn>;
@@ -42,8 +40,6 @@ describe('TaskRepository', () => {
     storage = {
       loadUserTasks: vi.fn().mockResolvedValue([]),
       saveUserTasks: vi.fn().mockResolvedValue(undefined),
-      loadDeletedTaskIds: vi.fn().mockResolvedValue([]),
-      saveDeletedTaskIds: vi.fn().mockResolvedValue(undefined),
       loadBaselineTaskAdditions: vi.fn().mockResolvedValue({}),
       saveBaselineTaskAdditions: vi.fn().mockResolvedValue(undefined),
       loadSharedTasks: vi.fn().mockResolvedValue([]),
@@ -80,18 +76,6 @@ describe('TaskRepository', () => {
       const updated = await repository.updateTask(testUserId, 'baseline-2', { name: 'Updated' });
 
       expect(updated?.entries).toHaveLength(2);
-    });
-
-    it('marks original baseline task as deleted after copy', async () => {
-      const baselineTask = createBaselineTask('baseline-3', testUserId);
-      vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
-
-      await repository.updateTask(testUserId, 'baseline-3', { name: 'Copy' });
-
-      expect(storage.saveDeletedTaskIds).toHaveBeenCalledWith(
-        testUserId,
-        expect.arrayContaining(['baseline-3'])
-      );
     });
 
     it('clears baseline additions after copying', async () => {
@@ -155,28 +139,12 @@ describe('TaskRepository', () => {
   });
 
   describe('deleteTask with baseline task', () => {
-    it('soft-deletes baseline task by adding to deleted list', async () => {
+    it('throws error when trying to delete baseline task', async () => {
       const baselineTask = createBaselineTask('baseline-del-1', testUserId);
       vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
 
-      const result = await repository.deleteTask(testUserId, 'baseline-del-1');
-
-      expect(result).toBe(true);
-      expect(storage.saveDeletedTaskIds).toHaveBeenCalledWith(
-        testUserId,
-        expect.arrayContaining(['baseline-del-1'])
-      );
-    });
-
-    it('does not duplicate in deleted list', async () => {
-      const baselineTask = createBaselineTask('baseline-del-2', testUserId);
-      vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
-      storage.loadDeletedTaskIds.mockResolvedValue(['baseline-del-2']);
-
-      const result = await repository.deleteTask(testUserId, 'baseline-del-2');
-
-      expect(result).toBe(true);
-      expect(storage.saveDeletedTaskIds).not.toHaveBeenCalled();
+      await expect(repository.deleteTask(testUserId, 'baseline-del-1'))
+        .rejects.toThrow('Cannot delete baseline task');
     });
   });
 
