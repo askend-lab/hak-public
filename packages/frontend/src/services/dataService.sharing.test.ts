@@ -1,6 +1,6 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DataService } from './dataService';
+import { setupSimpleStoreMock, resetSimpleStoreMock, getStoredSharedTasks } from './__mocks__/simpleStoreMock';
 
 describe('DataService Sharing', () => {
   let dataService: DataService;
@@ -8,7 +8,9 @@ describe('DataService Sharing', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    resetSimpleStoreMock();
+    setupSimpleStoreMock();
+    (DataService as unknown as { instance: null }).instance = null;
     dataService = DataService.getInstance();
   });
 
@@ -21,12 +23,9 @@ describe('DataService Sharing', () => {
 
       await dataService.shareUserTask(mockUserId, task.id);
 
-      const stored = localStorage.getItem('eki_shared_tasks');
-      expect(stored).toBeTruthy();
-      if (stored) {
-        const sharedTasks = JSON.parse(stored);
-        expect(sharedTasks.some((t: { id: string }) => t.id === task.id)).toBe(true);
-      }
+      const sharedTasks = getStoredSharedTasks();
+      expect(sharedTasks.length).toBeGreaterThan(0);
+      expect(sharedTasks.some((t: { id: string }) => t.id === task.id)).toBe(true);
     });
 
     it('throws when task not found', async () => {
@@ -46,12 +45,9 @@ describe('DataService Sharing', () => {
       await dataService.updateTask(mockUserId, task.id, { name: 'Task v2' });
       await dataService.shareUserTask(mockUserId, task.id);
 
-      const stored = localStorage.getItem('eki_shared_tasks');
-      if (stored) {
-        const sharedTasks = JSON.parse(stored);
-        const sharedTask = sharedTasks.find((t: { id: string }) => t.id === task.id);
-        expect(sharedTask.name).toBe('Task v2');
-      }
+      const sharedTasks = getStoredSharedTasks();
+      const sharedTask = sharedTasks.find((t: { id: string }) => t.id === task.id);
+      expect(sharedTask?.name).toBe('Task v2');
     });
   });
 
@@ -76,11 +72,14 @@ describe('DataService Sharing', () => {
   });
 
   describe('getTaskByShareToken', () => {
-    it('returns task by share token', async () => {
+    it('returns task by share token after sharing', async () => {
       const task = await dataService.createTask(mockUserId, {
         name: 'Token Task',
         description: 'Test'
       });
+
+      // Share the task first so it can be found by token
+      await dataService.shareUserTask(mockUserId, task.id);
 
       const result = await dataService.getTaskByShareToken(task.shareToken);
       expect(result).toBeDefined();

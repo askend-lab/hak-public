@@ -1,13 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TaskRepository } from './TaskRepository';
-import { LocalStorageAdapter } from '../storage/LocalStorageAdapter';
+import { SimpleStoreAdapter } from '../storage/SimpleStoreAdapter';
 import { MockDataLoader } from '../storage/MockDataLoader';
 import { ShareService } from '../storage/ShareService';
-import { Task } from '@/types/task';
+import { Task, TaskEntry } from '@/types/task';
 
 describe('TaskRepository', () => {
   let repository: TaskRepository;
-  let storage: LocalStorageAdapter;
+  let storage: {
+    loadUserTasks: ReturnType<typeof vi.fn>;
+    saveUserTasks: ReturnType<typeof vi.fn>;
+    loadDeletedTaskIds: ReturnType<typeof vi.fn>;
+    saveDeletedTaskIds: ReturnType<typeof vi.fn>;
+    loadBaselineTaskAdditions: ReturnType<typeof vi.fn>;
+    saveBaselineTaskAdditions: ReturnType<typeof vi.fn>;
+    loadSharedTasks: ReturnType<typeof vi.fn>;
+    saveSharedTasks: ReturnType<typeof vi.fn>;
+    findAllUserTaskKeys: ReturnType<typeof vi.fn>;
+    loadTasksByKey: ReturnType<typeof vi.fn>;
+  };
   let mockLoader: MockDataLoader;
   let shareService: ShareService;
   const testUserId = '38001085718';
@@ -28,11 +39,21 @@ describe('TaskRepository', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
-    storage = new LocalStorageAdapter();
+    storage = {
+      loadUserTasks: vi.fn().mockResolvedValue([]),
+      saveUserTasks: vi.fn().mockResolvedValue(undefined),
+      loadDeletedTaskIds: vi.fn().mockResolvedValue([]),
+      saveDeletedTaskIds: vi.fn().mockResolvedValue(undefined),
+      loadBaselineTaskAdditions: vi.fn().mockResolvedValue({}),
+      saveBaselineTaskAdditions: vi.fn().mockResolvedValue(undefined),
+      loadSharedTasks: vi.fn().mockResolvedValue([]),
+      saveSharedTasks: vi.fn().mockResolvedValue(undefined),
+      findAllUserTaskKeys: vi.fn().mockResolvedValue([]),
+      loadTasksByKey: vi.fn().mockResolvedValue([]),
+    };
     mockLoader = new MockDataLoader();
-    shareService = new ShareService(storage, mockLoader);
-    repository = new TaskRepository(storage, mockLoader, shareService);
+    shareService = new ShareService(storage as unknown as SimpleStoreAdapter, mockLoader);
+    repository = new TaskRepository(storage as unknown as SimpleStoreAdapter, mockLoader, shareService);
   });
 
   describe('updateTask with baseline task', () => {
@@ -51,9 +72,10 @@ describe('TaskRepository', () => {
       const baselineTask = createBaselineTask('baseline-2', testUserId);
       vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
       
-      storage.saveBaselineTaskAdditions(testUserId, {
+      const additions: Record<string, TaskEntry[]> = {
         'baseline-2': [{ id: 'added-1', taskId: 'baseline-2', text: 'Added', stressedText: 'Added', audioUrl: null, audioBlob: null, order: 2, createdAt: new Date() }]
-      });
+      };
+      storage.loadBaselineTaskAdditions.mockResolvedValue(additions);
 
       const updated = await repository.updateTask(testUserId, 'baseline-2', { name: 'Updated' });
 
@@ -66,22 +88,27 @@ describe('TaskRepository', () => {
 
       await repository.updateTask(testUserId, 'baseline-3', { name: 'Copy' });
 
-      const deletedIds = storage.loadDeletedTaskIds(testUserId);
-      expect(deletedIds).toContain('baseline-3');
+      expect(storage.saveDeletedTaskIds).toHaveBeenCalledWith(
+        testUserId,
+        expect.arrayContaining(['baseline-3'])
+      );
     });
 
     it('clears baseline additions after copying', async () => {
       const baselineTask = createBaselineTask('baseline-4', testUserId);
       vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
       
-      storage.saveBaselineTaskAdditions(testUserId, {
+      const additions: Record<string, TaskEntry[]> = {
         'baseline-4': [{ id: 'added-1', taskId: 'baseline-4', text: 'Added', stressedText: 'Added', audioUrl: null, audioBlob: null, order: 2, createdAt: new Date() }]
-      });
+      };
+      storage.loadBaselineTaskAdditions.mockResolvedValue(additions);
 
       await repository.updateTask(testUserId, 'baseline-4', { name: 'Copy' });
 
-      const additions = storage.loadBaselineTaskAdditions(testUserId);
-      expect(additions['baseline-4']).toBeUndefined();
+      expect(storage.saveBaselineTaskAdditions).toHaveBeenCalledWith(
+        testUserId,
+        expect.not.objectContaining({ 'baseline-4': expect.anything() })
+      );
     });
   });
 
@@ -94,23 +121,36 @@ describe('TaskRepository', () => {
 
       expect(entries).toHaveLength(1);
       expect(entries[0]?.text).toBe('New Text');
-
-      const additions = storage.loadBaselineTaskAdditions(testUserId);
-      expect(additions['baseline-5']).toHaveLength(1);
+      expect(storage.saveBaselineTaskAdditions).toHaveBeenCalledWith(
+        testUserId,
+        expect.objectContaining({
+          'baseline-5': expect.arrayContaining([
+            expect.objectContaining({ text: 'New Text' })
+          ])
+        })
+      );
     });
 
     it('appends to existing baseline additions', async () => {
       const baselineTask = createBaselineTask('baseline-6', testUserId);
       vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
       
-      storage.saveBaselineTaskAdditions(testUserId, {
+      const existingAdditions: Record<string, TaskEntry[]> = {
         'baseline-6': [{ id: 'existing-1', taskId: 'baseline-6', text: 'Existing', stressedText: 'Existing', audioUrl: null, audioBlob: null, order: 2, createdAt: new Date() }]
-      });
+      };
+      storage.loadBaselineTaskAdditions.mockResolvedValue(existingAdditions);
 
       await repository.addTextEntriesToTask(testUserId, 'baseline-6', ['Another']);
 
-      const additions = storage.loadBaselineTaskAdditions(testUserId);
-      expect(additions['baseline-6']).toHaveLength(2);
+      expect(storage.saveBaselineTaskAdditions).toHaveBeenCalledWith(
+        testUserId,
+        expect.objectContaining({
+          'baseline-6': expect.arrayContaining([
+            expect.objectContaining({ text: 'Existing' }),
+            expect.objectContaining({ text: 'Another' })
+          ])
+        })
+      );
     });
   });
 
@@ -122,20 +162,21 @@ describe('TaskRepository', () => {
       const result = await repository.deleteTask(testUserId, 'baseline-del-1');
 
       expect(result).toBe(true);
-      const deletedIds = storage.loadDeletedTaskIds(testUserId);
-      expect(deletedIds).toContain('baseline-del-1');
+      expect(storage.saveDeletedTaskIds).toHaveBeenCalledWith(
+        testUserId,
+        expect.arrayContaining(['baseline-del-1'])
+      );
     });
 
     it('does not duplicate in deleted list', async () => {
       const baselineTask = createBaselineTask('baseline-del-2', testUserId);
       vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
-      storage.saveDeletedTaskIds(testUserId, ['baseline-del-2']);
+      storage.loadDeletedTaskIds.mockResolvedValue(['baseline-del-2']);
 
       const result = await repository.deleteTask(testUserId, 'baseline-del-2');
 
       expect(result).toBe(true);
-      const deletedIds = storage.loadDeletedTaskIds(testUserId);
-      expect(deletedIds.filter(id => id === 'baseline-del-2')).toHaveLength(1);
+      expect(storage.saveDeletedTaskIds).not.toHaveBeenCalled();
     });
   });
 
@@ -156,8 +197,8 @@ describe('TaskRepository', () => {
       const baselineTask = createBaselineTask('baseline-8', testUserId);
       vi.spyOn(mockLoader, 'loadBaselineTasks').mockResolvedValue([baselineTask]);
       
-      const addedEntry = { id: 'added-entry-1', taskId: 'baseline-8', text: 'Added', stressedText: 'Added', audioUrl: null, audioBlob: null, order: 2, createdAt: new Date() };
-      storage.saveBaselineTaskAdditions(testUserId, { 'baseline-8': [addedEntry] });
+      const addedEntry: TaskEntry = { id: 'added-entry-1', taskId: 'baseline-8', text: 'Added', stressedText: 'Added', audioUrl: null, audioBlob: null, order: 2, createdAt: new Date() };
+      storage.loadBaselineTaskAdditions.mockResolvedValue({ 'baseline-8': [addedEntry] });
 
       const updated = await repository.updateTaskEntry(testUserId, 'baseline-8', 'added-entry-1', {
         text: 'Modified Added',
@@ -165,9 +206,14 @@ describe('TaskRepository', () => {
       });
 
       expect(updated?.text).toBe('Modified Added');
-
-      const additions = storage.loadBaselineTaskAdditions(testUserId);
-      expect(additions['baseline-8']?.[0]?.text).toBe('Modified Added');
+      expect(storage.saveBaselineTaskAdditions).toHaveBeenCalledWith(
+        testUserId,
+        expect.objectContaining({
+          'baseline-8': expect.arrayContaining([
+            expect.objectContaining({ text: 'Modified Added' })
+          ])
+        })
+      );
     });
   });
 });

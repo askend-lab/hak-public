@@ -1,6 +1,7 @@
  
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import RoleSelectionContent from './RoleSelectionPage';
 
@@ -24,27 +25,27 @@ describe('RoleSelectionContent', () => {
 
   describe('rendering', () => {
     it('renders title', () => {
-      render(<RoleSelectionContent />);
+      render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
       expect(screen.getByText('Teksti kõnesünteesiks vali oma roll')).toBeInTheDocument();
     });
 
     it('renders role cards', () => {
-      render(<RoleSelectionContent />);
+      render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
       expect(document.querySelectorAll('.role-card').length).toBeGreaterThan(0);
     });
 
     it('renders learner role', () => {
-      render(<RoleSelectionContent />);
+      render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
       expect(screen.getByText(/Olen õppija/i)).toBeInTheDocument();
     });
 
     it('renders teacher role', () => {
-      render(<RoleSelectionContent />);
+      render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
       expect(screen.getByText(/Olen õpetaja/i)).toBeInTheDocument();
     });
 
     it('renders specialist role', () => {
-      render(<RoleSelectionContent />);
+      render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
       expect(screen.getByText(/Olen kõnesünteesi spetsialist/i)).toBeInTheDocument();
     });
   });
@@ -52,7 +53,7 @@ describe('RoleSelectionContent', () => {
   describe('interactions', () => {
     it('calls selectRole when button clicked', async () => {
       const user = userEvent.setup();
-      render(<RoleSelectionContent />);
+      render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
 
       const buttons = screen.getAllByRole('button');
       if (buttons[0]) {
@@ -63,7 +64,7 @@ describe('RoleSelectionContent', () => {
 
     it('calls selectRole with learner role', async () => {
       const user = userEvent.setup();
-      render(<RoleSelectionContent />);
+      render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
 
       const buttons = screen.getAllByRole('button');
       if (buttons[0]) {

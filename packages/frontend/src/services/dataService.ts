@@ -1,18 +1,18 @@
 import { Task, TaskSummary, TaskEntry, CreateTaskRequest } from '@/types/task';
-import { LocalStorageAdapter } from './storage/LocalStorageAdapter';
+import { SimpleStoreAdapter } from './storage/SimpleStoreAdapter';
 import { MockDataLoader } from './storage/MockDataLoader';
 import { ShareService } from './storage/ShareService';
 import { TaskRepository } from './repository/TaskRepository';
 
 export class DataService {
   private static instance: DataService;
-  private storage: LocalStorageAdapter;
+  private storage: SimpleStoreAdapter;
   private mockLoader: MockDataLoader;
   private shareService: ShareService;
   private repository: TaskRepository;
   
   private constructor() {
-    this.storage = new LocalStorageAdapter();
+    this.storage = new SimpleStoreAdapter();
     this.mockLoader = new MockDataLoader();
     this.shareService = new ShareService(this.storage, this.mockLoader);
     this.repository = new TaskRepository(this.storage, this.mockLoader, this.shareService);

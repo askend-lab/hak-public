@@ -1,15 +1,18 @@
  
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { OnboardingProvider } from '../../contexts/OnboardingContext';
 import RoleSelectionPage from './RoleSelectionPage';
 
 describe('RoleSelectionPage render', () => {
   const renderWithProvider = () => {
     return render(
-      <OnboardingProvider>
-        <RoleSelectionPage />
-      </OnboardingProvider>
+      <MemoryRouter>
+        <OnboardingProvider>
+          <RoleSelectionPage />
+        </OnboardingProvider>
+      </MemoryRouter>
     );
   };
 

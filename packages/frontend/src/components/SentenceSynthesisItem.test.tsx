@@ -279,7 +279,7 @@ describe('SentenceSynthesisItem', () => {
           rowMenuItems={[{ label: 'Delete', onClick: vi.fn() }]}
         />
       );
-      expect(screen.getByLabelText('More options')).toBeInTheDocument();
+      expect(screen.getByLabelText('Rohkem valikuid')).toBeInTheDocument();
     });
 
     it('calls onMenuOpen when menu button clicked', async () => {
@@ -294,7 +294,7 @@ describe('SentenceSynthesisItem', () => {
         />
       );
       
-      await user.click(screen.getByLabelText('More options'));
+      await user.click(screen.getByLabelText('Rohkem valikuid'));
       expect(onMenuOpen).toHaveBeenCalledWith('test-sentence');
     });
   });

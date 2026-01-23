@@ -1,6 +1,6 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DataService } from './dataService';
+import { setupSimpleStoreMock, resetSimpleStoreMock } from './__mocks__/simpleStoreMock';
 
 describe('DataService Entry Operations', () => {
   let dataService: DataService;
@@ -8,7 +8,9 @@ describe('DataService Entry Operations', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    resetSimpleStoreMock();
+    setupSimpleStoreMock();
+    (DataService as unknown as { instance: null }).instance = null;
     dataService = DataService.getInstance();
   });
 
