@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Task, TaskEntry } from '@/types/task';
 import { DataService } from '@/services/dataService';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/services/auth';
 import { useNotification } from '@/contexts/NotificationContext';
 import SentenceSynthesisItem from './SentenceSynthesisItem';
 import ShareTaskModal from './ShareTaskModal';
