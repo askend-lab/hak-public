@@ -1,6 +1,6 @@
  
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Footer from './components/Footer';
 import AppHeader from './components/AppHeader';
 import SynthesisView from './components/SynthesisView';
@@ -12,14 +12,14 @@ import { RoleSelectionContent } from './components/onboarding';
 import { useAuth } from './services/auth';
 import { useNotification } from './contexts/NotificationContext';
 import { useOnboarding } from './contexts/OnboardingContext';
-import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSentenceMenu } from './hooks';
+import { useSynthesis, useTaskHandlers, useDragAndDrop, useVariantsPanel, useSentenceMenu, useCurrentView } from './hooks';
 
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
   const { state: onboardingState, isWizardActive, isLoading: isOnboardingLoading } = useOnboarding();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { currentView, selectedTaskId } = useCurrentView();
 
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
 
@@ -29,16 +29,6 @@ export default function Home() {
   const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences, showNotification);
   const menu = useSentenceMenu();
   const hasCheckedInitialRedirect = useRef(false);
-
-  // Determine current view and task ID from location
-  const pathname = location.pathname;
-  const currentView = pathname.startsWith('/tasks') ? 'tasks' 
-    : pathname.startsWith('/specs') ? 'specs'
-    : pathname.startsWith('/dashboard') ? 'dashboard'
-    : pathname.startsWith('/role-selection') ? 'role-selection'
-    : 'synthesis';
-  const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
-  const selectedTaskId: string | null = taskIdMatch?.[1] || null;
 
   // Handle post-login redirect
   useEffect(() => {
