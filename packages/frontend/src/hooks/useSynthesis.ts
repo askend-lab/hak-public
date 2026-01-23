@@ -6,6 +6,7 @@ import { getVoiceModel } from '@/types/synthesis';
 import { useSynthesisOrchestrator } from './synthesis/useSynthesisOrchestrator';
 import { useTagEditor } from './synthesis/useTagEditor';
 import { usePlaylistControl } from './synthesis/usePlaylistControl';
+import { useTagUpdater } from './synthesis/useTagUpdater';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useSynthesis() {
@@ -32,6 +33,7 @@ export function useSynthesis() {
 
   const tagEditor = useTagEditor(getSentence, updateSentence);
   const { handleInputBlur } = tagEditor;
+  const tagUpdater = useTagUpdater(setSentences);
 
   const playlist = usePlaylistControl(
     sentences,
@@ -110,14 +112,9 @@ export function useSynthesis() {
   }, [getSentence, updateSentence]);
 
   const handleDeleteTag = useCallback((sentenceId: string, tagIndex: number) => {
-    setSentences(prev => prev.map(s => {
-      if (s.id !== sentenceId) return s;
-      const newTags = s.tags.filter((_, i) => i !== tagIndex);
-      const newStressedTags = s.stressedTags?.filter((_, i) => i !== tagIndex);
-      return { ...s, tags: newTags, text: newTags.join(' '), stressedTags: newStressedTags, phoneticText: undefined, audioUrl: undefined };
-    }));
+    tagUpdater.deleteTag(sentenceId, tagIndex);
     setOpenTagMenu(null);
-  }, [setSentences]);
+  }, [tagUpdater]);
 
   const handleEditTag = useCallback((sentenceId: string, tagIndex: number) => {
     const sentence = getSentence(sentenceId);
@@ -137,24 +134,14 @@ export function useSynthesis() {
     const { sentenceId, tagIndex, value } = editingTag;
     const trimmedValue = value.trim();
 
-    const newSentences = sentencesRef.current.map(s => {
-      if (s.id !== sentenceId) return s;
-      if (trimmedValue === '') {
-        const newTags = s.tags.filter((_, i) => i !== tagIndex);
-        const newStressedTags = s.stressedTags?.filter((_, i) => i !== tagIndex);
-        return { ...s, tags: newTags, text: newTags.join(' '), stressedTags: newStressedTags, phoneticText: undefined, audioUrl: undefined };
-      } else {
-        const newWords = trimmedValue.split(/\s+/).filter(w => w.length > 0);
-        const newTags = [...s.tags.slice(0, tagIndex), ...newWords, ...s.tags.slice(tagIndex + 1)];
-        const newStressedTags = s.stressedTags ? [...s.stressedTags.slice(0, tagIndex), ...newWords.map(() => undefined as unknown as string), ...s.stressedTags.slice(tagIndex + 1)].filter(t => t !== undefined) : undefined;
-        return { ...s, tags: newTags, text: newTags.join(' '), stressedTags: newStressedTags, phoneticText: undefined, audioUrl: undefined };
-      }
-    });
-    
-    sentencesRef.current = newSentences;
-    setSentences(newSentences);
+    if (trimmedValue === '') {
+      tagUpdater.deleteTag(sentenceId, tagIndex);
+    } else {
+      const newWords = trimmedValue.split(/\s+/).filter(w => w.length > 0);
+      tagUpdater.replaceTag(sentenceId, tagIndex, newWords);
+    }
     setEditingTag(null);
-  }, [editingTag, setSentences]);
+  }, [editingTag, tagUpdater]);
 
   const handleEditTagKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -193,16 +180,9 @@ export function useSynthesis() {
 
   const handleUseVariant = useCallback((variantText: string, selectedSentenceId: string | null, selectedTagIndex: number | null) => {
     if (selectedSentenceId !== null && selectedTagIndex !== null) {
-      setSentences(prev => prev.map(s => {
-        if (s.id === selectedSentenceId) {
-          const newStressedTags = s.stressedTags ? [...s.stressedTags] : [...s.tags];
-          newStressedTags[selectedTagIndex] = variantText;
-          return { ...s, stressedTags: newStressedTags, phoneticText: newStressedTags.join(' '), audioUrl: undefined };
-        }
-        return s;
-      }));
+      tagUpdater.updateStressedTag(selectedSentenceId, selectedTagIndex, variantText);
     }
-  }, [setSentences]);
+  }, [tagUpdater]);
 
   const handleSentencePhoneticApply = useCallback((sentenceId: string, newPhoneticText: string) => {
     setSentences(prev => prev.map(s => {
