@@ -202,5 +202,24 @@ describe('DataService CRUD Operations', () => {
       
       expect(taskNames).toContain('Persistent Task');
     });
+
+    it('created task appears in getUserTasks after navigation', async () => {
+      // RED TEST: Bug - task saved but not visible when navigating to /tasks
+      // Scenario: User creates task, task saved to API, then navigates to tasks page
+      
+      // 1. Create task
+      const taskData = { name: 'Navigation Test Task', description: 'Should appear after navigation' };
+      const created = await dataService.createTask(mockUserId, taskData);
+      expect(created.id).toBeDefined();
+      
+      // 2. Simulate navigation - fresh load of tasks (like opening /tasks page)
+      const tasks = await dataService.getUserTasks(mockUserId);
+      
+      // 3. Task should be in the list
+      expect(tasks.length).toBeGreaterThan(0);
+      const foundTask = tasks.find(t => t.id === created.id);
+      expect(foundTask).toBeDefined();
+      expect(foundTask?.name).toBe('Navigation Test Task');
+    });
   });
 });
