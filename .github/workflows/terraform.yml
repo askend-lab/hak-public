@@ -162,6 +162,18 @@ jobs:
             terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
           fi
       
+      - name: Invalidate CloudFront Cache
+        run: |
+          # Get CloudFront distribution ID from terraform output
+          DIST_ID=$(terraform output -raw cloudfront_distribution_id 2>/dev/null || echo "")
+          if [ -n "$DIST_ID" ]; then
+            echo "Invalidating CloudFront cache for distribution: $DIST_ID"
+            aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/api/*" "/*"
+            echo "✅ CloudFront cache invalidated"
+          else
+            echo "⚠️ Could not get CloudFront distribution ID, skipping invalidation"
+          fi
+
       - name: Deployment Summary
         run: |
           echo "✅ Terraform applied for ${{ matrix.environment }}"
