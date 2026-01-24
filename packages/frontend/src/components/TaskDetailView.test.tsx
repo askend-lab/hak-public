@@ -48,7 +48,6 @@ describe('TaskDetailView', () => {
     onEditTask: vi.fn(),
     onDeleteTask: vi.fn(),
     onNavigateToSynthesis: vi.fn(),
-    onAddEntryFromInput: vi.fn(),
   };
 
   beforeEach(() => {
