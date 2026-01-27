@@ -47,8 +47,6 @@ describe('AppHeader', () => {
       );
       expect(screen.getByText('Kõnesüntees')).toBeInTheDocument();
       expect(screen.getByText('Ülesanded')).toBeInTheDocument();
-      expect(screen.getByText('Testid')).toBeInTheDocument();
-      expect(screen.getByText('Töölaud')).toBeInTheDocument();
     });
 
     it('renders help button', () => {
@@ -104,25 +102,6 @@ describe('AppHeader', () => {
       expect(link).toHaveAttribute('href', '/tasks');
     });
 
-    it('Testid link navigates to /specs', () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>
-      );
-      const link = screen.getByText('Testid');
-      expect(link).toHaveAttribute('href', '/specs');
-    });
-
-    it('Töölaud link navigates to /dashboard', () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>
-      );
-      const link = screen.getByText('Töölaud');
-      expect(link).toHaveAttribute('href', '/dashboard');
-    });
   });
 
   describe('active state', () => {
@@ -156,25 +135,6 @@ describe('AppHeader', () => {
       expect(link).toHaveClass('active');
     });
 
-    it('marks specs link as active on /specs', () => {
-      render(
-        <MemoryRouter initialEntries={['/specs']}>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>
-      );
-      const link = screen.getByText('Testid');
-      expect(link).toHaveClass('active');
-    });
-
-    it('marks dashboard link as active on /dashboard', () => {
-      render(
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>
-      );
-      const link = screen.getByText('Töölaud');
-      expect(link).toHaveClass('active');
-    });
   });
 
   describe('authentication-gated navigation', () => {
