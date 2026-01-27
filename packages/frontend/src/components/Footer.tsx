@@ -1,7 +1,20 @@
 import BuildInfo from './BuildInfo';
 
-const FooterLogo = () => <div className="footer-section footer-logo"><img src="/icons/logo.png" alt="EKI Logo" className="footer-logo-image" /><div className="footer-contact"><p>Roosikrantsi 6, 10119 Tallinn Reg-kood: 70004011 Keelenõu 631 3731 Üldkontakt 617 7500 eki@eki.ee</p></div></div>;
-const FooterLinks = () => <div className="footer-section"><h3 className="footer-heading">Hääldusabiline</h3><ul className="footer-links"><li><a href="#">Portaaliest</a></li><li><a href="#">Versiooniajalugu</a></li><li><a href="#">Kasutus- ja privaatsustingimused</a></li></ul></div>;
+const FooterLogo = () => (
+  <div className="footer-section footer-logo">
+    <img src="/icons/logo.png" alt="EKI Logo" className="footer-logo-image" />
+    <div className="footer-contact">
+      <p>
+        Roosikrantsi 6, 10119 Tallinn<br />
+        Registrikood 70004011<br />
+        Keelenõu 631 3731<br />
+        Üldkontakt 617 7500<br />
+        E-post eki@eki.ee
+      </p>
+    </div>
+  </div>
+);
+const FooterLinks = () => <div className="footer-section"><h3 className="footer-heading">Hääldusabiline</h3><ul className="footer-links"><li><a href="#">Portaalist</a></li><li><a href="#">Versiooniajalugu</a></li><li><a href="#">Kasutus- ja privaatsustingimused</a></li></ul></div>;
 const SocialLinks = () => <div className="footer-section"><h3 className="footer-heading">Sotsiaalmeedia</h3><p className="footer-description">Hoia pilk peal.</p><ul className="footer-social"><li><a href="https://www.facebook.com/eestikeeleinstituut" target="_blank" rel="noopener noreferrer"><img src="/icons/facebook.svg" alt="" className="social-icon" /><span>Facebook</span></a></li><li><a href="https://www.youtube.com/@EestiKeeleInstituut" target="_blank" rel="noopener noreferrer"><img src="/icons/youtube.svg" alt="" className="social-icon" /><span>Youtube</span></a></li><li><a href="https://www.linkedin.com/company/eesti-keele-instituut" target="_blank" rel="noopener noreferrer"><img src="/icons/linkedin.svg" alt="" className="social-icon" /><span>LinkedIn</span></a></li></ul></div>;
 const FeedbackSection = () => (
   <div className="footer-section">

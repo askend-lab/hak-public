@@ -15,7 +15,8 @@
 // Footer component-specific styles (used within .page-footer--full wrapper)
 // Logo section
 .footer-logo {
-  gap: $spacing-6;
+  position: relative;
+  padding-top: 44px; // Space for absolute logo
   
   // Desktop: Fixed width
   @include desktop {
@@ -23,10 +24,12 @@
   }
 
   .footer-logo-image {
-    height: 56px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 40px;
     width: auto;
     object-fit: contain;
-    align-self: flex-start;
   }
 
   .footer-contact {
