@@ -18,6 +18,8 @@ describe('useUserId', () => {
       login: vi.fn(),
       refreshSession: vi.fn(),
       handleCodeCallback: vi.fn(),
+      loginWithTara: vi.fn(),
+      handleTaraTokens: vi.fn(),
       isLoading: false,
       error: null,
     });
@@ -36,6 +38,8 @@ describe('useUserId', () => {
       login: vi.fn(),
       refreshSession: vi.fn(),
       handleCodeCallback: vi.fn(),
+      loginWithTara: vi.fn(),
+      handleTaraTokens: vi.fn(),
       isLoading: false,
       error: null,
     });

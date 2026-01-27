@@ -62,6 +62,8 @@ describe('App Routing', () => {
         setShowLoginModal: vi.fn(),
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       render(
@@ -87,6 +89,8 @@ describe('App Routing', () => {
         setShowLoginModal: vi.fn(),
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       render(
@@ -147,6 +151,8 @@ describe('App Routing', () => {
         setShowLoginModal: vi.fn(),
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       render(
@@ -172,6 +178,8 @@ describe('App Routing', () => {
         setShowLoginModal: vi.fn(),
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       render(
@@ -209,6 +217,8 @@ describe('App Routing', () => {
         setShowLoginModal: vi.fn(),
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       render(

@@ -4,7 +4,8 @@ import { vi } from 'vitest';
 export const mockAuthContext = () => ({
   user: null, isAuthenticated: false, isLoading: false, error: null,
   showLoginModal: false, setShowLoginModal: vi.fn(),
-  login: vi.fn(), logout: vi.fn(), refreshSession: vi.fn(), handleCodeCallback: vi.fn(),
+  login: vi.fn(), loginWithTara: vi.fn(), logout: vi.fn(), refreshSession: vi.fn(), 
+  handleCodeCallback: vi.fn(), handleTaraTokens: vi.fn(),
 });
 
 export const mockNotificationContext = () => ({ showNotification: vi.fn() });

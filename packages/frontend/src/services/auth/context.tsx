@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 import { AuthStorage } from './storage';
-import { getLoginUrl, getLogoutUrl, cognitoConfig } from './config';
+import { getLoginUrl, getLogoutUrl, getTaraLoginUrl, cognitoConfig } from './config';
 import type { AuthContextValue, AuthState, User } from './types';
 
 const initialState: AuthState = {
@@ -108,6 +108,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     window.location.href = await getLoginUrl();
   }, []);
 
+  const loginWithTara = useCallback(() => {
+    window.location.href = getTaraLoginUrl();
+  }, []);
+
   const logout = useCallback(async () => {
     AuthStorage.clear();
     setState({ user: null, isAuthenticated: false, isLoading: false, error: null });
@@ -159,12 +163,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
+  const handleTaraTokens = useCallback((tokens: {
+    accessToken: string;
+    idToken: string;
+    refreshToken: string;
+  }): boolean => {
+    const user = parseIdToken(tokens.idToken);
+    if (user) {
+      AuthStorage.setUser(user);
+      AuthStorage.setAccessToken(tokens.accessToken);
+      AuthStorage.setIdToken(tokens.idToken);
+      AuthStorage.setRefreshToken(tokens.refreshToken);
+      setState({ user, isAuthenticated: true, isLoading: false, error: null });
+      return true;
+    }
+    return false;
+  }, []);
+
   const value: AuthContextValue = {
     ...state,
     login,
+    loginWithTara,
     logout,
     refreshSession,
     handleCodeCallback,
+    handleTaraTokens,
     showLoginModal,
     setShowLoginModal,
   };

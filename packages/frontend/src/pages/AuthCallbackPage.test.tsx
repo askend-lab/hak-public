@@ -6,8 +6,12 @@ const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({ useNavigate: () => mockNavigate }));
 
 const mockHandleCodeCallback = vi.fn();
+const mockHandleTaraTokens = vi.fn();
 vi.mock('../services/auth', () => ({
-  useAuth: () => ({ handleCodeCallback: mockHandleCodeCallback }),
+  useAuth: () => ({ 
+    handleCodeCallback: mockHandleCodeCallback,
+    handleTaraTokens: mockHandleTaraTokens,
+  }),
 }));
 
 import { AuthCallbackPage } from './AuthCallbackPage';

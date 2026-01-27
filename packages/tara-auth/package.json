@@ -1,0 +1,37 @@
+{
+  "name": "tara-auth",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && serverless offline --httpPort 4001 --host 0.0.0.0",
+    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
+    "test:full": "jest --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0",
+    "serverless-domain-manager": "^7.0.0",
+    "serverless-esbuild": "^1.52.0",
+    "esbuild": "^0.20.0",
+    "@types/aws-lambda": "^8.10.159",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.0.0",
+    "@aws-sdk/client-secrets-manager": "^3.0.0",
+    "jose": "^5.0.0"
+  }
+}

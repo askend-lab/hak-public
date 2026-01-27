@@ -25,11 +25,19 @@ export interface TokenPayload {
   expiresIn: number;
 }
 
+export interface TaraTokens {
+  accessToken: string;
+  idToken: string;
+  refreshToken: string;
+}
+
 export interface AuthContextValue extends AuthState {
   login: () => Promise<void>;
+  loginWithTara: () => void;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   handleCodeCallback: (code: string) => Promise<boolean>;
+  handleTaraTokens: (tokens: TaraTokens) => boolean;
   showLoginModal: boolean;
   setShowLoginModal: (show: boolean) => void;
 }

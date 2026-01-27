@@ -27,8 +27,15 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const TaraIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <rect width="24" height="24" rx="4" fill="#0066CC"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">EE</text>
+  </svg>
+);
+
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const { login } = useAuth();
+  const { login, loginWithTara } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,6 +48,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       setError(err instanceof Error ? err.message : 'Sisselogimine ebaõnnestus');
       setIsLoading(false);
     }
+  };
+
+  const handleTaraLogin = () => {
+    setError(null);
+    setIsLoading(true);
+    loginWithTara();
   };
 
   const handleClose = () => {
@@ -60,8 +73,23 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         <div className="login-modal__actions">
           <button
             type="button"
+            onClick={handleTaraLogin}
+            className="button button--primary login-modal__tara-button"
+            disabled={isLoading}
+            style={{ marginBottom: '0.75rem' }}
+          >
+            <TaraIcon />
+            {isLoading ? 'Suunan...' : 'Logi sisse TARA-ga'}
+          </button>
+          <div className="login-modal__divider" style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '0.5rem 0' }}>
+            <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--color-border, #e0e0e0)' }} />
+            <span style={{ color: 'var(--color-text-secondary, #666)', fontSize: '0.875rem' }}>või</span>
+            <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--color-border, #e0e0e0)' }} />
+          </div>
+          <button
+            type="button"
             onClick={handleGoogleLogin}
-            className="button button--primary login-modal__google-button login-modal__google-button--flex"
+            className="button button--secondary login-modal__google-button login-modal__google-button--flex"
             disabled={isLoading}
           >
             <GoogleIcon />
