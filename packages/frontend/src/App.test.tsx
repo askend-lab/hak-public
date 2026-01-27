@@ -141,6 +141,8 @@ describe('App (Home)', () => {
         setShowLoginModal: vi.fn(),
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       render(<MemoryRouter><Home /></MemoryRouter>);
@@ -169,6 +171,8 @@ describe('App (Home)', () => {
         setShowLoginModal,
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       const user = userEvent.setup();
@@ -270,6 +274,8 @@ describe('App (Home)', () => {
         setShowLoginModal,
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       const user = userEvent.setup();
@@ -294,6 +300,8 @@ describe('App (Home)', () => {
         setShowLoginModal: vi.fn(),
         refreshSession: vi.fn(),
         handleCodeCallback: vi.fn(),
+        loginWithTara: vi.fn(),
+        handleTaraTokens: vi.fn(),
       });
 
       const { useOnboarding } = await import('./contexts/OnboardingContext');

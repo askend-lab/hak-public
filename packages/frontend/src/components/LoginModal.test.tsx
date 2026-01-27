@@ -7,6 +7,7 @@ import LoginModal from './LoginModal';
 vi.mock('@/services/auth', () => ({
   useAuth: vi.fn(() => ({
     login: vi.fn().mockResolvedValue(undefined),
+    loginWithTara: vi.fn(),
   })),
 }));
 
@@ -15,11 +16,13 @@ import { useAuth } from '@/services/auth';
 describe('LoginModal', () => {
   const mockOnClose = vi.fn();
   const mockLogin = vi.fn();
+  const mockLoginWithTara = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
     (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({
       login: mockLogin.mockResolvedValue(undefined),
+      loginWithTara: mockLoginWithTara,
     });
   });
 
@@ -64,7 +67,8 @@ describe('LoginModal', () => {
 
       await user.click(screen.getByText(/Jätka Google/));
 
-      expect(screen.getByText('Suunan...')).toBeInTheDocument();
+      // Both buttons show loading text when loading
+      expect(screen.getAllByText('Suunan...').length).toBeGreaterThan(0);
     });
 
     it('shows error on login failure', async () => {

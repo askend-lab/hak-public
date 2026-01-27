@@ -78,6 +78,21 @@ export function getLogoutUrl(): string {
   return `https://${cognitoConfig.domain}/logout?${params.toString()}`;
 }
 
+export function getTaraLoginUrl(): string {
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  let apiBase: string;
+  
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    apiBase = 'http://localhost:4001';
+  } else if (hostname === 'hak-dev.askend-lab.com') {
+    apiBase = 'https://hak-api-dev.askend-lab.com';
+  } else {
+    apiBase = 'https://hak-api.askend-lab.com';
+  }
+  
+  return `${apiBase}/auth/tara/start`;
+}
+
 export async function exchangeCodeForTokens(code: string): Promise<{
   accessToken: string;
   idToken: string;

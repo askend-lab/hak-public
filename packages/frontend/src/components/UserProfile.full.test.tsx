@@ -28,7 +28,7 @@ describe('UserProfile Full', () => {
   it('calls logout when logout clicked', async () => {
     const { useAuth } = await import('@/services/auth');
     const logout = vi.fn();
-    vi.mocked(useAuth).mockReturnValue({ logout, user: null, isAuthenticated: false, isLoading: false, login: vi.fn(), showLoginModal: false, setShowLoginModal: vi.fn(), refreshSession: vi.fn(), handleCodeCallback: vi.fn(), error: null });
+    vi.mocked(useAuth).mockReturnValue({ logout, user: null, isAuthenticated: false, isLoading: false, login: vi.fn(), loginWithTara: vi.fn(), showLoginModal: false, setShowLoginModal: vi.fn(), refreshSession: vi.fn(), handleCodeCallback: vi.fn(), handleTaraTokens: vi.fn(), error: null });
     
     render(<UserProfile {...props} />);
     fireEvent.click(screen.getByText('Test User'));

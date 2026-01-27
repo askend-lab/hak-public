@@ -5,7 +5,7 @@ import { useAuth } from '../services/auth';
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
-  const { handleCodeCallback } = useAuth();
+  const { handleCodeCallback, handleTaraTokens } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const processedRef = useRef(false);
 
@@ -15,8 +15,25 @@ export function AuthCallbackPage() {
       processedRef.current = true;
 
       const queryParams = new URLSearchParams(window.location.search);
-      const code = queryParams.get('code');
       
+      // Handle TARA tokens (tokens come directly in URL from TARA Lambda)
+      const accessToken = queryParams.get('access_token');
+      const idToken = queryParams.get('id_token');
+      const refreshToken = queryParams.get('refresh_token');
+      
+      if (accessToken && idToken && refreshToken) {
+        const success = handleTaraTokens({ accessToken, idToken, refreshToken });
+        if (success) {
+          navigate('/', { replace: true });
+          return;
+        } else {
+          setError('TARA autentimise viga. Palun proovi uuesti.');
+          return;
+        }
+      }
+
+      // Handle Cognito code flow (Google/Facebook)
+      const code = queryParams.get('code');
       if (code) {
         const success = await handleCodeCallback(code);
         if (success) {
@@ -40,7 +57,7 @@ export function AuthCallbackPage() {
     }
     
     void processCallback();
-  }, [handleCodeCallback, navigate]);
+  }, [handleCodeCallback, handleTaraTokens, navigate]);
 
   if (error) {
     return (
