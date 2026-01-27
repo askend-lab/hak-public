@@ -32,6 +32,7 @@ test_modules:
     min_coverage_branches: 58
     command: "pnpm test"
     command_full: "pnpm test:coverage"
+    results_file: "jest-results.json"
   - name: cucumber
     path: packages/frontend
     type: cucumber
