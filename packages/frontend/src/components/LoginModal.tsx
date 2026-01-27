@@ -10,7 +10,7 @@ interface LoginModalProps { isOpen: boolean; onClose: () => void; message?: stri
 
 const LoginIntro = () => (
   <div className="login-modal__intro">
-    <img src="/icons/logo.svg" alt="Logo" className="login-modal__intro-logo" />
+    <img src="/icons/logo.png" alt="Logo" className="login-modal__intro-logo" />
     <h2 className="login-modal__intro-title">Logi sisse</h2>
     <p className="login-modal__intro-description">Sisene oma Google kontoga, et luua ja hallata ülesandeid</p>
   </div>

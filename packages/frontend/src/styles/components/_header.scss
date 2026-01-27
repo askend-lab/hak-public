@@ -21,7 +21,7 @@
 
   img {
     height: auto;
-    max-height: 40px;
+    max-height: 48px;
   }
 }
 
@@ -124,17 +124,6 @@
 
   &:hover {
     background-color: $color-menu-hover;
-  }
-}
-
-// Menu button (9 dots icon) - uses shared mixin with custom icon size
-.header-menu-button {
-  @include menu-button;
-  
-  // Override for img instead of svg
-  img {
-    width: 24px;
-    height: 24px;
   }
 }
 
