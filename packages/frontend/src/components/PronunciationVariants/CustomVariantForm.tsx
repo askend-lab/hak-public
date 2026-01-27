@@ -45,7 +45,7 @@ export function CustomVariantForm({
       <div className="pronunciation-variants__form">
         <h4 className="pronunciation-variants__form-title">Loo oma variant</h4>
         <p className="pronunciation-variants__form-description">
-          Sisesta oma foneetilise tekst või sõna variant, et kasutada ja kuulata selle hääldust. Juhendid saab lugeda{' '}
+          Sisesta oma tekst hääldusmärkidega ja kuula tulemust. Juhendid saab lugeda{' '}
           <button className="pronunciation-variants__guide-link" onClick={onShowGuide}>
             siit
           </button>
@@ -58,7 +58,7 @@ export function CustomVariantForm({
               type="text"
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="Kirjuta oma foneetiline variant"
+              placeholder="Kirjuta oma hääldusmärkidega variant"
               className="pronunciation-variants__input"
             />
             {value && (
@@ -91,7 +91,7 @@ export function CustomVariantForm({
               disabled={!value.trim()}
               className="button button--secondary"
             >
-              Kasuta
+              Helinda
             </button>
           </div>
         </div>

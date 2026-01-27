@@ -9,7 +9,7 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
   learner: {
     id: 'learner',
     titleEt: 'Õppija',
-    descriptionEt: 'Kuula sõnade ja lausete korrektset hääldust. Uuri sõnade hääldusvariandid.',
+    descriptionEt: 'Sisesta lause ja kuula, kuidas see kõlab. Uuri sõnade hääldusvariante.',
     ctaText: 'Hakkan õppima',
     mascotVariant: 'wave',
     steps: [
@@ -53,7 +53,7 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
   teacher: {
     id: 'teacher',
     titleEt: 'Õpetaja',
-    descriptionEt: 'Loo ja jaga õppijatega ülesanded korrektse eesti keelse häälduse harjutamiseks.',
+    descriptionEt: 'Loo ja jaga õppijatega ülesandeid eesti keele häälduse harjutamiseks.',
     ctaText: 'Hakkan looma',
     mascotVariant: 'point',
     steps: [
@@ -96,8 +96,8 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
   },
   specialist: {
     id: 'specialist',
-    titleEt: 'Kõnesünteesi spetsialist',
-    descriptionEt: 'Tööta sõnade ja lausete kõnesünteesiga. Uuri ja loo oma hääldusvariandid.',
+    titleEt: 'Uurija',
+    descriptionEt: 'Helinda sõnu ja lauseid kõnesünteesiga. Uuri ja loo oma hääldusvariante.',
     ctaText: 'Hakkan uurima',
     mascotVariant: 'think',
     steps: [

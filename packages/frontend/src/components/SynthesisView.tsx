@@ -73,9 +73,9 @@ interface TagMenuItem {
 }
 
 const getTagMenuItems = (p: SynthesisViewProps): TagMenuItem[] => [
-  { label: 'Uuri variandid', onClick: (sid, tidx, w) => p.onOpenVariantsFromMenu(sid, tidx, w) },
-  { label: 'Muuda', onClick: (sid, tidx) => p.onEditTag(sid, tidx) },
-  { label: 'Kustuta', onClick: (sid, tidx) => p.onDeleteTag(sid, tidx), danger: true },
+  { label: 'Vali sõna häälduskuju', onClick: (sid, tidx, w) => p.onOpenVariantsFromMenu(sid, tidx, w) },
+  { label: 'Muuda sõna kirjakuju', onClick: (sid, tidx) => p.onEditTag(sid, tidx) },
+  { label: 'Kustuta sõna', onClick: (sid, tidx) => p.onDeleteTag(sid, tidx), danger: true },
 ];
 
 interface SentenceItemProps {

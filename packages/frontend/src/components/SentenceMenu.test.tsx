@@ -64,7 +64,7 @@ describe('SentenceMenu actions', () => {
   it('calls onExplorePhonetic', async () => {
     const fn = vi.fn();
     render(<SentenceMenu {...defaultProps} onExplorePhonetic={fn} />);
-    await userEvent.click(screen.getByText('Uuri foneetilist kuju'));
+    await userEvent.click(screen.getByText('Uuri häälduskuju'));
     expect(fn).toHaveBeenCalledWith('s1');
   });
 

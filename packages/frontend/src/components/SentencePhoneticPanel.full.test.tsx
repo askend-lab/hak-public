@@ -46,7 +46,7 @@ describe('SentencePhoneticPanel', () => {
 
     it('renders panel when open', () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText('Muuda foneetilist kuju')).toBeInTheDocument();
+      expect(screen.getByText('Muuda häälduskuju')).toBeInTheDocument();
     });
 
     it('renders close button', () => {
@@ -70,7 +70,7 @@ describe('SentencePhoneticPanel', () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
       expect(screen.getByTitle('kolmas välde')).toBeInTheDocument();
       expect(screen.getByTitle('ebareeglipärase rõhu märk')).toBeInTheDocument();
-      expect(screen.getByTitle('palatalisatsioon')).toBeInTheDocument();
+      expect(screen.getByTitle('peenendus')).toBeInTheDocument();
       expect(screen.getByTitle('liitsõnapiir')).toBeInTheDocument();
     });
 
@@ -176,7 +176,7 @@ describe('SentencePhoneticPanel', () => {
       await user.click(screen.getByText('siit'));
       expect(screen.getByText('kolmas välde')).toBeInTheDocument();
       expect(screen.getByText('ebareeglipärase rõhu märk')).toBeInTheDocument();
-      expect(screen.getByText('palatalisatsioon')).toBeInTheDocument();
+      expect(screen.getByText('peenendus (palatalisatsioon)')).toBeInTheDocument();
       expect(screen.getByText('liitsõnapiir')).toBeInTheDocument();
     });
 

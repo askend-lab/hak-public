@@ -8,7 +8,7 @@ export const parsePhoneticMarkers = (text: string): MarkerTag[] => {
 
   if (text.includes('<')) markers.push({ tag: 'kolmas välde', type: 'phonetic' });
   if (text.includes('?')) markers.push({ tag: 'ebareeglipärane rõhk', type: 'phonetic' });
-  if (text.includes(']')) markers.push({ tag: 'palatalisatsioon', type: 'phonetic' });
+  if (text.includes(']')) markers.push({ tag: 'peenendus', type: 'phonetic' });
   if (text.includes('_')) markers.push({ tag: 'liitsõna piir', type: 'boundary' });
 
   if (markers.length === 0) {
