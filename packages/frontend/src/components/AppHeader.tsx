@@ -26,8 +26,6 @@ export default function AppHeader({ isAuthenticated, user, onTasksClick, onHelpC
         <nav className="header-nav">
           <NavLink to="/synthesis" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`}>Kõnesüntees</NavLink>
           <NavLink to="/tasks" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`} data-nav="tasks" onClick={handleTasksClick}>Ülesanded</NavLink>
-          <NavLink to="/specs" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`}>Testid</NavLink>
-          <NavLink to="/dashboard" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`} data-nav="dashboard">Töölaud</NavLink>
         </nav>
         <div className="header-functions">
           <button className="header-help-button" onClick={onHelpClick} aria-label="Abi ja juhend" title="Näita juhendeid">
