@@ -119,7 +119,15 @@ describe('Lambda Handler', () => {
     it('should return 200 with valid params', async () => {
       const event = createGetEvent('/get', { pk: 'test', sk: 'sort', type: 'public' });
       const result = await handler(event);
-      expect([200, 404]).toContain(result.statusCode);
+      expect(result.statusCode).toBe(200);
+    });
+
+    it('should return 200 with null item when item not found', async () => {
+      const event = createGetEvent('/get', { pk: 'nonexistent', sk: 'nothere', type: 'private' });
+      const result = await handler(event);
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body);
+      expect(body.item).toBeNull();
     });
   });
 

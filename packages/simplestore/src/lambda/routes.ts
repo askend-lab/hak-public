@@ -83,9 +83,20 @@ export async function handleGet(event: APIGatewayProxyEvent, store: Store): Prom
   }
 
   const result = await store.get(pk as string, sk as string, type as DataType);
-  return result.success 
-    ? createResponse(HTTP_STATUS.OK, { item: result.item }) 
-    : createErrorResponse(result.error, HTTP_STATUS.NOT_FOUND);
+  
+  // Always return 200 - null item means not found
+  // This prevents CloudFront from transforming 404 to SPA fallback HTML
+  if (result.success) {
+    return createResponse(HTTP_STATUS.OK, { item: result.item });
+  }
+  
+  // Not found is a valid result - return 200 with null item
+  if (result.error === ERRORS.NOT_FOUND) {
+    return createResponse(HTTP_STATUS.OK, { item: null });
+  }
+  
+  // Other errors (access denied, etc.) still return appropriate status
+  return createErrorResponse(result.error, HTTP_STATUS.FORBIDDEN);
 }
 
 export async function handleDelete(event: APIGatewayProxyEvent, store: Store): Promise<APIGatewayProxyResult> {
