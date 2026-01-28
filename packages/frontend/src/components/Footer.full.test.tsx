@@ -1,28 +1,9 @@
  
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import Footer from './Footer';
 
-vi.mock('./FeedbackModal', () => ({
-  default: ({ isOpen, onClose, onSubmit }: { 
-    isOpen: boolean; 
-    onClose: () => void; 
-    onSubmit: (message: string, email: string) => Promise<void>;
-  }) => isOpen ? (
-    <div data-testid="feedback-modal">
-      <button onClick={onClose}>Close</button>
-      <button onClick={() => onSubmit('Test message', 'test@email.com')}>Submit</button>
-    </div>
-  ) : null
-}));
-
 describe('Footer', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    global.fetch = vi.fn();
-  });
-
   describe('rendering', () => {
     it('renders logo', () => {
       render(<Footer />);
@@ -41,7 +22,7 @@ describe('Footer', () => {
 
     it('renders footer links', () => {
       render(<Footer />);
-      expect(screen.getByText('Portaaliest')).toBeInTheDocument();
+      expect(screen.getByText('Portaalist')).toBeInTheDocument();
       expect(screen.getByText('Versiooniajalugu')).toBeInTheDocument();
       expect(screen.getByText('Kasutus- ja privaatsustingimused')).toBeInTheDocument();
     });
@@ -76,77 +57,21 @@ describe('Footer', () => {
       render(<Footer />);
       expect(screen.getByText('Tagasiside')).toBeInTheDocument();
       expect(screen.getByText(/iga arvamus loeb/i)).toBeInTheDocument();
+      expect(screen.getByText(/Saada meile oma mõtted/)).toBeInTheDocument();
     });
 
-    it('renders feedback button', () => {
+    it('renders feedback email link', () => {
       render(<Footer />);
-      expect(screen.getByText('Kirjuta meile')).toBeInTheDocument();
-    });
-  });
-
-  describe('feedback modal', () => {
-    it('opens feedback modal when button clicked', async () => {
-      const user = userEvent.setup();
-      render(<Footer />);
-      
-      await user.click(screen.getByText('Kirjuta meile'));
-      expect(screen.getByTestId('feedback-modal')).toBeInTheDocument();
+      const emailLink = screen.getByText('kristjan.suluste@eki.ee');
+      expect(emailLink).toBeInTheDocument();
+      expect(emailLink.closest('a')).toHaveAttribute('href', 'mailto:kristjan.suluste@eki.ee');
     });
 
-    it('closes feedback modal', async () => {
-      const user = userEvent.setup();
+    it('renders sponsor logos', () => {
       render(<Footer />);
-      
-      await user.click(screen.getByText('Kirjuta meile'));
-      expect(screen.getByTestId('feedback-modal')).toBeInTheDocument();
-      
-      await user.click(screen.getByText('Close'));
-      expect(screen.queryByTestId('feedback-modal')).not.toBeInTheDocument();
-    });
-
-    it('submits feedback successfully', async () => {
-      const user = userEvent.setup();
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      });
-      
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      
-      render(<Footer />);
-      
-      await user.click(screen.getByText('Kirjuta meile'));
-      await user.click(screen.getByText('Submit'));
-      
-      await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: 'Test message', email: 'test@email.com' }),
-        });
-      });
-      
-      expect(consoleSpy).toHaveBeenCalledWith('Feedback submitted successfully');
-      consoleSpy.mockRestore();
-    });
-
-    it('makes API call with correct payload on submit', async () => {
-      const user = userEvent.setup();
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      });
-      
-      render(<Footer />);
-      
-      await user.click(screen.getByText('Kirjuta meile'));
-      await user.click(screen.getByText('Submit'));
-      
-      await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/feedback', expect.objectContaining({
-          method: 'POST',
-        }));
-      });
+      expect(screen.getByAltText('Kaasrahastanud Euroopa Liit')).toBeInTheDocument();
+      expect(screen.getByAltText('Eesti tuleviku heaks')).toBeInTheDocument();
+      expect(screen.getByAltText('Haridus- ja Teadusministeerium')).toBeInTheDocument();
     });
   });
 });

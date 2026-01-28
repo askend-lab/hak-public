@@ -1,15 +1,9 @@
  
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import Footer from './Footer';
 
 describe('Footer', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    global.fetch = vi.fn();
-  });
-
   describe('rendering', () => {
     it('renders footer content', () => {
       render(<Footer />);
@@ -24,7 +18,7 @@ describe('Footer', () => {
     it('renders Hääldusabiline section', () => {
       render(<Footer />);
       expect(screen.getByText('Hääldusabiline')).toBeInTheDocument();
-      expect(screen.getByText('Portaaliest')).toBeInTheDocument();
+      expect(screen.getByText('Portaalist')).toBeInTheDocument();
       expect(screen.getByText('Versiooniajalugu')).toBeInTheDocument();
     });
 
@@ -36,10 +30,13 @@ describe('Footer', () => {
       expect(screen.getByText('LinkedIn')).toBeInTheDocument();
     });
 
-    it('renders feedback section', () => {
+    it('renders feedback section with email link', () => {
       render(<Footer />);
       expect(screen.getByText('Tagasiside')).toBeInTheDocument();
-      expect(screen.getByText('Kirjuta meile')).toBeInTheDocument();
+      expect(screen.getByText(/Saada meile oma mõtted/)).toBeInTheDocument();
+      const emailLink = screen.getByText('kristjan.suluste@eki.ee');
+      expect(emailLink).toBeInTheDocument();
+      expect(emailLink.closest('a')).toHaveAttribute('href', 'mailto:kristjan.suluste@eki.ee');
     });
 
     it('social links have correct hrefs', () => {
@@ -60,21 +57,12 @@ describe('Footer', () => {
       expect(fbLink).toHaveAttribute('target', '_blank');
       expect(fbLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
-  });
 
-  describe('feedback button', () => {
-    it('has feedback button', () => {
+    it('renders sponsor logos', () => {
       render(<Footer />);
-      expect(screen.getByText('Kirjuta meile')).toBeInTheDocument();
-    });
-
-    it('feedback button is clickable', async () => {
-      const user = userEvent.setup();
-      render(<Footer />);
-      
-      const button = screen.getByText('Kirjuta meile');
-      await user.click(button);
-      // Modal should open - but we don't test the modal content here
+      expect(screen.getByAltText('Kaasrahastanud Euroopa Liit')).toBeInTheDocument();
+      expect(screen.getByAltText('Eesti tuleviku heaks')).toBeInTheDocument();
+      expect(screen.getByAltText('Haridus- ja Teadusministeerium')).toBeInTheDocument();
     });
   });
 });

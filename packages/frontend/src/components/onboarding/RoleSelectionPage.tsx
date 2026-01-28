@@ -15,7 +15,7 @@ import { UserRole } from '@/types/onboarding';
  * Shows on first visit to guide user through selecting their role:
  * - Õppija (Learner)
  * - Õpetaja (Teacher)  
- * - Kõnesünteesi spetsialist (Speech synthesis specialist)
+ * - Uurija (Researcher)
  */
 export default function RoleSelectionContent() {
   const { selectRole } = useOnboarding();
@@ -32,15 +32,21 @@ export default function RoleSelectionContent() {
     <>
       <div className="page-header page-header--minimal">
         <h1 className="page-header__title">
-          Teksti kõnesünteesiks vali oma roll
+          Vali oma roll
         </h1>
       </div>
       <div className="page-content">
         <div className="role-cards">
-          {roles.map((role) => (
+          {roles.map((role) => {
+            const avatarMap: Record<string, string> = {
+              learner: '/icons/student-avatar.png',
+              teacher: '/icons/teacher-avatar.png',
+              specialist: '/icons/researcher-avatar.png',
+            };
+            return (
             <div key={role.id} className="role-card">
               <div className="role-card-avatar">
-                <img src="/icons/rolli_avatar.png" alt="" />
+                <img src={avatarMap[role.id] || '/icons/rolli_avatar.png'} alt="" />
               </div>
               
               <h2 className="role-card-title">
@@ -58,7 +64,8 @@ export default function RoleSelectionContent() {
                 {role.ctaText}
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </>

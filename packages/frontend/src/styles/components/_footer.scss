@@ -15,7 +15,8 @@
 // Footer component-specific styles (used within .page-footer--full wrapper)
 // Logo section
 .footer-logo {
-  gap: $spacing-6;
+  position: relative;
+  padding-top: 44px; // Space for absolute logo
   
   // Desktop: Fixed width
   @include desktop {
@@ -23,8 +24,12 @@
   }
 
   .footer-logo-image {
-    width: 116px;
-    height: 36px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 40px;
+    width: auto;
+    object-fit: contain;
   }
 
   .footer-contact {
@@ -54,12 +59,6 @@
   color: $color-primary;
   margin: 0;
   font-family: $font-body;
-  
-  // Desktop: Fixed width
-  @include desktop {
-    width: 305px;
-    height: 30px;
-  }
 }
 
 // Links section
@@ -96,6 +95,12 @@
   color: $color-primary;
   margin: 0;
   font-family: $font-body;
+  max-width: 100%;
+  word-wrap: break-word;
+  
+  @include desktop {
+    max-width: 305px;
+  }
 }
 
 // Social media links
@@ -148,32 +153,87 @@
   }
 }
 
-// Feedback button
-.footer-feedback-button {
-  background-color: $color-primary;
-  color: $color-white;
-  border: none;
-  border-radius: 100px;
-  padding: 4px $spacing-6;
-  height: 48px;
-  min-height: 48px;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-  letter-spacing: $letter-spacing-normal;
-  cursor: pointer;
-  transition: opacity 0.2s ease-in-out;
-  font-family: $font-body;
+// Feedback email link with icon
+.footer-feedback-link {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: auto;
-  align-self: flex-start;
+  gap: $spacing-2;
+  color: $color-primary;
+  text-decoration: none;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  font-family: $font-body;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    opacity: $opacity-hover;
+    opacity: 0.7;
+    
+    span {
+      text-decoration: underline;
+    }
   }
+}
 
-  &:active {
-    opacity: $opacity-active;
+.footer-feedback-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+// Feedback content wrapper (tighter gap between text and email)
+.footer-feedback-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// =========================================================================
+// Sponsor Logos Strip
+// =========================================================================
+
+.footer-sponsors {
+  background: $color-white;
+  border-top: 1px solid $color-border-neutral-light;
+  padding: $spacing-4 0;
+  margin-top: $spacing-8;
+  width: 100%;
+}
+
+.footer-sponsors__content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  padding: 0 $spacing-4;
+  
+  @include respond-below($breakpoint-md) {
+    flex-direction: column;
+    gap: $spacing-8;
+  }
+  
+  @include mobile-landscape {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $spacing-10;
+    justify-content: center;
+  }
+  
+  @include desktop {
+    flex-wrap: nowrap;
+    gap: 60px;
+  }
+}
+
+.footer-sponsors__logo {
+  height: auto;
+  max-height: 60px;
+  width: auto;
+  object-fit: contain;
+  
+  @include respond-below($breakpoint-md) {
+    max-height: 48px;
   }
 }

@@ -72,7 +72,7 @@ export default function SentenceMenu({ isAuthenticated, sentenceId, sentenceText
       <div className="synthesis__menu-backdrop" onClick={onClose} aria-hidden="true" />
       <div className={menuClassName} role="menu" aria-label="Lausungi valikud" onKeyDown={handleKeyDown} style={menuStyle}>
         {isAuthenticated ? <AuthenticatedMenu sentenceId={sentenceId} hasText={hasText} menuSearchQuery={menuSearchQuery} onSearchChange={onSearchChange} isLoadingTasks={isLoadingTasks} filteredTasks={filteredTasks} onAddToTask={onAddToTask} onCreateNewTask={onCreateNewTask} onClose={onClose} /> : <button className="synthesis__menu-item" role="menuitem" onClick={() => { onClose(); onLogin(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Lisa ülesandesse</div></button>}
-        <button className="synthesis__menu-item" role="menuitem" onClick={() => { onExplorePhonetic(sentenceId); onClose(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Uuri foneetilist kuju</div></button>
+        <button className="synthesis__menu-item" role="menuitem" onClick={() => { onExplorePhonetic(sentenceId); onClose(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Uuri häälduskuju</div></button>
         <button className="synthesis__menu-item" role="menuitem" onClick={() => { onDownload(sentenceId); onClose(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Lae alla .wav fail</div></button>
         <button className="synthesis__menu-item synthesis__menu-item--danger" role="menuitem" onClick={() => { onRemove(sentenceId); onClose(); }}><div className="synthesis__menu-item-content">Eemalda</div></button>
       </div>

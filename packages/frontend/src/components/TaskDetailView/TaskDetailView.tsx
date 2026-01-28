@@ -128,7 +128,7 @@ export default function TaskDetailView({
                 onMenuOpen={setOpenMenuId}
                 onMenuClose={handleMenuClose}
                 rowMenuItems={[
-                  { label: 'Uuri foneetilist kuju', onClick: phonetic.handleExplorePhonetic },
+                  { label: 'Uuri häälduskuju', onClick: phonetic.handleExplorePhonetic },
                   { label: 'Kustuta', onClick: handleDeleteEntry, danger: true }
                 ]}
               />

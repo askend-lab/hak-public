@@ -20,6 +20,8 @@
 }
 
 .page-footer--full {
+  position: relative;
+  
   // Mobile
   padding: 24px 16px 20px 16px;
   
@@ -43,8 +45,10 @@
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     flex-direction: column;
     gap: 32px;
+    overflow: hidden;
     
     @include tablet {
       flex-direction: row;
@@ -63,14 +67,33 @@
     flex-direction: column;
     gap: $spacing-6;
     width: 100%;
+    min-width: 0;
     
     @include tablet {
       width: calc(50% - 12px);
+      flex-shrink: 0;
     }
     
     @include desktop {
       width: auto;
-      flex: 0 0 auto;
+      flex: 1 1 auto;
+      max-width: 305px;
+    }
+  }
+  
+  // BuildInfo positioned separately
+  .footer-build-info {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+    
+    @include tablet {
+      right: 24px;
+    }
+    
+    @include desktop {
+      position: static;
+      align-self: flex-end;
     }
   }
 }

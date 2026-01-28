@@ -1,6 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import UserProfile from './UserProfile';
-import { HelpIcon, MenuIcon } from './ui/Icons';
+import { HelpIcon } from './ui/Icons';
 import type { User } from '@/services/auth';
 
 interface AppHeaderProps {
@@ -22,9 +22,11 @@ export default function AppHeader({ isAuthenticated, user, onTasksClick, onHelpC
   return (
     <header className="page-layout__header">
       <div className="page-layout__header-content">
-        <div className="eki-logo"><img src="/icons/logo.svg" alt="EKI Logo" /></div>
+        <Link to="/synthesis" className="eki-logo">
+          <img src="/icons/logo.png" alt="EKI Logo" />
+        </Link>
         <nav className="header-nav">
-          <NavLink to="/synthesis" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`}>Kõnesüntees</NavLink>
+          <NavLink to="/synthesis" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`}>Tekst kõneks</NavLink>
           <NavLink to="/tasks" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`} data-nav="tasks" onClick={handleTasksClick}>Ülesanded</NavLink>
         </nav>
         <div className="header-functions">
@@ -32,7 +34,6 @@ export default function AppHeader({ isAuthenticated, user, onTasksClick, onHelpC
             <HelpIcon size="2xl" />
           </button>
           {isAuthenticated && user ? <UserProfile user={user} /> : <button className="button button--primary" onClick={onLoginClick}>Logi sisse</button>}
-          <button className="header-menu-button" aria-label="Menu"><MenuIcon size="2xl" /></button>
         </div>
       </div>
     </header>

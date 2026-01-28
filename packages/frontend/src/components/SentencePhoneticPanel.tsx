@@ -13,7 +13,7 @@ interface SentencePhoneticPanelProps { sentenceText: string; phoneticText: strin
 const markerData = [
   { symbol: '`', name: 'kolmas välde', rule: 'Paikneb kolmandavältelise silbi esimese vokaali ees ainult täishääliku ees.', examples: ['k`ätte', 'par`ool'] },
   { symbol: '´', name: 'ebareeglipärase rõhu märk', rule: 'Kasutatakse ainult kui rõhk ei ole reeglipärane ehk esimesel silbil. Paikneb pearõhulise silbi esimese vokaali ees.', examples: ['selj´anka', 'dial´ektika'] },
-  { symbol: "'", name: 'palatalisatsioon', rule: 'Võib paikneda konsonantide d, l, n, s ja t järel. Kahetähelise pika hääliku puhul on see märk vaid esimese tähe järel.', examples: ["pad'ja", "p`an't", "k`as't"] },
+  { symbol: "'", name: 'peenendus', rule: 'Võib paikneda konsonantide d, l, n, s ja t järel. Kahetähelise pika hääliku puhul on see märk vaid esimese tähe järel.', examples: ["pad'ja", "p`an't", "k`as't"] },
   { symbol: '+', name: 'liitsõnapiir', rule: 'Märgib liitsõna osade vahelist piiri.', examples: ['maja+uks', 'auto+juht'] },
 ];
 
@@ -99,7 +99,7 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
       {!showGuide && (
         <div className="sentence-phonetic-panel__header">
           <div className="sentence-phonetic-panel__title-section">
-            <h3 className="sentence-phonetic-panel__title">Muuda foneetilist kuju</h3>
+            <h3 className="sentence-phonetic-panel__title">Muuda häälduskuju</h3>
           </div>
           <div className="sentence-phonetic-panel__header-actions">
             <button onClick={handleClose} className="sentence-phonetic-panel__close" aria-label="Sulge">
@@ -111,7 +111,7 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
       <div className="sentence-phonetic-panel__content">
         {showGuide ? <GuideView onBack={() => setShowGuide(false)} onClose={handleClose} /> : (
           <div className="sentence-phonetic-panel__edit-section">
-            <p className="sentence-phonetic-panel__description">Sisesta foneetilised märgid, et täpsustada lause hääldust. Kasuta allolevaid nuppe märkide lisamiseks. Juhendid saab lugeda <button className="sentence-phonetic-panel__guide-link" onClick={() => setShowGuide(true)}>siit</button>.</p>
+            <p className="sentence-phonetic-panel__description">Sisesta hääldusmärgid, et täpsustada lause hääldust. Kasuta allolevaid nuppe märkide lisamiseks. Juhendid saab lugeda <button className="sentence-phonetic-panel__guide-link" onClick={() => setShowGuide(true)}>siit</button>.</p>
             <div className="sentence-phonetic-panel__input-container"><textarea ref={inputRef} value={editedText} onChange={(e) => setEditedText(e.target.value)} className="sentence-phonetic-panel__textarea" placeholder="Kirjuta oma foneetiline variant" rows={4} /></div>
             <MarkersToolbar onInsert={insertMarkerAtCursor} />
             <div className="sentence-phonetic-panel__actions"><button onClick={handlePlay} disabled={!editedText.trim() || isLoading} className={`button button--primary ${isLoading ? 'loading' : ''} ${isPlaying ? 'playing' : ''}`} title={isLoading ? 'Laen...' : isPlaying ? 'Mängib' : 'Kuula'}>{isLoading ? <div className="loader-spinner"></div> : isPlaying ? <PauseIcon size="2xl" /> : <PlayIcon size="2xl" />}Kuula</button><button onClick={handleApply} disabled={!editedText.trim()} className="button button--secondary">Rakenda</button></div>

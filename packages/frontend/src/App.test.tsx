@@ -55,13 +55,13 @@ describe('App (Home)', () => {
 
     it('renders navigation links', () => {
       render(<MemoryRouter><Home /></MemoryRouter>);
-      expect(screen.getByText('Kõnesüntees')).toBeInTheDocument();
+      expect(screen.getByText('Tekst kõneks')).toBeInTheDocument();
       expect(screen.getByText('Ülesanded')).toBeInTheDocument();
     });
 
     it('renders synthesis view by default', () => {
       render(<MemoryRouter><Home /></MemoryRouter>);
-      expect(screen.getByText('Teksti kõnesüntees')).toBeInTheDocument();
+      expect(screen.getByText('Muuda tekst kõneks')).toBeInTheDocument();
     });
 
     it('renders footer', () => {
@@ -79,10 +79,6 @@ describe('App (Home)', () => {
       expect(screen.getByText('Logi sisse')).toBeInTheDocument();
     });
 
-    it('renders menu button', () => {
-      render(<MemoryRouter><Home /></MemoryRouter>);
-      expect(screen.getByLabelText('Menu')).toBeInTheDocument();
-    });
   });
 
   describe('loading state', () => {
@@ -153,7 +149,7 @@ describe('App (Home)', () => {
   describe('navigation', () => {
     it('synthesis link is rendered by default', () => {
       render(<MemoryRouter><Home /></MemoryRouter>);
-      const synthesisLink = screen.getByText('Kõnesüntees');
+      const synthesisLink = screen.getByText('Tekst kõneks');
       expect(synthesisLink).toBeInTheDocument();
     });
 
@@ -213,7 +209,7 @@ describe('App (Home)', () => {
 
     it('renders page title', () => {
       render(<MemoryRouter><Home /></MemoryRouter>);
-      expect(screen.getByText('Teksti kõnesüntees')).toBeInTheDocument();
+      expect(screen.getByText('Muuda tekst kõneks')).toBeInTheDocument();
     });
   });
 
