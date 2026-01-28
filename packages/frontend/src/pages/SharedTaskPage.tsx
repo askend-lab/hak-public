@@ -92,6 +92,7 @@ export function SharedTaskPage() {
 
             <TaskDetailView
               taskId={task.id}
+              initialTask={task}
               onBack={() => window.history.back()}
               onEditTask={() => {}}
               onDeleteTask={() => {}}

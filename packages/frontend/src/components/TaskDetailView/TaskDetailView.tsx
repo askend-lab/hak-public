@@ -22,16 +22,17 @@ interface TaskDetailViewProps {
   onEditTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
   onNavigateToSynthesis: () => void;
+  initialTask?: Task;  // Pre-loaded task for shared view (no auth required)
 }
 
 export default function TaskDetailView({
-  taskId, onBack, onEditTask, onDeleteTask, onNavigateToSynthesis
+  taskId, onBack, onEditTask, onDeleteTask, onNavigateToSynthesis, initialTask
 }: TaskDetailViewProps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
-  const [task, setTask] = useState<Task | null>(null);
-  const [entries, setEntries] = useState<TaskEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [task, setTask] = useState<Task | null>(initialTask || null);
+  const [entries, setEntries] = useState<TaskEntry[]>(initialTask?.entries || []);
+  const [isLoading, setIsLoading] = useState(!initialTask);
   const [error, setError] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isHeaderMenuOpen, setIsHeaderMenuOpen] = useState(false);
@@ -45,31 +46,27 @@ export default function TaskDetailView({
   const variants = usePronunciationVariants(entries, setEntries, task, user?.id);
   const phonetic = usePhoneticPanel(entries, setEntries, task, user?.id, handleMenuClose);
 
-  // Load task data
+  // Load task data (skip if initialTask provided)
   useEffect(() => {
-    const loadTask = async () => {
-      if (!user) {
-        setError('Kasutaja pole sisse logitud');
-        setIsLoading(false);
-        return;
-      }
-      try {
-        setIsLoading(true);
-        const taskData = await DataService.getInstance().getTask(taskId, user.id);
-        if (!taskData) {
+    if (initialTask || !user) {
+      if (!initialTask && !user) setError('Kasutaja pole sisse logitud');
+      setIsLoading(false);
+      return;
+    }
+    
+    setIsLoading(true);
+    DataService.getInstance().getTask(taskId, user.id)
+      .then(taskData => {
+        if (taskData) {
+          setTask(taskData);
+          setEntries(taskData.entries || []);
+        } else {
           setError('Ülesannet ei leitud');
-          return;
         }
-        setTask(taskData);
-        setEntries(taskData.entries || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Viga ülesande laadimisel');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadTask();
-  }, [taskId, user]);
+      })
+      .catch(err => setError(err instanceof Error ? err.message : 'Viga ülesande laadimisel'))
+      .finally(() => setIsLoading(false));
+  }, [taskId, user, initialTask]);
 
   const handleDeleteEntry = async (id: string) => {
     if (!user) return;
