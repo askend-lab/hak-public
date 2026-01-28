@@ -138,12 +138,14 @@ hooks:
   run-typecheck:
     command: 'pnpm -r exec tsc --noEmit'
 
-  test-coverage: {}
+  test-coverage:
+    mode: error
 
   run-tests:
     command: 'node devbox test'
 
   run-build:
+    mode: error
     command: 'pnpm --filter @hak/frontend build'
 
   plan-validation: {}
