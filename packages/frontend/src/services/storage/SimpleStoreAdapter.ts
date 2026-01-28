@@ -38,7 +38,9 @@ export class SimpleStoreAdapter {
 
   private async get(pk: string, sk: string, type: 'private' | 'shared'): Promise<Record<string, unknown> | null> {
     const params = new URLSearchParams({ pk, sk, type });
-    const response = await fetch(`${this.baseUrl}/get?${params}`, {
+    // Use /get-shared endpoint for shared data (no auth required)
+    const endpoint = type === 'shared' ? '/get-shared' : '/get';
+    const response = await fetch(`${this.baseUrl}${endpoint}?${params}`, {
       headers: this.getAuthHeaders(),
     });
 

@@ -75,6 +75,10 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId: !Ref ApiGatewayAuthorizer
       - http:
+          path: /get-shared
+          method: get
+          cors: true
+      - http:
           path: /delete
           method: delete
           cors: true
