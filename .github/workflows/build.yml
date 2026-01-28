@@ -86,6 +86,7 @@ jobs:
             echo "audio-api=true" >> $GITHUB_OUTPUT
             echo "merlin-api=true" >> $GITHUB_OUTPUT
             echo "vabamorf-api=true" >> $GITHUB_OUTPUT
+            echo "tara-auth=true" >> $GITHUB_OUTPUT
           else
             CHANGED=$(git diff --name-only $BASE_SHA HEAD)
             echo "Changed files: $CHANGED"
@@ -95,6 +96,7 @@ jobs:
             echo "audio-api=$(echo "$CHANGED" | grep -q "^packages/audio-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "merlin-api=$(echo "$CHANGED" | grep -q "^packages/merlin-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "vabamorf-api=$(echo "$CHANGED" | grep -q "^packages/vabamorf-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "tara-auth=$(echo "$CHANGED" | grep -q "^packages/tara-auth/" && echo true || echo false)" >> $GITHUB_OUTPUT
             
             if echo "$CHANGED" | grep -qE "^(package\.json|pnpm-lock\.yaml|tsconfig\.json)$"; then
               echo "Root config changed - building all"
@@ -103,6 +105,7 @@ jobs:
               echo "audio-api=true" >> $GITHUB_OUTPUT
               echo "merlin-api=true" >> $GITHUB_OUTPUT
               echo "vabamorf-api=true" >> $GITHUB_OUTPUT
+              echo "tara-auth=true" >> $GITHUB_OUTPUT
             fi
           fi
       
@@ -134,6 +137,10 @@ jobs:
           npm ci
           npx tsc
       
+      - name: Build TARA Auth
+        if: steps.detect.outputs.tara-auth == 'true'
+        run: pnpm --filter tara-auth build
+      
       - name: Login to ECR
         if: steps.detect.outputs.vabamorf-api == 'true'
         id: login-ecr
@@ -156,6 +163,7 @@ jobs:
           AUDIO_API_CHANGED: ${{ steps.detect.outputs.audio-api }}
           MERLIN_API_CHANGED: ${{ steps.detect.outputs.merlin-api }}
           VABAMORF_API_CHANGED: ${{ steps.detect.outputs.vabamorf-api }}
+          TARA_AUTH_CHANGED: ${{ steps.detect.outputs.tara-auth }}
         run: |
           BUILD_ID="BUILD-$(date +%Y%m%d%H%M%S)"
           echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
@@ -189,6 +197,7 @@ jobs:
           upload_module "audio-api" "packages/audio-api/dist" "$AUDIO_API_CHANGED"
           upload_module "merlin-api" "packages/merlin-api/dist" "$MERLIN_API_CHANGED"
           upload_module "vabamorf-api" "packages/vabamorf-api/dist/src" "$VABAMORF_API_CHANGED"
+          upload_module "tara-auth" "packages/tara-auth/dist" "$TARA_AUTH_CHANGED"
           
           # Build manifest using jq
           jq -n \
@@ -200,6 +209,7 @@ jobs:
             --arg audio "$( [ "$AUDIO_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha audio-api )" \
             --arg merlin "$( [ "$MERLIN_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha merlin-api )" \
             --arg vabamorf "$( [ "$VABAMORF_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha vabamorf-api )" \
+            --arg taraauth "$( [ "$TARA_AUTH_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha tara-auth )" \
             '{
               build_id: $id,
               git_sha: $sha,
@@ -209,7 +219,8 @@ jobs:
                 simplestore: $simplestore,
                 "audio-api": $audio,
                 "merlin-api": $merlin,
-                "vabamorf-api": $vabamorf
+                "vabamorf-api": $vabamorf,
+                "tara-auth": $taraauth
               }
             }' > /tmp/manifest.json
           

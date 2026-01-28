@@ -111,7 +111,7 @@ jobs:
           get_module() { jq -r ".modules.\"$1\" // \"\"" "$2"; }
           
           # Compare modules and determine what to deploy
-          for module in frontend simplestore audio-api merlin-api vabamorf-api; do
+          for module in frontend simplestore audio-api merlin-api vabamorf-api tara-auth; do
             BUILD_SHA=$(get_module "$module" /tmp/build-manifest.json)
             CURRENT_SHA=$(get_module "$module" /tmp/current-state.json)
             
@@ -144,6 +144,7 @@ jobs:
           [ "${{ steps.state.outputs.deploy_audio_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/audio-api/ artifacts/audio-api/
           [ "${{ steps.state.outputs.deploy_merlin_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/merlin-api/ artifacts/merlin-api/
           [ "${{ steps.state.outputs.deploy_vabamorf_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/vabamorf-api/ artifacts/vabamorf-api/
+          [ "${{ steps.state.outputs.deploy_tara_auth }}" == "true" ] && aws s3 sync ${S3_BUILD}/tara-auth/ artifacts/tara-auth/
           
           echo "✅ Downloaded artifacts"
       
@@ -184,7 +185,7 @@ jobs:
           echo "✅ Frontend deployed to $BUCKET with build-info.json"
       
       - name: Install Serverless
-        if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_audio_api == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true'
+        if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_audio_api == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true' || steps.state.outputs.deploy_tara_auth == 'true'
         run: npm install -g serverless@3
       
       - name: Deploy SimpleStore
@@ -227,6 +228,14 @@ jobs:
           serverless deploy --stage ${{ inputs.environment }}
           echo "✅ Vabamorf API deployed"
       
+      - name: Deploy TARA Auth
+        if: steps.state.outputs.deploy_tara_auth == 'true'
+        working-directory: packages/tara-auth
+        run: |
+          mkdir -p dist && cp -r ../../artifacts/tara-auth/* dist/ 2>/dev/null || true
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1 --force
+          echo "✅ TARA Auth deployed"
+      
       - name: Update deployment state
         run: |
           BUILD_ID="${{ inputs.build_id }}"
@@ -264,3 +273,4 @@ jobs:
           [ "${{ steps.state.outputs.deploy_audio_api }}" == "true" ] && echo "- ✅ audio-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ audio-api (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_merlin_api }}" == "true" ] && echo "- ✅ merlin-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ merlin-api (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_vabamorf_api }}" == "true" ] && echo "- ✅ vabamorf-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ vabamorf-api (unchanged)" >> $GITHUB_STEP_SUMMARY
+          [ "${{ steps.state.outputs.deploy_tara_auth }}" == "true" ] && echo "- ✅ tara-auth" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ tara-auth (unchanged)" >> $GITHUB_STEP_SUMMARY
