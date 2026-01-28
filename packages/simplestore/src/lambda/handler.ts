@@ -86,6 +86,7 @@ interface Route {
 const routes: Route[] = [
   { method: 'POST', path: '/save', handler: handleSave },
   { method: 'GET', path: '/get', handler: handleGet },
+  { method: 'GET', path: '/get-shared', handler: handleGet },
   { method: 'DELETE', path: '/delete', handler: handleDelete },
   { method: 'GET', path: '/query', handler: handleQuery }
 ];
