@@ -22,7 +22,7 @@ describe('Footer', () => {
 
     it('renders footer links', () => {
       render(<Footer />);
-      expect(screen.getByText('Portaaliest')).toBeInTheDocument();
+      expect(screen.getByText('Portaalist')).toBeInTheDocument();
       expect(screen.getByText('Versiooniajalugu')).toBeInTheDocument();
       expect(screen.getByText('Kasutus- ja privaatsustingimused')).toBeInTheDocument();
     });

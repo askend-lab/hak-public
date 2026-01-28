@@ -45,7 +45,7 @@ describe('AppHeader', () => {
           <AppHeader {...defaultProps} />
         </MemoryRouter>
       );
-      expect(screen.getByText('Kõnesüntees')).toBeInTheDocument();
+      expect(screen.getByText('Tekst kõneks')).toBeInTheDocument();
       expect(screen.getByText('Ülesanded')).toBeInTheDocument();
     });
 
@@ -82,13 +82,13 @@ describe('AppHeader', () => {
   });
 
   describe('navigation links', () => {
-    it('Kõnesüntees link navigates to /synthesis', () => {
+    it('Tekst kõneks link navigates to /synthesis', () => {
       render(
         <MemoryRouter>
           <AppHeader {...defaultProps} />
         </MemoryRouter>
       );
-      const link = screen.getByText('Kõnesüntees');
+      const link = screen.getByText('Tekst kõneks');
       expect(link).toHaveAttribute('href', '/synthesis');
     });
 
@@ -111,7 +111,7 @@ describe('AppHeader', () => {
           <AppHeader {...defaultProps} />
         </MemoryRouter>
       );
-      const link = screen.getByText('Kõnesüntees');
+      const link = screen.getByText('Tekst kõneks');
       expect(link).toHaveClass('active');
     });
 

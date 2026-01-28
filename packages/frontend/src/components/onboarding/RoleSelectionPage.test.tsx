@@ -26,7 +26,7 @@ describe('RoleSelectionContent', () => {
   describe('rendering', () => {
     it('renders title', () => {
       render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
-      expect(screen.getByText('Teksti kõnesünteesiks vali oma roll')).toBeInTheDocument();
+      expect(screen.getByText('Vali oma roll')).toBeInTheDocument();
     });
 
     it('renders role cards', () => {
@@ -46,7 +46,7 @@ describe('RoleSelectionContent', () => {
 
     it('renders specialist role', () => {
       render(<MemoryRouter><RoleSelectionContent /></MemoryRouter>);
-      expect(screen.getByText(/Olen kõnesünteesi spetsialist/i)).toBeInTheDocument();
+      expect(screen.getByText(/Olen uurija/i)).toBeInTheDocument();
     });
   });
 

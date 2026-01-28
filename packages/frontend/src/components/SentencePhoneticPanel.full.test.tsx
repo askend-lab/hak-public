@@ -176,7 +176,7 @@ describe('SentencePhoneticPanel', () => {
       await user.click(screen.getByText('siit'));
       expect(screen.getByText('kolmas välde')).toBeInTheDocument();
       expect(screen.getByText('ebareeglipärase rõhu märk')).toBeInTheDocument();
-      expect(screen.getByText('peenendus (palatalisatsioon)')).toBeInTheDocument();
+      expect(screen.getByText('peenendus')).toBeInTheDocument();
       expect(screen.getByText('liitsõnapiir')).toBeInTheDocument();
     });
 

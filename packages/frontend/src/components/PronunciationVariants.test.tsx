@@ -229,7 +229,7 @@ describe('PronunciationVariants', () => {
       });
       
       await user.click(screen.getByText('Loo oma variant'));
-      expect(screen.getByPlaceholderText('Kirjuta oma foneetiline variant')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant')).toBeInTheDocument();
     });
 
     it('shows phonetic marker buttons in custom form', async () => {
@@ -272,7 +272,7 @@ describe('PronunciationVariants', () => {
       
       await user.click(screen.getByText('Loo oma variant'));
       
-      const input = screen.getByPlaceholderText('Kirjuta oma foneetiline variant');
+      const input = screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant');
       await user.type(input, 'custom text');
       expect(input).toHaveValue('custom text');
     });
@@ -294,7 +294,7 @@ describe('PronunciationVariants', () => {
       
       await user.click(screen.getByText('Loo oma variant'));
       
-      const input = screen.getByPlaceholderText('Kirjuta oma foneetiline variant');
+      const input = screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant');
       await user.type(input, 'custom');
       
       expect(screen.getByLabelText('Clear input')).toBeInTheDocument();
@@ -316,10 +316,10 @@ describe('PronunciationVariants', () => {
       });
       
       await user.click(screen.getByText('Loo oma variant'));
-      expect(screen.getByPlaceholderText('Kirjuta oma foneetiline variant')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant')).toBeInTheDocument();
       
       await user.click(screen.getByText('Eemalda loodud variant'));
-      expect(screen.queryByPlaceholderText('Kirjuta oma foneetiline variant')).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('Kirjuta oma hääldusmärkidega variant')).not.toBeInTheDocument();
     });
   });
 
@@ -342,7 +342,7 @@ describe('PronunciationVariants', () => {
       await user.click(screen.getByText('Loo oma variant'));
       await user.click(screen.getByText('siit'));
       
-      expect(screen.getByText('Foneetiliste märkide juhend')).toBeInTheDocument();
+      expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
     });
 
     it('closes guide view when back button clicked', async () => {
@@ -362,10 +362,10 @@ describe('PronunciationVariants', () => {
       
       await user.click(screen.getByText('Loo oma variant'));
       await user.click(screen.getByText('siit'));
-      expect(screen.getByText('Foneetiliste märkide juhend')).toBeInTheDocument();
+      expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
       
       await user.click(screen.getByLabelText('Tagasi variantide juurde'));
-      expect(screen.queryByText('Foneetiliste märkide juhend')).not.toBeInTheDocument();
+      expect(screen.queryByText('Hääldusmärkide juhend')).not.toBeInTheDocument();
     });
   });
 

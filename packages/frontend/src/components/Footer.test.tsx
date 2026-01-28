@@ -18,7 +18,7 @@ describe('Footer', () => {
     it('renders Hääldusabiline section', () => {
       render(<Footer />);
       expect(screen.getByText('Hääldusabiline')).toBeInTheDocument();
-      expect(screen.getByText('Portaaliest')).toBeInTheDocument();
+      expect(screen.getByText('Portaalist')).toBeInTheDocument();
       expect(screen.getByText('Versiooniajalugu')).toBeInTheDocument();
     });
 

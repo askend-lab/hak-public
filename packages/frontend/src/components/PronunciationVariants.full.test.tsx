@@ -64,7 +64,7 @@ describe('PronunciationVariants Full', () => {
     render(<PronunciationVariants {...props} />);
     await waitFor(() => expect(screen.getByText('Loo oma variant')).toBeInTheDocument());
     await user.click(screen.getByText('Loo oma variant'));
-    expect(screen.getByPlaceholderText('Kirjuta oma foneetiline variant')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant')).toBeInTheDocument();
   });
 
   it('clears custom input when clear button clicked', async () => {
@@ -72,7 +72,7 @@ describe('PronunciationVariants Full', () => {
     render(<PronunciationVariants {...props} />);
     await waitFor(() => expect(screen.getByText('Loo oma variant')).toBeInTheDocument());
     await user.click(screen.getByText('Loo oma variant'));
-    const input = screen.getByPlaceholderText('Kirjuta oma foneetiline variant');
+    const input = screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant');
     await user.type(input, 'custom');
     await user.click(screen.getByLabelText('Clear input'));
     expect(input).toHaveValue('');
@@ -90,7 +90,7 @@ describe('PronunciationVariants Full', () => {
     await waitFor(() => expect(screen.getByText('Loo oma variant')).toBeInTheDocument());
     await user.click(screen.getByText('Loo oma variant'));
     await user.click(screen.getByText('siit'));
-    expect(screen.getByText('Foneetiliste märkide juhend')).toBeInTheDocument();
+    expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
   });
 
   it('closes guide when back clicked', async () => {
@@ -100,7 +100,7 @@ describe('PronunciationVariants Full', () => {
     await user.click(screen.getByText('Loo oma variant'));
     await user.click(screen.getByText('siit'));
     await user.click(screen.getByLabelText('Tagasi variantide juurde'));
-    expect(screen.queryByText('Foneetiliste märkide juhend')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hääldusmärkide juhend')).not.toBeInTheDocument();
   });
 
   it('inserts phonetic marker when marker button clicked', async () => {
@@ -108,7 +108,7 @@ describe('PronunciationVariants Full', () => {
     render(<PronunciationVariants {...props} />);
     await waitFor(() => expect(screen.getByText('Loo oma variant')).toBeInTheDocument());
     await user.click(screen.getByText('Loo oma variant'));
-    const input = screen.getByPlaceholderText('Kirjuta oma foneetiline variant');
+    const input = screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant');
     await user.click(input);
     await user.click(screen.getByTitle('Kolmas välde'));
     expect(input).toHaveValue('`');
@@ -124,11 +124,10 @@ describe('PronunciationVariants Full', () => {
     render(<PronunciationVariants {...props} />);
     await waitFor(() => expect(screen.getByText('Loo oma variant')).toBeInTheDocument());
     await user.click(screen.getByText('Loo oma variant'));
-    const input = screen.getByPlaceholderText('Kirjuta oma foneetiline variant');
+    const input = screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant');
     await user.type(input, 'my-custom');
-    const useButtons = screen.getAllByText('Kasuta');
-    const lastButton = useButtons[useButtons.length - 1];
-    if (lastButton) await user.click(lastButton);
+    // The custom form's button is "Helinda" not "Kasuta"
+    await user.click(screen.getByText('Helinda'));
     expect(props.onUseVariant).toHaveBeenCalledWith('my-custom');
   });
 });
