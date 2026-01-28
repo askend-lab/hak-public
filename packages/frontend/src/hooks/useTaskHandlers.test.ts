@@ -336,4 +336,28 @@ describe('useTaskHandlers edge cases', () => {
     expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));
   });
 
+  // Bug #3: Creating new task from single sentence menu should add only that sentence
+  it('creates new task with only the selected sentence, not all sentences', async () => {
+    const multipleSentences: SentenceState[] = [
+      { id: 'sent-1', text: 'First sentence', tags: ['First', 'sentence'], isPlaying: false, isLoading: false, currentInput: '' },
+      { id: 'sent-2', text: 'Second sentence', tags: ['Second', 'sentence'], isPlaying: false, isLoading: false, currentInput: '' },
+      { id: 'sent-3', text: 'Third sentence', tags: ['Third', 'sentence'], isPlaying: false, isLoading: false, currentInput: '' },
+    ];
+    const { result } = renderHook(() => useTaskHandlers(multipleSentences, setView, setTaskId));
+
+    // User clicks "Create new task" from sentence 2's menu
+    act(() => { result.current.handleCreateNewTaskFromMenu('sent-2'); });
+    expect(result.current.showAddTaskModal).toBe(true);
+
+    // User submits the modal to create the task
+    await act(async () => { await result.current.handleAddTask('My New Task', 'Description'); });
+
+    // Should only add sentence 2, NOT all 3 sentences
+    expect(mockCreateTask).toHaveBeenCalledWith('user-1', expect.objectContaining({
+      name: 'My New Task',
+      description: 'Description',
+      speechEntries: [{ text: 'Second sentence', stressedText: 'Second sentence' }],
+    }));
+  });
+
 });

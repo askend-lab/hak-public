@@ -37,6 +37,7 @@ export function useTaskHandlers(
   const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [pendingSentenceId, setPendingSentenceId] = useState<string | null>(null);
 
   const handleAddAllSentencesToTask = useCallback(() => {
     if (requireAuth()) return;
@@ -78,8 +79,9 @@ export function useTaskHandlers(
     }
   }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
 
-  const handleCreateNewTaskFromMenu = useCallback((_sentenceId: string) => {
+  const handleCreateNewTaskFromMenu = useCallback((sentenceId: string) => {
     if (requireAuth()) return;
+    setPendingSentenceId(sentenceId);
     setShowAddTaskModal(true);
   }, [requireAuth]);
 
@@ -112,13 +114,18 @@ export function useTaskHandlers(
     if (!user) return;
     try {
       const dataService = DataService.getInstance();
-      const playlistEntries = filterNonEmptySentences(sentences).map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
+      // If triggered from single sentence menu, use only that sentence
+      const entriesToAdd = pendingSentenceId
+        ? sentences.filter(s => s.id === pendingSentenceId && s.text.trim())
+        : filterNonEmptySentences(sentences);
+      const playlistEntries = entriesToAdd.map(s => ({ text: s.text, stressedText: s.phoneticText || s.text }));
       const newTask = await dataService.createTask(user.id, {
         name: title, description: description || null,
         speechSequences: playlistEntries.map(e => e.text),
         speechEntries: playlistEntries.length > 0 ? playlistEntries : null
       });
       setShowAddTaskModal(false);
+      setPendingSentenceId(null); // Clear pending sentence
       setTaskRefreshTrigger(prev => prev + 1);
       if (playlistEntries.length > 0) {
         showNotification('success', 'Ülesanne loodud', `${title} loodud!`, undefined, undefined, viewTaskAction(newTask.id));
@@ -128,7 +135,7 @@ export function useTaskHandlers(
       console.error('Failed to create task:', error);
       throw error;
     }
-  }, [user, sentences, showNotification, setSelectedTaskId, setCurrentView]);
+  }, [user, sentences, pendingSentenceId, showNotification, setSelectedTaskId, setCurrentView]);
 
   const handleEditTask = useCallback(async (task: { id: string; name: string; description?: string | null }) => {
     if (requireAuth()) return;
