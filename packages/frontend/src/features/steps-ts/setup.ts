@@ -13,6 +13,11 @@ import { JSDOM } from 'jsdom';
 import { InMemoryAdapter, setAdapter } from 'simplestore';
 import { render, cleanup, fireEvent, waitFor, RenderResult } from '@testing-library/react';
 import { createElement } from 'react';
+import { MemoryRouter } from 'react-router-dom';
+import App from '../../App';
+import { AuthProvider } from '../../services/auth';
+import { NotificationProvider } from '../../contexts/NotificationContext';
+import { OnboardingProvider } from '../../contexts/OnboardingContext';
 
 // Setup jsdom
 (global as unknown as Record<string, unknown>).import = { meta: { env: { PROD: false, DEV: true } } };
@@ -113,13 +118,7 @@ export class TestWorld extends World {
     return this._renderResult?.container;
   }
 
-  async renderApp(): Promise<void> {
-    const { default: App } = await import('../../App');
-    const { AuthProvider } = await import('../../services/auth');
-    const { NotificationProvider } = await import('../../contexts/NotificationContext');
-    const { OnboardingProvider } = await import('../../contexts/OnboardingContext');
-    const { MemoryRouter } = await import('react-router-dom');
-    
+  renderApp(): void {
     const element = createElement(
       NotificationProvider,
       null,
