@@ -71,11 +71,25 @@ export default function TaskDetailView({
     loadTask();
   }, [taskId, user]);
 
-  const handleDeleteEntry = (id: string) => {
+  const handleDeleteEntry = async (id: string) => {
+    if (!user) return;
+    
     const entryToDelete = entries.find(e => e.id === id);
-    setEntries(prev => prev.filter(e => e.id !== id));
-    if (entryToDelete) {
-      showNotification('success', 'Lause kustutatud', undefined, undefined, 'success');
+    const updatedEntries = entries.filter(e => e.id !== id);
+    
+    // Update local state immediately for responsive UI
+    setEntries(updatedEntries);
+    
+    // Persist to backend
+    try {
+      await DataService.getInstance().updateTask(user.id, taskId, { entries: updatedEntries });
+      if (entryToDelete) {
+        showNotification('success', 'Lause kustutatud', undefined, undefined, 'success');
+      }
+    } catch (_err) {
+      // Revert on error
+      setEntries(entries);
+      showNotification('error', 'Viga lause kustutamisel');
     }
   };
 
