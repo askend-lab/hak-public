@@ -91,6 +91,15 @@ const routes: Route[] = [
 ];
 
 /**
+ * Check if request is for shared data (read-only access allowed without auth)
+ */
+function isSharedDataRequest(event: APIGatewayProxyEvent): boolean {
+  if (event.httpMethod !== 'GET') return false;
+  const type = event.queryStringParameters?.type;
+  return type === 'shared';
+}
+
+/**
  * Main Lambda handler
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -100,7 +109,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 
   const userId = getUserId(event);
-  if (!userId) {
+  
+  // Allow unauthenticated GET requests for shared data
+  const isAnonymousSharedAccess = !userId && isSharedDataRequest(event);
+  
+  if (!userId && !isAnonymousSharedAccess) {
     return createResponse(HTTP_STATUS.UNAUTHORIZED, { error: HTTP_ERRORS.UNAUTHORIZED });
   }
 
@@ -111,7 +124,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 
   try {
-    return await route.handler(event, createStore(userId));
+    // For anonymous shared access, use 'anonymous' as userId
+    const effectiveUserId = userId || 'anonymous';
+    return await route.handler(event, createStore(effectiveUserId));
   } catch {
     return createResponse(HTTP_STATUS.INTERNAL_ERROR, { error: HTTP_ERRORS.INTERNAL });
   }
