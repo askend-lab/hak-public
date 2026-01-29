@@ -56,49 +56,26 @@ export class SimpleStoreAdapter {
   }
 
   async loadUserTasks(userId: string): Promise<Task[]> {
-    try {
-      const data = await this.get('tasks', userId, 'private');
-      return data ? (data.tasks as Task[]) : [];
-    } catch (error) {
-      console.error('Failed to load user tasks:', error);
-      return [];
-    }
+    const data = await this.get('tasks', userId, 'private');
+    return data ? (data.tasks as Task[]) : [];
   }
 
   async saveUserTasks(userId: string, tasks: Task[]): Promise<void> {
-    try {
-      await this.save('tasks', userId, 'private', { tasks });
-    } catch (error) {
-      console.error('Failed to save user tasks:', error);
-    }
+    await this.save('tasks', userId, 'private', { tasks });
   }
 
   async loadBaselineTaskAdditions(userId: string): Promise<Record<string, TaskEntry[]>> {
-    try {
-      const data = await this.get('tasks', `baseline-${userId}`, 'private');
-      return data ? (data.additions as Record<string, TaskEntry[]>) : {};
-    } catch (error) {
-      console.error('Failed to load baseline task additions:', error);
-      return {};
-    }
+    const data = await this.get('tasks', `baseline-${userId}`, 'private');
+    return data ? (data.additions as Record<string, TaskEntry[]>) : {};
   }
 
   async saveBaselineTaskAdditions(userId: string, additions: Record<string, TaskEntry[]>): Promise<void> {
-    try {
-      await this.save('tasks', `baseline-${userId}`, 'private', { additions });
-    } catch (error) {
-      console.error('Failed to save baseline task additions:', error);
-    }
+    await this.save('tasks', `baseline-${userId}`, 'private', { additions });
   }
 
   async loadSharedTasks(): Promise<Task[]> {
-    try {
-      const data = await this.get('shared', 'tasks', 'shared');
-      return data ? (data.tasks as Task[]) : [];
-    } catch (error) {
-      console.error('Failed to load shared tasks:', error);
-      return [];
-    }
+    const data = await this.get('shared', 'tasks', 'shared');
+    return data ? (data.tasks as Task[]) : [];
   }
 
   async saveSharedTasks(tasks: Task[]): Promise<void> {

@@ -15,17 +15,13 @@ describe('DataService Error Handling and Edge Cases', () => {
   });
 
   describe('SimpleStore error handling', () => {
-    it('handles fetch error for user tasks', async () => {
+    it('throws error on fetch failure for user tasks', async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const tasks = await dataService.getUserCreatedTasks(mockUserId);
-      expect(tasks).toEqual([]);
-
-      consoleSpy.mockRestore();
+      await expect(dataService.getUserCreatedTasks(mockUserId)).rejects.toThrow('Network error');
     });
 
-    it('handles fetch error during save', async () => {
+    it('throws error on fetch failure during save', async () => {
       // First call succeeds (load), second fails (save)
       let callCount = 0;
       global.fetch = vi.fn().mockImplementation(() => {
@@ -36,12 +32,7 @@ describe('DataService Error Handling and Edge Cases', () => {
         return Promise.reject(new Error('Save failed'));
       });
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      // Should not throw, just log error
-      await dataService.createTask(mockUserId, { name: 'Test', description: '' });
-
-      consoleSpy.mockRestore();
+      await expect(dataService.createTask(mockUserId, { name: 'Test', description: '' })).rejects.toThrow('Save failed');
     });
 
     it('handles 404 responses gracefully', async () => {
@@ -202,26 +193,18 @@ describe('DataService Error Handling and Edge Cases', () => {
   });
 
   describe('getSharedTask error handling', () => {
-    it('handles fetch error for shared tasks', async () => {
+    it('throws error on fetch failure for shared tasks', async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const result = await dataService.getSharedTask('some-id');
-      expect(result === null || result !== undefined).toBe(true);
-
-      consoleSpy.mockRestore();
+      await expect(dataService.getSharedTask('some-id')).rejects.toThrow('Network error');
     });
   });
 
   describe('getTaskByShareToken edge cases', () => {
-    it('handles fetch error when searching user tasks', async () => {
+    it('throws error on fetch failure when searching shared tasks', async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const result = await dataService.getTaskByShareToken('some-token');
-      expect(result).toBeNull();
-
-      consoleSpy.mockRestore();
+      await expect(dataService.getTaskByShareToken('some-token')).rejects.toThrow('Network error');
     });
 
     it('searches through shared tasks', async () => {

@@ -68,12 +68,19 @@ describe('SimpleStoreAdapter', () => {
       expect(result).toEqual([]);
     });
 
-    it('returns empty array on error', async () => {
+    it('throws error on network failure instead of silently returning empty array', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      const result = await adapter.loadUserTasks('user-1');
+      await expect(adapter.loadUserTasks('user-1')).rejects.toThrow('Network error');
+    });
 
-      expect(result).toEqual([]);
+    it('throws error when API returns HTML instead of JSON', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => { throw new SyntaxError('Unexpected token < in JSON'); },
+      });
+
+      await expect(adapter.loadUserTasks('user-1')).rejects.toThrow();
     });
   });
 
@@ -89,6 +96,12 @@ describe('SimpleStoreAdapter', () => {
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
         body: expect.stringContaining('"pk":"tasks"'),
       });
+    });
+
+    it('throws error on save failure instead of silently swallowing', async () => {
+      mockFetch.mockResolvedValueOnce({ ok: false, text: async () => 'Save failed' });
+
+      await expect(adapter.saveUserTasks('user-1', [])).rejects.toThrow();
     });
   });
 
@@ -115,6 +128,12 @@ describe('SimpleStoreAdapter', () => {
 
       expect(result).toEqual({});
     });
+
+    it('throws error on network failure instead of silently returning empty object', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+
+      await expect(adapter.loadBaselineTaskAdditions('user-1')).rejects.toThrow('Network error');
+    });
   });
 
   describe('saveBaselineTaskAdditions', () => {
@@ -126,6 +145,12 @@ describe('SimpleStoreAdapter', () => {
       expect(mockFetch).toHaveBeenCalledWith('/api/save', expect.objectContaining({
         method: 'POST',
       }));
+    });
+
+    it('throws error on save failure instead of silently swallowing', async () => {
+      mockFetch.mockResolvedValueOnce({ ok: false, text: async () => 'Save failed' });
+
+      await expect(adapter.saveBaselineTaskAdditions('user-1', {})).rejects.toThrow();
     });
   });
 
@@ -143,6 +168,21 @@ describe('SimpleStoreAdapter', () => {
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
       });
       expect(result).toEqual(tasks);
+    });
+
+    it('throws error on network failure instead of silently returning empty array', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+
+      await expect(adapter.loadSharedTasks()).rejects.toThrow('Network error');
+    });
+
+    it('throws error when API returns HTML instead of JSON (CloudFront misconfiguration)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => { throw new SyntaxError('Unexpected token < in JSON'); },
+      });
+
+      await expect(adapter.loadSharedTasks()).rejects.toThrow();
     });
   });
 
