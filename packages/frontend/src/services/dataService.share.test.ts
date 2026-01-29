@@ -60,12 +60,9 @@ describe('DataService Share Operations', () => {
     expect(found?.name).toBe('Unshare Test');
   });
 
-  it('handles fetch error for shared tasks', async () => {
+  it('throws error on fetch failure for shared tasks', async () => {
     global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const found = await ds.getTaskByShareToken('any-token');
-    expect(found).toBeNull();
-    consoleSpy.mockRestore();
+    await expect(ds.getTaskByShareToken('any-token')).rejects.toThrow('Network error');
   });
 
   it('handles empty shared tasks', async () => {
