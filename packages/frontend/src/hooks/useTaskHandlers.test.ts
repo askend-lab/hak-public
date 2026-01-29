@@ -336,6 +336,28 @@ describe('useTaskHandlers edge cases', () => {
     expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));
   });
 
+  // Bug #2: Creating task from Tasks view (handleCreateTask) should NOT include synthesis sentences
+  it('creates empty task when triggered from Tasks view, not including synthesis sentences', async () => {
+    const synthesisSentences: SentenceState[] = [
+      { id: 'synth-1', text: 'Hello world', tags: ['Hello', 'world'], isPlaying: false, isLoading: false, currentInput: '' },
+      { id: 'synth-2', text: 'Test sentence', tags: ['Test', 'sentence'], isPlaying: false, isLoading: false, currentInput: '' },
+    ];
+    const { result } = renderHook(() => useTaskHandlers(synthesisSentences, setView, setTaskId));
+
+    // User clicks "Loo uus ülesanne" (Create new task) from Tasks view - NOT from synthesis
+    act(() => { result.current.handleCreateTask(); });
+    expect(result.current.showAddTaskModal).toBe(true);
+
+    // User submits the modal to create the task
+    await act(async () => { await result.current.handleAddTask('Empty Task', ''); });
+
+    // Task should be created WITHOUT any sentences from synthesis
+    expect(mockCreateTask).toHaveBeenCalledWith('user-1', expect.objectContaining({
+      name: 'Empty Task',
+      speechEntries: null,
+    }));
+  });
+
   // Bug #3: Creating new task from single sentence menu should add only that sentence
   it('creates new task with only the selected sentence, not all sentences', async () => {
     const multipleSentences: SentenceState[] = [
