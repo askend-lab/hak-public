@@ -92,12 +92,15 @@ const routes: Route[] = [
 ];
 
 /**
- * Check if request is for shared data (read-only access allowed without auth)
+ * Check if request is for publicly readable data (read-only access allowed without auth)
+ * - shared: everyone can read and modify
+ * - unlisted: everyone can read, only owner can modify
+ * - public: everyone can read, only owner can modify
  */
-function isSharedDataRequest(event: APIGatewayProxyEvent): boolean {
+function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
   if (event.httpMethod !== 'GET') return false;
   const type = event.queryStringParameters?.type;
-  return type === 'shared';
+  return type === 'shared' || type === 'unlisted' || type === 'public';
 }
 
 /**
@@ -112,7 +115,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const userId = getUserId(event);
   
   // Allow unauthenticated GET requests for shared data
-  const isAnonymousSharedAccess = !userId && isSharedDataRequest(event);
+  const isAnonymousSharedAccess = !userId && isPublicReadableRequest(event);
   
   if (!userId && !isAnonymousSharedAccess) {
     return createResponse(HTTP_STATUS.UNAUTHORIZED, { error: HTTP_ERRORS.UNAUTHORIZED });
