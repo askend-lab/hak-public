@@ -10,8 +10,11 @@ describe('ShareService sharing flow', () => {
   let mockLoader: MockDataLoader;
   let sharedTasksStorage: Task[];
 
+  let unlistedTasksStorage: Record<string, Task>;
+
   beforeEach(() => {
     sharedTasksStorage = [];
+    unlistedTasksStorage = {};
     
     mockStorage = {
       loadSharedTasks: vi.fn().mockImplementation(() => Promise.resolve(sharedTasksStorage)),
@@ -21,6 +24,15 @@ describe('ShareService sharing flow', () => {
       }),
       findAllUserTaskKeys: vi.fn().mockResolvedValue([]),
       loadTasksByKey: vi.fn().mockResolvedValue([]),
+      saveTaskAsUnlisted: vi.fn().mockImplementation((task: Task) => {
+        if (task.shareToken) {
+          unlistedTasksStorage[task.shareToken] = task;
+        }
+        return Promise.resolve();
+      }),
+      getTaskByShareToken: vi.fn().mockImplementation((token: string) => {
+        return Promise.resolve(unlistedTasksStorage[token] || null);
+      }),
     } as unknown as SimpleStoreAdapter;
 
     mockLoader = {
