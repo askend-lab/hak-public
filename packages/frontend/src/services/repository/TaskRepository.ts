@@ -120,6 +120,9 @@ export class TaskRepository {
     const userTasks = await this.storage.loadUserTasks(userId);
     userTasks.push(newTask);
     await this.storage.saveUserTasks(userId, userTasks);
+    
+    // Also save as unlisted for anonymous access via shareToken
+    await this.storage.saveTaskAsUnlisted(newTask);
 
     return newTask;
   }
@@ -139,6 +142,8 @@ export class TaskRepository {
 
       userTasks[taskIndex] = updatedTask;
       await this.storage.saveUserTasks(userId, userTasks);
+      // Sync unlisted storage for anonymous access
+      await this.storage.saveTaskAsUnlisted(updatedTask);
       return updatedTask;
     }
 
