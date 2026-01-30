@@ -32,8 +32,10 @@ vi.mock('@/components/AppHeader', () => ({
 }));
 
 vi.mock('@/components/TaskDetailView', () => ({
-  default: ({ taskId }: { taskId: string }) => (
-    <div data-testid="task-detail-view" data-task-id={taskId}>TaskDetailView</div>
+  default: ({ taskId, initialTask }: { taskId: string; initialTask?: { id: string; name: string } }) => (
+    <div data-testid="task-detail-view" data-task-id={taskId} data-has-initial-task={initialTask ? 'true' : 'false'}>
+      {initialTask ? `TaskDetailView: ${initialTask.name}` : 'TaskDetailView (no initialTask)'}
+    </div>
   ),
 }));
 
@@ -138,6 +140,33 @@ describe('SharedTaskPage', () => {
     });
     
     consoleSpy.mockRestore();
+  });
+
+  it('passes initialTask to TaskDetailView for unauthenticated access', async () => {
+    const mockTask = {
+      id: 'task-123',
+      name: 'Shared Test Task',
+      shareToken: 'abc123',
+      entries: [{ id: 'e1', text: 'Hello', stressedText: 'Hello' }],
+    };
+    
+    mockGetTaskByShareToken.mockResolvedValue(mockTask);
+    
+    render(
+      <MemoryRouter initialEntries={['/shared/task/abc123']}>
+        <Routes>
+          <Route path="/shared/task/:token" element={<SharedTaskPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('task-detail-view')).toBeInTheDocument();
+    });
+    
+    // TaskDetailView must receive initialTask prop for unauthenticated access to work
+    expect(screen.getByTestId('task-detail-view')).toHaveAttribute('data-has-initial-task', 'true');
+    expect(screen.getByText('TaskDetailView: Shared Test Task')).toBeInTheDocument();
   });
 
   it('copies link to clipboard when copy button clicked', async () => {

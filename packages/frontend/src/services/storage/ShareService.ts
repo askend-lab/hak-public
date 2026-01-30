@@ -43,15 +43,16 @@ export class ShareService {
     console.log('Sharing task:', task);
 
     try {
-      const sharedTasks = await this.storage.loadSharedTasks();
-      console.log('Current shared tasks:', sharedTasks);
+      // Save task as unlisted - directly accessible by shareToken (new architecture)
+      await this.storage.saveTaskAsUnlisted(task);
       
+      // Also save to legacy shared storage for backwards compatibility with getSharedTask
+      const sharedTasks = await this.storage.loadSharedTasks();
       const filteredTasks = sharedTasks.filter(t => t.id !== task.id);
       filteredTasks.push(task);
-      
       await this.storage.saveSharedTasks(filteredTasks);
       
-      console.log('Task shared successfully. New shared tasks:', filteredTasks);
+      console.log('Task shared successfully as unlisted:', task.shareToken);
     } catch (error) {
       console.error('Failed to share task:', error);
       throw new Error('Failed to share task');
@@ -61,30 +62,26 @@ export class ShareService {
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {
     console.log('Looking for share token:', shareToken);
 
+    // First check baseline tasks
     const baselineTask = await this.mockLoader.findTaskByShareToken(shareToken);
     if (baselineTask) {
       console.log('Found baseline task with share token:', baselineTask);
       return baselineTask;
     }
 
-    const sharedTasks = await this.storage.loadSharedTasks();
-    console.log('Checking global shared tasks storage');
-    const sharedTask = sharedTasks.find(task => task.shareToken === shareToken);
-    if (sharedTask) {
-      console.log('Found shared task with share token:', sharedTask);
-      return sharedTask;
+    // Direct lookup by shareToken in unlisted storage - O(1) instead of O(n)
+    const unlistedTask = await this.storage.getTaskByShareToken(shareToken);
+    if (unlistedTask) {
+      console.log('Found unlisted task with share token:', unlistedTask);
+      return unlistedTask;
     }
 
-    const allUserTaskKeys = await this.storage.findAllUserTaskKeys();
-    console.log('Checking user task keys:', allUserTaskKeys);
-
-    for (const key of allUserTaskKeys) {
-      const userTasks = await this.storage.loadTasksByKey(key);
-      const userTask = userTasks.find(task => task.shareToken === shareToken);
-      if (userTask) {
-        console.log('Found user task with share token:', userTask);
-        return userTask;
-      }
+    // Fallback: check legacy shared storage for backwards compatibility
+    const sharedTasks = await this.storage.loadSharedTasks();
+    const sharedTask = sharedTasks.find(task => task.shareToken === shareToken);
+    if (sharedTask) {
+      console.log('Found shared task with share token (legacy):', sharedTask);
+      return sharedTask;
     }
 
     console.log('No task found with share token:', shareToken);

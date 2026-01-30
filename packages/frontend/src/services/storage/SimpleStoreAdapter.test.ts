@@ -164,7 +164,7 @@ describe('SimpleStoreAdapter', () => {
 
       const result = await adapter.loadSharedTasks();
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/get-shared?pk=shared&sk=tasks&type=shared', {
+      expect(mockFetch).toHaveBeenCalledWith('/api/get?pk=shared&sk=tasks&type=shared', {
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer test-token' },
       });
       expect(result).toEqual(tasks);

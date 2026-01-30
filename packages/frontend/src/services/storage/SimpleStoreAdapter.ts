@@ -22,7 +22,7 @@ export class SimpleStoreAdapter {
     return headers;
   }
 
-  private async save(pk: string, sk: string, type: 'private' | 'shared', data: Record<string, unknown>): Promise<void> {
+  private async save(pk: string, sk: string, type: 'private' | 'shared' | 'unlisted', data: Record<string, unknown>): Promise<void> {
     const response = await fetch(`${this.baseUrl}/save`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
@@ -36,10 +36,10 @@ export class SimpleStoreAdapter {
     }
   }
 
-  private async get(pk: string, sk: string, type: 'private' | 'shared'): Promise<Record<string, unknown> | null> {
+  private async get(pk: string, sk: string, type: 'private' | 'shared' | 'unlisted'): Promise<Record<string, unknown> | null> {
     const params = new URLSearchParams({ pk, sk, type });
-    // Use /get-shared endpoint for shared data (no auth required)
-    const endpoint = type === 'shared' ? '/get-shared' : '/get';
+    // Use /get endpoint for all types - backend handles auth based on type
+    const endpoint = '/get';
     const response = await fetch(`${this.baseUrl}${endpoint}?${params}`, {
       headers: this.getAuthHeaders(),
     });
@@ -96,5 +96,22 @@ export class SimpleStoreAdapter {
   async loadTasksByKey(_key: string): Promise<Task[]> {
     // Not needed with SimpleStore - share tokens handled via dedicated query
     return [];
+  }
+
+  async getTaskByShareToken(shareToken: string): Promise<Task | null> {
+    try {
+      const data = await this.get('tasks', shareToken, 'unlisted');
+      return data ? (data as unknown as Task) : null;
+    } catch (error) {
+      console.error('Failed to get task by share token:', error);
+      return null;
+    }
+  }
+
+  async saveTaskAsUnlisted(task: Task): Promise<void> {
+    if (!task.shareToken) {
+      throw new Error('Task must have shareToken to save as unlisted');
+    }
+    await this.save('tasks', task.shareToken, 'unlisted', task as unknown as Record<string, unknown>);
   }
 }
