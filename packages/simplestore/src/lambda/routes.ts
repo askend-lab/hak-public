@@ -138,3 +138,36 @@ export async function handleDebugError(): Promise<APIGatewayProxyResult> {
     timestamp: new Date().toISOString()
   });
 }
+
+const PUBLIC_READABLE_TYPES = ['unlisted', 'public', 'shared'];
+
+export async function handleGetPublic(event: APIGatewayProxyEvent, store: Store): Promise<APIGatewayProxyResult> {
+  const { pk, sk, type } = event.queryStringParameters ?? {};
+  
+  const validation = validateGetRequest(pk, sk, type);
+  if (!validation.valid) {
+    return createResponse(HTTP_STATUS.BAD_REQUEST, { errors: validation.errors });
+  }
+
+  // Reject private type - this endpoint is only for public-readable data
+  if (type === 'private') {
+    return createResponse(HTTP_STATUS.BAD_REQUEST, { error: 'private type not allowed on /get-public endpoint' });
+  }
+
+  // Verify type is one of the allowed public-readable types
+  if (!PUBLIC_READABLE_TYPES.includes(type as string)) {
+    return createResponse(HTTP_STATUS.BAD_REQUEST, { error: `Invalid type. Allowed: ${PUBLIC_READABLE_TYPES.join(', ')}` });
+  }
+
+  const result = await store.get(pk as string, sk as string, type as DataType);
+  
+  if (result.success) {
+    return createResponse(HTTP_STATUS.OK, { item: result.item });
+  }
+  
+  if (result.error === ERRORS.NOT_FOUND) {
+    return createResponse(HTTP_STATUS.OK, { item: null });
+  }
+  
+  return createErrorResponse(result.error, HTTP_STATUS.FORBIDDEN);
+}

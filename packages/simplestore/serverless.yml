@@ -79,6 +79,10 @@ functions:
           method: get
           cors: true
       - http:
+          path: /get-public
+          method: get
+          cors: true
+      - http:
           path: /delete
           method: delete
           cors: true
