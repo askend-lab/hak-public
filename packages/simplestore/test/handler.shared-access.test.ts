@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
 import { handler, setAdapter } from '../src/lambda/handler';
 import { InMemoryAdapter } from '../src/adapters';
 import { APIGatewayProxyEvent } from 'aws-lambda';
