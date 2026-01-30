@@ -42,7 +42,7 @@ export function setupSimpleStoreMock(): void {
       return { ok: true, json: async (): Promise<{ success: boolean }> => ({ success: true }) };
     }
     
-    if (path === '/api/get' || path === '/api/get-shared') {
+    if (path === '/api/get' || path === '/api/get-public') {
       const pk = urlObj.searchParams.get('pk');
       const sk = urlObj.searchParams.get('sk');
       const type = urlObj.searchParams.get('type');

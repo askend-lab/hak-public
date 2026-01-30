@@ -7,7 +7,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 import { Store, ServerContext, StorageAdapter } from '../core';
 import { InMemoryAdapter, DynamoDBAdapter } from '../adapters';
-import { handleSave, handleGet, handleDelete, handleQuery, handleDebugError, createResponse, HTTP_STATUS, HTTP_ERRORS } from './routes';
+import { handleSave, handleGet, handleGetPublic, handleDelete, handleQuery, handleDebugError, createResponse, HTTP_STATUS, HTTP_ERRORS } from './routes';
 
 /** Shared adapter instance for persistence across calls */
 let sharedAdapter: StorageAdapter | null = null;
@@ -87,6 +87,7 @@ const routes: Route[] = [
   { method: 'POST', path: '/save', handler: handleSave },
   { method: 'GET', path: '/get', handler: handleGet },
   { method: 'GET', path: '/get-shared', handler: handleGet },
+  { method: 'GET', path: '/get-public', handler: handleGetPublic },
   { method: 'DELETE', path: '/delete', handler: handleDelete },
   { method: 'GET', path: '/query', handler: handleQuery }
 ];
@@ -99,6 +100,10 @@ const routes: Route[] = [
  */
 function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
   if (event.httpMethod !== 'GET') return false;
+  
+  // /get-public endpoint always allows anonymous access (type validation done in handler)
+  if (event.resource === '/get-public') return true;
+  
   const type = event.queryStringParameters?.type;
   return type === 'shared' || type === 'unlisted' || type === 'public';
 }

@@ -38,9 +38,8 @@ export class SimpleStoreAdapter {
 
   private async get(pk: string, sk: string, type: 'private' | 'shared' | 'unlisted'): Promise<Record<string, unknown> | null> {
     const params = new URLSearchParams({ pk, sk, type });
-    // Use /get-shared endpoint for shared/unlisted (no auth required at API Gateway level)
-    // Use /get for private data (requires Cognito auth)
-    const endpoint = type === 'private' ? '/get' : '/get-shared';
+    // Use /get-public for unlisted/shared/public (no auth required, rejects private type)
+    const endpoint = type === 'private' ? '/get' : '/get-public';
     const response = await fetch(`${this.baseUrl}${endpoint}?${params}`, {
       headers: this.getAuthHeaders(),
     });
