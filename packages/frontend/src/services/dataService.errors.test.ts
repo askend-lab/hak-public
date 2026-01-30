@@ -201,13 +201,12 @@ describe('DataService Error Handling and Edge Cases', () => {
   });
 
   describe('getTaskByShareToken edge cases', () => {
-    it('throws error on fetch failure when searching shared tasks', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-
-      await expect(dataService.getTaskByShareToken('some-token')).rejects.toThrow('Network error');
+    it('returns null when task not found', async () => {
+      const result = await dataService.getTaskByShareToken('non-existent-token');
+      expect(result).toBeNull();
     });
 
-    it('searches through shared tasks', async () => {
+    it('finds task by shareToken', async () => {
       const task = await dataService.createTask(mockUserId, { name: 'Shared Task', description: '' });
       await dataService.shareUserTask(mockUserId, task.id);
 
@@ -223,10 +222,10 @@ describe('DataService Error Handling and Edge Cases', () => {
         description: 'Test'
       });
 
-      // Make save fail for shared tasks
+      // Make save fail for unlisted tasks
       const originalFetch = global.fetch;
       global.fetch = vi.fn().mockImplementation(async (url: string, options?: RequestInit) => {
-        if (options?.method === 'POST' && (options?.body as string)?.includes('"pk":"shared"')) {
+        if (options?.method === 'POST' && (options?.body as string)?.includes('"type":"unlisted"')) {
           return { ok: false, text: async (): Promise<string> => 'Save error' };
         }
         return originalFetch(url, options);
