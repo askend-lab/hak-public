@@ -21,6 +21,7 @@ export const ChevronRightIcon = (props: IconComponentProps) => <Icon name="chevr
 export const ShareIcon = (props: IconComponentProps) => <Icon name="share" {...props} />;
 export const CheckIcon = (props: IconComponentProps) => <Icon name="check" {...props} />;
 export const HelpIcon = (props: IconComponentProps) => <Icon name="help" {...props} />;
+export const InfoIcon = (props: IconComponentProps) => <Icon name="info" {...props} />;
 export const VolumeIcon = (props: IconComponentProps) => <Icon name="volume_up" {...props} />;
 export const MuteIcon = (props: IconComponentProps) => <Icon name="volume_off" {...props} />;
 export const SpeedIcon = (props: IconComponentProps) => <Icon name="speed" {...props} />;

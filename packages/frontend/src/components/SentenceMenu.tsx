@@ -20,6 +20,7 @@ interface SentenceMenuProps {
   onCreateNewTask: (sentenceId: string) => void;
   onExplorePhonetic: (sentenceId: string) => void;
   onDownload: (sentenceId: string) => void;
+  onCopyText: (sentenceId: string) => void;
   onRemove: (sentenceId: string) => void;
   onLogin: () => void;
   onClose: () => void;
@@ -39,7 +40,7 @@ const AuthenticatedMenu = ({ sentenceId, hasText, menuSearchQuery, onSearchChang
   </>
 );
 
-export default function SentenceMenu({ isAuthenticated, sentenceId, sentenceText, menuSearchQuery, onSearchChange, isLoadingTasks, tasks, onAddToTask, onCreateNewTask, onExplorePhonetic, onDownload, onRemove, onLogin, onClose, anchorEl }: SentenceMenuProps) {
+export default function SentenceMenu({ isAuthenticated, sentenceId, sentenceText, menuSearchQuery, onSearchChange, isLoadingTasks, tasks, onAddToTask, onCreateNewTask, onExplorePhonetic, onDownload, onCopyText, onRemove, onLogin, onClose, anchorEl }: SentenceMenuProps) {
   const hasText = sentenceText.trim().length > 0;
   const filteredTasks = tasks.filter(t => t.name.toLowerCase().includes(menuSearchQuery.toLowerCase()));
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
@@ -74,6 +75,7 @@ export default function SentenceMenu({ isAuthenticated, sentenceId, sentenceText
         {isAuthenticated ? <AuthenticatedMenu sentenceId={sentenceId} hasText={hasText} menuSearchQuery={menuSearchQuery} onSearchChange={onSearchChange} isLoadingTasks={isLoadingTasks} filteredTasks={filteredTasks} onAddToTask={onAddToTask} onCreateNewTask={onCreateNewTask} onClose={onClose} /> : <button className="synthesis__menu-item" role="menuitem" onClick={() => { onClose(); onLogin(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Lisa ülesandesse</div></button>}
         <button className="synthesis__menu-item" role="menuitem" onClick={() => { onExplorePhonetic(sentenceId); onClose(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Uuri häälduskuju</div></button>
         <button className="synthesis__menu-item" role="menuitem" onClick={() => { onDownload(sentenceId); onClose(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Lae alla .wav fail</div></button>
+        <button className="synthesis__menu-item" role="menuitem" onClick={() => { onCopyText(sentenceId); onClose(); }} disabled={!hasText}><div className="synthesis__menu-item-content">Kopeeri tekst</div></button>
         <button className="synthesis__menu-item synthesis__menu-item--danger" role="menuitem" onClick={() => { onRemove(sentenceId); onClose(); }}><div className="synthesis__menu-item-content">Eemalda</div></button>
       </div>
     </>

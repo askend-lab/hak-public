@@ -1,8 +1,8 @@
- 
 'use client';
 
 import React, { useRef } from 'react';
 import { CloseIcon, PlayIcon, PauseIcon } from '../ui/Icons';
+import MarkersGuideBox from '../ui/MarkersGuideBox';
 
 interface CustomVariantFormProps {
   value: string;
@@ -45,11 +45,7 @@ export function CustomVariantForm({
       <div className="pronunciation-variants__form">
         <h4 className="pronunciation-variants__form-title">Loo oma variant</h4>
         <p className="pronunciation-variants__form-description">
-          Sisesta oma tekst hääldusmärkidega ja kuula tulemust. Juhendid saab lugeda{' '}
-          <button className="pronunciation-variants__guide-link" onClick={onShowGuide}>
-            siit
-          </button>
-          .
+          Sisesta oma tekst hääldusmärkidega ja kuula tulemust.
         </p>
         <div className="pronunciation-variants__input-container">
           <div className="input-wrapper">
@@ -95,36 +91,11 @@ export function CustomVariantForm({
             </button>
           </div>
         </div>
-        <div className="pronunciation-variants__markers-toolbar">
-          <button
-            onClick={() => insertMarkerAtCursor('`')}
-            className="pronunciation-variants__marker-button"
-            title="Kolmas välde"
-          >
-            `
-          </button>
-          <button
-            onClick={() => insertMarkerAtCursor('´')}
-            className="pronunciation-variants__marker-button"
-            title="Rõhuline silp"
-          >
-            ´
-          </button>
-          <button
-            onClick={() => insertMarkerAtCursor("'")}
-            className="pronunciation-variants__marker-button"
-            title="Palatalisatsioon"
-          >
-            '
-          </button>
-          <button
-            onClick={() => insertMarkerAtCursor('+')}
-            className="pronunciation-variants__marker-button"
-            title="Liitsõna piir"
-          >
-            +
-          </button>
-        </div>
+        <MarkersGuideBox
+          onInsertMarker={insertMarkerAtCursor}
+          onShowGuide={onShowGuide}
+          className="pronunciation-variants__markers-guide-box"
+        />
       </div>
       <button className="pronunciation-variants__toggle-link" onClick={onClose}>
         Eemalda loodud variant
