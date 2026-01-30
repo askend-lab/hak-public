@@ -18,6 +18,7 @@ export class ShareService {
   async getSharedTask(taskId: string): Promise<Task | null> {
     console.log('Getting shared task:', taskId);
     
+    // Check baseline tasks only - no shared storage fallback
     const mockLoader = new MockDataLoader();
     const baselineTasks = await mockLoader.loadBaselineTasks();
     const baselineTask = baselineTasks.find(task => task.id === taskId);
@@ -26,16 +27,9 @@ export class ShareService {
       return baselineTask;
     }
 
-    const sharedTasks = await this.storage.loadSharedTasks();
-    console.log('Shared tasks storage:', sharedTasks);
-    
-    const sharedTask = sharedTasks.find(task => task.id === taskId);
-    if (sharedTask) {
-      console.log('Found shared task:', sharedTask);
-      return sharedTask;
-    }
-
-    console.log('No shared task found for ID:', taskId);
+    // Note: This method is deprecated. Use getTaskByShareToken instead.
+    // Tasks are now stored as unlisted and accessed by shareToken, not by ID.
+    console.log('No baseline task found for ID:', taskId);
     return null;
   }
 

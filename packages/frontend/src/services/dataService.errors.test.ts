@@ -192,11 +192,11 @@ describe('DataService Error Handling and Edge Cases', () => {
     });
   });
 
-  describe('getSharedTask error handling', () => {
-    it('throws error on fetch failure for shared tasks', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-
-      await expect(dataService.getSharedTask('some-id')).rejects.toThrow('Network error');
+  describe('getSharedTask behavior', () => {
+    it('returns null for non-baseline task (no shared storage fallback)', async () => {
+      // getSharedTask no longer uses shared storage - only checks baseline tasks
+      const result = await dataService.getSharedTask('some-id');
+      expect(result).toBeNull();
     });
   });
 
