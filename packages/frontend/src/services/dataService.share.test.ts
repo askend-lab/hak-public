@@ -69,4 +69,21 @@ describe('DataService Share Operations', () => {
     const found = await ds.getTaskByShareToken('any-token');
     expect(found).toBeNull();
   });
+
+  it('task is accessible by shareToken immediately after creation (without explicit share)', async () => {
+    // RED TEST: This is the core unlisted architecture requirement
+    // Tasks should be accessible via shareToken right after creation
+    // without needing to call shareUserTask first
+    const task = await ds.createTask(userId, { name: 'Instant Access Task', description: '' });
+    
+    // Task should have a shareToken
+    expect(task.shareToken).toBeDefined();
+    expect(task.shareToken.length).toBeGreaterThan(0);
+    
+    // Task should be findable by shareToken immediately (no shareUserTask call!)
+    const found = await ds.getTaskByShareToken(task.shareToken);
+    expect(found).not.toBeNull();
+    expect(found?.name).toBe('Instant Access Task');
+    expect(found?.id).toBe(task.id);
+  });
 });
