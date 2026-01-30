@@ -148,26 +148,4 @@ describe('DataService Baseline Task Operations', () => {
     });
   });
 
-  describe('getSharedTask', () => {
-    it('returns baseline task by ID', async () => {
-      const tasks = await dataService.getUserTasks(mockUserId);
-      if (tasks.length > 0) {
-        const shared = await dataService.getSharedTask(tasks[0]?.id ?? '');
-        // May or may not find it depending on whether it's baseline
-        expect(shared === null || shared !== undefined).toBe(true);
-      }
-    });
-
-    it('returns shared user task', async () => {
-      const task = await dataService.createTask(mockUserId, {
-        name: 'To Share',
-        description: ''
-      });
-      
-      await dataService.shareUserTask(mockUserId, task.id);
-      
-      const shared = await dataService.getSharedTask(task.id);
-      expect(shared?.name).toBe('To Share');
-    });
-  });
 });

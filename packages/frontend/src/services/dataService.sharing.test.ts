@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DataService } from './dataService';
-import { setupSimpleStoreMock, resetSimpleStoreMock, getStoredSharedTasks } from './__mocks__/simpleStoreMock';
+import { setupSimpleStoreMock, resetSimpleStoreMock } from './__mocks__/simpleStoreMock';
 
 describe('DataService Sharing', () => {
   let dataService: DataService;
@@ -15,7 +15,7 @@ describe('DataService Sharing', () => {
   });
 
   describe('shareUserTask', () => {
-    it('shares a user task to global storage', async () => {
+    it('shares a user task to unlisted storage', async () => {
       const task = await dataService.createTask(mockUserId, {
         name: 'Task to Share',
         description: 'Test'
@@ -23,9 +23,10 @@ describe('DataService Sharing', () => {
 
       await dataService.shareUserTask(mockUserId, task.id);
 
-      const sharedTasks = getStoredSharedTasks();
-      expect(sharedTasks.length).toBeGreaterThan(0);
-      expect(sharedTasks.some((t: { id: string }) => t.id === task.id)).toBe(true);
+      // Verify task is accessible by shareToken
+      const found = await dataService.getTaskByShareToken(task.shareToken);
+      expect(found).toBeDefined();
+      expect(found?.id).toBe(task.id);
     });
 
     it('throws when task not found', async () => {
@@ -45,29 +46,9 @@ describe('DataService Sharing', () => {
       await dataService.updateTask(mockUserId, task.id, { name: 'Task v2' });
       await dataService.shareUserTask(mockUserId, task.id);
 
-      const sharedTasks = getStoredSharedTasks();
-      const sharedTask = sharedTasks.find((t: { id: string }) => t.id === task.id);
-      expect(sharedTask?.name).toBe('Task v2');
-    });
-  });
-
-  describe('getSharedTask', () => {
-    it('returns shared task by ID', async () => {
-      const task = await dataService.createTask(mockUserId, {
-        name: 'Shared Task',
-        description: 'Test'
-      });
-
-      await dataService.shareUserTask(mockUserId, task.id);
-
-      const result = await dataService.getSharedTask(task.id);
-      expect(result).toBeDefined();
-      expect(result?.name).toBe('Shared Task');
-    });
-
-    it('returns null for non-shared task', async () => {
-      const result = await dataService.getSharedTask('non-existent');
-      expect(result).toBeNull();
+      // Verify updated task is accessible by shareToken
+      const found = await dataService.getTaskByShareToken(task.shareToken);
+      expect(found?.name).toBe('Task v2');
     });
   });
 

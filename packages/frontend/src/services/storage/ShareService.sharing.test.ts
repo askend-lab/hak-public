@@ -64,9 +64,9 @@ describe('ShareService sharing flow', () => {
     // Step 1: Share the task
     await shareService.shareUserTask(taskToShare);
 
-    // Verify task was saved to shared storage
-    expect(mockStorage.saveSharedTasks).toHaveBeenCalled();
-    expect(sharedTasksStorage).toContainEqual(expect.objectContaining({ id: 'task-123' }));
+    // Verify task was saved to unlisted storage
+    expect(mockStorage.saveTaskAsUnlisted).toHaveBeenCalled();
+    expect(unlistedTasksStorage['share-token-abc']).toBeDefined();
 
     // Step 2: Find the task by share token (simulating incognito access)
     const foundTask = await shareService.getTaskByShareToken('share-token-abc');

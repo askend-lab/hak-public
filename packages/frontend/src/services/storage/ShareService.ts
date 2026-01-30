@@ -43,15 +43,8 @@ export class ShareService {
     console.log('Sharing task:', task);
 
     try {
-      // Save task as unlisted - directly accessible by shareToken (new architecture)
+      // Save task as unlisted - directly accessible by shareToken
       await this.storage.saveTaskAsUnlisted(task);
-      
-      // Also save to legacy shared storage for backwards compatibility with getSharedTask
-      const sharedTasks = await this.storage.loadSharedTasks();
-      const filteredTasks = sharedTasks.filter(t => t.id !== task.id);
-      filteredTasks.push(task);
-      await this.storage.saveSharedTasks(filteredTasks);
-      
       console.log('Task shared successfully as unlisted:', task.shareToken);
     } catch (error) {
       console.error('Failed to share task:', error);
@@ -69,19 +62,11 @@ export class ShareService {
       return baselineTask;
     }
 
-    // Direct lookup by shareToken in unlisted storage - O(1) instead of O(n)
+    // Direct lookup by shareToken in unlisted storage - O(1)
     const unlistedTask = await this.storage.getTaskByShareToken(shareToken);
     if (unlistedTask) {
       console.log('Found unlisted task with share token:', unlistedTask);
       return unlistedTask;
-    }
-
-    // Fallback: check legacy shared storage for backwards compatibility
-    const sharedTasks = await this.storage.loadSharedTasks();
-    const sharedTask = sharedTasks.find(task => task.shareToken === shareToken);
-    if (sharedTask) {
-      console.log('Found shared task with share token (legacy):', sharedTask);
-      return sharedTask;
     }
 
     console.log('No task found with share token:', shareToken);
