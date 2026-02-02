@@ -114,24 +114,24 @@ export class CognitoClient {
         MessageAction: 'SUPPRESS', // Don't send welcome email
       });
       await this.client.send(createCommand);
-
-      // Set permanent password so ADMIN_USER_PASSWORD_AUTH works
-      const setPasswordCommand = new AdminSetUserPasswordCommand({
-        UserPoolId: this.config.userPoolId,
-        Username: username,
-        Password: password,
-        Permanent: true,
-      });
-      await this.client.send(setPasswordCommand);
-
-      return username;
     } catch (error) {
-      if (error instanceof UsernameExistsException) {
-        // User already exists, return existing username
-        return username;
+      if (!(error instanceof UsernameExistsException)) {
+        throw error;
       }
-      throw error;
+      // User already exists, continue to set password
     }
+
+    // Set permanent password so ADMIN_USER_PASSWORD_AUTH works
+    // This runs for both new and existing users
+    const setPasswordCommand = new AdminSetUserPasswordCommand({
+      UserPoolId: this.config.userPoolId,
+      Username: username,
+      Password: password,
+      Permanent: true,
+    });
+    await this.client.send(setPasswordCommand);
+
+    return username;
   }
 
   async generateTokens(username: string): Promise<CognitoTokens> {
