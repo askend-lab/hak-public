@@ -48,7 +48,7 @@ export async function startHandler(
   _event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
-    const taraClient = createTaraClient();
+    const taraClient = await createTaraClient();
 
     const state = generateRandomString(32);
     const nonce = generateRandomString(32);
@@ -115,7 +115,7 @@ export async function callbackHandler(
     }
 
     // Exchange code for tokens
-    const taraClient = createTaraClient();
+    const taraClient = await createTaraClient();
     const taraTokens = await taraClient.exchangeCodeForTokens(code);
 
     // Verify and decode ID token
