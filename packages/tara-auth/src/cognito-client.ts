@@ -80,8 +80,9 @@ export class CognitoClient {
   }
 
   private async createUser(taraIdToken: TaraIdToken): Promise<string> {
-    const username = `tara_${taraIdToken.sub}`;
-    const email = taraIdToken.email || `${taraIdToken.sub}@tara.local`;
+    // Cognito requires email as username (UsernameAttributes: ["email"])
+    const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
+    const username = email;
 
     try {
       const command = new AdminCreateUserCommand({
