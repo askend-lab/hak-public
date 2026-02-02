@@ -71,6 +71,7 @@ hooks:
       - '**/DESIGN_SYSTEM_COMPLIANCE_REPORT.md'
       - '**/ACCESSIBILITY_REMEDIATION_BACKLOG.md'
       - 'docs/02-DESIGN-SYSTEM/07-Quality-Standards.md'
+      - 'docs/01-SPECIFICATIONS/*.docx.md'
       - 'audits/**'
 
   language-check:

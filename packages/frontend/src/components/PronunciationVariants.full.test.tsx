@@ -33,12 +33,6 @@ describe('PronunciationVariants Full', () => {
     expect(screen.getByText('Laen variante...')).toBeInTheDocument();
   });
 
-  it('shows loading while fetching', () => {
-    global.fetch = vi.fn().mockImplementation(() => new Promise(() => {}));
-    render(<PronunciationVariants {...props} />);
-    expect(screen.getByText('Laen variante...')).toBeInTheDocument();
-  });
-
   it('displays variants after fetch', async () => {
     render(<PronunciationVariants {...props} />);
     await waitFor(() => expect(screen.getByText('te`st')).toBeInTheDocument());
@@ -89,7 +83,7 @@ describe('PronunciationVariants Full', () => {
     render(<PronunciationVariants {...props} />);
     await waitFor(() => expect(screen.getByText('Loo oma variant')).toBeInTheDocument());
     await user.click(screen.getByText('Loo oma variant'));
-    await user.click(screen.getByText('siit'));
+    await user.click(screen.getByLabelText('Ava hääldusmärkide juhend'));
     expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
   });
 
@@ -98,7 +92,7 @@ describe('PronunciationVariants Full', () => {
     render(<PronunciationVariants {...props} />);
     await waitFor(() => expect(screen.getByText('Loo oma variant')).toBeInTheDocument());
     await user.click(screen.getByText('Loo oma variant'));
-    await user.click(screen.getByText('siit'));
+    await user.click(screen.getByLabelText('Ava hääldusmärkide juhend'));
     await user.click(screen.getByLabelText('Tagasi variantide juurde'));
     expect(screen.queryByText('Hääldusmärkide juhend')).not.toBeInTheDocument();
   });
@@ -110,7 +104,7 @@ describe('PronunciationVariants Full', () => {
     await user.click(screen.getByText('Loo oma variant'));
     const input = screen.getByPlaceholderText('Kirjuta oma hääldusmärkidega variant');
     await user.click(input);
-    await user.click(screen.getByTitle('Kolmas välde'));
+    await user.click(screen.getByLabelText('kolmas välde'));
     expect(input).toHaveValue('`');
   });
 

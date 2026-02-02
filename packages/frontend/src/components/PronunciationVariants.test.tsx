@@ -97,32 +97,16 @@ describe('PronunciationVariants', () => {
       });
     });
 
-    it('shows play buttons for variants', async () => {
+    it('shows play and use buttons for variants', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({
           variants: [{ text: 'test', description: 'Normal' }],
         }),
       });
-      
       render(<PronunciationVariants {...defaultProps} />);
-      
       await waitFor(() => {
         expect(screen.getByTitle('Mängi')).toBeInTheDocument();
-      });
-    });
-
-    it('shows use button for variants', async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
-          variants: [{ text: 'test', description: 'Normal' }],
-        }),
-      });
-      
-      render(<PronunciationVariants {...defaultProps} />);
-      
-      await waitFor(() => {
         expect(screen.getByText('Kasuta')).toBeInTheDocument();
       });
     });

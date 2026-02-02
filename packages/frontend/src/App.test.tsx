@@ -341,6 +341,7 @@ describe('App (Home)', () => {
         handlePlay: vi.fn(),
         handlePlayAll: vi.fn(),
         handleDownload: vi.fn(),
+        handleCopyText: vi.fn(),
         handleDeleteTag: vi.fn(),
         handleEditTag: vi.fn(),
         handleEditTagChange: vi.fn(),

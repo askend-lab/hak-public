@@ -5,7 +5,7 @@ import MarkerTooltip from './MarkerTooltip';
 import { markers } from '@/data/markerData';
 
 describe('MarkerTooltip', () => {
-  const testMarker = markers[0]; // kolmas välde
+  const testMarker = markers[0]!; // kolmas välde
 
   beforeEach(() => {
     vi.clearAllMocks();

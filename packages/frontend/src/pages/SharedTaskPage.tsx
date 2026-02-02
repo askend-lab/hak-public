@@ -1,10 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DataService } from '@/services/dataService';
-import { Task, TaskEntry } from '@/types/task';
+import { Task } from '@/types/task';
 import { useNotification } from '@/contexts/NotificationContext';
-import { synthesizeWithPolling } from '@/utils/synthesize';
-import { getVoiceModel } from '@/types/synthesis';
+import { useSharedTaskAudio } from '@/hooks/useSharedTaskAudio';
 import AppHeader from '@/components/AppHeader';
 import Footer from '@/components/Footer';
 import SentenceSynthesisItem from '@/components/SentenceSynthesisItem';
@@ -18,17 +17,17 @@ export function SharedTaskPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Audio playback state
-  const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);
-  const [currentLoadingId, setCurrentLoadingId] = useState<string | null>(null);
-  const [isPlayingAll, setIsPlayingAll] = useState(false);
-  const [isLoadingPlayAll, setIsLoadingPlayAll] = useState(false);
-  const [playAllAbortController, setPlayAllAbortController] = useState<AbortController | null>(null);
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const {
+    currentPlayingId,
+    currentLoadingId,
+    isPlayingAll,
+    isLoadingPlayAll,
+    handlePlayEntry,
+    handlePlayAll,
+  } = useSharedTaskAudio();
 
-  // Load task by share token
   useEffect(() => {
-    async function loadTask() {
+    async function loadTask(): Promise<void> {
       if (!token) {
         setError('Token puudub');
         setIsLoading(false);
@@ -55,182 +54,17 @@ export function SharedTaskPage() {
     loadTask();
   }, [token]);
 
-  // Synthesize and play audio
-  const synthesizeAndPlay = useCallback(async (stressedText: string, originalText: string, id: string) => {
-    setCurrentLoadingId(id);
-    setCurrentPlayingId(null);
+  const entries = task?.entries || [];
 
-    try {
-      const audioUrl = await synthesizeWithPolling(stressedText, getVoiceModel(originalText));
-      const audio = new Audio(audioUrl);
-      
-      audio.onloadeddata = () => {
-        setCurrentLoadingId(null);
-        setCurrentPlayingId(id);
-      };
-      
-      audio.onended = () => {
-        setCurrentPlayingId(null);
-        setCurrentLoadingId(null);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      audio.onerror = () => {
-        setCurrentPlayingId(null);
-        setCurrentLoadingId(null);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      await audio.play();
-    } catch {
-      setCurrentPlayingId(null);
-      setCurrentLoadingId(null);
-    }
-  }, []);
+  const onPlayEntry = useCallback((id: string) => {
+    handlePlayEntry(id, entries);
+  }, [handlePlayEntry, entries]);
 
-  // Play single entry
-  const handlePlayEntry = useCallback((id: string) => {
-    if (!task?.entries) return;
-    const entry = task.entries.find(e => e.id === id);
-    if (!entry) return;
+  const onPlayAll = useCallback(async () => {
+    await handlePlayAll(entries);
+  }, [handlePlayAll, entries]);
 
-    if ((entry.audioBlob && entry.audioBlob.size > 0) || (entry.audioUrl && entry.audioUrl.trim() !== '')) {
-      setCurrentPlayingId(id);
-      const playUrl = entry.audioBlob ? URL.createObjectURL(entry.audioBlob) : entry.audioUrl;
-      if (playUrl) {
-        const audio = new Audio(playUrl);
-        audio.onended = () => {
-          setCurrentPlayingId(null);
-          if (entry.audioBlob && playUrl !== entry.audioUrl) URL.revokeObjectURL(playUrl);
-        };
-        audio.onerror = () => {
-          if (entry.audioBlob && playUrl !== entry.audioUrl) URL.revokeObjectURL(playUrl);
-          synthesizeAndPlay(entry.stressedText, entry.text, id);
-        };
-        audio.play().catch(() => {
-          if (entry.audioBlob && playUrl !== entry.audioUrl) URL.revokeObjectURL(playUrl);
-          synthesizeAndPlay(entry.stressedText, entry.text, id);
-        });
-      }
-    } else {
-      synthesizeAndPlay(entry.stressedText, entry.text, id);
-    }
-  }, [task?.entries, synthesizeAndPlay]);
-
-  // Play single entry for sequential playback
-  const playSingleEntry = useCallback(async (entry: TaskEntry, abortSignal: AbortSignal): Promise<boolean> => {
-    if (abortSignal.aborted) return false;
-
-    let audioUrl: string | null = null;
-    let shouldRevokeUrl = false;
-
-    try {
-      if (entry.audioBlob && entry.audioBlob.size > 0) {
-        audioUrl = URL.createObjectURL(entry.audioBlob);
-        shouldRevokeUrl = true;
-      } else if (entry.audioUrl && entry.audioUrl.trim() !== '') {
-        audioUrl = entry.audioUrl;
-      } else {
-        setCurrentLoadingId(entry.id);
-        try {
-          audioUrl = await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text));
-          if (abortSignal.aborted) {
-            setCurrentLoadingId(null);
-            return false;
-          }
-        } catch {
-          setCurrentLoadingId(null);
-          return false;
-        }
-      }
-
-      if (!audioUrl || abortSignal.aborted) return false;
-
-      return new Promise((resolve) => {
-        const audio = new Audio(audioUrl!);
-        setCurrentAudio(audio);
-
-        const cleanup = () => {
-          setCurrentPlayingId(null);
-          setCurrentLoadingId(null);
-          setCurrentAudio(null);
-          if (shouldRevokeUrl && audioUrl) URL.revokeObjectURL(audioUrl);
-        };
-
-        audio.onloadeddata = () => {
-          setCurrentLoadingId(null);
-          setCurrentPlayingId(entry.id);
-        };
-
-        audio.onended = () => { cleanup(); resolve(true); };
-        audio.onerror = () => { cleanup(); resolve(false); };
-
-        abortSignal.addEventListener('abort', () => {
-          audio.pause();
-          audio.src = '';
-          cleanup();
-          resolve(false);
-        });
-
-        audio.play().catch(() => { cleanup(); resolve(false); });
-      });
-    } catch {
-      setCurrentLoadingId(null);
-      setCurrentPlayingId(null);
-      if (shouldRevokeUrl && audioUrl) URL.revokeObjectURL(audioUrl);
-      return false;
-    }
-  }, []);
-
-  // Play all entries sequentially
-  const handlePlayAll = useCallback(async () => {
-    if (!task?.entries) return;
-
-    if (isPlayingAll || isLoadingPlayAll) {
-      playAllAbortController?.abort();
-      setPlayAllAbortController(null);
-      setIsPlayingAll(false);
-      setIsLoadingPlayAll(false);
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.src = '';
-        setCurrentAudio(null);
-      }
-      setCurrentPlayingId(null);
-      setCurrentLoadingId(null);
-      return;
-    }
-
-    if (task.entries.length === 0) return;
-
-    const abortController = new AbortController();
-    setPlayAllAbortController(abortController);
-    setIsLoadingPlayAll(true);
-
-    let isFirstEntry = true;
-    for (const entry of task.entries) {
-      if (abortController.signal.aborted) break;
-
-      const success = await playSingleEntry(entry, abortController.signal);
-      
-      if (isFirstEntry && success) {
-        setIsLoadingPlayAll(false);
-        setIsPlayingAll(true);
-        isFirstEntry = false;
-      }
-      
-      if (!success || abortController.signal.aborted) break;
-    }
-
-    setIsPlayingAll(false);
-    setIsLoadingPlayAll(false);
-    setPlayAllAbortController(null);
-    setCurrentPlayingId(null);
-    setCurrentLoadingId(null);
-  }, [task?.entries, isPlayingAll, isLoadingPlayAll, playAllAbortController, currentAudio, playSingleEntry]);
-
-  // Copy entries to playlist and navigate to synthesis
-  const handleCopyToPlaylist = () => {
+  const handleCopyToPlaylist = (): void => {
     if (!task?.entries) return;
     
     sessionStorage.setItem('copiedEntries', JSON.stringify(task.entries));
@@ -258,7 +92,6 @@ export function SharedTaskPage() {
     );
   }
 
-  const entries = task.entries || [];
 
   return (
     <div className="page-layout">
@@ -283,7 +116,7 @@ export function SharedTaskPage() {
               isPlaying={isPlayingAll}
               isLoading={isLoadingPlayAll}
               disabled={entries.length === 0}
-              onClick={handlePlayAll}
+              onClick={onPlayAll}
             />
           </div>
         </div>
@@ -323,7 +156,7 @@ export function SharedTaskPage() {
                   mode="readonly"
                   isPlaying={currentPlayingId === entry.id}
                   isLoading={currentLoadingId === entry.id}
-                  onPlay={handlePlayEntry}
+                  onPlay={onPlayEntry}
                 />
               ))
             )}
