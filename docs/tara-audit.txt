@@ -1,0 +1,245 @@
+# Аудит безопасности TARA + Social Login Integration
+
+## 🔴 Критические уязвимости
+
+### 1. **Небезопасное хранение паролей**
+```
+Current implementation uses deterministic password
+```
+**Проблема:** Детерминистические пароли позволяют атакующему, узнавшему алгоритм генерации, получить доступ ко всем аккаунтам.
+
+**Риски:**
+- Компрометация одного аккаунта → компрометация всех
+- Утечка исходного кода → массовый взлом
+- Невозможность ротации без сброса всех паролей
+
+**Рекомендации:**
+- ✅ Реализовать предложенное решение с `custom:tara_secret` **немедленно**
+- Использовать криптографически стойкий PRNG (crypto.randomBytes)
+- Добавить соль специфичную для каждого пользователя
+- Рассмотреть использование AWS Secrets Manager для глобального секрета
+
+### 2. **Передача токенов через URL параметры**
+```
+Lambda redirects to frontend with Cognito tokens in URL params
+```
+**Проблема:** Токены в URL:
+- Логируются в браузере (history)
+- Логируются на серверах (access logs, proxy)
+- Передаются в Referer заголовках
+- Видны в screenshot/screen sharing
+
+**Рекомендации:**
+- Использовать POST form с auto-submit или
+- Передавать через secure httpOnly cookies или
+- Использовать промежуточный authorization code
+
+### 3. **Отсутствие валидации state в деталях**
+```
+Lambda validates state cookie
+```
+**Проблема:** Не указаны детали защиты от CSRF:
+- Криптографическая стойкость генерации state
+- Время жизни state
+- Привязка к сессии пользователя
+
+**Рекомендации:**
+- State: 32+ байта криптографически случайных данных
+- TTL: 5-10 минут максимум
+- Хранить в httpOnly, Secure, SameSite=Lax cookie
+- One-time use (удалять после валидации)
+
+## 🟡 Высокие риски
+
+### 4. **Недостаточная валидация TARA id_token**
+```
+Lambda verifies TARA id_token (JWT signature via JWKS, issuer, audience, nonce)
+```
+**Что отсутствует:**
+- ✅ Проверка `exp` (expiration time)
+- ✅ Проверка `iat` (issued at) - защита от слишком старых токенов
+- ✅ Проверка `nbf` (not before)
+- ✅ Clock skew tolerance (обычно ±5 минут)
+- ✅ Проверка `at_hash` если используется hybrid flow
+
+**Рекомендации:**
+```javascript
+// Добавить проверки:
+- exp: now < exp
+- iat: now - iat < MAX_TOKEN_AGE (например, 5 минут)
+- nbf: now >= nbf (если присутствует)
+- nonce: must match original nonce
+- Reject if token older than 5 minutes
+```
+
+### 5. **Небезопасная конфигурация cookies**
+**Проблема:** Не указаны security флаги для state cookie.
+
+**Рекомендации:**
+```javascript
+Set-Cookie: state=xxx; 
+  HttpOnly;           // защита от XSS
+  Secure;             // только HTTPS
+  SameSite=Lax;       // защита от CSRF
+  Max-Age=600;        // 10 минут
+  Path=/auth/tara;    // минимальный scope
+```
+
+### 6. **Отсутствие rate limiting**
+**Проблема:** Не упомянута защита от:
+- Брутфорс атак на callback endpoint
+- DoS через создание множества пользователей
+- Перебор state/nonce значений
+
+**Рекомендации:**
+- AWS WAF rate limiting на Lambda endpoint
+- Cognito trigger для лимита создания пользователей
+- CloudWatch алармы на аномальную активность
+
+### 7. **Автоматическое создание пользователей**
+```
+If not found, create new user with AdminCreateUser
+```
+**Риски:**
+- Неконтролируемый рост базы пользователей
+- Возможность создания фейковых аккаунтов (если TARA скомпрометирована)
+- Отсутствие модерации
+
+**Рекомендации:**
+- Email verification для новых пользователей
+- Лимит создания аккаунтов с одного IP
+- Логирование всех создания пользователей в CloudWatch
+- Рассмотреть manual approval для новых пользователей
+
+## 🟠 Средние риски
+
+### 8. **Логирование чувствительных данных**
+**Проблема:** Не указана политика логирования. Риск логирования:
+- Personal codes (GDPR violation)
+- Tokens
+- Secrets
+
+**Рекомендации:**
+```javascript
+// Никогда не логировать:
+- Tokens (id_token, access_token, refresh_token)
+- Passwords/secrets
+- Personal codes в plaintext
+- Full request/response bodies
+
+// Логировать:
+- User IDs (pseudonymized)
+- Event types (login_success, login_fail)
+- IP addresses (с ограниченным retention)
+- Timestamps
+```
+
+### 9. **User linking по email без верификации**
+```
+If not found, search by email and link
+```
+**Проблема:** Email spoofing/takeover:
+- Атакующий создаёт Google аккаунт с чужим email
+- Затем входит через TARA с тем же email
+- Получает доступ к существующему аккаунту
+
+**Рекомендации:**
+- Требовать email verification перед linking
+- Отправлять уведомление при linking аккаунтов
+- Опция для пользователя отменить linking
+- Рассмотреть MFA при подозрительном linking
+
+### 10. **Отсутствие session management**
+**Проблема:** Не описано:
+- Как инвалидировать сессии
+- Максимальное время жизни сессии
+- Concurrent session control
+
+**Рекомендации:**
+- Refresh token rotation
+- Max session lifetime (например, 24 часа)
+- Опция "logout from all devices"
+- Мониторинг подозрительной активности сессий
+
+### 11. **NAT Gateway - single point of failure**
+```
+Cost: ~€35/month
+```
+**Проблемы:**
+- Один Elastic IP → если забанят, весь auth упадёт
+- Нет failover
+- Нет географической избыточности
+
+**Рекомендации:**
+- Multi-AZ deployment с несколькими NAT Gateways
+- Резервный Elastic IP (зарегистрировать в TARA)
+- CloudWatch алармы на NAT Gateway health
+- Документировать процедуру переключения на backup IP
+
+## 🔵 Рекомендации по архитектуре
+
+### 12. **Secrets management**
+**Проблема:** Не указано где хранятся:
+- TARA client_secret
+- Google/Facebook credentials
+- Ключи для генерации паролей
+
+**Рекомендации:**
+- AWS Secrets Manager для всех секретов
+- Автоматическая ротация где возможно
+- Secrets в environment variables через SSM Parameter Store
+- Никогда не коммитить секреты в git
+
+### 13. **Monitoring & Alerting**
+**Добавить мониторинг:**
+- Неудачные попытки входа (rate, pattern)
+- Создание новых пользователей (volume)
+- Изменения в user linking
+- TARA token endpoint errors
+- NAT Gateway метрики
+- Lambda errors/timeouts
+
+### 14. **Compliance**
+**GDPR требования:**
+- ✅ Право на удаление (`custom:personal_code` = PII)
+- ✅ Право на экспорт данных
+- ✅ Логирование обработки PII
+- ✅ Data retention policy
+- ✅ Согласие на обработку данных
+
+**Эстонские требования:**
+- Проверить соответствие требованиям к обработке isikukood
+- Документировать правовое основание обработки
+
+### 15. **Code security**
+**Рекомендации:**
+- Dependency scanning (npm audit, Snyk)
+- SAST для Lambda кода
+- Input validation на всех endpoints
+- Output encoding для предотвращения XSS
+- SQL injection protection (если используется БД)
+
+## Приоритеты исправления
+
+### Немедленно (1-2 дня):
+1. ✅ Реализовать `custom:tara_secret` вместо детерминистических паролей
+2. ✅ Исправить передачу токенов (не через URL)
+3. ✅ Добавить все JWT validation checks
+
+### Критично (1 неделя):
+4. ✅ Настроить secure cookies (HttpOnly, Secure, SameSite)
+5. ✅ Добавить rate limiting
+6. ✅ Настроить secrets management
+7. ✅ Реализовать proper логирование (без PII)
+
+### Важно (2-4 недели):
+8. ✅ Email verification для user linking
+9. ✅ Session management
+10. ✅ Monitoring & alerting
+11. ✅ NAT Gateway redundancy
+
+### Желательно (1-3 месяца):
+12. ✅ GDPR compliance audit
+13. ✅ Penetration testing
+14. ✅ Security documentation
+15. ✅ Incident response plan
