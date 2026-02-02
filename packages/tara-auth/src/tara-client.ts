@@ -61,14 +61,16 @@ export class TaraClient {
       grant_type: 'authorization_code',
       code,
       redirect_uri: this.config.redirectUri,
-      client_id: this.config.clientId,
-      client_secret: this.config.clientSecret,
     });
+
+    // TARA requires client_secret_basic authentication (Basic Auth header)
+    const credentials = Buffer.from(`${this.config.clientId}:${this.config.clientSecret}`).toString('base64');
 
     const response = await fetch(this.tokenEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${credentials}`,
       },
       body: params.toString(),
     });
