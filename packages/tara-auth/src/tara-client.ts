@@ -1,5 +1,35 @@
 import * as jose from 'jose';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { TaraConfig, TaraIdToken, TaraTokenResponse } from './types';
+
+interface TaraSecrets {
+  'tara-client-id': string;
+  'tara-client-secret': string;
+}
+
+let cachedSecrets: TaraSecrets | null = null;
+
+async function getTaraSecrets(): Promise<TaraSecrets> {
+  if (cachedSecrets) {
+    return cachedSecrets;
+  }
+
+  const secretsArn = process.env.TARA_SECRETS_ARN;
+  if (!secretsArn) {
+    throw new Error('TARA_SECRETS_ARN environment variable is not set');
+  }
+
+  const client = new SecretsManagerClient({ region: process.env.AWS_REGION || 'eu-west-1' });
+  const command = new GetSecretValueCommand({ SecretId: secretsArn });
+  const response = await client.send(command);
+
+  if (!response.SecretString) {
+    throw new Error('Secret value is empty');
+  }
+
+  cachedSecrets = JSON.parse(response.SecretString) as TaraSecrets;
+  return cachedSecrets;
+}
 
 export class TaraClient {
   private config: TaraConfig;
@@ -74,16 +104,18 @@ export class TaraClient {
   }
 }
 
-export function createTaraClient(): TaraClient {
+export async function createTaraClient(): Promise<TaraClient> {
+  const secrets = await getTaraSecrets();
+  
   const config: TaraConfig = {
     issuer: process.env.TARA_ISSUER || 'https://tara-test.ria.ee/oidc',
-    clientId: process.env.TARA_CLIENT_ID || '',
-    clientSecret: process.env.TARA_CLIENT_SECRET || '',
+    clientId: secrets['tara-client-id'],
+    clientSecret: secrets['tara-client-secret'],
     redirectUri: getRedirectUri(),
   };
 
   if (!config.clientId || !config.clientSecret) {
-    throw new Error('TARA_CLIENT_ID and TARA_CLIENT_SECRET must be set');
+    throw new Error('TARA credentials not found in Secrets Manager');
   }
 
   return new TaraClient(config);

@@ -44,8 +44,7 @@ provider:
   
   environment:
     TARA_ISSUER: ${self:custom.taraConfig.${self:provider.stage}.issuer}
-    TARA_CLIENT_ID: ${ssm:/askend-lab/tara-client-id, 'demo-client-id'}
-    TARA_CLIENT_SECRET: ${ssm:/askend-lab/tara-client-secret, 'demo-client-secret'}
+    TARA_SECRETS_ARN: arn:aws:secretsmanager:eu-west-1:465168436856:secret:askend-lab/llm-keys-qiGKhS
     COGNITO_USER_POOL_ID: eu-west-1_wlRtuLkG2
     COGNITO_CLIENT_ID: 64tf6nf61n6sgftqif6q975hka
     FRONTEND_URL_DEV: https://hak-dev.askend-lab.com
@@ -76,6 +75,11 @@ provider:
             - ssm:GetParameter
           Resource:
             - arn:aws:ssm:eu-west-1:465168436856:parameter/askend-lab/*
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:secretsmanager:eu-west-1:465168436856:secret:askend-lab/llm-keys-*
 
 functions:
   taraStart:
