@@ -67,6 +67,7 @@ provider:
             - cognito-idp:AdminGetUser
             - cognito-idp:AdminUpdateUserAttributes
             - cognito-idp:AdminInitiateAuth
+            - cognito-idp:AdminSetUserPassword
             - cognito-idp:ListUsers
           Resource:
             - arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
