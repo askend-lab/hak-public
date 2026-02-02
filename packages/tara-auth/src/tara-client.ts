@@ -39,9 +39,10 @@ export class TaraClient {
 
   constructor(config: TaraConfig) {
     this.config = config;
-    this.jwksUri = `${config.issuer}/.well-known/openid-configuration`;
-    this.tokenEndpoint = `${config.issuer}/token`;
-    this.authorizationEndpoint = `${config.issuer}/authorize`;
+    // TARA OIDC endpoints are at /oidc/* but issuer claim is just the base URL
+    this.jwksUri = `${config.issuer}/oidc/jwks`;
+    this.tokenEndpoint = `${config.issuer}/oidc/token`;
+    this.authorizationEndpoint = `${config.issuer}/oidc/authorize`;
   }
 
   buildAuthorizationUrl(state: string, nonce: string): string {

@@ -32,9 +32,9 @@ custom:
 
   taraConfig:
     dev:
-      issuer: https://tara-test.ria.ee/oidc
+      issuer: https://tara-test.ria.ee
     prod:
-      issuer: https://tara.ria.ee/oidc
+      issuer: https://tara.ria.ee
 
 provider:
   name: aws
