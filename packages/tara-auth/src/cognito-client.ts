@@ -79,6 +79,26 @@ export class CognitoClient {
     await this.client.send(command);
   }
 
+  buildUserAttributes(taraIdToken: TaraIdToken): Array<{ Name: string; Value: string }> {
+    const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
+    
+    const attributes: Array<{ Name: string; Value: string }> = [
+      { Name: 'email', Value: email },
+      { Name: 'email_verified', Value: 'true' },
+      { Name: 'custom:personal_code', Value: taraIdToken.sub },
+    ];
+
+    // Add optional attributes only if they have values
+    if (taraIdToken.given_name) {
+      attributes.push({ Name: 'given_name', Value: taraIdToken.given_name });
+    }
+    if (taraIdToken.family_name) {
+      attributes.push({ Name: 'family_name', Value: taraIdToken.family_name });
+    }
+
+    return attributes;
+  }
+
   private async createUser(taraIdToken: TaraIdToken): Promise<string> {
     // Cognito requires email as username (UsernameAttributes: ["email"])
     const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
@@ -88,13 +108,7 @@ export class CognitoClient {
       const command = new AdminCreateUserCommand({
         UserPoolId: this.config.userPoolId,
         Username: username,
-        UserAttributes: [
-          { Name: 'email', Value: email },
-          { Name: 'email_verified', Value: 'true' },
-          { Name: 'given_name', Value: taraIdToken.given_name },
-          { Name: 'family_name', Value: taraIdToken.family_name },
-          { Name: 'custom:personal_code', Value: taraIdToken.sub },
-        ],
+        UserAttributes: this.buildUserAttributes(taraIdToken),
         MessageAction: 'SUPPRESS', // Don't send welcome email
       });
       await this.client.send(command);

@@ -1,7 +1,7 @@
 export interface TaraIdToken {
   sub: string; // Personal code (isikukood) e.g., "EE38001085718"
-  given_name: string;
-  family_name: string;
+  given_name?: string;
+  family_name?: string;
   date_of_birth?: string;
   email?: string;
   email_verified?: boolean;
