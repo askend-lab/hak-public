@@ -2,7 +2,7 @@ import { TaraClient } from '../src/tara-client';
 
 describe('TaraClient', () => {
   const mockConfig = {
-    issuer: 'https://tara-test.ria.ee/oidc',
+    issuer: 'https://tara-test.ria.ee',
     clientId: 'test-client-id',
     clientSecret: 'test-client-secret',
     redirectUri: 'https://example.com/callback',
