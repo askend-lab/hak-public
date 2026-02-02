@@ -93,15 +93,38 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 
 ### TARA Flow
 1. User clicks "Login with TARA" → redirects to `/auth/tara/start`
-2. Lambda builds TARA authorize URL with state, redirects user
+2. Lambda builds TARA authorize URL with state/nonce, redirects user
 3. User authenticates in TARA (ID-card, Mobile-ID, Smart-ID)
 4. TARA redirects to `/auth/tara/callback?code=xxx&state=yyy`
-5. Lambda validates state, exchanges code for tokens at TARA (via NAT Gateway IP)
-6. Lambda extracts user info (personal code, name) from TARA id_token
-7. Lambda creates/finds user in Cognito (AdminCreateUser or lookup by personal code)
-8. Lambda generates Cognito tokens (AdminInitiateAuth with ADMIN_NO_SRP_AUTH)
-9. Lambda redirects to frontend with Cognito tokens
+5. Lambda validates state cookie
+6. Lambda exchanges code for tokens at TARA token endpoint (via NAT Gateway IP)
+   - Uses `client_secret_basic` authentication (Basic Auth header)
+7. Lambda verifies TARA id_token (JWT signature via JWKS, issuer, audience, nonce)
+8. Lambda extracts user info (personal code, name, email) from TARA id_token
+9. Lambda creates/finds user in Cognito:
+   - Search by `custom:personal_code` attribute
+   - If not found, search by email and link
+   - If not found, create new user with `AdminCreateUser`
+10. Lambda sets user password with `AdminSetUserPassword` (for ADMIN_USER_PASSWORD_AUTH)
+11. Lambda generates Cognito tokens via `AdminInitiateAuth` with `ADMIN_USER_PASSWORD_AUTH`
+12. Lambda redirects to frontend with Cognito tokens in URL params
+
+### TARA OIDC Configuration
+- **Issuer:** `https://tara-test.ria.ee` (demo) / `https://tara.ria.ee` (prod)
+- **Endpoints:** All at `/oidc/*` path (authorize, token, jwks)
+- **Auth method:** `client_secret_basic` only
+- **Supported scopes:** `openid`
+
+### Cognito Configuration
+- **ExplicitAuthFlows:** `ALLOW_ADMIN_USER_PASSWORD_AUTH`, `ALLOW_REFRESH_TOKEN_AUTH`
+- **Custom attribute:** `custom:personal_code` for TARA user linking
+
+### Password Security (TODO)
+Current implementation uses deterministic password. Target implementation:
+1. On user creation: generate random secret, store in `custom:tara_secret` attribute
+2. On login: read secret from attribute, use for password generation
+3. Benefits: rotating global secret doesn't break existing users, one leak doesn't compromise all
 
 ### User Linking
-Users are linked by personal code (isikukood) stored as Cognito custom attribute.
+Users are linked by personal code (isikukood) stored as `custom:personal_code` Cognito attribute.
 Same person logging via TARA and Google gets linked to same Cognito user if email matches.
