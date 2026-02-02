@@ -85,7 +85,7 @@ export class TaraClient {
   }
 
   async verifyIdToken(idToken: string, nonce: string): Promise<TaraIdToken> {
-    const JWKS = jose.createRemoteJWKSet(new URL(`${this.config.issuer}/jwks`));
+    const JWKS = jose.createRemoteJWKSet(new URL(this.jwksUri));
 
     const { payload } = await jose.jwtVerify(idToken, JWKS, {
       issuer: this.config.issuer,
