@@ -3,6 +3,7 @@ import {
   AdminCreateUserCommand,
   AdminUpdateUserAttributesCommand,
   AdminInitiateAuthCommand,
+  AdminSetUserPasswordCommand,
   ListUsersCommand,
   UsernameExistsException,
 } from '@aws-sdk/client-cognito-identity-provider';
@@ -103,15 +104,26 @@ export class CognitoClient {
     // Cognito requires email as username (UsernameAttributes: ["email"])
     const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
     const username = email;
+    const password = this.generateDeterministicPassword(username);
 
     try {
-      const command = new AdminCreateUserCommand({
+      const createCommand = new AdminCreateUserCommand({
         UserPoolId: this.config.userPoolId,
         Username: username,
         UserAttributes: this.buildUserAttributes(taraIdToken),
         MessageAction: 'SUPPRESS', // Don't send welcome email
       });
-      await this.client.send(command);
+      await this.client.send(createCommand);
+
+      // Set permanent password so ADMIN_USER_PASSWORD_AUTH works
+      const setPasswordCommand = new AdminSetUserPasswordCommand({
+        UserPoolId: this.config.userPoolId,
+        Username: username,
+        Password: password,
+        Permanent: true,
+      });
+      await this.client.send(setPasswordCommand);
+
       return username;
     } catch (error) {
       if (error instanceof UsernameExistsException) {
