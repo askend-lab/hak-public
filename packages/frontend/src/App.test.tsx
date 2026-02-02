@@ -20,8 +20,6 @@ vi.mock('./hooks', async (importOriginal) => {
     useSentenceMenu: vi.fn(() => mockSentenceMenu()),
     useUserTasks: vi.fn(() => ({ tasks: [], isLoading: false, error: null, refresh: vi.fn() })),
     useUserId: vi.fn(() => '38001085718'),
-    useTaskForm: vi.fn(() => ({ form: {}, errors: {}, handleChange: vi.fn(), handleSubmit: vi.fn(), isValid: true })),
-    useModalState: vi.fn(() => ({ isOpen: false, open: vi.fn(), close: vi.fn() })),
   };
 });
 
@@ -29,7 +27,6 @@ vi.mock('./components/Footer', () => ({ default: () => <div data-testid="footer"
 vi.mock('./components/PronunciationVariants', () => ({ default: () => null }));
 vi.mock('./components/TaskManager', () => ({ default: () => <div data-testid="task-manager">TaskManager</div> }));
 vi.mock('./components/TaskDetailView', () => ({ default: () => <div data-testid="task-detail-view">TaskDetailView</div> }));
-vi.mock('./components/TaskCreationModal', () => ({ default: () => null }));
 vi.mock('./components/TaskEditModal', () => ({ default: () => null }));
 vi.mock('./components/AddEntryModal', () => ({ default: () => null }));
 vi.mock('./components/ShareTaskModal', () => ({ default: () => null }));
@@ -344,6 +341,7 @@ describe('App (Home)', () => {
         handlePlay: vi.fn(),
         handlePlayAll: vi.fn(),
         handleDownload: vi.fn(),
+        handleCopyText: vi.fn(),
         handleDeleteTag: vi.fn(),
         handleEditTag: vi.fn(),
         handleEditTagChange: vi.fn(),

@@ -7,7 +7,7 @@ const defaultProps = {
   isAuthenticated: false, sentenceId: 's1', sentenceText: 'test', menuSearchQuery: '',
   onSearchChange: vi.fn(), isLoadingTasks: false, tasks: [], onAddToTask: vi.fn(),
   onCreateNewTask: vi.fn(), onExplorePhonetic: vi.fn(), onDownload: vi.fn(),
-  onRemove: vi.fn(), onLogin: vi.fn(), onClose: vi.fn(),
+  onCopyText: vi.fn(), onRemove: vi.fn(), onLogin: vi.fn(), onClose: vi.fn(),
 };
 
 describe('SentenceMenu unauthenticated', () => {
@@ -72,6 +72,13 @@ describe('SentenceMenu actions', () => {
     const fn = vi.fn();
     render(<SentenceMenu {...defaultProps} onDownload={fn} />);
     await userEvent.click(screen.getByText('Lae alla .wav fail'));
+    expect(fn).toHaveBeenCalledWith('s1');
+  });
+
+  it('calls onCopyText', async () => {
+    const fn = vi.fn();
+    render(<SentenceMenu {...defaultProps} onCopyText={fn} />);
+    await userEvent.click(screen.getByText('Kopeeri tekst'));
     expect(fn).toHaveBeenCalledWith('s1');
   });
 

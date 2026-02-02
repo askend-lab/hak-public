@@ -61,6 +61,7 @@ interface SynthesisViewProps {
   onCreateNewTask: (sentenceId: string) => void;
   onExplorePhonetic: (id: string) => void;
   onDownload: (id: string) => void;
+  onCopyText: (id: string) => void;
   onRemoveSentence: (id: string) => void;
   onLogin: () => void;
   onAddSentence: () => void;
@@ -136,6 +137,7 @@ const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
           onCreateNewTask={p.onCreateNewTask}
           onExplorePhonetic={p.onExplorePhonetic}
           onDownload={p.onDownload}
+          onCopyText={p.onCopyText}
           onRemove={p.onRemoveSentence}
           onLogin={p.onLogin}
           onClose={p.onMenuClose}

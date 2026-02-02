@@ -97,32 +97,16 @@ describe('PronunciationVariants', () => {
       });
     });
 
-    it('shows play buttons for variants', async () => {
+    it('shows play and use buttons for variants', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({
           variants: [{ text: 'test', description: 'Normal' }],
         }),
       });
-      
       render(<PronunciationVariants {...defaultProps} />);
-      
       await waitFor(() => {
         expect(screen.getByTitle('Mängi')).toBeInTheDocument();
-      });
-    });
-
-    it('shows use button for variants', async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
-          variants: [{ text: 'test', description: 'Normal' }],
-        }),
-      });
-      
-      render(<PronunciationVariants {...defaultProps} />);
-      
-      await waitFor(() => {
         expect(screen.getByText('Kasuta')).toBeInTheDocument();
       });
     });
@@ -249,10 +233,10 @@ describe('PronunciationVariants', () => {
       
       await user.click(screen.getByText('Loo oma variant'));
       
-      expect(screen.getByTitle('Kolmas välde')).toBeInTheDocument();
-      expect(screen.getByTitle('Rõhuline silp')).toBeInTheDocument();
-      expect(screen.getByTitle('Palatalisatsioon')).toBeInTheDocument();
-      expect(screen.getByTitle('Liitsõna piir')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'kolmas välde' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'ebareeglipärase rõhu märk' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'peenendus' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'liitsõnapiir' })).toBeInTheDocument();
     });
 
     it('allows entering custom variant', async () => {
@@ -323,8 +307,8 @@ describe('PronunciationVariants', () => {
     });
   });
 
-  describe('guide view', () => {
-    it('opens guide view when guide link clicked', async () => {
+  describe('markers guide box', () => {
+    it('shows markers guide box in custom variant form', async () => {
       const user = userEvent.setup();
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
@@ -340,7 +324,28 @@ describe('PronunciationVariants', () => {
       });
       
       await user.click(screen.getByText('Loo oma variant'));
-      await user.click(screen.getByText('siit'));
+      
+      expect(screen.getByText('Hääldusmärgid')).toBeInTheDocument();
+      expect(screen.getByText('Kasuta märke häälduse täpsustamiseks. Klõpsa märgil selle lisamiseks või hõlju kohal juhiste nägemiseks.')).toBeInTheDocument();
+    });
+
+    it('opens guide view when info button clicked', async () => {
+      const user = userEvent.setup();
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          variants: [{ text: 'test', description: 'Normal' }],
+        }),
+      });
+      
+      render(<PronunciationVariants {...defaultProps} />);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Loo oma variant')).toBeInTheDocument();
+      });
+      
+      await user.click(screen.getByText('Loo oma variant'));
+      await user.click(screen.getByLabelText('Ava hääldusmärkide juhend'));
       
       expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
     });
@@ -361,11 +366,11 @@ describe('PronunciationVariants', () => {
       });
       
       await user.click(screen.getByText('Loo oma variant'));
-      await user.click(screen.getByText('siit'));
+      await user.click(screen.getByLabelText('Ava hääldusmärkide juhend'));
       expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
       
       await user.click(screen.getByLabelText('Tagasi variantide juurde'));
-      expect(screen.queryByText('Hääldusmärkide juhend')).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Hääldusmärkide juhend' })).not.toBeInTheDocument();
     });
   });
 

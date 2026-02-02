@@ -7,9 +7,11 @@ import { useSynthesisOrchestrator } from './synthesis/useSynthesisOrchestrator';
 import { useTagEditor } from './synthesis/useTagEditor';
 import { usePlaylistControl } from './synthesis/usePlaylistControl';
 import { useTagUpdater } from './synthesis/useTagUpdater';
+import { useNotification } from '@/contexts/NotificationContext';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useSynthesis() {
+  const { showNotification } = useNotification();
   const orchestrator = useSynthesisOrchestrator();
   const {
     sentences,
@@ -110,6 +112,19 @@ export function useSynthesis() {
       console.error('Failed to download audio:', error);
     }
   }, [getSentence, updateSentence]);
+
+  const handleCopyText = useCallback(async (id: string) => {
+    const sentence = getSentence(id);
+    if (!sentence || !sentence.text.trim()) return;
+
+    try {
+      await navigator.clipboard.writeText(sentence.text);
+      showNotification('success', 'Tekst kopeeritud!', undefined, undefined, 'success');
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+      showNotification('error', 'Viga teksti kopeerimisel');
+    }
+  }, [getSentence, showNotification]);
 
   const handleDeleteTag = useCallback((sentenceId: string, tagIndex: number) => {
     tagUpdater.deleteTag(sentenceId, tagIndex);
@@ -212,6 +227,7 @@ export function useSynthesis() {
     handlePlay,
     handlePlayAll: playlist.handlePlayAll,
     handleDownload,
+    handleCopyText,
     handleDeleteTag,
     handleEditTag,
     handleEditTagChange,

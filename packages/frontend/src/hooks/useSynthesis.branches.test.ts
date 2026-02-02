@@ -1,7 +1,10 @@
- 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSynthesis } from './useSynthesis';
+
+vi.mock('@/contexts/NotificationContext', () => ({
+  useNotification: (): { showNotification: ReturnType<typeof vi.fn> } => ({ showNotification: vi.fn() }),
+}));
 
 vi.mock('@/utils/phoneticMarkers', () => ({
   stripPhoneticMarkers: (text: string): string => text.replace(/[·`´]/g, ''),

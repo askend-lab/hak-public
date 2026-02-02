@@ -6,5 +6,3 @@ export { useSentenceMenu } from './useSentenceMenu';
 export { useUserTasks } from './useUserTasks';
 export { useUserId } from './useUserId';
 export { useCurrentView } from './useCurrentView';
-export { useTaskForm } from './useTaskForm';
-export { useModalState } from './useModalState';

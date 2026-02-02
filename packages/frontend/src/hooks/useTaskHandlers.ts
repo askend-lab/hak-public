@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { DataService } from '@/services/dataService';
-import { CreateTaskRequest } from '@/types/task';
 import { useAuth } from '@/services/auth';
 import { useNotification } from '@/contexts/NotificationContext';
 import { SentenceState, filterNonEmptySentences } from '@/types/synthesis';
@@ -27,7 +26,6 @@ export function useTaskHandlers(
     onClick: (): void => { setSelectedTaskId(taskId); setCurrentView('tasks'); }
   }), [setSelectedTaskId, setCurrentView]);
 
-  const [showTaskCreationModal, setShowTaskCreationModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showAddToTaskDropdown, setShowAddToTaskDropdown] = useState(false);
   const [showTaskEditModal, setShowTaskEditModal] = useState(false);
@@ -91,26 +89,6 @@ export function useTaskHandlers(
     setIsTaskCreationFromTasksView(true);
     setShowAddTaskModal(true);
   }, [requireAuth]);
-
-  const handleTaskCreated = useCallback(async (taskData: CreateTaskRequest) => {
-    if (!user) return;
-    try {
-      const dataService = DataService.getInstance();
-      const newTask = await dataService.createTask(user.id, taskData);
-      setShowTaskCreationModal(false);
-      setTaskRefreshTrigger(prev => prev + 1);
-      const entryCount = taskData.speechEntries?.length || 0;
-      if (entryCount > 0) {
-        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud ja ${entryCount} ${entryCount === 1 ? 'lause' : 'lauset'} lisatud!`, undefined, undefined, viewTaskAction(newTask.id));
-      } else {
-        showNotification('success', 'Ülesanne loodud', `${taskData.name} loodud!`, undefined, undefined, viewTaskAction(newTask.id));
-      }
-      setSelectedTaskId(newTask.id);
-    } catch (error) {
-      console.error('Failed to create task:', error);
-      showNotification('error', 'Ülesande loomine ebaõnnestus');
-    }
-  }, [user, showNotification, setSelectedTaskId, setCurrentView]);
 
   const handleAddTask = useCallback(async (title: string, description: string) => {
     if (!user) return;
@@ -222,7 +200,6 @@ export function useTaskHandlers(
   }, [requireAuth, user]);
 
   return {
-    showTaskCreationModal, setShowTaskCreationModal,
     showAddTaskModal, setShowAddTaskModal,
     showAddToTaskDropdown, setShowAddToTaskDropdown,
     showTaskEditModal, setShowTaskEditModal,
@@ -238,7 +215,6 @@ export function useTaskHandlers(
     handleAddSentenceToExistingTask,
     handleCreateNewTaskFromMenu,
     handleCreateTask,
-    handleTaskCreated,
     handleAddTask,
     handleEditTask,
     handleTaskUpdated,

@@ -58,7 +58,6 @@ describe('useTaskHandlers', () => {
   it('should initialize with closed modals', () => {
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
 
-    expect(result.current.showTaskCreationModal).toBe(false);
     expect(result.current.showAddTaskModal).toBe(false);
     expect(result.current.showAddToTaskDropdown).toBe(false);
   });
@@ -131,18 +130,6 @@ describe('useTaskHandlers', () => {
     expect(result.current.showAddTaskModal).toBe(true);
   });
 
-  it('should handle task created', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
-
-    await act(async () => {
-      await result.current.handleTaskCreated({ name: 'New Task', speechSequences: [] });
-    });
-
-    expect(mockCreateTask).toHaveBeenCalled();
-    expect(mockShowNotification).toHaveBeenCalled();
-    expect(mockSetSelectedTaskId).toHaveBeenCalledWith('new-task-1');
-  });
-
   it('should add task with playlist entries', async () => {
     const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
 
@@ -195,20 +182,6 @@ describe('useTaskHandlers', () => {
     expect(result.current.taskToShare).toMatchObject({ id: 'task-1', name: 'Task 1' });
   });
 
-  it('should close modals', () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
-
-    act(() => {
-      result.current.setShowTaskCreationModal(true);
-    });
-    expect(result.current.showTaskCreationModal).toBe(true);
-
-    act(() => {
-      result.current.setShowTaskCreationModal(false);
-    });
-    expect(result.current.showTaskCreationModal).toBe(false);
-  });
-
   it('should handle error when adding entries to task', async () => {
     mockAddTextEntriesToTask.mockRejectedValueOnce(new Error('Failed'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -233,19 +206,6 @@ describe('useTaskHandlers', () => {
     });
 
     expect(mockAddTextEntriesToTask).not.toHaveBeenCalled();
-  });
-
-  it('should handle error when creating task', async () => {
-    mockCreateTask.mockRejectedValueOnce(new Error('Failed'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
-
-    await act(async () => {
-      await result.current.handleTaskCreated({ name: 'New Task', speechSequences: [] });
-    });
-
-    expect(mockShowNotification).toHaveBeenCalledWith('error', expect.any(String));
-    consoleSpy.mockRestore();
   });
 
   it('should handle error when updating task', async () => {

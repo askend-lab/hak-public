@@ -68,6 +68,19 @@ export default function TaskDetailView({
       .finally(() => setIsLoading(false));
   }, [taskId, user, initialTask]);
 
+  const handleCopyText = async (id: string) => {
+    const entry = entries.find(e => e.id === id);
+    if (!entry || !entry.text.trim()) return;
+
+    try {
+      await navigator.clipboard.writeText(entry.text);
+      showNotification('success', 'Tekst kopeeritud!', undefined, undefined, 'success');
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+      showNotification('error', 'Viga teksti kopeerimisel');
+    }
+  };
+
   const handleDeleteEntry = async (id: string) => {
     if (!user) return;
     
@@ -140,6 +153,7 @@ export default function TaskDetailView({
                 onMenuClose={handleMenuClose}
                 rowMenuItems={[
                   { label: 'Uuri häälduskuju', onClick: phonetic.handleExplorePhonetic },
+                  { label: 'Kopeeri tekst', onClick: handleCopyText },
                   { label: 'Kustuta', onClick: handleDeleteEntry, danger: true }
                 ]}
               />

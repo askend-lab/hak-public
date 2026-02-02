@@ -128,6 +128,38 @@ export function useSentenceState(): {
     }
   }, []);
 
+  // Load copied entries from shared task
+  useEffect(() => {
+    try {
+      const copied = sessionStorage.getItem('copiedEntries');
+      if (copied) {
+        const entries = JSON.parse(copied);
+        if (Array.isArray(entries) && entries.length > 0) {
+          const transformed: SentenceState[] = entries.map((entry: { id?: string; text: string; stressedText?: string; audioUrl?: string | null }) => {
+            const words = entry.text.trim().split(/\s+/).filter((w: string) => w.length > 0);
+            const stressedWords = entry.stressedText?.trim().split(/\s+/).filter((w: string) => w.length > 0) || [];
+            return ensureSentenceState({
+              id: entry.id || `entry_${Date.now()}_${Math.random()}`,
+              text: entry.text,
+              tags: words,
+              isPlaying: false,
+              isLoading: false,
+              currentInput: '',
+              stressedTags: stressedWords.length === words.length ? stressedWords : undefined,
+              audioUrl: entry.audioUrl,
+              phoneticText: entry.stressedText
+            });
+          });
+          setSentences(transformed);
+          sessionStorage.removeItem('copiedEntries');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load copied entries from sessionStorage:', error);
+      sessionStorage.removeItem('copiedEntries');
+    }
+  }, []);
+
   const setDemoSentences = useCallback(() => {
     setSentences([
       { id: 'demo-1', text: 'Noormees läks kooli', tags: ['Noormees', 'läks', 'kooli'], isPlaying: false, isLoading: false, currentInput: '', phoneticText: null, audioUrl: null, stressedTags: null },

@@ -29,6 +29,8 @@ export default function Home() {
   const variants = useVariantsPanel(synthesis.sentences, synthesis.setSentences, showNotification);
   const menu = useSentenceMenu();
   const hasCheckedInitialRedirect = useRef(false);
+  // Capture copiedEntries presence synchronously during render (before effects clear it)
+  const hadCopiedEntries = useRef(sessionStorage.getItem('copiedEntries') !== null);
 
   // Handle post-login redirect
   useEffect(() => {
@@ -49,7 +51,9 @@ export default function Home() {
     // Only check on initial app load, not on subsequent navigation
     if (!hasCheckedInitialRedirect.current) {
       hasCheckedInitialRedirect.current = true;
-      if (!onboardingState.completed && !onboardingState.selectedRole && currentView === 'synthesis') {
+      // Skip role selection if user has copied entries from shared task
+      // Use ref captured during render since useSentenceState clears sessionStorage in its effect
+      if (!hadCopiedEntries.current && !onboardingState.completed && !onboardingState.selectedRole && currentView === 'synthesis') {
         navigate('/role-selection', { replace: true });
       }
     }
@@ -111,7 +115,7 @@ export default function Home() {
                 onClearSentence={synthesis.handleClearSentence} onMenuOpen={(event: React.MouseEvent<Element, MouseEvent>, id: string) => menu.handleMenuOpen(event, id)} onMenuClose={menu.handleMenuClose}
                 onMenuSearchChange={menu.setMenuSearchQuery} onAddToTask={taskHandlers.handleAddSentenceToExistingTask}
                 onCreateNewTask={taskHandlers.handleCreateNewTaskFromMenu} onExplorePhonetic={variants.handleExplorePhonetic}
-                onDownload={synthesis.handleDownload} onRemoveSentence={synthesis.handleRemoveSentence}
+                onDownload={synthesis.handleDownload} onCopyText={synthesis.handleCopyText} onRemoveSentence={synthesis.handleRemoveSentence}
                 onLogin={() => setShowLoginModal(true)} onAddSentence={synthesis.handleAddSentence}
               />
             )}
@@ -139,7 +143,7 @@ export default function Home() {
       </main>
 
       <footer className="page-layout__footer page-footer--full"><Footer /></footer>
-      <AppModals user={user} sentences={synthesis.sentences} showLoginModal={showLoginModal} setShowLoginModal={setShowLoginModal} showNotification={showNotification} isWizardActive={isWizardActive} variants={variants} synthesis={synthesis} taskHandlers={taskHandlers} onUseVariant={handleUseVariant} />
+      <AppModals showLoginModal={showLoginModal} setShowLoginModal={setShowLoginModal} showNotification={showNotification} isWizardActive={isWizardActive} variants={variants} synthesis={synthesis} taskHandlers={taskHandlers} onUseVariant={handleUseVariant} />
     </div>
   );
 }
