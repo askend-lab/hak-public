@@ -45,13 +45,14 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 - NAT Gateway has Elastic IP (fixed, controllable)
 - Register Elastic IP with TARA (klient@ria.ee)
 - Cost: ~€35/month
+- ⚠️ **Known limitation:** Single AZ deployment. If AZ goes down, TARA login unavailable. Acceptable for MVP; future: multi-AZ with multiple NAT Gateways.
 
 ### 2. TARA Auth Lambda
 - Runs in VPC private subnet (outbound via NAT Gateway)
 - Endpoints:
   - `GET /auth/tara/start` - redirects to TARA authorize URL
   - `GET /auth/tara/callback` - receives code, exchanges for token, creates Cognito session
-- Uses AdminCreateUser/AdminInitiateAuth to create Cognito tokens
+- Uses AdminCreateUser + Custom Auth flow (via Cognito triggers) for token generation
 
 ### 3. Identity Providers in Cognito (Google/Facebook only)
 
@@ -72,6 +73,8 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 - Secrets stored in: `askend-lab/llm-keys` (Secrets Manager)
   - `tara-client-id`
   - `tara-client-secret`
+- Issuer: https://tara.ria.ee (prod) or https://tara-test.ria.ee (demo)
+  - Note: OIDC endpoints are at `/oidc/*` but issuer claim in JWT is the base URL
 - For production: apply to klient@ria.ee with same redirect URI and IP
 
 ### 5. Frontend
@@ -106,7 +109,13 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 
 ## Authentication Flow Details
 
-### TARA Flow
+### TARA Flow (Custom Auth)
+
+**Why Custom Auth?**
+TARA cannot be added as a standard Cognito OIDC Identity Provider due to IP whitelist requirements.
+Cognito's `CUSTOM_AUTH` flow is the documented AWS mechanism for non-standard authentication scenarios.
+
+**Flow:**
 1. User clicks "Login with TARA" → redirects to `/auth/tara/start`
 2. Lambda builds TARA authorize URL with state/nonce, redirects user
 3. User authenticates in TARA (ID-card, Mobile-ID, Smart-ID)
@@ -118,11 +127,13 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 8. Lambda extracts user info (personal code, name, email) from TARA id_token
 9. Lambda creates/finds user in Cognito:
    - Search by `custom:personal_code` attribute
-   - If not found, search by email and link
    - If not found, create new user with `AdminCreateUser`
-10. Lambda sets user password with `AdminSetUserPassword` (for ADMIN_USER_PASSWORD_AUTH)
-11. Lambda generates Cognito tokens via `AdminInitiateAuth` with `ADMIN_USER_PASSWORD_AUTH`
-12. Lambda redirects to frontend with Cognito tokens in URL params
+   - No email-based linking: different login methods = separate accounts (simpler, no account takeover risk)
+10. Lambda calls `AdminInitiateAuth` with `CUSTOM_AUTH` flow
+11. Cognito triggers Custom Auth Lambda (verifies and issues tokens)
+12. Lambda returns tokens to frontend via HttpOnly secure cookies
+    - Tokens NOT passed in URL parameters (prevents logging, Referer leaks)
+    - Frontend auth state: separate `is_authenticated` cookie (not HttpOnly) or `/auth/me` endpoint
 
 ### TARA OIDC Configuration
 - **Current:** Demo environment (`https://tara-test.ria.ee`)
@@ -144,19 +155,28 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 | TARA Demo | ✅ | Credentials in Secrets Manager |
 | TARA Production | ⏳ | Apply after demo testing |
 
-### Cognito Configuration
+### Cognito Custom Auth Configuration
 - **ExplicitAuthFlows:** `ALLOW_ADMIN_USER_PASSWORD_AUTH`, `ALLOW_REFRESH_TOKEN_AUTH`
 - **Custom attribute:** `custom:personal_code` for TARA user linking
 
-### Password Security (TODO)
-Current implementation uses deterministic password. Target implementation:
-1. On user creation: generate random secret, store in `custom:tara_secret` attribute
-2. On login: read secret from attribute, use for password generation
-3. Benefits: rotating global secret doesn't break existing users, one leak doesn't compromise all
+**Lambda Functions:**
+- `cognitoTriggers` - handles all three Cognito trigger events via switch on `triggerSource`
+- IAM role: minimal permissions (no Admin API access needed, only Cognito trigger response)
 
-### User Linking
-Users are linked by personal code (isikukood) stored as `custom:personal_code` Cognito attribute.
-Same person logging via TARA and Google gets linked to same Cognito user if email matches.
+**Triggers:**
+1. **DefineAuthChallenge** - returns `CUSTOM_CHALLENGE`
+2. **CreateAuthChallenge** - creates challenge metadata
+3. **VerifyAuthChallengeResponse** - validates and returns success
+
+**Trust chain between TARA Lambda and Cognito triggers:**
+- Cognito triggers are invoked only by Cognito, not externally accessible
+- TARA Lambda verifies JWT before calling adminInitiateAuth
+- Chain of trust: User → TARA (auth) → TARA Lambda (JWT verified) → Cognito → Trigger Lambda
+
+### User Accounts
+- TARA users identified by `custom:personal_code` attribute
+- No cross-provider linking: Google login and TARA login = separate accounts
+- Simplifies security model, eliminates account takeover risks
 
 ## Next Steps
 
@@ -178,3 +198,25 @@ Same person logging via TARA and Google gets linked to same Cognito user if emai
 - [ ] Apply for TARA production account (klient@ria.ee)
 - [ ] Switch TARA_ISSUER from `tara-test.ria.ee` to `tara.ria.ee`
 - [ ] Implement password security improvement (random secret per user)
+
+## Security & Operations Considerations
+
+### Rate Limiting
+- AWS WAF rate limiting on Lambda endpoints
+- Cognito built-in throttling for Admin API calls
+- CloudWatch alarms on anomalous request patterns
+
+### Error Handling
+- Structured error responses (no sensitive data in errors)
+- Failed auth attempts logged with pseudonymized user ID
+- Graceful degradation on TARA unavailability
+
+### Monitoring
+- CloudWatch metrics: auth success/failure rates, latency
+- Alarms: elevated failure rates, NAT Gateway issues
+- Log retention: 30 days (no PII in logs)
+
+### Token Management
+- Access/ID tokens: 1 hour validity
+- Refresh tokens: 30 days, rotation on use
+- JWKS caching: cache TARA JWKS with TTL (reduce latency, handle TARA downtime)
