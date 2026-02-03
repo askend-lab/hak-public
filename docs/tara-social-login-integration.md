@@ -160,10 +160,21 @@ Same person logging via TARA and Google gets linked to same Cognito user if emai
 
 ## Next Steps
 
-- [ ] Fix redirect_uri in callback (change from `hak-api-dev.askend-lab.com` to `auth.askend-lab.com`)
-- [ ] Add Cognito Lambda triggers (lambda_config in cognito.tf)
-- [ ] Test full TARA demo flow end-to-end
-- [ ] Add TARA login button to frontend
+### INFRA repo (sam/infra)
+- [ ] Fix redirect_uri in `lambdas/tara-auth/src/handler.ts` (change callback URL from `hak-api-dev` to `auth.askend-lab.com`)
+- [ ] Add Cognito Lambda triggers in `terraform/cognito.tf` (lambda_config block)
+- [ ] Deploy: Lambda via CI/CD + Terraform apply
+
+### HAK repo (kate/hak)
+- [ ] Update `getTaraLoginUrl()` in `packages/frontend/src/services/auth/config.ts` to use `auth.askend-lab.com`
+- [ ] Update E2E tests in `packages/frontend/e2e/tara-auth.spec.ts` to use new URLs
+- [ ] Deploy frontend
+
+### Testing
+- [ ] Test full TARA demo flow end-to-end (ID-card, Mobile-ID, Smart-ID)
+- [ ] Verify Cognito user creation/linking works
+
+### Production Migration (later)
 - [ ] Apply for TARA production account (klient@ria.ee)
-- [ ] Switch from TARA demo to production (update TARA_ISSUER)
+- [ ] Switch TARA_ISSUER from `tara-test.ria.ee` to `tara.ria.ee`
 - [ ] Implement password security improvement (random secret per user)
