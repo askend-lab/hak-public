@@ -26,6 +26,9 @@ test_modules:
   - name: gherkin-parser
     path: packages/gherkin-parser
     type: jest
+  - name: tara-auth
+    path: packages/tara-auth
+    type: jest
   - name: shared
     path: packages/shared
     type: jest
