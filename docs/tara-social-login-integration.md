@@ -66,10 +66,13 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 **TARA:** NOT added to Cognito (handled by custom Lambda)
 
 ### 4. TARA Registration
-- Apply to klient@ria.ee (demo first, then prod)
-- Redirect URI: https://hak-api.askend-lab.com/auth/tara/callback (our Lambda)
-- IP whitelist: NAT Gateway Elastic IP
-- Issuer: https://tara.ria.ee/oidc (prod) or https://tara-test.ria.ee/oidc (demo)
+- ✅ **Demo account configured** (tara-test.ria.ee)
+- Redirect URI: https://auth.askend-lab.com/auth/tara/callback
+- IP whitelist: 34.253.56.45 (NAT Gateway Elastic IP)
+- Secrets stored in: `askend-lab/llm-keys` (Secrets Manager)
+  - `tara-client-id`
+  - `tara-client-secret`
+- For production: apply to klient@ria.ee with same redirect URI and IP
 
 ### 5. Frontend
 - Google/Facebook: Use Cognito Hosted UI
@@ -82,12 +85,24 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 ## Files
 
 **Infrastructure (sam/infra):**
-- terraform/vpc-nat.tf - VPC, private subnet, NAT Gateway, Elastic IP
-- terraform/cognito.tf - existing, add Google/Facebook providers
+- `terraform/vpc-nat.tf` - VPC, private subnets, NAT Gateway, Elastic IP
+- `terraform/cognito.tf` - User Pool configuration
+- `terraform/tara-auth-domain.tf` - Custom domain for TARA Auth API
+- `lambdas/tara-auth/` - TARA authentication Lambda
+  - `serverless.yml` - deployment config with VPC settings
+  - `src/handler.ts` - API endpoints (start, callback)
+  - `src/tara-client.ts` - TARA OIDC client
+  - `src/cognito-client.ts` - Cognito integration
+  - `src/cognito-triggers.ts` - Custom Auth triggers
 
-**TARA Lambda (hak):**
-- packages/tara-auth/ - new package for TARA authentication Lambda
-- serverless-tara.yml - deployment config with VPC settings
+**Deployed Infrastructure:**
+- Domain: `auth.askend-lab.com`
+- API Gateway: REST API (REGIONAL)
+- NAT Gateway IP: `34.253.56.45`
+- Lambda functions:
+  - `tara-auth-dev-taraStart`
+  - `tara-auth-dev-taraCallback`
+  - `tara-auth-dev-cognitoTriggers`
 
 ## Authentication Flow Details
 
@@ -110,10 +125,24 @@ TARA production environment requires IP whitelist for token endpoint requests. C
 12. Lambda redirects to frontend with Cognito tokens in URL params
 
 ### TARA OIDC Configuration
-- **Issuer:** `https://tara-test.ria.ee` (demo) / `https://tara.ria.ee` (prod)
+- **Current:** Demo environment (`https://tara-test.ria.ee`)
+- **Production:** `https://tara.ria.ee` (switch later)
 - **Endpoints:** All at `/oidc/*` path (authorize, token, jwks)
 - **Auth method:** `client_secret_basic` only
 - **Supported scopes:** `openid`
+
+## Current Status
+
+| Component | Status | Details |
+|-----------|--------|--------|
+| VPC + NAT Gateway | ✅ | IP: 34.253.56.45 |
+| TARA Auth Lambda | ✅ | Deployed to infra |
+| Custom Domain | ✅ | auth.askend-lab.com |
+| /auth/tara/start | ✅ | Redirects to TARA |
+| /auth/tara/callback | ⏳ | Needs testing |
+| Cognito Triggers | ⏳ | Need to add lambda_config |
+| TARA Demo | ✅ | Credentials in Secrets Manager |
+| TARA Production | ⏳ | Apply after demo testing |
 
 ### Cognito Configuration
 - **ExplicitAuthFlows:** `ALLOW_ADMIN_USER_PASSWORD_AUTH`, `ALLOW_REFRESH_TOKEN_AUTH`
