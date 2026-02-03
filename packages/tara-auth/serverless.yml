@@ -1,0 +1,118 @@
+service: tara-auth
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+  - serverless-domain-manager
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    platform: 'node'
+    target: 'node18'
+    packager: 'pnpm'
+    
+  domainName:
+    dev: hak-api-dev.askend-lab.com
+    prod: hak-api.askend-lab.com
+  
+  customDomain:
+    domainName: ${self:custom.domainName.${self:provider.stage}}
+    basePath: auth
+    stage: ${self:provider.stage}
+    certificateName: '*.askend-lab.com'
+    createRoute53Record: true
+    endpointType: regional
+    securityPolicy: tls_1_2
+    apiType: rest
+
+  taraConfig:
+    dev:
+      issuer: https://tara-test.ria.ee
+    prod:
+      issuer: https://tara.ria.ee
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-west-1'}
+  
+  environment:
+    TARA_ISSUER: ${self:custom.taraConfig.${self:provider.stage}.issuer}
+    TARA_SECRETS_ARN: arn:aws:secretsmanager:eu-west-1:465168436856:secret:askend-lab/llm-keys-qiGKhS
+    COGNITO_USER_POOL_ID: eu-west-1_wlRtuLkG2
+    COGNITO_CLIENT_ID: 64tf6nf61n6sgftqif6q975hka
+    FRONTEND_URL_DEV: https://hak-dev.askend-lab.com
+    FRONTEND_URL_PROD: https://hak.askend-lab.com
+    STAGE: ${self:provider.stage}
+  
+  vpc:
+    securityGroupIds:
+      - ${ssm:/askend-lab/lambda-security-group-id}
+    subnetIds:
+      - ${ssm:/askend-lab/private-subnet-id-1}
+      - ${ssm:/askend-lab/private-subnet-id-2}
+  
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminCreateUser
+            - cognito-idp:AdminGetUser
+            - cognito-idp:AdminUpdateUserAttributes
+            - cognito-idp:AdminInitiateAuth
+            - cognito-idp:AdminRespondToAuthChallenge
+            - cognito-idp:AdminSetUserPassword
+            - cognito-idp:ListUsers
+          Resource:
+            - arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource:
+            - arn:aws:ssm:eu-west-1:465168436856:parameter/askend-lab/*
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:secretsmanager:eu-west-1:465168436856:secret:askend-lab/llm-keys-*
+
+functions:
+  taraStart:
+    handler: src/handler.startHandler
+    events:
+      - http:
+          path: /tara/start
+          method: get
+          cors: true
+
+  taraCallback:
+    handler: src/handler.callbackHandler
+    events:
+      - http:
+          path: /tara/callback
+          method: get
+          cors: true
+
+  cognitoTriggers:
+    handler: src/cognito-triggers.handler
+    description: Cognito Custom Auth triggers for TARA authentication
+    # No VPC needed - only processes Cognito events
+    vpc: ~
+
+resources:
+  Outputs:
+    TaraAuthEndpoint:
+      Description: TARA Auth API endpoint
+      Value: !Sub https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}
+    CognitoTriggersLambdaArn:
+      Description: Cognito Custom Auth triggers Lambda ARN
+      Value: !GetAtt CognitoTriggersLambdaFunction.Arn
+      Export:
+        Name: ${self:service}-${self:provider.stage}-cognito-triggers-arn
