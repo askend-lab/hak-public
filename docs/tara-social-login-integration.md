@@ -157,3 +157,13 @@ Current implementation uses deterministic password. Target implementation:
 ### User Linking
 Users are linked by personal code (isikukood) stored as `custom:personal_code` Cognito attribute.
 Same person logging via TARA and Google gets linked to same Cognito user if email matches.
+
+## Next Steps
+
+- [ ] Fix redirect_uri in callback (change from `hak-api-dev.askend-lab.com` to `auth.askend-lab.com`)
+- [ ] Add Cognito Lambda triggers (lambda_config in cognito.tf)
+- [ ] Test full TARA demo flow end-to-end
+- [ ] Add TARA login button to frontend
+- [ ] Apply for TARA production account (klient@ria.ee)
+- [ ] Switch from TARA demo to production (update TARA_ISSUER)
+- [ ] Implement password security improvement (random secret per user)
