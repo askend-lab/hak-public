@@ -33,7 +33,7 @@
 - Все тесты simplestore
 - Проверить: покрытие, качество тестов
 
-### [ ] A05. packages/audio-api
+### [✅] A05. packages/audio-api
 - src/ + test/
 - Проверить: S3/SQS интеграция, error handling
 
