@@ -25,7 +25,7 @@
 - store.ts, types.ts, validation.ts
 - Проверить: бизнес-логика, типы
 
-### [ ] A03. packages/simplestore/src/adapters + lambda
+### [✅] A03. packages/simplestore/src/adapters + lambda
 - memory.ts, dynamodb.ts, handler.ts, routes.ts
 - Проверить: DI, error handling
 
