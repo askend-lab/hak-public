@@ -29,7 +29,7 @@
 - memory.ts, dynamodb.ts, handler.ts, routes.ts
 - Проверить: DI, error handling
 
-### [ ] A04. packages/simplestore/test
+### [✅] A04. packages/simplestore/test
 - Все тесты simplestore
 - Проверить: покрытие, качество тестов
 
