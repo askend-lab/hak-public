@@ -21,7 +21,7 @@
 - `src/` — utils, logger, hash, constants
 - Проверить: экспорты, типизация, тесты
 
-### [ ] A02. packages/simplestore/src/core
+### [✅] A02. packages/simplestore/src/core
 - store.ts, types.ts, validation.ts
 - Проверить: бизнес-логика, типы
 
