@@ -61,27 +61,27 @@
 
 ## Part B: Frontend — Services (6 блоков)
 
-### [ ] B01. frontend/src/services/auth
+### [✅] B01. frontend/src/services/auth
 - Аутентификация, токены
 - Проверить: безопасность, error handling
 
-### [ ] B02. frontend/src/services/repository
+### [✅] B02. frontend/src/services/repository
 - API клиент, data access
 - Проверить: типизация, error handling
 
-### [ ] B03. frontend/src/services/storage
+### [✅] B03. frontend/src/services/storage
 - LocalStorage, persistence
 - Проверить: сериализация, edge cases
 
-### [ ] B04. frontend/src/services/merlin + vabamorf
+### [✅] B04. frontend/src/services/merlin + vabamorf
 - TTS и морфология клиенты
 - Проверить: интеграция, типы
 
-### [ ] B05. frontend/src/services/specs
+### [✅] B05. frontend/src/services/specs
 - Спецификации клиент
 - Проверить: типы, features
 
-### [ ] B06. frontend/src/services/__mocks__
+### [✅] B06. frontend/src/services/__mocks__
 - Моки для тестов
 - Проверить: соответствие реальным API
 
