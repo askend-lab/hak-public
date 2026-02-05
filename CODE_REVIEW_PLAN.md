@@ -37,7 +37,7 @@
 - src/ + test/
 - Проверить: S3/SQS интеграция, error handling
 
-### [ ] A06. packages/vabamorf-api/src
+### [✅] A06. packages/vabamorf-api/src
 - handler, parser, validation, types
 - Проверить: парсинг, типизация
 
