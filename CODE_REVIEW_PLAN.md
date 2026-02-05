@@ -41,19 +41,19 @@
 - handler, parser, validation, types
 - Проверить: парсинг, типизация
 
-### [ ] A07. packages/vabamorf-api/test
+### [✅] A07. packages/vabamorf-api/test
 - Все тесты vabamorf
 - Проверить: edge cases, mocks
 
-### [ ] A08. packages/merlin-api + merlin-worker
+### [✅] A08. packages/merlin-api + merlin-worker
 - TTS интеграция
 - Проверить: async flow, error handling
 
-### [ ] A09. packages/gherkin-parser
+### [✅] A09. packages/gherkin-parser
 - Парсер Gherkin спецификаций
 - Проверить: корректность парсинга
 
-### [ ] A10. packages/specifications
+### [✅] A10. packages/specifications
 - Gherkin features (auth, playlist, sharing, synthesis, tasks)
 - Проверить: качество спецификаций, покрытие
 
