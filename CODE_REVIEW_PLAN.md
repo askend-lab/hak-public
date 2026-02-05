@@ -89,27 +89,27 @@
 
 ## Part C: Frontend — Components (6 блоков)
 
-### [ ] C01. frontend/src/components/ui
+### [✅] C01. frontend/src/components/ui
 - Базовые UI компоненты
 - Проверить: переиспользуемость, a11y, стили
 
-### [ ] C02. frontend/src/components/TaskDetailView
+### [✅] C02. frontend/src/components/TaskDetailView
 - Просмотр задач
 - Проверить: логика, hooks
 
-### [ ] C03. frontend/src/components/SentenceSynthesis
+### [✅] C03. frontend/src/components/SentenceSynthesis
 - Синтез предложений
 - Проверить: состояние, UX
 
-### [ ] C04. frontend/src/components/PronunciationVariants
+### [✅] C04. frontend/src/components/PronunciationVariants
 - Варианты произношения
 - Проверить: логика выбора
 
-### [ ] C05. frontend/src/components/onboarding
+### [✅] C05. frontend/src/components/onboarding
 - Onboarding flow
 - Проверить: UX, состояние
 
-### [ ] C06. frontend/src/components/specs
+### [✅] C06. frontend/src/components/specs
 - Компоненты спецификаций
 - Проверить: отображение данных
 
@@ -117,27 +117,27 @@
 
 ## Part D: Frontend — Core (6 блоков)
 
-### [ ] D01. frontend/src/pages
+### [✅] D01. frontend/src/pages
 - Все страницы приложения
 - Проверить: роутинг, layout
 
-### [ ] D02. frontend/src/hooks
+### [✅] D02. frontend/src/hooks
 - Кастомные хуки (включая synthesis/)
 - Проверить: реактивность, зависимости
 
-### [ ] D03. frontend/src/contexts
+### [✅] D03. frontend/src/contexts
 - React контексты
 - Проверить: провайдеры, подписки
 
-### [ ] D04. frontend/src/types + config
+### [✅] D04. frontend/src/types + config
 - Типы и конфигурация
 - Проверить: полнота, консистентность
 
-### [ ] D05. frontend/src/styles
+### [✅] D05. frontend/src/styles
 - Стили (base, components, tokens, abstracts)
 - Проверить: консистентность, CSS-in-JS
 
-### [ ] D06. frontend/src/utils + data + test + features
+### [✅] D06. frontend/src/utils + data + test + features
 - Утилиты, данные, тесты
 - Проверить: helpers, mocks, step definitions
 
@@ -145,23 +145,23 @@
 
 ## Part E: Infrastructure & Config (5 блоков)
 
-### [ ] E01. infra/*.tf (main, variables, outputs)
+### [✅] E01. infra/*.tf (main, variables, outputs)
 - Базовая конфигурация Terraform
 - Проверить: секреты, best practices
 
-### [ ] E02. infra/ (API Gateway, DynamoDB, Route53, website)
+### [✅] E02. infra/ (API Gateway, DynamoDB, Route53, website)
 - AWS ресурсы
 - Проверить: security, naming
 
-### [ ] E03. infra/ (CloudFront, CloudWatch)
+### [✅] E03. infra/ (CloudFront, CloudWatch)
 - CDN и мониторинг
 - Проверить: алармы, dashboards
 
-### [ ] E04. infra/ (audio, merlin, slack-notifications)
+### [✅] E04. infra/ (audio, merlin, slack-notifications)
 - Специализированные ресурсы
 - Проверить: интеграции
 
-### [ ] E05. .github/workflows
+### [✅] E05. .github/workflows
 - CI/CD пайплайны
 - Проверить: секреты, jobs, безопасность
 
@@ -169,15 +169,15 @@
 
 ## Part F: Root & Documentation (3 блока)
 
-### [ ] F01. Root config files
+### [✅] F01. Root config files
 - package.json, tsconfig, eslint, jest, babel
 - Проверить: версии, настройки
 
-### [ ] F02. docs/
+### [✅] F02. docs/
 - Документация проекта
 - Проверить: актуальность, полнота
 
-### [ ] F03. README, BACKLOG, scripts/
+### [✅] F03. README, BACKLOG, scripts/
 - Точка входа для контрибьюторов
 - Проверить: инструкции, onboarding
 
@@ -185,7 +185,7 @@
 
 ## Part G: Final Review (1 блок)
 
-### [ ] G01. Cross-module review
+### [✅] G01. Cross-module review
 - Консистентность между модулями
 - Общие паттерны и проблемы
 - Итоговые рекомендации
