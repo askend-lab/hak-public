@@ -17,7 +17,7 @@
 
 ## Part A: Backend Modules (10 блоков)
 
-### [ ] A01. packages/shared
+### [✅] A01. packages/shared
 - `src/` — utils, logger, hash, constants
 - Проверить: экспорты, типизация, тесты
 
