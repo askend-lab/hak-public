@@ -1,14 +1,9 @@
 import { Store } from '../src/core/store';
-import { ServerContext, StoreRequest, StoreItem, StorageAdapter } from '../src/core/types';
+import { ServerContext, StoreRequest } from '../src/core/types';
 
-import { InMemoryDynamoDB } from './mockDynamoDB';
+import { InMemoryDynamoDB, FailingDynamoDB } from './mockDynamoDB';
 
-class FailingDynamoDB implements StorageAdapter {
-  put(): Promise<void> { throw new Error('DB error'); }
-  get(): Promise<StoreItem | null> { throw new Error('DB error'); }
-  delete(): Promise<void> { throw new Error('DB error'); }
-  queryBySortKeyPrefix(): Promise<StoreItem[]> { throw new Error('DB error'); }
-}
+const ONE_HOUR = 3600;
 
 describe('Store', () => {
   let db: InMemoryDynamoDB;
@@ -31,7 +26,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: { name: 'test' }
       };
 
@@ -78,7 +73,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'public',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       };
 
@@ -92,7 +87,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'public',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       };
 
@@ -121,7 +116,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: { version: 1 }
       };
 
@@ -148,7 +143,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: { value: 42 }
       });
 
@@ -170,7 +165,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
@@ -186,7 +181,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
@@ -208,7 +203,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'public',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
@@ -225,9 +220,9 @@ describe('Store', () => {
 
   describe('query', () => {
     beforeEach(async () => {
-      await store.save({ pk: 'user-settings', sk: 'theme', type: 'private', ttl: 3600, data: { color: 'dark' } });
-      await store.save({ pk: 'user-settings', sk: 'lang', type: 'private', ttl: 3600, data: { lang: 'en' } });
-      await store.save({ pk: 'app-config', sk: 'v1', type: 'private', ttl: 3600, data: {} });
+      await store.save({ pk: 'user-settings', sk: 'theme', type: 'private', ttl: ONE_HOUR, data: { color: 'dark' } });
+      await store.save({ pk: 'user-settings', sk: 'lang', type: 'private', ttl: ONE_HOUR, data: { lang: 'en' } });
+      await store.save({ pk: 'app-config', sk: 'v1', type: 'private', ttl: ONE_HOUR, data: {} });
     });
 
     it('should query items by prefix', async () => {
@@ -264,7 +259,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
