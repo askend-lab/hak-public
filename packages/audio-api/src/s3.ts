@@ -13,6 +13,14 @@ interface S3Error {
   };
 }
 
+function isS3Error(error: unknown): error is S3Error {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    ('name' in error || '$metadata' in error)
+  );
+}
+
 export async function checkFileExists(
   s3Client: S3ClientLike,
   bucket: string,
@@ -26,7 +34,10 @@ export async function checkFileExists(
     await s3Client.send(command);
     return true;
   } catch (error: unknown) {
-    const s3Error = error as S3Error;
+    if (!isS3Error(error)) {
+      throw new Error(`Unknown S3 error: ${String(error)}`);
+    }
+    const s3Error = error;
     const statusCode = s3Error.$metadata?.httpStatusCode;
     const errorName = s3Error.name;
     const errorMessage = s3Error.message;
