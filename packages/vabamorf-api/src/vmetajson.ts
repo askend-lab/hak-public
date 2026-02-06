@@ -2,62 +2,84 @@ import { spawn, ChildProcess } from 'child_process';
 
 import { VmetajsonInput, VmetajsonResponse } from './types';
 
-let process: ChildProcess | null = null;
-let pendingResolve: ((value: VmetajsonResponse) => void) | null = null;
-let pendingReject: ((reason: Error) => void) | null = null;
+interface QueuedRequest {
+  resolve: (value: VmetajsonResponse) => void;
+  reject: (reason: Error) => void;
+  input: VmetajsonInput;
+  timeoutId: ReturnType<typeof setTimeout>;
+}
+
+let vmetajsonProcess: ChildProcess | null = null;
+const requestQueue: QueuedRequest[] = [];
+let currentRequest: QueuedRequest | null = null;
 let buffer = '';
 
+function processNextRequest(): void {
+  if (currentRequest || requestQueue.length === 0 || !vmetajsonProcess?.stdin) {
+    return;
+  }
+  
+  currentRequest = requestQueue.shift()!;
+  vmetajsonProcess.stdin.write(`${JSON.stringify(currentRequest.input)}\n`);
+}
+
+function completeCurrentRequest(response: VmetajsonResponse): void {
+  if (currentRequest) {
+    clearTimeout(currentRequest.timeoutId);
+    currentRequest.resolve(response);
+    currentRequest = null;
+    processNextRequest();
+  }
+}
+
+function failCurrentRequest(error: Error): void {
+  if (currentRequest) {
+    clearTimeout(currentRequest.timeoutId);
+    currentRequest.reject(error);
+    currentRequest = null;
+    processNextRequest();
+  }
+}
+
 export function initVmetajson(binaryPath = './vmetajson', dictPath = '.'): void {
-  if (process) {
+  if (vmetajsonProcess) {
     return;
   }
 
-  process = spawn(binaryPath, [`--path=${dictPath}`], {
+  vmetajsonProcess = spawn(binaryPath, [`--path=${dictPath}`], {
     stdio: ['pipe', 'pipe', 'ignore']
   });
 
-  process.stdout?.on('data', (data: Buffer) => {
+  vmetajsonProcess.stdout?.on('data', (data: Buffer) => {
     buffer += data.toString();
     const lines = buffer.split('\n');
     
     while (lines.length > 1) {
       const line = lines.shift();
-      // intentional null/undefined check
-      if (line !== undefined && line.trim() !== '' && pendingResolve !== null) {
+      if (line !== undefined && line.trim() !== '' && currentRequest) {
         try {
           const response = JSON.parse(line) as VmetajsonResponse;
-          pendingResolve(response);
+          completeCurrentRequest(response);
         } catch {
-           
-          pendingReject?.(new Error(`Failed to parse vmetajson response: ${line ?? 'unknown'}`));
+          failCurrentRequest(new Error(`Failed to parse vmetajson response: ${line ?? 'unknown'}`));
         }
-        pendingResolve = null;
-        pendingReject = null;
       }
     }
     buffer = lines[0] || '';
   });
 
-  process.on('error', (err: Error) => {
-    if (pendingReject) {
-      pendingReject(err);
-      pendingResolve = null;
-      pendingReject = null;
-    }
+  vmetajsonProcess.on('error', (err: Error) => {
+    failCurrentRequest(err);
   });
 
-  process.on('exit', (code: number | null) => {
-    if (pendingReject) {
-      pendingReject(new Error(`vmetajson exited with code ${String(code ?? 'unknown')}`));
-      pendingResolve = null;
-      pendingReject = null;
-    }
-    process = null;
+  vmetajsonProcess.on('exit', (code: number | null) => {
+    failCurrentRequest(new Error(`vmetajson exited with code ${String(code ?? 'unknown')}`));
+    vmetajsonProcess = null;
   });
 }
 
 export async function analyze(text: string): Promise<VmetajsonResponse> {
-  if (!process) {
+  if (!vmetajsonProcess) {
     throw new Error('vmetajson process not initialized');
   }
 
@@ -69,43 +91,30 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
   };
 
   return new Promise((resolve, reject) => {
-    pendingResolve = resolve;
-    pendingReject = reject;
-
-    const timeout = setTimeout(() => {
-      pendingResolve = null;
-      pendingReject = null;
-      reject(new Error('vmetajson timeout'));
+    const timeoutId = setTimeout(() => {
+      const index = requestQueue.findIndex(r => r.timeoutId === timeoutId);
+      if (index !== -1) {
+        requestQueue.splice(index, 1);
+        reject(new Error('vmetajson timeout'));
+      } else if (currentRequest?.timeoutId === timeoutId) {
+        currentRequest = null;
+        reject(new Error('vmetajson timeout'));
+        processNextRequest();
+      }
     }, 5000);
 
-    const cleanup = (): void => { clearTimeout(timeout); };
-    
-    const originalResolve = resolve;
-    const originalReject = reject;
-    
-    pendingResolve = (value): void => {
-      cleanup();
-      originalResolve(value);
-    };
-    
-    pendingReject = (error): void => {
-      cleanup();
-      originalReject(error);
-    };
-
-    if (process?.stdin) {
-      process.stdin.write(`${JSON.stringify(input)  }\n`);
-    }
+    requestQueue.push({ resolve, reject, input, timeoutId });
+    processNextRequest();
   });
 }
 
 export function closeVmetajson(): void {
-  if (process) {
-    process.kill();
-    process = null;
+  if (vmetajsonProcess) {
+    vmetajsonProcess.kill();
+    vmetajsonProcess = null;
   }
 }
 
 export function isInitialized(): boolean {
-  return process !== null;
+  return vmetajsonProcess !== null;
 }
