@@ -6,6 +6,9 @@ import { AnalyzeRequest, VariantsRequest, LambdaResponse } from './types';
 import { createResponse, ensureInitialized, parseJsonBody, validateField } from './validation';
 import { analyze } from './vmetajson';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version } = require('../package.json') as { version: string };
+
 const MAX_TEXT_LENGTH = TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH;
 
 const HTTP_STATUS = {
@@ -72,6 +75,6 @@ export async function variantsHandler(event: APIGatewayProxyEvent): Promise<APIG
 export function healthHandler(): APIGatewayProxyResult {
   return createResponse(HTTP_STATUS.OK, {
     status: 'ok',
-    version: '1.0.0'
+    version
   });
 }
