@@ -1,12 +1,9 @@
 import type { S3ClientLike } from './s3';
 import type { SQSClientLike } from './sqs';
-import { TEXT_LIMITS } from '@hak/shared';
+import { TEXT_LIMITS, calculateHashSync as calculateHash } from '@hak/shared';
 
-import { calculateHashSync as calculateHash } from '@hak/shared';
 import { checkFileExists } from './s3';
 import { publishToQueue } from './sqs';
-
-const MAX_TEXT_LENGTH = TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH;
 
 const HTTP_STATUS = {
   OK: 200,
@@ -38,8 +35,8 @@ function validateText(text: unknown): { valid: true; text: string } | { valid: f
   if (typeof text !== 'string' || text === '') {
     return { valid: false, error: 'Text field is required' };
   }
-  if (text.length > MAX_TEXT_LENGTH) {
-    return { valid: false, error: `Text is too long (max ${String(MAX_TEXT_LENGTH)} characters)` };
+  if (text.length > TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH) {
+    return { valid: false, error: `Text is too long (max ${String(TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH)} characters)` };
   }
   return { valid: true, text };
 }
