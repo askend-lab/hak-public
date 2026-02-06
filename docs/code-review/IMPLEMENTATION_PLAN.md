@@ -104,8 +104,8 @@
 
 ### Testing Improvements
 - [x] **TEST-07** `simplestore/test/boundary.test.ts` — Add Estonian characters test (õ, ä, ö, ü)
-- [ ] **TEST-08** `simplestore/test/boundary.test.ts` — Add emoji in data test
-- [ ] **TEST-09** `simplestore/test/boundary.test.ts` — Add very long string test
+- [x] **TEST-08** `simplestore/test/boundary.test.ts` — Add emoji in data test (already exists)
+- [x] **TEST-09** `simplestore/test/boundary.test.ts` — Add very long string test (already exists)
 - [ ] **TEST-10** `shared/src/hash.test.ts` — Add more edge case tests
 
 ### Documentation
