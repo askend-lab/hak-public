@@ -152,6 +152,23 @@ describe('Boundary Conditions', () => {
   });
 
   describe('unicode characters', () => {
+    it('should handle Estonian characters (õ, ä, ö, ü)', async () => {
+      const store = new Store(db, context);
+      const result = await store.save({
+        pk: 'töötaja-ülesanne',
+        sk: 'öösäälane-õppetöö',
+        type: 'public',
+        ttl: 3600,
+        data: { eestiKeel: 'Tere päevast! Õhtu on käes.' }
+      });
+
+      expect(result.success).toBe(true);
+
+      const getResult = await store.get('töötaja-ülesanne', 'öösäälane-õppetöö', 'public');
+      expect(getResult.success).toBe(true);
+      expect(getResult.item?.data.eestiKeel).toBe('Tere päevast! Õhtu on käes.');
+    });
+
     it('should handle unicode in pk', async () => {
       const store = new Store(db, context);
       const result = await store.save({
