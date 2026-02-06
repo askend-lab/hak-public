@@ -2,7 +2,7 @@ import type { S3ClientLike } from './s3';
 import type { SQSClientLike } from './sqs';
 import { TEXT_LIMITS } from '@hak/shared';
 
-import { calculateHash } from './hash';
+import { calculateHashSync as calculateHash } from '@hak/shared';
 import { checkFileExists } from './s3';
 import { publishToQueue } from './sqs';
 
