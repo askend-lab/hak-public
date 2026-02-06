@@ -96,7 +96,7 @@
 - [x] **STYLE-04** `simplestore/test/store.test.ts` — Move `FailingDynamoDB` to mockDynamoDB.ts
 - [ ] **STYLE-05** `simplestore/test/handler.test.ts` — Improve test names to be more specific
 - [ ] **STYLE-06** `simplestore/test/handler.test.ts` — Remove duplicate tests for `{}` vs `null` params
-- [ ] **STYLE-07** `audio-api/src/handler.ts` — Use `TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH` directly
+- [x] **STYLE-07** `audio-api/src/handler.ts` — Use `TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH` directly
 - [x] **STYLE-08** `vabamorf-api/src/handler.ts` — Read version from package.json
 - [x] **STYLE-09** `vabamorf-api/src/vmetajson.ts` — Log stderr instead of ignoring
 - [x] **STYLE-10** `gherkin-parser/src/index.ts` — Add semicolons for consistency
