@@ -46,7 +46,7 @@
 - [x] **ARCH-05** `vabamorf-api/src/vmetajson.ts` — Make timeout configurable via env var
 - [ ] **ARCH-06** `audio-api/src/index.ts` — Extract CORS headers to shared helper
 - [ ] **ARCH-07** `audio-api/src/hash.ts` — Delete file, use `@hak/shared` directly
-- [ ] **ARCH-08** `merlin-api/src/handler.ts` — Add centralized `createResponse()` helper
+- [x] **ARCH-08** `merlin-api/src/handler.ts` — Add centralized `createResponse()` helper
 - [ ] **ARCH-09** `gherkin-parser/src/index.ts` — Add Scenario Outline support
 
 ### Error Handling & Validation
@@ -73,7 +73,7 @@
 - [x] **DOC-05** Root — Add `.env.example` with all required env vars
 
 ### Frontend
-- [ ] **FE-01** `frontend/services/auth/config.ts` — Move hardcoded ports (5181, 4001) to env
+- [x] **FE-01** `frontend/services/auth/config.ts` — Move hardcoded ports to env var
 - [ ] **FE-02** `frontend/services/repository/TaskRepository.ts` — Don't mutate objects after creation
 - [ ] **FE-03** `frontend/src/components/` — Add Storybook for visual component testing
 - [ ] **FE-04** `frontend/src/components/` — Add accessibility attributes (aria-label, role)
