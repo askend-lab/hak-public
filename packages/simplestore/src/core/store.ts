@@ -60,6 +60,7 @@ export class Store {
 
   /**
    * Creates or updates an item in the store
+   * Preserves createdAt on update, only changes updatedAt
    */
   async save(request: StoreRequest): Promise<StoreResult> {
     const ttlResult = parseTtl(request.ttl, this.config);
@@ -67,9 +68,13 @@ export class Store {
       return this.failure(ttlResult.error);
     }
 
-    const item = this.createItem(request);
-
+    const keys = buildKeys(this.context, request.type, request.pk, request.sk, this.config.keyDelimiter);
+    
     try {
+      // Check if item exists to preserve createdAt
+      const existing = await this.adapter.get(keys.pk, keys.sk);
+      const item = this.createItem(request, existing?.createdAt);
+      
       await this.adapter.put(item);
       return this.success(item);
     } catch (error) {
@@ -129,7 +134,7 @@ export class Store {
     }
   }
 
-  private createItem(request: StoreRequest): StoreItem {
+  private createItem(request: StoreRequest, existingCreatedAt?: string): StoreItem {
     const keys = buildKeys(this.context, request.type, request.pk, request.sk, this.config.keyDelimiter);
     const now = new Date().toISOString();
     
@@ -138,7 +143,7 @@ export class Store {
       SK: keys.sk,
       data: request.data ?? {},
       owner: this.context.userId,
-      createdAt: now,
+      createdAt: existingCreatedAt ?? now,
       updatedAt: now,
       ttl: this.calculateTtl(request.ttl)
     };
