@@ -44,15 +44,15 @@
 - [ ] **ARCH-03** `frontend/services/repository/TaskRepository.ts` — Split into smaller classes (SRP violation)
 - [x] **ARCH-04** `vabamorf-api/src/handler.ts` — Use `TEXT_LIMITS` from shared
 - [x] **ARCH-05** `vabamorf-api/src/vmetajson.ts` — Make timeout configurable via env var
-- [ ] **ARCH-06** `audio-api/src/index.ts` — Extract CORS headers to shared helper
-- [ ] **ARCH-07** `audio-api/src/hash.ts` — Delete file, use `@hak/shared` directly
+- [x] **ARCH-06** `audio-api/src/index.ts` — Extract CORS headers to shared helper
+- [x] **ARCH-07** `audio-api/src/hash.ts` — Delete file, use `@hak/shared` directly
 - [x] **ARCH-08** `merlin-api/src/handler.ts` — Add centralized `createResponse()` helper
 - [ ] **ARCH-09** `gherkin-parser/src/index.ts` — Add Scenario Outline support
 
 ### Error Handling & Validation
 - [x] **ERR-01** `simplestore/src/core/validation.ts` — Add max length validation for pk/sk
 - [ ] **ERR-02** `simplestore/src/lambda/routes.ts` — Return specific error for anonymous user ID
-- [ ] **ERR-03** `audio-api/src/sqs.ts` — Add retry logic with exponential backoff
+- [x] **ERR-03** `audio-api/src/sqs.ts` — Add retry logic with exponential backoff
 - [x] **ERR-04** `audio-api/src/s3.ts` — Replace unsafe cast with type guard
 - [ ] **ERR-05** `frontend/services/auth/context.tsx` — Add JWT signature verification or server-side validation
 - [x] **ERR-06** `frontend/services/repository/TaskRepository.ts` — Use `crypto.randomUUID()`
@@ -60,14 +60,14 @@
 ### Testing
 - [x] **TEST-01** `simplestore/test/setup.ts` — Reset env vars in afterEach
 - [ ] **TEST-02** `simplestore/test/handler.test.ts` — Replace `expect([200,500]).toContain()` with deterministic assertions
-- [ ] **TEST-03** `simplestore/test/store.test.ts` — Add test for update existing item behavior
+- [x] **TEST-03** `simplestore/test/store.test.ts` — Add test for update existing item behavior
 - [ ] **TEST-04** `simplestore/test/mockDynamoDB.ts` — Unify with `InMemoryAdapter` from adapters
 - [ ] **TEST-05** `simplestore/test/*.test.ts` — Add concurrent access tests
 - [ ] **TEST-06** `shared/src/constants.test.ts` — Replace snapshot-like tests with meaningful assertions
 
 ### Documentation & Config
 - [x] **DOC-01** Root `package.json` — Add `repository`, `bugs`, `homepage` fields
-- [ ] **DOC-02** `infra/` — Add `terraform.tfvars.example` with required variables
+- [x] **DOC-02** `infra/` — Add `terraform.tfvars.example` with required variables
 - [x] **DOC-03** `.github/` — Add `dependabot.yml` for automated updates
 - [ ] **DOC-04** `.github/` — Configure GitHub Environments for secrets isolation
 - [x] **DOC-05** Root — Add `.env.example` with all required env vars
@@ -109,9 +109,9 @@
 - [ ] **TEST-10** `shared/src/hash.test.ts` — Add more edge case tests
 
 ### Documentation
-- [ ] **DOC-06** Root — Add `.nvmrc` for Node version
-- [ ] **DOC-07** Root — Add SECURITY.md for vulnerability reporting
-- [ ] **DOC-08** Root — Add GitHub Issue templates
+- [x] **DOC-06** Root — Add `.nvmrc` for Node version
+- [x] **DOC-07** Root — Add SECURITY.md for vulnerability reporting
+- [x] **DOC-08** Root — Add GitHub Issue templates
 - [ ] **DOC-09** `README.md` — Remove internal URLs, add contributor-friendly instructions
 - [ ] **DOC-10** `BACKLOG.md` — Review for internal/sensitive context
 
