@@ -19,7 +19,7 @@ interface SynthesizeRequest {
 
 function generateCacheKey(text: string, voice: string, speed: number, pitch: number): string {
   const input = `${text}|${voice}|${speed}|${pitch}`;
-  return createHash('md5').update(input).digest('hex');
+  return createHash('sha256').update(input).digest('hex');
 }
 
 async function checkS3Cache(cacheKey: string): Promise<boolean> {
@@ -55,7 +55,12 @@ export async function synthesize(event: { body?: string }): Promise<LambdaRespon
     if (!body.text) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
         body: JSON.stringify({ error: 'Missing text field' })
       };
     }
@@ -70,11 +75,16 @@ export async function synthesize(event: { body?: string }): Promise<LambdaRespon
     if (cached) {
       return {
         statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
         body: JSON.stringify({
           status: 'ready',
           cacheKey,
-          audioUrl: `https://${S3_BUCKET}.s3.eu-west-1.amazonaws.com/cache/${cacheKey}.wav`
+          audioUrl: `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? 'eu-west-1'}.amazonaws.com/cache/${cacheKey}.wav`
         })
       };
     }
@@ -90,18 +100,28 @@ export async function synthesize(event: { body?: string }): Promise<LambdaRespon
 
     return {
       statusCode: 202,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
       body: JSON.stringify({
         status: 'processing',
         cacheKey,
-        audioUrl: `https://${S3_BUCKET}.s3.eu-west-1.amazonaws.com/cache/${cacheKey}.wav`
+        audioUrl: `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? 'eu-west-1'}.amazonaws.com/cache/${cacheKey}.wav`
       })
     };
   } catch (error) {
     console.error('Synthesize error:', error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
       body: JSON.stringify({ error: 'Internal server error' })
     };
   }
@@ -114,7 +134,12 @@ export async function status(event: { pathParameters?: { cacheKey?: string } }):
     if (!cacheKey) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
         body: JSON.stringify({ error: 'Missing cacheKey' })
       };
     }
@@ -123,18 +148,28 @@ export async function status(event: { pathParameters?: { cacheKey?: string } }):
     
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
       body: JSON.stringify({
         status: ready ? 'ready' : 'processing',
         cacheKey,
-        audioUrl: ready ? `https://${S3_BUCKET}.s3.eu-west-1.amazonaws.com/cache/${cacheKey}.wav` : null
+        audioUrl: ready ? `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? 'eu-west-1'}.amazonaws.com/cache/${cacheKey}.wav` : null
       })
     };
   } catch (error) {
     console.error('Status error:', error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
       body: JSON.stringify({ error: 'Internal server error' })
     };
   }
@@ -143,7 +178,12 @@ export async function status(event: { pathParameters?: { cacheKey?: string } }):
 export async function health(): Promise<LambdaResponse> {
   return {
     statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
     body: JSON.stringify({ status: 'ok', version: '1.0.0' })
   };
 }
@@ -155,7 +195,12 @@ export async function warmup(): Promise<LambdaResponse> {
   if (!cluster || !service) {
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
       body: JSON.stringify({ error: 'Missing ECS config' })
     };
   }
@@ -173,7 +218,12 @@ export async function warmup(): Promise<LambdaResponse> {
     if (currentDesired >= 1) {
       return {
         statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
         body: JSON.stringify({ status: 'already_warm', running, desired: currentDesired })
       };
     }
@@ -187,14 +237,24 @@ export async function warmup(): Promise<LambdaResponse> {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
       body: JSON.stringify({ status: 'warming', running: 0, desired: 1 })
     };
   } catch (error) {
     console.error('Warmup error:', error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+      },
       body: JSON.stringify({ error: 'Failed to warmup' })
     };
   }
