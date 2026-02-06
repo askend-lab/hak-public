@@ -3,6 +3,10 @@ import { SimpleStoreAdapter } from '../storage/SimpleStoreAdapter';
 import { MockDataLoader } from '../storage/MockDataLoader';
 import { ShareService } from '../storage/ShareService';
 
+function generateId(prefix: string): string {
+  return `${prefix}_${crypto.randomUUID()}`;
+}
+
 export class TaskRepository {
   constructor(
     private storage: SimpleStoreAdapter,
@@ -84,7 +88,7 @@ export class TaskRepository {
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
     const newTask: Task = {
-      id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      id: generateId('task'),
       userId,
       name: taskData.name,
       description: taskData.description ?? null,
@@ -164,7 +168,7 @@ export class TaskRepository {
         userId,
         entries: mergedEntries,
         ...updates,
-        id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+        id: generateId('task'),
         updatedAt: new Date(),
         shareToken: this.shareService.generateShareToken()
       };
@@ -221,7 +225,7 @@ export class TaskRepository {
     const newEntries: TaskEntry[] = textEntries.map((entry, index) => {
       const isStringEntry = typeof entry === 'string';
       return {
-        id: `entry_${Date.now()}_${index}_${Math.random().toString(36).substring(2, 11)}`,
+        id: generateId('entry'),
         taskId,
         text: isStringEntry ? entry : entry.text,
         stressedText: isStringEntry ? entry : entry.stressedText,
