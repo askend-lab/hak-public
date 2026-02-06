@@ -53,5 +53,26 @@ describe('hash', () => {
     it('should throw error for whitespace-only text', () => {
       expect(() => calculateHashSync('   ')).toThrow('Text cannot be empty');
     });
+
+    it('should handle unicode characters', () => {
+      const hash = calculateHashSync('Tere päevast! 日本語 🎉');
+      expect(hash).toHaveLength(64);
+    });
+
+    it('should handle very long strings', () => {
+      const longText = 'a'.repeat(10000);
+      const hash = calculateHashSync(longText);
+      expect(hash).toHaveLength(64);
+    });
+
+    it('should handle special characters', () => {
+      const hash = calculateHashSync('!@#$%^&*()_+-=[]{}|;:,.<>?');
+      expect(hash).toHaveLength(64);
+    });
+
+    it('should handle newlines and tabs', () => {
+      const hash = calculateHashSync('line1\nline2\ttab');
+      expect(hash).toHaveLength(64);
+    });
   });
 });
