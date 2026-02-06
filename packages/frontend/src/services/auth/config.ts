@@ -1,6 +1,8 @@
+const LOCAL_PORT = import.meta.env.VITE_PORT ?? '5181';
+
 export function getRedirectUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:5181/auth/callback';
+    return `http://localhost:${LOCAL_PORT}/auth/callback`;
   }
   if (hostname === 'hak-dev.askend-lab.com') {
     return 'https://hak-dev.askend-lab.com/auth/callback';
@@ -10,7 +12,7 @@ export function getRedirectUri(hostname: string = typeof window !== 'undefined' 
 
 export function getLogoutUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:5181';
+    return `http://localhost:${LOCAL_PORT}`;
   }
   if (hostname === 'hak-dev.askend-lab.com') {
     return 'https://hak-dev.askend-lab.com';
