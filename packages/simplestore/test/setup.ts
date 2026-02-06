@@ -1,11 +1,25 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
+// Store original env vars
+const originalEnv = { ...process.env };
+
 // Set test environment variables
 process.env.APP_NAME = 'test-app';
 process.env.TENANT = 'test-tenant';
 process.env.ENVIRONMENT = 'test';
 process.env.TABLE_NAME = 'test-table';
 process.env.IS_OFFLINE = 'true';
+
+// Reset env vars after each test to prevent pollution
+afterEach(() => {
+  process.env = { ...originalEnv };
+  // Re-apply test defaults
+  process.env.APP_NAME = 'test-app';
+  process.env.TENANT = 'test-tenant';
+  process.env.ENVIRONMENT = 'test';
+  process.env.TABLE_NAME = 'test-table';
+  process.env.IS_OFFLINE = 'true';
+});
 
 export const mockContext: Context = {
   callbackWaitsForEmptyEventLoop: false,
