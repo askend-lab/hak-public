@@ -91,6 +91,7 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
   };
 
   return new Promise((resolve, reject) => {
+    const timeoutMs = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? '5000', 10);
     const timeoutId = setTimeout(() => {
       const index = requestQueue.findIndex(r => r.timeoutId === timeoutId);
       if (index !== -1) {
@@ -101,7 +102,7 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
         reject(new Error('vmetajson timeout'));
         processNextRequest();
       }
-    }, 5000);
+    }, timeoutMs);
 
     requestQueue.push({ resolve, reject, input, timeoutId });
     processNextRequest();
