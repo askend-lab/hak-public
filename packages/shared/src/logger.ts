@@ -48,6 +48,12 @@ export function createLogger(minLevel: LogLevel = 'info'): Logger {
   };
 }
 
+const VALID_LOG_LEVELS: readonly LogLevel[] = ['debug', 'info', 'warn', 'error'];
+
+function isValidLogLevel(level: string): level is LogLevel {
+  return VALID_LOG_LEVELS.includes(level as LogLevel);
+}
+
 // Environment-safe log level detection
 const getLogLevel = (): LogLevel => {
   try {
@@ -55,7 +61,10 @@ const getLogLevel = (): LogLevel => {
     // eslint-disable-next-line no-restricted-globals
     if (typeof process !== 'undefined' && process.env?.LOG_LEVEL) {
       // eslint-disable-next-line no-restricted-globals
-      return process.env.LOG_LEVEL as LogLevel;
+      const envLevel = process.env.LOG_LEVEL;
+      if (isValidLogLevel(envLevel)) {
+        return envLevel;
+      }
     }
   } catch {
     // Ignore errors in environment detection
