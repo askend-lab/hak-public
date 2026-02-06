@@ -78,7 +78,7 @@ export async function handler(
     if (exists) {
       return createSuccessResponse({
         status: 'ready',
-        url: `https://${bucketName}.s3.amazonaws.com/${key}`,
+        url: `https://${bucketName}.s3.${process.env.AWS_REGION ?? 'eu-west-1'}.amazonaws.com/${key}`,
         hash
       });
     }
