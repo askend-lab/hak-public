@@ -47,7 +47,11 @@ export function initVmetajson(binaryPath = './vmetajson', dictPath = '.'): void 
   }
 
   vmetajsonProcess = spawn(binaryPath, [`--path=${dictPath}`], {
-    stdio: ['pipe', 'pipe', 'ignore']
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
+
+  vmetajsonProcess.stderr?.on('data', (data: Buffer) => {
+    console.error('[vmetajson stderr]', data.toString());
   });
 
   vmetajsonProcess.stdout?.on('data', (data: Buffer) => {
