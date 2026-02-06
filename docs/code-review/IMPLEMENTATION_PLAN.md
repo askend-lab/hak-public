@@ -92,8 +92,8 @@
 ### Code Style
 - [ ] **STYLE-01** `shared/src/utils.ts` — Consider moving functions to separate modules
 - [ ] **STYLE-02** `shared/src/` — Add JSDoc to all public exports
-- [ ] **STYLE-03** `simplestore/test/store.test.ts` — Extract `3600` to `ONE_HOUR` constant
-- [ ] **STYLE-04** `simplestore/test/store.test.ts` — Move `FailingDynamoDB` to mockDynamoDB.ts
+- [x] **STYLE-03** `simplestore/test/store.test.ts` — Extract `3600` to `ONE_HOUR` constant
+- [x] **STYLE-04** `simplestore/test/store.test.ts` — Move `FailingDynamoDB` to mockDynamoDB.ts
 - [ ] **STYLE-05** `simplestore/test/handler.test.ts` — Improve test names to be more specific
 - [ ] **STYLE-06** `simplestore/test/handler.test.ts` — Remove duplicate tests for `{}` vs `null` params
 - [ ] **STYLE-07** `audio-api/src/handler.ts` — Use `TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH` directly
