@@ -18,6 +18,17 @@ export function getLogoutUri(hostname: string = typeof window !== 'undefined' ? 
   return 'https://hak.askend-lab.com';
 }
 
+/**
+ * PUBLIC OAuth Configuration
+ *
+ * These values are intentionally public (like OAuth client_id).
+ * Security is ensured by:
+ * - Cognito redirect URI whitelist
+ * - PKCE flow (code_verifier never leaves client)
+ * - No client_secret on frontend
+ *
+ * @see https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-idp-settings.html
+ */
 export const cognitoConfig = {
   region: 'eu-west-1',
   userPoolId: 'eu-west-1_wlRtuLkG2',
