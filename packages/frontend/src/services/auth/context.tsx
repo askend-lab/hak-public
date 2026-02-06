@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 import { AuthStorage } from './storage';
-import { getLoginUrl, getLogoutUrl, getTaraLoginUrl, cognitoConfig } from './config';
+import { getLoginUrl, getLogoutUrl, getTaraLoginUrl, cognitoConfig, exchangeCodeForTokens } from './config';
 import type { AuthContextValue, AuthState, User } from './types';
 
 const initialState: AuthState = {
@@ -119,40 +119,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const handleCodeCallback = useCallback(async (code: string): Promise<boolean> => {
-    const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
-    if (!codeVerifier) return false;
+    const tokens = await exchangeCodeForTokens(code);
+    if (!tokens) return false;
 
-    try {
-      const response = await fetch(`https://${cognitoConfig.domain}/oauth2/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          client_id: cognitoConfig.clientId,
-          code,
-          redirect_uri: cognitoConfig.redirectUri,
-          code_verifier: codeVerifier,
-        }),
-      });
-
-      if (!response.ok) return false;
-
-      const data = await response.json();
-      sessionStorage.removeItem('pkce_code_verifier');
-
-      const user = parseIdToken(data.id_token);
-      if (user) {
-        AuthStorage.setUser(user);
-        AuthStorage.setAccessToken(data.access_token);
-        AuthStorage.setIdToken(data.id_token);
-        AuthStorage.setRefreshToken(data.refresh_token);
-        setState({ user, isAuthenticated: true, isLoading: false, error: null });
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
+    const user = parseIdToken(tokens.idToken);
+    if (user) {
+      AuthStorage.setUser(user);
+      AuthStorage.setAccessToken(tokens.accessToken);
+      AuthStorage.setIdToken(tokens.idToken);
+      AuthStorage.setRefreshToken(tokens.refreshToken);
+      setState({ user, isAuthenticated: true, isLoading: false, error: null });
+      return true;
     }
+    return false;
   }, []);
 
   const refreshSession = useCallback(async () => {
