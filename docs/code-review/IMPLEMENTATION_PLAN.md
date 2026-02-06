@@ -100,7 +100,7 @@
 - [x] **STYLE-08** `vabamorf-api/src/handler.ts` — Read version from package.json
 - [x] **STYLE-09** `vabamorf-api/src/vmetajson.ts` — Log stderr instead of ignoring
 - [ ] **STYLE-10** `gherkin-parser/src/index.ts` — Add semicolons for consistency
-- [ ] **STYLE-11** `frontend/services/repository/TaskRepository.ts` — Be consistent with `|| []` vs `?? []`
+- [x] **STYLE-11** `frontend/services/repository/TaskRepository.ts` — Be consistent with `?? []`
 
 ### Testing Improvements
 - [x] **TEST-07** `simplestore/test/boundary.test.ts` — Add Estonian characters test (õ, ä, ö, ü)
