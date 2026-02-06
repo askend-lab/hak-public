@@ -115,6 +115,31 @@ describe('Store', () => {
       expect(result.success).toBe(true);
       expect(result.item?.data).toStrictEqual({});
     });
+
+    it('should preserve createdAt when updating existing item', async () => {
+      const request: StoreRequest = {
+        pk: 'entity1',
+        sk: 'sort1',
+        type: 'private',
+        ttl: 3600,
+        data: { version: 1 }
+      };
+
+      const createResult = await store.save(request);
+      const originalCreatedAt = createResult.item?.createdAt;
+
+      // Wait a bit to ensure timestamps differ
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const updateResult = await store.save({
+        ...request,
+        data: { version: 2 }
+      });
+
+      expect(updateResult.success).toBe(true);
+      expect(updateResult.item?.createdAt).toEqual(originalCreatedAt);
+      expect(updateResult.item?.data).toStrictEqual({ version: 2 });
+    });
   });
 
   describe('get', () => {
