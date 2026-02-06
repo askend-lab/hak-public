@@ -14,6 +14,8 @@ export interface ValidationResult {
 
 const VALID_TYPES: readonly DataType[] = ['private', 'unlisted', 'public', 'shared'] as const;
 
+const MAX_KEY_LENGTH = 1024;
+
 const DEFAULT_CONFIG: StoreConfig = {
   maxTtlSeconds: 31536000, // 1 year
   keyDelimiter: '#'
@@ -27,13 +29,15 @@ function result(errors: string[]): ValidationResult {
 }
 
 /**
- * Validates a string field is present and non-empty
+ * Validates a string field is present, non-empty, and within max length
  */
-function validateRequiredString(value: unknown, name: string, errors: string[]): void {
+function validateRequiredString(value: unknown, name: string, errors: string[], maxLength = MAX_KEY_LENGTH): void {
   if (value === null || value === undefined || typeof value !== 'string') {
     errors.push(`${name} is required and must be a string`);
   } else if (value.trim() === '') {
     errors.push(`${name} cannot be empty`);
+  } else if (value.length > maxLength) {
+    errors.push(`${name} exceeds maximum length of ${maxLength} characters`);
   }
 }
 
