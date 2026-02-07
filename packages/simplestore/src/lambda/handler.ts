@@ -123,7 +123,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const isAnonymousSharedAccess = !userId && isPublicReadableRequest(event);
   
   if (!userId && !isAnonymousSharedAccess) {
-    return createResponse(HTTP_STATUS.UNAUTHORIZED, { error: HTTP_ERRORS.UNAUTHORIZED });
+    return createResponse(HTTP_STATUS.UNAUTHORIZED, { 
+      error: 'Authentication required. Provide a valid token or use a public-readable endpoint.' 
+    });
   }
 
   // Use event.resource (API Gateway resource path) instead of event.path (which includes basePath)
