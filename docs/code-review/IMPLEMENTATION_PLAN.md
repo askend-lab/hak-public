@@ -63,7 +63,7 @@
 - [x] **TEST-03** `simplestore/test/store.test.ts` — Add test for update existing item behavior
 - [x] **TEST-04** `simplestore/test/mockDynamoDB.ts` — Unify with `InMemoryAdapter` from adapters
 - [ ] **TEST-05** `simplestore/test/*.test.ts` — Add concurrent access tests
-- [ ] **TEST-06** `shared/src/constants.test.ts` — Replace snapshot-like tests with meaningful assertions
+- [x] **TEST-06** `shared/src/constants.test.ts` — Replace snapshot-like tests with meaningful assertions
 
 ### Documentation & Config
 - [x] **DOC-01** Root `package.json` — Add `repository`, `bugs`, `homepage` fields
