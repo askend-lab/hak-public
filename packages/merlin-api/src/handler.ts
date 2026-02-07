@@ -131,7 +131,16 @@ export async function health(): Promise<LambdaResponse> {
   return createResponse(200, { status: 'ok', version: '1.0.0' });
 }
 
+const WARMUP_COOLDOWN_MS = 60_000;
+let lastWarmupTime = 0;
+
 export async function warmup(): Promise<LambdaResponse> {
+  const now = Date.now();
+  if (now - lastWarmupTime < WARMUP_COOLDOWN_MS) {
+    return createResponse(429, { error: 'Rate limited. Try again later.', retryAfterMs: WARMUP_COOLDOWN_MS - (now - lastWarmupTime) });
+  }
+  lastWarmupTime = now;
+
   const cluster = process.env.ECS_CLUSTER ?? '';
   const service = process.env.ECS_SERVICE ?? '';
 
