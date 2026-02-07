@@ -39,7 +39,7 @@
 ## 🟠 MEDIUM (43) — Should fix for quality
 
 ### Architecture & Design
-- [ ] **ARCH-01** `simplestore/src/core/types.ts` — Extract `StoreConfig` from `store.ts`, avoid duplication
+- [x] **ARCH-01** `simplestore/src/core/types.ts` — Extract `StoreConfig` from `store.ts` (already in types.ts)
 - [x] **ARCH-02** `simplestore/src/core/store.ts` — Preserve `createdAt` on update
 - [ ] **ARCH-03** `frontend/services/repository/TaskRepository.ts` — Split into smaller classes (SRP violation)
 - [x] **ARCH-04** `vabamorf-api/src/handler.ts` — Use `TEXT_LIMITS` from shared
