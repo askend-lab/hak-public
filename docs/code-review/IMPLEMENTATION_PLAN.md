@@ -62,7 +62,7 @@
 - [x] **TEST-02** `simplestore/test/handler.test.ts` — Replace `expect([200,500]).toContain()` with deterministic assertions
 - [x] **TEST-03** `simplestore/test/store.test.ts` — Add test for update existing item behavior
 - [x] **TEST-04** `simplestore/test/mockDynamoDB.ts` — Unify with `InMemoryAdapter` from adapters
-- [ ] **TEST-05** `simplestore/test/*.test.ts` — Add concurrent access tests
+- [x] **TEST-05** `simplestore/test/*.test.ts` — Add concurrent access tests
 - [x] **TEST-06** `shared/src/constants.test.ts` — Replace snapshot-like tests with meaningful assertions
 
 ### Documentation & Config
