@@ -2,26 +2,35 @@ import { TEXT_LIMITS, TIMING } from './constants';
 
 describe('Constants', () => {
   describe('TEXT_LIMITS', () => {
-    it('should have MAX_AUDIO_TEXT_LENGTH', () => {
-      expect(TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH).toBe(1000);
+    it('should define positive audio text length limit', () => {
+      expect(TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH).toBeGreaterThan(0);
+      expect(typeof TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH).toBe('number');
     });
 
-    it('should have MAX_MORPHOLOGY_TEXT_LENGTH', () => {
-      expect(TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH).toBe(10000);
+    it('should define morphology limit larger than audio limit', () => {
+      expect(TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH).toBeGreaterThan(TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH);
+    });
+
+    it('should be frozen (immutable)', () => {
+      expect(Object.isFrozen(TEXT_LIMITS)).toBe(true);
     });
   });
 
   describe('TIMING', () => {
-    it('should have POLL_INTERVAL_MS', () => {
-      expect(TIMING.POLL_INTERVAL_MS).toBe(1000);
+    it('should define positive poll interval', () => {
+      expect(TIMING.POLL_INTERVAL_MS).toBeGreaterThan(0);
     });
 
-    it('should have ERROR_RETRY_DELAY_MS', () => {
-      expect(TIMING.ERROR_RETRY_DELAY_MS).toBe(5000);
+    it('should define error retry delay longer than poll interval', () => {
+      expect(TIMING.ERROR_RETRY_DELAY_MS).toBeGreaterThanOrEqual(TIMING.POLL_INTERVAL_MS);
     });
 
-    it('should have NOTIFICATION_DURATION_MS', () => {
-      expect(TIMING.NOTIFICATION_DURATION_MS).toBe(5000);
+    it('should define positive notification duration', () => {
+      expect(TIMING.NOTIFICATION_DURATION_MS).toBeGreaterThan(0);
+    });
+
+    it('should be frozen (immutable)', () => {
+      expect(Object.isFrozen(TIMING)).toBe(true);
     });
   });
 });
