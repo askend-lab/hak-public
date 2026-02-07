@@ -45,7 +45,7 @@ describe('Lambda Handler - Cache Hit', () => {
     
     const body = JSON.parse(response.body);
     expect(body.status).toBe('ready');
-    expect(body.url).toBe(`https://${TEST_BUCKET}.s3.amazonaws.com/cache/${hash}.mp3`);
+    expect(body.url).toBe(`https://${TEST_BUCKET}.s3.${process.env.AWS_REGION ?? 'eu-west-1'}.amazonaws.com/cache/${hash}.mp3`);
     expect(body.hash).toBe(hash);
   });
 

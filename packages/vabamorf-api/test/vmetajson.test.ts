@@ -52,7 +52,7 @@ describe('vmetajson', () => {
       expect(mockSpawn).toHaveBeenCalledWith(
         './vmetajson',
         ['--path=/dict'],
-        { stdio: ['pipe', 'pipe', 'ignore'] }
+        { stdio: ['pipe', 'pipe', 'pipe'] }
       );
     });
 
