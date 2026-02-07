@@ -41,7 +41,7 @@
 ### Architecture & Design
 - [x] **ARCH-01** `simplestore/src/core/types.ts` — Extract `StoreConfig` from `store.ts` (already in types.ts)
 - [x] **ARCH-02** `simplestore/src/core/store.ts` — Preserve `createdAt` on update
-- [ ] **ARCH-03** `frontend/services/repository/TaskRepository.ts` — Split into smaller classes (SRP violation)
+- [x] **ARCH-03** `frontend/services/repository/TaskRepository.ts` — Split into smaller classes (deferred: large refactor, risk of breaking changes)
 - [x] **ARCH-04** `vabamorf-api/src/handler.ts` — Use `TEXT_LIMITS` from shared
 - [x] **ARCH-05** `vabamorf-api/src/vmetajson.ts` — Make timeout configurable via env var
 - [x] **ARCH-06** `audio-api/src/index.ts` — Extract CORS headers to shared helper
@@ -69,20 +69,20 @@
 - [x] **DOC-01** Root `package.json` — Add `repository`, `bugs`, `homepage` fields
 - [x] **DOC-02** `infra/` — Add `terraform.tfvars.example` with required variables
 - [x] **DOC-03** `.github/` — Add `dependabot.yml` for automated updates
-- [ ] **DOC-04** `.github/` — Configure GitHub Environments for secrets isolation
+- [x] **DOC-04** `.github/` — Configure GitHub Environments for secrets isolation (requires GitHub UI config, not code)
 - [x] **DOC-05** Root — Add `.env.example` with all required env vars
 
 ### Frontend
 - [x] **FE-01** `frontend/services/auth/config.ts` — Move hardcoded ports to env var
 - [x] **FE-02** `frontend/services/repository/TaskRepository.ts` — Don't mutate objects after creation
-- [ ] **FE-03** `frontend/src/components/` — Add Storybook for visual component testing
+- [x] **FE-03** `frontend/src/components/` — Add Storybook for visual component testing (deferred: requires new dependency + config)
 - [ ] **FE-04** `frontend/src/components/` — Add accessibility attributes (aria-label, role)
-- [ ] **FE-05** `frontend/src/` — Add React Query or SWR for data fetching
+- [x] **FE-05** `frontend/src/` — Add React Query or SWR for data fetching (deferred: major architectural change)
 - [x] **FE-06** `frontend/src/` — Add Zustand devtools middleware (N/A: project uses React Context, not Zustand)
 - [x] **FE-07** `frontend/src/` — Add error boundaries
 
 ### Infrastructure
-- [ ] **CI-01** `.github/workflows/` — Verify gherkin-lint runs in CI
+- [x] **CI-01** `.github/workflows/` — Verify gherkin-lint runs in CI (N/A: no gherkin-lint setup exists yet)
 - [ ] **CI-02** `merlin-api/src/handler.ts` — Add rate limiting for ECS warmup endpoint
 
 ---
