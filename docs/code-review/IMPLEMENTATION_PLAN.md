@@ -112,8 +112,8 @@
 - [x] **DOC-06** Root — Add `.nvmrc` for Node version
 - [x] **DOC-07** Root — Add SECURITY.md for vulnerability reporting
 - [x] **DOC-08** Root — Add GitHub Issue templates
-- [ ] **DOC-09** `README.md` — Remove internal URLs, add contributor-friendly instructions
-- [ ] **DOC-10** `BACKLOG.md` — Review for internal/sensitive context
+- [x] **DOC-09** `README.md` — Remove internal URLs, add contributor-friendly instructions
+- [x] **DOC-10** `BACKLOG.md` — Review for internal/sensitive context (clean)
 
 ### Frontend Polish
 - [ ] **FE-08** `frontend/src/components/ui/` — Add lazy loading for icons
