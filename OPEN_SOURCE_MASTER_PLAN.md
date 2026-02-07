@@ -15,132 +15,136 @@
 
 ---
 
-## Security & Secrets — CRITICAL `docs/open-source/01-security.md`
+## 1. Security & Secrets — CRITICAL `docs/open-source/01-security.md`
 
-| 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|-------------|-------------|
-| [x] | [ ] | No secrets in code/history | `secret-detection` (gitleaks) |
-| [x] | [ ] | No vulnerable dependencies | `security-audit` (pnpm audit) |
-| [ ] | [ ] | No hardcoded domains/IDs (askend-lab, AWS IDs, Cognito) | NEW: `no-hardcoded-env` |
-| [ ] | [ ] | No internal path references (devbox, boxer, agent) | NEW: `no-internal-refs` |
-| [ ] | [ ] | IaC security (Terraform) | NEW: `run-tfsec` |
-| [ ] | [ ] | Docker security (Hadolint) | NEW: `run-docker-lint` |
-| [x] | [ ] | License compatibility of all deps | `license-check` |
-
-### Manual gates (one-time, not hookable)
-- [x] Remove internal docs (code-review, migration plans, old reports) — done
-- [ ] Run `gitleaks detect` on full git history, purge if needed
-- [ ] Decide: clean initial commit vs. sanitized history
-- [ ] Remove `.agent-channel`, `.test-runner-state.json`
-- [ ] Remove or sanitize `audits/` directory
-- [ ] Remove or package `packages/vendor/eki-storybook`
-
----
-
-## Internal Tooling Decoupling — HIGH `docs/open-source/02-decoupling.md`
-
-| 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|-------------|-------------|
-| [ ] | [ ] | ESLint config self-contained (no external imports) | NEW: `no-external-imports` |
-| [ ] | [ ] | No references to paths outside repo | NEW: `no-internal-refs` |
-| [x] | [x] | Build succeeds | `run-build` |
-| [x] | [x] | All tests pass | `run-tests` |
-| [x] | [x] | TypeScript compiles | `run-typecheck` |
-
-### Manual gates (one-time pre-launch)
-- [ ] Replace `devbox` wrapper → `husky` + `lint-staged` + pnpm scripts
-- [ ] Replace `.githooks/` → husky
-- [ ] Remove `defaults.yaml`, `babel.config.js` if unused
-- [ ] Remove `packages/vabamorf-api/package-lock.json` (use pnpm)
-- [ ] Update Dockerfiles to use pnpm
-- [ ] Verify `pnpm install && pnpm test && pnpm build` from clean clone
-
----
-
-## Code Quality — HIGH `docs/open-source/03-code-quality.md`
-
-| 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|-------------|-------------|
-| [x] | [x] | Zero `any` types | `no-any` |
-| [x] | [x] | All Promises handled | `no-floating-promises` |
-| [x] | [x] | Consistent import order | `import-order` |
-| [x] | [ ] | No `console.log` in production | `no-console` |
-| [x] | [ ] | ESLint zero warnings | `run-lint` |
-| [x] | [x] | No copy-paste (≤5%) | `jscpd` |
-| [x] | [x] | Source files ≤400 lines | `source-size` |
-| [x] | [x] | Strict TypeScript | `run-typecheck` |
-| [ ] | [ ] | No dead exports | NEW: `dead-code` (ts-prune) |
-| [ ] | [ ] | No circular dependencies | NEW: `circular-deps` (madge) |
-
----
-
-## Testing & Coverage — HIGH `docs/open-source/04-testing.md`
-
-| 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|-------------|-------------|
-| [x] | [x] | All tests pass | `run-tests` |
-| [x] | [ ] | Coverage ≥90% lines, ≥85% branches | `test-coverage` |
-| [x] | [x] | TDD enforced (new code needs tests) | `test-required` |
-| [x] | [x] | Unused deps detected | `dependency-check` |
-
-### Stretch goals (nice-to-have)
-- [ ] 🔧 / [ ] ✅ Property-based tests (`fast-check`) — integration tests
-- [ ] 🔧 / [ ] ✅ E2E tests (Playwright) — `run-e2e` hook
-- [ ] 🔧 / [ ] ✅ Mutation testing (`stryker`) — `run-mutation` hook
-
----
-
-## Documentation — MEDIUM `docs/open-source/05-documentation.md`
-
-| 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|-------------|-------------|
-| [x] | [x] | Markdown ≤200 lines | `markdown-size` |
-| [x] | [x] | No broken links in docs | `broken-links` |
-| [x] | [ ] | English-only code | `language-check` |
-| [x] | [x] | Docs have metrics | `metrics-required` |
+| # | 🔧 | ✅ | Requirement | DevBox Hook |
+|---|---|---|-------------|-------------|
+| S1 | [x] | [ ] | No secrets in code/history | `secret-detection` (gitleaks) |
+| S2 | [x] | [ ] | No vulnerable dependencies | `security-audit` (pnpm audit) |
+| S3 | [ ] | [ ] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` |
+| S4 | [ ] | [ ] | No internal path references | NEW: `no-internal-refs` |
+| S5 | [ ] | [ ] | IaC security (Terraform) | NEW: `run-tfsec` |
+| S6 | [ ] | [ ] | Docker security (Hadolint) | NEW: `run-docker-lint` |
+| S7 | [x] | [ ] | License compatibility of all deps | `license-check` |
 
 ### Manual gates
-- [ ] Rewrite `README.md` for OSS audience (screenshots, quick start)
-- [ ] Create `docs/ARCHITECTURE.md` with Mermaid diagrams
-- [ ] Create ADRs in `docs/adr/`
-- [ ] Create `docs/DEPLOYMENT.md` and `docs/API.md`
-- [ ] Translate Russian-language docs → English
-- [ ] Add "Built with AI" section to README
+| # | ✅ | Gate |
+|---|---|------|
+| S8 | [x] | Remove internal docs (code-review, plans, reports) |
+| S9 | [ ] | Run `gitleaks detect` on full git history, purge if needed |
+| S10 | [ ] | Decide: clean initial commit vs. sanitized history |
+| S11 | [ ] | Remove `.agent-channel`, `.test-runner-state.json` |
+| S12 | [ ] | Remove or sanitize `audits/` directory |
+| S13 | [ ] | Remove or package `packages/vendor/eki-storybook` |
 
 ---
 
-## CI/CD & DevEx — MEDIUM `docs/open-source/06-cicd.md`
+## 2. Internal Tooling Decoupling — HIGH `docs/open-source/02-decoupling.md`
 
-| 🔧 | ✅ | Requirement | DevBox Hook / CI |
-|---|---|-------------|------------------|
-| [ ] | [ ] | Prettier formatting | `prettier-check` (disabled, enable at launch) |
-| [ ] | [ ] | CodeQL security scanning | GitHub Actions |
-| [ ] | [ ] | Docker image scanning | NEW: CI `trivy` step |
-| [ ] | [ ] | Bundle size budget | NEW: `bundle-size` hook |
-| [ ] | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` hook |
+| # | 🔧 | ✅ | Requirement | DevBox Hook |
+|---|---|---|-------------|-------------|
+| D1 | [ ] | [ ] | ESLint config self-contained | NEW: `no-external-imports` |
+| D2 | [ ] | [ ] | No paths outside repo | NEW: `no-internal-refs` |
+| D3 | [x] | [x] | Build succeeds | `run-build` |
+| D4 | [x] | [x] | All tests pass | `run-tests` |
+| D5 | [x] | [x] | TypeScript compiles | `run-typecheck` |
 
 ### Manual gates
-- [ ] Fix all 16 npm vulnerabilities
-- [ ] Add PR template, verify issue templates
-- [ ] Define semver + automated release workflow
-- [ ] Parameterize Terraform (no hardcoded env values)
-- [ ] Create `docker-compose.yml` for local dev
-- [ ] Add `.editorconfig`, VS Code settings
+| # | ✅ | Gate |
+|---|---|------|
+| D6 | [ ] | Replace `devbox` wrapper → `husky` + `lint-staged` |
+| D7 | [ ] | Replace `.githooks/` → husky |
+| D8 | [ ] | Remove `defaults.yaml`, `babel.config.js` if unused |
+| D9 | [ ] | Remove `packages/vabamorf-api/package-lock.json` |
+| D10 | [ ] | Update Dockerfiles to use pnpm |
+| D11 | [ ] | Verify clean clone: `pnpm install && pnpm test && pnpm build` |
 
 ---
 
-## Launch Gate — FINAL `docs/open-source/08-launch-checklist.md`
+## 3. Code Quality — HIGH `docs/open-source/03-code-quality.md`
 
-**All hooks must be green. All manual gates must be checked.**
+| # | 🔧 | ✅ | Requirement | DevBox Hook |
+|---|---|---|-------------|-------------|
+| Q1 | [x] | [x] | Zero `any` types | `no-any` |
+| Q2 | [x] | [x] | All Promises handled | `no-floating-promises` |
+| Q3 | [x] | [x] | Consistent import order | `import-order` |
+| Q4 | [x] | [ ] | No `console.log` in production | `no-console` |
+| Q5 | [x] | [ ] | ESLint zero warnings | `run-lint` |
+| Q6 | [x] | [x] | No copy-paste (≤5%) | `jscpd` |
+| Q7 | [x] | [x] | Source files ≤400 lines | `source-size` |
+| Q8 | [x] | [x] | Strict TypeScript | `run-typecheck` |
+| Q9 | [ ] | [ ] | No dead exports | NEW: `dead-code` (ts-prune) |
+| Q10 | [ ] | [ ] | No circular dependencies | NEW: `circular-deps` (madge) |
 
-| Gate | Status |
-|------|--------|
-| All DevBox hooks pass on commit | [ ] |
-| `gitleaks detect` on full history clean | [ ] |
-| MIT license verified with stakeholders | [ ] |
-| License headers in all source files | [ ] |
-| `NOTICE` file with third-party deps | [ ] |
-| Branch protection on `main` | [ ] |
-| GitHub Discussions enabled | [ ] |
-| Press release / blog post ready | [ ] |
-| Code of Conduct published | [ ] |
+---
+
+## 4. Testing & Coverage — HIGH `docs/open-source/04-testing.md`
+
+| # | 🔧 | ✅ | Requirement | DevBox Hook |
+|---|---|---|-------------|-------------|
+| T1 | [x] | [x] | All tests pass | `run-tests` |
+| T2 | [x] | [ ] | Coverage ≥90% lines, ≥85% branches | `test-coverage` |
+| T3 | [x] | [x] | TDD enforced (new code needs tests) | `test-required` |
+| T4 | [x] | [x] | Unused deps detected | `dependency-check` |
+| T5 | [ ] | [ ] | E2E tests (Playwright) | NEW: `run-e2e` |
+| T6 | [ ] | [ ] | Property-based tests | (in `run-tests`) fast-check |
+| T7 | [ ] | [ ] | Mutation testing (≥80%) | NEW: `run-mutation` stryker |
+
+---
+
+## 5. Documentation — MEDIUM `docs/open-source/05-documentation.md`
+
+| # | 🔧 | ✅ | Requirement | DevBox Hook |
+|---|---|---|-------------|-------------|
+| O1 | [x] | [x] | Markdown ≤200 lines | `markdown-size` |
+| O2 | [x] | [x] | No broken links in docs | `broken-links` |
+| O3 | [x] | [ ] | English-only code | `language-check` |
+| O4 | [x] | [x] | Docs have metrics | `metrics-required` |
+
+### Manual gates
+| # | ✅ | Gate |
+|---|---|------|
+| O5 | [ ] | Rewrite `README.md` for OSS audience |
+| O6 | [ ] | Create `docs/ARCHITECTURE.md` with Mermaid diagrams |
+| O7 | [ ] | Create ADRs in `docs/adr/` |
+| O8 | [ ] | Create `docs/DEPLOYMENT.md` and `docs/API.md` |
+| O9 | [ ] | Translate Russian-language docs → English |
+| O10 | [ ] | Add "Built with AI" section to README |
+
+---
+
+## 6. CI/CD & DevEx — MEDIUM `docs/open-source/06-cicd.md`
+
+| # | 🔧 | ✅ | Requirement | DevBox Hook / CI |
+|---|---|---|-------------|------------------|
+| C1 | [ ] | [ ] | Prettier formatting | `prettier-check` (disabled) |
+| C2 | [ ] | [ ] | CodeQL security scanning | GitHub Actions |
+| C3 | [ ] | [ ] | Docker image scanning | NEW: CI `trivy` step |
+| C4 | [ ] | [ ] | Bundle size budget | NEW: `bundle-size` |
+| C5 | [ ] | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` |
+
+### Manual gates
+| # | ✅ | Gate |
+|---|---|------|
+| C6 | [ ] | Fix all 16 npm vulnerabilities |
+| C7 | [ ] | Add PR template, verify issue templates |
+| C8 | [ ] | Define semver + automated release workflow |
+| C9 | [ ] | Parameterize Terraform (no hardcoded env values) |
+| C10 | [ ] | Create `docker-compose.yml` for local dev |
+| C11 | [ ] | Add `.editorconfig`, VS Code settings |
+
+---
+
+## 7. Launch Gate — FINAL `docs/open-source/08-launch-checklist.md`
+
+| # | ✅ | Gate |
+|---|---|------|
+| L1 | [ ] | All DevBox hooks pass on commit |
+| L2 | [ ] | `gitleaks detect` on full history clean |
+| L3 | [ ] | MIT license verified with stakeholders |
+| L4 | [ ] | License headers in all source files |
+| L5 | [ ] | `NOTICE` file with third-party deps |
+| L6 | [ ] | Branch protection on `main` |
+| L7 | [ ] | GitHub Discussions enabled |
+| L8 | [ ] | Press release / blog post ready |
+| L9 | [ ] | Code of Conduct published |
