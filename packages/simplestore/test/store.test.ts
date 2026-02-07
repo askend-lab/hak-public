@@ -289,4 +289,74 @@ describe('Store', () => {
       expect(result.error).toContain('DB error');
     });
   });
+
+  describe('concurrent access', () => {
+    it('should handle concurrent saves to different keys', async () => {
+      const promises = Array.from({ length: 10 }, (_, i) =>
+        store.save({
+          pk: `entity-${i}`,
+          sk: `sort-${i}`,
+          type: 'private',
+          ttl: ONE_HOUR,
+          data: { index: i }
+        })
+      );
+
+      const results = await Promise.all(promises);
+      results.forEach(r => expect(r.success).toBe(true));
+
+      // Verify all items were saved
+      for (let i = 0; i < 10; i++) {
+        const get = await store.get(`entity-${i}`, `sort-${i}`, 'private');
+        expect(get.success).toBe(true);
+        expect(get.item?.data.index).toBe(i);
+      }
+    });
+
+    it('should handle concurrent saves to the same key', async () => {
+      const promises = Array.from({ length: 5 }, (_, i) =>
+        store.save({
+          pk: 'shared-entity',
+          sk: 'shared-sort',
+          type: 'private',
+          ttl: ONE_HOUR,
+          data: { version: i }
+        })
+      );
+
+      const results = await Promise.all(promises);
+      results.forEach(r => expect(r.success).toBe(true));
+
+      // Last write wins
+      const get = await store.get('shared-entity', 'shared-sort', 'private');
+      expect(get.success).toBe(true);
+      expect(typeof get.item?.data.version).toBe('number');
+    });
+
+    it('should handle concurrent reads and writes', async () => {
+      await store.save({
+        pk: 'rw-entity',
+        sk: 'rw-sort',
+        type: 'private',
+        ttl: ONE_HOUR,
+        data: { initial: true }
+      });
+
+      const reads = Array.from({ length: 5 }, () =>
+        store.get('rw-entity', 'rw-sort', 'private')
+      );
+      const writes = Array.from({ length: 3 }, (_, i) =>
+        store.save({
+          pk: 'rw-entity',
+          sk: 'rw-sort',
+          type: 'private',
+          ttl: ONE_HOUR,
+          data: { version: i }
+        })
+      );
+
+      const allResults = await Promise.all([...reads, ...writes]);
+      allResults.forEach(r => expect(r.success).toBe(true));
+    });
+  });
 });
