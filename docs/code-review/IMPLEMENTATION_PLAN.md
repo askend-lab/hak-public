@@ -132,12 +132,15 @@
 
 ## Progress Tracking
 
-| Severity | Total | Done | Remaining |
-|----------|-------|------|-----------|
-| 🔴 Critical | 20 | 0 | 20 |
-| 🟠 Medium | 43 | 0 | 43 |
-| 🟡 Low | 29 | 0 | 29 |
-| **Total** | **92** | **0** | **92** |
+| Severity | Total | Done | Deferred | Remaining |
+|----------|-------|------|----------|-----------|
+| 🔴 Critical | 20 | 20 | 0 | 0 |
+| 🟠 Medium | 43 | 37 | 6 | 0 |
+| 🟡 Low | 29 | 21 | 0 | 8 |
+| **Total** | **92** | **78** | **6** | **8** |
+
+*Deferred items have explanations in their descriptions above.*
+*Remaining Low items (FE-08..14, SPEC-01/02) are nice-to-have polish.*
 
 ---
 
