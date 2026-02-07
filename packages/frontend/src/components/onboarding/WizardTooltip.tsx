@@ -1,9 +1,8 @@
- 
-'use client';
+"use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { WizardStep } from '@/types/onboarding';
-import { CloseIcon, BackIcon, ArrowForwardIcon } from '../ui/Icons';
+import { useEffect, useState, useRef, useCallback } from "react";
+import { WizardStep } from "@/types/onboarding";
+import { CloseIcon, BackIcon, ArrowForwardIcon } from "../ui/Icons";
 
 interface WizardTooltipProps {
   step: WizardStep;
@@ -19,13 +18,13 @@ interface WizardTooltipProps {
 interface Position {
   top: number;
   left: number;
-  arrowPosition: 'top' | 'bottom' | 'left' | 'right';
+  arrowPosition: "top" | "bottom" | "left" | "right";
   arrowOffset?: number; // Percentage offset for arrow positioning
 }
 
 /**
  * WizardTooltip - Individual tooltip for wizard steps
- * 
+ *
  * Positions itself relative to the target element and highlights it.
  * Shows title, description, progress indicator, and navigation buttons.
  */
@@ -37,9 +36,13 @@ export default function WizardTooltip({
   onPrev,
   onSkip,
   isFirst,
-  isLast
+  isLast,
 }: WizardTooltipProps) {
-  const [position, setPosition] = useState<Position>({ top: 0, left: 0, arrowPosition: 'top' });
+  const [position, setPosition] = useState<Position>({
+    top: 0,
+    left: 0,
+    arrowPosition: "top",
+  });
   const [targetElement, setTargetElement] = useState<Element | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
@@ -59,25 +62,25 @@ export default function WizardTooltip({
     let arrowPosition = step.position;
 
     switch (step.position) {
-      case 'bottom':
+      case "bottom":
         top = targetRect.bottom + padding + arrowSize;
-        left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
-        arrowPosition = 'top';
+        left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
+        arrowPosition = "top";
         break;
-      case 'top':
+      case "top":
         top = targetRect.top - tooltipRect.height - padding - arrowSize;
-        left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
-        arrowPosition = 'bottom';
+        left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
+        arrowPosition = "bottom";
         break;
-      case 'left':
-        top = targetRect.top + (targetRect.height / 2) - (tooltipRect.height / 2);
+      case "left":
+        top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2;
         left = targetRect.left - tooltipRect.width - padding - arrowSize;
-        arrowPosition = 'right';
+        arrowPosition = "right";
         break;
-      case 'right':
-        top = targetRect.top + (targetRect.height / 2) - (tooltipRect.height / 2);
+      case "right":
+        top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2;
         left = targetRect.right + padding + arrowSize;
-        arrowPosition = 'left';
+        arrowPosition = "left";
         break;
     }
 
@@ -96,17 +99,17 @@ export default function WizardTooltip({
 
     // Calculate arrow offset to point at target element center
     let arrowOffset = 50; // Default to center (50%)
-    
-    if (arrowPosition === 'top' || arrowPosition === 'bottom') {
+
+    if (arrowPosition === "top" || arrowPosition === "bottom") {
       // For top/bottom arrows, calculate horizontal offset
-      const targetCenter = targetRect.left + (targetRect.width / 2);
+      const targetCenter = targetRect.left + targetRect.width / 2;
       const tooltipLeft = left;
       arrowOffset = ((targetCenter - tooltipLeft) / tooltipRect.width) * 100;
       // Clamp between 15% and 85% to keep arrow visible
       arrowOffset = Math.max(15, Math.min(85, arrowOffset));
-    } else if (arrowPosition === 'left' || arrowPosition === 'right') {
+    } else if (arrowPosition === "left" || arrowPosition === "right") {
       // For left/right arrows, calculate vertical offset
-      const targetCenter = targetRect.top + (targetRect.height / 2);
+      const targetCenter = targetRect.top + targetRect.height / 2;
       const tooltipTop = top;
       arrowOffset = ((targetCenter - tooltipTop) / tooltipRect.height) * 100;
       // Clamp between 15% and 85% to keep arrow visible
@@ -137,26 +140,26 @@ export default function WizardTooltip({
 
     // Recalculate on resize/scroll
     const handleResize = () => calculatePosition();
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleResize, true);
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleResize, true);
 
     return () => {
       cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleResize, true);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleResize, true);
     };
   }, [calculatePosition]);
 
   // Add highlight class to target element
   useEffect(() => {
     if (targetElement) {
-      targetElement.classList.add('wizard__highlight');
-      
+      targetElement.classList.add("wizard__highlight");
+
       // Scroll target into view if needed
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
 
       return () => {
-        targetElement.classList.remove('wizard__highlight');
+        targetElement.classList.remove("wizard__highlight");
       };
     }
     return undefined;
@@ -166,46 +169,46 @@ export default function WizardTooltip({
     <>
       {/* Overlay that dims the rest of the page */}
       <div className="wizard__overlay" onClick={onSkip} />
-      
+
       {/* Tooltip */}
-      <div 
+      <div
         ref={tooltipRef}
         className={`wizard__tooltip wizard__tooltip--arrow-${position.arrowPosition}`}
         style={{
-          top: position.top, 
+          top: position.top,
           left: position.left,
           opacity: position.top === 0 && position.left === 0 ? 0 : 1,
           // @ts-ignore - CSS custom property
-          '--arrow-offset': `${position.arrowOffset || 50}%`
+          "--arrow-offset": `${position.arrowOffset || 50}%`,
         }}
         role="dialog"
         aria-labelledby="wizard-title"
         aria-describedby="wizard-description"
       >
         {/* Close button */}
-        <button 
-          className="wizard__close" 
-          onClick={onSkip} 
+        <button
+          className="wizard__close"
+          onClick={onSkip}
           aria-label="Sulge juhend"
         >
           <CloseIcon size="2xl" />
         </button>
-        
+
         <h3 id="wizard-title" className="wizard__title">
           {step.title}
         </h3>
-        
+
         <p id="wizard-description" className="wizard__description">
           {step.description}
         </p>
-        
+
         <div className="wizard__footer">
           <span className="wizard__progress">
             {currentIndex + 1} / {totalSteps}
           </span>
-          
+
           <div className="wizard__nav">
-            <button 
+            <button
               className="wizard__nav-button"
               onClick={onPrev}
               disabled={isFirst}
@@ -213,7 +216,7 @@ export default function WizardTooltip({
             >
               <BackIcon size="2xl" />
             </button>
-            <button 
+            <button
               className="wizard__nav-button wizard__nav-button--primary"
               onClick={isLast ? onSkip : onNext}
               aria-label={isLast ? "Lõpeta juhend" : "Järgmine samm"}

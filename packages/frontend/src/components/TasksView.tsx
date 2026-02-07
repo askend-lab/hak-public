@@ -1,9 +1,9 @@
-import TaskManager from './TaskManager';
-import TaskDetailView from './TaskDetailView';
-import { AddIcon } from './ui/Icons';
-import { DataService } from '@/services/dataService';
-import { useAuth } from '@/services/auth';
-import { useUserTasks } from '@/hooks';
+import TaskManager from "./TaskManager";
+import TaskDetailView from "./TaskDetailView";
+import { AddIcon } from "./ui/Icons";
+import { DataService } from "@/services/dataService";
+import { useAuth } from "@/services/auth";
+import { useUserTasks } from "@/hooks";
 
 interface Task {
   id: string;
@@ -24,7 +24,17 @@ interface TasksViewProps {
   onNavigateToSynthesis: () => void;
 }
 
-export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, onViewTask, onCreateTask, onEditTask, onDeleteTask, onShareTask, onNavigateToSynthesis }: TasksViewProps) {
+export default function TasksView({
+  selectedTaskId,
+  taskRefreshTrigger,
+  onBack,
+  onViewTask,
+  onCreateTask,
+  onEditTask,
+  onDeleteTask,
+  onShareTask,
+  onNavigateToSynthesis,
+}: TasksViewProps) {
   const { user } = useAuth();
   const { tasks, isLoading, error, isEmpty } = useUserTasks(taskRefreshTrigger);
 
@@ -39,7 +49,7 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
         onEditTask(taskData);
       }
     } catch (error) {
-      console.error('Failed to fetch task for editing:', error);
+      console.error("Failed to fetch task for editing:", error);
     }
   };
 
@@ -55,7 +65,7 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
         onShareTask(taskData);
       }
     } catch (error) {
-      console.error('Failed to fetch task for sharing:', error);
+      console.error("Failed to fetch task for sharing:", error);
     }
   };
 
@@ -63,7 +73,13 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
   if (selectedTaskId) {
     return (
       <div className="page-content">
-        <TaskDetailView taskId={selectedTaskId} onBack={onBack} onEditTask={handleEditTask} onDeleteTask={onDeleteTask} onNavigateToSynthesis={onNavigateToSynthesis} />
+        <TaskDetailView
+          taskId={selectedTaskId}
+          onBack={onBack}
+          onEditTask={handleEditTask}
+          onDeleteTask={onDeleteTask}
+          onNavigateToSynthesis={onNavigateToSynthesis}
+        />
       </div>
     );
   }
@@ -73,7 +89,10 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
     return (
       <div className="page-content page-content--empty">
         <div className="empty-state">
-          <div className="loader-spinner" style={{ width: 48, height: 48 }}></div>
+          <div
+            className="loader-spinner"
+            style={{ width: 48, height: 48 }}
+          ></div>
           <p className="empty-state__description">Laen ülesandeid...</p>
         </div>
       </div>
@@ -85,17 +104,17 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
     return (
       <div className="page-content page-content--empty">
         <div className="empty-state">
-          <img 
-            className="empty-state__icon" 
-            src="/icons/avatar_task_empty.png" 
-            alt="" 
+          <img
+            className="empty-state__icon"
+            src="/icons/avatar_task_empty.png"
+            alt=""
             style={{ width: 213, height: 186, opacity: 1 }}
           />
           <h2 className="empty-state__title">Ülesanded puuduvad</h2>
           <p className="empty-state__description">
             Sul pole veel ühtegi ülesannet. Alusta uue ülesande loomisega!
           </p>
-          <button 
+          <button
             className="empty-state__action button button--primary"
             onClick={onCreateTask}
           >
@@ -125,11 +144,11 @@ export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, 
             <p>Viga ülesannete laadimisel: {error}</p>
           </div>
         )}
-        <TaskManager 
+        <TaskManager
           tasks={tasks}
-          onEditTask={handleEditTask} 
-          onViewTask={onViewTask} 
-          onDeleteTask={onDeleteTask} 
+          onEditTask={handleEditTask}
+          onViewTask={onViewTask}
+          onDeleteTask={onDeleteTask}
           onShareTask={handleShareTask}
         />
       </div>

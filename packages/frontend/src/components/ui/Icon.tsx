@@ -1,5 +1,5 @@
-export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-export type IconWeight = 'light' | 'regular' | 'medium' | 'bold';
+export type IconSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type IconWeight = "light" | "regular" | "medium" | "bold";
 
 interface IconProps {
   name: string;
@@ -9,20 +9,22 @@ interface IconProps {
   className?: string;
 }
 
-export const Icon = ({ 
-  name, 
-  size = 'lg', 
-  weight = 'regular', 
+export const Icon = ({
+  name,
+  size = "lg",
+  weight = "regular",
   filled = false,
-  className 
+  className,
 }: IconProps) => {
   const classes = [
-    'icon',
+    "icon",
     `icon--${size}`,
     `icon--${weight}`,
-    filled && 'icon--filled',
-    className
-  ].filter(Boolean).join(' ');
+    filled && "icon--filled",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <span className={classes} aria-hidden="true">

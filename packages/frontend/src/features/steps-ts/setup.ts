@@ -1,6 +1,6 @@
 /**
  * Cucumber Test Setup
- * 
+ *
  * Provides:
  * - JSDOM environment for React rendering
  * - TestWorld class with rendering helpers
@@ -8,24 +8,35 @@
  * - InMemoryStore adapter for each scenario
  */
 
-import { setWorldConstructor, World, Before, After } from '@cucumber/cucumber';
-import { JSDOM } from 'jsdom';
-import { InMemoryAdapter, setAdapter } from 'simplestore';
-import { render, cleanup, fireEvent, waitFor, RenderResult } from '@testing-library/react';
-import { createElement } from 'react';
-import { MemoryRouter } from 'react-router-dom';
-import App from '../../App';
-import { AuthProvider } from '../../services/auth';
-import { NotificationProvider } from '../../contexts/NotificationContext';
-import { OnboardingProvider } from '../../contexts/OnboardingContext';
+import { setWorldConstructor, World, Before, After } from "@cucumber/cucumber";
+import { JSDOM } from "jsdom";
+import { InMemoryAdapter, setAdapter } from "simplestore";
+import {
+  render,
+  cleanup,
+  fireEvent,
+  waitFor,
+  RenderResult,
+} from "@testing-library/react";
+import { createElement } from "react";
+import { MemoryRouter } from "react-router-dom";
+import App from "../../App";
+import { AuthProvider } from "../../services/auth";
+import { NotificationProvider } from "../../contexts/NotificationContext";
+import { OnboardingProvider } from "../../contexts/OnboardingContext";
 
 // Setup jsdom
-(global as unknown as Record<string, unknown>).import = { meta: { env: { PROD: false, DEV: true } } };
+(global as unknown as Record<string, unknown>).import = {
+  meta: { env: { PROD: false, DEV: true } },
+};
 
-const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></html>', {
-  url: 'http://localhost:3000',
-  pretendToBeVisual: true,
-});
+const dom = new JSDOM(
+  '<!DOCTYPE html><html><body><div id="root"></div></body></html>',
+  {
+    url: "http://localhost:3000",
+    pretendToBeVisual: true,
+  },
+);
 
 // Polyfill requestAnimationFrame for BaseModal and other components
 const rafPolyfill = (callback: FrameRequestCallback): number => {
@@ -62,24 +73,33 @@ Object.assign(global, {
 });
 
 // Polyfill attachEvent/detachEvent for React DOM compatibility
-const htmlProto = global.window.HTMLElement.prototype as HTMLElement & { attachEvent?: unknown; detachEvent?: unknown };
+const htmlProto = global.window.HTMLElement.prototype as HTMLElement & {
+  attachEvent?: unknown;
+  detachEvent?: unknown;
+};
 if (!htmlProto.attachEvent) {
-  htmlProto.attachEvent = function(event: string, handler: EventListener): void {
-    this.addEventListener(event.replace(/^on/, ''), handler);
+  htmlProto.attachEvent = function (
+    event: string,
+    handler: EventListener,
+  ): void {
+    this.addEventListener(event.replace(/^on/, ""), handler);
   };
 }
 if (!htmlProto.detachEvent) {
-  htmlProto.detachEvent = function(event: string, handler: EventListener): void {
-    this.removeEventListener(event.replace(/^on/, ''), handler);
+  htmlProto.detachEvent = function (
+    event: string,
+    handler: EventListener,
+  ): void {
+    this.removeEventListener(event.replace(/^on/, ""), handler);
   };
 }
 
 // Mock matchMedia
-Object.defineProperty(global.window, 'matchMedia', {
+Object.defineProperty(global.window, "matchMedia", {
   writable: true,
   value: (): MediaQueryList => ({
     matches: false,
-    media: '',
+    media: "",
     onchange: null,
     addListener: (): void => {},
     removeListener: (): void => {},
@@ -90,22 +110,30 @@ Object.defineProperty(global.window, 'matchMedia', {
 });
 
 // Mock fetch for API calls
-global.fetch = async (input: RequestInfo | URL, _init?: RequestInit): Promise<Response> => {
-  let url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-  
-  if (url.startsWith('/')) {
+global.fetch = async (
+  input: RequestInfo | URL,
+  _init?: RequestInit,
+): Promise<Response> => {
+  let url =
+    typeof input === "string"
+      ? input
+      : input instanceof URL
+        ? input.href
+        : input.url;
+
+  if (url.startsWith("/")) {
     url = `http://localhost:3000${url}`;
   }
-  
+
   // Return mock response for API calls
-  if (url.includes('/api/')) {
+  if (url.includes("/api/")) {
     return new Response(JSON.stringify({ items: [], tasks: [] }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   }
-  
-  return new Response('{}', { status: 200 });
+
+  return new Response("{}", { status: 200 });
 };
 
 /**
@@ -130,13 +158,13 @@ export class TestWorld extends World {
           null,
           createElement(
             MemoryRouter,
-            { initialEntries: ['/synthesis'] },
-            createElement(App)
-          )
-        )
-      )
+            { initialEntries: ["/synthesis"] },
+            createElement(App),
+          ),
+        ),
+      ),
     );
-    
+
     this._renderResult = render(element);
   }
 
@@ -148,20 +176,22 @@ export class TestWorld extends World {
   type(element: Element, text: string): void {
     const input = element as HTMLInputElement;
     const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-      window.HTMLInputElement.prototype, 'value'
+      window.HTMLInputElement.prototype,
+      "value",
     )?.set;
     const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
-      window.HTMLTextAreaElement.prototype, 'value'
+      window.HTMLTextAreaElement.prototype,
+      "value",
     )?.set;
-    
-    if (element.tagName === 'TEXTAREA' && nativeTextAreaValueSetter) {
+
+    if (element.tagName === "TEXTAREA" && nativeTextAreaValueSetter) {
       nativeTextAreaValueSetter.call(element, text);
     } else if (nativeInputValueSetter) {
       nativeInputValueSetter.call(element, text);
     } else {
       input.value = text;
     }
-    
+
     fireEvent.input(element, { target: { value: text }, bubbles: true });
     fireEvent.change(element, { target: { value: text }, bubbles: true });
   }
@@ -195,7 +225,11 @@ export class TestWorld extends World {
       return this._renderResult?.getByPlaceholderText(placeholder) || null;
     } catch {
       // Element not found - return null instead of throwing
-      return this.container?.querySelector(`[placeholder*="${placeholder.substring(0, 10)}"]`) || null;
+      return (
+        this.container?.querySelector(
+          `[placeholder*="${placeholder.substring(0, 10)}"]`,
+        ) || null
+      );
     }
   }
 

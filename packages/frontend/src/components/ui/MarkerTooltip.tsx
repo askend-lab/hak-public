@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { type MarkerDefinition } from '@/data/markerData';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { type MarkerDefinition } from "@/data/markerData";
 
-type TooltipAlign = 'left' | 'center' | 'right';
+type TooltipAlign = "left" | "center" | "right";
 
 interface MarkerTooltipProps {
   /** The marker definition to display in the tooltip */
@@ -20,7 +20,11 @@ interface MarkerTooltipProps {
  * Positioned below button to avoid covering input fields
  * Alignment adjusts based on button position to stay within panel
  */
-export default function MarkerTooltip({ marker, children, align = 'center' }: MarkerTooltipProps) {
+export default function MarkerTooltip({
+  marker,
+  children,
+  align = "center",
+}: MarkerTooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -28,7 +32,7 @@ export default function MarkerTooltip({ marker, children, align = 'center' }: Ma
 
   // Detect touch device on mount
   useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
   }, []);
 
   // Clear timeout on unmount
@@ -45,17 +49,20 @@ export default function MarkerTooltip({ marker, children, align = 'center' }: Ma
     if (!isTouchDevice || !isVisible) return;
 
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setIsVisible(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [isTouchDevice, isVisible]);
 
@@ -105,7 +112,7 @@ export default function MarkerTooltip({ marker, children, align = 'center' }: Ma
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape' && isVisible) {
+    if (e.key === "Escape" && isVisible) {
       setIsVisible(false);
     }
   };
@@ -138,7 +145,9 @@ export default function MarkerTooltip({ marker, children, align = 'center' }: Ma
             <p className="marker-tooltip__rule">{marker.rule}</p>
             <div className="marker-tooltip__examples">
               {marker.examples.map((ex, i) => (
-                <span key={i} className="marker-tooltip__example-tag">{ex}</span>
+                <span key={i} className="marker-tooltip__example-tag">
+                  {ex}
+                </span>
               ))}
             </div>
           </div>

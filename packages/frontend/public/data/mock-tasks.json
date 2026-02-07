@@ -95,35 +95,35 @@
           "audioUrl": null,
           "order": 1
         },
-                {
+        {
           "id": "entry-009",
           "text": "Küll on hea, kui kevad käes,saab siis porilompi kalla.",
           "stressedText": "k<üll <on h<ea kui kevad k<äe+s s<aa+b s<iis pori_l<ompi k<alla",
           "audioUrl": null,
           "order": 2
         },
-                        {
+        {
           "id": "entry-010",
           "text": "Küll on hea, kui suvi soe, paljajalu joosta tohib.",
           "stressedText": "k<üll <on h<ea kui suvi s<oe p<al]ja_jalu j<oos+ta tohi+b",
           "audioUrl": null,
           "order": 3
         },
-                                {
+        {
           "id": "entry-011",
           "text": "Küll on hea, kui sügis toob õunu, ploome, pirne, moosi!",
           "stressedText": "k<üll <on h<ea kui sügis t<oo+b <õun+u pl<oom+e p<irn+e m<oos]i",
           "audioUrl": null,
           "order": 4
         },
-                                        {
+        {
           "id": "entry-012",
           "text": "Küll on hea, et igal ajal midagi on toredat.",
           "stressedText": "k<üll <on h<ea <et iga+l aja+l mi+dagi <on toreda+t",
           "audioUrl": null,
           "order": 5
         },
-                                                {
+        {
           "id": "entry-013",
           "text": "Ole ainult rõõmus, laps, naera, hüppa, laula, karga!",
           "stressedText": "ole ainu+lt r<õõmus l<aps naera h<üppa laula k<arga",

@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -21,7 +21,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('[ErrorBoundary] Uncaught error:', error, errorInfo);
+    console.error("[ErrorBoundary] Uncaught error:", error, errorInfo);
   }
 
   override render(): ReactNode {
@@ -31,20 +31,20 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <div style={{ padding: "2rem", textAlign: "center" }}>
           <h2>Midagi läks valesti</h2>
-          <p style={{ color: '#666', marginTop: '0.5rem' }}>
-            {this.state.error?.message ?? 'Tekkis ootamatu viga'}
+          <p style={{ color: "#666", marginTop: "0.5rem" }}>
+            {this.state.error?.message ?? "Tekkis ootamatu viga"}
           </p>
           <button
             onClick={() => this.setState({ hasError: false, error: null })}
             style={{
-              marginTop: '1rem',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.5rem',
-              border: '1px solid #ccc',
-              cursor: 'pointer',
-              background: '#fff',
+              marginTop: "1rem",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #ccc",
+              cursor: "pointer",
+              background: "#fff",
             }}
           >
             Proovi uuesti

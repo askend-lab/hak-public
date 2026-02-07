@@ -1,15 +1,20 @@
- 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import BaseModal from './BaseModal';
+import { useState, useEffect } from "react";
+import BaseModal from "./BaseModal";
 
 interface TaskEditModalProps {
   isOpen: boolean;
   task: { id: string; name: string; description?: string | null } | null;
   onClose: () => void;
-  onSave: (updatedTask: { id: string; name: string; description?: string | null }) => Promise<void>;
-  setTaskToEdit: (task: { id: string; name: string; description?: string | null } | null) => void;
+  onSave: (updatedTask: {
+    id: string;
+    name: string;
+    description?: string | null;
+  }) => Promise<void>;
+  setTaskToEdit: (
+    task: { id: string; name: string; description?: string | null } | null,
+  ) => void;
 }
 
 export default function TaskEditModal({
@@ -17,10 +22,10 @@ export default function TaskEditModal({
   task,
   onClose,
   onSave,
-  setTaskToEdit
+  setTaskToEdit,
 }: TaskEditModalProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,26 +33,30 @@ export default function TaskEditModal({
   useEffect(() => {
     if (isOpen && task) {
       setName(task.name);
-      setDescription(task.description || '');
+      setDescription(task.description || "");
       setError(null);
     }
   }, [isOpen, task]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!task) return;
-    
+
     if (!name.trim()) {
-      setError('Ülesande nimi on kohustuslik');
+      setError("Ülesande nimi on kohustuslik");
       return;
     }
 
     setIsSubmitting(true);
     setError(null);
 
-    const updatedTask = { ...task, name: name.trim(), description: description.trim() || null };
-    
+    const updatedTask = {
+      ...task,
+      name: name.trim(),
+      description: description.trim() || null,
+    };
+
     // Update the task in the hook state
     setTaskToEdit(updatedTask);
 
@@ -56,7 +65,7 @@ export default function TaskEditModal({
       await onSave(updatedTask);
       handleClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Viga ülesande muutmisel');
+      setError(err instanceof Error ? err.message : "Viga ülesande muutmisel");
     } finally {
       setIsSubmitting(false);
     }
@@ -64,8 +73,8 @@ export default function TaskEditModal({
 
   const handleClose = () => {
     if (!isSubmitting) {
-      setName('');
-      setDescription('');
+      setName("");
+      setDescription("");
       setError(null);
       onClose();
     }
@@ -121,7 +130,7 @@ export default function TaskEditModal({
             className="button button--primary"
             disabled={isSubmitting || !name.trim()}
           >
-            {isSubmitting ? 'Salvestan...' : 'Salvesta'}
+            {isSubmitting ? "Salvestan..." : "Salvesta"}
           </button>
         </div>
       </form>

@@ -4,7 +4,7 @@
 // Visibility helpers for different breakpoints
 // =========================================================================
 
-@import '../tokens/breakpoints';
+@import "../tokens/breakpoints";
 
 // =============================================================================
 // RESPONSIVE UTILITIES
@@ -41,7 +41,7 @@
 // Show only on tablet
 .show-tablet-only {
   display: none !important;
-  
+
   @include respond-between($breakpoint-md, $breakpoint-lg) {
     display: block !important;
   }
@@ -50,7 +50,7 @@
 // Show only on desktop
 .show-desktop-only {
   display: none !important;
-  
+
   @include desktop {
     display: block !important;
   }

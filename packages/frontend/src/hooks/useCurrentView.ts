@@ -1,6 +1,11 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
-export type ViewType = 'synthesis' | 'tasks' | 'specs' | 'dashboard' | 'role-selection';
+export type ViewType =
+  | "synthesis"
+  | "tasks"
+  | "specs"
+  | "dashboard"
+  | "role-selection";
 
 interface CurrentViewResult {
   currentView: ViewType;
@@ -16,11 +21,15 @@ export function useCurrentView(): CurrentViewResult {
   const location = useLocation();
   const pathname = location.pathname;
 
-  const currentView: ViewType = pathname.startsWith('/tasks') ? 'tasks'
-    : pathname.startsWith('/specs') ? 'specs'
-    : pathname.startsWith('/dashboard') ? 'dashboard'
-    : pathname.startsWith('/role-selection') ? 'role-selection'
-    : 'synthesis';
+  const currentView: ViewType = pathname.startsWith("/tasks")
+    ? "tasks"
+    : pathname.startsWith("/specs")
+      ? "specs"
+      : pathname.startsWith("/dashboard")
+        ? "dashboard"
+        : pathname.startsWith("/role-selection")
+          ? "role-selection"
+          : "synthesis";
 
   const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
   const selectedTaskId: string | null = taskIdMatch?.[1] || null;

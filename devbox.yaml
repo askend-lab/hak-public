@@ -29,7 +29,7 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
-    min_coverage_branches: 58
+    min_coverage_branches: 75
     command: "pnpm test"
     command_full: "pnpm test:coverage"
     results_file: "jest-results.json"
@@ -183,6 +183,17 @@ hooks:
       - "**/styles/**/*.scss"
       - "**/*.full.test.tsx"
       - "**/*.full.test.ts"
+      - "**/useSynthesisOrchestrator.test.ts"
+      - "**/useAudioPlayback.test.ts"
+      - "**/SharedTaskPage.test.tsx"
+      - "**/TasksView.test.tsx"
+      - "**/App.test.tsx"
+      - "**/context.test.tsx"
+      - "**/PronunciationVariants.test.tsx"
+      - "**/useSynthesis.branches.test.ts"
+      - "**/useTaskHandlers.test.ts"
+      - "**/coverage-summary.json"
+      - "**/.nyc_output/**"
       - "**/cucumber-report.json"
       - "**/merlin/**/*.py"
       - "**/merlin-worker/tools/**/*"

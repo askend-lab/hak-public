@@ -1,8 +1,8 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // =========================================================================
 // Phonetic Guide Modal Component
@@ -92,7 +92,13 @@
 }
 
 .phonetic-guide-modal__symbol-code {
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-xl;
   font-weight: $font-weight-bold;
   color: $color-primary;
@@ -131,7 +137,13 @@
 }
 
 .phonetic-guide-modal__symbol-example {
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-xs;
   font-weight: $font-weight-regular;
   color: $color-text-secondary;
@@ -178,7 +190,13 @@
 }
 
 .phonetic-guide-modal__example-code {
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   color: $color-primary;

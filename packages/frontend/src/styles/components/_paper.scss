@@ -1,14 +1,14 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
 
 // =========================================================================
 // Paper Component (Base)
 // =========================================================================
 // BEM: .paper, .paper__*, .paper--*
 // Surface container for dropdowns, popovers, cards, and floating elements
-// 
+//
 // Usage:
 //   <div class="paper paper--dropdown">
 //     <div class="paper__item">Item 1</div>
@@ -156,7 +156,7 @@
 @mixin paper-scroll {
   max-height: 240px;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -173,7 +173,7 @@
       background: $color-gray;
     }
   }
-  
+
   scrollbar-width: thin;
   scrollbar-color: $color-outlined-neutral transparent;
 }
@@ -262,7 +262,7 @@
 
 .paper__item--selected {
   background-color: $color-soft-primary-bg;
-  
+
   .paper__item-content {
     font-weight: 500;
     color: $color-primary;

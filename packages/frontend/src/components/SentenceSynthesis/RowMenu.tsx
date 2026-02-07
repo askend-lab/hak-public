@@ -1,10 +1,9 @@
- 
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
-import { useRef, useEffect, useState } from 'react';
-import { MoreIcon } from '../ui/Icons';
+import { useRef, useEffect, useState } from "react";
+import { MoreIcon } from "../ui/Icons";
 
 interface RowMenuItem {
   label: string;
@@ -19,7 +18,7 @@ interface RowMenuProps {
   items: RowMenuItem[];
   onOpen: (id: string) => void;
   onClose: () => void;
-  'data-onboarding-target'?: string;
+  "data-onboarding-target"?: string;
 }
 
 export function RowMenu({
@@ -28,10 +27,13 @@ export function RowMenu({
   items,
   onOpen,
   onClose,
-  'data-onboarding-target': onboardingTarget
+  "data-onboarding-target": onboardingTarget,
 }: RowMenuProps): React.ReactElement {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number } | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    right: number;
+  } | null>(null);
 
   useEffect(() => {
     if (isOpen && menuButtonRef.current) {
@@ -47,12 +49,12 @@ export function RowMenu({
 
       updatePosition();
 
-      window.addEventListener('scroll', updatePosition, true);
-      window.addEventListener('resize', updatePosition);
+      window.addEventListener("scroll", updatePosition, true);
+      window.addEventListener("resize", updatePosition);
 
       return (): void => {
-        window.removeEventListener('scroll', updatePosition, true);
-        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener("scroll", updatePosition, true);
+        window.removeEventListener("resize", updatePosition);
       };
     } else {
       setDropdownPosition(null);
@@ -62,7 +64,7 @@ export function RowMenu({
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent): void => {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       onClose();
       menuButtonRef.current?.focus();
     }
@@ -90,7 +92,10 @@ export function RowMenu({
           />
           <div
             className="sentence-synthesis-item__dropdown-menu sentence-synthesis-item__dropdown-menu--fixed"
-            style={{ top: `${dropdownPosition.top}px`, right: `${dropdownPosition.right}px` }}
+            style={{
+              top: `${dropdownPosition.top}px`,
+              right: `${dropdownPosition.right}px`,
+            }}
             role="menu"
             aria-label="Lausungi valikud"
             onKeyDown={handleKeyDown}
@@ -98,7 +103,7 @@ export function RowMenu({
             {items.map((item, index) => (
               <button
                 key={index}
-                className={`sentence-synthesis-item__menu-item ${item.danger ? 'sentence-synthesis-item__menu-item--danger' : ''}`}
+                className={`sentence-synthesis-item__menu-item ${item.danger ? "sentence-synthesis-item__menu-item--danger" : ""}`}
                 role="menuitem"
                 onClick={() => {
                   item.onClick(id);
@@ -106,9 +111,16 @@ export function RowMenu({
                 }}
               >
                 {item.icon && (
-                  <span className="sentence-synthesis-item__menu-item-icon" aria-hidden="true">{item.icon}</span>
+                  <span
+                    className="sentence-synthesis-item__menu-item-icon"
+                    aria-hidden="true"
+                  >
+                    {item.icon}
+                  </span>
                 )}
-                <div className="sentence-synthesis-item__menu-item-content">{item.label}</div>
+                <div className="sentence-synthesis-item__menu-item-content">
+                  {item.label}
+                </div>
               </button>
             ))}
           </div>

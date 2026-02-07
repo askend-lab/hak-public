@@ -1,8 +1,13 @@
- 
-'use client';
+"use client";
 
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { validateIsikukood, getNameFromIsikukood } from '@/utils/isikukood';
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
+import { validateIsikukood, getNameFromIsikukood } from "@/utils/isikukood";
 
 export interface User {
   id: string; // Isikukood
@@ -31,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const storedUser = localStorage.getItem('eki_user');
+        const storedUser = localStorage.getItem("eki_user");
         if (storedUser) {
           const userData = JSON.parse(storedUser);
           // Validate the stored user data
@@ -39,12 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(userData);
           } else {
             // Clear invalid stored user
-            localStorage.removeItem('eki_user');
+            localStorage.removeItem("eki_user");
           }
         }
       } catch (error) {
-        console.error('Failed to load user from storage:', error);
-        localStorage.removeItem('eki_user');
+        console.error("Failed to load user from storage:", error);
+        localStorage.removeItem("eki_user");
       } finally {
         setIsLoading(false);
       }
@@ -56,44 +61,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (isikukood: string): Promise<void> => {
     // Validate Isikukood
     if (!validateIsikukood(isikukood)) {
-      throw new Error('Vigane isikukood');
+      throw new Error("Vigane isikukood");
     }
 
     // Simulate eID authentication delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     try {
       // First, try to find user in mock database
-      const response = await fetch('/data/mock-users.json');
+      const response = await fetch("/data/mock-users.json");
       const data = await response.json();
-      
+
       let userData = data.users.find((u: User) => u.id === isikukood);
-      
+
       if (!userData) {
         // If not in mock database, create a new user
         userData = {
           id: isikukood,
           name: getNameFromIsikukood(isikukood),
-          email: `${isikukood.substring(0, 6)}@eesti.ee`
+          email: `${isikukood.substring(0, 6)}@eesti.ee`,
         };
       }
 
       // Store user in localStorage
-      localStorage.setItem('eki_user', JSON.stringify(userData));
+      localStorage.setItem("eki_user", JSON.stringify(userData));
       setUser(userData);
       setShowLoginModal(false);
     } catch (error) {
-      console.error('Login error:', error);
-      throw new Error('Sisselogimine ebaõnnestus');
+      console.error("Login error:", error);
+      throw new Error("Sisselogimine ebaõnnestus");
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('eki_user');
+    localStorage.removeItem("eki_user");
     // Clear all user-specific localStorage data
     const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-      if (key.startsWith('eki_task_') || key.startsWith('eki_user_tasks_')) {
+    keys.forEach((key) => {
+      if (key.startsWith("eki_task_") || key.startsWith("eki_user_tasks_")) {
         localStorage.removeItem(key);
       }
     });
@@ -101,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider 
+    <AuthContext.Provider
       value={{
         user,
         isAuthenticated: !!user,
@@ -109,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         showLoginModal,
-        setShowLoginModal
+        setShowLoginModal,
       }}
     >
       {children}
@@ -120,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

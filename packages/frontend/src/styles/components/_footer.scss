@@ -5,19 +5,19 @@
 // Layout styles are in _page-layouts.scss (.page-footer--full)
 // =========================================================================
 
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/opacity';
-@import '../tokens/borders';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/opacity";
+@import "../tokens/borders";
 
 // Footer component-specific styles (used within .page-footer--full wrapper)
 // Logo section
 .footer-logo {
   position: relative;
   padding-top: 44px; // Space for absolute logo
-  
+
   // Desktop: Fixed width
   @include desktop {
     width: 305px;
@@ -97,7 +97,7 @@
   font-family: $font-body;
   max-width: 100%;
   word-wrap: break-word;
-  
+
   @include desktop {
     max-width: 305px;
   }
@@ -168,7 +168,7 @@
 
   &:hover {
     opacity: 0.7;
-    
+
     span {
       text-decoration: underline;
     }
@@ -208,19 +208,19 @@
   justify-content: center;
   gap: 60px;
   padding: 0 $spacing-4;
-  
+
   @include respond-below($breakpoint-md) {
     flex-direction: column;
     gap: $spacing-8;
   }
-  
+
   @include mobile-landscape {
     flex-direction: row;
     flex-wrap: wrap;
     gap: $spacing-10;
     justify-content: center;
   }
-  
+
   @include desktop {
     flex-wrap: nowrap;
     gap: 60px;
@@ -232,7 +232,7 @@
   max-height: 60px;
   width: auto;
   object-fit: contain;
-  
+
   @include respond-below($breakpoint-md) {
     max-height: 48px;
   }

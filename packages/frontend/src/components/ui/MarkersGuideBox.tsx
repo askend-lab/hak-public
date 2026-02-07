@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { InfoIcon } from './Icons';
-import MarkerTooltip from './MarkerTooltip';
-import { markers } from '@/data/markerData';
+import { InfoIcon } from "./Icons";
+import MarkerTooltip from "./MarkerTooltip";
+import { markers } from "@/data/markerData";
 
 interface MarkersGuideBoxProps {
   /** Callback when a marker button is clicked */
@@ -20,7 +20,7 @@ interface MarkersGuideBoxProps {
 export default function MarkersGuideBox({
   onInsertMarker,
   onShowGuide,
-  className = '',
+  className = "",
 }: MarkersGuideBoxProps) {
   return (
     <div className={`markers-guide-box ${className}`.trim()}>
@@ -37,15 +37,12 @@ export default function MarkersGuideBox({
         </button>
       </div>
       <p className="markers-guide-box__intro">
-        Kasuta märke häälduse täpsustamiseks. Klõpsa märgil selle lisamiseks või hõlju kohal juhiste nägemiseks.
+        Kasuta märke häälduse täpsustamiseks. Klõpsa märgil selle lisamiseks või
+        hõlju kohal juhiste nägemiseks.
       </p>
       <div className="markers-guide-box__toolbar">
         {markers.map((marker) => (
-          <MarkerTooltip
-            key={marker.symbol}
-            marker={marker}
-            align="left"
-          >
+          <MarkerTooltip key={marker.symbol} marker={marker} align="left">
             <button
               type="button"
               onClick={() => onInsertMarker(marker.symbol)}

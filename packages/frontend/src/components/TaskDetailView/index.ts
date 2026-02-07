@@ -1,1 +1,1 @@
-export { default } from './TaskDetailView';
+export { default } from "./TaskDetailView";

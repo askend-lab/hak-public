@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createAudioPlayer, playAudioWithCallbacks } from './audioPlayer';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { createAudioPlayer, playAudioWithCallbacks } from "./audioPlayer";
 
 interface MockAudioInstance {
   src: string;
@@ -10,14 +10,14 @@ interface MockAudioInstance {
   play: ReturnType<typeof vi.fn>;
 }
 
-describe('audioPlayer', () => {
+describe("audioPlayer", () => {
   let mockAudio: MockAudioInstance;
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     class MockAudio {
-      src = '';
+      src = "";
       onloadeddata: (() => void) | null = null;
       onended: (() => void) | null = null;
       onerror: (() => void) | null = null;
@@ -34,33 +34,42 @@ describe('audioPlayer', () => {
     global.URL.revokeObjectURL = vi.fn();
   });
 
-  describe('createAudioPlayer', () => {
-    it('should create audio player with callbacks', () => {
+  describe("createAudioPlayer", () => {
+    it("should create audio player with callbacks", () => {
       const onLoaded = vi.fn();
       const onEnded = vi.fn();
       const onError = vi.fn();
 
-      const { audio, cleanup } = createAudioPlayer('https://example.com/audio.mp3', {
-        onLoaded,
-        onEnded,
-        onError
-      });
+      const { audio, cleanup } = createAudioPlayer(
+        "https://example.com/audio.mp3",
+        {
+          onLoaded,
+          onEnded,
+          onError,
+        },
+      );
 
       expect(audio).toBe(mockAudio);
-      expect(mockAudio.src).toBe('https://example.com/audio.mp3');
+      expect(mockAudio.src).toBe("https://example.com/audio.mp3");
 
       mockAudio.onloadeddata!();
       expect(onLoaded).toHaveBeenCalled();
 
       mockAudio.onended!();
       expect(onEnded).toHaveBeenCalled();
-      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('https://example.com/audio.mp3');
+      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(
+        "https://example.com/audio.mp3",
+      );
 
       cleanup();
     });
 
-    it('should not revoke URL if shouldRevokeUrl is false', () => {
-      const { cleanup } = createAudioPlayer('https://example.com/audio.mp3', {}, false);
+    it("should not revoke URL if shouldRevokeUrl is false", () => {
+      const { cleanup } = createAudioPlayer(
+        "https://example.com/audio.mp3",
+        {},
+        false,
+      );
 
       mockAudio.onended!();
       expect(global.URL.revokeObjectURL).not.toHaveBeenCalled();
@@ -68,10 +77,10 @@ describe('audioPlayer', () => {
       cleanup();
     });
 
-    it('should handle error callback', () => {
+    it("should handle error callback", () => {
       const onError = vi.fn();
 
-      createAudioPlayer('https://example.com/audio.mp3', { onError });
+      createAudioPlayer("https://example.com/audio.mp3", { onError });
 
       mockAudio.onerror!();
       expect(onError).toHaveBeenCalled();
@@ -79,15 +88,18 @@ describe('audioPlayer', () => {
     });
   });
 
-  describe('playAudioWithCallbacks', () => {
-    it('should play audio and resolve on success', async () => {
+  describe("playAudioWithCallbacks", () => {
+    it("should play audio and resolve on success", async () => {
       const onLoaded = vi.fn();
       const onEnded = vi.fn();
 
-      const playPromise = playAudioWithCallbacks('https://example.com/audio.mp3', {
-        onLoaded,
-        onEnded
-      });
+      const playPromise = playAudioWithCallbacks(
+        "https://example.com/audio.mp3",
+        {
+          onLoaded,
+          onEnded,
+        },
+      );
 
       mockAudio.onloadeddata!();
       expect(onLoaded).toHaveBeenCalled();
@@ -99,25 +111,28 @@ describe('audioPlayer', () => {
       expect(mockAudio.play).toHaveBeenCalled();
     });
 
-    it('should reject on error', async () => {
+    it("should reject on error", async () => {
       const onError = vi.fn();
 
-      const playPromise = playAudioWithCallbacks('https://example.com/audio.mp3', { onError });
+      const playPromise = playAudioWithCallbacks(
+        "https://example.com/audio.mp3",
+        { onError },
+      );
 
       mockAudio.onerror!();
 
-      await expect(playPromise).rejects.toThrow('Audio playback failed');
+      await expect(playPromise).rejects.toThrow("Audio playback failed");
       expect(onError).toHaveBeenCalled();
     });
 
-    it('should reject on play failure', async () => {
+    it("should reject on play failure", async () => {
       class MockAudioWithError {
-        src = '';
+        src = "";
         onloadeddata: (() => void) | null = null;
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
         pause = vi.fn();
-        play = vi.fn().mockRejectedValue(new Error('Play failed'));
+        play = vi.fn().mockRejectedValue(new Error("Play failed"));
 
         constructor(url?: string) {
           if (url) this.src = url;
@@ -127,11 +142,15 @@ describe('audioPlayer', () => {
 
       global.Audio = MockAudioWithError as unknown as typeof Audio;
 
-      await expect(playAudioWithCallbacks('https://example.com/audio.mp3')).rejects.toThrow();
+      await expect(
+        playAudioWithCallbacks("https://example.com/audio.mp3"),
+      ).rejects.toThrow();
     });
 
-    it('should work without callbacks', async () => {
-      const playPromise = playAudioWithCallbacks('https://example.com/audio.mp3');
+    it("should work without callbacks", async () => {
+      const playPromise = playAudioWithCallbacks(
+        "https://example.com/audio.mp3",
+      );
 
       mockAudio.onended!();
       await playPromise;

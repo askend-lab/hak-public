@@ -1,14 +1,24 @@
-'use client';
+"use client";
 
-import { CloseIcon, BackIcon } from '../ui/Icons';
-import { markers } from '@/data/markerData';
+import { CloseIcon, BackIcon } from "../ui/Icons";
+import { markers } from "@/data/markerData";
 
 interface PhoneticGuideProps {
   onBack: () => void;
   onClose: () => void;
 }
 
-const MarkerItem = ({ symbol, name, rule, examples }: { symbol: string; name: string; rule: string; examples: string[] }) => (
+const MarkerItem = ({
+  symbol,
+  name,
+  rule,
+  examples,
+}: {
+  symbol: string;
+  name: string;
+  rule: string;
+  examples: string[];
+}) => (
   <div className="pronunciation-variants__marker-item">
     <div className="pronunciation-variants__marker-symbol">
       <code>{symbol}</code>
@@ -17,7 +27,9 @@ const MarkerItem = ({ symbol, name, rule, examples }: { symbol: string; name: st
     <div className="pronunciation-variants__marker-rule">{rule}</div>
     <div className="pronunciation-variants__marker-examples">
       {examples.map((ex, i) => (
-        <span key={i} className="pronunciation-variants__item-tag">{ex}</span>
+        <span key={i} className="pronunciation-variants__item-tag">
+          {ex}
+        </span>
       ))}
     </div>
   </div>
@@ -47,7 +59,8 @@ export default function PhoneticGuide({ onBack, onClose }: PhoneticGuideProps) {
       </div>
       <div className="pronunciation-variants__guide-view-content">
         <p className="pronunciation-variants__guide-intro">
-          Hääldusmärgid aitavad täpsustada sõna hääldust. Klõpsa märgil, et lisada see kursori asukohta.
+          Hääldusmärgid aitavad täpsustada sõna hääldust. Klõpsa märgil, et
+          lisada see kursori asukohta.
         </p>
         {markers.map((m) => (
           <MarkerItem key={m.symbol} {...m} />

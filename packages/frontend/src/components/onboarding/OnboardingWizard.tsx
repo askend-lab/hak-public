@@ -1,22 +1,17 @@
-'use client';
+"use client";
 
-import { useOnboarding } from '@/contexts/OnboardingContext';
-import WizardTooltip from './WizardTooltip';
+import { useOnboarding } from "@/contexts/OnboardingContext";
+import WizardTooltip from "./WizardTooltip";
 
 /**
  * OnboardingWizard - Controller component for the wizard overlay
- * 
+ *
  * Renders the current wizard step tooltip based on the selected role.
  * Manages navigation between steps and completion.
  */
 export default function OnboardingWizard() {
-  const { 
-    state, 
-    currentSteps, 
-    nextStep, 
-    prevStep, 
-    skipWizard 
-  } = useOnboarding();
+  const { state, currentSteps, nextStep, prevStep, skipWizard } =
+    useOnboarding();
 
   // Don't render if no steps or wizard is not active
   if (!currentSteps.length || state.completed) {
@@ -24,7 +19,7 @@ export default function OnboardingWizard() {
   }
 
   const currentStep = currentSteps[state.currentStep];
-  
+
   if (!currentStep) {
     return null;
   }

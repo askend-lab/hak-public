@@ -1,8 +1,8 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // =========================================================================
 // Share Task Modal Component
@@ -46,7 +46,13 @@
   padding: 0 $spacing-3;
   border: 1px solid $color-outlined-neutral;
   border-radius: $border-radius;
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-sm;
   font-weight: $font-weight-regular;
   color: $color-primary;

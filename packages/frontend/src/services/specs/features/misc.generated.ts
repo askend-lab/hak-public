@@ -3,7 +3,7 @@
 // Group: misc
 
 export const FEATURES_MISC: Record<string, string> = {
-  'US-024-view-phonetic-guide': `@misc @US-024
+  "US-024-view-phonetic-guide": `@misc @US-024
 Feature: View phonetic symbols reference guide (US-024)
   As a language learner
   I want to view an explanation of phonetic markers
@@ -36,7 +36,7 @@ Feature: View phonetic symbols reference guide (US-024)
     And I return to the main synthesis view
 `,
 
-  'US-029-submit-feedback': `@misc @US-029
+  "US-029-submit-feedback": `@misc @US-029
 Feature: Submit feedback (US-029)
   As a user of the application
   I want to submit feedback about the platform
@@ -68,7 +68,7 @@ Feature: Submit feedback (US-029)
     And I can submit without entering an email
 `,
 
-  'US-030-notifications': `@misc @US-030
+  "US-030-notifications": `@misc @US-030
 Feature: Display and dismiss notifications (US-030)
   As a user of the application
   I want to see notifications for system messages

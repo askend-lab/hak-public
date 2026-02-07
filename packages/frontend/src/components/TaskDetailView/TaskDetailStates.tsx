@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface BackButtonProps {
   onBack: () => void;
@@ -7,8 +7,15 @@ interface BackButtonProps {
 function BackButton({ onBack }: BackButtonProps) {
   return (
     <button onClick={onBack} className="task-back-button">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <polyline points="15,18 9,12 15,6"/>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <polyline points="15,18 9,12 15,6" />
       </svg>
       <span>Tagasi</span>
     </button>

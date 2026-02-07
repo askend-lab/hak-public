@@ -1,7 +1,7 @@
-@import '../tokens/colors';
-@import '../tokens/borders';
-@import '../tokens/opacity';
-@import '../tokens/typography';
+@import "../tokens/colors";
+@import "../tokens/borders";
+@import "../tokens/opacity";
+@import "../tokens/typography";
 
 // =========================================================================
 // Button Component
@@ -16,7 +16,7 @@
   color: $color-spinner-primary;
   border: 1px solid $color-spinner-primary;
   cursor: wait;
-  
+
   .loader-spinner {
     width: 18px;
     height: 18px;
@@ -43,11 +43,11 @@
   transition: all 0.2s ease;
   padding: 0;
   flex-shrink: 0;
-  
+
   &:hover:not(:disabled) {
     background: $color-menu-hover;
   }
-  
+
   &:disabled {
     opacity: $opacity-menu-disabled;
     cursor: not-allowed;
@@ -70,15 +70,15 @@
   transition: background-color 0.2s ease;
   flex-shrink: 0;
   user-select: none;
-  
+
   &:hover {
     background-color: $color-menu-hover;
   }
-  
+
   &:active {
     cursor: grabbing;
   }
-  
+
   svg {
     display: block;
     pointer-events: none;
@@ -95,20 +95,20 @@
   height: 36px;
   cursor: pointer;
   white-space: nowrap;
-  
+
   // Typography
   font-size: $font-size-sm;
   font-weight: 500;
-  letter-spacing: .175px;
+  letter-spacing: 0.175px;
   font-family: $font-body;
   text-align: center;
-  
+
   // Borders & Styling
   border-width: 2px;
   border-style: solid;
   border-color: $color-primary;
   border-radius: $border-radius-round;
-  transition: .2s all ease-in-out;
+  transition: 0.2s all ease-in-out;
 
   &--primary {
     color: $color-white;
@@ -129,7 +129,7 @@
       border-color: $color-secondary;
     }
   }
-  
+
   &--icon,
   &--icon-only {
     svg,
@@ -249,13 +249,13 @@
     width: 48px;
     height: 48px;
     padding: 0;
-    
+
     // Circular variant (36px icon-only button)
     &.button--circular {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      
+
       svg {
         width: 16px;
         height: 16px;
@@ -269,7 +269,7 @@
     background-color: $color-secondary;
     border-color: $color-secondary;
   }
-  
+
   // Loading state (applies to all button variants)
   &.loading {
     @include button-loading-state;

@@ -1,6 +1,6 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/borders';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/borders";
 
 .textarea-wrapper {
   position: relative;
@@ -47,7 +47,7 @@
   font-size: $font-size-sm;
   font-family: $font-body;
   border: 1px solid $color-primary;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   box-shadow: 0px 1px 2px 0px rgba(21, 21, 21, 0.08);
   resize: vertical;
   min-height: 120px;
@@ -87,4 +87,3 @@
     color: $color-overlay;
   }
 }
-

@@ -6,11 +6,11 @@
 // Provides row-based task display with expand/collapse functionality
 // =========================================================================
 
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
 
 // Container for task list
 .task-manager-simple {
@@ -33,7 +33,7 @@
   min-height: 72px;
   box-sizing: border-box;
   transition: all 0.2s ease;
-  
+
   &.expanded {
     .task-row-name,
     .task-row-description {
@@ -83,7 +83,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  
+
   &.expanded {
     -webkit-line-clamp: unset;
     display: block;
@@ -112,7 +112,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  
+
   &.expanded {
     -webkit-line-clamp: unset;
     display: block;
@@ -134,7 +134,7 @@
   text-align: left;
   text-decoration: underline;
   align-self: flex-start;
-  
+
   &:hover {
     color: $color-soft-primary;
   }
@@ -173,7 +173,7 @@
   border: 1px solid $color-outlined-danger;
   border-radius: $border-radius;
   margin-bottom: $spacing-4;
-  
+
   p {
     margin: 0;
     color: $color-soft-danger;
@@ -191,7 +191,7 @@
   justify-content: center;
   padding: $spacing-12 $spacing-6;
   min-height: 300px;
-  
+
   .loading-spinner {
     width: 32px;
     height: 32px;
@@ -201,7 +201,7 @@
     animation: spin 1s linear infinite;
     margin-bottom: $spacing-4;
   }
-  
+
   p {
     margin: 0;
     color: $color-text-secondary;
@@ -227,22 +227,22 @@
     flex-wrap: wrap;
     gap: $spacing-2;
   }
-  
+
   .task-row-content {
     width: 100%;
     flex-wrap: wrap;
   }
-  
+
   .task-row-info {
     flex-direction: column;
     gap: $spacing-2;
     width: 100%;
   }
-  
+
   .task-row-name {
     flex: 1 1 auto;
   }
-  
+
   .task-row-meta {
     width: 100%;
     justify-content: flex-start;

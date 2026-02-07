@@ -1,13 +1,13 @@
-import { useState, useCallback, useRef } from 'react';
-import { EditingTag, OpenTagMenu } from '@/types/synthesis';
-import { stripPhoneticMarkers } from '@/utils/phoneticMarkers';
-import { synthesizeWithPolling } from '@/utils/synthesize';
-import { getVoiceModel } from '@/types/synthesis';
-import { useSynthesisOrchestrator } from './synthesis/useSynthesisOrchestrator';
-import { useTagEditor } from './synthesis/useTagEditor';
-import { usePlaylistControl } from './synthesis/usePlaylistControl';
-import { useTagUpdater } from './synthesis/useTagUpdater';
-import { useNotification } from '@/contexts/NotificationContext';
+import { useState, useCallback, useRef } from "react";
+import { EditingTag, OpenTagMenu } from "@/types/synthesis";
+import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
+import { synthesizeWithPolling } from "@/utils/synthesize";
+import { getVoiceModel } from "@/types/synthesis";
+import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
+import { useTagEditor } from "./synthesis/useTagEditor";
+import { usePlaylistControl } from "./synthesis/usePlaylistControl";
+import { useTagUpdater } from "./synthesis/useTagUpdater";
+import { useNotification } from "@/contexts/NotificationContext";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useSynthesis() {
@@ -27,7 +27,7 @@ export function useSynthesis() {
     currentAudio,
     playSingleSentence,
     synthesizeAndPlay,
-    synthesizeWithText
+    synthesizeWithText,
   } = orchestrator;
 
   const sentencesRef = useRef(sentences);
@@ -43,10 +43,10 @@ export function useSynthesis() {
     () => {
       if (currentAudio) {
         currentAudio.pause();
-        currentAudio.src = '';
+        currentAudio.src = "";
       }
     },
-    updateAllSentences
+    updateAllSentences,
   );
 
   const [editingTag, setEditingTag] = useState<EditingTag>(null);
@@ -62,152 +62,231 @@ export function useSynthesis() {
     });
   };
 
-  const handleRemoveSentenceWrapper = useCallback((id: string) => {
-    handleRemoveSentence(id, true);
-  }, [handleRemoveSentence]);
+  const handleRemoveSentenceWrapper = useCallback(
+    (id: string) => {
+      handleRemoveSentence(id, true);
+    },
+    [handleRemoveSentence],
+  );
 
-  const handlePlay = useCallback((id: string): void => {
-    const sentence = getSentence(id);
-    if (!sentence) return;
-    if (sentence.currentInput.trim()) {
-      const inputWords = sentence.currentInput.trim().split(/\s+/).filter(word => word.length > 0);
-      const allTags = [...sentence.tags, ...inputWords];
-      const fullText = allTags.join(' ');
-      updateSentence(id, { tags: allTags, currentInput: '', text: fullText, phoneticText: undefined, audioUrl: undefined });
-      synthesizeWithText(id, fullText);
-    } else if (sentence.tags.length > 0) {
-      synthesizeAndPlay(id);
-    }
-  }, [getSentence, updateSentence, synthesizeAndPlay, synthesizeWithText]);
-
-  const handleDownload = useCallback(async (id: string) => {
-    const sentence = getSentence(id);
-    if (!sentence) return;
-    let audioUrl = sentence.audioUrl;
-
-    if (!audioUrl) {
-      try {
-        audioUrl = await synthesizeWithPolling(sentence.text, getVoiceModel(sentence.text));
-        updateSentence(id, { audioUrl });
-      } catch (error) {
-        console.error('Failed to generate audio:', error);
-        return;
+  const handlePlay = useCallback(
+    (id: string): void => {
+      const sentence = getSentence(id);
+      if (!sentence) return;
+      if (sentence.currentInput.trim()) {
+        const inputWords = sentence.currentInput
+          .trim()
+          .split(/\s+/)
+          .filter((word) => word.length > 0);
+        const allTags = [...sentence.tags, ...inputWords];
+        const fullText = allTags.join(" ");
+        updateSentence(id, {
+          tags: allTags,
+          currentInput: "",
+          text: fullText,
+          phoneticText: undefined,
+          audioUrl: undefined,
+        });
+        synthesizeWithText(id, fullText);
+      } else if (sentence.tags.length > 0) {
+        synthesizeAndPlay(id);
       }
-    }
+    },
+    [getSentence, updateSentence, synthesizeAndPlay, synthesizeWithText],
+  );
 
-    if (!audioUrl) return;
+  const handleDownload = useCallback(
+    async (id: string) => {
+      const sentence = getSentence(id);
+      if (!sentence) return;
+      let audioUrl = sentence.audioUrl;
 
-    try {
-      const audioResponse = await fetch(audioUrl);
-      const audioBlob = await audioResponse.blob();
-      const blobUrl = URL.createObjectURL(audioBlob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = `${sentence.text || 'audio'}.wav`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error('Failed to download audio:', error);
-    }
-  }, [getSentence, updateSentence]);
+      if (!audioUrl) {
+        try {
+          audioUrl = await synthesizeWithPolling(
+            sentence.text,
+            getVoiceModel(sentence.text),
+          );
+          updateSentence(id, { audioUrl });
+        } catch (error) {
+          console.error("Failed to generate audio:", error);
+          return;
+        }
+      }
 
-  const handleCopyText = useCallback(async (id: string) => {
-    const sentence = getSentence(id);
-    if (!sentence || !sentence.text.trim()) return;
+      if (!audioUrl) return;
 
-    try {
-      await navigator.clipboard.writeText(sentence.text);
-      showNotification('success', 'Tekst kopeeritud!', undefined, undefined, 'success');
-    } catch (error) {
-      console.error('Failed to copy text:', error);
-      showNotification('error', 'Viga teksti kopeerimisel');
-    }
-  }, [getSentence, showNotification]);
+      try {
+        const audioResponse = await fetch(audioUrl);
+        const audioBlob = await audioResponse.blob();
+        const blobUrl = URL.createObjectURL(audioBlob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = `${sentence.text || "audio"}.wav`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+        console.error("Failed to download audio:", error);
+      }
+    },
+    [getSentence, updateSentence],
+  );
 
-  const handleDeleteTag = useCallback((sentenceId: string, tagIndex: number) => {
-    tagUpdater.deleteTag(sentenceId, tagIndex);
-    setOpenTagMenu(null);
-  }, [tagUpdater]);
+  const handleCopyText = useCallback(
+    async (id: string) => {
+      const sentence = getSentence(id);
+      if (!sentence || !sentence.text.trim()) return;
 
-  const handleEditTag = useCallback((sentenceId: string, tagIndex: number) => {
-    const sentence = getSentence(sentenceId);
-    if (!sentence) return;
-    const word = sentence.tags[tagIndex] ?? '';
-    setEditingTag({ sentenceId, tagIndex, value: word });
-    setOpenTagMenu(null);
-  }, [getSentence]);
+      try {
+        await navigator.clipboard.writeText(sentence.text);
+        showNotification(
+          "success",
+          "Tekst kopeeritud!",
+          undefined,
+          undefined,
+          "success",
+        );
+      } catch (error) {
+        console.error("Failed to copy text:", error);
+        showNotification("error", "Viga teksti kopeerimisel");
+      }
+    },
+    [getSentence, showNotification],
+  );
 
-  const handleEditTagChange = useCallback((value: string) => {
-    if (!editingTag) return;
-    setEditingTag({ ...editingTag, value });
-  }, [editingTag]);
+  const handleDeleteTag = useCallback(
+    (sentenceId: string, tagIndex: number) => {
+      tagUpdater.deleteTag(sentenceId, tagIndex);
+      setOpenTagMenu(null);
+    },
+    [tagUpdater],
+  );
+
+  const handleEditTag = useCallback(
+    (sentenceId: string, tagIndex: number) => {
+      const sentence = getSentence(sentenceId);
+      if (!sentence) return;
+      const word = sentence.tags[tagIndex] ?? "";
+      setEditingTag({ sentenceId, tagIndex, value: word });
+      setOpenTagMenu(null);
+    },
+    [getSentence],
+  );
+
+  const handleEditTagChange = useCallback(
+    (value: string) => {
+      if (!editingTag) return;
+      setEditingTag({ ...editingTag, value });
+    },
+    [editingTag],
+  );
 
   const handleEditTagCommit = useCallback(() => {
     if (!editingTag) return;
     const { sentenceId, tagIndex, value } = editingTag;
     const trimmedValue = value.trim();
 
-    if (trimmedValue === '') {
+    if (trimmedValue === "") {
       tagUpdater.deleteTag(sentenceId, tagIndex);
     } else {
-      const newWords = trimmedValue.split(/\s+/).filter(w => w.length > 0);
+      const newWords = trimmedValue.split(/\s+/).filter((w) => w.length > 0);
       tagUpdater.replaceTag(sentenceId, tagIndex, newWords);
     }
     setEditingTag(null);
   }, [editingTag, tagUpdater]);
 
-  const handleEditTagKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (editingTag) {
-        const sentenceId = editingTag.sentenceId;
-        const tagIndex = editingTag.tagIndex;
-        const trimmedValue = editingTag.value.trim();
-        // Compute the new text BEFORE commit clears editingTag
-        const sentence = sentencesRef.current.find(s => s.id === sentenceId);
-        let newText = '';
-        if (sentence) {
-          if (trimmedValue === '') {
-            const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
-            newText = newTags.join(' ');
-          } else {
-            const newWords = trimmedValue.split(/\s+/).filter(w => w.length > 0);
-            const newTags = [...sentence.tags.slice(0, tagIndex), ...newWords, ...sentence.tags.slice(tagIndex + 1)];
-            newText = newTags.join(' ');
+  const handleEditTagKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (editingTag) {
+          const sentenceId = editingTag.sentenceId;
+          const tagIndex = editingTag.tagIndex;
+          const trimmedValue = editingTag.value.trim();
+          // Compute the new text BEFORE commit clears editingTag
+          const sentence = sentencesRef.current.find(
+            (s) => s.id === sentenceId,
+          );
+          let newText = "";
+          if (sentence) {
+            if (trimmedValue === "") {
+              const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
+              newText = newTags.join(" ");
+            } else {
+              const newWords = trimmedValue
+                .split(/\s+/)
+                .filter((w) => w.length > 0);
+              const newTags = [
+                ...sentence.tags.slice(0, tagIndex),
+                ...newWords,
+                ...sentence.tags.slice(tagIndex + 1),
+              ];
+              newText = newTags.join(" ");
+            }
+          }
+          handleEditTagCommit();
+          // Use synthesizeWithText to pass the correct text directly, bypassing stale ref
+          if (newText) {
+            synthesizeWithText(sentenceId, newText);
           }
         }
+      } else if (e.key === " ") {
+        e.preventDefault();
         handleEditTagCommit();
-        // Use synthesizeWithText to pass the correct text directly, bypassing stale ref
-        if (newText) {
-          synthesizeWithText(sentenceId, newText);
-        }
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        setEditingTag(null);
       }
-    } else if (e.key === ' ') {
-      e.preventDefault();
-      handleEditTagCommit();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setEditingTag(null);
-    }
-  }, [editingTag, handleEditTagCommit, synthesizeWithText]);
+    },
+    [editingTag, handleEditTagCommit, synthesizeWithText],
+  );
 
-  const handleUseVariant = useCallback((variantText: string, selectedSentenceId: string | null, selectedTagIndex: number | null) => {
-    if (selectedSentenceId !== null && selectedTagIndex !== null) {
-      tagUpdater.updateStressedTag(selectedSentenceId, selectedTagIndex, variantText);
-    }
-  }, [tagUpdater]);
+  const handleUseVariant = useCallback(
+    (
+      variantText: string,
+      selectedSentenceId: string | null,
+      selectedTagIndex: number | null,
+    ) => {
+      if (selectedSentenceId !== null && selectedTagIndex !== null) {
+        tagUpdater.updateStressedTag(
+          selectedSentenceId,
+          selectedTagIndex,
+          variantText,
+        );
+      }
+    },
+    [tagUpdater],
+  );
 
-  const handleSentencePhoneticApply = useCallback((sentenceId: string, newPhoneticText: string) => {
-    setSentences(prev => prev.map(s => {
-      if (s.id !== sentenceId) return s;
-      const newPlainText = stripPhoneticMarkers(newPhoneticText) || '';
-      const newTags = newPlainText.trim().split(/\s+/).filter(w => w.length > 0);
-      const newStressedTags = newPhoneticText.trim().split(/\s+/).filter(w => w.length > 0);
-      return { ...s, text: newPlainText, tags: newTags, phoneticText: newPhoneticText, stressedTags: newStressedTags, audioUrl: undefined };
-    }));
-  }, [setSentences]);
+  const handleSentencePhoneticApply = useCallback(
+    (sentenceId: string, newPhoneticText: string) => {
+      setSentences((prev) =>
+        prev.map((s) => {
+          if (s.id !== sentenceId) return s;
+          const newPlainText = stripPhoneticMarkers(newPhoneticText) || "";
+          const newTags = newPlainText
+            .trim()
+            .split(/\s+/)
+            .filter((w) => w.length > 0);
+          const newStressedTags = newPhoneticText
+            .trim()
+            .split(/\s+/)
+            .filter((w) => w.length > 0);
+          return {
+            ...s,
+            text: newPlainText,
+            tags: newTags,
+            phoneticText: newPhoneticText,
+            stressedTags: newStressedTags,
+            audioUrl: undefined,
+          };
+        }),
+      );
+    },
+    [setSentences],
+  );
 
   return {
     sentences,
@@ -235,6 +314,6 @@ export function useSynthesis() {
     handleEditTagKeyDown,
     handleUseVariant,
     handleSentencePhoneticApply,
-    synthesizeAndPlay
+    synthesizeAndPlay,
   };
 }

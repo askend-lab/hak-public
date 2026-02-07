@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useAudioPlayer } from './useAudioPlayer';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useAudioPlayer } from "./useAudioPlayer";
 
-describe('useAudioPlayer', () => {
+describe("useAudioPlayer", () => {
   let audioInstances: any[] = [];
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe('useAudioPlayer', () => {
     audioInstances = [];
 
     class MockAudio {
-      src = '';
+      src = "";
       onloadeddata: (() => void) | null = null;
       onended: (() => void) | null = null;
       onerror: (() => void) | null = null;
@@ -30,18 +30,18 @@ describe('useAudioPlayer', () => {
     vi.restoreAllMocks();
   });
 
-  describe('playAudio', () => {
-    it('should play audio successfully', async () => {
+  describe("playAudio", () => {
+    it("should play audio successfully", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const onLoadStart = vi.fn();
       const onLoadComplete = vi.fn();
       const onEnded = vi.fn();
 
       const playPromise = act(async () => {
-        return result.current.playAudio('https://example.com/audio.mp3', {
+        return result.current.playAudio("https://example.com/audio.mp3", {
           onLoadStart,
           onLoadComplete,
-          onEnded
+          onEnded,
         });
       });
 
@@ -63,12 +63,14 @@ describe('useAudioPlayer', () => {
       expect(result.current.currentAudio).toBeNull();
     });
 
-    it('should handle audio error', async () => {
+    it("should handle audio error", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const onError = vi.fn();
 
       const playPromise = act(async () => {
-        return result.current.playAudio('https://example.com/audio.mp3', { onError });
+        return result.current.playAudio("https://example.com/audio.mp3", {
+          onError,
+        });
       });
 
       act(() => {
@@ -81,18 +83,18 @@ describe('useAudioPlayer', () => {
       expect(result.current.currentAudio).toBeNull();
     });
 
-    it('should handle play rejection', async () => {
+    it("should handle play rejection", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const onError = vi.fn();
 
       audioInstances[0] = null;
       class MockAudioWithError {
-        src = '';
+        src = "";
         onloadeddata: (() => void) | null = null;
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
         pause = vi.fn();
-        play = vi.fn().mockRejectedValue(new Error('Play failed'));
+        play = vi.fn().mockRejectedValue(new Error("Play failed"));
 
         constructor(url?: string) {
           if (url) this.src = url;
@@ -102,7 +104,9 @@ describe('useAudioPlayer', () => {
       global.Audio = MockAudioWithError as any;
 
       const playResult = await act(async () => {
-        return result.current.playAudio('https://example.com/audio.mp3', { onError });
+        return result.current.playAudio("https://example.com/audio.mp3", {
+          onError,
+        });
       });
 
       expect(playResult).toBe(false);
@@ -110,11 +114,11 @@ describe('useAudioPlayer', () => {
       expect(result.current.currentAudio).toBeNull();
     });
 
-    it('should work without callbacks', async () => {
+    it("should work without callbacks", async () => {
       const { result } = renderHook(() => useAudioPlayer());
 
       const playPromise = act(async () => {
-        return result.current.playAudio('https://example.com/audio.mp3');
+        return result.current.playAudio("https://example.com/audio.mp3");
       });
 
       act(() => {
@@ -126,8 +130,8 @@ describe('useAudioPlayer', () => {
     });
   });
 
-  describe('playWithAbort', () => {
-    it('should play audio with abort signal', async () => {
+  describe("playWithAbort", () => {
+    it("should play audio with abort signal", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const abortController = new AbortController();
       const onStart = vi.fn();
@@ -135,9 +139,9 @@ describe('useAudioPlayer', () => {
 
       const playPromise = act(async () => {
         return result.current.playWithAbort(
-          'https://example.com/audio.mp3',
+          "https://example.com/audio.mp3",
           abortController.signal,
-          { onStart, onEnded }
+          { onStart, onEnded },
         );
       });
 
@@ -153,16 +157,16 @@ describe('useAudioPlayer', () => {
       expect(result.current.currentAudio).toBeNull();
     });
 
-    it('should handle abort signal', async () => {
+    it("should handle abort signal", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const abortController = new AbortController();
       const onStart = vi.fn();
 
       const playPromise = act(async () => {
         return result.current.playWithAbort(
-          'https://example.com/audio.mp3',
+          "https://example.com/audio.mp3",
           abortController.signal,
-          { onStart }
+          { onStart },
         );
       });
 
@@ -178,31 +182,31 @@ describe('useAudioPlayer', () => {
       expect(result.current.currentAudio).toBeNull();
     });
 
-    it('should return false if already aborted', async () => {
+    it("should return false if already aborted", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const abortController = new AbortController();
       abortController.abort();
 
       const playResult = await act(async () => {
         return result.current.playWithAbort(
-          'https://example.com/audio.mp3',
-          abortController.signal
+          "https://example.com/audio.mp3",
+          abortController.signal,
         );
       });
 
       expect(playResult).toBe(false);
     });
 
-    it('should handle audio error with abort signal', async () => {
+    it("should handle audio error with abort signal", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const abortController = new AbortController();
       const onError = vi.fn();
 
       const playPromise = act(async () => {
         return result.current.playWithAbort(
-          'https://example.com/audio.mp3',
+          "https://example.com/audio.mp3",
           abortController.signal,
-          { onError }
+          { onError },
         );
       });
 
@@ -216,18 +220,18 @@ describe('useAudioPlayer', () => {
       expect(result.current.currentAudio).toBeNull();
     });
 
-    it('should handle play rejection with abort signal', async () => {
+    it("should handle play rejection with abort signal", async () => {
       const { result } = renderHook(() => useAudioPlayer());
       const abortController = new AbortController();
       const onError = vi.fn();
 
       class MockAudioWithError {
-        src = '';
+        src = "";
         onloadeddata: (() => void) | null = null;
         onended: (() => void) | null = null;
         onerror: (() => void) | null = null;
         pause = vi.fn();
-        play = vi.fn().mockRejectedValue(new Error('Play failed'));
+        play = vi.fn().mockRejectedValue(new Error("Play failed"));
 
         constructor(url?: string) {
           if (url) this.src = url;
@@ -238,9 +242,9 @@ describe('useAudioPlayer', () => {
 
       const playResult = await act(async () => {
         return result.current.playWithAbort(
-          'https://example.com/audio.mp3',
+          "https://example.com/audio.mp3",
           abortController.signal,
-          { onError }
+          { onError },
         );
       });
 
@@ -249,12 +253,12 @@ describe('useAudioPlayer', () => {
     });
   });
 
-  describe('stopCurrentAudio', () => {
-    it('should stop current audio', async () => {
+  describe("stopCurrentAudio", () => {
+    it("should stop current audio", async () => {
       const { result } = renderHook(() => useAudioPlayer());
 
       await act(async () => {
-        result.current.playAudio('https://example.com/audio.mp3');
+        result.current.playAudio("https://example.com/audio.mp3");
       });
 
       expect(result.current.currentAudio).not.toBeNull();
@@ -264,11 +268,11 @@ describe('useAudioPlayer', () => {
       });
 
       expect(audioInstances[0].pause).toHaveBeenCalled();
-      expect(audioInstances[0].src).toBe('');
+      expect(audioInstances[0].src).toBe("");
       expect(result.current.currentAudio).toBeNull();
     });
 
-    it('should do nothing if no audio is playing', () => {
+    it("should do nothing if no audio is playing", () => {
       const { result } = renderHook(() => useAudioPlayer());
 
       act(() => {

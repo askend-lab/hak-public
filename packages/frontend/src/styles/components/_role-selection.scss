@@ -1,9 +1,9 @@
 // Role Selection Content Styles
-@import '../tokens/colors';
-@import '../tokens/spacing';
-@import '../tokens/typography';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/spacing";
+@import "../tokens/typography";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // Main area when showing role selection
 .role-selection-main {
@@ -48,7 +48,7 @@
 }
 
 .role-card-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: $font-size-lg;
   line-height: 140%;
@@ -59,7 +59,7 @@
 }
 
 .role-card-description {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 400;
   font-size: $font-size-md;
   line-height: 140%;
@@ -69,7 +69,6 @@
   margin: 0;
   flex-grow: 1;
 }
-
 
 // Responsive styles
 @include respond-below($breakpoint-lg) {

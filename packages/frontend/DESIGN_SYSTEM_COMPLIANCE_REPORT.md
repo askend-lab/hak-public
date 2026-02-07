@@ -48,23 +48,23 @@
 
 ### 1. BEM Naming Convention
 
-| Metric | Status |
-|--------|--------|
-| Block naming (lowercase-hyphen) | ✅ 100% |
-| Element naming (`__element`) | ✅ 330+ instances |
-| Modifier naming (`--modifier`) | ✅ 26+ instances |
-| Deep nesting violations | ✅ 0 |
+| Metric                          | Status            |
+| ------------------------------- | ----------------- |
+| Block naming (lowercase-hyphen) | ✅ 100%           |
+| Element naming (`__element`)    | ✅ 330+ instances |
+| Modifier naming (`--modifier`)  | ✅ 26+ instances  |
+| Deep nesting violations         | ✅ 0              |
 
 **Result:** PASS - Excellent BEM compliance across all component files.
 
 ### 2. React Component Architecture
 
-| Metric | Status |
-|--------|--------|
-| God components (>300 lines, 5+ useState) | ✅ 0 |
-| Custom hook usage | ✅ Excellent |
-| Inline styles (non-dynamic) | ⚠️ 3 minor |
-| Component separation | ✅ Good |
+| Metric                                   | Status       |
+| ---------------------------------------- | ------------ |
+| God components (>300 lines, 5+ useState) | ✅ 0         |
+| Custom hook usage                        | ✅ Excellent |
+| Inline styles (non-dynamic)              | ⚠️ 3 minor   |
+| Component separation                     | ✅ Good      |
 
 **Result:** PASS - Architecture has been properly refactored.
 
@@ -72,16 +72,16 @@
 
 ### 3. Token Usage
 
-| Token Category | Violations | Status |
-|----------------|------------|--------|
-| Missing imports | 14 | ❌ FAIL |
-| Hex colors | 56 | ❌ FAIL |
-| `white` keyword | 41 | ❌ FAIL |
-| RGBA shadows | 84 | ⚠️ WARN |
-| Font sizes (px) | 105 | ⚠️ WARN |
-| Font sizes (rem) | 115 | ⚠️ WARN |
-| Breakpoints | 54 | ⚠️ WARN |
-| Deprecated functions | 1 | ⚠️ WARN |
+| Token Category       | Violations | Status  |
+| -------------------- | ---------- | ------- |
+| Missing imports      | 14         | ❌ FAIL |
+| Hex colors           | 56         | ❌ FAIL |
+| `white` keyword      | 41         | ❌ FAIL |
+| RGBA shadows         | 84         | ⚠️ WARN |
+| Font sizes (px)      | 105        | ⚠️ WARN |
+| Font sizes (rem)     | 115        | ⚠️ WARN |
+| Breakpoints          | 54         | ⚠️ WARN |
+| Deprecated functions | 1          | ⚠️ WARN |
 
 **Result:** FAIL - Significant token compliance work needed.
 
@@ -89,18 +89,18 @@
 
 ## Top 10 Files Requiring Attention
 
-| Rank | File | Violations | Priority |
-|------|------|------------|----------|
-| 1 | `_synthesis-results.scss` | 84 | 🔴 Critical |
-| 2 | `_simple-layout.scss` | 71 | 🔴 Critical |
-| 3 | `_eki-app.scss` | 51 | 🔴 Critical |
-| 4 | `_build-info.scss` | 18 | 🟠 High |
-| 5 | `_playlist-audio-player.scss` | 18 | 🟠 High |
-| 6 | `_pronunciation-variants.scss` | 17 | 🟡 Medium |
-| 7 | `_shared-task.scss` | 16 | 🟡 Medium |
-| 8 | `_task-detail.scss` | 15 | 🟡 Medium |
-| 9 | `_audio-player.scss` | 14 | 🟡 Medium |
-| 10 | `_sentence-phonetic-panel.scss` | 12 | 🟡 Medium |
+| Rank | File                            | Violations | Priority    |
+| ---- | ------------------------------- | ---------- | ----------- |
+| 1    | `_synthesis-results.scss`       | 84         | 🔴 Critical |
+| 2    | `_simple-layout.scss`           | 71         | 🔴 Critical |
+| 3    | `_eki-app.scss`                 | 51         | 🔴 Critical |
+| 4    | `_build-info.scss`              | 18         | 🟠 High     |
+| 5    | `_playlist-audio-player.scss`   | 18         | 🟠 High     |
+| 6    | `_pronunciation-variants.scss`  | 17         | 🟡 Medium   |
+| 7    | `_shared-task.scss`             | 16         | 🟡 Medium   |
+| 8    | `_task-detail.scss`             | 15         | 🟡 Medium   |
+| 9    | `_audio-player.scss`            | 14         | 🟡 Medium   |
+| 10   | `_sentence-phonetic-panel.scss` | 12         | 🟡 Medium   |
 
 ---
 
@@ -108,29 +108,29 @@
 
 ### Sprint 1: Quick Wins (70 min total)
 
-| Task | Effort | Fixes |
-|------|--------|-------|
-| Add missing token imports to 9 files | 15 min | 14 critical |
-| Replace `white` with `$color-white` | 20 min | 41 high |
+| Task                                   | Effort | Fixes            |
+| -------------------------------------- | ------ | ---------------- |
+| Add missing token imports to 9 files   | 15 min | 14 critical      |
+| Replace `white` with `$color-white`    | 20 min | 41 high          |
 | Create shadow tokens in `_colors.scss` | 15 min | Enables 84 fixes |
-| Extract `TaskRow` to separate file | 20 min | Architecture |
+| Extract `TaskRow` to separate file     | 20 min | Architecture     |
 
 ### Sprint 2: Medium Priority (3 hours total)
 
-| Task | Effort | Fixes |
-|------|--------|-------|
-| Refactor `_build-info.scss` | 30 min | 18 violations |
-| Refactor `_eki-app.scss` | 1 hour | 51 violations |
+| Task                          | Effort | Fixes         |
+| ----------------------------- | ------ | ------------- |
+| Refactor `_build-info.scss`   | 30 min | 18 violations |
+| Refactor `_eki-app.scss`      | 1 hour | 51 violations |
 | Replace hardcoded breakpoints | 1 hour | 54 violations |
-| Fix inline styles | 30 min | 3 violations |
+| Fix inline styles             | 30 min | 3 violations  |
 
 ### Sprint 3: Major Refactoring (10-13 hours)
 
-| Task | Effort | Fixes |
-|------|--------|-------|
-| Refactor `_synthesis-results.scss` | 3-4 hours | 84 violations |
-| Refactor `_simple-layout.scss` | 4-5 hours | 71 violations |
-| Replace all hardcoded font sizes | 3-4 hours | 220 violations |
+| Task                               | Effort    | Fixes          |
+| ---------------------------------- | --------- | -------------- |
+| Refactor `_synthesis-results.scss` | 3-4 hours | 84 violations  |
+| Refactor `_simple-layout.scss`     | 4-5 hours | 71 violations  |
+| Replace all hardcoded font sizes   | 3-4 hours | 220 violations |
 
 ---
 
@@ -166,10 +166,10 @@ npm run validate:design:json
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Pass - No critical/high violations |
-| 1 | Fail - Critical or high violations found |
+| Code | Meaning                                  |
+| ---- | ---------------------------------------- |
+| 0    | Pass - No critical/high violations       |
+| 1    | Fail - Critical or high violations found |
 
 ---
 
@@ -198,19 +198,19 @@ npm run validate:design:json
 
 ## Appendix: Validation Rules
 
-| Rule ID | Severity | Description |
-|---------|----------|-------------|
-| `hardcoded-hex-color` | Critical | Hex colors not using tokens |
-| `missing-token-import` | Critical | Files using tokens without importing |
-| `white-keyword` | High | Using `white` instead of `$color-white` |
-| `black-keyword` | High | Using `black` instead of token |
-| `hardcoded-rgba` | Medium | RGBA shadows not using tokens |
-| `hardcoded-font-size-px` | Medium | Font sizes in px |
-| `hardcoded-font-size-rem` | Medium | Font sizes in rem |
-| `hardcoded-breakpoint` | Medium | Media queries with hardcoded px |
-| `inline-style` | Medium | React inline styles (non-dynamic) |
-| `deprecated-scss-function` | Low | Using `darken()`/`lighten()` |
-| `non-bem-class` | Low | Non-BEM class definitions |
+| Rule ID                    | Severity | Description                             |
+| -------------------------- | -------- | --------------------------------------- |
+| `hardcoded-hex-color`      | Critical | Hex colors not using tokens             |
+| `missing-token-import`     | Critical | Files using tokens without importing    |
+| `white-keyword`            | High     | Using `white` instead of `$color-white` |
+| `black-keyword`            | High     | Using `black` instead of token          |
+| `hardcoded-rgba`           | Medium   | RGBA shadows not using tokens           |
+| `hardcoded-font-size-px`   | Medium   | Font sizes in px                        |
+| `hardcoded-font-size-rem`  | Medium   | Font sizes in rem                       |
+| `hardcoded-breakpoint`     | Medium   | Media queries with hardcoded px         |
+| `inline-style`             | Medium   | React inline styles (non-dynamic)       |
+| `deprecated-scss-function` | Low      | Using `darken()`/`lighten()`            |
+| `non-bem-class`            | Low      | Non-BEM class definitions               |
 
 ---
 

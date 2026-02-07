@@ -1,7 +1,7 @@
-import { NavLink, Link } from 'react-router-dom';
-import UserProfile from './UserProfile';
-import { HelpIcon } from './ui/Icons';
-import type { User } from '@/services/auth';
+import { NavLink, Link } from "react-router-dom";
+import UserProfile from "./UserProfile";
+import { HelpIcon } from "./ui/Icons";
+import type { User } from "@/services/auth";
 
 interface AppHeaderProps {
   isAuthenticated: boolean;
@@ -11,7 +11,13 @@ interface AppHeaderProps {
   onLoginClick: () => void;
 }
 
-export default function AppHeader({ isAuthenticated, user, onTasksClick, onHelpClick, onLoginClick }: AppHeaderProps) {
+export default function AppHeader({
+  isAuthenticated,
+  user,
+  onTasksClick,
+  onHelpClick,
+  onLoginClick,
+}: AppHeaderProps) {
   const handleTasksClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {
       e.preventDefault();
@@ -26,14 +32,41 @@ export default function AppHeader({ isAuthenticated, user, onTasksClick, onHelpC
           <img src="/icons/logo.png" alt="EKI Logo" />
         </Link>
         <nav className="header-nav">
-          <NavLink to="/synthesis" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`}>Tekst kõneks</NavLink>
-          <NavLink to="/tasks" className={({ isActive }) => `header-nav-link ${isActive ? 'active' : ''}`} data-nav="tasks" onClick={handleTasksClick}>Ülesanded</NavLink>
+          <NavLink
+            to="/synthesis"
+            className={({ isActive }) =>
+              `header-nav-link ${isActive ? "active" : ""}`
+            }
+          >
+            Tekst kõneks
+          </NavLink>
+          <NavLink
+            to="/tasks"
+            className={({ isActive }) =>
+              `header-nav-link ${isActive ? "active" : ""}`
+            }
+            data-nav="tasks"
+            onClick={handleTasksClick}
+          >
+            Ülesanded
+          </NavLink>
         </nav>
         <div className="header-functions">
-          <button className="header-help-button" onClick={onHelpClick} aria-label="Abi ja juhend" title="Näita juhendeid">
+          <button
+            className="header-help-button"
+            onClick={onHelpClick}
+            aria-label="Abi ja juhend"
+            title="Näita juhendeid"
+          >
             <HelpIcon size="2xl" />
           </button>
-          {isAuthenticated && user ? <UserProfile user={user} /> : <button className="button button--primary" onClick={onLoginClick}>Logi sisse</button>}
+          {isAuthenticated && user ? (
+            <UserProfile user={user} />
+          ) : (
+            <button className="button button--primary" onClick={onLoginClick}>
+              Logi sisse
+            </button>
+          )}
         </div>
       </div>
     </header>

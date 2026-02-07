@@ -3,7 +3,7 @@
 // Group: synthesis
 
 export const FEATURES_SYNTHESIS: Record<string, string> = {
-  'US-001-basic-synthesis': `@synthesis @US-001
+  "US-001-basic-synthesis": `@synthesis @US-001
 Feature: Basic text synthesis (US-001)
   As a user
   I want to enter text and hear it synthesized
@@ -29,7 +29,7 @@ Feature: Basic text synthesis (US-001)
     Then all sentences should be synthesized and played
 `,
 
-  'US-003-download-audio': `@synthesis @US-003
+  "US-003-download-audio": `@synthesis @US-003
 Feature: Download synthesized audio (US-003)
   As a language learner
   I want to download the synthesized audio file
@@ -61,7 +61,7 @@ Feature: Download synthesized audio (US-003)
     And the format is WAV
 `,
 
-  'US-004-view-stressed-text': `@synthesis @US-004 @ready
+  "US-004-view-stressed-text": `@synthesis @US-004 @ready
 Feature: View text with stress markers (US-004)
   As a language learner
   I want to see the Estonian text with stress markers visually indicated
@@ -86,7 +86,7 @@ Feature: View text with stress markers (US-004)
     And the differences are highlighted
 `,
 
-  'US-005-view-pronunciation-variants': `@synthesis @US-005 @ready
+  "US-005-view-pronunciation-variants": `@synthesis @US-005 @ready
 Feature: View pronunciation variants (US-005)
   As a language learner
   I want to see alternative pronunciation variants for ambiguous words
@@ -119,7 +119,7 @@ Feature: View pronunciation variants (US-005)
     And each variant has a play button
 `,
 
-  'US-007-edit-phonetic-text': `@synthesis @US-007
+  "US-007-edit-phonetic-text": `@synthesis @US-007
 Feature: Edit phonetic text manually (US-007)
   As a language teacher
   I want to manually edit the phonetic text with stress markers
@@ -148,7 +148,7 @@ Feature: Edit phonetic text manually (US-007)
     Then the audio uses the edited phonetic form
 `,
 
-  'US-008-save-phonetic-edits': `@synthesis @US-008 @ready
+  "US-008-save-phonetic-edits": `@synthesis @US-008 @ready
 Feature: Save phonetic text edits (US-008)
   As a language teacher
   I want to save my phonetic text edits
@@ -172,7 +172,7 @@ Feature: Save phonetic text edits (US-008)
     Then the phonetic text reverts to original
 `,
 
-  'US-014-edit-sentence-inline': `@synthesis @US-014
+  "US-014-edit-sentence-inline": `@synthesis @US-014
 Feature: Edit sentence inline (US-014)
   As a language learner
   I want to edit my sentence text directly in the input field
@@ -211,7 +211,7 @@ Feature: Edit sentence inline (US-014)
     And changes are reflected in synthesis
 `,
 
-  'US-031-audio-caching': `@synthesis @performance @caching @US-031
+  "US-031-audio-caching": `@synthesis @performance @caching @US-031
 Feature: US-031 Audio performance optimization (caching)
   As a language learner
   I want synthesized audio to load quickly when revisiting the same text
@@ -251,7 +251,7 @@ Feature: US-031 Audio performance optimization (caching)
     Then download uses cached version without re-synthesis
 `,
 
-  'US-034-custom-phonetic-variant': `@synthesis @phonetic @US-034
+  "US-034-custom-phonetic-variant": `@synthesis @phonetic @US-034
 Feature: US-034 Create custom phonetic variant
   As a language learner or advanced user
   I want to manually create and test custom phonetic variants for words

@@ -2,12 +2,12 @@
 // Run: pnpm --filter @hak/frontend sync-features
 // Source: packages/specifications/*/*.feature
 
-import { FEATURES_AUTH } from './auth.generated.js';
-import { FEATURES_MISC } from './misc.generated.js';
-import { FEATURES_PLAYLIST } from './playlist.generated.js';
-import { FEATURES_SHARING } from './sharing.generated.js';
-import { FEATURES_SYNTHESIS } from './synthesis.generated.js';
-import { FEATURES_TASKS } from './tasks.generated.js';
+import { FEATURES_AUTH } from "./auth.generated.js";
+import { FEATURES_MISC } from "./misc.generated.js";
+import { FEATURES_PLAYLIST } from "./playlist.generated.js";
+import { FEATURES_SHARING } from "./sharing.generated.js";
+import { FEATURES_SYNTHESIS } from "./synthesis.generated.js";
+import { FEATURES_TASKS } from "./tasks.generated.js";
 
 export const FEATURES: Record<string, string> = {
   ...FEATURES_AUTH,

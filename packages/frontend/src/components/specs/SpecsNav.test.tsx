@@ -1,23 +1,53 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import SpecsNav from './SpecsNav';
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import SpecsNav from "./SpecsNav";
 
-const mockFeature = (name: string, scenarios: string[], tags: string[] = []) => ({
-  name, description: '', tags, scenarios: scenarios.map(s => ({ name: s, steps: [], tags: [] })),
+const mockFeature = (
+  name: string,
+  scenarios: string[],
+  tags: string[] = [],
+) => ({
+  name,
+  description: "",
+  tags,
+  scenarios: scenarios.map((s) => ({ name: s, steps: [], tags: [] })),
 });
 
 const mockTestSuites = [
-  { name: 'Suite1', status: 'passed' as const, tests: [
-    { name: 'Scenario 1', fullName: 'Suite1 Scenario 1', status: 'passed' as const, duration: 100 },
-    { name: 'Scenario 2', fullName: 'Suite1 Scenario 2', status: 'failed' as const, duration: 50 },
-  ]},
+  {
+    name: "Suite1",
+    status: "passed" as const,
+    tests: [
+      {
+        name: "Scenario 1",
+        fullName: "Suite1 Scenario 1",
+        status: "passed" as const,
+        duration: 100,
+      },
+      {
+        name: "Scenario 2",
+        fullName: "Suite1 Scenario 2",
+        status: "failed" as const,
+        duration: 50,
+      },
+    ],
+  },
 ];
 
 const defaultProps = {
   groups: [
-    { name: 'Group 1', features: [mockFeature('Feature 1', ['Scenario 1', 'Scenario 2'])] },
-    { name: 'Group 2', features: [mockFeature('Feature 2 (US-123)', ['Scenario 3']), mockFeature('Skipped Feature', ['Scenario 4'], ['@skip'])] },
+    {
+      name: "Group 1",
+      features: [mockFeature("Feature 1", ["Scenario 1", "Scenario 2"])],
+    },
+    {
+      name: "Group 2",
+      features: [
+        mockFeature("Feature 2 (US-123)", ["Scenario 3"]),
+        mockFeature("Skipped Feature", ["Scenario 4"], ["@skip"]),
+      ],
+    },
   ],
   testSuites: mockTestSuites,
   selectedFeature: null,
@@ -28,69 +58,122 @@ const defaultProps = {
   onSelectFeature: vi.fn(),
 };
 
-describe('SpecsNav rendering', () => {
-  it('shows total features count', () => {
+describe("SpecsNav rendering", () => {
+  it("shows total features count", () => {
     render(<SpecsNav {...defaultProps} />);
-    expect(screen.getByText('3 total')).toBeInTheDocument();
+    expect(screen.getByText("3 total")).toBeInTheDocument();
   });
 
-  it('shows group headers', () => {
+  it("shows group headers", () => {
     render(<SpecsNav {...defaultProps} />);
     expect(screen.getByText(/Group 1/)).toBeInTheDocument();
     expect(screen.getByText(/Group 2/)).toBeInTheDocument();
   });
 });
 
-describe('SpecsNav group expansion', () => {
-  it('shows features when group expanded', () => {
-    render(<SpecsNav {...defaultProps} expandedGroups={new Set(['Group 1'])} />);
+describe("SpecsNav group expansion", () => {
+  it("shows features when group expanded", () => {
+    render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 1"])} />,
+    );
     expect(screen.getByText(/Feature 1/)).toBeInTheDocument();
   });
 
-  it('hides features when group collapsed', () => {
+  it("hides features when group collapsed", () => {
     render(<SpecsNav {...defaultProps} expandedGroups={new Set()} />);
     expect(screen.queryByText(/Feature 1/)).not.toBeInTheDocument();
   });
 
-  it('calls onToggleGroup when header clicked', async () => {
+  it("calls onToggleGroup when header clicked", async () => {
     const onToggleGroup = vi.fn();
     render(<SpecsNav {...defaultProps} onToggleGroup={onToggleGroup} />);
     await userEvent.click(screen.getByText(/Group 1/));
-    expect(onToggleGroup).toHaveBeenCalledWith('Group 1');
+    expect(onToggleGroup).toHaveBeenCalledWith("Group 1");
   });
 });
 
-describe('SpecsNav feature expansion', () => {
-  it('shows scenarios when feature expanded', () => {
-    render(<SpecsNav {...defaultProps} expandedGroups={new Set(['Group 1'])} expandedFeatures={new Set(['Feature 1'])} />);
-    expect(screen.getByText('Scenario 1')).toBeInTheDocument();
+describe("SpecsNav feature expansion", () => {
+  it("shows scenarios when feature expanded", () => {
+    render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        expandedFeatures={new Set(["Feature 1"])}
+      />,
+    );
+    expect(screen.getByText("Scenario 1")).toBeInTheDocument();
   });
 
-  it('removes US ticket from feature name', () => {
-    render(<SpecsNav {...defaultProps} expandedGroups={new Set(['Group 2'])} />);
+  it("removes US ticket from feature name", () => {
+    render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 2"])} />,
+    );
     expect(screen.getByText(/Feature 2/)).toBeInTheDocument();
     expect(screen.queryByText(/US-123/)).not.toBeInTheDocument();
   });
 
-  it('shows skipped badge for skipped features', () => {
-    render(<SpecsNav {...defaultProps} expandedGroups={new Set(['Group 2'])} />);
-    expect(screen.getByText('skip')).toBeInTheDocument();
+  it("shows skipped badge for skipped features", () => {
+    render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 2"])} />,
+    );
+    expect(screen.getByText("skip")).toBeInTheDocument();
   });
 
-  it('highlights selected feature', () => {
-    const { container } = render(<SpecsNav {...defaultProps} expandedGroups={new Set(['Group 1'])} selectedFeature="Feature 1" />);
-    expect(container.querySelector('.specs-feature__item--selected')).toBeInTheDocument();
+  it("highlights selected feature", () => {
+    const { container } = render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        selectedFeature="Feature 1"
+      />,
+    );
+    expect(
+      container.querySelector(".specs-feature__item--selected"),
+    ).toBeInTheDocument();
   });
 });
 
-describe('SpecsNav test status', () => {
-  it('shows passed count for scenarios', () => {
-    render(<SpecsNav {...defaultProps} expandedGroups={new Set(['Group 1'])} />);
-    expect(screen.getAllByText('1/2').length).toBeGreaterThan(0);
+describe("SpecsNav test status", () => {
+  it("shows passed count for scenarios", () => {
+    render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 1"])} />,
+    );
+    expect(screen.getAllByText("1/2").length).toBeGreaterThan(0);
   });
 
-  it('shows checkmark for passed scenarios', () => {
-    render(<SpecsNav {...defaultProps} expandedGroups={new Set(['Group 1'])} expandedFeatures={new Set(['Feature 1'])} />);
-    expect(screen.getByText('✓')).toBeInTheDocument();
+  it("shows checkmark for passed scenarios", () => {
+    render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        expandedFeatures={new Set(["Feature 1"])}
+      />,
+    );
+    expect(screen.getByText("✓")).toBeInTheDocument();
+  });
+
+  it("calls onSelectFeature when scenario clicked", async () => {
+    const onSelectFeature = vi.fn();
+    render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        expandedFeatures={new Set(["Feature 1"])}
+        onSelectFeature={onSelectFeature}
+      />,
+    );
+    await userEvent.click(screen.getByText("Scenario 1"));
+    expect(onSelectFeature).toHaveBeenCalledWith("Feature 1");
+  });
+
+  it("shows circle for pending scenarios in expanded skipped feature", () => {
+    render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 2"])}
+        expandedFeatures={new Set(["Skipped Feature"])}
+      />,
+    );
+    expect(screen.getByText("○")).toBeInTheDocument();
   });
 });

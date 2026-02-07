@@ -5,43 +5,53 @@
  * Run: node scripts/sync-features.js
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SPECS_DIR = path.resolve(__dirname, '../../specifications');
-const OUTPUT_DIR = path.resolve(__dirname, '../src/services/specs/features');
+const SPECS_DIR = path.resolve(__dirname, "../../specifications");
+const OUTPUT_DIR = path.resolve(__dirname, "../src/services/specs/features");
 
 function isValidDir(entry) {
-  return entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules';
+  return (
+    entry.isDirectory() &&
+    !entry.name.startsWith(".") &&
+    entry.name !== "node_modules"
+  );
 }
 
 function loadFeaturesFromDir(dir, groupName = null) {
   const features = {};
   const entries = fs.readdirSync(dir, { withFileTypes: true });
-  
+
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (isValidDir(entry)) {
       Object.assign(features, loadFeaturesFromDir(fullPath, entry.name));
-    } else if (entry.isFile() && entry.name.endsWith('.feature')) {
-      const group = groupName || 'root';
+    } else if (entry.isFile() && entry.name.endsWith(".feature")) {
+      const group = groupName || "root";
       if (!features[group]) features[group] = {};
-      features[group][entry.name.replace('.feature', '')] = fs.readFileSync(fullPath, 'utf-8');
+      features[group][entry.name.replace(".feature", "")] = fs.readFileSync(
+        fullPath,
+        "utf-8",
+      );
     }
   }
-  
+
   return features;
 }
 
 function generateGroupCode(features, groupName) {
   const entries = Object.entries(features)
     .map(([name, content]) => {
-      const escaped = content.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+      const escaped = content
+        .replace(/\\/g, "\\\\")
+        .replace(/`/g, "\\`")
+        .replace(/\$/g, "\\$");
       return `  '${name}': \`${escaped}\``;
     })
-    .join(',\n\n');
+    .join(",\n\n");
 
   return `// AUTO-GENERATED - DO NOT EDIT
 // Run: pnpm --filter @hak/frontend sync-features
@@ -54,12 +64,19 @@ ${entries},
 }
 
 function generateIndexCode(groups) {
-  const imports = groups.map(g => 
-    `import { FEATURES_${g.toUpperCase()} } from './${g}.generated.js';`
-  ).join('\n');
-  
-  const spread = groups.map(g => `  ...FEATURES_${g.toUpperCase()}`).join(',\n');
-  const groupsObj = Object.fromEntries(groups.map(g => [g, `FEATURES_${g.toUpperCase()}`]));
+  const imports = groups
+    .map(
+      (g) =>
+        `import { FEATURES_${g.toUpperCase()} } from './${g}.generated.js';`,
+    )
+    .join("\n");
+
+  const spread = groups
+    .map((g) => `  ...FEATURES_${g.toUpperCase()}`)
+    .join(",\n");
+  const groupsObj = Object.fromEntries(
+    groups.map((g) => [g, `FEATURES_${g.toUpperCase()}`]),
+  );
 
   return `// AUTO-GENERATED - DO NOT EDIT
 // Run: pnpm --filter @hak/frontend sync-features
@@ -72,7 +89,7 @@ ${spread},
 };
 
 export const FEATURE_GROUPS: Record<string, Record<string, string>> = {
-${groups.map(g => `  ${g}: FEATURES_${g.toUpperCase()}`).join(',\n')},
+${groups.map((g) => `  ${g}: FEATURES_${g.toUpperCase()}`).join(",\n")},
 };
 `;
 }
@@ -100,7 +117,7 @@ for (const group of groups) {
 
 // Generate index file
 const indexCode = generateIndexCode(groups);
-const indexFile = path.join(OUTPUT_DIR, 'index.ts');
+const indexFile = path.join(OUTPUT_DIR, "index.ts");
 fs.writeFileSync(indexFile, indexCode);
 console.log(`✓ Generated ${indexFile}`);
 

@@ -25,7 +25,7 @@ export interface CreateTaskRequest {
   name: string;
   description?: string | null;
   speechSequences?: string[] | null;
-  speechEntries?: Array<{text: string; stressedText: string}> | null;
+  speechEntries?: Array<{ text: string; stressedText: string }> | null;
 }
 
 export interface UpdateTaskRequest {

@@ -16,11 +16,11 @@ interface ImportMetaWithEnv {
 
 // Shim import.meta.env for Vite compatibility in Node.js
 const meta = import.meta as unknown as ImportMetaWithEnv;
-if (typeof meta.env === 'undefined') {
+if (typeof meta.env === "undefined") {
   meta.env = {
     PROD: false,
     DEV: true,
-    MODE: 'test',
-    VITE_API_BASE_URL: '/api',
+    MODE: "test",
+    VITE_API_BASE_URL: "/api",
   };
 }

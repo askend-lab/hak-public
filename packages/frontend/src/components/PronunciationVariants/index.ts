@@ -1,1 +1,1 @@
-export { default } from './PronunciationVariants';
+export { default } from "./PronunciationVariants";

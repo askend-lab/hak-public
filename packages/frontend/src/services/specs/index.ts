@@ -2,12 +2,12 @@
  * Service for loading Gherkin specifications and test results
  */
 
-import { FEATURES, FEATURE_GROUPS } from './features/index.js';
+import { FEATURES, FEATURE_GROUPS } from "./features/index.js";
 
 export interface TestResult {
   name: string;
   fullName: string;
-  status: 'passed' | 'failed' | 'pending';
+  status: "passed" | "failed" | "pending";
   duration: number;
 }
 
@@ -36,9 +36,9 @@ interface CucumberResult {
 
 export async function loadCucumberResults(): Promise<CucumberResult[] | null> {
   try {
-    const response = await fetch('/cucumber-results.json');
+    const response = await fetch("/cucumber-results.json");
     if (!response.ok) return null;
-    return await response.json() as CucumberResult[];
+    return (await response.json()) as CucumberResult[];
   } catch {
     return null;
   }
@@ -53,16 +53,21 @@ export function getFeatureGroups(): Record<string, Record<string, string>> {
 }
 
 export function parseCucumberResults(results: CucumberResult[]): TestSuite[] {
-  return results.map(feature => ({
+  return results.map((feature) => ({
     name: feature.name,
-    status: 'passed',
-    tests: feature.elements.map(scenario => {
-      const allPassed = scenario.steps.every(s => s.result.status === 'passed');
-      const totalDuration = scenario.steps.reduce((sum, s) => sum + (s.result.duration ?? 0), 0);
+    status: "passed",
+    tests: feature.elements.map((scenario) => {
+      const allPassed = scenario.steps.every(
+        (s) => s.result.status === "passed",
+      );
+      const totalDuration = scenario.steps.reduce(
+        (sum, s) => sum + (s.result.duration ?? 0),
+        0,
+      );
       return {
         name: scenario.name,
         fullName: `${feature.name} > ${scenario.name}`,
-        status: allPassed ? 'passed' as const : 'failed' as const,
+        status: allPassed ? ("passed" as const) : ("failed" as const),
         duration: totalDuration / 1000000,
       };
     }),

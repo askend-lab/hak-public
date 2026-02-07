@@ -1,20 +1,24 @@
- 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Task, TaskEntry } from '@/types/task';
-import { DataService } from '@/services/dataService';
-import { useAuth } from '@/services/auth';
-import { useNotification } from '@/contexts/NotificationContext';
-import SentenceSynthesisItem from '../SentenceSynthesisItem';
-import ShareTaskModal from '../ShareTaskModal';
-import PronunciationVariants from '../PronunciationVariants';
-import SentencePhoneticPanel from '../SentencePhoneticPanel';
+import { useState, useEffect } from "react";
+import { Task, TaskEntry } from "@/types/task";
+import { DataService } from "@/services/dataService";
+import { useAuth } from "@/services/auth";
+import { useNotification } from "@/contexts/NotificationContext";
+import SentenceSynthesisItem from "../SentenceSynthesisItem";
+import ShareTaskModal from "../ShareTaskModal";
+import PronunciationVariants from "../PronunciationVariants";
+import SentencePhoneticPanel from "../SentencePhoneticPanel";
 
-import { TaskDetailHeader } from './TaskDetailHeader';
-import { TaskDetailLoading, TaskDetailError } from './TaskDetailStates';
-import { TaskDetailEmpty } from './TaskDetailEmpty';
-import { useDragAndDrop, useAudioPlayback, usePronunciationVariants, usePhoneticPanel } from './hooks';
+import { TaskDetailHeader } from "./TaskDetailHeader";
+import { TaskDetailLoading, TaskDetailError } from "./TaskDetailStates";
+import { TaskDetailEmpty } from "./TaskDetailEmpty";
+import {
+  useDragAndDrop,
+  useAudioPlayback,
+  usePronunciationVariants,
+  usePhoneticPanel,
+} from "./hooks";
 
 interface TaskDetailViewProps {
   taskId: string;
@@ -22,16 +26,23 @@ interface TaskDetailViewProps {
   onEditTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
   onNavigateToSynthesis: () => void;
-  initialTask?: Task;  // Pre-loaded task for shared view (no auth required)
+  initialTask?: Task; // Pre-loaded task for shared view (no auth required)
 }
 
 export default function TaskDetailView({
-  taskId, onBack, onEditTask, onDeleteTask, onNavigateToSynthesis, initialTask
+  taskId,
+  onBack,
+  onEditTask,
+  onDeleteTask,
+  onNavigateToSynthesis,
+  initialTask,
 }: TaskDetailViewProps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
   const [task, setTask] = useState<Task | null>(initialTask || null);
-  const [entries, setEntries] = useState<TaskEntry[]>(initialTask?.entries || []);
+  const [entries, setEntries] = useState<TaskEntry[]>(
+    initialTask?.entries || [],
+  );
   const [isLoading, setIsLoading] = useState(!initialTask);
   const [error, setError] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -43,63 +54,93 @@ export default function TaskDetailView({
   // Custom hooks
   const dragDrop = useDragAndDrop(setEntries);
   const audio = useAudioPlayback(entries);
-  const variants = usePronunciationVariants(entries, setEntries, task, user?.id);
-  const phonetic = usePhoneticPanel(entries, setEntries, task, user?.id, handleMenuClose);
+  const variants = usePronunciationVariants(
+    entries,
+    setEntries,
+    task,
+    user?.id,
+  );
+  const phonetic = usePhoneticPanel(
+    entries,
+    setEntries,
+    task,
+    user?.id,
+    handleMenuClose,
+  );
 
   // Load task data (skip if initialTask provided)
   useEffect(() => {
     if (initialTask || !user) {
-      if (!initialTask && !user) setError('Kasutaja pole sisse logitud');
+      if (!initialTask && !user) setError("Kasutaja pole sisse logitud");
       setIsLoading(false);
       return;
     }
-    
+
     setIsLoading(true);
-    DataService.getInstance().getTask(taskId, user.id)
-      .then(taskData => {
+    DataService.getInstance()
+      .getTask(taskId, user.id)
+      .then((taskData) => {
         if (taskData) {
           setTask(taskData);
           setEntries(taskData.entries || []);
         } else {
-          setError('Ülesannet ei leitud');
+          setError("Ülesannet ei leitud");
         }
       })
-      .catch(err => setError(err instanceof Error ? err.message : 'Viga ülesande laadimisel'))
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : "Viga ülesande laadimisel",
+        ),
+      )
       .finally(() => setIsLoading(false));
   }, [taskId, user, initialTask]);
 
   const handleCopyText = async (id: string) => {
-    const entry = entries.find(e => e.id === id);
+    const entry = entries.find((e) => e.id === id);
     if (!entry || !entry.text.trim()) return;
 
     try {
       await navigator.clipboard.writeText(entry.text);
-      showNotification('success', 'Tekst kopeeritud!', undefined, undefined, 'success');
+      showNotification(
+        "success",
+        "Tekst kopeeritud!",
+        undefined,
+        undefined,
+        "success",
+      );
     } catch (error) {
-      console.error('Failed to copy text:', error);
-      showNotification('error', 'Viga teksti kopeerimisel');
+      console.error("Failed to copy text:", error);
+      showNotification("error", "Viga teksti kopeerimisel");
     }
   };
 
   const handleDeleteEntry = async (id: string) => {
     if (!user) return;
-    
-    const entryToDelete = entries.find(e => e.id === id);
-    const updatedEntries = entries.filter(e => e.id !== id);
-    
+
+    const entryToDelete = entries.find((e) => e.id === id);
+    const updatedEntries = entries.filter((e) => e.id !== id);
+
     // Update local state immediately for responsive UI
     setEntries(updatedEntries);
-    
+
     // Persist to backend
     try {
-      await DataService.getInstance().updateTask(user.id, taskId, { entries: updatedEntries });
+      await DataService.getInstance().updateTask(user.id, taskId, {
+        entries: updatedEntries,
+      });
       if (entryToDelete) {
-        showNotification('success', 'Lause kustutatud', undefined, undefined, 'success');
+        showNotification(
+          "success",
+          "Lause kustutatud",
+          undefined,
+          undefined,
+          "success",
+        );
       }
     } catch (_err) {
       // Revert on error
       setEntries(entries);
-      showNotification('error', 'Viga lause kustutamisel');
+      showNotification("error", "Viga lause kustutamisel");
     }
   };
 
@@ -123,7 +164,10 @@ export default function TaskDetailView({
       />
 
       {entries.length === 0 ? (
-        <TaskDetailEmpty task={task} onNavigateToSynthesis={onNavigateToSynthesis} />
+        <TaskDetailEmpty
+          task={task}
+          onNavigateToSynthesis={onNavigateToSynthesis}
+        />
       ) : (
         <div className="task-detail__entries">
           <div className="task-detail__entries-list">
@@ -132,7 +176,10 @@ export default function TaskDetailView({
                 key={entry.id}
                 id={entry.id}
                 text={entry.text}
-                tags={entry.text.trim().split(/\s+/).filter(word => word.length > 0)}
+                tags={entry.text
+                  .trim()
+                  .split(/\s+/)
+                  .filter((word) => word.length > 0)}
                 mode="tags"
                 draggable={true}
                 isDragging={dragDrop.draggedId === entry.id}
@@ -146,15 +193,26 @@ export default function TaskDetailView({
                 onDragLeave={dragDrop.handleDragLeave}
                 onDrop={dragDrop.handleDrop}
                 onTagClick={variants.handleTagClick}
-                selectedTagIndex={variants.selectedEntryId === entry.id ? variants.selectedTagIndex : null}
+                selectedTagIndex={
+                  variants.selectedEntryId === entry.id
+                    ? variants.selectedTagIndex
+                    : null
+                }
                 isPronunciationPanelOpen={variants.isVariantsPanelOpen}
                 openMenuId={openMenuId}
                 onMenuOpen={setOpenMenuId}
                 onMenuClose={handleMenuClose}
                 rowMenuItems={[
-                  { label: 'Uuri häälduskuju', onClick: phonetic.handleExplorePhonetic },
-                  { label: 'Kopeeri tekst', onClick: handleCopyText },
-                  { label: 'Kustuta', onClick: handleDeleteEntry, danger: true }
+                  {
+                    label: "Uuri häälduskuju",
+                    onClick: phonetic.handleExplorePhonetic,
+                  },
+                  { label: "Kopeeri tekst", onClick: handleCopyText },
+                  {
+                    label: "Kustuta",
+                    onClick: handleDeleteEntry,
+                    danger: true,
+                  },
                 ]}
               />
             ))}
@@ -164,14 +222,14 @@ export default function TaskDetailView({
 
       <ShareTaskModal
         isOpen={isShareModalOpen}
-        shareToken={task?.shareToken || ''}
-        taskName={task?.name || ''}
+        shareToken={task?.shareToken || ""}
+        taskName={task?.name || ""}
         onClose={() => setIsShareModalOpen(false)}
       />
 
       <PronunciationVariants
         isOpen={variants.isVariantsPanelOpen}
-        word={variants.variantsWord || ''}
+        word={variants.variantsWord || ""}
         onClose={variants.handleCloseVariants}
         onUseVariant={variants.handleUseVariant}
         customPhoneticForm={variants.variantsCustomPhonetic}
@@ -179,8 +237,14 @@ export default function TaskDetailView({
 
       {phonetic.phoneticPanelEntryId && (
         <SentencePhoneticPanel
-          sentenceText={entries.find(e => e.id === phonetic.phoneticPanelEntryId)?.text || ''}
-          phoneticText={entries.find(e => e.id === phonetic.phoneticPanelEntryId)?.stressedText || null}
+          sentenceText={
+            entries.find((e) => e.id === phonetic.phoneticPanelEntryId)?.text ||
+            ""
+          }
+          phoneticText={
+            entries.find((e) => e.id === phonetic.phoneticPanelEntryId)
+              ?.stressedText || null
+          }
           isOpen={phonetic.showPhoneticPanel}
           onClose={phonetic.handleClosePhoneticPanel}
           onApply={phonetic.handlePhoneticApply}

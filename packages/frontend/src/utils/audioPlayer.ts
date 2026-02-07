@@ -17,7 +17,7 @@ export interface AudioPlayResult {
 /**
  * Creates and configures an audio element with standard event handlers.
  * Automatically revokes the URL on ended/error if shouldRevokeUrl is true.
- * 
+ *
  * @param audioUrl - URL to play (can be blob URL or regular URL)
  * @param callbacks - Event callbacks for loaded, ended, error
  * @param shouldRevokeUrl - Whether to revoke the URL on cleanup (default: true)
@@ -26,7 +26,7 @@ export interface AudioPlayResult {
 export function createAudioPlayer(
   audioUrl: string,
   callbacks: AudioPlayCallbacks = {},
-  shouldRevokeUrl = true
+  shouldRevokeUrl = true,
 ): AudioPlayResult {
   const audio = new Audio(audioUrl);
 
@@ -60,7 +60,7 @@ export function createAudioPlayer(
 export async function playAudioWithCallbacks(
   audioUrl: string,
   callbacks: AudioPlayCallbacks = {},
-  shouldRevokeUrl = true
+  shouldRevokeUrl = true,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const { audio } = createAudioPlayer(
@@ -73,10 +73,10 @@ export async function playAudioWithCallbacks(
         },
         onError: () => {
           callbacks.onError?.();
-          reject(new Error('Audio playback failed'));
+          reject(new Error("Audio playback failed"));
         },
       },
-      shouldRevokeUrl
+      shouldRevokeUrl,
     );
 
     audio.play().catch(reject);

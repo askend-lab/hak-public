@@ -10,20 +10,20 @@
  * Only these markers will be shown in the UI, all others are omitted
  */
 const MARKER_MAPPING: Record<string, string> = {
-  '<': '`',  // Vabamorf < becomes ` in UI
-  '?': '´',  // Vabamorf ? becomes ´ in UI
-  ']': "'",  // Vabamorf ] becomes ' in UI
-  '_': '+',  // Vabamorf _ becomes + in UI
+  "<": "`", // Vabamorf < becomes ` in UI
+  "?": "´", // Vabamorf ? becomes ´ in UI
+  "]": "'", // Vabamorf ] becomes ' in UI
+  _: "+", // Vabamorf _ becomes + in UI
 };
 
 /**
  * Reverse mapping from UI markers back to Vabamorf markers
  */
 const REVERSE_MARKER_MAPPING: Record<string, string> = {
-  '`': '<',
-  '´': '?',
-  "'": ']',
-  '+': '_',
+  "`": "<",
+  "´": "?",
+  "'": "]",
+  "+": "_",
 };
 
 /**
@@ -48,7 +48,7 @@ const VABAMORF_MARKERS_TO_KEEP = new Set(Object.keys(MARKER_MAPPING));
 export function transformToUI(vabamorfText: string | null): string | null {
   if (!vabamorfText) return vabamorfText;
 
-  let result = '';
+  let result = "";
 
   for (const char of vabamorfText) {
     if (VABAMORF_MARKERS_TO_KEEP.has(char)) {
@@ -79,7 +79,7 @@ export function transformToUI(vabamorfText: string | null): string | null {
 export function transformToVabamorf(uiText: string | null): string | null {
   if (!uiText) return uiText;
 
-  let result = '';
+  let result = "";
 
   for (const char of uiText) {
     if (char in REVERSE_MARKER_MAPPING) {
@@ -113,25 +113,40 @@ export function transformToVabamorf(uiText: string | null): string | null {
  * @returns true if the character is a known Vabamorf marker
  */
 export function isVabamorfMarker(char: string): boolean {
-  const vabamorfMarkers = ['<', '?', ']', '~', '+', '_', '=', '[', "'", '.', '´', '`'];
+  const vabamorfMarkers = [
+    "<",
+    "?",
+    "]",
+    "~",
+    "+",
+    "_",
+    "=",
+    "[",
+    "'",
+    ".",
+    "´",
+    "`",
+  ];
   return vabamorfMarkers.includes(char);
 }
 
 /**
  * Removes all phonetic markers from text to get plain text
  * Useful when converting edited phonetic text back to display text
- * 
+ *
  * @param phoneticText - Text with Vabamorf phonetic markers
  * @returns Plain text without any markers
- * 
+ *
  * @example
  * stripPhoneticMarkers('m<ee_s k<au`p') // returns 'mees kaup'
  * stripPhoneticMarkers('tere maa`ilm') // returns 'tere maailm'
  */
-export function stripPhoneticMarkers(phoneticText: string | null): string | null {
+export function stripPhoneticMarkers(
+  phoneticText: string | null,
+): string | null {
   if (!phoneticText) return phoneticText;
 
-  let result = '';
+  let result = "";
 
   for (const char of phoneticText) {
     if (!isVabamorfMarker(char)) {
@@ -147,11 +162,19 @@ export function stripPhoneticMarkers(phoneticText: string | null): string | null
  * Get the UI-friendly symbols for the symbol toolbar
  * Returns the symbols that users can insert when editing phonetic text
  */
-export function getUISymbols(): Array<{symbol: string; label: string; description: string}> {
+export function getUISymbols(): Array<{
+  symbol: string;
+  label: string;
+  description: string;
+}> {
   return [
-    { symbol: '`', label: 'Kolmas välde', description: 'Third pitch accent' },
-    { symbol: '´', label: 'Rõhuline silp', description: 'Stressed syllable' },
-    { symbol: "'", label: 'Palatalisatsioon', description: 'Palatalization' },
-    { symbol: '+', label: 'Liitsõna piir', description: 'Compound word boundary' },
+    { symbol: "`", label: "Kolmas välde", description: "Third pitch accent" },
+    { symbol: "´", label: "Rõhuline silp", description: "Stressed syllable" },
+    { symbol: "'", label: "Palatalisatsioon", description: "Palatalization" },
+    {
+      symbol: "+",
+      label: "Liitsõna piir",
+      description: "Compound word boundary",
+    },
   ];
 }

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useRef } from 'react';
-import { CloseIcon, PlayIcon, PauseIcon } from '../ui/Icons';
-import MarkersGuideBox from '../ui/MarkersGuideBox';
+import React, { useRef } from "react";
+import { CloseIcon, PlayIcon, PauseIcon } from "../ui/Icons";
+import MarkersGuideBox from "../ui/MarkersGuideBox";
 
 interface CustomVariantFormProps {
   value: string;
@@ -23,7 +23,7 @@ export function CustomVariantForm({
   onClose,
   onShowGuide,
   isPlaying,
-  isLoading
+  isLoading,
 }: CustomVariantFormProps): React.ReactElement {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -59,7 +59,7 @@ export function CustomVariantForm({
             />
             {value && (
               <button
-                onClick={() => onChange('')}
+                onClick={() => onChange("")}
                 className="pronunciation-variants__input-clear"
                 aria-label="Clear input"
               >
@@ -71,8 +71,8 @@ export function CustomVariantForm({
             <button
               onClick={onPlay}
               disabled={!value.trim() || isLoading}
-              className={`button button--primary button--icon-only button--circular ${isLoading ? 'loading' : ''} ${isPlaying ? 'playing' : ''}`}
-              title={isLoading ? 'Laen...' : isPlaying ? 'Mängib' : 'Kuula'}
+              className={`button button--primary button--icon-only button--circular ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
+              title={isLoading ? "Laen..." : isPlaying ? "Mängib" : "Kuula"}
             >
               {isLoading ? (
                 <div className="loader-spinner"></div>

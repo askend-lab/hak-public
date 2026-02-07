@@ -4,7 +4,7 @@
 
 /// Brand colors
 $color-primary: #173148;
-$color-secondary: #D7E5F2;
+$color-secondary: #d7e5f2;
 $color-trietary: rgba(23, 49, 72, 0.75);
 $color-quaternary: var(--color-brand-quaternary);
 $color-accent: var(--color-brand-accent);
@@ -14,89 +14,89 @@ $color-second-gradient: var(--color-brand-second-gradient);
 /// More colors
 
 // Text secondary
-$color-text-secondary: #32383E !default;
+$color-text-secondary: #32383e !default;
 
 // Blue overlay
 $color-overlay: rgba(23, 49, 72, 0.25) !default;
 
 // White
-$color-white: #FFF !default;
+$color-white: #fff !default;
 
 // Black
 $color-black: #000 !default;
 
 // Gray
-$color-gray: #636B74 !default;
+$color-gray: #636b74 !default;
 
 // Orange
-$color-light-orange: #FFF5F1 !default;
-$color-orange: #DE6837 !default;
+$color-light-orange: #fff5f1 !default;
+$color-orange: #de6837 !default;
 
 // Red
-$color-red: #D32F2F !default;
+$color-red: #d32f2f !default;
 
 /// Brand other variables
 $border-radius-round: 10rem !default;
 
 /// Font families
-$font-body: 'Inter', sans-serif !default;
+$font-body: "Inter", sans-serif !default;
 
 /// Error
-$color-error: #E70505 !default;
+$color-error: #e70505 !default;
 
 // Warning
-$color-warning: #EF6C00 !default;
+$color-warning: #ef6c00 !default;
 
 // Success
-$color-success: #2E7D32 !default;
+$color-success: #2e7d32 !default;
 
 // Soft primary
-$color-soft-primary: #12467B !default;
+$color-soft-primary: #12467b !default;
 
 // Soft primary bg
-$color-soft-primary-bg: #E3EFFB !default;
+$color-soft-primary-bg: #e3effb !default;
 
 // Soft danger bg
-$color-soft-danger-bg: #FCE4E4 !default;
+$color-soft-danger-bg: #fce4e4 !default;
 
 // Soft danger color
-$color-soft-danger: #7D1212 !default;
+$color-soft-danger: #7d1212 !default;
 
 // Soft success bg
-$color-soft-success-bg: #E3FBE3 !default;
+$color-soft-success-bg: #e3fbe3 !default;
 
 // Soft success color
-$color-soft-success: #0A470A !default;
+$color-soft-success: #0a470a !default;
 
-// Soft warning bg 
-$color-soft-warning-bg: #FDF0E1 !default;
+// Soft warning bg
+$color-soft-warning-bg: #fdf0e1 !default;
 
 // Soft warning color
-$color-soft-warning: #492B08 !default;
+$color-soft-warning: #492b08 !default;
 
 // Outlined primary
-$color-outlined-primary: #0B6BCB !default;
+$color-outlined-primary: #0b6bcb !default;
 
 // Soft neutral bg
-$color-soft-neutral-bg: #F0F4F8 !default;
+$color-soft-neutral-bg: #f0f4f8 !default;
 
 // Outlined neutral
-$color-outlined-neutral: #CDD7E1 !default;
+$color-outlined-neutral: #cdd7e1 !default;
 
 // Outlined danger
-$color-outlined-danger: #C41C1C !default;
+$color-outlined-danger: #c41c1c !default;
 
 // Outlined success
-$color-outlined-success: #1F7A1F !default;
+$color-outlined-success: #1f7a1f !default;
 
 // Outlined warning border
-$color-outlined-warning-border: #F3C896 !default;
+$color-outlined-warning-border: #f3c896 !default;
 
 // Outlined warning
-$color-outlined-warning: #9A5B13 !default;
+$color-outlined-warning: #9a5b13 !default;
 
 // Background surface
-$color-surface-bg: #FBFCFE !default;
+$color-surface-bg: #fbfcfe !default;
 
 // Border radius
 $border-radius-sm: 6px;

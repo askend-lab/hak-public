@@ -1,8 +1,8 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // =========================================================================
 // Login Modal Component
@@ -278,7 +278,13 @@
 }
 
 .login-modal__demo-code-number {
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-xs;
   font-weight: $font-weight-medium;
   color: $color-primary;

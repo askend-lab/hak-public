@@ -1,9 +1,9 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
-@import '../abstracts/mixins';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "../abstracts/mixins";
 
 // =========================================================================
 // Pronunciation Variants Component
@@ -363,7 +363,7 @@
   text-decoration: underline;
   cursor: pointer;
   padding: $spacing-2 0;
-  
+
   &:hover {
     color: $color-soft-primary;
   }
@@ -382,7 +382,7 @@
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
-  
+
   &:hover {
     color: $color-soft-primary;
   }
@@ -550,7 +550,7 @@
       gap: $spacing-2;
 
       &:before {
-        content: '•';
+        content: "•";
         color: $color-gray;
         font-size: $font-size-md;
       }
@@ -623,7 +623,7 @@
   .pronunciation-variants__input-actions {
     width: 100%;
     justify-content: stretch;
-    
+
     > button {
       flex: 1;
     }

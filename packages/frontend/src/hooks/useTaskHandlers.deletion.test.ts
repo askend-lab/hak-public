@@ -1,29 +1,34 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useTaskHandlers } from './useTaskHandlers';
-import { SentenceState } from '@/types/synthesis';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useTaskHandlers } from "./useTaskHandlers";
+import { SentenceState } from "@/types/synthesis";
 
 const mockShowNotification = vi.fn();
 const mockSetShowLoginModal = vi.fn();
 
-vi.mock('@/services/auth', () => ({
+vi.mock("@/services/auth", () => ({
   useAuth: vi.fn(() => ({
-    user: { id: 'user-1', name: 'Test User' },
+    user: { id: "user-1", name: "Test User" },
     isAuthenticated: true,
     setShowLoginModal: mockSetShowLoginModal,
   })),
 }));
 
-vi.mock('@/contexts/NotificationContext', () => ({
+vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({
     showNotification: mockShowNotification,
   })),
 }));
 
 const mockDeleteTask = vi.fn().mockResolvedValue({});
-const mockGetTask = vi.fn().mockResolvedValue({ id: 'task-1', name: 'Task 1', description: 'Desc', shareToken: 'token' });
+const mockGetTask = vi.fn().mockResolvedValue({
+  id: "task-1",
+  name: "Task 1",
+  description: "Desc",
+  shareToken: "token",
+});
 
-vi.mock('@/services/dataService', () => ({
+vi.mock("@/services/dataService", () => ({
   DataService: {
     getInstance: vi.fn(() => ({
       deleteTask: mockDeleteTask,
@@ -32,9 +37,17 @@ vi.mock('@/services/dataService', () => ({
   },
 }));
 
-describe('useTaskHandlers - Task Deletion', () => {
+describe("useTaskHandlers - Task Deletion", () => {
   const mockSentences: SentenceState[] = [
-    { id: '1', text: 'Hello world', tags: ['Hello', 'world'], isPlaying: false, isLoading: false, currentInput: '', phoneticText: 'Héllo wórld' },
+    {
+      id: "1",
+      text: "Hello world",
+      tags: ["Hello", "world"],
+      isPlaying: false,
+      isLoading: false,
+      currentInput: "",
+      phoneticText: "Héllo wórld",
+    },
   ];
   const mockSetCurrentView = vi.fn();
   const mockSetSelectedTaskId = vi.fn();
@@ -43,53 +56,64 @@ describe('useTaskHandlers - Task Deletion', () => {
     vi.clearAllMocks();
   });
 
-  it('should delete task with confirmation', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
+  it("should delete task with confirmation", async () => {
+    const { result } = renderHook(() =>
+      useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+    );
 
     await act(async () => {
-      await result.current.handleDeleteTask('task-1');
+      await result.current.handleDeleteTask("task-1");
     });
 
     expect(result.current.showDeleteConfirmation).toBe(true);
-    expect(result.current.taskToDelete).toEqual({ id: 'task-1', name: 'Task 1' });
+    expect(result.current.taskToDelete).toEqual({
+      id: "task-1",
+      name: "Task 1",
+    });
   });
 
-  it('should confirm delete', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
+  it("should confirm delete", async () => {
+    const { result } = renderHook(() =>
+      useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+    );
 
     await act(async () => {
-      await result.current.handleDeleteTask('task-1');
+      await result.current.handleDeleteTask("task-1");
     });
 
     await act(async () => {
       await result.current.handleConfirmDelete();
     });
 
-    expect(mockDeleteTask).toHaveBeenCalledWith('user-1', 'task-1');
+    expect(mockDeleteTask).toHaveBeenCalledWith("user-1", "task-1");
     expect(result.current.showDeleteConfirmation).toBe(false);
   });
 
-  it('should redirect to task list after successful deletion', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
+  it("should redirect to task list after successful deletion", async () => {
+    const { result } = renderHook(() =>
+      useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+    );
 
     await act(async () => {
-      await result.current.handleDeleteTask('task-1');
+      await result.current.handleDeleteTask("task-1");
     });
 
     await act(async () => {
       await result.current.handleConfirmDelete();
     });
 
-    expect(mockDeleteTask).toHaveBeenCalledWith('user-1', 'task-1');
+    expect(mockDeleteTask).toHaveBeenCalledWith("user-1", "task-1");
     expect(mockSetSelectedTaskId).toHaveBeenCalledWith(null);
-    expect(mockSetCurrentView).toHaveBeenCalledWith('tasks');
+    expect(mockSetCurrentView).toHaveBeenCalledWith("tasks");
   });
 
-  it('should cancel delete', async () => {
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
+  it("should cancel delete", async () => {
+    const { result } = renderHook(() =>
+      useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+    );
 
     await act(async () => {
-      await result.current.handleDeleteTask('task-1');
+      await result.current.handleDeleteTask("task-1");
     });
 
     act(() => {
@@ -100,20 +124,25 @@ describe('useTaskHandlers - Task Deletion', () => {
     expect(result.current.taskToDelete).toBeNull();
   });
 
-  it('should handle error when deleting task', async () => {
-    mockDeleteTask.mockRejectedValueOnce(new Error('Failed'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { result } = renderHook(() => useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId));
+  it("should handle error when deleting task", async () => {
+    mockDeleteTask.mockRejectedValueOnce(new Error("Failed"));
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { result } = renderHook(() =>
+      useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+    );
 
     await act(async () => {
-      await result.current.handleDeleteTask('task-1');
+      await result.current.handleDeleteTask("task-1");
     });
 
     await act(async () => {
       await result.current.handleConfirmDelete();
     });
 
-    expect(mockShowNotification).toHaveBeenCalledWith('error', 'Ülesande kustutamine ebaõnnestus');
+    expect(mockShowNotification).toHaveBeenCalledWith(
+      "error",
+      "Ülesande kustutamine ebaõnnestus",
+    );
     consoleSpy.mockRestore();
   });
 });

@@ -1,4 +1,4 @@
-import { useAuth } from '@/services/auth';
+import { useAuth } from "@/services/auth";
 
 /**
  * Get the current user ID or fallback to test user
@@ -6,5 +6,5 @@ import { useAuth } from '@/services/auth';
  */
 export function useUserId(): string {
   const { user } = useAuth();
-  return user?.id ?? 'test-user';
+  return user?.id ?? "test-user";
 }

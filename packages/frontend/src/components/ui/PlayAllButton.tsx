@@ -1,4 +1,4 @@
-import { PlayIcon, PauseIcon } from './Icons';
+import { PlayIcon, PauseIcon } from "./Icons";
 
 interface PlayAllButtonProps {
   isPlaying: boolean;
@@ -7,11 +7,16 @@ interface PlayAllButtonProps {
   onClick: () => void;
 }
 
-export function PlayAllButton({ isPlaying, isLoading, disabled, onClick }: PlayAllButtonProps) {
+export function PlayAllButton({
+  isPlaying,
+  isLoading,
+  disabled,
+  onClick,
+}: PlayAllButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`button button--primary ${isLoading ? 'loading' : ''}`}
+      className={`button button--primary ${isLoading ? "loading" : ""}`}
       disabled={disabled}
     >
       {isLoading ? (
@@ -21,7 +26,7 @@ export function PlayAllButton({ isPlaying, isLoading, disabled, onClick }: PlayA
       ) : (
         <PlayIcon size="2xl" />
       )}
-      {isLoading ? 'Laadimine' : isPlaying ? 'Peata' : 'Mängi kõik'}
+      {isLoading ? "Laadimine" : isPlaying ? "Peata" : "Mängi kõik"}
     </button>
   );
 }

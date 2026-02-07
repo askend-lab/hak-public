@@ -35,5 +35,6 @@
 ---
 
 **See also:**
+
 - [Token Governance](./Token-Governance.md) - Rules and conventions
 - [Token Examples](./Token-Examples.md) - Usage examples

@@ -13,23 +13,23 @@
 :root {
   // Base spacing scale (4px increments)
   --spacing-0: 0;
-  --spacing-1: 0.25rem;   // 4px
-  --spacing-2: 0.5rem;    // 8px
-  --spacing-3: 0.75rem;   // 12px
-  --spacing-4: 1rem;      // 16px
-  --spacing-5: 1.25rem;   // 20px
-  --spacing-6: 1.5rem;    // 24px
-  --spacing-8: 2rem;      // 32px
-  --spacing-10: 2.5rem;   // 40px
-  --spacing-12: 3rem;     // 48px
-  --spacing-16: 4rem;     // 64px
-  
+  --spacing-1: 0.25rem; // 4px
+  --spacing-2: 0.5rem; // 8px
+  --spacing-3: 0.75rem; // 12px
+  --spacing-4: 1rem; // 16px
+  --spacing-5: 1.25rem; // 20px
+  --spacing-6: 1.5rem; // 24px
+  --spacing-8: 2rem; // 32px
+  --spacing-10: 2.5rem; // 40px
+  --spacing-12: 3rem; // 48px
+  --spacing-16: 4rem; // 64px
+
   // Semantic spacing aliases
-  --spacing-xs: var(--spacing-1);   // 4px
-  --spacing-sm: var(--spacing-2);   // 8px
-  --spacing-md: var(--spacing-4);   // 16px
-  --spacing-lg: var(--spacing-6);   // 24px
-  --spacing-xl: var(--spacing-8);   // 32px
+  --spacing-xs: var(--spacing-1); // 4px
+  --spacing-sm: var(--spacing-2); // 8px
+  --spacing-md: var(--spacing-4); // 16px
+  --spacing-lg: var(--spacing-6); // 24px
+  --spacing-xl: var(--spacing-8); // 32px
   --spacing-2xl: var(--spacing-12); // 48px
 }
 

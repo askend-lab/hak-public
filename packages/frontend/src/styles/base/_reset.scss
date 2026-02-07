@@ -248,7 +248,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--color-input-border-focus, #4A90E2);
+  outline: 2px solid var(--color-input-border-focus, #4a90e2);
   outline-offset: 2px;
 }
 
@@ -524,7 +524,7 @@ th {
   color: var(--color-white);
   z-index: 9999;
   text-decoration: none;
-  
+
   &:focus {
     top: 0;
   }

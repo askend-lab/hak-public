@@ -8,7 +8,7 @@
 // Bad
 .my-component {
   color: #173148;
-  background: #D7E5F2;
+  background: #d7e5f2;
 }
 
 // Good
@@ -20,18 +20,18 @@
 
 ### Available color tokens
 
-| Token | Usage |
-|-------|-------|
-| `$color-primary` | Main brand color |
-| `$color-secondary` | Secondary brand color |
-| `$color-text-primary` | Primary text |
-| `$color-text-secondary` | Secondary text |
-| `$color-surface-bg` | Page background |
-| `$color-error` | Error states |
-| `$color-warning` | Warning states |
-| `$color-success` | Success states |
-| `$color-soft-*-bg` | Soft variant backgrounds |
-| `$color-outlined-*` | Outlined variant colors |
+| Token                   | Usage                    |
+| ----------------------- | ------------------------ |
+| `$color-primary`        | Main brand color         |
+| `$color-secondary`      | Secondary brand color    |
+| `$color-text-primary`   | Primary text             |
+| `$color-text-secondary` | Secondary text           |
+| `$color-surface-bg`     | Page background          |
+| `$color-error`          | Error states             |
+| `$color-warning`        | Warning states           |
+| `$color-success`        | Success states           |
+| `$color-soft-*-bg`      | Soft variant backgrounds |
+| `$color-outlined-*`     | Outlined variant colors  |
 
 ## Storybook Components
 
@@ -59,5 +59,6 @@ Components unique to this app (documented in `STORYBOOK-BACKLOG.md` for future p
 ---
 
 **See also:**
+
 - [Style Guide Overview](./Style-Guide.md) - Architecture and BEM conventions
 - [Token Governance](./tokens/Token-Governance.md) - Token management rules

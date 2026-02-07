@@ -17,9 +17,9 @@ export interface AnalyzeResponse {
  */
 export async function analyzeText(text: string): Promise<string | null> {
   try {
-    const response = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
     });
 
@@ -30,7 +30,7 @@ export async function analyzeText(text: string): Promise<string | null> {
     const data: AnalyzeResponse = await response.json();
     return data.stressedText || null;
   } catch (error) {
-    console.error('Failed to analyze text:', error);
+    console.error("Failed to analyze text:", error);
     return null;
   }
 }
@@ -40,14 +40,14 @@ export async function analyzeText(text: string): Promise<string | null> {
  * Use when you need to handle the error explicitly.
  */
 export async function analyzeTextOrThrow(text: string): Promise<string> {
-  const response = await fetch('/api/analyze', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
   });
 
   if (!response.ok) {
-    throw new Error('Analysis failed');
+    throw new Error("Analysis failed");
   }
 
   const data: AnalyzeResponse = await response.json();

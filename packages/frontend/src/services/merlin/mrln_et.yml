@@ -7,7 +7,7 @@ dependencies:
   - numpy==1.19.5
   - mkl-service==2.4.0
   - mkl
-  - pip  
+  - pip
   - pip:
       - scipy==1.5.4
       - scikit-learn==0.24.2

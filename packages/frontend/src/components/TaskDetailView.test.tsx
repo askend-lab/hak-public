@@ -1,37 +1,36 @@
- 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import TaskDetailView from './TaskDetailView';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import TaskDetailView from "./TaskDetailView";
 
-vi.mock('@/services/auth', () => ({
+vi.mock("@/services/auth", () => ({
   useAuth: vi.fn(() => ({
-    user: { id: 'user-1', name: 'Test User' },
+    user: { id: "user-1", name: "Test User" },
     isAuthenticated: true,
   })),
 }));
 
-vi.mock('@/contexts/NotificationContext', () => ({
+vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({
     showNotification: vi.fn(),
   })),
 }));
 
 const mockTask = {
-  id: 'task-1',
-  name: 'Test Task',
-  description: 'Test Description',
-  shareToken: 'share-token-1',
+  id: "task-1",
+  name: "Test Task",
+  description: "Test Description",
+  shareToken: "share-token-1",
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   speechEntries: [
-    { id: 'entry-1', text: 'Entry 1', stressedText: 'Entry 1', order: 0 },
-    { id: 'entry-2', text: 'Entry 2', stressedText: 'Entry 2', order: 1 },
+    { id: "entry-1", text: "Entry 1", stressedText: "Entry 1", order: 0 },
+    { id: "entry-2", text: "Entry 2", stressedText: "Entry 2", order: 1 },
   ],
 };
 
 const mockGetTask = vi.fn().mockResolvedValue(mockTask);
 
-vi.mock('@/services/dataService', () => ({
+vi.mock("@/services/dataService", () => ({
   DataService: {
     getInstance: vi.fn(() => ({
       getTask: mockGetTask,
@@ -41,9 +40,9 @@ vi.mock('@/services/dataService', () => ({
   },
 }));
 
-describe('TaskDetailView', () => {
+describe("TaskDetailView", () => {
   const defaultProps = {
-    taskId: 'task-1',
+    taskId: "task-1",
     onBack: vi.fn(),
     onEditTask: vi.fn(),
     onDeleteTask: vi.fn(),
@@ -55,28 +54,28 @@ describe('TaskDetailView', () => {
     mockGetTask.mockResolvedValue(mockTask);
   });
 
-  it('should render loading state initially', () => {
+  it("should render loading state initially", () => {
     render(<TaskDetailView {...defaultProps} />);
     expect(screen.getByText(/laen/i)).toBeInTheDocument();
   });
 
-  it('should render task name after loading', async () => {
+  it("should render task name after loading", async () => {
     render(<TaskDetailView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Test Task')).toBeInTheDocument();
+      expect(screen.getByText("Test Task")).toBeInTheDocument();
     });
   });
 
-  it('should call getTask with correct params', async () => {
+  it("should call getTask with correct params", async () => {
     render(<TaskDetailView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(mockGetTask).toHaveBeenCalledWith('task-1', 'user-1');
+      expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
     });
   });
 
-  it('should show error when task not found', async () => {
+  it("should show error when task not found", async () => {
     mockGetTask.mockResolvedValue(null);
     render(<TaskDetailView {...defaultProps} />);
 
@@ -85,11 +84,11 @@ describe('TaskDetailView', () => {
     });
   });
 
-  it('should render task description when available', async () => {
+  it("should render task description when available", async () => {
     render(<TaskDetailView {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Test Description')).toBeInTheDocument();
+      expect(screen.getByText("Test Description")).toBeInTheDocument();
     });
   });
 });

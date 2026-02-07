@@ -11,26 +11,26 @@
 
 :root {
   // Breakpoint values
-  --breakpoint-xs: 375px;   // Small mobile (iPhone SE)
+  --breakpoint-xs: 375px; // Small mobile (iPhone SE)
   --breakpoint-mobile: 480px; // Mobile portrait max
-  --breakpoint-sm: 640px;   // Mobile landscape / Small tablet
-  --breakpoint-md: 768px;   // Tablet portrait
-  --breakpoint-lg: 1024px;  // Tablet landscape / Small desktop
-  --breakpoint-xl: 1280px;  // Desktop
+  --breakpoint-sm: 640px; // Mobile landscape / Small tablet
+  --breakpoint-md: 768px; // Tablet portrait
+  --breakpoint-lg: 1024px; // Tablet landscape / Small desktop
+  --breakpoint-xl: 1280px; // Desktop
   --breakpoint-2xl: 1536px; // Large desktop
-  
+
   // Container max-widths per breakpoint
   --container-sm: 640px;
   --container-md: 768px;
   --container-lg: 1024px;
   --container-xl: 1280px;
   --container-2xl: 1536px;
-  
+
   // Content max-widths (semantic)
-  --content-narrow: 640px;   // For text-heavy content
-  --content-default: 920px;  // Default page content
-  --content-wide: 1280px;    // Wide layouts
-  --content-full: 1536px;    // Full-width layouts
+  --content-narrow: 640px; // For text-heavy content
+  --content-default: 920px; // Default page content
+  --content-wide: 1280px; // Wide layouts
+  --content-full: 1536px; // Full-width layouts
 }
 
 // ---------------------------------------------------------------------------

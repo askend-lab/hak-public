@@ -1,14 +1,29 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useRef, ReactNode } from 'react';
-import NotificationContainer, { NotificationRef } from '@/components/NotificationContainer';
-import { NotificationType, NotificationColor, NotificationAction } from '@/components/Notification';
+import { createContext, useContext, useRef, ReactNode } from "react";
+import NotificationContainer, {
+  NotificationRef,
+} from "@/components/NotificationContainer";
+import {
+  NotificationType,
+  NotificationColor,
+  NotificationAction,
+} from "@/components/Notification";
 
 interface NotificationContextType {
-  showNotification: (type: NotificationType, message: string, description?: string, duration?: number, color?: NotificationColor, action?: NotificationAction) => void;
+  showNotification: (
+    type: NotificationType,
+    message: string,
+    description?: string,
+    duration?: number,
+    color?: NotificationColor,
+    action?: NotificationAction,
+  ) => void;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+const NotificationContext = createContext<NotificationContextType | undefined>(
+  undefined,
+);
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const notificationRef = useRef<NotificationRef>(null);
@@ -19,9 +34,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     description?: string,
     duration?: number,
     color?: NotificationColor,
-    action?: NotificationAction
+    action?: NotificationAction,
   ) => {
-    notificationRef.current?.show(type, message, description, duration, color, action);
+    notificationRef.current?.show(
+      type,
+      message,
+      description,
+      duration,
+      color,
+      action,
+    );
   };
 
   return (
@@ -35,7 +57,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 export function useNotification() {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error('useNotification must be used within NotificationProvider');
+    throw new Error("useNotification must be used within NotificationProvider");
   }
   return context;
 }

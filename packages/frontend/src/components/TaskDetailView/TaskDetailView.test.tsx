@@ -1,51 +1,310 @@
-import { describe, it, expect, vi } from 'vitest';
-import { DataService } from '@/services/dataService';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import TaskDetailView from "./TaskDetailView";
+import { Task } from "@/types/task";
 
-describe('TaskDetailView entry deletion persistence', () => {
-  it('handleDeleteEntry should call DataService.updateTask to persist deletion', async () => {
-    // This test verifies the fix for the bug where entry deletion wasn't persisted.
-    // The handleDeleteEntry function in TaskDetailView.tsx now calls:
-    //   await DataService.getInstance().updateTask(user.id, taskId, { entries: updatedEntries });
-    //
-    // Manual verification steps:
-    // 1. Create a task with multiple sentences
-    // 2. Open the task detail view
-    // 3. Delete a sentence using the menu "Kustuta"
-    // 4. Refresh the page
-    // 5. Verify the sentence remains deleted (not reappearing)
-    
-    // The fix adds persistence to handleDeleteEntry (lines 74-94 in TaskDetailView.tsx):
-    // - Updates local state immediately for responsive UI
-    // - Calls DataService.updateTask to persist the change
-    // - Reverts on error with error notification
-    
-    const mockUpdateTask = vi.fn().mockResolvedValue({});
-    vi.spyOn(DataService, 'getInstance').mockReturnValue({
+const mockGetTask = vi.fn();
+const mockUpdateTask = vi.fn();
+const mockShowNotification = vi.fn();
+
+vi.mock("@/services/dataService", () => ({
+  DataService: {
+    getInstance: vi.fn(() => ({
+      getTask: mockGetTask,
       updateTask: mockUpdateTask,
-    } as unknown as DataService);
+    })),
+  },
+}));
 
-    // Simulate the deletion logic from handleDeleteEntry
-    const userId = 'user-1';
-    const taskId = 'task-1';
-    const entries = [
-      { id: 'entry-1', taskId: 'task-1', text: 'First', createdAt: new Date() },
-      { id: 'entry-2', taskId: 'task-1', text: 'Second', createdAt: new Date() },
-    ];
-    const entryIdToDelete = 'entry-1';
-    
-    const updatedEntries = entries.filter(e => e.id !== entryIdToDelete);
-    
-    // This is what handleDeleteEntry now does
-    await DataService.getInstance().updateTask(userId, taskId, { entries: updatedEntries as never });
+vi.mock("@/services/auth", () => ({
+  useAuth: vi.fn(() => ({ user: { id: "u1", email: "test@test.com" } })),
+}));
 
-    expect(mockUpdateTask).toHaveBeenCalledWith(
-      'user-1',
-      'task-1',
-      expect.objectContaining({
-        entries: expect.arrayContaining([
-          expect.objectContaining({ id: 'entry-2', text: 'Second' })
-        ])
-      })
+vi.mock("@/contexts/NotificationContext", () => ({
+  useNotification: vi.fn(() => ({ showNotification: mockShowNotification })),
+}));
+
+vi.mock("../SentenceSynthesisItem", () => ({
+  default: ({
+    id,
+    rowMenuItems,
+    onPlay,
+  }: {
+    id: string;
+    rowMenuItems?: {
+      label: string;
+      onClick: (id: string) => void;
+      danger?: boolean;
+    }[];
+    onPlay?: (id: string) => void;
+  }) => (
+    <div data-testid={`entry-${id}`}>
+      {rowMenuItems?.map((item) => (
+        <button key={item.label} onClick={() => item.onClick(id)}>
+          {item.label}
+        </button>
+      ))}
+      {onPlay && <button onClick={() => onPlay(id)}>Play</button>}
+    </div>
+  ),
+}));
+
+vi.mock("../ShareTaskModal", () => ({
+  default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
+    isOpen ? (
+      <div data-testid="share-modal">
+        <button onClick={onClose}>Close Share</button>
+      </div>
+    ) : null,
+}));
+
+vi.mock("../PronunciationVariants", () => ({ default: () => null }));
+vi.mock("../SentencePhoneticPanel", () => ({ default: () => null }));
+vi.mock("./TaskDetailHeader", () => ({
+  TaskDetailHeader: ({
+    onShare,
+    onEditTask,
+    onDeleteTask,
+  }: {
+    onShare: () => void;
+    onEditTask: (id: string) => void;
+    onDeleteTask: (id: string) => void;
+  }) => (
+    <div data-testid="header">
+      <button onClick={onShare}>Share</button>
+      <button onClick={() => onEditTask("t1")}>Edit</button>
+      <button onClick={() => onDeleteTask("t1")}>Delete Task</button>
+    </div>
+  ),
+}));
+vi.mock("./TaskDetailStates", () => ({
+  TaskDetailLoading: ({ onBack }: { onBack: () => void }) => (
+    <div data-testid="loading">
+      <button onClick={onBack}>Back</button>
+    </div>
+  ),
+  TaskDetailError: ({
+    error,
+    onBack,
+  }: {
+    error: string;
+    onBack: () => void;
+  }) => (
+    <div data-testid="error">
+      {error}
+      <button onClick={onBack}>Back</button>
+    </div>
+  ),
+}));
+vi.mock("./TaskDetailEmpty", () => ({
+  TaskDetailEmpty: () => <div data-testid="empty">No entries</div>,
+}));
+vi.mock("./hooks", () => ({
+  useDragAndDrop: vi.fn(() => ({
+    draggedId: null,
+    dragOverId: null,
+    handleDragStart: vi.fn(),
+    handleDragEnd: vi.fn(),
+    handleDragOver: vi.fn(),
+    handleDragLeave: vi.fn(),
+    handleDrop: vi.fn(),
+  })),
+  useAudioPlayback: vi.fn(() => ({
+    currentPlayingId: null,
+    currentLoadingId: null,
+    isPlayingAll: false,
+    isLoadingPlayAll: false,
+    handlePlayEntry: vi.fn(),
+    handlePlayAll: vi.fn(),
+  })),
+  usePronunciationVariants: vi.fn(() => ({
+    selectedEntryId: null,
+    selectedTagIndex: null,
+    isVariantsPanelOpen: false,
+    variantsWord: null,
+    variantsCustomPhonetic: null,
+    loadingVariantsTag: null,
+    handleTagClick: vi.fn(),
+    handleCloseVariants: vi.fn(),
+    handleUseVariant: vi.fn(),
+  })),
+  usePhoneticPanel: vi.fn(() => ({
+    phoneticPanelEntryId: null,
+    showPhoneticPanel: false,
+    handleExplorePhonetic: vi.fn(),
+    handleClosePhoneticPanel: vi.fn(),
+    handlePhoneticApply: vi.fn(),
+  })),
+}));
+
+const mockTask: Task = {
+  id: "t1",
+  userId: "u1",
+  name: "Test Task",
+  description: "desc",
+  entries: [
+    {
+      id: "e1",
+      taskId: "t1",
+      text: "Hello world",
+      stressedText: "Hello world",
+      audioUrl: null,
+      audioBlob: null,
+      order: 0,
+      createdAt: new Date(),
+    },
+    {
+      id: "e2",
+      taskId: "t1",
+      text: "Tere",
+      stressedText: "Tere",
+      audioUrl: null,
+      audioBlob: null,
+      order: 1,
+      createdAt: new Date(),
+    },
+  ],
+  speechSequences: [],
+  shareToken: "tok1",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+describe("TaskDetailView", () => {
+  const defaultProps = {
+    taskId: "t1",
+    onBack: vi.fn(),
+    onEditTask: vi.fn(),
+    onDeleteTask: vi.fn(),
+    onNavigateToSynthesis: vi.fn(),
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const { useAuth } = await import("@/services/auth");
+    (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({
+      user: { id: "u1", email: "test@test.com" },
+    });
+    mockGetTask.mockResolvedValue(mockTask);
+    mockUpdateTask.mockResolvedValue({});
+  });
+
+  it("shows loading then renders task with entries", async () => {
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
+    );
+    expect(screen.getByTestId("entry-e2")).toBeInTheDocument();
+  });
+
+  it("shows error when task not found", async () => {
+    mockGetTask.mockResolvedValue(null);
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("error")).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/ei leitud/)).toBeInTheDocument();
+  });
+
+  it("shows error on fetch failure", async () => {
+    mockGetTask.mockRejectedValue(new Error("Network fail"));
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("error")).toBeInTheDocument(),
+    );
+  });
+
+  it("renders with initialTask (skips fetch)", async () => {
+    render(<TaskDetailView {...defaultProps} initialTask={mockTask} />);
+    expect(screen.getByTestId("entry-e1")).toBeInTheDocument();
+    expect(mockGetTask).not.toHaveBeenCalled();
+  });
+
+  it("renders empty state when task has no entries", async () => {
+    mockGetTask.mockResolvedValue({ ...mockTask, entries: [] });
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("empty")).toBeInTheDocument(),
+    );
+  });
+
+  it("handleDeleteEntry calls updateTask and shows notification", async () => {
+    const user = userEvent.setup();
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getAllByText("Kustuta")[0]!);
+    await waitFor(() => expect(mockUpdateTask).toHaveBeenCalled());
+    expect(mockShowNotification).toHaveBeenCalledWith(
+      "success",
+      expect.any(String),
+      undefined,
+      undefined,
+      "success",
+    );
+  });
+
+  it("handleDeleteEntry reverts on error", async () => {
+    mockUpdateTask.mockRejectedValueOnce(new Error("fail"));
+    const user = userEvent.setup();
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getAllByText("Kustuta")[0]!);
+    await waitFor(() =>
+      expect(mockShowNotification).toHaveBeenCalledWith(
+        "error",
+        expect.any(String),
+      ),
+    );
+  });
+
+  it("opens share modal from header", async () => {
+    const user = userEvent.setup();
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("header")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByText("Share"));
+    expect(screen.getByTestId("share-modal")).toBeInTheDocument();
+
+    await user.click(screen.getByText("Close Share"));
+    expect(screen.queryByTestId("share-modal")).not.toBeInTheDocument();
+  });
+
+  it("play button calls handlePlayEntry", async () => {
+    const mockHandlePlayEntry = vi.fn();
+    const { useAudioPlayback } = await import("./hooks");
+    (useAudioPlayback as ReturnType<typeof vi.fn>).mockReturnValue({
+      currentPlayingId: null,
+      currentLoadingId: null,
+      isPlayingAll: false,
+      isLoadingPlayAll: false,
+      handlePlayEntry: mockHandlePlayEntry,
+      handlePlayAll: vi.fn(),
+    });
+    const user = userEvent.setup();
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getAllByText("Play")[0]!);
+    expect(mockHandlePlayEntry).toHaveBeenCalledWith("e1");
+  });
+
+  it("shows error when no user", async () => {
+    const { useAuth } = await import("@/services/auth");
+    (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({ user: null });
+    render(<TaskDetailView {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByTestId("error")).toBeInTheDocument(),
     );
   });
 });

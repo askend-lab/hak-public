@@ -1,11 +1,11 @@
 // Add to Task Dropdown - Searchable task selection dropdown
 // Uses: paper mixins (base component)
 
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import 'input';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "input";
 
 // Backdrop - uses Paper mixin
 .add-to-task-backdrop {
@@ -131,4 +131,3 @@
   position: relative;
   display: inline-flex;
 }
-

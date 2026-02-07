@@ -3,7 +3,7 @@
 // Group: auth
 
 export const FEATURES_AUTH: Record<string, string> = {
-  'US-025-login-eid': `@auth @US-025 @ready
+  "US-025-login-eid": `@auth @US-025 @ready
 Feature: Login with eID (US-025)
   As a registered user
   I want to log in using Estonian eID via Cognito
@@ -21,7 +21,7 @@ Feature: Login with eID (US-025)
     And I see my profile information
 `,
 
-  'US-026-view-profile': `@auth @US-026
+  "US-026-view-profile": `@auth @US-026
 Feature: View user profile (US-026)
   As an authenticated user
   I want to view my profile information
@@ -49,7 +49,7 @@ Feature: View user profile (US-026)
     Then I see my recent tasks
 `,
 
-  'US-027-logout': `@auth @US-027 @ready
+  "US-027-logout": `@auth @US-027 @ready
 Feature: Logout from system (US-027)
   As an authenticated user
   I want to log out of the application
@@ -72,7 +72,7 @@ Feature: Logout from system (US-027)
     Then I am prompted to log in again
 `,
 
-  'US-028-auth-redirect': `@auth @redirect @US-028
+  "US-028-auth-redirect": `@auth @redirect @US-028
 Feature: US-028 Redirect to login for protected features
   As an unauthenticated user
   I want to be redirected to login when accessing protected features

@@ -5,92 +5,92 @@
 // -------------------------------------------------------------------------
 // 1. Design Tokens (must be first - provides CSS vars and SCSS aliases)
 // -------------------------------------------------------------------------
-@import 'tokens/colors';
-@import 'tokens/typography';
-@import 'tokens/spacing';
-@import 'tokens/borders';
-@import 'tokens/opacity';
-@import 'tokens/breakpoints';
+@import "tokens/colors";
+@import "tokens/typography";
+@import "tokens/spacing";
+@import "tokens/borders";
+@import "tokens/opacity";
+@import "tokens/breakpoints";
 
 // -------------------------------------------------------------------------
 // 2. Storybook-Specific Imports
 // -------------------------------------------------------------------------
-@import 'abstracts/storybook-imports';
+@import "abstracts/storybook-imports";
 
 // EKI Storybook Components (used as-is per design system guidelines)
 // Path resolved via vite loadPaths: [packages/]
-@import 'vendor/eki-storybook/src/stories/assets/scss/components/modal';
+@import "vendor/eki-storybook/src/stories/assets/scss/components/modal";
 
 // -------------------------------------------------------------------------
 // 3. Base Styles
 // -------------------------------------------------------------------------
-@import 'base/reset';
+@import "base/reset";
 
 // -------------------------------------------------------------------------
 // 4. Components (following storybook BEM conventions)
 // -------------------------------------------------------------------------
 
 // Base Components (reusable patterns)
-@import 'components/panel';
-@import 'components/paper';
+@import "components/panel";
+@import "components/paper";
 
 // Core UI Components
-@import 'components/modal-base';
-@import 'components/input';
-@import 'components/textarea';
-@import 'components/button';
-@import 'components/icons';
+@import "components/modal-base";
+@import "components/input";
+@import "components/textarea";
+@import "components/button";
+@import "components/icons";
 
 // Layout Components
-@import 'components/page-layout-base';
-@import 'components/page-header-variants';
-@import 'components/page-content';
-@import 'components/page-footer';
-@import 'components/page-utilities';
-@import 'components/header';
-@import 'components/footer';
+@import "components/page-layout-base";
+@import "components/page-header-variants";
+@import "components/page-content";
+@import "components/page-footer";
+@import "components/page-utilities";
+@import "components/header";
+@import "components/footer";
 
 // Phonetic/Text Components
-@import 'components/stressed-text';
-@import 'components/synthesis-results';
-@import 'components/synthesis-components';
-@import 'components/sentence-synthesis-item';
-@import 'components/pronunciation-variants';
-@import 'components/phonetic-guide-modal';
-@import 'components/sentence-phonetic-panel';
-@import 'components/marker-tooltip';
-@import 'components/markers-guide-box';
+@import "components/stressed-text";
+@import "components/synthesis-results";
+@import "components/synthesis-components";
+@import "components/sentence-synthesis-item";
+@import "components/pronunciation-variants";
+@import "components/phonetic-guide-modal";
+@import "components/sentence-phonetic-panel";
+@import "components/marker-tooltip";
+@import "components/markers-guide-box";
 
 // Task Management Components
-@import 'components/task-manager';
-@import 'components/task-list';
-@import 'components/task-edit-modal';
-@import 'components/task-detail';
-@import 'components/add-entry-modal';
-@import 'components/add-to-task-dropdown';
-@import 'components/share-task-modal';
-@import 'components/shared-task';
+@import "components/task-manager";
+@import "components/task-list";
+@import "components/task-edit-modal";
+@import "components/task-detail";
+@import "components/add-entry-modal";
+@import "components/add-to-task-dropdown";
+@import "components/share-task-modal";
+@import "components/shared-task";
 
 // User/Auth Components
-@import 'components/login-modal';
-@import 'components/user-profile';
+@import "components/login-modal";
+@import "components/user-profile";
 
 // Feedback/Notification Components
-@import 'components/notification';
-@import 'components/confirmation-modal';
+@import "components/notification";
+@import "components/confirmation-modal";
 
 // Onboarding Components
-@import 'components/role-selection';
-@import 'components/onboarding-wizard';
+@import "components/role-selection";
+@import "components/onboarding-wizard";
 
 // Specs/Tests Page
-@import 'components/specs-page';
+@import "components/specs-page";
 
 // Dashboard Components
-@import 'components/dashboard';
+@import "components/dashboard";
 
 // Build Info
-@import 'components/build-info';
+@import "components/build-info";
 
 // -------------------------------------------------------------------------
 // 5. Global Styles

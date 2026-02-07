@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { TaskSummary } from '@/types/task';
-import { DataService } from '@/services/dataService';
-import { useAuth } from '@/services/auth';
+import { useState, useEffect } from "react";
+import { TaskSummary } from "@/types/task";
+import { DataService } from "@/services/dataService";
+import { useAuth } from "@/services/auth";
 
 interface UseUserTasksResult {
   tasks: TaskSummary[];
@@ -30,7 +30,9 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
         const userTasks = await dataService.getUserTasks(user.id);
         setTasks(userTasks);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Viga ülesannete laadimisel');
+        setError(
+          err instanceof Error ? err.message : "Viga ülesannete laadimisel",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -43,6 +45,6 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
     tasks,
     isLoading,
     error,
-    isEmpty: !isLoading && tasks.length === 0
+    isEmpty: !isLoading && tasks.length === 0,
   };
 }
