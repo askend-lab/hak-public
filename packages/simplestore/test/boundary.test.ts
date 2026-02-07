@@ -5,10 +5,10 @@
 import { Store } from '../src/core/store';
 import { ServerContext } from '../src/core/types';
 import { validateStoreRequest, validateServerContext } from '../src/core/validation';
-import { InMemoryDynamoDB } from './mockDynamoDB';
+import { InMemoryAdapter } from '../src/adapters/memory';
 
 describe('Boundary Conditions', () => {
-  let db: InMemoryDynamoDB;
+  let db: InMemoryAdapter;
   const context: ServerContext = {
     app: 'testapp',
     tenant: 'tenant1',
@@ -17,7 +17,7 @@ describe('Boundary Conditions', () => {
   };
 
   beforeEach(() => {
-    db = new InMemoryDynamoDB();
+    db = new InMemoryAdapter();
   });
 
   describe('pk/sk with delimiter character #', () => {

@@ -1,12 +1,13 @@
 import { Store } from '../src/core/store';
 import { ServerContext, StoreRequest } from '../src/core/types';
 
-import { InMemoryDynamoDB, FailingDynamoDB } from './mockDynamoDB';
+import { InMemoryAdapter } from '../src/adapters/memory';
+import { FailingDynamoDB } from './mockDynamoDB';
 
 const ONE_HOUR = 3600;
 
 describe('Store', () => {
-  let db: InMemoryDynamoDB;
+  let db: InMemoryAdapter;
   let store: Store;
   const context: ServerContext = {
     app: 'testapp',
@@ -16,7 +17,7 @@ describe('Store', () => {
   };
 
   beforeEach(() => {
-    db = new InMemoryDynamoDB();
+    db = new InMemoryAdapter();
     store = new Store(db, context);
   });
 

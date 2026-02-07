@@ -10,10 +10,10 @@
 
 import { Store } from '../src/core/store';
 import { ServerContext, DataType } from '../src/core/types';
-import { InMemoryDynamoDB } from './mockDynamoDB';
+import { InMemoryAdapter } from '../src/adapters/memory';
 
 describe('Data Types Access Control', () => {
-  let db: InMemoryDynamoDB;
+  let db: InMemoryAdapter;
   
   const ownerContext: ServerContext = {
     app: 'testapp',
@@ -30,7 +30,7 @@ describe('Data Types Access Control', () => {
   };
 
   beforeEach(() => {
-    db = new InMemoryDynamoDB();
+    db = new InMemoryAdapter();
   });
 
   describe('private type', () => {
