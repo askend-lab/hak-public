@@ -90,8 +90,8 @@
 ## 🟡 LOW (29) — Nice to have
 
 ### Code Style
-- [ ] **STYLE-01** `shared/src/utils.ts` — Consider moving functions to separate modules
-- [ ] **STYLE-02** `shared/src/` — Add JSDoc to all public exports
+- [x] **STYLE-01** `shared/src/utils.ts` — Consider moving functions to separate modules (N/A: only 3 small functions, splitting would be over-engineering)
+- [x] **STYLE-02** `shared/src/` — Add JSDoc to all public exports
 - [x] **STYLE-03** `simplestore/test/store.test.ts` — Extract `3600` to `ONE_HOUR` constant
 - [x] **STYLE-04** `simplestore/test/store.test.ts` — Move `FailingDynamoDB` to mockDynamoDB.ts
 - [x] **STYLE-05** `simplestore/test/handler.test.ts` — Improve test names to be more specific
