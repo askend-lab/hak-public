@@ -17,15 +17,15 @@
 
 ## 1. Security & Secrets — CRITICAL `docs/open-source/01-security.md`
 
-| # | 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|---|-------------|-------------|
-| S1 | [x] | [ ] | No secrets in code/history | `secret-detection` (gitleaks) |
-| S2 | [x] | [ ] | No vulnerable dependencies | `security-audit` (pnpm audit) |
-| S3 | [ ] | [ ] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` |
-| S4 | [ ] | [ ] | No internal path references | NEW: `no-internal-refs` |
-| S5 | [ ] | [ ] | IaC security (Terraform) | NEW: `run-tfsec` |
-| S6 | [ ] | [ ] | Docker security (Hadolint) | NEW: `run-docker-lint` |
-| S7 | [x] | [ ] | License compatibility of all deps | `license-check` |
+| # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
+|---|---|---|-------------|-------------|--------|
+| S1 | [x] | [ ] | No secrets in code/history | `secret-detection` | `devbox.yaml:206`, tool: gitleaks, rules: `.gitleaks.toml` |
+| S2 | [x] | [ ] | No vulnerable dependencies | `security-audit` | `devbox.yaml:204`, tool: `pnpm audit`, defaults: `auditLevel: moderate` |
+| S3 | [ ] | [ ] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` | — needs grep-based hook |
+| S4 | [ ] | [ ] | No internal path references | NEW: `no-internal-refs` | — needs grep-based hook |
+| S5 | [ ] | [ ] | IaC security (Terraform) | NEW: `run-tfsec` | `defaults.yaml:171` (mode: off), tool: tfsec |
+| S6 | [ ] | [ ] | Docker security (Hadolint) | NEW: `run-docker-lint` | `defaults.yaml:168` (mode: off), tool: hadolint |
+| S7 | [x] | [ ] | License compatibility of all deps | `license-check` | `devbox.yaml:216-217`, mode: error, tool: license-checker |
 
 ### Manual gates
 | # | ✅ | Gate |
@@ -41,13 +41,13 @@
 
 ## 2. Internal Tooling Decoupling — HIGH `docs/open-source/02-decoupling.md`
 
-| # | 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|---|-------------|-------------|
-| D1 | [ ] | [ ] | ESLint config self-contained | NEW: `no-external-imports` |
-| D2 | [ ] | [ ] | No paths outside repo | NEW: `no-internal-refs` |
-| D3 | [x] | [x] | Build succeeds | `run-build` |
-| D4 | [x] | [x] | All tests pass | `run-tests` |
-| D5 | [x] | [x] | TypeScript compiles | `run-typecheck` |
+| # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
+|---|---|---|-------------|-------------|--------|
+| D1 | [ ] | [ ] | ESLint config self-contained | NEW: `no-external-imports` | — needs grep-based hook |
+| D2 | [ ] | [ ] | No paths outside repo | NEW: `no-internal-refs` | — needs grep-based hook |
+| D3 | [x] | [x] | Build succeeds | `run-build` | `devbox.yaml:156-158`, cmd: `pnpm --filter @hak/frontend build` |
+| D4 | [x] | [x] | All tests pass | `run-tests` | `devbox.yaml:153-154`, cmd: `node devbox test` |
+| D5 | [x] | [x] | TypeScript compiles | `run-typecheck` | `devbox.yaml:147-148`, cmd: `pnpm -r exec tsc --noEmit` |
 
 ### Manual gates
 | # | ✅ | Gate |
@@ -63,43 +63,43 @@
 
 ## 3. Code Quality — HIGH `docs/open-source/03-code-quality.md`
 
-| # | 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|---|-------------|-------------|
-| Q1 | [x] | [x] | Zero `any` types | `no-any` |
-| Q2 | [x] | [x] | All Promises handled | `no-floating-promises` |
-| Q3 | [x] | [x] | Consistent import order | `import-order` |
-| Q4 | [x] | [ ] | No `console.log` in production | `no-console` |
-| Q5 | [x] | [ ] | ESLint zero warnings | `run-lint` |
-| Q6 | [x] | [x] | No copy-paste (≤5%) | `jscpd` |
-| Q7 | [x] | [x] | Source files ≤400 lines | `source-size` |
-| Q8 | [x] | [x] | Strict TypeScript | `run-typecheck` |
-| Q9 | [ ] | [ ] | No dead exports | NEW: `dead-code` (ts-prune) |
-| Q10 | [ ] | [ ] | No circular dependencies | NEW: `circular-deps` (madge) |
+| # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
+|---|---|---|-------------|-------------|--------|
+| Q1 | [x] | [x] | Zero `any` types | `no-any` | `devbox.yaml:212`, `defaults.yaml:151-152` mode: error |
+| Q2 | [x] | [x] | All Promises handled | `no-floating-promises` | `devbox.yaml:214`, `defaults.yaml:154-155` mode: error |
+| Q3 | [x] | [x] | Consistent import order | `import-order` | `devbox.yaml:210`, `defaults.yaml:148-149` mode: error |
+| Q4 | [x] | [ ] | No `console.log` in production | `no-console` | `devbox.yaml:93-113`, `defaults.yaml:157-160` mode: error |
+| Q5 | [x] | [ ] | ESLint zero warnings | `run-lint` | `devbox.yaml:140-145`, cmd: `pnpm lint` |
+| Q6 | [x] | [x] | No copy-paste (≤5%) | `jscpd` | `devbox.yaml:162-168`, `defaults.yaml:137-140` threshold: 5% |
+| Q7 | [x] | [x] | Source files ≤400 lines | `source-size` | `devbox.yaml:170-202`, `defaults.yaml:91-93` max: 400 |
+| Q8 | [x] | [x] | Strict TypeScript | `run-typecheck` | `devbox.yaml:147-148`, cmd: `pnpm -r exec tsc --noEmit` |
+| Q9 | [ ] | [ ] | No dead exports | NEW: `dead-code` | `defaults.yaml:165-166` (mode: off), tool: ts-prune |
+| Q10 | [ ] | [ ] | No circular deps | NEW: `circular-deps` | `defaults.yaml:162-163` (mode: off), tool: madge |
 
 ---
 
 ## 4. Testing & Coverage — HIGH `docs/open-source/04-testing.md`
 
-| # | 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|---|-------------|-------------|
-| T1 | [x] | [x] | All tests pass | `run-tests` |
-| T2 | [x] | [ ] | Coverage ≥90% lines, ≥85% branches | `test-coverage` |
-| T3 | [x] | [x] | TDD enforced (new code needs tests) | `test-required` |
-| T4 | [x] | [x] | Unused deps detected | `dependency-check` |
-| T5 | [ ] | [ ] | E2E tests (Playwright) | NEW: `run-e2e` |
-| T6 | [ ] | [ ] | Property-based tests | (in `run-tests`) fast-check |
-| T7 | [ ] | [ ] | Mutation testing (≥80%) | NEW: `run-mutation` stryker |
+| # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
+|---|---|---|-------------|-------------|--------|
+| T1 | [x] | [x] | All tests pass | `run-tests` | `devbox.yaml:153-154`, cmd: `node devbox test` |
+| T2 | [x] | [ ] | Coverage ≥90% lines, ≥85% branches | `test-coverage` | `devbox.yaml:150-151`, mode: error, thresholds in test_modules |
+| T3 | [x] | [x] | TDD enforced (new code needs tests) | `test-required` | `devbox.yaml:118-136`, tdd: true |
+| T4 | [x] | [x] | Unused deps detected | `dependency-check` | `devbox.yaml:208`, `defaults.yaml:143-146` mode: error |
+| T5 | [ ] | [ ] | E2E tests (Playwright) | NEW: `run-e2e` | — needs new hook + Playwright config |
+| T6 | [ ] | [ ] | Property-based tests | (in `run-tests`) | — add fast-check to existing tests |
+| T7 | [ ] | [ ] | Mutation testing (≥80%) | NEW: `run-mutation` | — tool: stryker-mutator |
 
 ---
 
 ## 5. Documentation — MEDIUM `docs/open-source/05-documentation.md`
 
-| # | 🔧 | ✅ | Requirement | DevBox Hook |
-|---|---|---|-------------|-------------|
-| O1 | [x] | [x] | Markdown ≤200 lines | `markdown-size` |
-| O2 | [x] | [x] | No broken links in docs | `broken-links` |
-| O3 | [x] | [ ] | English-only code | `language-check` |
-| O4 | [x] | [x] | Docs have metrics | `metrics-required` |
+| # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
+|---|---|---|-------------|-------------|--------|
+| O1 | [x] | [x] | Markdown ≤200 lines | `markdown-size` | `devbox.yaml:54-76`, max_lines: 200 |
+| O2 | [x] | [x] | No broken links in docs | `broken-links` | `devbox.yaml:88-91`, `defaults.yaml:100-102` |
+| O3 | [x] | [ ] | English-only code | `language-check` | `devbox.yaml:78-86`, `defaults.yaml:95-98` |
+| O4 | [x] | [x] | Docs have metrics | `metrics-required` | `devbox.yaml:138`, `defaults.yaml:113-114` |
 
 ### Manual gates
 | # | ✅ | Gate |
@@ -115,13 +115,13 @@
 
 ## 6. CI/CD & DevEx — MEDIUM `docs/open-source/06-cicd.md`
 
-| # | 🔧 | ✅ | Requirement | DevBox Hook / CI |
-|---|---|---|-------------|------------------|
-| C1 | [ ] | [ ] | Prettier formatting | `prettier-check` (disabled) |
-| C2 | [ ] | [ ] | CodeQL security scanning | GitHub Actions |
-| C3 | [ ] | [ ] | Docker image scanning | NEW: CI `trivy` step |
-| C4 | [ ] | [ ] | Bundle size budget | NEW: `bundle-size` |
-| C5 | [ ] | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` |
+| # | 🔧 | ✅ | Requirement | DevBox Hook / CI | Config |
+|---|---|---|-------------|------------------|--------|
+| C1 | [ ] | [ ] | Prettier formatting | `prettier-check` | `devbox.yaml:115-116` mode: off, `defaults.yaml:104-105` |
+| C2 | [ ] | [ ] | CodeQL security scanning | GitHub Actions | — needs `.github/workflows/codeql.yml` |
+| C3 | [ ] | [ ] | Docker image scanning | NEW: CI `trivy` | — needs CI workflow step |
+| C4 | [ ] | [ ] | Bundle size budget | NEW: `bundle-size` | — tool: size-limit |
+| C5 | [ ] | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` | — tool: lhci (Lighthouse CI) |
 
 ### Manual gates
 | # | ✅ | Gate |
