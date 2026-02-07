@@ -138,8 +138,6 @@ hooks:
   metrics-required: {}
 
   run-lint:
-    mode: warning
-    blocking: false
     command: "pnpm lint"
     excludePaths:
       - "**/e2e/accessibility.spec.ts"
