@@ -87,15 +87,16 @@ export class TaskRepository {
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
+    const taskId = generateId('task');
     const newTask: Task = {
-      id: generateId('task'),
+      id: taskId,
       userId,
       name: taskData.name,
       description: taskData.description ?? null,
       speechSequences: taskData.speechSequences ?? [],
       entries: (taskData.speechEntries?.map((entry, index) => ({
         id: `entry_${Date.now()}_${index}`,
-        taskId: '',
+        taskId,
         text: entry.text,
         stressedText: entry.stressedText,
         audioUrl: null,
@@ -104,7 +105,7 @@ export class TaskRepository {
         createdAt: new Date()
       })) ?? taskData.speechSequences?.map((text, index) => ({
         id: `entry_${Date.now()}_${index}`,
-        taskId: '',
+        taskId,
         text,
         stressedText: text,
         audioUrl: null,
@@ -116,10 +117,6 @@ export class TaskRepository {
       updatedAt: new Date(),
       shareToken: this.shareService.generateShareToken()
     };
-
-    newTask.entries.forEach(entry => {
-      entry.taskId = newTask.id;
-    });
 
     const userTasks = await this.storage.loadUserTasks(userId);
     userTasks.push(newTask);
