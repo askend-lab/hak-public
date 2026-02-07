@@ -1,7 +1,16 @@
 {
   "name": "hak",
   "version": "0.1.1",
+  "description": "HAK - Estonian Language Learning Platform",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/askend-lab/hak.git"
+  },
+  "bugs": {
+    "url": "https://github.com/askend-lab/hak/issues"
+  },
+  "homepage": "https://github.com/askend-lab/hak#readme",
   "scripts": {
     "dx": "node devbox dx",
     "dx:cli": "node devbox",

@@ -1,0 +1,19 @@
+# Terraform Variables Example
+# Copy this file to terraform.tfvars and fill in your values
+
+# AWS Region
+aws_region = "eu-west-1"
+
+# Environment (dev, staging, prod)
+environment = "dev"
+
+# Domain configuration
+domain_name = "example.com"
+subdomain = "hak"
+
+# S3 bucket for Terraform state (must exist)
+# terraform_state_bucket = "your-terraform-state-bucket"
+
+# Tags
+project_name = "hak"
+owner = "your-team"

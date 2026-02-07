@@ -1,5 +1,4 @@
- 
-import { calculateHash } from '../src/hash';
+import { calculateHashSync } from '@hak/shared';
 
 import { MockS3Client, MockSQSClient } from './mocks';
 
@@ -36,13 +35,13 @@ export function setupTestEnv(): void {
 }
 
 export function setupCacheHit(mockS3: MockS3Client, text: string): string {
-  const hash = calculateHash(text);
+  const hash = calculateHashSync(text);
   mockS3.setFileExists(`cache/${hash}.mp3`, true);
   return hash;
 }
 
 export function setupCacheMiss(mockS3: MockS3Client, text: string): string {
-  const hash = calculateHash(text);
+  const hash = calculateHashSync(text);
   mockS3.setFileExists(`cache/${hash}.mp3`, false);
   return hash;
 }

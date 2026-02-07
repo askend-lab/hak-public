@@ -1,11 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-
 import { extractStressedText, extractVariants } from './parser';
 import { AnalyzeRequest, VariantsRequest, LambdaResponse } from './types';
 import { createResponse, ensureInitialized, parseJsonBody, validateField } from './validation';
 import { analyze } from './vmetajson';
 
-const MAX_TEXT_LENGTH = 10000;
+const { version } = require('../package.json') as { version: string };
+
+// Kept in sync with @hak/shared TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH
+const MAX_TEXT_LENGTH = 10_000;
 
 const HTTP_STATUS = {
   OK: 200,
@@ -71,6 +73,6 @@ export async function variantsHandler(event: APIGatewayProxyEvent): Promise<APIG
 export function healthHandler(): APIGatewayProxyResult {
   return createResponse(HTTP_STATUS.OK, {
     status: 'ok',
-    version: '1.0.0'
+    version
   });
 }

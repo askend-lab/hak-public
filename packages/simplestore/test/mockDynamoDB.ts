@@ -1,5 +1,12 @@
 import { StorageAdapter, StoreItem } from '../src/core/types';
 
+export class FailingDynamoDB implements StorageAdapter {
+  put(): Promise<void> { throw new Error('DB error'); }
+  get(): Promise<StoreItem | null> { throw new Error('DB error'); }
+  delete(): Promise<void> { throw new Error('DB error'); }
+  queryBySortKeyPrefix(): Promise<StoreItem[]> { throw new Error('DB error'); }
+}
+
 export class InMemoryDynamoDB implements StorageAdapter {
   private readonly items = new Map<string, StoreItem>();
 

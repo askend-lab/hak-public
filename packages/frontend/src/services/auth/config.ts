@@ -1,6 +1,8 @@
+const LOCAL_PORT = import.meta.env.VITE_PORT ?? '5181';
+
 export function getRedirectUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:5181/auth/callback';
+    return `http://localhost:${LOCAL_PORT}/auth/callback`;
   }
   if (hostname === 'hak-dev.askend-lab.com') {
     return 'https://hak-dev.askend-lab.com/auth/callback';
@@ -10,7 +12,7 @@ export function getRedirectUri(hostname: string = typeof window !== 'undefined' 
 
 export function getLogoutUri(hostname: string = typeof window !== 'undefined' ? window.location.hostname : 'localhost'): string {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:5181';
+    return `http://localhost:${LOCAL_PORT}`;
   }
   if (hostname === 'hak-dev.askend-lab.com') {
     return 'https://hak-dev.askend-lab.com';
@@ -18,6 +20,17 @@ export function getLogoutUri(hostname: string = typeof window !== 'undefined' ? 
   return 'https://hak.askend-lab.com';
 }
 
+/**
+ * PUBLIC OAuth Configuration
+ *
+ * These values are intentionally public (like OAuth client_id).
+ * Security is ensured by:
+ * - Cognito redirect URI whitelist
+ * - PKCE flow (code_verifier never leaves client)
+ * - No client_secret on frontend
+ *
+ * @see https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-idp-settings.html
+ */
 export const cognitoConfig = {
   region: 'eu-west-1',
   userPoolId: 'eu-west-1_wlRtuLkG2',

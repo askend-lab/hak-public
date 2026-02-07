@@ -1,0 +1,58 @@
+import { Component, ErrorInfo, ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('[ErrorBoundary] Uncaught error:', error, errorInfo);
+  }
+
+  override render(): ReactNode {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      return (
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2>Midagi läks valesti</h2>
+          <p style={{ color: '#666', marginTop: '0.5rem' }}>
+            {this.state.error?.message ?? 'Tekkis ootamatu viga'}
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false, error: null })}
+            style={{
+              marginTop: '1rem',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid #ccc',
+              cursor: 'pointer',
+              background: '#fff',
+            }}
+          >
+            Proovi uuesti
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}

@@ -30,12 +30,13 @@ export async function calculateHash(text: string): Promise<string> {
 
 /**
  * Synchronous hash for Node.js only (for backward compatibility)
+ * @deprecated Use async calculateHash() instead for ESM compatibility
  */
 export function calculateHashSync(text: string): string {
   if (!text || text.trim().length === 0) {
     throw new Error('Text cannot be empty');
   }
   
-  const crypto = require('node:crypto');
+  const crypto = require('node:crypto') as typeof import('node:crypto');
   return crypto.createHash('sha256').update(text).digest('hex');
 }

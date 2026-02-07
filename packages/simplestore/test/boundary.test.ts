@@ -5,10 +5,10 @@
 import { Store } from '../src/core/store';
 import { ServerContext } from '../src/core/types';
 import { validateStoreRequest, validateServerContext } from '../src/core/validation';
-import { InMemoryDynamoDB } from './mockDynamoDB';
+import { InMemoryAdapter } from '../src/adapters/memory';
 
 describe('Boundary Conditions', () => {
-  let db: InMemoryDynamoDB;
+  let db: InMemoryAdapter;
   const context: ServerContext = {
     app: 'testapp',
     tenant: 'tenant1',
@@ -17,7 +17,7 @@ describe('Boundary Conditions', () => {
   };
 
   beforeEach(() => {
-    db = new InMemoryDynamoDB();
+    db = new InMemoryAdapter();
   });
 
   describe('pk/sk with delimiter character #', () => {
@@ -152,6 +152,23 @@ describe('Boundary Conditions', () => {
   });
 
   describe('unicode characters', () => {
+    it('should handle Estonian characters (õ, ä, ö, ü)', async () => {
+      const store = new Store(db, context);
+      const result = await store.save({
+        pk: 'töötaja-ülesanne',
+        sk: 'öösäälane-õppetöö',
+        type: 'public',
+        ttl: 3600,
+        data: { eestiKeel: 'Tere päevast! Õhtu on käes.' }
+      });
+
+      expect(result.success).toBe(true);
+
+      const getResult = await store.get('töötaja-ülesanne', 'öösäälane-õppetöö', 'public');
+      expect(getResult.success).toBe(true);
+      expect(getResult.item?.data.eestiKeel).toBe('Tere päevast! Õhtu on käes.');
+    });
+
     it('should handle unicode in pk', async () => {
       const store = new Store(db, context);
       const result = await store.save({

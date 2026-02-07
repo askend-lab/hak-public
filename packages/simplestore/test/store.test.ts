@@ -1,17 +1,13 @@
 import { Store } from '../src/core/store';
-import { ServerContext, StoreRequest, StoreItem, StorageAdapter } from '../src/core/types';
+import { ServerContext, StoreRequest } from '../src/core/types';
 
-import { InMemoryDynamoDB } from './mockDynamoDB';
+import { InMemoryAdapter } from '../src/adapters/memory';
+import { FailingDynamoDB } from './mockDynamoDB';
 
-class FailingDynamoDB implements StorageAdapter {
-  put(): Promise<void> { throw new Error('DB error'); }
-  get(): Promise<StoreItem | null> { throw new Error('DB error'); }
-  delete(): Promise<void> { throw new Error('DB error'); }
-  queryBySortKeyPrefix(): Promise<StoreItem[]> { throw new Error('DB error'); }
-}
+const ONE_HOUR = 3600;
 
 describe('Store', () => {
-  let db: InMemoryDynamoDB;
+  let db: InMemoryAdapter;
   let store: Store;
   const context: ServerContext = {
     app: 'testapp',
@@ -21,7 +17,7 @@ describe('Store', () => {
   };
 
   beforeEach(() => {
-    db = new InMemoryDynamoDB();
+    db = new InMemoryAdapter();
     store = new Store(db, context);
   });
 
@@ -31,7 +27,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: { name: 'test' }
       };
 
@@ -78,7 +74,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'public',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       };
 
@@ -92,7 +88,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'public',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       };
 
@@ -115,6 +111,31 @@ describe('Store', () => {
       expect(result.success).toBe(true);
       expect(result.item?.data).toStrictEqual({});
     });
+
+    it('should preserve createdAt when updating existing item', async () => {
+      const request: StoreRequest = {
+        pk: 'entity1',
+        sk: 'sort1',
+        type: 'private',
+        ttl: ONE_HOUR,
+        data: { version: 1 }
+      };
+
+      const createResult = await store.save(request);
+      const originalCreatedAt = createResult.item?.createdAt;
+
+      // Wait a bit to ensure timestamps differ
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const updateResult = await store.save({
+        ...request,
+        data: { version: 2 }
+      });
+
+      expect(updateResult.success).toBe(true);
+      expect(updateResult.item?.createdAt).toStrictEqual(originalCreatedAt);
+      expect(updateResult.item?.data).toStrictEqual({ version: 2 });
+    });
   });
 
   describe('get', () => {
@@ -123,7 +144,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: { value: 42 }
       });
 
@@ -145,7 +166,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
@@ -161,7 +182,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
@@ -183,7 +204,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'public',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
@@ -200,9 +221,9 @@ describe('Store', () => {
 
   describe('query', () => {
     beforeEach(async () => {
-      await store.save({ pk: 'user-settings', sk: 'theme', type: 'private', ttl: 3600, data: { color: 'dark' } });
-      await store.save({ pk: 'user-settings', sk: 'lang', type: 'private', ttl: 3600, data: { lang: 'en' } });
-      await store.save({ pk: 'app-config', sk: 'v1', type: 'private', ttl: 3600, data: {} });
+      await store.save({ pk: 'user-settings', sk: 'theme', type: 'private', ttl: ONE_HOUR, data: { color: 'dark' } });
+      await store.save({ pk: 'user-settings', sk: 'lang', type: 'private', ttl: ONE_HOUR, data: { lang: 'en' } });
+      await store.save({ pk: 'app-config', sk: 'v1', type: 'private', ttl: ONE_HOUR, data: {} });
     });
 
     it('should query items by prefix', async () => {
@@ -239,7 +260,7 @@ describe('Store', () => {
         pk: 'entity1',
         sk: 'sort1',
         type: 'private',
-        ttl: 3600,
+        ttl: ONE_HOUR,
         data: {}
       });
 
@@ -266,6 +287,76 @@ describe('Store', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('DB error');
+    });
+  });
+
+  describe('concurrent access', () => {
+    it('should handle concurrent saves to different keys', async () => {
+      const promises = Array.from({ length: 10 }, (_, i) =>
+        store.save({
+          pk: `entity-${i}`,
+          sk: `sort-${i}`,
+          type: 'private',
+          ttl: ONE_HOUR,
+          data: { index: i }
+        })
+      );
+
+      const results = await Promise.all(promises);
+      results.forEach(r => expect(r.success).toBe(true));
+
+      // Verify all items were saved
+      for (let i = 0; i < 10; i++) {
+        const get = await store.get(`entity-${i}`, `sort-${i}`, 'private');
+        expect(get.success).toBe(true);
+        expect(get.item?.data.index).toBe(i);
+      }
+    });
+
+    it('should handle concurrent saves to the same key', async () => {
+      const promises = Array.from({ length: 5 }, (_, i) =>
+        store.save({
+          pk: 'shared-entity',
+          sk: 'shared-sort',
+          type: 'private',
+          ttl: ONE_HOUR,
+          data: { version: i }
+        })
+      );
+
+      const results = await Promise.all(promises);
+      results.forEach(r => expect(r.success).toBe(true));
+
+      // Last write wins
+      const get = await store.get('shared-entity', 'shared-sort', 'private');
+      expect(get.success).toBe(true);
+      expect(typeof get.item?.data.version).toBe('number');
+    });
+
+    it('should handle concurrent reads and writes', async () => {
+      await store.save({
+        pk: 'rw-entity',
+        sk: 'rw-sort',
+        type: 'private',
+        ttl: ONE_HOUR,
+        data: { initial: true }
+      });
+
+      const reads = Array.from({ length: 5 }, () =>
+        store.get('rw-entity', 'rw-sort', 'private')
+      );
+      const writes = Array.from({ length: 3 }, (_, i) =>
+        store.save({
+          pk: 'rw-entity',
+          sk: 'rw-sort',
+          type: 'private',
+          ttl: ONE_HOUR,
+          data: { version: i }
+        })
+      );
+
+      const allResults = await Promise.all([...reads, ...writes]);
+      allResults.forEach(r => expect(r.success).toBe(true));
     });
   });
 });

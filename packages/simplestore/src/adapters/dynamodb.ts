@@ -56,16 +56,27 @@ export class DynamoDBAdapter implements StorageAdapter {
   /**
    * Queries items by partition key with sort key prefix
    * Uses begins_with for efficient prefix matching
+   * Handles pagination to return all matching items
    */
   async queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]> {
-    const result = await this.docClient.send(new QueryCommand({
-      TableName: this.tableName,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :skPrefix)',
-      ExpressionAttributeValues: {
-        ':pk': pk,
-        ':skPrefix': skPrefix
-      }
-    }));
-    return (result.Items ?? []) as StoreItem[];
+    const allItems: StoreItem[] = [];
+    let lastEvaluatedKey: Record<string, unknown> | undefined;
+
+    do {
+      const result = await this.docClient.send(new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :skPrefix)',
+        ExpressionAttributeValues: {
+          ':pk': pk,
+          ':skPrefix': skPrefix
+        },
+        ExclusiveStartKey: lastEvaluatedKey
+      }));
+      
+      allItems.push(...((result.Items ?? []) as StoreItem[]));
+      lastEvaluatedKey = result.LastEvaluatedKey as Record<string, unknown> | undefined;
+    } while (lastEvaluatedKey);
+
+    return allItems;
   }
 }

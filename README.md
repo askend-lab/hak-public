@@ -19,7 +19,7 @@ The Estonian Institute of Language requested a helper application for learning E
 
 | Service | URL | Description |
 |---------|-----|-------------|
-| **Prototype** | http://localhost:3000/ | Visual/functional reference (code: `/home/alex/users/luna/eki`) |
+| **Prototype** | http://localhost:3000/ | Visual/functional reference |
 | **HAK App** | http://localhost:5180/ | Our production app with hot reload |
 
 ```bash
@@ -59,7 +59,5 @@ gh workflow run deploy-v2.yml -f environment=prod -f build_id=<BUILD_ID>
 ```
 
 ### URLs
-| Environment | Frontend | API |
-|-------------|----------|-----|
-| Dev | https://hak-dev.askend-lab.com | https://hak-api-dev.askend-lab.com |
-| Prod | https://hak.askend-lab.com | https://hak-api.askend-lab.com |
+
+URLs are configured per environment in the deployment workflow. See `.env.example` for local configuration.

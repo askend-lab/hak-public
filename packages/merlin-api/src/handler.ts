@@ -19,7 +19,7 @@ interface SynthesizeRequest {
 
 function generateCacheKey(text: string, voice: string, speed: number, pitch: number): string {
   const input = `${text}|${voice}|${speed}|${pitch}`;
-  return createHash('md5').update(input).digest('hex');
+  return createHash('sha256').update(input).digest('hex');
 }
 
 async function checkS3Cache(cacheKey: string): Promise<boolean> {
@@ -48,16 +48,27 @@ interface LambdaResponse {
   body: string;
 }
 
+const CORS_HEADERS = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+} as const;
+
+function createResponse(statusCode: number, body: object): LambdaResponse {
+  return {
+    statusCode,
+    headers: { ...CORS_HEADERS },
+    body: JSON.stringify(body)
+  };
+}
+
 export async function synthesize(event: { body?: string }): Promise<LambdaResponse> {
   try {
     const body: SynthesizeRequest = JSON.parse(event.body ?? '{}');
     
     if (!body.text) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing text field' })
-      };
+      return createResponse(400, { error: 'Missing text field' });
     }
 
     const voice = body.voice ?? 'efm_l';
@@ -68,15 +79,11 @@ export async function synthesize(event: { body?: string }): Promise<LambdaRespon
     // Check if already cached
     const cached = await checkS3Cache(cacheKey);
     if (cached) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'ready',
-          cacheKey,
-          audioUrl: `https://${S3_BUCKET}.s3.eu-west-1.amazonaws.com/cache/${cacheKey}.wav`
-        })
-      };
+      return createResponse(200, {
+        status: 'ready',
+        cacheKey,
+        audioUrl: `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? 'eu-west-1'}.amazonaws.com/cache/${cacheKey}.wav`
+      });
     }
 
     // Send to SQS for processing
@@ -88,22 +95,14 @@ export async function synthesize(event: { body?: string }): Promise<LambdaRespon
       cacheKey
     });
 
-    return {
-      statusCode: 202,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        status: 'processing',
-        cacheKey,
-        audioUrl: `https://${S3_BUCKET}.s3.eu-west-1.amazonaws.com/cache/${cacheKey}.wav`
-      })
-    };
+    return createResponse(202, {
+      status: 'processing',
+      cacheKey,
+      audioUrl: `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? 'eu-west-1'}.amazonaws.com/cache/${cacheKey}.wav`
+    });
   } catch (error) {
     console.error('Synthesize error:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal server error' })
-    };
+    return createResponse(500, { error: 'Internal server error' });
   }
 }
 
@@ -112,52 +111,41 @@ export async function status(event: { pathParameters?: { cacheKey?: string } }):
     const cacheKey = event.pathParameters?.cacheKey;
     
     if (!cacheKey) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing cacheKey' })
-      };
+      return createResponse(400, { error: 'Missing cacheKey' });
     }
 
     const ready = await checkS3Cache(cacheKey);
     
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        status: ready ? 'ready' : 'processing',
-        cacheKey,
-        audioUrl: ready ? `https://${S3_BUCKET}.s3.eu-west-1.amazonaws.com/cache/${cacheKey}.wav` : null
-      })
-    };
+    return createResponse(200, {
+      status: ready ? 'ready' : 'processing',
+      cacheKey,
+      audioUrl: ready ? `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? 'eu-west-1'}.amazonaws.com/cache/${cacheKey}.wav` : null
+    });
   } catch (error) {
     console.error('Status error:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal server error' })
-    };
+    return createResponse(500, { error: 'Internal server error' });
   }
 }
 
 export async function health(): Promise<LambdaResponse> {
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: 'ok', version: '1.0.0' })
-  };
+  return createResponse(200, { status: 'ok', version: '1.0.0' });
 }
 
+const WARMUP_COOLDOWN_MS = 60_000;
+let lastWarmupTime = 0;
+
 export async function warmup(): Promise<LambdaResponse> {
+  const now = Date.now();
+  if (now - lastWarmupTime < WARMUP_COOLDOWN_MS) {
+    return createResponse(429, { error: 'Rate limited. Try again later.', retryAfterMs: WARMUP_COOLDOWN_MS - (now - lastWarmupTime) });
+  }
+  lastWarmupTime = now;
+
   const cluster = process.env.ECS_CLUSTER ?? '';
   const service = process.env.ECS_SERVICE ?? '';
 
   if (!cluster || !service) {
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Missing ECS config' })
-    };
+    return createResponse(500, { error: 'Missing ECS config' });
   }
 
   try {
@@ -171,11 +159,7 @@ export async function warmup(): Promise<LambdaResponse> {
     const running = describe.services?.[0]?.runningCount ?? 0;
 
     if (currentDesired >= 1) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'already_warm', running, desired: currentDesired })
-      };
+      return createResponse(200, { status: 'already_warm', running, desired: currentDesired });
     }
 
     // Scale up to 1
@@ -185,17 +169,9 @@ export async function warmup(): Promise<LambdaResponse> {
       desiredCount: 1
     }));
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'warming', running: 0, desired: 1 })
-    };
+    return createResponse(200, { status: 'warming', running: 0, desired: 1 });
   } catch (error) {
     console.error('Warmup error:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Failed to warmup' })
-    };
+    return createResponse(500, { error: 'Failed to warmup' });
   }
 }

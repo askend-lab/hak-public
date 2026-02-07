@@ -1,9 +1,9 @@
-import { calculateHash } from '../src/hash';
+import { calculateHashSync } from '@hak/shared';
 
 describe('Hash Calculation', () => {
   it('should calculate SHA-256 hash for simple text input', () => {
     const text = 'tere';
-    const hash = calculateHash(text);
+    const hash = calculateHashSync(text);
     
     expect(hash).toBeDefined();
     expect(typeof hash).toBe('string');
@@ -13,13 +13,13 @@ describe('Hash Calculation', () => {
 
   it('should return consistent results for same input', () => {
     const text = 'tere';
-    const hash1 = calculateHash(text);
-    const hash2 = calculateHash(text);
+    const hash1 = calculateHashSync(text);
+    const hash2 = calculateHashSync(text);
     
     expect(hash1).toBe(hash2);
   });
 
   it('should throw error on empty input', () => {
-    expect(() => calculateHash('')).toThrow(/Text cannot be empty/);
+    expect(() => calculateHashSync('')).toThrow(/Text cannot be empty/);
   });
 });

@@ -3,6 +3,10 @@ import { SimpleStoreAdapter } from '../storage/SimpleStoreAdapter';
 import { MockDataLoader } from '../storage/MockDataLoader';
 import { ShareService } from '../storage/ShareService';
 
+function generateId(prefix: string): string {
+  return `${prefix}_${crypto.randomUUID()}`;
+}
+
 export class TaskRepository {
   constructor(
     private storage: SimpleStoreAdapter,
@@ -22,8 +26,8 @@ export class TaskRepository {
       .map(task => ({
         ...task,
         entries: [
-          ...(task.entries || []),
-          ...(baselineAdditions[task.id] || [])
+          ...(task.entries ?? []),
+          ...(baselineAdditions[task.id] ?? [])
         ]
       }));
 
@@ -73,8 +77,8 @@ export class TaskRepository {
       return {
         ...baselineTask,
         entries: [
-          ...(baselineTask.entries || []),
-          ...(baselineAdditions[taskId] || [])
+          ...(baselineTask.entries ?? []),
+          ...(baselineAdditions[taskId] ?? [])
         ]
       };
     }
@@ -83,39 +87,36 @@ export class TaskRepository {
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
+    const taskId = generateId('task');
     const newTask: Task = {
-      id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      id: taskId,
       userId,
       name: taskData.name,
       description: taskData.description ?? null,
-      speechSequences: taskData.speechSequences || [],
-      entries: taskData.speechEntries?.map((entry, index) => ({
+      speechSequences: taskData.speechSequences ?? [],
+      entries: (taskData.speechEntries?.map((entry, index) => ({
         id: `entry_${Date.now()}_${index}`,
-        taskId: '',
+        taskId,
         text: entry.text,
         stressedText: entry.stressedText,
         audioUrl: null,
         audioBlob: null,
         order: index + 1,
         createdAt: new Date()
-      })) || taskData.speechSequences?.map((text, index) => ({
+      })) ?? taskData.speechSequences?.map((text, index) => ({
         id: `entry_${Date.now()}_${index}`,
-        taskId: '',
+        taskId,
         text,
         stressedText: text,
         audioUrl: null,
         audioBlob: null,
         order: index + 1,
         createdAt: new Date()
-      })) || [],
+      }))) ?? [],
       createdAt: new Date(),
       updatedAt: new Date(),
       shareToken: this.shareService.generateShareToken()
     };
-
-    newTask.entries.forEach(entry => {
-      entry.taskId = newTask.id;
-    });
 
     const userTasks = await this.storage.loadUserTasks(userId);
     userTasks.push(newTask);
@@ -152,10 +153,10 @@ export class TaskRepository {
 
     if (baselineTask) {
       const baselineAdditions = await this.storage.loadBaselineTaskAdditions(userId);
-      const additionalEntries = baselineAdditions[taskId] || [];
+      const additionalEntries = baselineAdditions[taskId] ?? [];
 
       const mergedEntries = [
-        ...(baselineTask.entries || []),
+        ...(baselineTask.entries ?? []),
         ...additionalEntries
       ];
 
@@ -164,7 +165,7 @@ export class TaskRepository {
         userId,
         entries: mergedEntries,
         ...updates,
-        id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+        id: generateId('task'),
         updatedAt: new Date(),
         shareToken: this.shareService.generateShareToken()
       };
@@ -215,13 +216,13 @@ export class TaskRepository {
     const userTasks = await this.storage.loadUserTasks(userId);
     const isUserTask = userTasks.some(t => t.id === taskId);
     
-    const currentEntries = task.entries || [];
+    const currentEntries = task.entries ?? [];
     const maxOrder = currentEntries.length > 0 ? Math.max(...currentEntries.map(e => e.order)) : 0;
     
     const newEntries: TaskEntry[] = textEntries.map((entry, index) => {
       const isStringEntry = typeof entry === 'string';
       return {
-        id: `entry_${Date.now()}_${index}_${Math.random().toString(36).substring(2, 11)}`,
+        id: generateId('entry'),
         taskId,
         text: isStringEntry ? entry : entry.text,
         stressedText: isStringEntry ? entry : entry.stressedText,
@@ -236,13 +237,13 @@ export class TaskRepository {
       const updatedEntries = [...currentEntries, ...newEntries];
       await this.updateTask(userId, taskId, { 
         entries: updatedEntries,
-        speechSequences: [...(task.speechSequences || []), ...textEntries.map(entry => 
+        speechSequences: [...(task.speechSequences ?? []), ...textEntries.map(entry => 
           typeof entry === 'string' ? entry : entry.text
         )]
       });
     } else {
       const baselineAdditions = await this.storage.loadBaselineTaskAdditions(userId);
-      const existingAdditions = baselineAdditions[taskId] || [];
+      const existingAdditions = baselineAdditions[taskId] ?? [];
       baselineAdditions[taskId] = [...existingAdditions, ...newEntries];
       await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
     }
@@ -287,7 +288,7 @@ export class TaskRepository {
         if (entryIndex < baselineEntryCount) {
           await this.updateTask(userId, taskId, { entries: updatedEntries });
         } else {
-          const additions = baselineAdditions[taskId] || [];
+          const additions = baselineAdditions[taskId] ?? [];
           const additionIndex = entryIndex - baselineEntryCount;
           if (additionIndex >= 0 && additionIndex < additions.length) {
             additions[additionIndex] = updatedEntry;
