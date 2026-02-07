@@ -1,8 +1,10 @@
+/** Maximum text length limits for various API endpoints */
 export const TEXT_LIMITS = {
   MAX_AUDIO_TEXT_LENGTH: 1000,
   MAX_MORPHOLOGY_TEXT_LENGTH: 10000,
 } as const;
 
+/** Timing constants for polling, retries, and UI notifications */
 export const TIMING = {
   POLL_INTERVAL_MS: 1000,
   ERROR_RETRY_DELAY_MS: 5000,
