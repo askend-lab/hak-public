@@ -1,7 +1,7 @@
 # Open Source Preparation Plan
 
 > **Goal**: Prepare HAK for public open source release.
-> **Master plan**: [`OPEN_SOURCE_MASTER_PLAN.md`](../../OPEN_SOURCE_MASTER_PLAN.md) (root)
+> **Master plan**: [`MASTER_PLAN.md`](./MASTER_PLAN.md)
 
 ## Methodology
 
