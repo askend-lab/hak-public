@@ -497,10 +497,6 @@ importers:
         version: 5.9.3
 
   packages/vabamorf-api:
-    dependencies:
-      '@hak/shared':
-        specifier: workspace:*
-        version: link:../shared
     devDependencies:
       '@types/aws-lambda':
         specifier: ^8.10.130

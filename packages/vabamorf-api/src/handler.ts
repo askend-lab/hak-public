@@ -1,6 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { TEXT_LIMITS } from '@hak/shared';
-
 import { extractStressedText, extractVariants } from './parser';
 import { AnalyzeRequest, VariantsRequest, LambdaResponse } from './types';
 import { createResponse, ensureInitialized, parseJsonBody, validateField } from './validation';
@@ -8,7 +6,8 @@ import { analyze } from './vmetajson';
 
 const { version } = require('../package.json') as { version: string };
 
-const MAX_TEXT_LENGTH = TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH;
+// Kept in sync with @hak/shared TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH
+const MAX_TEXT_LENGTH = 10_000;
 
 const HTTP_STATUS = {
   OK: 200,
