@@ -74,7 +74,7 @@
 
 ### Frontend
 - [x] **FE-01** `frontend/services/auth/config.ts` — Move hardcoded ports to env var
-- [ ] **FE-02** `frontend/services/repository/TaskRepository.ts` — Don't mutate objects after creation
+- [x] **FE-02** `frontend/services/repository/TaskRepository.ts` — Don't mutate objects after creation
 - [ ] **FE-03** `frontend/src/components/` — Add Storybook for visual component testing
 - [ ] **FE-04** `frontend/src/components/` — Add accessibility attributes (aria-label, role)
 - [ ] **FE-05** `frontend/src/` — Add React Query or SWR for data fetching
@@ -94,7 +94,7 @@
 - [ ] **STYLE-02** `shared/src/` — Add JSDoc to all public exports
 - [x] **STYLE-03** `simplestore/test/store.test.ts` — Extract `3600` to `ONE_HOUR` constant
 - [x] **STYLE-04** `simplestore/test/store.test.ts` — Move `FailingDynamoDB` to mockDynamoDB.ts
-- [ ] **STYLE-05** `simplestore/test/handler.test.ts` — Improve test names to be more specific
+- [x] **STYLE-05** `simplestore/test/handler.test.ts` — Improve test names to be more specific
 - [ ] **STYLE-06** `simplestore/test/handler.test.ts` — Remove duplicate tests for `{}` vs `null` params
 - [x] **STYLE-07** `audio-api/src/handler.ts` — Use `TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH` directly
 - [x] **STYLE-08** `vabamorf-api/src/handler.ts` — Read version from package.json
