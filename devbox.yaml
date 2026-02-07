@@ -200,4 +200,7 @@ hooks:
 
   no-floating-promises: {}
 
+  license-check:
+    mode: error
+
 # final

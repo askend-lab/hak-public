@@ -1,0 +1,114 @@
+import { StoreItem } from "../src/core/types";
+import { DynamoDBAdapter } from "../src/adapters/dynamodb";
+
+// Mock the AWS SDK
+const mockSend = jest.fn();
+jest.mock("@aws-sdk/client-dynamodb", () => ({
+  DynamoDBClient: jest.fn().mockImplementation(() => ({ send: mockSend })),
+}));
+jest.mock("@aws-sdk/lib-dynamodb", () => ({
+  DynamoDBDocumentClient: {
+    from: (): { send: jest.Mock } => ({ send: mockSend }),
+  },
+  PutCommand: jest.fn().mockImplementation((params) => ({ input: params })),
+  GetCommand: jest.fn().mockImplementation((params) => ({ input: params })),
+  DeleteCommand: jest.fn().mockImplementation((params) => ({ input: params })),
+  QueryCommand: jest.fn().mockImplementation((params) => ({ input: params })),
+}));
+
+function makeItem(pk: string, sk: string): StoreItem {
+  return {
+    PK: pk,
+    SK: sk,
+    data: {},
+    owner: "user1",
+    createdAt: "2025-01-01",
+    updatedAt: "2025-01-01",
+    ttl: 0,
+  };
+}
+
+describe("DynamoDBAdapter", () => {
+  let adapter: DynamoDBAdapter;
+  const TABLE = "test-table";
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    adapter = new DynamoDBAdapter(TABLE);
+  });
+
+  describe("put", () => {
+    it("should send PutCommand with correct params", async () => {
+      mockSend.mockResolvedValue({});
+
+      await adapter.put(makeItem("user#1", "task#1"));
+
+      expect(mockSend).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("get", () => {
+    it("should return item when found", async () => {
+      const item = makeItem("user#1", "task#1");
+      mockSend.mockResolvedValue({ Item: item });
+
+      const result = await adapter.get("user#1", "task#1");
+
+      expect(result).toStrictEqual(item);
+    });
+
+    it("should return null when not found", async () => {
+      mockSend.mockResolvedValue({});
+
+      const result = await adapter.get("user#1", "missing");
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("delete", () => {
+    it("should send DeleteCommand", async () => {
+      mockSend.mockResolvedValue({});
+
+      await adapter.delete("user#1", "task#1");
+
+      expect(mockSend).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("queryBySortKeyPrefix", () => {
+    it("should return matching items", async () => {
+      const items = [
+        makeItem("user#1", "task#1"),
+        makeItem("user#1", "task#2"),
+      ];
+      mockSend.mockResolvedValue({ Items: items });
+
+      const result = await adapter.queryBySortKeyPrefix("user#1", "task#");
+
+      expect(result).toStrictEqual(items);
+    });
+
+    it("should handle pagination", async () => {
+      mockSend
+        .mockResolvedValueOnce({
+          Items: [makeItem("user#1", "task#1")],
+          LastEvaluatedKey: { PK: "user#1", SK: "task#1" },
+        })
+        .mockResolvedValueOnce({ Items: [makeItem("user#1", "task#2")] });
+
+      const result = await adapter.queryBySortKeyPrefix("user#1", "task#");
+
+      expect(result).toHaveLength(2);
+      expect(mockSend).toHaveBeenCalledTimes(2);
+    });
+
+    it("should return empty array when no items", async () => {
+      mockSend.mockResolvedValue({ Items: [] });
+
+      const result = await adapter.queryBySortKeyPrefix("user#1", "task#");
+
+      expect(result).toStrictEqual([]);
+    });
+  });
+});

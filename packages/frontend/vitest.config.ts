@@ -54,6 +54,8 @@ export default defineConfig({
         "src/services/auth/index.ts",
         "src/services/auth/types.ts",
         "src/utils/a11y-dev.ts",
+        "src/services/__mocks__/**",
+        "src/data/markerData.ts",
       ],
       reportOnFailure: true,
     },
