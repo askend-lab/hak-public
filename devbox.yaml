@@ -75,8 +75,6 @@ hooks:
       - "audits/**"
 
   language-check:
-    mode: warning
-    blocking: false
     excludePaths:
       - "**/drafts/**"
       - "**/test/fixtures/**"
