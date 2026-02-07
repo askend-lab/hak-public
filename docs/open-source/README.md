@@ -19,10 +19,25 @@
 | 7 | [Infrastructure & DevEx](./07-infra-devex.md) | Phase 5 | MEDIUM |
 | 8 | [Launch Checklist](./08-launch-checklist.md) | Phase 6 | HIGH |
 
+## Approach: Verify First, Fix Second
+
+> **Before fixing anything, define HOW we verify each requirement.**
+> If we can't verify it, we can't claim compliance.
+
+See: [Verification Approach](./checklists/00-verification-approach.md) — maps every standard to its tool/method.
+See: [Verification Pipeline](./checklists/00-verification-pipeline.md) — step-by-step setup for each tool.
+
+**Phase 0** (before all other phases):
+1. Set up verification tools (CI gates, linters, scanners)
+2. Confirm each tool catches violations (negative tests)
+3. Baseline current state (how many violations per standard)
+4. Then start fixing — with confidence that fixes are verified
+
 ## Phase Order
 
+0. **Verification Pipeline** — set up all tools and CI gates first
 1. **Security & Secrets** — must be done before any public access
-2. **Internal Decoupling** — code must be self-contained, no references to internal tools
+2. **Internal Decoupling** — code must be self-contained
 3. **Code Quality** — code must be exemplary, diamond-clean
 4. **Documentation** — essential for community adoption
 5. **Polish** — CI/CD, DevEx, accessibility, performance
