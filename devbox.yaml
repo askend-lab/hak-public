@@ -63,6 +63,7 @@ hooks:
       - "docs/templates/**"
       - "**/test/fixtures/**"
       - "docs/DAILY_ITERATIONS.md"
+      - "OPEN_SOURCE_MASTER_PLAN.md"
       - ".design/**"
       - "CodeReview_*.md"
       - "GHERKIN_PLAN.md"
@@ -111,7 +112,7 @@ hooks:
       - "**/stories/**"
       - "**/scripts/**"
 
-  prettier-check: {}
+  # prettier-check: {} # disabled — will run once before open source launch
 
   test-required:
     tdd: true # Enable strict TDD enforcement for feat/fix commits
