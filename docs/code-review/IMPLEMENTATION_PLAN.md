@@ -51,7 +51,7 @@
 
 ### Error Handling & Validation
 - [x] **ERR-01** `simplestore/src/core/validation.ts` — Add max length validation for pk/sk
-- [ ] **ERR-02** `simplestore/src/lambda/routes.ts` — Return specific error for anonymous user ID
+- [x] **ERR-02** `simplestore/src/lambda/handler.ts` — Return specific error for anonymous user ID
 - [x] **ERR-03** `audio-api/src/sqs.ts` — Add retry logic with exponential backoff
 - [x] **ERR-04** `audio-api/src/s3.ts` — Replace unsafe cast with type guard
 - [ ] **ERR-05** `frontend/services/auth/context.tsx` — Add JWT signature verification or server-side validation
