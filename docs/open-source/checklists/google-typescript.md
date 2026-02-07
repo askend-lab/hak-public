@@ -1,56 +1,50 @@
 # Google TypeScript Style Guide — Checklist
 
 > https://google.github.io/styleguide/tsguide.html
-> Google's internal TypeScript conventions applied to HAK.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## Type System
-- [ ] No `any` type (currently 0 in source — maintain with `@typescript-eslint/no-explicit-any: error`)
-- [ ] No type assertions (`as`) without runtime validation — audit all `as` casts in codebase
-- [ ] Use `unknown` instead of `any` for values of unknown type
-- [ ] Prefer interfaces over type aliases for object shapes
-- [ ] Use union types over enums (Google preference; evaluate for HAK)
-- [ ] Enable `noUncheckedIndexedAccess` for safer array/object access
+- [ ] check · [ ] done — No `any` type (`no-any` DevBox hook)
+- [ ] check · [ ] done — No `as` assertions without runtime validation (`run-lint`)
+- [ ] check · [ ] done — Use `unknown` instead of `any` for unknowns (`no-any` hook)
+- [ ] check · [ ] done — Prefer interfaces for object shapes (`run-lint` — style rule)
+- [ ] check · [ ] done — Enable `noUncheckedIndexedAccess` (`run-typecheck`)
 
 ## Naming
-- [ ] `PascalCase` for types, interfaces, classes, enums
-- [ ] `camelCase` for variables, functions, methods, properties
-- [ ] `UPPER_SNAKE_CASE` for constants and enum values
-- [ ] No `I` prefix on interfaces (e.g., `Config` not `IConfig`)
-- [ ] No `_` prefix for private members (use TypeScript `private`)
+- [ ] check · [ ] done — PascalCase for types/interfaces/classes (`run-lint` — naming convention)
+- [ ] check · [ ] done — camelCase for variables/functions/methods (`run-lint`)
+- [ ] check · [ ] done — UPPER_SNAKE_CASE for constants (`run-lint`)
+- [ ] check · [ ] done — No `I` prefix on interfaces (`run-lint`)
 
 ## Imports
-- [ ] No default exports (prefer named exports for better refactoring)
-- [ ] No barrel files (`index.ts` re-exporting everything) — or use sparingly
-- [ ] Import paths use the module path, not relative `../../` chains
-- [ ] No circular imports (verify with `madge --circular`)
+- [ ] check · [ ] done — No default exports — prefer named (`run-lint` — import rule)
+- [ ] check · [ ] done — No circular imports (`madge --circular`)
+- [ ] check · [ ] done — Consistent import order (`import-order` DevBox hook)
 
 ## Functions
-- [ ] Explicit return types on all exported functions
-- [ ] Prefer arrow functions for callbacks
-- [ ] No function overloads with different return types
-- [ ] Default parameters preferred over optional parameters where appropriate
+- [ ] check · [ ] done — Explicit return types on exported functions (`run-lint`)
+- [ ] check · [ ] done — Prefer arrow functions for callbacks (`run-lint`)
 
 ## Classes
-- [ ] Explicit visibility modifiers (`public`, `private`, `protected`)
-- [ ] `readonly` on properties that don't change after construction
-- [ ] `override` keyword on overridden methods (already fixed for `ErrorBoundary`)
-- [ ] Prefer composition over inheritance
+- [ ] check · [ ] done — Explicit visibility modifiers (`run-lint`)
+- [ ] check · [ ] done — `readonly` on immutable properties (`run-lint`)
+- [ ] check · [ ] done — `override` on overridden methods (`run-typecheck` — noImplicitOverride)
+- [ ] check · [ ] done — Prefer composition over inheritance (`code review`)
 
 ## Error Handling
-- [ ] Use custom error classes extending `Error` (not bare `throw 'message'`)
-- [ ] Every `catch` block types the error as `unknown` (TS 4.4+ default with `useUnknownInCatchVariables`)
-- [ ] No empty `catch` blocks
-- [ ] All Promises have error handling (`catch` or try-catch with await)
-- [ ] `@typescript-eslint/no-floating-promises: error` enforced
+- [ ] check · [ ] done — Custom error classes extend `Error` (`run-lint`)
+- [ ] check · [ ] done — `catch` types error as `unknown` (`run-typecheck` — strict)
+- [ ] check · [ ] done — No empty `catch` blocks (`run-lint` — `no-empty`)
+- [ ] check · [ ] done — All Promises have error handling (`no-floating-promises` hook)
 
 ## Null Handling
-- [ ] No non-null assertions (`!`) — use type narrowing or early return
-- [ ] Prefer nullish coalescing (`??`) over `||` for default values
-- [ ] Prefer optional chaining (`?.`) over manual null checks
-- [ ] `strictNullChecks: true` in tsconfig (included in `strict: true`)
+- [ ] check · [ ] done — No non-null assertions `!` (`run-lint` — `no-non-null-assertion`)
+- [ ] check · [ ] done — Use `??` over `||` for defaults (`run-lint`)
+- [ ] check · [ ] done — Use `?.` for optional chaining (`run-lint`)
+- [ ] check · [ ] done — `strictNullChecks: true` (`run-typecheck` — `strict: true`)
 
 ## Comments
-- [ ] JSDoc on all exported functions with `@param`, `@returns`, `@throws`
-- [ ] No commented-out code (use version control)
-- [ ] TODO comments have associated issue numbers
-- [ ] No `@ts-ignore` — use `@ts-expect-error` with explanation if absolutely necessary
+- [ ] check · [ ] done — JSDoc on all exported functions (`run-lint` — jsdoc rule)
+- [ ] check · [ ] done — No commented-out code (`run-lint`)
+- [ ] check · [ ] done — TODOs have issue numbers (`run-lint` — custom rule)
+- [ ] check · [ ] done — No `@ts-ignore` — use `@ts-expect-error` (`run-lint`)

@@ -1,61 +1,52 @@
 # NASA JPL Power of Ten Rules — Checklist
 
 > https://spinroot.com/gerard/pdf/P10.pdf
-> 10 rules for safety-critical code, adapted for TypeScript/Node.js.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## Rule 1: Avoid Complex Flow Constructs
-- [ ] No `goto` (N/A in TypeScript)
-- [ ] No unstructured recursion — audit all recursive calls, ensure they have provable termination
-- [ ] No deeply nested callbacks — use async/await consistently
-- [ ] Maximum cyclomatic complexity per function enforced via ESLint (`complexity` rule)
+- [ ] check · [ ] done — No unstructured recursion (`run-lint` — ESLint `no-restricted-syntax`)
+- [ ] check · [ ] done — No deeply nested callbacks — async/await (`run-lint` — `max-depth`)
+- [ ] check · [ ] done — Cyclomatic complexity enforced (`run-lint` — `complexity: 8`)
 
 ## Rule 2: All Loops Must Have Fixed Upper Bounds
-- [ ] All `for` loops have explicit bounds
-- [ ] All `while` loops have a maximum iteration guard
-- [ ] Async retry patterns have maximum retry count (audit Lambda handlers)
-- [ ] `vmetajson` request queue has bounded size
+- [ ] check · [ ] done — All loops have explicit bounds (`run-lint` + code review)
+- [ ] check · [ ] done — Retry patterns have max retry count (`run-tests`)
+- [ ] check · [ ] done — vmetajson queue has bounded size (`run-tests`)
 
-## Rule 3: No Dynamic Memory Allocation After Initialization
-- [ ] Lambda handlers initialize resources at module level (not per-request)
-- [ ] No unbounded array growth during request processing
-- [ ] S3/DynamoDB clients created once at module scope (verified)
-- [ ] vmetajson process pool has fixed size
+## Rule 3: No Dynamic Memory Allocation After Init
+- [ ] check · [ ] done — Lambda resources init at module level (`code review`)
+- [ ] check · [ ] done — No unbounded array growth per-request (`code review`)
+- [ ] check · [ ] done — AWS clients created once at module scope (`run-tests`)
 
 ## Rule 4: No Function Longer Than 60 Lines
-- [ ] Current ESLint limit: 50 lines (stricter than NASA — good)
-- [ ] Verify zero violations: `SRC-SIZE` hook passes
-- [ ] Every function fits on one printed page
+- [ ] check · [ ] done — ESLint max 50 lines (stricter than NASA) (`source-size` hook)
+- [ ] check · [ ] done — Zero violations in `SRC-SIZE` hook (`run-tests` — devbox output)
 
 ## Rule 5: Minimum Two Assertions Per Function
-- [ ] Input validation at function entry (parameter validation)
-- [ ] Return value checks on all external calls (AWS SDK, child_process)
-- [ ] Add runtime assertions for invariants in critical paths
-- [ ] Consider `zod` schemas for runtime type validation at API boundaries
+- [ ] check · [ ] done — Input validation at function entry (`run-tests`)
+- [ ] check · [ ] done — Return value checks on external calls (`run-lint` + `run-tests`)
+- [ ] check · [ ] done — Consider zod schemas at API boundaries (`code review`)
 
 ## Rule 6: Data Objects at Smallest Possible Scope
-- [ ] Variables declared at point of first use (ESLint `no-var`, `prefer-const`)
-- [ ] No global mutable state (all state in function scope or immutable constants)
-- [ ] Module-level variables are `const` only (enforced by ESLint)
+- [ ] check · [ ] done — `prefer-const`, no `var` (`run-lint` — ESLint rules)
+- [ ] check · [ ] done — No global mutable state (`run-lint` — `no-var`)
+- [ ] check · [ ] done — Module-level variables are `const` only (`run-lint`)
 
 ## Rule 7: Check Return Values of All Non-Void Functions
-- [ ] All AWS SDK calls have error handling (try-catch or `.catch()`)
-- [ ] All `JSON.parse()` calls wrapped in try-catch
-- [ ] `child_process.spawn` exit codes checked
-- [ ] No ignored Promise rejections (`@typescript-eslint/no-floating-promises`)
+- [ ] check · [ ] done — All AWS SDK calls have error handling (`no-floating-promises` hook)
+- [ ] check · [ ] done — All `JSON.parse` in try-catch (`run-tests`)
+- [ ] check · [ ] done — `child_process` exit codes checked (`run-tests`)
+- [ ] check · [ ] done — No ignored Promise rejections (`no-floating-promises` hook)
 
 ## Rule 8: Restrict Preprocessor Use
-- [ ] No `#define` equivalent (N/A in TypeScript)
-- [ ] Conditional compilation via environment variables is simple and documented
-- [ ] Build-time constants use `VITE_*` env vars (not complex transforms)
+- [ ] check · [ ] done — Build-time constants via `VITE_*` env vars only (`code review`)
 
-## Rule 9: Restrict Pointer Use
-- [ ] No raw pointer manipulation (N/A in TypeScript)
-- [ ] TypeScript equivalent: no `as any` casts (currently 0 — maintain)
-- [ ] No `as` type assertions without runtime validation
-- [ ] No non-null assertions (`!`) — enforced by ESLint rule
+## Rule 9: Restrict Pointer Use (TypeScript equivalent)
+- [ ] check · [ ] done — No `as any` casts — currently 0 (`no-any` hook)
+- [ ] check · [ ] done — No `as` assertions without runtime validation (`run-lint`)
+- [ ] check · [ ] done — No non-null assertions `!` (`run-lint` — `no-non-null-assertion`)
 
 ## Rule 10: Compile with All Warnings Enabled, Zero Warnings
-- [ ] `tsconfig.json` has `strict: true` (verified)
-- [ ] ESLint runs with zero warnings, zero errors
-- [ ] TypeScript `noEmit` compilation has zero errors
-- [ ] All CI quality gates pass with zero tolerance
+- [ ] check · [ ] done — `tsconfig.json` has `strict: true` (`run-typecheck` hook)
+- [ ] check · [ ] done — ESLint zero warnings, zero errors (`run-lint` hook)
+- [ ] check · [ ] done — All CI quality gates pass with zero tolerance (`run-tests` hook)

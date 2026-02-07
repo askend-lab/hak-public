@@ -1,40 +1,38 @@
 # CWE Top 25 Most Dangerous Software Weaknesses — Checklist
 
 > https://cwe.mitre.org/top25/archive/2023/2023_top25_list.html
-> Mapped to HAK codebase with specific verification actions.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
-## Memory Safety (not directly applicable to TypeScript/Node.js)
-- [ ] **CWE-787 Out-of-bounds Write** — N/A (managed language), verify native addons (vmetajson C++ binary)
-- [ ] **CWE-125 Out-of-bounds Read** — N/A, verify vmetajson binary is from trusted source
+## Memory Safety (N/A for TypeScript — verify native addons)
+- [ ] check · [ ] done — CWE-787/125: vmetajson binary from trusted source (`manual review`)
 
 ## Injection
-- [ ] **CWE-79 XSS** — React escapes by default; audit `dangerouslySetInnerHTML` usage (should be zero); audit URL construction in links
-- [ ] **CWE-89 SQL Injection** — N/A (DynamoDB, not SQL); verify DynamoDB expression construction uses parameterized expressions
-- [ ] **CWE-78 OS Command Injection** — Audit `child_process.spawn` in vmetajson.ts: uses argument array (safe), verify no shell option
-- [ ] **CWE-77 Command Injection** — No `exec()` or `execSync()` with user input anywhere in codebase
+- [ ] check · [ ] done — CWE-79 XSS: no `dangerouslySetInnerHTML` (`run-lint` — ESLint rule)
+- [ ] check · [ ] done — CWE-89: DynamoDB uses parameterized expressions (`run-tests`)
+- [ ] check · [ ] done — CWE-78: `spawn` uses argument array, no shell (`run-lint` + review)
+- [ ] check · [ ] done — CWE-77: no `exec()` with user input (`run-lint` — `no-eval`)
 
 ## Authentication & Access
-- [ ] **CWE-287 Improper Authentication** — All protected endpoints use Cognito authorizer; verify no bypass paths
-- [ ] **CWE-862 Missing Authorization** — Verify every Lambda checks userId from JWT matches requested resource
-- [ ] **CWE-863 Incorrect Authorization** — Verify share token access doesn't leak private data
-- [ ] **CWE-306 Missing Auth for Critical Function** — List all API endpoints, verify none are unprotected unintentionally
+- [ ] check · [ ] done — CWE-287: all protected endpoints use Cognito auth (`run-tests`)
+- [ ] check · [ ] done — CWE-862: every Lambda checks userId from JWT (`run-tests`)
+- [ ] check · [ ] done — CWE-863: share token doesn't leak private data (`run-tests`)
+- [ ] check · [ ] done — CWE-306: no unprotected critical endpoints (`run-tests` + review)
 
 ## Data Exposure
-- [ ] **CWE-200 Exposure of Sensitive Information** — Error responses don't include stack traces; logs don't contain PII
-- [ ] **CWE-522 Insufficiently Protected Credentials** — No credentials in source code; tokens not logged
+- [ ] check · [ ] done — CWE-200: error responses don't include stack traces (`run-tests`)
+- [ ] check · [ ] done — CWE-522: no credentials in source, tokens not logged (`secret-detection`)
 
 ## Input Validation
-- [ ] **CWE-20 Improper Input Validation** — All Lambda handlers validate input type, length, format before processing
-- [ ] **CWE-434 Unrestricted Upload** — No file upload endpoints (audio is generated server-side); if added, restrict type/size
-- [ ] **CWE-502 Deserialization of Untrusted Data** — `JSON.parse` wrapped in try-catch; no `eval` or `Function` constructor
-- [ ] **CWE-611 XXE** — N/A (no XML parsing in the application)
+- [ ] check · [ ] done — CWE-20: all handlers validate type/length/format (`run-tests`)
+- [ ] check · [ ] done — CWE-502: `JSON.parse` in try-catch, no `eval` (`run-lint`)
+- [ ] check · [ ] done — CWE-434: no unrestricted file uploads (`code review`)
 
 ## Design
-- [ ] **CWE-798 Hard-coded Credentials** — gitleaks scan confirms no secrets in code; Cognito client ID is public by design (documented)
-- [ ] **CWE-918 SSRF** — No user-controlled URLs in server-side HTTP requests
-- [ ] **CWE-352 CSRF** — PKCE + state parameter in OAuth flow; API uses Bearer token (not cookies) for auth
-- [ ] **CWE-269 Improper Privilege Management** — IAM roles follow least privilege; no admin endpoints without proper auth
+- [ ] check · [ ] done — CWE-798: no hard-coded credentials (`secret-detection` hook)
+- [ ] check · [ ] done — CWE-918 SSRF: no user-controlled URLs server-side (`run-lint` + review)
+- [ ] check · [ ] done — CWE-352 CSRF: PKCE + Bearer token, not cookies (`run-tests`)
+- [ ] check · [ ] done — CWE-269: IAM least privilege (`tfsec`)
 
 ## Crypto
-- [ ] **CWE-327 Use of Broken Crypto Algorithm** — SHA-256 used for hashing (verified); no MD5 or SHA-1 for security purposes
-- [ ] **CWE-326 Inadequate Encryption Strength** — TLS 1.2+ enforced; AES-256 for data at rest (AWS managed)
+- [ ] check · [ ] done — CWE-327: SHA-256 used, no MD5/SHA-1 for security (`run-tests`)
+- [ ] check · [ ] done — CWE-326: TLS 1.2+, AES-256 at rest (`tfsec`)

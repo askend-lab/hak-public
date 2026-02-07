@@ -1,32 +1,25 @@
 # SLSA — Supply-chain Levels for Software Artifacts Checklist
 
 > https://slsa.dev/
-> Framework for ensuring supply chain integrity. Target: Level 2.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## SLSA Level 1: Documentation
-- [ ] Build process is documented (README, CI workflow files)
-- [ ] Build scripts are version-controlled (GitHub Actions YAML)
-- [ ] Build process generates provenance metadata
+- [ ] check · [ ] done — Build process documented (`README + CI workflow files`)
+- [ ] check · [ ] done — Build scripts version-controlled (`GitHub Actions YAML`)
+- [ ] check · [ ] done — Build generates provenance metadata (`release workflow`)
 
 ## SLSA Level 2: Hosted Build
-- [ ] Builds run on a hosted CI service (GitHub Actions ✓)
-- [ ] Build process is defined in version-controlled config (`.github/workflows/` ✓)
-- [ ] Build service authenticates to artifact stores (AWS ECR, S3)
-- [ ] Provenance is generated automatically by the build service
-
-## SLSA Level 3: Hardened Builds (aspirational)
-- [ ] Build environment is ephemeral (GitHub-hosted runners ✓)
-- [ ] Build process is isolated (no shared state between builds)
-- [ ] Provenance is non-forgeable (signed by the build service)
+- [ ] check · [ ] done — Builds run on hosted CI — GitHub Actions (`build.yml`)
+- [ ] check · [ ] done — Build defined in version-controlled config (`build.yml`)
+- [ ] check · [ ] done — Provenance generated automatically (`release workflow`)
 
 ## Dependency Management
-- [ ] All dependencies pinned to exact versions in `pnpm-lock.yaml`
-- [ ] GitHub Actions pinned to SHA (not `@v3`, use `@sha256:abc...`)
-- [ ] Docker base images pinned to digest (`node:18@sha256:...`)
-- [ ] Dependabot configured for all ecosystems (npm, docker, github-actions)
+- [ ] check · [ ] done — All deps pinned in `pnpm-lock.yaml` (`dependency-check` hook)
+- [ ] check · [ ] done — Actions pinned to SHA (`workflow audit script`)
+- [ ] check · [ ] done — Docker images pinned to digest (`hadolint`)
+- [ ] check · [ ] done — Dependabot for all ecosystems (`dependabot.yml`)
 
 ## Artifact Integrity
-- [ ] Release artifacts have SHA-256 checksums
-- [ ] Docker images pushed with content-addressable digest
-- [ ] Consider Sigstore/cosign for container image signing
-- [ ] SBOM generated for each release (SPDX or CycloneDX format)
+- [ ] check · [ ] done — Release artifacts have SHA-256 checksums (`release workflow`)
+- [ ] check · [ ] done — Docker images with content-addressable digest (`CI push`)
+- [ ] check · [ ] done — SBOM generated per release — SPDX/CycloneDX (`release workflow`)

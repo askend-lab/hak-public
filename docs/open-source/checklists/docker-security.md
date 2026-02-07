@@ -1,46 +1,40 @@
 # Docker Security — Checklist
 
 > https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html
-> https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
-> Applied to HAK's Docker images: vabamorf-api, merlin-worker, merlin Dockerfile, vabamorf Dockerfile.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## Image Selection
-- [ ] Use official Node.js images from Docker Hub
-- [ ] Use slim/alpine variants (not full Debian)
-- [ ] Pin base image to specific digest (`node:18.20.5-slim@sha256:...`)
-- [ ] No `latest` tag in base images
+- [ ] check · [ ] done — Official Node.js images from Docker Hub (`hadolint`)
+- [ ] check · [ ] done — Slim/alpine variants, not full Debian (`hadolint`)
+- [ ] check · [ ] done — Base image pinned to specific digest (`hadolint` — DL3006)
+- [ ] check · [ ] done — No `latest` tag in base images (`hadolint` — DL3007)
 
 ## Build Process
-- [ ] Multi-stage builds: build stage (compile/bundle) + runtime stage (minimal)
-- [ ] `.dockerignore` excludes: `node_modules`, `test/`, `docs/`, `*.md`, `.git/`, `coverage/`
-- [ ] Install production dependencies only in runtime stage (`pnpm install --prod`)
-- [ ] Copy only necessary files to runtime stage (not entire repo)
+- [ ] check · [ ] done — Multi-stage builds (`hadolint` + `code review`)
+- [ ] check · [ ] done — `.dockerignore` excludes tests/docs/node_modules (`hadolint`)
+- [ ] check · [ ] done — Production deps only in runtime stage (`hadolint`)
+- [ ] check · [ ] done — Only necessary files copied to runtime (`code review`)
 
 ## Runtime Security
-- [ ] Run as non-root user: `USER node` (or create dedicated user)
-- [ ] Use `dumb-init` or `tini` as PID 1 for proper signal handling
-- [ ] Set `NODE_ENV=production` in runtime environment
-- [ ] No `--privileged` flag in container execution
-- [ ] Read-only root filesystem where possible (`--read-only`)
+- [ ] check · [ ] done — Run as non-root: `USER node` (`hadolint` — DL3002)
+- [ ] check · [ ] done — `dumb-init` or `tini` as PID 1 (`hadolint` + code review)
+- [ ] check · [ ] done — `NODE_ENV=production` set (`hadolint`)
 
 ## Secret Management
-- [ ] No secrets in Dockerfile (no `ENV SECRET=...`)
-- [ ] No secrets in build arguments (use runtime env vars or Secrets Manager)
-- [ ] No `.env` files copied into image
-- [ ] AWS credentials injected via IAM role (ECS task role), not env vars
+- [ ] check · [ ] done — No secrets in Dockerfile (`secret-detection` hook)
+- [ ] check · [ ] done — No `.env` files copied into image (`hadolint` + `.dockerignore`)
+- [ ] check · [ ] done — AWS creds via IAM role, not env vars (`tfsec`)
 
 ## Network
-- [ ] Expose only necessary ports (`EXPOSE` directive matches actual usage)
-- [ ] Use internal Docker networks for inter-container communication
-- [ ] No SSH server inside containers
+- [ ] check · [ ] done — Only necessary ports exposed (`hadolint`)
+- [ ] check · [ ] done — No SSH server inside containers (`hadolint`)
 
 ## Scanning
-- [ ] Trivy or Docker Scout integrated into CI pipeline
-- [ ] Zero high/critical vulnerabilities in final images
-- [ ] Scan runs on every PR that modifies Dockerfile or dependencies
-- [ ] Base image vulnerability alerts configured (Dependabot for Docker)
+- [ ] check · [ ] done — Trivy integrated into CI (`trivy` in build workflow)
+- [ ] check · [ ] done — Zero high/critical vulns in images (`trivy` exit code)
+- [ ] check · [ ] done — Scan on every Dockerfile change PR (`CI workflow`)
+- [ ] check · [ ] done — Dependabot for Docker base images (`dependabot.yml`)
 
 ## Health Checks
-- [ ] `HEALTHCHECK` instruction in Dockerfiles (HTTP check for web services)
-- [ ] ECS health check configured for merlin-worker
-- [ ] Restart policy configured for failed health checks
+- [ ] check · [ ] done — `HEALTHCHECK` instruction in Dockerfiles (`hadolint`)
+- [ ] check · [ ] done — ECS health check configured (`terraform validate`)

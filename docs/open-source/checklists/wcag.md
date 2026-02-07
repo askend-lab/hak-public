@@ -1,76 +1,70 @@
 # WCAG 2.2 AA — Checklist
 
 > https://www.w3.org/TR/WCAG22/
-> Web Content Accessibility Guidelines — Level AA compliance.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## 1. Perceivable
 
 ### 1.1 Text Alternatives
-- [ ] All images have meaningful `alt` text (or `alt=""` for decorative)
-- [ ] Icon-only buttons have accessible labels (`aria-label`)
-- [ ] SVG icons in `TaskDetailHeader.tsx` and elsewhere have `aria-hidden="true"` or labels
+- [ ] check · [ ] done — All images have meaningful `alt` text (`axe-core` in Playwright)
+- [ ] check · [ ] done — Icon-only buttons have `aria-label` (`axe-core`)
+- [ ] check · [ ] done — SVGs have `aria-hidden` or labels (`axe-core`)
 
 ### 1.2 Time-based Media
-- [ ] Audio playback controls are keyboard accessible
-- [ ] Audio content has text transcript available (TTS output matches input text)
+- [ ] check · [ ] done — Audio controls keyboard accessible (`Playwright keyboard tests`)
+- [ ] check · [ ] done — Audio has text transcript (`manual review`)
 
 ### 1.3 Adaptable
-- [ ] Semantic HTML used throughout (headings, lists, landmarks, nav, main, aside)
-- [ ] Reading order is logical when CSS is disabled
-- [ ] Form inputs have associated `<label>` elements
+- [ ] check · [ ] done — Semantic HTML: headings, landmarks, nav (`axe-core`)
+- [ ] check · [ ] done — Logical reading order without CSS (`manual review`)
+- [ ] check · [ ] done — Form inputs have `<label>` elements (`axe-core`)
 
 ### 1.4 Distinguishable
-- [ ] Text color contrast ratio ≥ 4.5:1 (normal text) and ≥ 3:1 (large text)
-- [ ] UI component contrast ratio ≥ 3:1 against adjacent colors
-- [ ] Text can be resized to 200% without loss of content
-- [ ] Content reflows at 320px viewport width (no horizontal scroll)
-- [ ] Non-text contrast: focus indicators, form borders ≥ 3:1
+- [ ] check · [ ] done — Text contrast ≥ 4.5:1 / large ≥ 3:1 (`axe-core`)
+- [ ] check · [ ] done — UI component contrast ≥ 3:1 (`axe-core`)
+- [ ] check · [ ] done — Text resizable to 200% without loss (`Playwright viewport test`)
+- [ ] check · [ ] done — Content reflows at 320px (`Playwright viewport test`)
+- [ ] check · [ ] done — Focus indicators ≥ 3:1 contrast (`axe-core`)
 
 ## 2. Operable
 
 ### 2.1 Keyboard Accessible
-- [ ] All interactive elements reachable via Tab key
-- [ ] No keyboard traps (can Tab out of every component)
-- [ ] Custom keyboard shortcuts (if any) are documented and configurable
-- [ ] Task completion exercises fully operable by keyboard
+- [ ] check · [ ] done — All interactive elements reachable via Tab (`Playwright keyboard`)
+- [ ] check · [ ] done — No keyboard traps (`Playwright keyboard`)
+- [ ] check · [ ] done — Task exercises fully keyboard-operable (`Playwright keyboard`)
 
 ### 2.2 Enough Time
-- [ ] No time limits on task completion (or adjustable if present)
-- [ ] Audio playback can be paused, stopped, and replayed
+- [ ] check · [ ] done — No time limits on tasks (`manual review`)
+- [ ] check · [ ] done — Audio can be paused/stopped/replayed (`Playwright tests`)
 
 ### 2.4 Navigable
-- [ ] Skip navigation link to main content
-- [ ] Page titles are descriptive and unique per route
-- [ ] Focus order follows visual/logical order
-- [ ] Link purpose clear from link text (no "click here")
-- [ ] Multiple ways to find pages (nav, search, sitemap)
+- [ ] check · [ ] done — Skip navigation link (`axe-core`)
+- [ ] check · [ ] done — Descriptive page titles per route (`Playwright title assertions`)
+- [ ] check · [ ] done — Focus order follows visual order (`Playwright keyboard`)
+- [ ] check · [ ] done — Link purpose clear from text (`axe-core`)
 
 ### 2.5 Input Modalities
-- [ ] Target size minimum 24x24 CSS pixels (WCAG 2.2 new criterion)
-- [ ] Dragging actions have non-dragging alternatives
-- [ ] No motion-dependent interactions (or alternatives provided)
+- [ ] check · [ ] done — Target size ≥ 24x24 CSS pixels (`axe-core` WCAG 2.2)
+- [ ] check · [ ] done — Dragging has non-dragging alternatives (`manual review`)
 
 ## 3. Understandable
 
 ### 3.1 Readable
-- [ ] Page language declared (`<html lang="et">` for Estonian)
-- [ ] Language changes within content marked with `lang` attribute
+- [ ] check · [ ] done — `<html lang="et">` declared (`axe-core`)
+- [ ] check · [ ] done — Language changes marked with `lang` attr (`axe-core`)
 
 ### 3.2 Predictable
-- [ ] Navigation is consistent across pages
-- [ ] Components behave consistently across the application
-- [ ] No unexpected context changes on focus or input
+- [ ] check · [ ] done — Consistent navigation across pages (`Playwright tests`)
+- [ ] check · [ ] done — No unexpected context changes (`Playwright tests`)
 
 ### 3.3 Input Assistance
-- [ ] Form errors identified and described in text
-- [ ] Error messages suggest corrections
-- [ ] Labels or instructions provided for user input
-- [ ] Error prevention: confirm before destructive actions
+- [ ] check · [ ] done — Form errors identified in text (`axe-core`)
+- [ ] check · [ ] done — Labels/instructions for user input (`axe-core`)
+- [ ] check · [ ] done — Confirm before destructive actions (`Playwright tests`)
 
 ## 4. Robust
 
 ### 4.1 Compatible
-- [ ] Valid HTML (no duplicate IDs, proper nesting)
-- [ ] ARIA roles, states, properties used correctly
-- [ ] Status messages use `aria-live` regions (audio playback status, save confirmations)
-- [ ] Custom components have proper ARIA roles and keyboard patterns
+- [ ] check · [ ] done — Valid HTML (no duplicate IDs) (`axe-core`)
+- [ ] check · [ ] done — ARIA roles/states used correctly (`axe-core`)
+- [ ] check · [ ] done — Status messages use `aria-live` (`axe-core`)

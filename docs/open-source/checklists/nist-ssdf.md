@@ -1,31 +1,31 @@
 # NIST SP 800-218 — Secure Software Development Framework Checklist
 
 > https://csrc.nist.gov/projects/ssdf
-> Practices for secure software development across the lifecycle.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## PO: Prepare the Organization
-- [ ] **PO.1** Define security requirements for HAK (authentication, authorization, data protection, input validation)
-- [ ] **PO.2** Implement roles and responsibilities for security (who reviews PRs for security, who triages vulnerabilities)
-- [ ] **PO.3** Implement supporting toolchain (ESLint security rules, gitleaks, pnpm audit, Dependabot)
-- [ ] **PO.4** Define and use criteria for software security checks (CI quality gates)
-- [ ] **PO.5** Create secure development environment (branch protection, signed commits, secret scanning)
+- [ ] check · [ ] done — PO.1: Security requirements defined (`manual review`)
+- [ ] check · [ ] done — PO.2: Roles for security reviews defined (`CONTRIBUTING.md`)
+- [ ] check · [ ] done — PO.3: Toolchain implemented (`devbox.yaml` — all hooks)
+- [ ] check · [ ] done — PO.4: Security check criteria defined (`devbox.yaml` thresholds)
+- [ ] check · [ ] done — PO.5: Secure dev environment (`branch protection + secret-detection`)
 
 ## PS: Protect the Software
-- [ ] **PS.1** Protect all forms of code from unauthorized access (branch protection on `main`, require reviews)
-- [ ] **PS.2** Provide a mechanism for verifying software integrity (signed releases, checksums, SBOM)
-- [ ] **PS.3** Archive and protect each software release (GitHub Releases with tags)
+- [ ] check · [ ] done — PS.1: Code protected from unauthorized access (`branch protection`)
+- [ ] check · [ ] done — PS.2: Software integrity verification (`signed releases + SBOM`)
+- [ ] check · [ ] done — PS.3: Releases archived and protected (`GitHub Releases + tags`)
 
 ## PW: Produce Well-Secured Software
-- [ ] **PW.1** Design software to meet security requirements (threat model, security architecture documented)
-- [ ] **PW.2** Review design to verify compliance with security requirements (architecture review documented in ADRs)
-- [ ] **PW.4** Reuse existing well-secured software (use AWS managed services, established npm packages)
-- [ ] **PW.5** Create source code following secure coding practices (OWASP, CERT, Google Style Guide)
-- [ ] **PW.6** Configure compilation/build to improve security (TypeScript strict, ESLint security rules, no debug in prod)
-- [ ] **PW.7** Review and test code for vulnerabilities (PR reviews, static analysis, dynamic testing)
-- [ ] **PW.8** Test executable code for vulnerabilities (E2E tests, property-based tests, security-focused tests)
-- [ ] **PW.9** Configure software to have secure settings by default (no debug pages, strict CORS, secure headers)
+- [ ] check · [ ] done — PW.1: Security requirements in design (`threat model docs`)
+- [ ] check · [ ] done — PW.2: Design reviewed for security (`ADR reviews`)
+- [ ] check · [ ] done — PW.4: Reuse well-secured components (`security-audit` hook)
+- [ ] check · [ ] done — PW.5: Secure coding practices (`run-lint` + `no-any` + `run-typecheck`)
+- [ ] check · [ ] done — PW.6: Build config improves security (`run-build` — strict mode)
+- [ ] check · [ ] done — PW.7: Code reviewed for vulns (`run-lint` + `secret-detection`)
+- [ ] check · [ ] done — PW.8: Executable tested for vulns (`run-tests` — security tests)
+- [ ] check · [ ] done — PW.9: Secure defaults — no debug in prod (`run-build` check)
 
 ## RV: Respond to Vulnerabilities
-- [ ] **RV.1** Identify and confirm vulnerabilities (monitor Dependabot alerts, pnpm audit, GitHub security advisories)
-- [ ] **RV.2** Assess, prioritize, and remediate vulnerabilities (response timeline in SECURITY.md: Critical 24-48h, High 7d)
-- [ ] **RV.3** Analyze vulnerabilities to find root cause (post-mortem process for security issues)
+- [ ] check · [ ] done — RV.1: Identify vulns (`security-audit` hook + Dependabot)
+- [ ] check · [ ] done — RV.2: Prioritize and remediate (`SECURITY.md` SLA)
+- [ ] check · [ ] done — RV.3: Root cause analysis (`post-mortem process`)

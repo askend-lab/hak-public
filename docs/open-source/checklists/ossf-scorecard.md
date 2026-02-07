@@ -1,90 +1,67 @@
 # OpenSSF Scorecard — Checklist
 
 > https://securityscorecards.dev/
-> Automated security assessment for open source projects. 18 checks.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## Binary-Artifacts
-- [ ] No compiled binaries checked into the repository
-- [ ] No `.exe`, `.dll`, `.so`, `.wasm` files in source tree
-- [ ] Vendor directory (`packages/vendor/eki-storybook`) reviewed for binaries
+- [ ] check · [ ] done — No compiled binaries in repo (`scorecard` CLI check)
+- [ ] check · [ ] done — Vendor directory reviewed for binaries (`manual review`)
 
 ## Branch-Protection
-- [ ] `main` branch requires pull request reviews (≥1 reviewer)
-- [ ] `main` branch requires status checks to pass
-- [ ] `main` branch prohibits force pushes
-- [ ] `main` branch requires signed commits (GPG or SSH)
-- [ ] Admin override disabled (admins also follow rules)
+- [ ] check · [ ] done — `main` requires PR reviews ≥1 (`GitHub branch rules`)
+- [ ] check · [ ] done — `main` requires status checks (`GitHub branch rules`)
+- [ ] check · [ ] done — `main` prohibits force pushes (`GitHub branch rules`)
+- [ ] check · [ ] done — `main` requires signed commits (`GitHub branch rules`)
 
 ## CI-Tests
-- [ ] CI runs on every pull request
-- [ ] CI includes unit tests, lint, typecheck
-- [ ] CI results visible in PR checks
-
-## CII-Best-Practices
-- [ ] OpenSSF Best Practices badge obtained (see [ossf-best-practices.md](./ossf-best-practices.md))
+- [ ] check · [ ] done — CI runs on every PR (`GitHub Actions build.yml`)
+- [ ] check · [ ] done — CI includes unit tests, lint, typecheck (`build.yml`)
 
 ## Code-Review
-- [ ] All changes go through code review (PR-based workflow)
-- [ ] At least one reviewer besides the author
-- [ ] Review policy documented in CONTRIBUTING.md
+- [ ] check · [ ] done — All changes go through code review (`GitHub branch rules`)
+- [ ] check · [ ] done — At least one reviewer besides author (`GitHub branch rules`)
 
 ## Contributors
-- [ ] Project has multiple contributors (not single-person bus factor)
-- [ ] Contribution history shows active development
+- [ ] check · [ ] done — Multiple contributors (`git log --format='%ae' | sort -u`)
 
 ## Dangerous-Workflow
-- [ ] No `pull_request_target` with checkout of PR code in CI
-- [ ] No `workflow_run` triggered by untrusted PRs
-- [ ] CI workflows do not use `${{ github.event.*.body }}` in scripts
+- [ ] check · [ ] done — No `pull_request_target` with checkout (`workflow audit`)
+- [ ] check · [ ] done — No untrusted input in scripts (`workflow audit`)
 
 ## Dependency-Update-Tool
-- [ ] Dependabot or Renovate configured and active
-- [ ] `.github/dependabot.yml` covers all package ecosystems (npm, docker, github-actions)
+- [ ] check · [ ] done — Dependabot configured for npm, docker, actions (`dependabot.yml`)
 
 ## Fuzzing
-- [ ] Consider adding fuzz testing for input parsers (vmetajson, gherkin-parser)
-- [ ] Property-based testing with `fast-check` as alternative to traditional fuzzing
+- [ ] check · [ ] done — Property-based testing with fast-check (`run-tests`)
 
 ## License
-- [ ] `LICENSE` file exists at repository root
-- [ ] License is OSI-approved (MIT)
-- [ ] SPDX identifier in `package.json` (`"license": "MIT"`)
+- [ ] check · [ ] done — `LICENSE` file at root (`file existence check`)
+- [ ] check · [ ] done — SPDX identifier in package.json (`package-json-validation`)
 
 ## Maintained
-- [ ] Repository shows recent commits (within last 90 days)
-- [ ] Issues are responded to within reasonable timeframe
-- [ ] No unaddressed security advisories
+- [ ] check · [ ] done — Recent commits within 90 days (`git log`)
+- [ ] check · [ ] done — Issues responded to timely (`GitHub metrics`)
 
 ## Pinned-Dependencies
-- [ ] GitHub Actions use pinned SHA versions (not `@v3`, use `@sha256:...`)
-- [ ] Docker base images use digest pins (`node:18@sha256:...`)
-- [ ] npm dependencies use exact versions (no `^` or `~`)
-
-## Packaging
-- [ ] Project uses standard packaging (npm/pnpm for Node.js)
-- [ ] Build process is documented and reproducible
+- [ ] check · [ ] done — Actions use SHA pins, not `@v3` (`workflow audit`)
+- [ ] check · [ ] done — Docker base images use digest (`hadolint`)
+- [ ] check · [ ] done — npm deps use exact versions (`dependency-check`)
 
 ## SAST
-- [ ] Static analysis runs in CI (ESLint with security rules)
-- [ ] Consider adding CodeQL for deeper analysis
-- [ ] Consider adding `semgrep` for security-specific patterns
+- [ ] check · [ ] done — ESLint with security rules in CI (`run-lint` hook)
+- [ ] check · [ ] done — CodeQL analysis configured (`codeql.yml`)
 
 ## Security-Policy
-- [ ] `SECURITY.md` exists with vulnerability reporting instructions
-- [ ] Contact email for security reports is monitored
-- [ ] Response timeline is defined
+- [ ] check · [ ] done — `SECURITY.md` exists (`file existence check`)
+- [ ] check · [ ] done — Contact email monitored (`manual review`)
 
 ## Signed-Releases
-- [ ] Git tags are signed (GPG or SSH)
-- [ ] Release artifacts have checksums
-- [ ] Consider using Sigstore for keyless signing
+- [ ] check · [ ] done — Git tags are signed (`release workflow`)
+- [ ] check · [ ] done — Release artifacts have checksums (`release workflow`)
 
 ## Token-Permissions
-- [ ] GitHub Actions workflows use minimal token permissions
-- [ ] `permissions:` block set at workflow level (not relying on defaults)
-- [ ] Read-only permissions where write is not needed
+- [ ] check · [ ] done — Workflows use minimal `permissions:` block (`workflow audit`)
 
 ## Vulnerabilities
-- [ ] Zero known high/critical vulnerabilities in dependencies
-- [ ] `pnpm audit` passes in CI
-- [ ] GitHub security advisories are addressed promptly
+- [ ] check · [ ] done — Zero high/critical dep vulnerabilities (`security-audit` hook)
+- [ ] check · [ ] done — GitHub security advisories addressed (`GitHub alerts`)

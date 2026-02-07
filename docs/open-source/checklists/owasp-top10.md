@@ -1,68 +1,62 @@
 # OWASP Top 10 (2021) — Checklist
 
 > https://owasp.org/www-project-top-ten/
-> Top 10 most critical web application security risks.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## A01: Broken Access Control
-- [ ] All API endpoints enforce authentication via Cognito authorizer
-- [ ] Users can only access their own data (partition key includes userId)
-- [ ] Shared/unlisted tasks enforce proper access control (share token validation)
-- [ ] No CORS misconfiguration (`Access-Control-Allow-Origin` is not `*` in production)
-- [ ] API Gateway resource policies restrict access appropriately
+- [ ] check · [ ] done — All endpoints enforce auth via Cognito (`run-tests` — auth tests)
+- [ ] check · [ ] done — Users access only own data — userId in partition key (`run-tests`)
+- [ ] check · [ ] done — Share token access control validated (`run-tests`)
+- [ ] check · [ ] done — CORS not `*` in production (`run-tests` — header assertions)
+- [ ] check · [ ] done — API Gateway resource policies restrict access (`terraform validate`)
 
 ## A02: Cryptographic Failures
-- [ ] All data in transit uses TLS (HTTPS enforced via CloudFront)
-- [ ] DynamoDB encryption at rest is enabled
-- [ ] S3 bucket encryption is enabled (SSE-S3 or SSE-KMS)
-- [ ] No sensitive data in URLs or query parameters
-- [ ] Audio cache keys use secure hash (SHA-256 via `@hak/shared`)
+- [ ] check · [ ] done — TLS enforced via CloudFront (`terraform validate`)
+- [ ] check · [ ] done — DynamoDB encryption at rest enabled (`tfsec`)
+- [ ] check · [ ] done — S3 bucket encryption enabled (`tfsec`)
+- [ ] check · [ ] done — No sensitive data in URLs/query params (`run-lint` — custom rule)
+- [ ] check · [ ] done — Audio cache uses SHA-256 hash (`run-tests`)
 
 ## A03: Injection
-- [ ] All Lambda handler inputs are validated (type, length, format)
-- [ ] DynamoDB queries use parameterized expressions (no string concatenation)
-- [ ] No `eval()`, `Function()`, or dynamic code execution
-- [ ] `vmetajson` process spawning uses argument array (not shell string)
-- [ ] Frontend sanitizes user input before rendering (React escapes by default)
+- [ ] check · [ ] done — All Lambda inputs validated (`run-tests` — validation tests)
+- [ ] check · [ ] done — DynamoDB uses parameterized expressions (`run-lint` — no string concat)
+- [ ] check · [ ] done — No `eval()` or `Function()` (`run-lint` — `no-eval` rule)
+- [ ] check · [ ] done — vmetajson uses argument array, not shell (`code review`)
+- [ ] check · [ ] done — React escapes output by default (`run-lint` — no dangerouslySetInnerHTML)
 
 ## A04: Insecure Design
-- [ ] Threat model exists for each API endpoint
-- [ ] Rate limiting is configured on API Gateway
-- [ ] Business logic abuse scenarios identified and mitigated
-- [ ] Text length limits enforced server-side (not just client-side)
+- [ ] check · [ ] done — Threat model exists per endpoint (`manual review`)
+- [ ] check · [ ] done — Rate limiting on API Gateway (`terraform validate`)
+- [ ] check · [ ] done — Text limits enforced server-side (`run-tests`)
 
 ## A05: Security Misconfiguration
-- [ ] No default credentials or API keys in codebase
-- [ ] All AWS resources have least-privilege IAM policies
-- [ ] Error responses do not leak stack traces or internal details
-- [ ] CloudFront custom error pages configured (no default AWS error pages)
-- [ ] Security headers set: X-Content-Type-Options, X-Frame-Options, CSP
+- [ ] check · [ ] done — No default credentials in code (`secret-detection` hook)
+- [ ] check · [ ] done — IAM least privilege (`tfsec`)
+- [ ] check · [ ] done — Error responses don't leak stack traces (`run-tests`)
+- [ ] check · [ ] done — Security headers set (CSP, X-Frame, etc.) (`run-tests`)
 
 ## A06: Vulnerable and Outdated Components
-- [ ] All 16 npm vulnerabilities resolved (9 high, 4 moderate, 3 low)
-- [ ] Dependabot enabled and configured for all package ecosystems
-- [ ] Docker base images are up-to-date and scanned
-- [ ] No deprecated dependencies in use
+- [ ] check · [ ] done — All npm vulns resolved (`security-audit` hook)
+- [ ] check · [ ] done — Dependabot enabled (`GitHub settings`)
+- [ ] check · [ ] done — Docker images scanned (`trivy` in CI)
+- [ ] check · [ ] done — No deprecated dependencies (`dependency-check` hook)
 
 ## A07: Identification and Authentication Failures
-- [ ] PKCE flow implementation follows RFC 7636 strictly
-- [ ] Token storage is secure (not in localStorage for sensitive tokens)
-- [ ] Session timeout is configured appropriately
-- [ ] Failed login attempts are rate-limited (Cognito handles this)
+- [ ] check · [ ] done — PKCE follows RFC 7636 (`run-tests` — auth tests)
+- [ ] check · [ ] done — Token storage is secure (`code review`)
+- [ ] check · [ ] done — Session timeout configured (`Cognito config review`)
 
 ## A08: Software and Data Integrity Failures
-- [ ] CI/CD pipeline has integrity checks (signed commits, protected branches)
-- [ ] Dependencies are pinned to exact versions
-- [ ] SLSA Level 2+ supply chain security
-- [ ] No deserialization of untrusted data without validation
+- [ ] check · [ ] done — Signed commits, protected branches (`GitHub settings`)
+- [ ] check · [ ] done — Dependencies pinned to exact versions (`dependency-check`)
+- [ ] check · [ ] done — No deserialization of untrusted data (`run-lint`)
 
 ## A09: Security Logging and Monitoring Failures
-- [ ] All authentication events are logged
-- [ ] All API access is logged (API Gateway access logs)
-- [ ] CloudWatch alarms for suspicious activity patterns
-- [ ] Log retention policies configured
-- [ ] No sensitive data in logs (PII, tokens, credentials)
+- [ ] check · [ ] done — All auth events logged (`run-tests` — logging assertions)
+- [ ] check · [ ] done — API access logged (`terraform validate` — access logs)
+- [ ] check · [ ] done — CloudWatch alarms configured (`terraform validate`)
+- [ ] check · [ ] done — No sensitive data in logs (`run-lint` — no-console + review)
 
 ## A10: Server-Side Request Forgery (SSRF)
-- [ ] No user-controlled URLs used in server-side HTTP requests
-- [ ] Lambda functions in VPC have restricted outbound access (if applicable)
-- [ ] S3 presigned URLs have short expiration and restricted permissions
+- [ ] check · [ ] done — No user-controlled URLs in server requests (`run-lint` + review)
+- [ ] check · [ ] done — S3 presigned URLs have short expiration (`run-tests`)

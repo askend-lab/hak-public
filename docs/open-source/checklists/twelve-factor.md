@@ -1,68 +1,54 @@
 # Twelve-Factor App — Checklist
 
 > https://12factor.net/
-> Methodology for building modern cloud-native applications.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
-## I. Codebase — One codebase tracked in revision control, many deploys
-- [ ] Single monorepo for all packages (verified ✓)
-- [ ] Same codebase deploys to dev and prod environments
-- [ ] No environment-specific code branches
+## I. Codebase — One codebase, many deploys
+- [ ] check · [ ] done — Single monorepo for all packages (`already satisfied`)
+- [ ] check · [ ] done — Same codebase deploys to dev and prod (`terraform validate`)
 
-## II. Dependencies — Explicitly declare and isolate dependencies
-- [ ] All dependencies in `package.json` (verified ✓)
-- [ ] Lock file (`pnpm-lock.yaml`) committed for reproducible builds
-- [ ] Remove stale `packages/vabamorf-api/package-lock.json` (npm artifact)
-- [ ] No implicit system dependencies undocumented
+## II. Dependencies — Explicitly declare and isolate
+- [ ] check · [ ] done — All deps in package.json (`dependency-check` hook)
+- [ ] check · [ ] done — Lock file committed (`pnpm-lock.yaml` in git)
+- [ ] check · [ ] done — Remove stale `vabamorf-api/package-lock.json` (`manual check`)
 
 ## III. Config — Store config in the environment
-- [ ] Remove hardcoded `askend-lab.com` URLs from source code
-- [ ] Remove hardcoded Cognito User Pool ID and Client ID from source
-- [ ] Remove hardcoded AWS Account ID from Terraform
-- [ ] All environment-specific values via `process.env` or `VITE_*` env vars
-- [ ] `.env.example` documents every required variable
+- [ ] check · [ ] done — No hardcoded `askend-lab.com` URLs (`secret-detection` + grep)
+- [ ] check · [ ] done — No hardcoded Cognito IDs in source (`secret-detection` + grep)
+- [ ] check · [ ] done — No hardcoded AWS Account ID in Terraform (`tfsec`)
+- [ ] check · [ ] done — `.env.example` documents all required vars (`manual review`)
 
-## IV. Backing Services — Treat backing services as attached resources
-- [ ] DynamoDB, S3, SQS, Cognito accessed via env-configured endpoints (verified ✓)
-- [ ] Switching from dev to prod DynamoDB requires only config change
-- [ ] Local development possible with localstack/dynamodb-local
+## IV. Backing Services — Treat as attached resources
+- [ ] check · [ ] done — DynamoDB/S3/SQS via env-configured endpoints (`run-tests`)
+- [ ] check · [ ] done — Local dev possible with localstack (`docker-compose.yml`)
 
-## V. Build, Release, Run — Strictly separate build and run stages
-- [ ] CI builds artifacts (Lambda zips, Docker images, frontend bundle)
-- [ ] Release tags artifacts with version number
-- [ ] Runtime configuration injected at deploy time (Terraform variables)
+## V. Build, Release, Run — Strictly separate stages
+- [ ] check · [ ] done — CI builds artifacts (`GitHub Actions build.yml`)
+- [ ] check · [ ] done — Release tags artifacts with version (`release workflow`)
 
-## VI. Processes — Execute the app as stateless processes
-- [ ] Lambda functions are stateless (verified ✓)
-- [ ] No in-memory session state (Cognito handles sessions)
-- [ ] vmetajson process pool is per-container (ECS), not shared
+## VI. Processes — Stateless
+- [ ] check · [ ] done — Lambda functions are stateless (`run-tests`)
+- [ ] check · [ ] done — No in-memory session state (`code review`)
 
-## VII. Port Binding — Export services via port binding
-- [ ] vabamorf-api exposes HTTP via port in Docker container (verified ✓)
-- [ ] Frontend dev server binds to configurable port
+## VII. Port Binding — Export via port
+- [ ] check · [ ] done — vabamorf-api exposes HTTP via port (`Dockerfile EXPOSE`)
 
-## VIII. Concurrency — Scale out via the process model
-- [ ] Lambda auto-scales horizontally (verified ✓)
-- [ ] merlin-worker scales via ECS task count + SQS
-- [ ] No shared mutable state between Lambda invocations
+## VIII. Concurrency — Scale out via process model
+- [ ] check · [ ] done — Lambda auto-scales horizontally (`terraform validate`)
+- [ ] check · [ ] done — No shared mutable state between invocations (`run-tests`)
 
-## IX. Disposability — Maximize robustness with fast startup and graceful shutdown
-- [ ] Lambda cold start under 1 second (measure and optimize)
-- [ ] ECS containers handle SIGTERM gracefully (merlin-worker)
-- [ ] No long-running initialization in Lambda handler path
+## IX. Disposability — Fast startup, graceful shutdown
+- [ ] check · [ ] done — Lambda cold start < 1 second (`performance test`)
+- [ ] check · [ ] done — ECS handles SIGTERM gracefully (`Docker health check`)
 
-## X. Dev/Prod Parity — Keep dev, staging, and production similar
-- [ ] Same Terraform modules for dev and prod (parameterized)
-- [ ] Local development uses same database technology (DynamoDB)
-- [ ] Docker images identical between environments
-- [ ] Create `docker-compose.yml` for local parity
+## X. Dev/Prod Parity
+- [ ] check · [ ] done — Same Terraform modules for dev/prod (`terraform validate`)
+- [ ] check · [ ] done — `docker-compose.yml` for local parity (`file existence check`)
 
-## XI. Logs — Treat logs as event streams
-- [ ] Structured JSON logging in all Lambda functions
-- [ ] Logs shipped to CloudWatch (verified ✓)
-- [ ] No file-based logging (stdout/stderr only)
-- [ ] Replace debug `console.log` with structured logger
+## XI. Logs — Event streams
+- [ ] check · [ ] done — Structured JSON logging (`no-console` hook — no raw console.log)
+- [ ] check · [ ] done — No file-based logging (`code review`)
 
-## XII. Admin Processes — Run admin/management tasks as one-off processes
-- [ ] Database migrations (if any) run as one-off scripts
-- [ ] Admin tasks documented in `scripts/` with README
-- [ ] No manual AWS Console operations required for routine tasks
+## XII. Admin Processes — One-off tasks
+- [ ] check · [ ] done — Admin tasks documented in scripts/ (`manual review`)
+- [ ] check · [ ] done — No manual Console operations required (`manual review`)

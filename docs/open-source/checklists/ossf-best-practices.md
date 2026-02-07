@@ -1,39 +1,39 @@
 # OpenSSF Best Practices Badge — Checklist
 
 > https://www.bestpractices.dev/
-> Criteria for open source project quality. Target: Passing level.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## Basics
-- [ ] Project has a publicly accessible website with description
-- [ ] Project has a version control repository (Git on GitHub)
-- [ ] Project has a unique version numbering scheme (SemVer)
-- [ ] Project provides release notes for each release (CHANGELOG.md)
+- [ ] check · [ ] done — Public website with description (`GitHub repo settings`)
+- [ ] check · [ ] done — Version control repository (`GitHub — already satisfied`)
+- [ ] check · [ ] done — Unique version numbering — SemVer (`package.json version`)
+- [ ] check · [ ] done — Release notes for each release — CHANGELOG.md (`file check`)
 
 ## Change Control
-- [ ] Project uses a distributed version control system (Git)
-- [ ] Project has a documented contribution process (CONTRIBUTING.md)
-- [ ] Each major change is reviewed before merge (PR reviews)
+- [ ] check · [ ] done — Distributed VCS — Git (`already satisfied`)
+- [ ] check · [ ] done — Documented contribution process (`CONTRIBUTING.md check`)
+- [ ] check · [ ] done — Major changes reviewed before merge (`branch protection`)
 
 ## Reporting
-- [ ] Project has a process for reporting bugs (GitHub Issues)
-- [ ] Project has a process for reporting vulnerabilities (SECURITY.md)
-- [ ] Bug reports are acknowledged within 14 days
+- [ ] check · [ ] done — Process for reporting bugs — GitHub Issues (`GitHub settings`)
+- [ ] check · [ ] done — Process for reporting vulns — SECURITY.md (`file check`)
+- [ ] check · [ ] done — Bug reports acknowledged within 14 days (`manual review`)
 
 ## Quality
-- [ ] Project has automated test suite that covers most functionality
-- [ ] Test suite achieves ≥80% statement coverage (target 90%+)
-- [ ] New functionality includes tests
-- [ ] Project has a CI system that runs tests on each commit
-- [ ] Warning flags enabled and warnings addressed (`strict: true` in tsconfig)
+- [ ] check · [ ] done — Automated test suite covers most functionality (`run-tests` hook)
+- [ ] check · [ ] done — Test suite ≥80% statement coverage (`run-tests` — thresholds)
+- [ ] check · [ ] done — New functionality includes tests (`test-required` hook)
+- [ ] check · [ ] done — CI runs tests on each commit (`GitHub Actions build.yml`)
+- [ ] check · [ ] done — Warnings enabled and addressed (`run-typecheck` — strict)
 
 ## Security
-- [ ] Project lead knows how to design secure software (documented threat model)
-- [ ] No unpatched publicly known vulnerabilities (pnpm audit clean)
-- [ ] Project uses TLS for all external communications
-- [ ] Cryptographic algorithms are well-known and not custom
-- [ ] Project has a hardened authentication mechanism (Cognito/TARA)
+- [ ] check · [ ] done — Secure software design knowledge (`threat model docs`)
+- [ ] check · [ ] done — No unpatched known vulnerabilities (`security-audit` hook)
+- [ ] check · [ ] done — TLS for all external comms (`tfsec`)
+- [ ] check · [ ] done — Well-known crypto algorithms only (`code review`)
+- [ ] check · [ ] done — Hardened auth mechanism (`run-tests` — auth tests)
 
 ## Analysis
-- [ ] At least one static analysis tool runs on every commit (ESLint)
-- [ ] Dynamic analysis (fuzzing or property-based testing) is used
-- [ ] All identified security issues are fixed promptly
+- [ ] check · [ ] done — Static analysis on every commit (`run-lint` hook)
+- [ ] check · [ ] done — Dynamic analysis used (`run-tests` — property-based tests)
+- [ ] check · [ ] done — Security issues fixed promptly (`manual review`)

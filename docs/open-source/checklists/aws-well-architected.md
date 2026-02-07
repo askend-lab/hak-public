@@ -1,48 +1,41 @@
 # AWS Well-Architected Framework — Checklist
 
 > https://aws.amazon.com/architecture/well-architected/
-> 6 pillars applied to HAK's serverless architecture.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## Pillar 1: Operational Excellence
-- [ ] Runbooks for common operations (deployment, rollback, incident response)
-- [ ] CloudWatch dashboards for all Lambda functions (invocations, errors, duration)
-- [ ] Automated deployments via CI/CD (GitHub Actions → Terraform → AWS)
-- [ ] Infrastructure changes reviewed before apply (`terraform plan` in PR)
-- [ ] Deployment strategy documented (blue/green, canary, or all-at-once)
+- [ ] check · [ ] done — Runbooks for deployment/rollback (`manual review`)
+- [ ] check · [ ] done — CloudWatch dashboards for all Lambdas (`terraform validate`)
+- [ ] check · [ ] done — Automated deployments via CI/CD (`GitHub Actions build.yml`)
+- [ ] check · [ ] done — Infra changes reviewed before apply (`terraform plan` in PR)
 
 ## Pillar 2: Security
-- [ ] IAM roles follow least privilege (per-function roles, no `*` resources)
-- [ ] Encryption at rest for DynamoDB, S3 (AWS managed keys or CMK)
-- [ ] Encryption in transit: TLS 1.2+ for all endpoints (CloudFront config)
-- [ ] Security groups and VPC configuration reviewed (if Lambdas in VPC)
-- [ ] CloudTrail enabled for audit logging
-- [ ] AWS Config rules for compliance monitoring
-- [ ] GuardDuty enabled for threat detection
+- [ ] check · [ ] done — IAM least privilege per-function roles (`tfsec`)
+- [ ] check · [ ] done — Encryption at rest DynamoDB/S3 (`tfsec`)
+- [ ] check · [ ] done — TLS 1.2+ for all endpoints (`tfsec` — CloudFront config)
+- [ ] check · [ ] done — CloudTrail enabled for audit logging (`terraform validate`)
+- [ ] check · [ ] done — GuardDuty enabled (`terraform validate`)
 
 ## Pillar 3: Reliability
-- [ ] Multi-AZ deployment for critical services (DynamoDB global tables or backups)
-- [ ] Lambda retry and dead-letter queue configuration for async invocations
-- [ ] SQS dead-letter queue for merlin-worker message failures
-- [ ] Backup strategy for DynamoDB data (point-in-time recovery enabled)
-- [ ] Disaster recovery plan documented (RPO/RTO targets)
+- [ ] check · [ ] done — DynamoDB point-in-time recovery enabled (`tfsec`)
+- [ ] check · [ ] done — Lambda retry + DLQ for async invocations (`terraform validate`)
+- [ ] check · [ ] done — SQS DLQ for merlin-worker failures (`terraform validate`)
+- [ ] check · [ ] done — Disaster recovery plan documented (`manual review`)
 
 ## Pillar 4: Performance Efficiency
-- [ ] Lambda memory right-sized (use AWS Lambda Power Tuning)
-- [ ] Lambda cold start minimized (small bundles, lazy imports)
-- [ ] DynamoDB access patterns optimized (no Scan operations, proper GSI design)
-- [ ] CloudFront caching configured for static assets and API responses where appropriate
-- [ ] S3 audio cache prevents redundant TTS synthesis
+- [ ] check · [ ] done — Lambda memory right-sized (`Lambda Power Tuning`)
+- [ ] check · [ ] done — Lambda cold start minimized — small bundles (`size-limit` tool)
+- [ ] check · [ ] done — DynamoDB no Scan operations (`run-tests` + code review)
+- [ ] check · [ ] done — CloudFront caching for static assets (`terraform validate`)
+- [ ] check · [ ] done — S3 audio cache prevents re-synthesis (`run-tests`)
 
 ## Pillar 5: Cost Optimization
-- [ ] Lambda concurrency limits set to prevent runaway costs
-- [ ] DynamoDB on-demand vs provisioned capacity evaluated
-- [ ] S3 lifecycle policies for audio cache (transition to IA, expire old files)
-- [ ] CloudWatch billing alarms configured
-- [ ] Cost allocation tags on all resources (`Project: hak`, `Environment: dev/prod`)
-- [ ] Monthly cost review process documented
+- [ ] check · [ ] done — Lambda concurrency limits set (`terraform validate`)
+- [ ] check · [ ] done — S3 lifecycle policies for audio cache (`terraform validate`)
+- [ ] check · [ ] done — CloudWatch billing alarms configured (`terraform validate`)
+- [ ] check · [ ] done — Cost allocation tags on all resources (`tfsec` tag check)
 
 ## Pillar 6: Sustainability
-- [ ] Right-sized compute (Lambda memory, ECS task sizes for merlin-worker)
-- [ ] Caching reduces redundant computation (S3 audio cache)
-- [ ] Efficient data transfer (CloudFront edge caching)
-- [ ] Minimal deployment artifact sizes (tree-shaking, production-only deps)
+- [ ] check · [ ] done — Right-sized compute (`Lambda Power Tuning`)
+- [ ] check · [ ] done — Caching reduces redundant computation (`run-tests`)
+- [ ] check · [ ] done — Minimal deployment artifacts (`size-limit`)

@@ -1,45 +1,43 @@
 # CIS AWS Foundations Benchmark — Checklist
 
 > https://www.cisecurity.org/benchmark/amazon_web_services
-> Security configuration best practices for AWS services used by HAK.
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## Identity and Access Management
-- [ ] No root account usage for daily operations
-- [ ] MFA enabled on root account and all IAM users
-- [ ] IAM policies use least privilege (no `Action: "*"` or `Resource: "*"`)
-- [ ] Lambda execution roles scoped to specific resources (table ARN, bucket ARN, queue ARN)
-- [ ] No inline IAM policies — use managed policies attached to roles
-- [ ] IAM Access Analyzer enabled to detect unintended access
+- [ ] check · [ ] done — No root account for daily operations (`AWS Security Hub`)
+- [ ] check · [ ] done — MFA on root and all IAM users (`AWS Security Hub`)
+- [ ] check · [ ] done — IAM policies least privilege, no `*` (`tfsec`)
+- [ ] check · [ ] done — Lambda roles scoped to specific resources (`tfsec`)
+- [ ] check · [ ] done — No inline IAM policies (`tfsec`)
+- [ ] check · [ ] done — IAM Access Analyzer enabled (`terraform validate`)
 
 ## Logging & Monitoring
-- [ ] CloudTrail enabled in all regions with log file validation
-- [ ] CloudTrail logs delivered to S3 with server-side encryption
-- [ ] CloudWatch Log Groups have retention policies (not infinite)
-- [ ] API Gateway access logging enabled
-- [ ] CloudWatch Alarms for: unauthorized API calls, root account usage, IAM changes
+- [ ] check · [ ] done — CloudTrail enabled in all regions (`tfsec`)
+- [ ] check · [ ] done — CloudTrail logs encrypted in S3 (`tfsec`)
+- [ ] check · [ ] done — CloudWatch Log retention policies set (`terraform validate`)
+- [ ] check · [ ] done — API Gateway access logging enabled (`terraform validate`)
+- [ ] check · [ ] done — Alarms for unauthorized calls, root usage (`terraform validate`)
 
 ## Networking
-- [ ] Default VPC security groups restrict all inbound traffic
-- [ ] S3 buckets block public access (unless intentionally public for frontend)
-- [ ] CloudFront distributions use TLS 1.2 minimum
-- [ ] API Gateway endpoints use regional or edge-optimized (not private unless needed)
+- [ ] check · [ ] done — Default VPC security groups restrict inbound (`tfsec`)
+- [ ] check · [ ] done — S3 buckets block public access (`tfsec`)
+- [ ] check · [ ] done — CloudFront uses TLS 1.2 minimum (`tfsec`)
 
 ## Storage
-- [ ] S3 bucket versioning enabled for data recovery
-- [ ] S3 bucket access logging enabled for audit trail
-- [ ] DynamoDB point-in-time recovery enabled
-- [ ] DynamoDB encryption at rest enabled (default AWS managed key or CMK)
-- [ ] S3 lifecycle policies for cost management (audio cache expiry)
+- [ ] check · [ ] done — S3 versioning enabled (`tfsec`)
+- [ ] check · [ ] done — S3 access logging enabled (`tfsec`)
+- [ ] check · [ ] done — DynamoDB point-in-time recovery (`tfsec`)
+- [ ] check · [ ] done — DynamoDB encryption at rest (`tfsec`)
+- [ ] check · [ ] done — S3 lifecycle policies for cost management (`terraform validate`)
 
 ## Compute
-- [ ] Lambda functions use latest supported runtime version (Node.js 20)
-- [ ] Lambda environment variables do not contain secrets (use Secrets Manager)
-- [ ] ECS tasks use Fargate (no EC2 instances to manage)
-- [ ] ECS task definitions specify CPU and memory limits
-- [ ] ECR image scanning enabled for merlin-worker images
+- [ ] check · [ ] done — Lambda uses latest Node.js runtime (`terraform validate`)
+- [ ] check · [ ] done — Lambda env vars contain no secrets (`secret-detection` hook)
+- [ ] check · [ ] done — ECS tasks use Fargate (`terraform validate`)
+- [ ] check · [ ] done — ECR image scanning enabled (`terraform validate`)
 
 ## Terraform Verification
-- [ ] Run `tfsec` on all Terraform files — zero high findings
-- [ ] Run `checkov` on all Terraform files — zero critical findings
-- [ ] Terraform state encrypted at rest (S3 + DynamoDB backend ✓)
-- [ ] Terraform state access restricted via IAM policies
+- [ ] check · [ ] done — `tfsec` zero high findings (`tfsec` in CI)
+- [ ] check · [ ] done — `checkov` zero critical findings (`checkov` in CI)
+- [ ] check · [ ] done — Terraform state encrypted (`tfsec`)
+- [ ] check · [ ] done — Terraform state access restricted (`tfsec`)

@@ -1,91 +1,70 @@
 # OWASP ASVS Level 2 — Checklist
 
 > https://owasp.org/www-project-application-security-verification-standard/
-> Application Security Verification Standard — Level 2 (standard applications).
+> Format: [ ] **check** = verification exists · [ ] **done** = requirement satisfied
 
 ## V1: Architecture, Design and Threat Modeling
-- [ ] Document application architecture with trust boundaries
-- [ ] Create threat model for each API endpoint (STRIDE methodology)
-- [ ] All components are identified and have defined security controls
-- [ ] Input validation strategy is centralized and documented
+- [ ] check · [ ] done — Architecture with trust boundaries documented (`manual review`)
+- [ ] check · [ ] done — Threat model per API endpoint — STRIDE (`manual review`)
+- [ ] check · [ ] done — Input validation strategy centralized (`run-lint` + `run-tests`)
 
 ## V2: Authentication
-- [ ] Authentication via Cognito/TARA uses standard OIDC protocol
-- [ ] PKCE code verifier has sufficient entropy (min 43 characters, RFC 7636)
-- [ ] Tokens have appropriate expiration (access: short, refresh: longer)
-- [ ] Account lockout or rate limiting after failed attempts (Cognito config)
-- [ ] No credentials stored in application code or client-side storage
+- [ ] check · [ ] done — OIDC via Cognito/TARA (`run-tests` — auth tests)
+- [ ] check · [ ] done — PKCE verifier ≥ 43 chars, RFC 7636 (`run-tests`)
+- [ ] check · [ ] done — Token expiration configured (`Cognito config review`)
+- [ ] check · [ ] done — No credentials in code (`secret-detection` hook)
 
 ## V3: Session Management
-- [ ] Session tokens are cryptographically random (Cognito JWT)
-- [ ] Session timeout configured (idle and absolute)
-- [ ] Logout properly invalidates tokens on server side
-- [ ] Session fixation protection (new tokens after authentication)
+- [ ] check · [ ] done — Session tokens cryptographically random — JWT (`run-tests`)
+- [ ] check · [ ] done — Session timeout configured (`Cognito config review`)
+- [ ] check · [ ] done — Logout invalidates tokens (`run-tests` — logout test)
 
 ## V4: Access Control
-- [ ] Every API endpoint has explicit access control checks
-- [ ] Users can only access their own resources (userId in partition key)
-- [ ] Shared resources have explicit access control (share token validation)
-- [ ] Admin functions (if any) require elevated authorization
-- [ ] Deny by default — resources are private unless explicitly shared
+- [ ] check · [ ] done — Every endpoint has access control (`run-tests`)
+- [ ] check · [ ] done — Users access only own resources (`run-tests`)
+- [ ] check · [ ] done — Deny by default (`run-tests` — unauthorized access tests)
 
 ## V5: Validation, Sanitization and Encoding
-- [ ] All input validated: type, length, range, format
-- [ ] Output encoding appropriate for context (HTML, JSON, URL)
-- [ ] File uploads (if any) validated for type, size, content
-- [ ] Text inputs enforce `MAX_TEXT_LENGTH` server-side
-- [ ] API responses use `Content-Type: application/json` consistently
+- [ ] check · [ ] done — All input validated: type, length, format (`run-tests`)
+- [ ] check · [ ] done — `MAX_TEXT_LENGTH` enforced server-side (`run-tests`)
+- [ ] check · [ ] done — API responses use `application/json` (`run-tests`)
 
 ## V6: Stored Cryptography
-- [ ] DynamoDB encryption at rest enabled (AWS managed or CMK)
-- [ ] S3 server-side encryption enabled
-- [ ] No custom cryptography — use AWS managed services
-- [ ] Hash functions use SHA-256 or better (verified in `@hak/shared`)
+- [ ] check · [ ] done — DynamoDB encryption at rest (`tfsec`)
+- [ ] check · [ ] done — S3 encryption enabled (`tfsec`)
+- [ ] check · [ ] done — SHA-256 for hashing (`run-tests` — hash tests)
 
 ## V7: Error Handling and Logging
-- [ ] Errors logged with sufficient context for debugging
-- [ ] Error responses to clients contain no sensitive information
-- [ ] All security-relevant events logged (auth, access control, input validation failures)
-- [ ] Logs do not contain PII, tokens, or credentials
+- [ ] check · [ ] done — Errors logged with context (`run-tests` — logging tests)
+- [ ] check · [ ] done — Client responses contain no sensitive info (`run-tests`)
+- [ ] check · [ ] done — Security events logged (`run-tests`)
+- [ ] check · [ ] done — Logs don't contain PII/tokens (`no-console` hook + review)
 
 ## V8: Data Protection
-- [ ] Sensitive data classified and documented
-- [ ] PII (user IDs, names) protected in transit and at rest
-- [ ] Data retention policies defined and implemented
-- [ ] No sensitive data cached in browser (Cache-Control headers)
+- [ ] check · [ ] done — Sensitive data classified (`manual review`)
+- [ ] check · [ ] done — PII protected in transit and at rest (`tfsec` + `run-tests`)
+- [ ] check · [ ] done — Data retention policies defined (`manual review`)
 
 ## V9: Communication
-- [ ] All external communication over TLS 1.2+ (CloudFront config)
-- [ ] HSTS headers configured
-- [ ] Certificate validation not disabled anywhere
-- [ ] Internal AWS service communication uses VPC endpoints or TLS
+- [ ] check · [ ] done — TLS 1.2+ for all external comms (`tfsec` — CloudFront)
+- [ ] check · [ ] done — HSTS headers configured (`run-tests` — header tests)
 
 ## V10: Malicious Code
-- [ ] No backdoors or debug endpoints in production code
-- [ ] `DebugPage.tsx` is removed or disabled in production builds
-- [ ] No eval, Function constructor, or dynamic code execution
-- [ ] Dependencies scanned for known malicious packages
+- [ ] check · [ ] done — No backdoors/debug endpoints in prod (`run-lint` + review)
+- [ ] check · [ ] done — `DebugPage.tsx` removed/disabled in prod (`run-build` check)
+- [ ] check · [ ] done — No eval/Function constructor (`run-lint` — `no-eval` rule)
 
 ## V11: Business Logic
-- [ ] Text length limits enforced consistently (client + server)
-- [ ] Rate limiting prevents abuse of TTS synthesis (expensive operation)
-- [ ] Task sharing has proper authorization checks
-- [ ] API responses have appropriate size limits
-
-## V12: Files and Resources
-- [ ] S3 upload policies restrict file types and sizes
-- [ ] Audio files served via CloudFront (not direct S3 access)
-- [ ] No path traversal possible in file operations
-- [ ] Temporary files cleaned up after processing
+- [ ] check · [ ] done — Text limits enforced client + server (`run-tests`)
+- [ ] check · [ ] done — TTS synthesis rate-limited (`terraform validate`)
+- [ ] check · [ ] done — Task sharing has auth checks (`run-tests`)
 
 ## V13: API and Web Service
-- [ ] All API endpoints documented with expected inputs/outputs
-- [ ] API versioning strategy defined
-- [ ] Request size limits configured at API Gateway level
-- [ ] Proper HTTP methods used (GET for read, POST for write)
+- [ ] check · [ ] done — All endpoints documented (`manual review`)
+- [ ] check · [ ] done — Request size limits at API Gateway (`terraform validate`)
+- [ ] check · [ ] done — Proper HTTP methods (GET read, POST write) (`run-tests`)
 
 ## V14: Configuration
-- [ ] All secrets externalized from code (env vars, Secrets Manager)
-- [ ] Default configurations are secure (no debug mode in production)
-- [ ] Security headers configured at CloudFront level
-- [ ] CORS policy is restrictive (specific origins, not `*`)
+- [ ] check · [ ] done — Secrets externalized from code (`secret-detection` hook)
+- [ ] check · [ ] done — No debug mode in production (`run-build` check)
+- [ ] check · [ ] done — CORS restrictive, not `*` (`run-tests` — header tests)
