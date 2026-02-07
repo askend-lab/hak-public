@@ -66,14 +66,8 @@ describe('Lambda Handler', () => {
   });
 
   describe('get endpoint', () => {
-    it('should return 400 for missing query params', async () => {
-      const event = createGetEvent('/get', {});
-      const result = await handler(event);
-      expect(result.statusCode).toBe(400);
-    });
-
-    it('should return 400 for null queryStringParameters', async () => {
-      const event = createGetEvent('/get', null);
+    it.each([{}, null])('should return 400 for missing/null query params: %j', async (params) => {
+      const event = createGetEvent('/get', params);
       const result = await handler(event);
       expect(result.statusCode).toBe(400);
     });
@@ -88,14 +82,8 @@ describe('Lambda Handler', () => {
   });
 
   describe('delete endpoint', () => {
-    it('should return 400 for missing query params', async () => {
-      const event = createDeleteEvent('/delete', {});
-      const result = await handler(event);
-      expect(result.statusCode).toBe(400);
-    });
-
-    it('should return 400 for null queryStringParameters', async () => {
-      const event = createDeleteEvent('/delete', null);
+    it.each([{}, null])('should return 400 for missing/null query params: %j', async (params) => {
+      const event = createDeleteEvent('/delete', params);
       const result = await handler(event);
       expect(result.statusCode).toBe(400);
     });
