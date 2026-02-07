@@ -78,7 +78,7 @@
 - [ ] **FE-03** `frontend/src/components/` — Add Storybook for visual component testing
 - [ ] **FE-04** `frontend/src/components/` — Add accessibility attributes (aria-label, role)
 - [ ] **FE-05** `frontend/src/` — Add React Query or SWR for data fetching
-- [ ] **FE-06** `frontend/src/` — Add Zustand devtools middleware
+- [x] **FE-06** `frontend/src/` — Add Zustand devtools middleware (N/A: project uses React Context, not Zustand)
 - [x] **FE-07** `frontend/src/` — Add error boundaries
 
 ### Infrastructure
