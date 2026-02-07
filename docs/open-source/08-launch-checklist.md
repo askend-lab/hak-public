@@ -1,53 +1,37 @@
 # Phase 6: Launch Checklist
 
 > All previous phases must be complete before launch.
+> **All DevBox hooks must be green. All manual gates must be checked.**
 
-## 1. Code Quality Gates (all must pass)
+## DevBox Hooks — ALL must pass on every commit
 
-- [ ] `pnpm lint` — zero warnings, zero errors
-- [ ] `pnpm typecheck` — zero errors across all packages
-- [ ] `pnpm test` — all tests pass, coverage 90%+
-- [ ] `pnpm audit` — zero high/critical vulnerabilities
-- [ ] `gitleaks detect` — zero findings in full history
-- [ ] `tsc --noEmit --strict` — zero errors
-- [ ] Lighthouse — 90+ all categories
-- [ ] WCAG 2.1 AA — zero violations
-- [ ] Bundle size — within defined budgets
-- [ ] Docker image scan — zero high/critical vulnerabilities
+| 🔧 | ✅ | Hook | Status |
+|---|---|------|--------|
+| [x] | [x] | `run-tests` | ✅ active |
+| [x] | [x] | `run-typecheck` | ✅ active |
+| [x] | [x] | `run-build` | ✅ active |
+| [x] | [ ] | `run-lint` | ⚠️ warnings remain |
+| [x] | [ ] | `security-audit` | ⚠️ 16 vulns |
+| [x] | [ ] | `no-console` | ⚠️ violations |
+| [x] | [ ] | `language-check` | ⚠️ non-English |
+| [x] | [ ] | `license-check` | needs verification |
+| [ ] | [ ] | `prettier-check` | disabled |
+| [ ] | [ ] | NEW hooks (tfsec, hadolint, etc.) | not yet added |
 
-## 2. Documentation Gates
+## Manual Gates
 
-- [ ] README.md — complete, professional, with screenshots
-- [ ] ARCHITECTURE.md — system diagrams and explanations
-- [ ] CONTRIBUTING.md — complete contributor guide
-- [ ] SECURITY.md — security policy and contact
-- [ ] API documentation — all endpoints documented
-- [ ] ADRs — all major decisions documented
-- [ ] Inline code docs — all exported functions documented
-- [ ] No internal references in any document
+### Licensing & Compliance
+- [ ] Verify MIT license with stakeholders (government IP)
+- [ ] Add license headers to all `.ts`/`.tsx` files
+- [ ] Add `NOTICE` file (third-party deps and licenses)
 
-## 3. Licensing & Compliance
-
-- [ ] **Verify MIT license** — Confirm with stakeholders for government-funded project.
-- [ ] **Add license headers** — Standard copyright notice in every `.ts`/`.tsx` file.
-- [ ] **Add `NOTICE` file** — List all third-party dependencies and licenses.
-- [ ] **Verify Estonian government IP requirements** — Compliance with procurement rules.
-- [ ] **Update copyright** — Correct holder, year range `2024-2026`.
-- [ ] **Consider CLA** — Contributor License Agreement for external contributors.
-
-## 4. Repository Setup
-
-- [ ] Branch protection on `main` — require reviews, status checks, signed commits
+### Repository Setup
+- [ ] Branch protection on `main` (reviews, status checks)
 - [ ] Enable GitHub Discussions
-- [ ] Enable GitHub Pages for documentation
-- [ ] Configure security alerts
-- [ ] Add topics/tags for discoverability
-- [ ] Social preview image
+- [ ] Add topics/tags, social preview image
 - [ ] Pinned "Good First Issue" issues
 
-## 5. Launch Communication
-
-- [ ] **Press release / blog post** — Announce open source release.
-- [ ] **Technical blog post** — "Building a government platform with AI-assisted development".
-- [ ] **Community guidelines** — Code of Conduct, governance model.
-- [ ] **Public roadmap** — Planned features and improvements.
+### Launch Communication
+- [ ] Press release / blog post
+- [ ] Code of Conduct, governance model
+- [ ] Public roadmap

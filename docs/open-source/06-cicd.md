@@ -1,52 +1,32 @@
 # Phase 5a: CI/CD & Dependencies
 
-> MEDIUM — robust pipeline and healthy dependencies for sustainable maintenance.
+> MEDIUM — robust pipeline and healthy dependencies.
+> Every item: 🔧 = DevBox hook or CI step exists, ✅ = all green.
 
-## 1. Build Consistency
+## Automated Verification (DevBox hooks)
 
-- [ ] **Standardize on pnpm everywhere** — Remove `packages/vabamorf-api/package-lock.json` (3851 lines). Update all Dockerfiles to use pnpm.
-- [ ] **Add build caching** — pnpm cache + GitHub Actions cache for node_modules and build outputs.
-- [ ] **Add typecheck step to CI** — `tsc --noEmit` for every package.
-- [ ] **Add lint step to CI** — ESLint + gherkin-lint in pipeline.
+| 🔧 | ✅ | Requirement | Hook | Tool |
+|---|---|-------------|------|------|
+| [x] | [ ] | No vulnerable deps | `security-audit` | pnpm audit |
+| [x] | [ ] | License compatibility | `license-check` | license-checker |
+| [x] | [x] | Unused deps detected | `dependency-check` | depcheck |
+| [ ] | [ ] | Prettier formatting | `prettier-check` (disabled) | prettier |
+| [ ] | [ ] | Bundle size budget | NEW: `bundle-size` | size-limit |
+| [ ] | [ ] | Docker image scan | NEW: CI `trivy` step | trivy |
+| [ ] | [ ] | CodeQL scanning | GitHub Actions | CodeQL |
 
-## 2. CI Quality Gates
+## Manual Gates
 
-- [ ] **Coverage enforcement** — Fail CI if coverage drops below threshold.
-- [ ] **Bundle size check** — Track and enforce frontend bundle size limits.
-- [ ] **Dependency audit** — `pnpm audit` in CI, fail on high severity.
-- [ ] **License check** — Verify all deps have MIT/Apache-2.0/BSD-compatible licenses.
-- [ ] **Secret scanning** — Run gitleaks in CI on every PR.
-- [ ] **Docker image scanning** — `trivy` on built images.
+### Dependencies
+- [ ] Fix all 16 npm vulnerabilities (3 low, 4 mod, 9 high)
+- [ ] Remove deprecated subdependencies
+- [ ] Update all deps to latest stable
 
-## 3. CI Workflow Improvements
+### CI/CD
+- [ ] Add PR template (`.github/PULL_REQUEST_TEMPLATE.md`)
+- [ ] Add CodeQL analysis workflow
+- [ ] Define semver + automated release workflow
 
-- [ ] **Add PR template** — `.github/PULL_REQUEST_TEMPLATE.md` with checklist.
-- [ ] **Verify issue templates** — Bug report and feature request completeness.
-- [ ] **Verify Dependabot config** — `.github/dependabot.yml` properly configured.
-- [ ] **Add CodeQL analysis** — GitHub code scanning for security.
-- [ ] **Add OSSF Scorecard** — Automated security assessment for OSS projects.
-- [ ] **Add automated changelog** — Generate from conventional commits on release.
-
-## 4. Release Process
-
-- [ ] **Define versioning strategy** — Semantic versioning with automated releases.
-- [ ] **Create release workflow** — GitHub Actions for creating releases with changelog.
-- [ ] **Document release-to-environment mapping**.
-
-## 5. Dependency Health
-
-### Vulnerability Remediation
-- [ ] **Fix all 16 npm vulnerabilities** — 3 low, 4 moderate, 9 high. Every one resolved.
-- [ ] **Set up automated monitoring** — Dependabot + GitHub security alerts.
-- [ ] **Pin all production dependency versions** — No `^` or `~` ranges.
-
-### Dependency Audit
-- [ ] **Remove deprecated deps** — 25 deprecated subdependencies found.
-- [ ] **License audit** — Run `license-checker`, verify MIT compatibility.
-- [ ] **Minimize dependency count** — Audit each dep: necessary? replaceable with native APIs?
-- [ ] **Add `engines` field to all packages** — Required Node.js version.
-- [ ] **Create dependency policy** — Criteria for adding new deps (size, maintenance, license).
-
-### Freshness
-- [ ] **Update all deps to latest stable** — TypeScript, React, AWS SDK, Jest/Vitest, ESLint.
-- [ ] **Remove unused deps** — Run `depcheck` to find unused packages.
+### Infrastructure
+- [ ] Parameterize all env-specific values in Terraform
+- [ ] Add `infra/README.md`

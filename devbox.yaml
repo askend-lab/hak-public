@@ -112,7 +112,8 @@ hooks:
       - "**/stories/**"
       - "**/scripts/**"
 
-  # prettier-check: {} # disabled — will run once before open source launch
+  prettier-check:
+    mode: off # disabled — will run once before open source launch
 
   test-required:
     tdd: true # Enable strict TDD enforcement for feat/fix commits

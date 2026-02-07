@@ -1,35 +1,27 @@
 # Phase 3b: Testing & Coverage
 
 > HIGH — tests must prove the code works and catch regressions.
+> Every item: 🔧 = DevBox hook exists, ✅ = all green.
 
-## 1. Coverage Targets
+## Automated Verification (DevBox hooks)
 
-- [ ] **Raise all coverage thresholds to 90%+** — Current lowered values:
-  - `simplestore` functions: 75% → 90%
-  - `merlin-worker` branches: 75% → 90%
-  - Target: lines 90%, branches 85%, functions 90%, statements 90%
-- [ ] **Achieve 90%+ for `vabamorf-api`** — Currently 83% lines, 77% branches.
-- [ ] **Measure and improve frontend coverage** — Set and enforce thresholds.
-- [ ] **Add coverage badges to README** — Per-package coverage display.
+| 🔧 | ✅ | Requirement | Hook | Tool |
+|---|---|-------------|------|------|
+| [x] | [x] | All tests pass | `run-tests` | jest/vitest |
+| [x] | [ ] | Coverage ≥90% lines, ≥85% branches | `test-coverage` | v8/istanbul |
+| [x] | [x] | TDD enforced (new code needs tests) | `test-required` | devbox |
+| [x] | [x] | Unused deps detected | `dependency-check` | depcheck |
 
-## 2. Test Quality
+## Stretch Goals (NEW hooks needed)
 
-- [ ] **Audit test descriptions** — Every `describe`/`it` must describe behavior, not implementation.
-- [ ] **Audit test isolation** — No test depends on another's state. Verify with `--randomize`.
-- [ ] **Add integration tests** — Lambda handlers with realistic event payloads.
-- [ ] **Add E2E tests** — Playwright for critical user journeys:
-  - Login via TARA/Cognito
-  - Create a task
-  - Complete an exercise
-  - Audio synthesis playback
-- [ ] **Fix or replace cucumber BDD tests** — Currently broken. Either fix infrastructure or convert to Playwright.
-- [ ] **Add property-based tests** — `fast-check` for input validation, parsers, text processing.
-- [ ] **Add mutation testing** — `stryker-mutator` for test suite quality (>80% mutation score).
-- [ ] **Add load tests** — `artillery` or `k6` for Lambda API load testing.
-- [ ] **Add contract tests** — Frontend API calls match backend contracts (consider `pact` or `zod` sharing).
+| 🔧 | ✅ | Requirement | Hook | Tool |
+|---|---|-------------|------|------|
+| [ ] | [ ] | E2E critical journeys | NEW: `run-e2e` | Playwright |
+| [ ] | [ ] | Property-based tests | (in `run-tests`) | fast-check |
+| [ ] | [ ] | Mutation score ≥80% | NEW: `run-mutation` | stryker |
 
-## 3. Test Infrastructure
+## Manual Gates
 
-- [ ] **Standardize mock patterns** — `simplestore` has both `mockDynamoDB.ts` and `InMemoryAdapter`. Pick one.
-- [ ] **Add test data factories** — `fishery` or similar instead of manual object construction.
-- [ ] **Review snapshot usage** — Ensure snapshots are meaningful and reviewed.
+- [ ] Raise all per-package coverage thresholds to 90%+ in devbox.yaml
+- [ ] Add coverage badges to README
+- [ ] Fix or remove broken cucumber BDD tests
