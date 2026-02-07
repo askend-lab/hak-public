@@ -1,119 +1,118 @@
-# Verification Pipeline — Implementation Plan
+# Verification Pipeline — DevBox Implementation
 
-> Step-by-step: install each tool, configure it, add to CI, verify it catches violations.
+> All checks run on **pre-commit** via DevBox hooks.
+> Step-by-step: enable hook → configure in `devbox.yaml` → verify it catches violations.
 
-## Tier 1: Already Available (just wire into CI)
+## Step 1: Enable All Available DevBox Hooks
 
-### 1.1 TypeScript Strict (`tsc --noEmit`)
-- **Status**: ✅ `strict: true` in tsconfig.json
-- **Add to CI**: `pnpm -r exec tsc --noEmit`
-- **Verify**: Introduce a type error → CI fails
+These hooks already exist in DevBox but are not yet active in `devbox.yaml`.
+Just add them to the config with `mode: error`.
 
-### 1.2 ESLint (`pnpm lint`)
-- **Status**: ✅ Configured, runs locally
-- **Add to CI**: `pnpm lint` in build workflow
-- **Verify**: Introduce a lint violation → CI fails
+### 1.1 `no-any` — Zero `any` types
+- **Standards**: Google TS Guide, NASA Rule 9
+- **Config**: `no-any: { mode: error }`
+- **Verify**: Add `: any` to a staged file → hook blocks commit
+- **Current status**: 0 violations (safe to enable immediately)
 
-### 1.3 Jest Coverage (`pnpm test`)
-- **Status**: ✅ Configured with thresholds
-- **Add to CI**: Already runs; add `--coverage` flag
-- **Verify**: Lower a threshold → CI fails
+### 1.2 `no-floating-promises` — All Promises handled
+- **Standards**: NASA Rule 7, Node.js Best Practices
+- **Config**: `no-floating-promises: { mode: error }`
+- **Verify**: Add unhandled Promise → hook blocks commit
 
-### 1.4 pnpm audit
-- **Status**: ⚠️ 16 vulnerabilities exist
-- **Add to CI**: `pnpm audit --audit-level=high`
-- **First**: Fix all 16 vulnerabilities, THEN enable gate
+### 1.3 `no-console` — No console.log in production
+- **Standards**: Node.js Best Practices, Clean Code
+- **Config**: Already configured with `allow_warn: true, allow_error: true`
+- **Currently**: mode not set → add `mode: error`
+- **Caveat**: 20+ violations exist → fix first, then enable
 
-### 1.5 Terraform fmt
-- **Status**: ✅ Terraform installed in CI
-- **Add to CI**: `terraform fmt -check -recursive infra/`
-- **Verify**: Misformat a `.tf` file → CI fails
+### 1.4 `import-order` — Consistent import ordering
+- **Standards**: Google TS Guide
+- **Config**: `import-order: { mode: error }`
+- **Verify**: Disorder imports → hook blocks commit
 
-## Tier 2: Install & Configure (standard npm packages)
+### 1.5 `prettier-check` — Consistent formatting
+- **Standards**: Google TS Guide, Standard for Public Code
+- **Config**: `prettier-check: { mode: error }` (already `{}`)
+- **Prerequisite**: Install and configure Prettier first
 
-### 2.1 gitleaks (secret scanning)
-- **Install**: Download binary or use GitHub Action `gitleaks/gitleaks-action@v2`
-- **Config**: `.gitleaks.toml` already exists; expand rules
-- **CI**: Add step after checkout: `gitleaks detect --source . --verbose`
-- **Pre-commit**: Add to husky hooks
-- **Verify**: Add a fake AWS key to a test file → gitleaks catches it
+### 1.6 `run-build` — Frontend build succeeds
+- **Standards**: Build verification
+- **Config**: Already `mode: error, command: pnpm --filter @hak/frontend build`
+- **Move to pre-commit stage** (currently only used on-demand)
 
-### 2.2 commitlint (commit message format)
-- **Install**: `pnpm add -Dw @commitlint/cli @commitlint/config-conventional`
-- **Config**: `commitlint.config.js` → `{ extends: ['@commitlint/config-conventional'] }`
-- **Hook**: `npx commitlint --edit $1` in commit-msg hook
-- **Verify**: Bad commit message → hook rejects
+### 1.7 `broken-links` — No dead links in documentation
+- **Standards**: Standard for Public Code
+- **Config**: Already configured, add to `pre-commit` stage
 
-### 2.3 license-checker (dependency licenses)
-- **Install**: `pnpm add -Dw license-checker`
-- **CI**: `license-checker --production --failOn 'GPL;AGPL;SSPL'`
-- **Verify**: Confirms all deps are MIT/Apache/BSD compatible
+### 1.8 `language-check` → upgrade to error
+- **Standards**: Standard for Public Code (Criterion 10: Use Plain English)
+- **Config**: Change `mode: warning` → `mode: error`
+- **Caveat**: May have violations → fix first
 
-### 2.4 madge (circular dependencies)
+### 1.9 `run-lint` → upgrade to error
+- **Standards**: All code quality standards
+- **Config**: Change `mode: warning` → `mode: error`
+- **Caveat**: May have violations → fix first
+
+## Step 2: Configure Stricter Thresholds
+
+### 2.1 Coverage thresholds → 90%
+- **File**: Each package's `jest.config.js`
+- **Change**: `lines: 90, branches: 85, functions: 90, statements: 90`
+- **Prerequisite**: Write tests to reach 90% first
+
+### 2.2 Complexity → 8 (McCabe)
+- **File**: `eslint.config.mjs`
+- **Rule**: `complexity: ['error', 8]` (already default in defaults.yaml)
+- **Verify**: Write complex function → ESLint blocks
+
+### 2.3 Security audit level → high
+- **File**: `devbox.yaml` → `security-audit.auditLevel: high`
+- **Prerequisite**: Fix all 16 vulnerabilities first
+
+## Step 3: Add New Hooks to DevBox
+
+DevBox supports `CommandRunnerHook` — any shell command can be a hook.
+Request these as new hooks or use `run-*` pattern.
+
+### 3.1 Circular dependency detection
+- **Command**: `madge --circular --extensions ts packages/*/src`
+- **Implementation**: Add as `run-circular-deps` hook or request from DevBox team
 - **Install**: `pnpm add -Dw madge`
-- **CI**: `madge --circular --extensions ts packages/*/src`
-- **Verify**: Create circular import → madge catches it
 
-### 2.5 ts-prune (dead code)
+### 3.2 Dead code detection
+- **Command**: `ts-prune | grep -v '(used in module)' | grep -v '__tests__'`
+- **Implementation**: Add as `run-dead-code` hook
 - **Install**: `pnpm add -Dw ts-prune`
-- **CI**: `ts-prune | grep -v '(used in module)'`
-- **Verify**: Add unused export → ts-prune catches it
 
-### 2.6 hadolint (Dockerfile linting)
-- **Install**: GitHub Action `hadolint/hadolint-action@v3`
-- **CI**: `hadolint packages/*/Dockerfile packages/frontend/src/services/*/Dockerfile`
-- **Verify**: Add `RUN apt-get install` without version pin → hadolint catches it
+### 3.3 Dockerfile linting
+- **Command**: `hadolint packages/*/Dockerfile`
+- **Implementation**: Add as `run-docker-lint` hook
+- **Install**: `brew install hadolint` or download binary
 
-### 2.7 size-limit (bundle size)
-- **Install**: `pnpm add -Dw size-limit @size-limit/preset-app`
-- **Config**: `.size-limit.json` with budget per entry point
-- **CI**: `npx size-limit`
-- **Verify**: Import a large library → size-limit fails
+### 3.4 Terraform security scanning
+- **Command**: `tfsec infra/ --minimum-severity HIGH`
+- **Implementation**: Add as `run-tfsec` hook
+- **Install**: `brew install tfsec` or download binary
 
-### 2.8 Prettier (formatting)
-- **Install**: `pnpm add -Dw prettier`
-- **Config**: `.prettierrc` with project settings
-- **CI**: `prettier --check .`
-- **Verify**: Misformat a file → prettier --check fails
+### 3.5 License compliance
+- **Command**: `license-checker --production --failOn 'GPL;AGPL;SSPL'`
+- **Implementation**: Add as `run-license-check` hook
+- **Install**: `pnpm add -Dw license-checker`
 
-## Tier 3: Advanced Tools (require more setup)
+## Step 4: Commit-msg Hooks
 
-### 3.1 CodeQL (deep static analysis)
-- **Setup**: `.github/workflows/codeql.yml` using `github/codeql-action`
-- **Languages**: `javascript-typescript`
-- **Schedule**: On every PR + weekly full scan
-- **Verify**: Review CodeQL alerts in GitHub Security tab
+### 4.1 Conventional Commits enforcement
+- **Current**: `test-required` hook on commit-msg stage
+- **Add**: commitlint hook for message format
+- **Install**: `pnpm add -Dw @commitlint/cli @commitlint/config-conventional`
+- **DevBox integration**: Add `commit-msg-format` hook
 
-### 3.2 semgrep (pattern-based security scanning)
-- **Setup**: `.github/workflows/semgrep.yml` or in build workflow
-- **Config**: `semgrep --config=p/owasp-top-ten --config=p/typescript`
-- **Verify**: Add `eval()` call → semgrep catches it
+## Implementation Order
 
-### 3.3 trivy (container + dependency scanning)
-- **Setup**: `aquasecurity/trivy-action@master` in CI
-- **Targets**: Docker images + filesystem (node_modules)
-- **CI**: `trivy image --severity HIGH,CRITICAL --exit-code 1`
-- **Verify**: Use image with known CVE → trivy catches it
-
-### 3.4 tfsec / checkov (IaC security)
-- **Setup**: `aquasecurity/tfsec-action@v1` or `bridgecrewio/checkov-action@v2`
-- **CI**: `tfsec infra/ --minimum-severity HIGH`
-- **Verify**: Add S3 bucket without encryption → tfsec catches it
-
-### 3.5 Lighthouse CI (performance + a11y)
-- **Install**: `pnpm add -Dw @lhci/cli`
-- **Config**: `lighthouserc.json` with assertions (scores ≥ 90)
-- **CI**: `lhci autorun` against deployed preview
-- **Verify**: Add blocking script → Lighthouse performance drops
-
-### 3.6 Playwright + axe-core (E2E + accessibility)
-- **Install**: `pnpm add -Dw @playwright/test @axe-core/playwright`
-- **Config**: `playwright.config.ts`
-- **CI**: `npx playwright test`
-- **Verify**: Add image without alt → axe catches it
-
-### 3.7 Stryker (mutation testing)
-- **Install**: `pnpm add -Dw @stryker-mutator/core @stryker-mutator/jest-runner`
-- **Config**: `stryker.config.mjs`
-- **Schedule**: Weekly (too slow for every PR)
-- **Verify**: Mutation score report shows test suite quality
+1. **Enable zero-violation hooks** (no-any, no-floating-promises) — safe, no fixes needed
+2. **Fix violations, then enable** (no-console: fix 20+ logs, then mode: error)
+3. **Upgrade warnings → errors** (run-lint, language-check)
+4. **Raise thresholds** (coverage 90%, after writing tests)
+5. **Add new hooks** (madge, ts-prune, hadolint, tfsec, license-checker)
+6. **Fix vulnerabilities** (then set security-audit to strict)

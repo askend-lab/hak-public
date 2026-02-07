@@ -24,14 +24,16 @@
 > **Before fixing anything, define HOW we verify each requirement.**
 > If we can't verify it, we can't claim compliance.
 
-See: [Verification Approach](./checklists/00-verification-approach.md) — maps every standard to its tool/method.
-See: [Verification Pipeline](./checklists/00-verification-pipeline.md) — step-by-step setup for each tool.
+**All checks run on pre-commit via DevBox hooks.** No bad code enters the repository.
+
+See: [Verification Approach](./checklists/00-verification-approach.md) — maps every standard to its DevBox hook.
+See: [Verification Pipeline](./checklists/00-verification-pipeline.md) — step-by-step DevBox hook enablement.
 
 **Phase 0** (before all other phases):
-1. Set up verification tools (CI gates, linters, scanners)
-2. Confirm each tool catches violations (negative tests)
+1. Enable all available DevBox hooks (no-any, no-console, prettier, etc.)
+2. Verify each hook catches violations (negative test)
 3. Baseline current state (how many violations per standard)
-4. Then start fixing — with confidence that fixes are verified
+4. Fix violations, then upgrade hook modes from `warning` → `error`
 
 ## Phase Order
 

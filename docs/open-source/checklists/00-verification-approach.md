@@ -4,80 +4,107 @@
 > Every standard must have a measurable, repeatable verification method.
 > If we can't verify it, we can't claim compliance.
 
-## Verification Methods
+## DevBox is our Verification Engine
 
-| Method | Type | When | Blocks |
-|--------|------|------|--------|
-| **CI Gate** | Automated, in pipeline | Every PR | Merge |
-| **CLI Tool** | Automated, run locally | Pre-commit / on-demand | Commit |
-| **Scheduled Scan** | Automated, periodic | Weekly/monthly | Nothing (alerts) |
-| **Manual Review** | Human checklist | Per-release | Release |
-| **External Audit** | Third-party assessment | Pre-launch | Launch |
+All checks run on **pre-commit** via DevBox hooks. Every developer gets instant feedback
+before code leaves their machine. No bad code ever enters the repository.
 
-## Standard → Verification Mapping
+**DevBox Architecture**:
+- `devbox.yaml` → project config (extends `defaults.yaml`)
+- **Stages**: `pre-commit` → `commit-msg` → `pre-push` → `pr-check` → `ci-cd`
+- **24 hooks available**, each with `mode: error | warning | off`
+- Hooks run on staged files only (fast) or full repo (thorough)
+- Test runner executes all test modules with coverage thresholds
 
-### Security Standards
+## Currently Active Hooks (pre-commit)
 
-| Standard | Verification Tool | CI Gate? | Command |
-|----------|------------------|----------|---------|
-| OWASP Top 10 | `semgrep` + custom rules | ✅ | `semgrep --config=p/owasp-top-ten` |
-| OWASP Serverless | Manual review + `semgrep` | ✅ | Custom semgrep rules for Lambda patterns |
-| OWASP ASVS L2 | `zap` (DAST) + manual | ❌ | `zap-baseline.py` on staging |
-| CWE Top 25 | `CodeQL` + `semgrep` | ✅ | GitHub CodeQL Action |
-| NIST SSDF | Process checklist | ❌ | Manual review per-release |
-| SLSA | `slsa-verifier` | ✅ | Provenance verification in release workflow |
-| Secret scanning | `gitleaks` | ✅ | `gitleaks detect --source .` |
-| Dependency vulns | `pnpm audit` | ✅ | `pnpm audit --audit-level=high` |
-| License compliance | `license-checker` | ✅ | `license-checker --production --failOn` |
-| Docker security | `trivy` | ✅ | `trivy image <image>` |
-| IaC security | `tfsec` + `checkov` | ✅ | `tfsec infra/ && checkov -d infra/` |
-| CIS AWS Benchmark | AWS Security Hub | ❌ | AWS Console / CLI scheduled |
+| Hook | What it Checks | Mode |
+|------|---------------|------|
+| `markdown-size` | Markdown files ≤ 200 lines | error |
+| `source-size` | Source files ≤ 400 lines | error |
+| `language-check` | English-only code | warning |
+| `jscpd` | Copy-paste detection ≤ 5% | error |
+| `run-lint` | ESLint (all rules) | warning |
+| `run-tests` | Full test suite + coverage | error |
+| `run-typecheck` | `tsc --noEmit` strict mode | error |
+| `dependency-check` | Unused/missing dependencies | error |
+| `security-audit` | `pnpm audit` vulnerabilities | error |
+| `secret-detection` | gitleaks secret scanning | error |
 
-### Code Quality Standards
+## Currently Active Hooks (commit-msg)
 
-| Standard | Verification Tool | CI Gate? | Command |
-|----------|------------------|----------|---------|
-| TypeScript strict | `tsc --noEmit` | ✅ | `tsc --noEmit --strict` |
-| Google TS Guide | `ESLint` custom config | ✅ | `pnpm lint` |
-| NASA Power of Ten | ESLint `complexity` + `max-lines-per-function` | ✅ | `pnpm lint` |
-| Node.js Best Practices | ESLint + custom rules | ✅ | `pnpm lint` |
-| No `any` types | `@typescript-eslint/no-explicit-any` | ✅ | `pnpm lint` |
-| No `console.log` | `no-console` ESLint rule | ✅ | `pnpm lint` |
-| No dead code | `ts-prune` | ✅ | `ts-prune \| grep -v used` |
-| Circular deps | `madge` | ✅ | `madge --circular --extensions ts packages/` |
-| Bundle size | `size-limit` | ✅ | `size-limit` |
-| Conventional Commits | `commitlint` | ✅ | `commitlint --from=HEAD~1` |
+| Hook | What it Checks | Mode |
+|------|---------------|------|
+| `test-required` | TDD: new code must have tests | error |
 
-### Testing Standards
+## Available but Not Yet Configured
 
-| Standard | Verification Tool | CI Gate? | Command |
-|----------|------------------|----------|---------|
-| Coverage 90%+ | Jest `--coverage` | ✅ | `pnpm test -- --coverage` |
-| Mutation score 80%+ | `stryker-mutator` | ❌ | `npx stryker run` (scheduled) |
-| E2E tests | Playwright | ✅ | `npx playwright test` |
-| a11y tests | `@axe-core/playwright` | ✅ | Part of Playwright suite |
-| Property-based | `fast-check` (in Jest) | ✅ | Part of `pnpm test` |
-| BDD specs | Cucumber / Playwright | ✅ | Part of test suite |
-| Test isolation | Jest `--randomize` | ✅ | `pnpm test -- --randomize` |
+| Hook | What it Checks | Needed For |
+|------|---------------|------------|
+| `no-any` | Zero `any` types | Google TS Guide, NASA Rule 9 |
+| `no-floating-promises` | All Promises handled | NASA Rule 7 |
+| `import-order` | Consistent imports | Google TS Guide |
+| `prettier-check` | Code formatting | Consistency |
+| `no-console` | No `console.log` in source | Node.js Best Practices |
+| `run-build` | Frontend build succeeds | Build verification |
+| `test-coverage` | Coverage thresholds met | Testing standards |
+| `eslint-batch` | Batch ESLint on staged files | Performance |
+| `broken-links` | Dead links in docs | Documentation |
+| `metrics-required` | Docs have metrics | Documentation |
+| `package-json-validation` | Valid package.json | Consistency |
 
-### Accessibility Standards
+## Standard → DevBox Hook Mapping
 
-| Standard | Verification Tool | CI Gate? | Command |
-|----------|------------------|----------|---------|
-| WCAG 2.2 AA | `axe-core` + Lighthouse | ✅ | `npx playwright test --grep a11y` |
-| EN 301 549 | `axe-core` + manual | Partial | Automated ~60%, manual ~40% |
-| Keyboard nav | Playwright keyboard tests | ✅ | `npx playwright test --grep keyboard` |
-| Screen reader | Manual testing (NVDA/VO) | ❌ | Manual checklist per-release |
-| Color contrast | `axe-core` + Lighthouse | ✅ | Automated in a11y tests |
-| Lighthouse 90+ | `lighthouse-ci` | ✅ | `lhci autorun` |
+### Security Standards (OWASP, CWE, NIST)
 
-### Infrastructure Standards
+| Requirement | DevBox Hook | Config Key |
+|-------------|------------|------------|
+| No secrets in code | `secret-detection` ✅ | gitleaks rules |
+| No vulnerable deps | `security-audit` ✅ | `auditLevel: high` |
+| No `eval()`/injection | `run-lint` ✅ | ESLint `no-eval` rule |
+| Input validation | `run-tests` ✅ | Tests verify validation |
+| Auth enforcement | `run-tests` ✅ | Tests verify auth |
+| CORS hardening | `run-tests` ✅ | Tests verify headers |
+| Docker security | **NEW**: `run-docker-lint` | `hadolint` command |
+| IaC security | **NEW**: `run-tfsec` | `tfsec infra/` command |
 
-| Standard | Verification Tool | CI Gate? | Command |
-|----------|------------------|----------|---------|
-| AWS Well-Architected | AWS WA Tool | ❌ | Manual review, scheduled |
-| Twelve-Factor | Process checklist | ❌ | Manual review per-release |
-| CIS AWS | AWS Security Hub | ❌ | Scheduled scan |
-| Terraform fmt | `terraform fmt -check` | ✅ | `terraform fmt -check -recursive infra/` |
-| Terraform validate | `terraform validate` | ✅ | `cd infra && terraform validate` |
-| Docker best practices | `hadolint` | ✅ | `hadolint packages/*/Dockerfile` |
+### Code Quality (NASA, Google TS, Clean Code)
+
+| Requirement | DevBox Hook | Config Key |
+|-------------|------------|------------|
+| Strict TypeScript | `run-typecheck` ✅ | `tsc --noEmit` |
+| No `any` types | `no-any` (enable) | mode: error |
+| No floating Promises | `no-floating-promises` (enable) | mode: error |
+| No `console.log` | `no-console` (enable) | mode: error |
+| Complexity ≤ 8 | `run-lint` ✅ | ESLint `complexity` rule |
+| Functions ≤ 50 lines | `source-size` ✅ | max_lines: 400 |
+| No copy-paste | `jscpd` ✅ | threshold: 5% |
+| Import ordering | `import-order` (enable) | mode: error |
+| Formatting | `prettier-check` (enable) | mode: error |
+| No unused deps | `dependency-check` ✅ | mode: error |
+| No dead exports | **NEW**: `dead-code` | `ts-prune` command |
+| No circular deps | **NEW**: `circular-deps` | `madge --circular` |
+
+### Testing (ISTQB, TDD, BDD)
+
+| Requirement | DevBox Hook | Config Key |
+|-------------|------------|------------|
+| Coverage ≥ 90% | `run-tests` ✅ | Jest thresholds |
+| TDD enforced | `test-required` ✅ | tdd: true |
+| All tests pass | `run-tests` ✅ | exit code 0 |
+| Build succeeds | `run-build` (enable) | mode: error |
+
+### Accessibility (WCAG, EN 301 549)
+
+| Requirement | DevBox Hook | Config Key |
+|-------------|------------|------------|
+| axe-core passes | `run-tests` ✅ | Playwright + axe in test suite |
+| Lighthouse ≥ 90 | **NEW**: `run-lighthouse` | `lhci autorun` |
+
+### Documentation (Standard for Public Code)
+
+| Requirement | DevBox Hook | Config Key |
+|-------------|------------|------------|
+| Docs ≤ 200 lines | `markdown-size` ✅ | max_lines: 200 |
+| No broken links | `broken-links` (enable) | mode: error |
+| English language | `language-check` ✅ | warning → error |
