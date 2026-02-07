@@ -59,7 +59,7 @@
 
 ### Testing
 - [x] **TEST-01** `simplestore/test/setup.ts` — Reset env vars in afterEach
-- [ ] **TEST-02** `simplestore/test/handler.test.ts` — Replace `expect([200,500]).toContain()` with deterministic assertions
+- [x] **TEST-02** `simplestore/test/handler.test.ts` — Replace `expect([200,500]).toContain()` with deterministic assertions
 - [x] **TEST-03** `simplestore/test/store.test.ts` — Add test for update existing item behavior
 - [ ] **TEST-04** `simplestore/test/mockDynamoDB.ts` — Unify with `InMemoryAdapter` from adapters
 - [ ] **TEST-05** `simplestore/test/*.test.ts` — Add concurrent access tests
