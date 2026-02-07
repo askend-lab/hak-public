@@ -79,7 +79,7 @@
 - [ ] **FE-04** `frontend/src/components/` — Add accessibility attributes (aria-label, role)
 - [ ] **FE-05** `frontend/src/` — Add React Query or SWR for data fetching
 - [ ] **FE-06** `frontend/src/` — Add Zustand devtools middleware
-- [ ] **FE-07** `frontend/src/` — Add error boundaries
+- [x] **FE-07** `frontend/src/` — Add error boundaries
 
 ### Infrastructure
 - [ ] **CI-01** `.github/workflows/` — Verify gherkin-lint runs in CI
