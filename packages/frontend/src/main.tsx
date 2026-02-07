@@ -17,6 +17,7 @@ Sentry.init({
 })
 
 import App from './App'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { AuthProvider } from './services/auth'
 import { NotificationProvider } from './contexts/NotificationContext'
 import { OnboardingProvider } from './contexts/OnboardingContext'
@@ -37,19 +38,21 @@ if (!rootElement) throw new Error('Root element not found');
 
 createRoot(rootElement).render(
   <StrictMode>
-    <AuthProvider>
-      <NotificationProvider>
-        <OnboardingProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/auth/callback" element={<AuthCallbackPage />} />
-              <Route path="/debug-x7k9m" element={<DebugPage />} />
-              <Route path="/shared/task/:token" element={<SharedTaskPage />} />
-              <Route path="*" element={<App />} />
-            </Routes>
-          </BrowserRouter>
-        </OnboardingProvider>
-      </NotificationProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <NotificationProvider>
+          <OnboardingProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                <Route path="/debug-x7k9m" element={<DebugPage />} />
+                <Route path="/shared/task/:token" element={<SharedTaskPage />} />
+                <Route path="*" element={<App />} />
+              </Routes>
+            </BrowserRouter>
+          </OnboardingProvider>
+        </NotificationProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
