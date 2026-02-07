@@ -129,10 +129,7 @@ jobs:
       
       - name: Build Vabamorf API
         if: steps.detect.outputs.vabamorf-api == 'true'
-        working-directory: packages/vabamorf-api
-        run: |
-          npm ci
-          npx tsc
+        run: pnpm --filter vabamorf-api build
       
       - name: Login to ECR
         if: steps.detect.outputs.vabamorf-api == 'true'
