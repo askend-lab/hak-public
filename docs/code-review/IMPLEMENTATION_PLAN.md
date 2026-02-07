@@ -47,7 +47,7 @@
 - [x] **ARCH-06** `audio-api/src/index.ts` — Extract CORS headers to shared helper
 - [x] **ARCH-07** `audio-api/src/hash.ts` — Delete file, use `@hak/shared` directly
 - [x] **ARCH-08** `merlin-api/src/handler.ts` — Add centralized `createResponse()` helper
-- [ ] **ARCH-09** `gherkin-parser/src/index.ts` — Add Scenario Outline support
+- [x] **ARCH-09** `gherkin-parser/src/index.ts` — Add Scenario Outline support
 
 ### Error Handling & Validation
 - [x] **ERR-01** `simplestore/src/core/validation.ts` — Add max length validation for pk/sk
