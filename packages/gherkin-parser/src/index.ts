@@ -28,7 +28,8 @@ function processScenarioLine(
   pendingTags: string[]
 ): { name: string; tags: string[]; steps: string[] } {
   if (currentScenario) feature.scenarios.push(currentScenario);
-  const newScenario = { name: line.replace('Scenario:', '').trim(), tags: [...pendingTags], steps: [] };
+  const name = line.replace('Scenario Outline:', '').replace('Scenario:', '').trim();
+  const newScenario = { name, tags: [...pendingTags], steps: [] };
   pendingTags.length = 0;
   return newScenario;
 }
@@ -52,7 +53,7 @@ export function parseFeatureContent(content: string): ParsedFeature | null {
     if (trimmed.startsWith('@')) processTagLine(trimmed, pendingTags);
     else if (trimmed.startsWith('Feature:')) processFeatureLine(trimmed, feature, pendingTags);
     else if (trimmed.startsWith('Background:')) { inBackground = true; pendingTags = []; }
-    else if (trimmed.startsWith('Scenario:')) { inBackground = false; currentScenario = processScenarioLine(trimmed, feature, currentScenario, pendingTags); }
+    else if (trimmed.startsWith('Scenario:') || trimmed.startsWith('Scenario Outline:')) { inBackground = false; currentScenario = processScenarioLine(trimmed, feature, currentScenario, pendingTags); }
     else if (currentScenario && !inBackground && isStepLine(trimmed)) currentScenario.steps.push(trimmed);
   }
   
