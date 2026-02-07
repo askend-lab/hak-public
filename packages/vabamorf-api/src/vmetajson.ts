@@ -19,7 +19,9 @@ function processNextRequest(): void {
     return;
   }
   
-  currentRequest = requestQueue.shift()!;
+  const next = requestQueue.shift();
+  if (!next) return;
+  currentRequest = next;
   vmetajsonProcess.stdin.write(`${JSON.stringify(currentRequest.input)}\n`);
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable jest/require-top-level-describe */
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
 // Store original env vars

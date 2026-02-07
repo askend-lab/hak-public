@@ -37,7 +37,6 @@ export function calculateHashSync(text: string): string {
     throw new Error('Text cannot be empty');
   }
   
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const crypto = require('node:crypto') as typeof import('node:crypto');
   return crypto.createHash('sha256').update(text).digest('hex');
 }

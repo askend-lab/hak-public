@@ -15,7 +15,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 } as const;
 
-function createResponse(statusCode: number, body: object) {
+function createResponse(statusCode: number, body: object): { statusCode: number; headers: typeof CORS_HEADERS; body: string } {
   return { statusCode, headers: { ...CORS_HEADERS }, body: JSON.stringify(body) };
 }
 

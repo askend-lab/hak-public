@@ -1,4 +1,3 @@
- 
 import { calculateHashSync } from '@hak/shared';
 
 import { MockS3Client, MockSQSClient } from './mocks';

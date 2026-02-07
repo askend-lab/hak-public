@@ -133,7 +133,7 @@ describe('Store', () => {
       });
 
       expect(updateResult.success).toBe(true);
-      expect(updateResult.item?.createdAt).toEqual(originalCreatedAt);
+      expect(updateResult.item?.createdAt).toStrictEqual(originalCreatedAt);
       expect(updateResult.item?.data).toStrictEqual({ version: 2 });
     });
   });
