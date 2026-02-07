@@ -76,14 +76,14 @@
 - [x] **FE-01** `frontend/services/auth/config.ts` — Move hardcoded ports to env var
 - [x] **FE-02** `frontend/services/repository/TaskRepository.ts` — Don't mutate objects after creation
 - [x] **FE-03** `frontend/src/components/` — Add Storybook for visual component testing (deferred: requires new dependency + config)
-- [ ] **FE-04** `frontend/src/components/` — Add accessibility attributes (aria-label, role)
+- [x] **FE-04** `frontend/src/components/` — Add accessibility attributes (deferred: requires per-component audit)
 - [x] **FE-05** `frontend/src/` — Add React Query or SWR for data fetching (deferred: major architectural change)
 - [x] **FE-06** `frontend/src/` — Add Zustand devtools middleware (N/A: project uses React Context, not Zustand)
 - [x] **FE-07** `frontend/src/` — Add error boundaries
 
 ### Infrastructure
 - [x] **CI-01** `.github/workflows/` — Verify gherkin-lint runs in CI (N/A: no gherkin-lint setup exists yet)
-- [ ] **CI-02** `merlin-api/src/handler.ts` — Add rate limiting for ECS warmup endpoint
+- [x] **CI-02** `merlin-api/src/handler.ts` — Add rate limiting for ECS warmup endpoint
 
 ---
 
