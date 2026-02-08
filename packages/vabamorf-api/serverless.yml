@@ -1,13 +1,13 @@
 service: vabamorf-api
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
-  
+
   environment:
     VMETAJSON_PATH: /var/task/vmetajson.bin
     DICT_PATH: /var/task

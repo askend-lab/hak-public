@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { StorageAdapter, StoreItem } from '../src/core/types';
+import { StorageAdapter, StoreItem } from "../src/core/types";
 
 export class FailingDynamoDB implements StorageAdapter {
-  put(): Promise<void> { throw new Error('DB error'); }
-  get(): Promise<StoreItem | null> { throw new Error('DB error'); }
-  delete(): Promise<void> { throw new Error('DB error'); }
-  queryBySortKeyPrefix(): Promise<StoreItem[]> { throw new Error('DB error'); }
+  put(): Promise<void> {
+    throw new Error("DB error");
+  }
+  get(): Promise<StoreItem | null> {
+    throw new Error("DB error");
+  }
+  delete(): Promise<void> {
+    throw new Error("DB error");
+  }
+  queryBySortKeyPrefix(): Promise<StoreItem[]> {
+    throw new Error("DB error");
+  }
 }
 
 export class InMemoryDynamoDB implements StorageAdapter {

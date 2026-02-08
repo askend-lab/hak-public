@@ -13,22 +13,22 @@ on:
         required: false
         type: boolean
         default: false
-  
+
   workflow_dispatch:
     inputs:
       build_id:
-        description: 'Build ID to deploy (e.g., BUILD-20260112123456)'
+        description: "Build ID to deploy (e.g., BUILD-20260112123456)"
         required: true
         type: string
       environment:
-        description: 'Environment to deploy to'
+        description: "Environment to deploy to"
         required: true
         type: choice
         options:
           - dev
           - prod
       force:
-        description: 'Force deploy all modules (bypass smart diff)'
+        description: "Force deploy all modules (bypass smart diff)"
         required: false
         type: boolean
         default: false
@@ -55,43 +55,43 @@ jobs:
     name: Deploy ${{ inputs.build_id }} to ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
-      
+          node-version: "20"
+          cache: "pnpm"
+
       - name: Configure npm registry auth
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
-      
+
       - name: Install dependencies
         run: pnpm install
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
           aws-region: eu-west-1
-      
+
       - name: Get build manifest and current state
         id: state
         run: |
           BUILD_ID="${{ inputs.build_id }}"
           ENV="${{ inputs.environment }}"
           FORCE="${{ inputs.force }}"
-          
+
           # Download build manifest
           S3_BUILD="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
           if ! aws s3 cp ${S3_BUILD}/manifest.json /tmp/build-manifest.json; then
@@ -99,17 +99,17 @@ jobs:
             exit 1
           fi
           echo "Build manifest:" && cat /tmp/build-manifest.json
-          
+
           # Download current deployment state
           S3_DEPLOY="s3://$ARTIFACTS_BUCKET/$DEPLOYMENTS_PREFIX/${ENV}.json"
           if ! aws s3 cp ${S3_DEPLOY} /tmp/current-state.json 2>/dev/null; then
             echo "No existing deployment, will deploy all"
             echo '{"modules":{}}' > /tmp/current-state.json
           fi
-          
+
           # Use jq for reliable JSON parsing
           get_module() { jq -r ".modules.\"$1\" // \"\"" "$2"; }
-          
+
           # Compare modules and determine what to deploy
           for module in frontend simplestore audio-api merlin-api vabamorf-api; do
             BUILD_SHA=$(get_module "$module" /tmp/build-manifest.json)
@@ -132,21 +132,21 @@ jobs:
             echo "$OUTPUT_NAME=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
             echo "$module: BUILD=$BUILD_SHA CURRENT=$CURRENT_SHA -> $( [ "$SHOULD_DEPLOY" == "true" ] && echo DEPLOY || echo skip )"
           done
-      
+
       - name: Download build artifacts
         run: |
           BUILD_ID="${{ inputs.build_id }}"
           S3_BUILD="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
           mkdir -p artifacts
-          
+
           [ "${{ steps.state.outputs.deploy_frontend }}" == "true" ] && aws s3 sync ${S3_BUILD}/frontend/ artifacts/frontend/
           [ "${{ steps.state.outputs.deploy_simplestore }}" == "true" ] && aws s3 sync ${S3_BUILD}/simplestore/ artifacts/simplestore/
           [ "${{ steps.state.outputs.deploy_audio_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/audio-api/ artifacts/audio-api/
           [ "${{ steps.state.outputs.deploy_merlin_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/merlin-api/ artifacts/merlin-api/
           [ "${{ steps.state.outputs.deploy_vabamorf_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/vabamorf-api/ artifacts/vabamorf-api/
-          
+
           echo "✅ Downloaded artifacts"
-      
+
       - name: Deploy Frontend
         if: steps.state.outputs.deploy_frontend == 'true'
         run: |
@@ -155,17 +155,17 @@ jobs:
           BUCKET="hak-${ENV}-website"
           [ "$ENV" == "prod" ] && BUCKET="hak-prod-website"
           CF_DIST_ID="$( [ "$ENV" == "prod" ] && echo $CF_DIST_PROD || echo $CF_DIST_DEV )"
-          
+
           # Generate build-info.json from manifest
           MANIFEST="/tmp/build-manifest.json"
           GIT_SHA=$(jq -r '.git_sha' $MANIFEST)
           BUILD_TIME=$(jq -r '.timestamp' $MANIFEST)
           DEPLOY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          
+
           # Get commit info from git
           COMMIT_MSG=$(git log -1 --format=%s $GIT_SHA 2>/dev/null || echo "")
           BRANCH=$(git branch --contains $GIT_SHA --format='%(refname:short)' 2>/dev/null | head -1 || echo "main")
-          
+
           cat > artifacts/frontend/build-info.json << EOF
           {
             "buildId": "$BUILD_ID",
@@ -178,15 +178,15 @@ jobs:
             "environment": "$ENV"
           }
           EOF
-          
+
           aws s3 cp artifacts/frontend/ s3://${BUCKET}/ --recursive
           aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*"
           echo "✅ Frontend deployed to $BUCKET with build-info.json"
-      
+
       - name: Install Serverless
         if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_audio_api == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true'
         run: npm install -g serverless@3
-      
+
       - name: Deploy SimpleStore
         if: steps.state.outputs.deploy_simplestore == 'true'
         working-directory: packages/simplestore
@@ -194,7 +194,7 @@ jobs:
           mkdir -p dist && cp -r ../../artifacts/simplestore/* dist/ 2>/dev/null || true
           serverless deploy --stage ${{ inputs.environment }} --region eu-west-1 --force
           echo "✅ SimpleStore deployed"
-      
+
       - name: Deploy Audio API
         if: steps.state.outputs.deploy_audio_api == 'true'
         working-directory: packages/audio-api
@@ -202,7 +202,7 @@ jobs:
           mkdir -p dist && cp -r ../../artifacts/audio-api/* dist/ 2>/dev/null || true
           serverless deploy --stage ${{ inputs.environment }} --region eu-west-1 --force
           echo "✅ Audio API deployed"
-      
+
       - name: Deploy Merlin API
         if: steps.state.outputs.deploy_merlin_api == 'true'
         working-directory: packages/merlin-api
@@ -211,11 +211,11 @@ jobs:
           serverless create_domain --stage ${{ inputs.environment }} || true
           serverless deploy --stage ${{ inputs.environment }} --force
           echo "✅ Merlin API deployed"
-      
+
       - name: Login to ECR
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         uses: aws-actions/amazon-ecr-login@v2
-      
+
       - name: Deploy Vabamorf API
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         working-directory: packages/vabamorf-api
@@ -226,12 +226,12 @@ jobs:
           serverless create_domain --stage ${{ inputs.environment }} || true
           serverless deploy --stage ${{ inputs.environment }}
           echo "✅ Vabamorf API deployed"
-      
+
       - name: Update deployment state
         run: |
           BUILD_ID="${{ inputs.build_id }}"
           ENV="${{ inputs.environment }}"
-          
+
           # Build deployment state from manifest using jq
           jq --arg env "$ENV" --arg build "$BUILD_ID" --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '
             {
@@ -241,16 +241,16 @@ jobs:
               modules: .modules
             }
           ' /tmp/build-manifest.json > /tmp/deployment-state.json
-          
+
           aws s3 cp /tmp/deployment-state.json s3://$ARTIFACTS_BUCKET/$DEPLOYMENTS_PREFIX/${ENV}.json --sse AES256
           echo "✅ Deployment state updated:"
           cat /tmp/deployment-state.json
-      
+
       - name: Smoke test
         run: |
           chmod +x scripts/smoke-test.sh
           ./scripts/smoke-test.sh ${{ inputs.environment }}
-      
+
       - name: Summary
         run: |
           ENV="${{ inputs.environment }}"

@@ -7,28 +7,31 @@
 
 // Define SubtleCrypto interface for environments without DOM types
 interface SubtleCryptoLike {
-  digest(algorithm: string, data: ArrayBuffer | ArrayBufferView): Promise<ArrayBuffer>;
+  digest(
+    algorithm: string,
+    data: ArrayBuffer | ArrayBufferView,
+  ): Promise<ArrayBuffer>;
 }
 
 declare const window: { crypto?: { subtle?: SubtleCryptoLike } } | undefined;
 
 export async function calculateHash(text: string): Promise<string> {
   if (!text || text.trim().length === 0) {
-    throw new Error('Text cannot be empty');
+    throw new Error("Text cannot be empty");
   }
 
   // Browser environment
-  if (typeof window !== 'undefined' && window?.crypto?.subtle) {
+  if (typeof window !== "undefined" && window?.crypto?.subtle) {
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
-    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+    const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
   // Node.js environment
-  const crypto = await import('node:crypto');
-  return crypto.createHash('sha256').update(text).digest('hex');
+  const crypto = await import("node:crypto");
+  return crypto.createHash("sha256").update(text).digest("hex");
 }
 
 /**
@@ -37,9 +40,9 @@ export async function calculateHash(text: string): Promise<string> {
  */
 export function calculateHashSync(text: string): string {
   if (!text || text.trim().length === 0) {
-    throw new Error('Text cannot be empty');
+    throw new Error("Text cannot be empty");
   }
-  
-  const crypto = require('node:crypto') as typeof import('node:crypto');
-  return crypto.createHash('sha256').update(text).digest('hex');
+
+  const crypto = require("node:crypto") as typeof import("node:crypto");
+  return crypto.createHash("sha256").update(text).digest("hex");
 }

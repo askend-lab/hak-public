@@ -24,46 +24,46 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    
+
     outputs:
       build_id: ${{ steps.build.outputs.build_id }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
-      
+          node-version: "20"
+          cache: "pnpm"
+
       - name: Configure npm registry auth
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
-      
+
       - name: Install dependencies
         run: pnpm install
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
           aws-region: eu-west-1
-      
+
       - name: Detect changes and prepare build
         id: detect
         run: |
           LAST_BUILD=$(aws s3 ls s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/ --recursive | grep manifest.json | sort | tail -1 | awk '{print $4}' | cut -d'/' -f3)
-          
+
           if [ -n "$LAST_BUILD" ]; then
             echo "Last build: $LAST_BUILD"
             aws s3 cp s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$LAST_BUILD/manifest.json /tmp/last-manifest.json || echo "{}" > /tmp/last-manifest.json
@@ -72,13 +72,13 @@ jobs:
             echo "{}" > /tmp/last-manifest.json
           fi
           echo "last_build=$LAST_BUILD" >> $GITHUB_OUTPUT
-          
+
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             BASE_SHA="${{ github.event.pull_request.base.sha }}"
           else
             BASE_SHA="${{ github.event.before }}"
           fi
-          
+
           if [ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]; then
             echo "Initial commit - building all"
             echo "frontend=true" >> $GITHUB_OUTPUT
@@ -105,37 +105,37 @@ jobs:
               echo "vabamorf-api=true" >> $GITHUB_OUTPUT
               fi
           fi
-      
+
       - name: Run tests
         run: pnpm exec jest --passWithNoTests
-      
+
       - name: Build frontend
         if: steps.detect.outputs.frontend == 'true'
         env:
           VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
         run: pnpm --filter @hak/frontend build
-      
+
       - name: Build SimpleStore
         if: steps.detect.outputs.simplestore == 'true'
         run: pnpm --filter simplestore build
-      
+
       - name: Build Audio API
         if: steps.detect.outputs.audio-api == 'true'
         run: pnpm --filter audio-api build
-      
+
       - name: Build Merlin API
         if: steps.detect.outputs.merlin-api == 'true'
         run: pnpm --filter merlin-api build
-      
+
       - name: Build Vabamorf API
         if: steps.detect.outputs.vabamorf-api == 'true'
         run: pnpm --filter vabamorf-api build
-      
+
       - name: Login to ECR
         if: steps.detect.outputs.vabamorf-api == 'true'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      
+
       - name: Build Vabamorf Docker image
         if: steps.detect.outputs.vabamorf-api == 'true'
         working-directory: packages/vabamorf-api
@@ -144,7 +144,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} .
           docker push $ECR_REGISTRY/vabamorf-api:${{ github.sha }}
-      
+
       - name: Create full build artifact
         id: build
         env:
@@ -156,14 +156,14 @@ jobs:
         run: |
           BUILD_ID="BUILD-$(date +%Y%m%d%H%M%S)"
           echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-          
+
           S3_PATH="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$BUILD_ID"
           LAST_BUILD="${{ steps.detect.outputs.last_build }}"
           LAST_S3="s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/$LAST_BUILD"
-          
+
           # Helper to get module SHA from last manifest
           get_last_sha() { jq -r ".modules.\"$1\" // \"unknown\"" /tmp/last-manifest.json 2>/dev/null || echo "unknown"; }
-          
+
           # Upload each module explicitly (no subshell issues)
           upload_module() {
             local name="$1"
@@ -180,13 +180,13 @@ jobs:
               echo "$name: skipping (no previous build)"
             fi
           }
-          
+
           upload_module "frontend" "packages/frontend/dist" "$FRONTEND_CHANGED"
           upload_module "simplestore" "packages/simplestore/dist" "$SIMPLESTORE_CHANGED"
           upload_module "audio-api" "packages/audio-api/dist" "$AUDIO_API_CHANGED"
           upload_module "merlin-api" "packages/merlin-api/dist" "$MERLIN_API_CHANGED"
           upload_module "vabamorf-api" "packages/vabamorf-api/dist/src" "$VABAMORF_API_CHANGED"
-          
+
           # Build manifest using jq
           jq -n \
             --arg id "$BUILD_ID" \
@@ -209,11 +209,11 @@ jobs:
                 "vabamorf-api": $vabamorf
               }
             }' > /tmp/manifest.json
-          
+
           aws s3 cp /tmp/manifest.json ${S3_PATH}/manifest.json --sse AES256
           echo "✅ Build $BUILD_ID created"
           cat /tmp/manifest.json
-      
+
       - name: Build summary
         run: |
           echo "## Build Complete ✅" >> $GITHUB_STEP_SUMMARY

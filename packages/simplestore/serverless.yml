@@ -1,6 +1,6 @@
 service: simplestore
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 plugins:
   - serverless-esbuild
@@ -12,21 +12,21 @@ custom:
     bundle: true
     minify: false
     sourcemap: true
-    platform: 'node'
-    target: 'node18'
-    packager: 'pnpm'
-    
+    platform: "node"
+    target: "node18"
+    packager: "pnpm"
+
   # Custom domain configuration
   # Domain: hak-api-{stage}.askend-lab.com (dev) / hak-api.askend-lab.com (prod)
   domainName:
     dev: hak-api-dev.askend-lab.com
     prod: hak-api.askend-lab.com
-  
+
   customDomain:
     domainName: ${self:custom.domainName.${self:provider.stage}}
     basePath: api
     stage: ${self:provider.stage}
-    certificateName: '*.askend-lab.com'
+    certificateName: "*.askend-lab.com"
     createRoute53Record: true
     endpointType: regional
     securityPolicy: tls_1_2
@@ -37,13 +37,13 @@ provider:
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
-  
+
   environment:
     TABLE_NAME: ${self:service}-${self:provider.stage}
     APP_NAME: ${self:service}
     TENANT: default
     ENVIRONMENT: ${self:provider.stage}
-  
+
   iam:
     role:
       statements:
@@ -141,7 +141,7 @@ resources:
     ApiEndpoint:
       Description: API Gateway endpoint URL
       Value: !Sub https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}
-    
+
     TableName:
       Description: DynamoDB Table Name
       Value: !Ref DataTable

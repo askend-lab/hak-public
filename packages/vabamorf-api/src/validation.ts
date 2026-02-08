@@ -1,24 +1,26 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { LambdaResponse } from './types';
-import { initVmetajson, isInitialized } from './vmetajson';
+import { LambdaResponse } from "./types";
+import { initVmetajson, isInitialized } from "./vmetajson";
 
- 
-const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? './vmetajson';
- 
-const DICT_PATH = process.env.DICT_PATH ?? '.';
+const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
 
-export function createResponse(statusCode: number, body: object): LambdaResponse {
+const DICT_PATH = process.env.DICT_PATH ?? ".";
+
+export function createResponse(
+  statusCode: number,
+  body: object,
+): LambdaResponse {
   return {
     statusCode,
     body: JSON.stringify(body),
     headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
-    }
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type,Authorization",
+      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    },
   };
 }
 
@@ -28,20 +30,34 @@ export function ensureInitialized(): void {
 
 export function parseJsonBody(eventBody: string | null): unknown {
   if (eventBody === null) return null;
-   
-  try { return JSON.parse(eventBody); } catch { return null; }
+
+  try {
+    return JSON.parse(eventBody);
+  } catch {
+    return null;
+  }
 }
 
-export function getFieldError(fieldValue: unknown, fieldName: string, maxLength?: number): string | null {
-  if (fieldValue === null || typeof fieldValue !== 'string') return `Missing '${fieldName}' field in request body`;
-   
+export function getFieldError(
+  fieldValue: unknown,
+  fieldName: string,
+  maxLength?: number,
+): string | null {
+  if (fieldValue === null || typeof fieldValue !== "string")
+    return `Missing '${fieldName}' field in request body`;
+
   if (!fieldValue.trim()) return `'${fieldName}' must be a non-empty string`;
-   
-  if (maxLength != null && fieldValue.length > maxLength) return `Text is too long (max ${String(maxLength)} characters)`;
+
+  if (maxLength != null && fieldValue.length > maxLength)
+    return `Text is too long (max ${String(maxLength)} characters)`;
   return null;
 }
 
-export function validateField(body: Record<string, unknown>, fieldName: string, maxLength?: number): { value: string } | { error: string } {
+export function validateField(
+  body: Record<string, unknown>,
+  fieldName: string,
+  maxLength?: number,
+): { value: string } | { error: string } {
   const error = getFieldError(body[fieldName], fieldName, maxLength);
   if (error !== null) return { error };
   return { value: (body[fieldName] as string).trim() };

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { spawn, ChildProcess } from 'child_process';
+import { spawn, ChildProcess } from "child_process";
 
-import { VmetajsonInput, VmetajsonResponse } from './types';
+import { VmetajsonInput, VmetajsonResponse } from "./types";
 
 interface QueuedRequest {
   resolve: (value: VmetajsonResponse) => void;
@@ -15,13 +15,13 @@ interface QueuedRequest {
 let vmetajsonProcess: ChildProcess | null = null;
 const requestQueue: QueuedRequest[] = [];
 let currentRequest: QueuedRequest | null = null;
-let buffer = '';
+let buffer = "";
 
 function processNextRequest(): void {
   if (currentRequest || requestQueue.length === 0 || !vmetajsonProcess?.stdin) {
     return;
   }
-  
+
   const next = requestQueue.shift();
   if (!next) return;
   currentRequest = next;
@@ -46,69 +46,78 @@ function failCurrentRequest(error: Error): void {
   }
 }
 
-export function initVmetajson(binaryPath = './vmetajson', dictPath = '.'): void {
+export function initVmetajson(
+  binaryPath = "./vmetajson",
+  dictPath = ".",
+): void {
   if (vmetajsonProcess) {
     return;
   }
 
   vmetajsonProcess = spawn(binaryPath, [`--path=${dictPath}`], {
-    stdio: ['pipe', 'pipe', 'pipe']
+    stdio: ["pipe", "pipe", "pipe"],
   });
 
-  vmetajsonProcess.stderr?.on('data', (data: Buffer) => {
-    console.error('[vmetajson stderr]', data.toString());
+  vmetajsonProcess.stderr?.on("data", (data: Buffer) => {
+    console.error("[vmetajson stderr]", data.toString());
   });
 
-  vmetajsonProcess.stdout?.on('data', (data: Buffer) => {
+  vmetajsonProcess.stdout?.on("data", (data: Buffer) => {
     buffer += data.toString();
-    const lines = buffer.split('\n');
-    
+    const lines = buffer.split("\n");
+
     while (lines.length > 1) {
       const line = lines.shift();
-      if (line !== undefined && line.trim() !== '' && currentRequest) {
+      if (line !== undefined && line.trim() !== "" && currentRequest) {
         try {
           const response = JSON.parse(line) as VmetajsonResponse;
           completeCurrentRequest(response);
         } catch {
-          failCurrentRequest(new Error(`Failed to parse vmetajson response: ${line ?? 'unknown'}`));
+          failCurrentRequest(
+            new Error(
+              `Failed to parse vmetajson response: ${line ?? "unknown"}`,
+            ),
+          );
         }
       }
     }
-    buffer = lines[0] || '';
+    buffer = lines[0] || "";
   });
 
-  vmetajsonProcess.on('error', (err: Error) => {
+  vmetajsonProcess.on("error", (err: Error) => {
     failCurrentRequest(err);
   });
 
-  vmetajsonProcess.on('exit', (code: number | null) => {
-    failCurrentRequest(new Error(`vmetajson exited with code ${String(code ?? 'unknown')}`));
+  vmetajsonProcess.on("exit", (code: number | null) => {
+    failCurrentRequest(
+      new Error(`vmetajson exited with code ${String(code ?? "unknown")}`),
+    );
     vmetajsonProcess = null;
   });
 }
 
 export async function analyze(text: string): Promise<VmetajsonResponse> {
   if (!vmetajsonProcess) {
-    throw new Error('vmetajson process not initialized');
+    throw new Error("vmetajson process not initialized");
   }
 
   const input: VmetajsonInput = {
     params: {
-      vmetajson: ['--stem', '--addphonetics']
+      vmetajson: ["--stem", "--addphonetics"],
     },
-    content: text
+    content: text,
   };
 
   return new Promise((resolve, reject) => {
-    const timeoutMs = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? '5000', 10);
+    const timeoutMs = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
     const timeoutId = setTimeout(() => {
-      const index = requestQueue.findIndex(r => r.timeoutId === timeoutId);
+      const index = requestQueue.findIndex((r) => r.timeoutId === timeoutId);
       if (index !== -1) {
         requestQueue.splice(index, 1);
-        reject(new Error('vmetajson timeout'));
+        reject(new Error("vmetajson timeout"));
       } else if (currentRequest?.timeoutId === timeoutId) {
         currentRequest = null;
-        reject(new Error('vmetajson timeout'));
+        reject(new Error("vmetajson timeout"));
         processNextRequest();
       }
     }, timeoutMs);

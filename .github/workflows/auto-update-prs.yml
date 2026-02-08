@@ -13,14 +13,14 @@ jobs:
   update-prs:
     name: Update PR branches
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Update all open PRs with main
         uses: actions/github-script@v8
         with:
           script: |
             const { owner, repo } = context.repo;
-            
+
             // Get all open PRs targeting main
             const { data: pullRequests } = await github.rest.pulls.list({
               owner,
@@ -28,9 +28,9 @@ jobs:
               state: 'open',
               base: 'main'
             });
-            
+
             console.log(`Found ${pullRequests.length} open PRs targeting main`);
-            
+
             for (const pr of pullRequests) {
               // Skip PRs that have auto-merge disabled (manual PRs)
               // Only update PRs that have auto-merge enabled

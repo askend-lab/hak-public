@@ -5,7 +5,7 @@ project:
   name: "HAK"
 
 global_excludes:
-  - '**/.design/**'
+  - "**/.design/**"
 
 # Incremental testing - only runs affected tests (requires module-level opt-in)
 
@@ -115,8 +115,7 @@ hooks:
       - "**/stories/**"
       - "**/scripts/**"
 
-  prettier-check:
-    mode: off # disabled — will run once before open source launch
+  prettier-check: {}
 
   test-required:
     tdd: true # Enable strict TDD enforcement for feat/fix commits
@@ -197,6 +196,8 @@ hooks:
       - "**/PronunciationVariants.test.tsx"
       - "**/useSynthesis.branches.test.ts"
       - "**/useTaskHandlers.test.ts"
+      - "**/boundary.test.ts"
+      - "**/dataTypes.test.ts"
       - "**/coverage-summary.json"
       - "**/.nyc_output/**"
       - "**/cucumber-report.json"

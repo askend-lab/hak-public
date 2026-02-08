@@ -1,4 +1,10 @@
 .design
+devbox
+*.md
+docs/
+.project/
+.serverless/
+packages/merlin-worker/tools/
 node_modules
 dist
 build

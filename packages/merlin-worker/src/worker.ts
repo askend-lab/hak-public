@@ -1,15 +1,20 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { S3Client } from '@aws-sdk/client-s3';
-import { SQSClient } from '@aws-sdk/client-sqs';
-import { createLogger } from '@hak/shared';
+import { S3Client } from "@aws-sdk/client-s3";
+import { SQSClient } from "@aws-sdk/client-sqs";
+import { createLogger } from "@hak/shared";
 
-import { synthesize } from './merlin';
-import { uploadAudio } from './s3';
-import { receiveMessage, parseMessage, deleteMessage, isWarmMessage } from './sqs';
+import { synthesize } from "./merlin";
+import { uploadAudio } from "./s3";
+import {
+  receiveMessage,
+  parseMessage,
+  deleteMessage,
+  isWarmMessage,
+} from "./sqs";
 
-const logger = createLogger('info');
+const logger = createLogger("info");
 
 export interface WorkerConfig {
   queueUrl: string;
@@ -20,10 +25,10 @@ export interface WorkerConfig {
 export async function processMessage(
   sqsClient: SQSClient,
   s3Client: S3Client,
-  config: WorkerConfig
+  config: WorkerConfig,
 ): Promise<boolean> {
   const message = await receiveMessage(sqsClient, config.queueUrl);
-  
+
   if (!message) {
     return false;
   }
@@ -32,8 +37,12 @@ export async function processMessage(
     const parsed = parseMessage(message);
 
     if (isWarmMessage(parsed)) {
-      logger.info('Received warm-up message, acknowledging and continuing');
-      await deleteMessage(sqsClient, config.queueUrl, message.ReceiptHandle ?? '');
+      logger.info("Received warm-up message, acknowledging and continuing");
+      await deleteMessage(
+        sqsClient,
+        config.queueUrl,
+        message.ReceiptHandle ?? "",
+      );
       return true;
     }
 
@@ -46,12 +55,19 @@ export async function processMessage(
     await uploadAudio(s3Client, config.bucketName, hash, audioBuffer);
     logger.info(`Uploaded: cache/${hash}.mp3`);
 
-    await deleteMessage(sqsClient, config.queueUrl, message.ReceiptHandle ?? '');
-    logger.info(`Deleted message: ${message.MessageId ?? 'unknown'}`);
+    await deleteMessage(
+      sqsClient,
+      config.queueUrl,
+      message.ReceiptHandle ?? "",
+    );
+    logger.info(`Deleted message: ${message.MessageId ?? "unknown"}`);
 
     return true;
   } catch (error) {
-    logger.error(`Error processing message ${message.MessageId ?? 'unknown'}:`, error);
+    logger.error(
+      `Error processing message ${message.MessageId ?? "unknown"}:`,
+      error,
+    );
     throw error;
   }
 }
@@ -63,9 +79,9 @@ export async function runWorker(
   sqsClient: SQSClient,
   s3Client: S3Client,
   config: WorkerConfig,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<void> {
-  logger.info('Audio worker started');
+  logger.info("Audio worker started");
   logger.info(`Queue: ${config.queueUrl}`);
   logger.info(`Bucket: ${config.bucketName}`);
   logger.info(`Merlin: ${config.merlinUrl}`);
@@ -74,12 +90,12 @@ export async function runWorker(
     try {
       await processMessage(sqsClient, s3Client, config);
     } catch (error) {
-      logger.error('Worker error:', error);
+      logger.error("Worker error:", error);
       await new Promise((resolve) => {
         setTimeout(resolve, ERROR_RETRY_DELAY_MS);
       });
     }
   }
 
-  logger.info('Audio worker stopped');
+  logger.info("Audio worker stopped");
 }
