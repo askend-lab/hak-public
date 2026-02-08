@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 describe('Audio Worker Hello Test', () => {
   it('should pass a simple test', () => {
     expect(true).toBe(true);

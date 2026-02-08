@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Tasks CRUD Step Definitions (US-016, US-017, US-018, US-019)
  * View, Edit, Delete operations

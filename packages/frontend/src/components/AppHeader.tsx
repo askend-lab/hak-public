@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { NavLink, Link } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import { HelpIcon } from "./ui/Icons";

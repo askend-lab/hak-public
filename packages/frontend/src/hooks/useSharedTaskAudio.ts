@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { useState, useCallback } from "react";
 import { TaskEntry } from "@/types/task";
 import { synthesizeWithPolling } from "@/utils/synthesize";

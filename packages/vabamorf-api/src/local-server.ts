@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import * as http from 'http';
 import { analyzeHandler, variantsHandler, healthHandler } from './handler';
 import { APIGatewayProxyEvent } from 'aws-lambda';

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { checkFileExists } from "../src/s3";
 
 import { MockS3Client } from "./mocks";

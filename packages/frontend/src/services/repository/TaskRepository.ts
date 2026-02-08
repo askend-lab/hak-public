@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { Task, TaskEntry, TaskSummary, CreateTaskRequest } from "@/types/task";
 import { SimpleStoreAdapter } from "../storage/SimpleStoreAdapter";
 import { MockDataLoader } from "../storage/MockDataLoader";

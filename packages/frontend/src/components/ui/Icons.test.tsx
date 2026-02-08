@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { render } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { Icon } from "./Icon";

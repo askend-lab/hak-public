@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { buildKeys, buildPartitionKey } from '../src/core/store';
 import { parseTtl } from '../src/core/validation';
 import { ServerContext } from '../src/core/types';

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Sharing Step Definitions
  * Implements steps for US-022 (share link), US-023 (access shared), US-032 (copy entries)

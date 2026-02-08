@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Shared phonetic marker definitions used across the application.
  * Used by MarkerTooltip and marker toolbars in CustomVariantForm and SentencePhoneticPanel.

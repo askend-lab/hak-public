@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Integration tests - testing full pipeline through Lambda handler
  * Tests all 4 data types with proper validation

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import TaskManager from "./TaskManager";
 import TaskDetailView from "./TaskDetailView";
 import { AddIcon } from "./ui/Icons";

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 export type IconSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 export type IconWeight = "light" | "regular" | "medium" | "bold";
 

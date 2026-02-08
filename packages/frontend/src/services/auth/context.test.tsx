@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /* eslint-disable max-lines */
 import { vi } from "vitest";
 import { render, screen, waitFor, act } from "@testing-library/react";

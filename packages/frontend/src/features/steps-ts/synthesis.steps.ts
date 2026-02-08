@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Synthesis Step Definitions
  * Implements steps for US-004 (stressed text), US-005 (variants), US-008 (phonetic edits)

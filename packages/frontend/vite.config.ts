@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";

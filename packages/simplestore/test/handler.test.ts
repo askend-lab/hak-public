@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { handler } from '../src/lambda/handler';
 import { Store } from '../src/core/store';
 import { InMemoryAdapter } from '../src/adapters/memory';

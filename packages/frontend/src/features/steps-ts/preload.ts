@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Preload script - sets up import.meta.env before any other imports
  * Must be loaded first via NODE_OPTIONS

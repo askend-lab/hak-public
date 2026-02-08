@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { handler, setAdapter } from '../src/lambda/handler';
 import { InMemoryAdapter } from '../src/adapters';
 import { APIGatewayProxyEvent } from 'aws-lambda';

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import type { SQSClient } from '@aws-sdk/client-sqs';
 
 import { receiveMessage, deleteMessage, parseMessage } from '../src/sqs';

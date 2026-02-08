@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import * as Sentry from "@sentry/react";
 
 const btnStyle = {

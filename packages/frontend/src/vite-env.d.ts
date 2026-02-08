@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /// <reference types="vite/client" />
 
 declare module "*.scss" {

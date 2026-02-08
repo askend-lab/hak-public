@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { useState, useCallback } from "react";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";

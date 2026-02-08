@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { S3Client, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { ECSClient, UpdateServiceCommand, DescribeServicesCommand } from '@aws-sdk/client-ecs';

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { synthesize } from '../src/merlin';
 import { uploadAudio } from '../src/s3';
 import { receiveMessage, parseMessage, deleteMessage, isWarmMessage } from '../src/sqs';

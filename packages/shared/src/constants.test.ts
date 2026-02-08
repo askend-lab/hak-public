@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { TEXT_LIMITS, TIMING } from './constants';
 
 describe('Constants', () => {

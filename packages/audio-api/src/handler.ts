@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import type { S3ClientLike } from './s3';
 import type { SQSClientLike } from './sqs';
 import { TEXT_LIMITS, calculateHashSync as calculateHash } from '@hak/shared';

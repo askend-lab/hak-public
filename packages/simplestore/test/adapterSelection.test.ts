@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Tests for adapter selection logic in Lambda handler
  * Verifies correct adapter is used based on environment variables

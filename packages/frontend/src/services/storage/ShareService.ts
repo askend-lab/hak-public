@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { Task } from "@/types/task";
 import { logger } from "@hak/shared";
 import { SimpleStoreAdapter } from "./SimpleStoreAdapter";

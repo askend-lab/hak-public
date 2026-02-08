@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { useState, useCallback, useRef } from "react";
 import { EditingTag, OpenTagMenu } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";

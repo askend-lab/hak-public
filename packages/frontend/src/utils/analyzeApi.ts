@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Shared utility for calling the /api/analyze endpoint
  * Consolidates 5 duplicate fetch calls across:

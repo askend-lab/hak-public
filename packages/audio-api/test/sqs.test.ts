@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { publishToQueue, publishWarmMessage } from "../src/sqs";
 
 import { MockSQSClient } from "./mocks";

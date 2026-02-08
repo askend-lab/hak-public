@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 export { useSynthesis } from "./useSynthesis";
 export { useTaskHandlers } from "./useTaskHandlers";
 export { useDragAndDrop } from "./useDragAndDrop";

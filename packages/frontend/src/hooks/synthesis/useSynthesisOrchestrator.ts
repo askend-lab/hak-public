@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { useCallback, useRef } from "react";
 import { convertTextToTags } from "@/types/synthesis";
 import { useSentenceState } from "./useSentenceState";

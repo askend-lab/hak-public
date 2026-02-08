@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import AddToTaskDropdown from "./AddToTaskDropdown";
 import { PlayAllButton } from "./ui/PlayAllButton";
 

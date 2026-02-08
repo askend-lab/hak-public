@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Pronunciation Variants Step Definitions
  * Implements steps for US-005 (view pronunciation variants)

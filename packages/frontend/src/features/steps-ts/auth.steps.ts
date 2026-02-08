@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Auth Step Definitions
  * Implements steps for US-025 (login), US-026 (profile), US-027 (logout), US-028 (redirect)

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { extractStressedText, extractVariants } from './parser';
 import { AnalyzeRequest, VariantsRequest, LambdaResponse } from './types';

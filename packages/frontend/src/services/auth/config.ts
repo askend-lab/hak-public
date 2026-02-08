@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 const LOCAL_PORT = import.meta.env.VITE_PORT ?? "5181";
 
 export function getRedirectUri(

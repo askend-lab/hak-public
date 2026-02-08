@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 // AUTO-GENERATED - DO NOT EDIT
 // Run: pnpm --filter @hak/frontend sync-features
 // Source: packages/specifications/*/*.feature
