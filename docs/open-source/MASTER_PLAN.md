@@ -117,7 +117,7 @@
 | O5 | [x] | Rewrite `README.md` for OSS audience |
 | O6 | [x] | Create `docs/ARCHITECTURE.md` with Mermaid diagrams |
 | O7 | [ ] | Create ADRs in `docs/adr/` |
-| O8 | [ ] | Create `docs/DEPLOYMENT.md` and `docs/API.md` |
+| O8 | [x] | Create `docs/DEPLOYMENT.md` and `docs/API.md` |
 | O9 | [ ] | Translate Russian-language docs — only in `.design/` (internal, excluded from OSS) |
 | O10 | [x] | Add "Built with AI" section to README |
 
