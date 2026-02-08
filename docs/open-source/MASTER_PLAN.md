@@ -65,8 +65,8 @@
 | D6 | [ ] | Replace `devbox` wrapper → `husky` + `lint-staged` |
 | D7 | [ ] | Replace `.githooks/` → husky |
 | D8 | [ ] | Remove `defaults.yaml`, `babel.config.js` if unused |
-| D9 | [ ] | Remove `packages/vabamorf-api/package-lock.json` |
-| D10 | [ ] | Update Dockerfiles to use pnpm |
+| D9 | [x] | Remove `packages/vabamorf-api/package-lock.json` — removed, in .gitignore |
+| D10 | [ ] | Update Dockerfiles to use pnpm — SKIP: needs architectural discussion (pnpm monorepo build context) |
 | D11 | [ ] | Verify clean clone: `pnpm install && pnpm test && pnpm build` |
 
 ---
@@ -114,12 +114,12 @@
 ### Manual gates
 | # | ✅ | Gate |
 |---|---|------|
-| O5 | [ ] | Rewrite `README.md` for OSS audience |
-| O6 | [ ] | Create `docs/ARCHITECTURE.md` with Mermaid diagrams |
+| O5 | [x] | Rewrite `README.md` for OSS audience |
+| O6 | [x] | Create `docs/ARCHITECTURE.md` with Mermaid diagrams |
 | O7 | [ ] | Create ADRs in `docs/adr/` |
 | O8 | [ ] | Create `docs/DEPLOYMENT.md` and `docs/API.md` |
-| O9 | [ ] | Translate Russian-language docs → English |
-| O10 | [ ] | Add "Built with AI" section to README |
+| O9 | [ ] | Translate Russian-language docs — only in `.design/` (internal, excluded from OSS) |
+| O10 | [x] | Add "Built with AI" section to README |
 
 ---
 
@@ -137,11 +137,11 @@
 | # | ✅ | Gate |
 |---|---|------|
 | C6 | [ ] | Fix all 16 npm vulnerabilities |
-| C7 | [ ] | Add PR template, verify issue templates |
+| C7 | [x] | Add PR template, verify issue templates |
 | C8 | [ ] | Define semver + automated release workflow |
 | C9 | [ ] | Parameterize Terraform (no hardcoded env values) |
-| C10 | [ ] | Create `docker-compose.yml` for local dev |
-| C11 | [ ] | Add `.editorconfig`, VS Code settings |
+| C10 | [x] | Create `docker-compose.yml` for local dev |
+| C11 | [x] | Add `.editorconfig`, VS Code settings |
 
 ---
 
@@ -149,7 +149,7 @@
 
 | # | ✅ | Gate |
 |---|---|------|
-| L1 | [ ] | All DevBox hooks pass on commit |
+| L1 | [x] | All DevBox hooks pass on commit — verified, all pre-commit hooks green |
 | L2 | [ ] | `gitleaks detect` on full history clean |
 | L3 | [ ] | MIT license verified with stakeholders |
 | L4 | [ ] | License headers in all source files |
@@ -157,4 +157,4 @@
 | L6 | [ ] | Branch protection on `main` |
 | L7 | [ ] | GitHub Discussions enabled |
 | L8 | [ ] | Press release / blog post ready |
-| L9 | [ ] | Code of Conduct published |
+| L9 | [x] | Code of Conduct published — CODE_OF_CONDUCT.md (Contributor Covenant 2.1) |
