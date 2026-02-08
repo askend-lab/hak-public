@@ -3,7 +3,7 @@
 // Group: sharing
 
 export const FEATURES_SHARING: Record<string, string> = {
-  "US-022-generate-share-link": `@sharing @US-022
+  'US-022-generate-share-link': `@sharing @US-022
 Feature: Generate shareable link for task (US-022)
   As a language teacher
   I want to generate a shareable link for my task
@@ -35,7 +35,7 @@ Feature: Generate shareable link for task (US-022)
     Then the same share link is available
 `,
 
-  "US-023-access-shared-task": `@sharing @US-023
+  'US-023-access-shared-task': `@sharing @US-023
 Feature: Access shared task via link (US-023)
   As a language student
   I want to access a task via a shared link
@@ -69,7 +69,7 @@ Feature: Access shared task via link (US-023)
     Then the task is copied to my task list
 `,
 
-  "US-032-copy-shared-entries": `@sharing @US-032
+  'US-032-copy-shared-entries': `@sharing @US-032
 Feature: Copy shared task entries to playlist (US-032)
   As a language learner
   I want to copy entries from a shared task to my own playlist

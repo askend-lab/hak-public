@@ -3,7 +3,7 @@
 // Group: tasks
 
 export const FEATURES_TASKS: Record<string, string> = {
-  "US-015-create-task": `@tasks @US-015 @ready
+  'US-015-create-task': `@tasks @US-015 @ready
 Feature: Create new task (US-015)
   As a language teacher
   I want to create a new pronunciation task
@@ -43,7 +43,7 @@ Feature: Create new task (US-015)
     Then I see a validation error for required fields
 `,
 
-  "US-016-view-task-list": `@tasks @US-016 @ready
+  'US-016-view-task-list': `@tasks @US-016 @ready
 Feature: View task list (US-016)
   As a language teacher
   I want to view all my created tasks
@@ -74,7 +74,7 @@ Feature: View task list (US-016)
     Then tasks are sorted by creation date newest first
 `,
 
-  "US-017-view-task-details": `@tasks @US-017 @ready
+  'US-017-view-task-details': `@tasks @US-017 @ready
 Feature: View task details (US-017)
   As a language teacher
   I want to view detailed information about a specific task
@@ -104,7 +104,7 @@ Feature: View task details (US-017)
     Then I see a "Play all" button
 `,
 
-  "US-018-edit-task": `@tasks @US-018 @ready
+  'US-018-edit-task': `@tasks @US-018 @ready
 Feature: Edit task metadata (US-018)
   As a language teacher
   I want to edit task name and description
@@ -142,7 +142,7 @@ Feature: Edit task metadata (US-018)
     Then I see a validation error
 `,
 
-  "US-019-delete-task": `@tasks @US-019 @ready
+  'US-019-delete-task': `@tasks @US-019 @ready
 Feature: Delete task (US-019)
   As a language teacher
   I want to delete tasks I no longer need
@@ -171,7 +171,7 @@ Feature: Delete task (US-019)
     Then the task is not deleted
 `,
 
-  "US-020-add-synthesis-to-task": `@tasks @US-020
+  'US-020-add-synthesis-to-task': `@tasks @US-020
 Feature: Add synthesis entries to task (US-020)
   As a language teacher
   I want to add synthesized text entries to a task
@@ -240,7 +240,7 @@ Feature: Add synthesis entries to task (US-020)
     Then I see the entry count "3 kirjet" next to the task
 `,
 
-  "US-021-add-playlist-to-task": `@tasks @US-021
+  'US-021-add-playlist-to-task': `@tasks @US-021
 Feature: Add playlist entries to task (US-021)
   As a language teacher
   I want to add entire playlist to a task
@@ -270,7 +270,7 @@ Feature: Add playlist entries to task (US-021)
     Then I see a success notification
 `,
 
-  "US-033-baseline-tasks": `@tasks @baseline @US-033
+  'US-033-baseline-tasks': `@tasks @baseline @US-033
 Feature: US-033 Baseline tasks access
   As a new user
   I want to see example tasks when I first log in

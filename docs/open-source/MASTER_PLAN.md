@@ -67,7 +67,7 @@
 | D8 | [ ] | Remove `defaults.yaml`, `babel.config.js` if unused |
 | D9 | [x] | Remove `packages/vabamorf-api/package-lock.json` — removed, in .gitignore |
 | D10 | [ ] | Update Dockerfiles to use pnpm — SKIP: needs architectural discussion (pnpm monorepo build context) |
-| D11 | [ ] | Verify clean clone — tests pass, frontend build fails on Sass (pre-existing) |
+| D11 | [x] | Verify clean clone — tests pass, build passes (extracted eki-storybook SCSS into frontend) |
 
 ---
 

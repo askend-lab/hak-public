@@ -3,7 +3,7 @@
 // Group: playlist
 
 export const FEATURES_PLAYLIST: Record<string, string> = {
-  "US-009-add-to-playlist": `@playlist @US-009
+  'US-009-add-to-playlist': `@playlist @US-009
 Feature: Add sentence to synthesis list (US-009)
   As a language learner
   I want to add multiple sentence rows to the synthesis page
@@ -27,7 +27,7 @@ Feature: Add sentence to synthesis list (US-009)
     And each sentence has a unique ID
 `,
 
-  "US-010-play-playlist-entry": `@playlist @US-010
+  'US-010-play-playlist-entry': `@playlist @US-010
 Feature: Play individual sentence (US-010)
   As a language learner
   I want to play a specific sentence from my list
@@ -61,7 +61,7 @@ Feature: Play individual sentence (US-010)
     And "Hommikust" starts playing
 `,
 
-  "US-011-play-all-entries": `@playlist @US-011
+  'US-011-play-all-entries': `@playlist @US-011
 Feature: Play all sentences sequentially (US-011)
   As a language learner
   I want to play all my sentences in sequence
@@ -91,7 +91,7 @@ Feature: Play all sentences sequentially (US-011)
     And the button changes back to "Mängi kõik"
 `,
 
-  "US-012-delete-playlist-entry": `@playlist @US-012 @skip
+  'US-012-delete-playlist-entry': `@playlist @US-012 @skip
 Feature: Remove sentence from list (US-012)
   As a language learner
   I want to remove a sentence from my list
@@ -115,7 +115,7 @@ Feature: Remove sentence from list (US-012)
     And I still have 1 sentence row visible
 `,
 
-  "US-013-reorder-playlist": `@playlist @US-013
+  'US-013-reorder-playlist': `@playlist @US-013
 Feature: Reorder sentences via drag and drop (US-013)
   As a language learner
   I want to change the order of my sentences
@@ -138,7 +138,7 @@ Feature: Reorder sentences via drag and drop (US-013)
     And the drop target shows a visual indicator
 `,
 
-  "US-035-session-persistence": `@playlist @persistence @US-035
+  'US-035-session-persistence': `@playlist @persistence @US-035
 Feature: US-035 Session persistence
   As a language learner
   I want my entered sentences to persist across page refreshes and browser sessions

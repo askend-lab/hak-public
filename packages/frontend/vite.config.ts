@@ -48,7 +48,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         additionalData: `
-          @use "${path.resolve(__dirname, "../vendor/eki-storybook/src/stories/assets/scss/abstracts/variables")}" as *;
+          @use "${path.resolve(__dirname, "src/styles/vendor/eki-storybook/abstracts/variables")}" as *;
           $color-light-blue: #e3effb;
           $border-radius-round: 50px;
         `,
