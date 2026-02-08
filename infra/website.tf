@@ -47,6 +47,6 @@ resource "aws_s3_bucket_policy" "website" {
   depends_on = [aws_s3_bucket_public_access_block.website]
 }
 
-# Note: Artifacts bucket is centralized in askend-lab infrastructure
-# Use: askend-lab-artifacts/hak/builds/...
+# Note: Artifacts bucket is centralized (see terraform.tfvars: artifacts_bucket)
+# Use: {artifacts_bucket}/hak/builds/...
 # See: /home/alex/users/sam/infra/terraform/artifacts.tf

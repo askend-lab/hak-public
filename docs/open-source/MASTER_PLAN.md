@@ -139,7 +139,7 @@
 | C6 | [ ] | Fix all 16 npm vulnerabilities |
 | C7 | [x] | Add PR template, verify issue templates |
 | C8 | [ ] | Define semver + automated release workflow |
-| C9 | [ ] | Parameterize Terraform (no hardcoded env values) |
+| C9 | [x] | Parameterize Terraform — domain, cert ARN, state bucket all via variables |
 | C10 | [x] | Create `docker-compose.yml` for local dev |
 | C11 | [x] | Add `.editorconfig`, VS Code settings |
 

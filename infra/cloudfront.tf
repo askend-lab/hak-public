@@ -39,7 +39,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   # Vabamorf API origin
   origin {
-    domain_name = var.env == "prod" ? "vabamorf.askend-lab.com" : "vabamorf-${var.env}.askend-lab.com"
+    domain_name = var.env == "prod" ? "vabamorf.${var.domain_name}" : "vabamorf-${var.env}.${var.domain_name}"
     origin_id   = "vabamorf-api"
     custom_origin_config {
       http_port              = 80
@@ -51,7 +51,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   # Merlin API origin (can be overridden to use prod for dev environment)
   origin {
-    domain_name = var.use_prod_merlin ? "merlin-prod.askend-lab.com" : "merlin-${var.env}.askend-lab.com"
+    domain_name = var.use_prod_merlin ? "merlin-prod.${var.domain_name}" : "merlin-${var.env}.${var.domain_name}"
     origin_id   = "merlin-api"
     custom_origin_config {
       http_port              = 80
@@ -63,7 +63,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   # SimpleStore API origin
   origin {
-    domain_name = var.env == "prod" ? "hak-api.askend-lab.com" : "hak-api-${var.env}.askend-lab.com"
+    domain_name = var.env == "prod" ? "hak-api.${var.domain_name}" : "hak-api-${var.env}.${var.domain_name}"
     origin_id   = "simplestore-api"
     custom_origin_config {
       http_port              = 80
@@ -125,7 +125,7 @@ resource "aws_cloudfront_distribution" "website" {
     max_ttl                = 0
   }
 
-  # /api/synthesize -> Merlin API  
+  # /api/synthesize -> Merlin API
   ordered_cache_behavior {
     path_pattern     = "/api/synthesize"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
