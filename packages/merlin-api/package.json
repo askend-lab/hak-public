@@ -10,9 +10,9 @@
     "deploy:prod": "serverless deploy --stage prod"
   },
   "dependencies": {
-    "@aws-sdk/client-ecs": "^3.967.0",
-    "@aws-sdk/client-s3": "^3.478.0",
-    "@aws-sdk/client-sqs": "^3.478.0"
+    "@aws-sdk/client-ecs": "^3.985.0",
+    "@aws-sdk/client-s3": "^3.985.0",
+    "@aws-sdk/client-sqs": "^3.985.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.131",
