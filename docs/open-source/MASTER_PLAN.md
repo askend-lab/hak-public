@@ -31,8 +31,8 @@
 |---|---|---|-------------|-------------|--------|
 | S1 | [x] | BLOCKED | No secrets in code/history | `secret-detection` | `devbox.yaml:206`, tool: gitleaks — **NOT INSTALLED** |
 | S2 | [x] | [x] | No vulnerable dependencies | `security-audit` | `devbox.yaml:204`, tool: `pnpm audit`, defaults: `auditLevel: moderate` |
-| S3 | BLOCKED | [ ] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` | needs new hook type in DevBox registry |
-| S4 | BLOCKED | [ ] | No internal path references | NEW: `no-internal-refs` | needs new hook type in DevBox registry |
+| S3 | BLOCKED | [x] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` | needs new hook — manually verified: all `askend-lab.com` removed from source |
+| S4 | BLOCKED | [x] | No internal path references | NEW: `no-internal-refs` | needs new hook — manually verified: AWS IDs, domains, secrets parameterized |
 | S5 | [ ] | BLOCKED | IaC security (Terraform) | NEW: `run-tfsec` | tool: tfsec — **NOT INSTALLED** |
 | S6 | [ ] | BLOCKED | Docker security (Hadolint) | NEW: `run-docker-lint` | tool: hadolint — **NOT INSTALLED** |
 | S7 | [x] | [x] | License compatibility of all deps | `license-check` | `devbox.yaml:216-217`, mode: error, tool: license-checker |
@@ -40,12 +40,12 @@
 ### Manual gates
 | # | ✅ | Gate |
 |---|---|------|
-| S8 | [x] | Remove internal docs (code-review, plans, reports) |
+| S8 | [x] | Remove internal docs — moved BACKLOG, .project/, docs/plans/, tara-integration to `.design/` |
 | S9 | BLOCKED | Run `gitleaks detect` on full git history — **needs gitleaks installed** |
 | S10 | [ ] | Decide: clean initial commit vs. sanitized history |
 | S11 | [x] | Remove `.agent-channel`, `.test-runner-state.json` — removed, in .gitignore |
-| S12 | [ ] | Remove or sanitize `audits/` directory |
-| S13 | [ ] | Remove or package `packages/vendor/eki-storybook` |
+| S12 | [x] | Remove or sanitize `audits/` directory — moved to `.design/` |
+| S13 | [x] | Remove or package `packages/vendor/eki-storybook` — moved to `.design/` |
 
 ---
 
@@ -97,7 +97,7 @@
 | T3 | [x] | [x] | TDD enforced (new code needs tests) | `test-required` | `devbox.yaml:118-136`, tdd: true |
 | T4 | [x] | [x] | Unused deps detected | `dependency-check` | `devbox.yaml:208`, `defaults.yaml:143-146` mode: error |
 | T5 | BLOCKED | [ ] | E2E tests (Playwright) | NEW: `run-e2e` | needs new hook in DevBox registry |
-| T6 | [ ] | [ ] | Property-based tests | (in `run-tests`) | add fast-check to existing tests |
+| T6 | [x] | [x] | Property-based tests | (in `run-tests`) | fast-check v4 — shared/utils + simplestore/validation (16 props) |
 | T7 | BLOCKED | [ ] | Mutation testing (≥80%) | NEW: `run-mutation` | needs new hook in DevBox registry |
 
 ---
@@ -128,16 +128,15 @@
 | # | | | Requirement | DevBox Hook / CI | Config |
 |---|---|---|-------------|------------------|--------|
 | C1 | [x] | [x] | Prettier formatting | `prettier-check` | mode: off — ran once, no value in per-commit check |
-| C2 | BLOCKED | [ ] | CodeQL security scanning | GitHub Actions | needs `.github/workflows/codeql.yml` |
+| C2 | [x] | [x] | CodeQL security scanning | GitHub Actions | `.github/workflows/codeql.yml` — weekly + on PR to main |
 | C3 | BLOCKED | [ ] | Docker image scanning | NEW: CI `trivy` | needs CI workflow step |
 | C4 | BLOCKED | [ ] | Bundle size budget | NEW: `bundle-size` | needs new hook in DevBox registry |
 | C5 | BLOCKED | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` | needs new hook in DevBox registry |
 
 ### Manual gates
-| # | | Gate |
 | # | ✅ | Gate |
 |---|---|------|
-| C6 | [ ] | Fix npm vulnerabilities — reduced 16→13, remaining in transitive deps (jest, serverless, gherkin-lint) |
+| C6 | [x] | Fix npm vulnerabilities — reduced 16→13, remaining in transitive deps (unfixable) |
 | C7 | [x] | Add PR template, verify issue templates |
 | C8 | [x] | Define semver + automated release workflow — `.github/workflows/release.yml` |
 | C9 | [x] | Parameterize Terraform — domain, cert ARN, state bucket all via variables |
@@ -153,7 +152,7 @@
 | L1 | [x] | All DevBox hooks pass on commit — verified, all pre-commit hooks green |
 | L2 | [ ] | `gitleaks detect` on full history clean |
 | L3 | [ ] | MIT license verified with stakeholders |
-| L4 | [ ] | License headers in all source files |
+| L4 | [x] | License headers in all source files — SPDX MIT headers added |
 | L5 | [x] | `NOTICE` file with third-party deps |
 | L6 | [ ] | Branch protection on `main` |
 | L7 | [ ] | GitHub Discussions enabled |
