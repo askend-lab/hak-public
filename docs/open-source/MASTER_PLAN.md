@@ -153,7 +153,7 @@
 | L2 | [ ] | `gitleaks detect` on full history clean |
 | L3 | [ ] | MIT license verified with stakeholders |
 | L4 | [ ] | License headers in all source files |
-| L5 | [ ] | `NOTICE` file with third-party deps |
+| L5 | [x] | `NOTICE` file with third-party deps |
 | L6 | [ ] | Branch protection on `main` |
 | L7 | [ ] | GitHub Discussions enabled |
 | L8 | [ ] | Press release / blog post ready |
