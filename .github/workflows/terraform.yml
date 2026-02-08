@@ -45,7 +45,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Setup Terraform
@@ -84,7 +84,7 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const output = `### Terraform Plan - ${{ matrix.environment }} 
+            const output = `### Terraform Plan - ${{ matrix.environment }}
 
             #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
@@ -130,7 +130,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Setup Terraform
@@ -177,4 +177,4 @@ jobs:
       - name: Deployment Summary
         run: |
           echo "✅ Terraform applied for ${{ matrix.environment }}"
-          echo "🌐 Website: https://hak${{ matrix.environment == 'prod' && '' || format('-{0}', matrix.environment) }}.askend-lab.com"
+          echo "🌐 Terraform applied for environment: ${{ matrix.environment }}"

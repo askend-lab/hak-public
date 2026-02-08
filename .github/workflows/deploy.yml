@@ -43,12 +43,12 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTIFACTS_BUCKET: askend-lab-artifacts
+  ARTIFACTS_BUCKET: ${{ secrets.ARTIFACTS_BUCKET }}
   ARTIFACTS_PREFIX: hak/builds
   DEPLOYMENTS_PREFIX: hak/deployments
   # CloudFront distribution IDs per environment
-  CF_DIST_DEV: E232G8TMX7360Y
-  CF_DIST_PROD: E2D4DEJKUQ1SXC
+  CF_DIST_DEV: ${{ secrets.CF_DIST_DEV }}
+  CF_DIST_PROD: ${{ secrets.CF_DIST_PROD }}
 
 jobs:
   deploy:
@@ -74,7 +74,7 @@ jobs:
       - name: Configure npm registry auth
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Install dependencies
         run: pnpm install
@@ -82,7 +82,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Get build manifest and current state
@@ -114,7 +114,7 @@ jobs:
           for module in frontend simplestore audio-api merlin-api vabamorf-api; do
             BUILD_SHA=$(get_module "$module" /tmp/build-manifest.json)
             CURRENT_SHA=$(get_module "$module" /tmp/current-state.json)
-            
+
             # Special handling for frontend: use S3 ETag for true content comparison
             if [ "$module" == "frontend" ]; then
               BUILD_ETAG=$(aws s3api head-object --bucket $ARTIFACTS_BUCKET --key $ARTIFACTS_PREFIX/$BUILD_ID/frontend/index.html --query ETag --output text 2>/dev/null || echo "")
@@ -126,7 +126,7 @@ jobs:
             else
               SHOULD_DEPLOY=$( [ "$FORCE" == "true" ] || [ "$BUILD_SHA" != "$CURRENT_SHA" ] && echo true || echo false )
             fi
-            
+
             # Convert module name to output variable format (audio-api -> deploy_audio_api)
             OUTPUT_NAME="deploy_$(echo $module | tr '-' '_')"
             echo "$OUTPUT_NAME=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT

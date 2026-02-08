@@ -24,11 +24,11 @@ The Audio API Lambda is a thin API layer that manages audio generation requests.
 
 2. **S3 Cache Check**
    - Check if file exists: `s3://hak-audio-{env}/cache/abc12345.mp3`
-   
+
    **If EXISTS:**
    - Return immediately with URL
    - **No generation needed** (protection from spam/bombing)
-   
+
    **If NOT EXISTS:**
    - Put message to SQS queue
    - Return status "processing"
@@ -37,7 +37,7 @@ The Audio API Lambda is a thin API layer that manages audio generation requests.
 ```json
 {
   "status": "ready",
-  "url": "https://hak-audio-dev.askend-lab.com/cache/abc12345.mp3",
+  "url": "https://<your-audio-bucket>.s3.amazonaws.com/cache/abc12345.mp3",
   "hash": "abc12345"
 }
 ```

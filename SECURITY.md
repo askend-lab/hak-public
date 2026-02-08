@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability, please report it by emailing **security@askend-lab.com**.
+If you discover a security vulnerability, please report it by opening a **GitHub Security Advisory** on this repository.
 
 **Please do NOT open a public GitHub issue for security vulnerabilities.**
 

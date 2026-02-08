@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARTIFACTS_BUCKET: askend-lab-artifacts
+  ARTIFACTS_BUCKET: ${{ secrets.ARTIFACTS_BUCKET }}
   ARTIFACTS_PREFIX: hak/builds
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
       - name: Configure npm registry auth
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          echo "@askend-lab:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Install dependencies
         run: pnpm install
@@ -56,7 +56,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Detect changes and prepare build
@@ -89,13 +89,13 @@ jobs:
           else
             CHANGED=$(git diff --name-only $BASE_SHA HEAD)
             echo "Changed files: $CHANGED"
-            
+
             echo "frontend=$(echo "$CHANGED" | grep -q "^packages/frontend/" && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "simplestore=$(echo "$CHANGED" | grep -q "^packages/simplestore/" && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "audio-api=$(echo "$CHANGED" | grep -q "^packages/audio-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "merlin-api=$(echo "$CHANGED" | grep -q "^packages/merlin-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "vabamorf-api=$(echo "$CHANGED" | grep -q "^packages/vabamorf-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
-            
+
             if echo "$CHANGED" | grep -qE "^(package\.json|pnpm-lock\.yaml|tsconfig\.json)$"; then
               echo "Root config changed - building all"
               echo "frontend=true" >> $GITHUB_OUTPUT
@@ -169,7 +169,7 @@ jobs:
             local name="$1"
             local path="$2"
             local changed="$3"
-            
+
             if [ "$changed" == "true" ]; then
               echo "$name: uploading from $path"
               aws s3 sync "$path/" "${S3_PATH}/$name/" --sse AES256
