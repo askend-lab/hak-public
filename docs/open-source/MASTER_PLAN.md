@@ -12,6 +12,16 @@
 >
 > **If it's not in DevBox, it doesn't exist.** Manual CLI checks don't count.
 > Flow: find tool → add to DevBox → see it fail → fix → see it green.
+>
+>
+> **NO FALLBACKS.** If a tool is missing or misconfigured, the hook must
+> **FAIL HARD** — block the commit, print the error. Never skip, never
+> degrade gracefully. The quality system itself must crash on its own
+> configuration problems.
+>
+> **Config scope:** changes go into HAK's `devbox.yaml` only, never into
+> the base DevBox config (`defaults.yaml`). Transfer to base later.
+> **System deps:** tools requiring installation → [`SYSTEM_DEPENDENCIES.md`](./SYSTEM_DEPENDENCIES.md).
 
 ---
 
@@ -19,21 +29,21 @@
 
 | # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
 |---|---|---|-------------|-------------|--------|
-| S1 | [x] | [ ] | No secrets in code/history | `secret-detection` | `devbox.yaml:206`, tool: gitleaks, rules: `.gitleaks.toml` |
+| S1 | [x] | BLOCKED | No secrets in code/history | `secret-detection` | `devbox.yaml:206`, tool: gitleaks — **NOT INSTALLED** |
 | S2 | [x] | [ ] | No vulnerable dependencies | `security-audit` | `devbox.yaml:204`, tool: `pnpm audit`, defaults: `auditLevel: moderate` |
-| S3 | [ ] | [ ] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` | — needs grep-based hook |
-| S4 | [ ] | [ ] | No internal path references | NEW: `no-internal-refs` | — needs grep-based hook |
-| S5 | [ ] | [ ] | IaC security (Terraform) | NEW: `run-tfsec` | `defaults.yaml:171` (mode: off), tool: tfsec |
-| S6 | [ ] | [ ] | Docker security (Hadolint) | NEW: `run-docker-lint` | `defaults.yaml:168` (mode: off), tool: hadolint |
-| S7 | [x] | [ ] | License compatibility of all deps | `license-check` | `devbox.yaml:216-217`, mode: error, tool: license-checker |
+| S3 | BLOCKED | [ ] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` | needs new hook type in DevBox registry |
+| S4 | BLOCKED | [ ] | No internal path references | NEW: `no-internal-refs` | needs new hook type in DevBox registry |
+| S5 | [ ] | BLOCKED | IaC security (Terraform) | NEW: `run-tfsec` | tool: tfsec — **NOT INSTALLED** |
+| S6 | [ ] | BLOCKED | Docker security (Hadolint) | NEW: `run-docker-lint` | tool: hadolint — **NOT INSTALLED** |
+| S7 | [x] | [x] | License compatibility of all deps | `license-check` | `devbox.yaml:216-217`, mode: error, tool: license-checker |
 
 ### Manual gates
 | # | ✅ | Gate |
 |---|---|------|
 | S8 | [x] | Remove internal docs (code-review, plans, reports) |
-| S9 | [ ] | Run `gitleaks detect` on full git history, purge if needed |
+| S9 | BLOCKED | Run `gitleaks detect` on full git history — **needs gitleaks installed** |
 | S10 | [ ] | Decide: clean initial commit vs. sanitized history |
-| S11 | [ ] | Remove `.agent-channel`, `.test-runner-state.json` |
+| S11 | [x] | Remove `.agent-channel`, `.test-runner-state.json` — removed, in .gitignore |
 | S12 | [ ] | Remove or sanitize `audits/` directory |
 | S13 | [ ] | Remove or package `packages/vendor/eki-storybook` |
 
