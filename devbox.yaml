@@ -4,6 +4,9 @@ extends: "./defaults.yaml"
 project:
   name: "HAK"
 
+global_excludes:
+  - '**/.design/**'
+
 # Incremental testing - only runs affected tests (requires module-level opt-in)
 
 # Test modules with coverage requirements

@@ -1,0 +1,8 @@
+.design
+node_modules
+dist
+build
+coverage
+.esbuild
+.old-frontend
+pnpm-lock.yaml
