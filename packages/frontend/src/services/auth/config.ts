@@ -3,21 +3,7 @@
 
 const LOCAL_PORT = import.meta.env.VITE_PORT ?? "5181";
 
-export function getRedirectUri(
-  hostname: string = typeof window !== "undefined"
-    ? window.location.hostname
-    : "localhost",
-): string {
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    return `http://localhost:${LOCAL_PORT}/auth/callback`;
-  }
-  if (hostname === "hak-dev.askend-lab.com") {
-    return "https://hak-dev.askend-lab.com/auth/callback";
-  }
-  return "https://hak.askend-lab.com/auth/callback";
-}
-
-export function getLogoutUri(
+function getBaseUrl(
   hostname: string = typeof window !== "undefined"
     ? window.location.hostname
     : "localhost",
@@ -25,10 +11,23 @@ export function getLogoutUri(
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return `http://localhost:${LOCAL_PORT}`;
   }
-  if (hostname === "hak-dev.askend-lab.com") {
-    return "https://hak-dev.askend-lab.com";
-  }
-  return "https://hak.askend-lab.com";
+  return `https://${hostname}`;
+}
+
+export function getRedirectUri(
+  hostname: string = typeof window !== "undefined"
+    ? window.location.hostname
+    : "localhost",
+): string {
+  return `${getBaseUrl(hostname)}/auth/callback`;
+}
+
+export function getLogoutUri(
+  hostname: string = typeof window !== "undefined"
+    ? window.location.hostname
+    : "localhost",
+): string {
+  return getBaseUrl(hostname);
 }
 
 /**
@@ -43,10 +42,10 @@ export function getLogoutUri(
  * @see https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-idp-settings.html
  */
 export const cognitoConfig = {
-  region: "eu-west-1",
-  userPoolId: "eu-west-1_wlRtuLkG2",
-  clientId: "64tf6nf61n6sgftqif6q975hka",
-  domain: "askend-lab-auth.auth.eu-west-1.amazoncognito.com",
+  region: import.meta.env.VITE_COGNITO_REGION ?? "eu-west-1",
+  userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID ?? "",
+  clientId: import.meta.env.VITE_COGNITO_CLIENT_ID ?? "",
+  domain: import.meta.env.VITE_COGNITO_DOMAIN ?? "",
 
   get redirectUri(): string {
     return getRedirectUri();
@@ -104,15 +103,15 @@ export function getLogoutUrl(): string {
 
 export function getTaraLoginUrl(): string {
   const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "localhost";
+    typeof window !== "undefined"
+      ? (window.location.hostname || "localhost")
+      : "localhost";
   let apiBase: string;
 
   if (hostname === "localhost" || hostname === "127.0.0.1") {
-    apiBase = "http://localhost:4001";
-  } else if (hostname === "hak-dev.askend-lab.com") {
-    apiBase = "https://hak-api-dev.askend-lab.com";
+    apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:4001";
   } else {
-    apiBase = "https://hak-api.askend-lab.com";
+    apiBase = import.meta.env.VITE_API_URL ?? `https://${hostname.replace(/^hak/, "hak-api")}`;
   }
 
   return `${apiBase}/auth/tara/start`;

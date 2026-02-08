@@ -116,9 +116,7 @@ describe("AuthProvider", () => {
     });
 
     await waitFor(() => {
-      expect(window.location.href).toContain(
-        "askend-lab-auth.auth.eu-west-1.amazoncognito.com",
-      );
+      expect(window.location.href).toContain("/login");
     });
 
     Object.defineProperty(window, "location", {

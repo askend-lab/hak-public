@@ -11,12 +11,10 @@ import {
 
 describe("cognitoConfig", () => {
   it("should have required Cognito properties", () => {
-    expect(cognitoConfig.region).toBe("eu-west-1");
-    expect(cognitoConfig.userPoolId).toBe("eu-west-1_wlRtuLkG2");
-    expect(cognitoConfig.clientId).toBe("64tf6nf61n6sgftqif6q975hka");
-    expect(cognitoConfig.domain).toBe(
-      "askend-lab-auth.auth.eu-west-1.amazoncognito.com",
-    );
+    expect(cognitoConfig.region).toBeDefined();
+    expect(typeof cognitoConfig.userPoolId).toBe("string");
+    expect(typeof cognitoConfig.clientId).toBe("string");
+    expect(typeof cognitoConfig.domain).toBe("string");
   });
 
   it("should have OAuth scopes", () => {
@@ -32,16 +30,16 @@ describe("cognitoConfig", () => {
 });
 
 describe("getRedirectUri - environment detection", () => {
-  it("should redirect to dev when on hak-dev.askend-lab.com", async () => {
+  it("should redirect using https for non-localhost hostnames", async () => {
     const { getRedirectUri } = await import("./config");
-    const uri = getRedirectUri("hak-dev.askend-lab.com");
-    expect(uri).toBe("https://hak-dev.askend-lab.com/auth/callback");
+    const uri = getRedirectUri("app-dev.example.com");
+    expect(uri).toBe("https://app-dev.example.com/auth/callback");
   });
 
-  it("should redirect to prod when on hak.askend-lab.com", async () => {
+  it("should redirect using https for production hostname", async () => {
     const { getRedirectUri } = await import("./config");
-    const uri = getRedirectUri("hak.askend-lab.com");
-    expect(uri).toBe("https://hak.askend-lab.com/auth/callback");
+    const uri = getRedirectUri("app.example.com");
+    expect(uri).toBe("https://app.example.com/auth/callback");
   });
 
   it("should redirect to localhost when on localhost", async () => {
@@ -58,9 +56,8 @@ describe("getLoginUrl", () => {
 
   it("should return a URL to Cognito hosted UI", async () => {
     const url = await getLoginUrl();
-    expect(url).toContain(
-      "https://askend-lab-auth.auth.eu-west-1.amazoncognito.com/login",
-    );
+    expect(url).toContain("/login");
+    expect(url).toContain(`https://${cognitoConfig.domain}`);
   });
 
   it("should include required OAuth parameters", async () => {
@@ -81,9 +78,8 @@ describe("getLoginUrl", () => {
 describe("getLogoutUrl", () => {
   it("should return a URL to Cognito logout", () => {
     const url = getLogoutUrl();
-    expect(url).toContain(
-      "https://askend-lab-auth.auth.eu-west-1.amazoncognito.com/logout",
-    );
+    expect(url).toContain("/logout");
+    expect(url).toContain(`https://${cognitoConfig.domain}`);
   });
 
   it("should include client_id and logout_uri", () => {

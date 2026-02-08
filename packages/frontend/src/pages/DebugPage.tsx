@@ -11,9 +11,11 @@ const btnStyle = {
   borderRadius: "8px",
   cursor: "pointer",
 };
-const apiBase = window.location.hostname.includes("dev")
-  ? "https://hak-api-dev.askend-lab.com"
-  : "https://hak-api-prod.askend-lab.com";
+const hostname = window.location.hostname;
+const apiBase =
+  hostname === "localhost" || hostname === "127.0.0.1"
+    ? "http://localhost:4001"
+    : `https://${hostname.replace(/^hak/, "hak-api")}`;
 
 export function DebugPage() {
   return (

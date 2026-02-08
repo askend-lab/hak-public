@@ -3,6 +3,9 @@
 
 import { test, expect } from "@playwright/test";
 
+const API_BASE =
+  process.env.VITE_API_URL ?? "http://localhost:4001";
+
 test.describe("TARA Authentication", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -10,7 +13,7 @@ test.describe("TARA Authentication", () => {
     request,
   }) => {
     const response = await request.get(
-      "https://hak-api-dev.askend-lab.com/auth/tara/start",
+      `${API_BASE}/auth/tara/start`,
       {
         maxRedirects: 0,
       },
@@ -26,7 +29,7 @@ test.describe("TARA Authentication", () => {
 
   test("TARA callback handles missing code parameter", async ({ request }) => {
     const response = await request.get(
-      "https://hak-api-dev.askend-lab.com/auth/tara/callback",
+      `${API_BASE}/auth/tara/callback`,
       {
         maxRedirects: 0,
       },
@@ -39,7 +42,7 @@ test.describe("TARA Authentication", () => {
 
   test("TARA callback handles invalid state", async ({ request }) => {
     const response = await request.get(
-      "https://hak-api-dev.askend-lab.com/auth/tara/callback?code=test&state=invalid",
+      `${API_BASE}/auth/tara/callback?code=test&state=invalid`,
       { maxRedirects: 0 },
     );
 
@@ -91,7 +94,7 @@ test.describe("TARA Authentication", () => {
     request,
   }) => {
     const response = await request.get(
-      "https://hak-api-dev.askend-lab.com/auth/tara/start",
+      `${API_BASE}/auth/tara/start`,
       {
         maxRedirects: 0,
       },
@@ -113,7 +116,7 @@ test.describe("TARA Authentication", () => {
 
   test("TARA start sets state cookie", async ({ request }) => {
     const response = await request.get(
-      "https://hak-api-dev.askend-lab.com/auth/tara/start",
+      `${API_BASE}/auth/tara/start`,
       {
         maxRedirects: 0,
       },

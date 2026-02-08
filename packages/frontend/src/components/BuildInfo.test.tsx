@@ -44,7 +44,7 @@ describe("BuildInfo runtime fetch", () => {
       } as Response),
     );
     Object.defineProperty(window, "location", {
-      value: { hostname: "hak-dev.askend-lab.com" },
+      value: { hostname: "hak-dev.example.com" },
       writable: true,
     });
     render(<BuildInfo />);

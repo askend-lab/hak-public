@@ -8,7 +8,7 @@ import {
 } from "@aws-sdk/client-secrets-manager";
 
 const STORAGE_STATE_PATH = "e2e/.auth/user.json";
-const SECRET_ID = "askend-lab/llm-keys";
+const SECRET_ID = process.env.E2E_SECRET_ID ?? "test/e2e-credentials";
 
 async function getTestCredentials(): Promise<{
   username: string;
