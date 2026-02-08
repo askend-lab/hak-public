@@ -1,9 +1,10 @@
 terraform {
   backend "s3" {
-    bucket         = "askend-lab-terraform-state"
-    region         = "eu-west-1"
-    dynamodb_table = "askend-lab-terraform-locks"
-    encrypt        = true
-    # Key set via -backend-config: merlin/dev/terraform.tfstate or merlin/prod/terraform.tfstate
+    # All values set via -backend-config flags in CI/CD:
+    #   -backend-config="bucket=YOUR_STATE_BUCKET"
+    #   -backend-config="dynamodb_table=YOUR_LOCK_TABLE"
+    #   -backend-config="key=merlin/ENV/terraform.tfstate"
+    region  = "eu-west-1"
+    encrypt = true
   }
 }

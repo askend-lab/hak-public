@@ -17,16 +17,15 @@ custom:
     packager: "pnpm"
 
   # Custom domain configuration
-  # Domain: hak-api-{stage}.askend-lab.com (dev) / hak-api.askend-lab.com (prod)
   domainName:
-    dev: hak-api-dev.askend-lab.com
-    prod: hak-api.askend-lab.com
+    dev: hak-api-dev.${env:DOMAIN_NAME, 'example.com'}
+    prod: hak-api.${env:DOMAIN_NAME, 'example.com'}
 
   customDomain:
     domainName: ${self:custom.domainName.${self:provider.stage}}
     basePath: api
     stage: ${self:provider.stage}
-    certificateName: "*.askend-lab.com"
+    certificateName: "*.${env:DOMAIN_NAME, 'example.com'}"
     createRoute53Record: true
     endpointType: regional
     securityPolicy: tls_1_2
@@ -122,11 +121,7 @@ resources:
           AttributeName: ttl
           Enabled: true
 
-    # Use centralized Cognito User Pool (askend-lab-users)
-    # Pool ID: eu-west-1_wlRtuLkG2
-    # Client ID: 64tf6nf61n6sgftqif6q975hka
-    # Domain: askend-lab-auth.auth.eu-west-1.amazoncognito.com
-
+    # Cognito User Pool — ARN provided via environment variable
     ApiGatewayAuthorizer:
       Type: AWS::ApiGateway::Authorizer
       Properties:
@@ -135,7 +130,7 @@ resources:
         IdentitySource: method.request.header.Authorization
         RestApiId: !Ref ApiGatewayRestApi
         ProviderARNs:
-          - arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
+          - ${env:COGNITO_USER_POOL_ARN}
 
   Outputs:
     ApiEndpoint:

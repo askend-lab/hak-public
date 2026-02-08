@@ -39,14 +39,14 @@ plugins:
 custom:
   customDomain:
     domainName: ${self:custom.domainNames.${self:provider.stage}}
-    certificateArn: arn:aws:acm:eu-west-1:465168436856:certificate/f91069e3-9ca9-4651-b912-765c9f49fc0d
+    certificateArn: ${env:CERTIFICATE_ARN, ''}
     endpointType: REGIONAL
     apiType: http
     createRoute53Record: true
-    hostedZoneId: Z0251725SXN1AR149FEI
+    hostedZoneId: ${env:HOSTED_ZONE_ID, ''}
   domainNames:
-    dev: vabamorf-dev.askend-lab.com
-    prod: vabamorf.askend-lab.com
+    dev: vabamorf-dev.${env:DOMAIN_NAME, 'example.com'}
+    prod: vabamorf.${env:DOMAIN_NAME, 'example.com'}
 
 resources:
   Outputs:

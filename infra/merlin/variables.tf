@@ -1,3 +1,14 @@
+variable "aws_account_id" {
+  description = "AWS account ID for ECR and other resources"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-1"
+}
+
 variable "env" {
   description = "Environment (dev or prod)"
   type        = string
