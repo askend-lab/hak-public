@@ -1,63 +1,102 @@
-# HAK
+# HAK — Estonian Language Learning Platform
 
-Estonian language learning platform — serverless LMS where teachers create interactive lessons and students complete them.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220.svg)](https://pnpm.io/)
 
-## Project Background
+A serverless language learning platform where teachers create interactive
+Estonian lessons and students complete them. Built with React, TypeScript,
+and AWS Lambda.
 
-The Estonian Institute of Language requested a helper application for learning Estonian. We built a quick **prototype** using vibe coding — it looks exactly how the client wants but has terrible internal architecture and no tests.
-
-**What we're doing now**: Rewriting the prototype properly with TDD, clean architecture, and production-ready AWS infrastructure. We compare screens and functionality between the prototype and our new app, find differences, and fix them.
-
-**The prototype is NOT an architecture reference** — it's a visual and functional reference only. The client has already approved the prototype's look and feel.
-
-## Dual Purpose
-
-1. **Build the HAK app** — production-ready Estonian language learning platform
-2. **Test our development methodology** — this project is a testing ground for agent-based development with DevBox, TDD, and executable specifications (Gherkin)
-
-## Running Locally
-
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Prototype** | http://localhost:3000/ | Visual/functional reference |
-| **HAK App** | http://localhost:5180/ | Our production app with hot reload |
+## Quick Start
 
 ```bash
 pnpm install
-pnpm run dx    # Full check: tests + hooks
-pnpm start     # Run frontend + backend (kills previous server, starts new)
+pnpm test          # Run all tests
+pnpm run dx        # Full quality check: tests + hooks
+pnpm start         # Start dev server (http://localhost:5180)
 ```
 
-## Development with DevBox
+**Prerequisites:** Node.js 20+, pnpm 9+
 
-Built for AI-assisted development using [DevBox](devbox.yaml) — enforces TDD, coverage thresholds, and code quality through git hooks.
+## Architecture
 
-## CI/CD
+**Monorepo** (`pnpm` workspaces) with serverless backend on AWS.
 
-**Incremental builds** — only changed modules are built and deployed.
+| Package | Description |
+|---------|-------------|
+| `packages/frontend` | React SPA — Vite, TailwindCSS, React Router |
+| `packages/simplestore` | REST API — Lambda + DynamoDB |
+| `packages/audio-api` | Audio processing — Lambda + S3 |
+| `packages/merlin-api` | Estonian TTS gateway — Lambda |
+| `packages/merlin-worker` | TTS synthesis engine — SQS + Docker |
+| `packages/vabamorf-api` | Morphological analysis — Lambda + native binary |
+| `packages/shared` | Shared types and utilities |
+| `packages/specifications` | Gherkin specs (BDD) |
+| `packages/gherkin-parser` | Gherkin → test mapping |
 
-| Workflow | Trigger | Description |
-|----------|---------|-------------|
-| `build-v2.yml` | Push to main | Detects changes, builds affected modules, uploads to S3, auto-deploys to dev |
-| `deploy-v2.yml` | Manual / Called | Deploys specified modules from S3 to any environment |
+## Development
 
-### Modules
-- `frontend` — React app → S3 + CloudFront
-- `simplestore` — Lambda API → Serverless
-- `audio-api` — Audio processing Lambda
-- `merlin-api` — Estonian TTS API
-- `vabamorf-api` — Morphology API (Docker + Lambda)
+### Code Quality
 
-### Commands
+Quality is enforced automatically via pre-commit hooks:
+
+- **TypeScript** — strict mode, zero `any` types
+- **ESLint** — zero warnings policy
+- **Tests** — TDD enforced, coverage thresholds per module
+- **Security** — dependency audit, secret detection
+- **Architecture** — file size limits, no copy-paste, import order
+
+Run all checks manually:
 
 ```bash
-# Compare dev vs prod deployments
-./scripts/compare-deployments.sh
-
-# Manual deploy to prod
-gh workflow run deploy-v2.yml -f environment=prod -f build_id=<BUILD_ID>
+pnpm run dx        # Full DevBox quality check
+pnpm lint          # ESLint
+pnpm -r exec tsc --noEmit   # TypeScript check
 ```
 
-### URLs
+### Testing
 
-URLs are configured per environment in the deployment workflow. See `.env.example` for local configuration.
+```bash
+pnpm test              # All tests
+pnpm test -- --full    # Full suite with coverage
+```
+
+Tests use **Jest** (backend packages) and **Vitest** (frontend).
+BDD specifications in Gherkin live in `packages/specifications/`.
+
+## Infrastructure
+
+Serverless on AWS, managed with Terraform.
+
+- **Frontend** — S3 + CloudFront
+- **APIs** — Lambda behind API Gateway
+- **Database** — DynamoDB
+- **Audio** — S3 + Lambda processing
+- **TTS** — ECS/Docker (Merlin synthesis engine)
+
+See [`docs/`](docs/) for detailed documentation.
+
+## Contributing
+
+We welcome contributions! Please read:
+
+1. [Contributing Guide](CONTRIBUTING.md)
+2. [Code of Conduct](CODE_OF_CONDUCT.md)
+
+```bash
+# Fork, clone, then:
+pnpm install
+pnpm test          # Make sure everything passes
+# Create a branch, make changes, open a PR
+```
+
+## Built With AI
+
+This project is developed using an AI-assisted methodology with automated
+quality enforcement. Human developers and AI agents collaborate through
+structured workflows, TDD, and executable specifications.
+
+## License
+
+[MIT](LICENSE) — see [LICENSE](LICENSE) for details.
