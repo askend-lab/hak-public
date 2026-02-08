@@ -143,6 +143,23 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} .
+
+      - name: Scan Docker image with Trivy
+        if: steps.detect.outputs.vabamorf-api == 'true'
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ github.sha }}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Push Vabamorf Docker image
+        if: steps.detect.outputs.vabamorf-api == 'true'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
           docker push $ECR_REGISTRY/vabamorf-api:${{ github.sha }}
 
       - name: Create full build artifact
