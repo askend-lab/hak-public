@@ -30,7 +30,7 @@
 | # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
 |---|---|---|-------------|-------------|--------|
 | S1 | [x] | BLOCKED | No secrets in code/history | `secret-detection` | `devbox.yaml:206`, tool: gitleaks — **NOT INSTALLED** |
-| S2 | [x] | [ ] | No vulnerable dependencies | `security-audit` | `devbox.yaml:204`, tool: `pnpm audit`, defaults: `auditLevel: moderate` |
+| S2 | [x] | [x] | No vulnerable dependencies | `security-audit` | `devbox.yaml:204`, tool: `pnpm audit`, defaults: `auditLevel: moderate` |
 | S3 | BLOCKED | [ ] | No hardcoded domains/IDs | NEW: `no-hardcoded-env` | needs new hook type in DevBox registry |
 | S4 | BLOCKED | [ ] | No internal path references | NEW: `no-internal-refs` | needs new hook type in DevBox registry |
 | S5 | [ ] | BLOCKED | IaC security (Terraform) | NEW: `run-tfsec` | tool: tfsec — **NOT INSTALLED** |
@@ -53,8 +53,8 @@
 
 | # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
 |---|---|---|-------------|-------------|--------|
-| D1 | [ ] | [ ] | ESLint config self-contained | NEW: `no-external-imports` | — needs grep-based hook |
-| D2 | [ ] | [ ] | No paths outside repo | NEW: `no-internal-refs` | — needs grep-based hook |
+| D1 | BLOCKED | [ ] | ESLint config self-contained | NEW: `no-external-imports` | needs new hook type in DevBox registry |
+| D2 | BLOCKED | [ ] | No paths outside repo | NEW: `no-internal-refs` | needs new hook type in DevBox registry |
 | D3 | [x] | [x] | Build succeeds | `run-build` | `devbox.yaml:156-158`, cmd: `pnpm --filter @hak/frontend build` |
 | D4 | [x] | [x] | All tests pass | `run-tests` | `devbox.yaml:153-154`, cmd: `node devbox test` |
 | D5 | [x] | [x] | TypeScript compiles | `run-typecheck` | `devbox.yaml:147-148`, cmd: `pnpm -r exec tsc --noEmit` |
@@ -78,13 +78,13 @@
 | Q1 | [x] | [x] | Zero `any` types | `no-any` | `devbox.yaml:212`, `defaults.yaml:151-152` mode: error |
 | Q2 | [x] | [x] | All Promises handled | `no-floating-promises` | `devbox.yaml:214`, `defaults.yaml:154-155` mode: error |
 | Q3 | [x] | [x] | Consistent import order | `import-order` | `devbox.yaml:210`, `defaults.yaml:148-149` mode: error |
-| Q4 | [x] | [ ] | No `console.log` in production | `no-console` | `devbox.yaml:93-113`, `defaults.yaml:157-160` mode: error |
-| Q5 | [x] | [ ] | ESLint zero warnings | `run-lint` | `devbox.yaml:140-145`, cmd: `pnpm lint` |
+| Q4 | [x] | [x] | No `console.log` in production | `no-console` | `devbox.yaml:93-113`, `defaults.yaml:157-160` mode: error |
+| Q5 | [x] | [x] | ESLint zero warnings | `run-lint` | `devbox.yaml:140-145`, cmd: `pnpm lint` |
 | Q6 | [x] | [x] | No copy-paste (≤5%) | `jscpd` | `devbox.yaml:162-168`, `defaults.yaml:137-140` threshold: 5% |
 | Q7 | [x] | [x] | Source files ≤400 lines | `source-size` | `devbox.yaml:170-202`, `defaults.yaml:91-93` max: 400 |
 | Q8 | [x] | [x] | Strict TypeScript | `run-typecheck` | `devbox.yaml:147-148`, cmd: `pnpm -r exec tsc --noEmit` |
-| Q9 | [ ] | [ ] | No dead exports | NEW: `dead-code` | `defaults.yaml:165-166` (mode: off), tool: ts-prune |
-| Q10 | [ ] | [ ] | No circular deps | NEW: `circular-deps` | `defaults.yaml:162-163` (mode: off), tool: madge |
+| Q9 | BLOCKED | [ ] | No dead exports | `dead-code` | mode: off + not in pre-commit stage — needs base config change |
+| Q10 | BLOCKED | [ ] | No circular deps | `circular-deps` | mode: off + not in pre-commit stage — needs base config change |
 
 ---
 
@@ -93,12 +93,12 @@
 | # | 🔧 | ✅ | Requirement | DevBox Hook | Config |
 |---|---|---|-------------|-------------|--------|
 | T1 | [x] | [x] | All tests pass | `run-tests` | `devbox.yaml:153-154`, cmd: `node devbox test` |
-| T2 | [x] | [ ] | Coverage ≥90% lines, ≥85% branches | `test-coverage` | `devbox.yaml:150-151`, mode: error, thresholds in test_modules |
+| T2 | [x] | BLOCKED | Coverage ≥90% lines, ≥85% branches | `test-coverage` | `devbox.yaml:150-151` — not in pre-commit stage |
 | T3 | [x] | [x] | TDD enforced (new code needs tests) | `test-required` | `devbox.yaml:118-136`, tdd: true |
 | T4 | [x] | [x] | Unused deps detected | `dependency-check` | `devbox.yaml:208`, `defaults.yaml:143-146` mode: error |
-| T5 | [ ] | [ ] | E2E tests (Playwright) | NEW: `run-e2e` | — needs new hook + Playwright config |
-| T6 | [ ] | [ ] | Property-based tests | (in `run-tests`) | — add fast-check to existing tests |
-| T7 | [ ] | [ ] | Mutation testing (≥80%) | NEW: `run-mutation` | — tool: stryker-mutator |
+| T5 | BLOCKED | [ ] | E2E tests (Playwright) | NEW: `run-e2e` | needs new hook in DevBox registry |
+| T6 | [ ] | [ ] | Property-based tests | (in `run-tests`) | add fast-check to existing tests |
+| T7 | BLOCKED | [ ] | Mutation testing (≥80%) | NEW: `run-mutation` | needs new hook in DevBox registry |
 
 ---
 
@@ -108,7 +108,7 @@
 |---|---|---|-------------|-------------|--------|
 | O1 | [x] | [x] | Markdown ≤200 lines | `markdown-size` | `devbox.yaml:54-76`, max_lines: 200 |
 | O2 | [x] | [x] | No broken links in docs | `broken-links` | `devbox.yaml:88-91`, `defaults.yaml:100-102` |
-| O3 | [x] | [ ] | English-only code | `language-check` | `devbox.yaml:78-86`, `defaults.yaml:95-98` |
+| O3 | [x] | [x] | English-only code | `language-check` | `devbox.yaml:78-86`, `defaults.yaml:95-98` |
 | O4 | [x] | [x] | Docs have metrics | `metrics-required` | `devbox.yaml:138`, `defaults.yaml:113-114` |
 
 ### Manual gates
@@ -127,11 +127,11 @@
 
 | # | 🔧 | ✅ | Requirement | DevBox Hook / CI | Config |
 |---|---|---|-------------|------------------|--------|
-| C1 | [ ] | [ ] | Prettier formatting | `prettier-check` | `devbox.yaml:115-116` mode: off, `defaults.yaml:104-105` |
-| C2 | [ ] | [ ] | CodeQL security scanning | GitHub Actions | — needs `.github/workflows/codeql.yml` |
-| C3 | [ ] | [ ] | Docker image scanning | NEW: CI `trivy` | — needs CI workflow step |
-| C4 | [ ] | [ ] | Bundle size budget | NEW: `bundle-size` | — tool: size-limit |
-| C5 | [ ] | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` | — tool: lhci (Lighthouse CI) |
+| C1 | [x] | [ ] | Prettier formatting | `prettier-check` | `devbox.yaml:115-116` mode: off — enable before launch |
+| C2 | BLOCKED | [ ] | CodeQL security scanning | GitHub Actions | needs `.github/workflows/codeql.yml` |
+| C3 | BLOCKED | [ ] | Docker image scanning | NEW: CI `trivy` | needs CI workflow step |
+| C4 | BLOCKED | [ ] | Bundle size budget | NEW: `bundle-size` | needs new hook in DevBox registry |
+| C5 | BLOCKED | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` | needs new hook in DevBox registry |
 
 ### Manual gates
 | # | ✅ | Gate |
