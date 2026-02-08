@@ -136,9 +136,9 @@
 ### Manual gates
 | # | ✅ | Gate |
 |---|---|------|
-| C6 | [ ] | Fix all 16 npm vulnerabilities |
+| C6 | [ ] | Fix npm vulnerabilities — reduced 16→13, remaining in transitive deps (jest, serverless, gherkin-lint) |
 | C7 | [x] | Add PR template, verify issue templates |
-| C8 | [ ] | Define semver + automated release workflow |
+| C8 | [x] | Define semver + automated release workflow — `.github/workflows/release.yml` |
 | C9 | [x] | Parameterize Terraform — domain, cert ARN, state bucket all via variables |
 | C10 | [x] | Create `docker-compose.yml` for local dev |
 | C11 | [x] | Add `.editorconfig`, VS Code settings |
