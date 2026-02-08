@@ -1,5 +1,7 @@
 .design
 devbox
+.test-runner-state.json
+**/jest-results.json
 *.md
 docs/
 .project/

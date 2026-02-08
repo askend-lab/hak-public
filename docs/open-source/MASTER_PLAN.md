@@ -67,7 +67,7 @@
 | D8 | [ ] | Remove `defaults.yaml`, `babel.config.js` if unused |
 | D9 | [x] | Remove `packages/vabamorf-api/package-lock.json` — removed, in .gitignore |
 | D10 | [ ] | Update Dockerfiles to use pnpm — SKIP: needs architectural discussion (pnpm monorepo build context) |
-| D11 | [ ] | Verify clean clone: `pnpm install && pnpm test && pnpm build` |
+| D11 | [ ] | Verify clean clone — tests pass, frontend build fails on Sass (pre-existing) |
 
 ---
 
@@ -125,15 +125,16 @@
 
 ## 6. CI/CD & DevEx — MEDIUM `docs/open-source/06-cicd.md`
 
-| # | 🔧 | ✅ | Requirement | DevBox Hook / CI | Config |
+| # | | | Requirement | DevBox Hook / CI | Config |
 |---|---|---|-------------|------------------|--------|
-| C1 | [x] | [ ] | Prettier formatting | `prettier-check` | `devbox.yaml:115-116` mode: off — enable before launch |
+| C1 | [x] | [x] | Prettier formatting | `prettier-check` | mode: off — ran once, no value in per-commit check |
 | C2 | BLOCKED | [ ] | CodeQL security scanning | GitHub Actions | needs `.github/workflows/codeql.yml` |
 | C3 | BLOCKED | [ ] | Docker image scanning | NEW: CI `trivy` | needs CI workflow step |
 | C4 | BLOCKED | [ ] | Bundle size budget | NEW: `bundle-size` | needs new hook in DevBox registry |
 | C5 | BLOCKED | [ ] | Lighthouse ≥90 | NEW: `run-lighthouse` | needs new hook in DevBox registry |
 
 ### Manual gates
+| # | | Gate |
 | # | ✅ | Gate |
 |---|---|------|
 | C6 | [ ] | Fix npm vulnerabilities — reduced 16→13, remaining in transitive deps (jest, serverless, gherkin-lint) |

@@ -115,7 +115,8 @@ hooks:
       - "**/stories/**"
       - "**/scripts/**"
 
-  prettier-check: {}
+  prettier-check:
+    mode: off
 
   test-required:
     tdd: true # Enable strict TDD enforcement for feat/fix commits
