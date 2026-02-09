@@ -226,13 +226,12 @@ jobs:
       - name: Deploy Vabamorf API
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         working-directory: packages/vabamorf-api
-        env:
-          npm_config_ignore_scripts: true
         run: |
           mkdir -p dist/src && cp -r ../../artifacts/vabamorf-api/* dist/src/ 2>/dev/null || true
-          npm install serverless-domain-manager --no-save 2>/dev/null || true
-          npx serverless create_domain --stage ${{ inputs.environment }} || true
-          npx serverless deploy --stage ${{ inputs.environment }}
+          cd /tmp && npm init -y && npm install serverless-domain-manager serverless@3 --save
+          cd /home/runner/work/hak/hak/packages/vabamorf-api
+          /tmp/node_modules/.bin/serverless create_domain --stage ${{ inputs.environment }} || true
+          /tmp/node_modules/.bin/serverless deploy --stage ${{ inputs.environment }}
           echo "✅ Vabamorf API deployed"
 
       - name: Update deployment state
