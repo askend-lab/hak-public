@@ -228,7 +228,7 @@ jobs:
         working-directory: packages/vabamorf-api
         run: |
           mkdir -p dist/src && cp -r ../../artifacts/vabamorf-api/* dist/src/ 2>/dev/null || true
-          npm ci
+          npm install
           npm install --save-dev serverless-domain-manager
           serverless create_domain --stage ${{ inputs.environment }} || true
           serverless deploy --stage ${{ inputs.environment }}
