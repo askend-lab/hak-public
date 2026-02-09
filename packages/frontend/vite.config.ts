@@ -148,10 +148,6 @@ export default defineConfig({
           });
         },
       },
-      "/auth/tara": {
-        target: "https://auth.askend-lab.com",
-        changeOrigin: true,
-      },
       "/api": {
         // Local development: use local serverless-offline
         // target: 'http://localhost:4000',

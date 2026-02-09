@@ -97,10 +97,10 @@ describe("getLogoutUrl", () => {
 });
 
 describe("getTaraLoginUrl", () => {
-  it("should return relative path for TARA auth (proxied in vite.config.ts)", async () => {
+  it("should return direct URL to auth.askend-lab.com", async () => {
     const { getTaraLoginUrl } = await import("./config");
     const url = getTaraLoginUrl();
-    expect(url).toBe("/auth/tara/start");
+    expect(url).toBe("https://auth.askend-lab.com/auth/tara/start");
   });
 });
 
