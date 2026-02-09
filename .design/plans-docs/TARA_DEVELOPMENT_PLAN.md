@@ -4,13 +4,14 @@
 
 Implementation of TARA authentication in Development Environment with full infrastructure (NAT Gateway, Lambda) using TARA Demo environment.
 
-**Target:** hak-dev.askend-lab.com  
-**TARA Environment:** tara-test.ria.ee (demo, no IP whitelist)  
-**Timeline:** Ready for production switch after dev validation
+**Target:** hak-dev.askend-lab.com
+**TARA Environment:** tara-test.ria.ee (demo, no IP whitelist)
+**Status:** ✅ DEV deployed (2026-02-03), pending E2E testing
+**Next:** E2E testing → TARA production registration
 
 ---
 
-## Phase 1: Infrastructure Setup (sam/infra)
+## Phase 1: Infrastructure Setup ✅ DONE
 
 ### 1.1 VPC + NAT Gateway
 
@@ -57,12 +58,16 @@ Secret structure:
 
 ---
 
-## Phase 2: TARA Auth Lambda (hak)
+## Phase 2: TARA Auth Lambda ✅ IMPLEMENTED
+
+> **Location:** `/home/alex/users/kate/infra/lambdas/tara-auth/`
+> **Status:** Deployed to DEV (2026-02-03)
+> **Endpoint:** `auth.askend-lab.com/auth/tara/*`
 
 ### 2.1 Package Structure
 
 ```
-packages/tara-auth/
+/home/alex/users/kate/infra/lambdas/tara-auth/
 ├── src/
 │   ├── handler.ts          # Lambda entry point
 │   ├── routes.ts           # /auth/tara/* routes
@@ -143,7 +148,7 @@ async function findOrCreateUser(taraIdToken: TaraIdToken): Promise<CognitoUser> 
   // 1. Try find by personal_code
   const existingUser = await findUserByAttribute('custom:personal_code', taraIdToken.sub);
   if (existingUser) return existingUser;
-  
+
   // 2. Try find by email (if provided)
   if (taraIdToken.email) {
     const emailUser = await findUserByEmail(taraIdToken.email);
@@ -153,7 +158,7 @@ async function findOrCreateUser(taraIdToken: TaraIdToken): Promise<CognitoUser> 
       return emailUser;
     }
   }
-  
+
   // 3. Create new user
   return await adminCreateUser({
     username: `tara_${taraIdToken.sub}`,
@@ -169,7 +174,7 @@ async function findOrCreateUser(taraIdToken: TaraIdToken): Promise<CognitoUser> 
 
 ---
 
-## Phase 3: Frontend Integration
+## Phase 3: Frontend Integration ✅ DONE
 
 ### 3.1 Login Page Update
 
@@ -177,7 +182,7 @@ async function findOrCreateUser(taraIdToken: TaraIdToken): Promise<CognitoUser> 
 
 Add TARA button:
 ```tsx
-<Button 
+<Button
   variant="outlined"
   onClick={() => window.location.href = '/api/auth/tara/start'}
 >
@@ -198,7 +203,7 @@ const idToken = params.get('id_token');
 
 ---
 
-## Phase 4: Testing
+## Phase 4: Testing ⏳ PENDING
 
 ### 4.1 Unit Tests
 
@@ -223,7 +228,7 @@ const idToken = params.get('id_token');
 
 ---
 
-## Phase 5: TARA Registration
+## Phase 5: TARA Registration ⏳ PENDING
 
 ### 5.1 Demo Environment (tara-test.ria.ee)
 
@@ -244,20 +249,20 @@ After dev validation:
 
 ## Implementation Order
 
-| Step | Task | Blocked by |
-|------|------|------------|
-| 1 | Create VPC + NAT in sam/infra | - |
-| 2 | Apply Terraform, get VPC outputs | Step 1 |
-| 3 | Add custom:personal_code to Cognito schema | - |
-| 4 | Create tara-auth package scaffold | - |
-| 5 | Implement TARA client (OIDC) | Step 4 |
-| 6 | Implement Cognito admin client | Step 4 |
-| 7 | Implement Lambda handlers | Steps 5, 6 |
-| 8 | Write unit tests | Step 7 |
-| 9 | Deploy Lambda to dev with VPC | Steps 2, 7 |
-| 10 | Add TARA button to frontend | - |
-| 11 | End-to-end testing | Steps 9, 10 |
-| 12 | Apply for TARA production | Step 11 validated |
+| Step | Task | Status |
+|------|------|--------|
+| 1 | Create VPC + NAT in infra | ✅ Done (NAT IP: 34.253.56.45) |
+| 2 | Apply Terraform, get VPC outputs | ✅ Done (SSM params) |
+| 3 | Add custom:personal_code to Cognito | ✅ Done |
+| 4 | Create tara-auth package | ✅ Done (`infra/lambdas/tara-auth/`) |
+| 5 | Implement TARA client (OIDC) | ✅ Done (`tara-client.ts`) |
+| 6 | Implement Cognito admin client | ✅ Done (`cognito-client.ts`) |
+| 7 | Implement Lambda handlers | ✅ Done (`handler.ts`) |
+| 8 | Write unit tests | ⏳ Pending |
+| 9 | Deploy Lambda to dev with VPC | ✅ Done (2026-02-03) |
+| 10 | Add TARA button to frontend | ✅ Done (`LoginModal.tsx`) |
+| 11 | End-to-end testing | ⏳ Pending |
+| 12 | Apply for TARA production | ⏳ Blocked by Step 11 |
 
 ---
 
