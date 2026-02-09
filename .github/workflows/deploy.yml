@@ -51,6 +51,8 @@ env:
   CF_DIST_PROD: E2D4DEJKUQ1SXC
   # Cognito for SimpleStore authorizer
   COGNITO_USER_POOL_ARN: arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
+  # Domain for serverless-domain-manager
+  DOMAIN_NAME: askend-lab.com
 
 jobs:
   deploy:
