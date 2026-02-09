@@ -94,6 +94,9 @@ hooks:
       - ".design/**"
 
   no-console:
+    mode: error
+    allow_warn: true
+    allow_error: true
     excludePaths:
       - "audio-worker/**"
       - "**/audio-worker/**"
