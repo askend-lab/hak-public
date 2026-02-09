@@ -43,12 +43,12 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTIFACTS_BUCKET: ${{ secrets.ARTIFACTS_BUCKET }}
+  ARTIFACTS_BUCKET: askend-lab-artifacts
   ARTIFACTS_PREFIX: hak/builds
   DEPLOYMENTS_PREFIX: hak/deployments
   # CloudFront distribution IDs per environment
-  CF_DIST_DEV: ${{ secrets.CF_DIST_DEV }}
-  CF_DIST_PROD: ${{ secrets.CF_DIST_PROD }}
+  CF_DIST_DEV: E232G8TMX7360Y
+  CF_DIST_PROD: E2D4DEJKUQ1SXC
 
 jobs:
   deploy:
