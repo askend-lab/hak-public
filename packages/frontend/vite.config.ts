@@ -148,6 +148,10 @@ export default defineConfig({
           });
         },
       },
+      "/auth/tara": {
+        target: "https://hak-api-dev.askend-lab.com",
+        changeOrigin: true,
+      },
       "/api": {
         // Local development: use local serverless-offline
         // target: 'http://localhost:4000',
