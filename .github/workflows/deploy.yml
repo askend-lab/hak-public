@@ -226,12 +226,13 @@ jobs:
       - name: Deploy Vabamorf API
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         working-directory: packages/vabamorf-api
+        env:
+          npm_config_ignore_scripts: true
         run: |
           mkdir -p dist/src && cp -r ../../artifacts/vabamorf-api/* dist/src/ 2>/dev/null || true
-          npm install --omit=dev --ignore-scripts || true
-          npm install --save-dev serverless-domain-manager --ignore-scripts
-          serverless create_domain --stage ${{ inputs.environment }} || true
-          serverless deploy --stage ${{ inputs.environment }}
+          npm install serverless-domain-manager --no-save 2>/dev/null || true
+          npx serverless create_domain --stage ${{ inputs.environment }} || true
+          npx serverless deploy --stage ${{ inputs.environment }}
           echo "✅ Vabamorf API deployed"
 
       - name: Update deployment state
