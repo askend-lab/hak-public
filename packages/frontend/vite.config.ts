@@ -154,7 +154,7 @@ export default defineConfig({
         // rewrite: (path) => path.replace(/^\/api/, '/dev'),
 
         // Deployed API
-        target: process.env.VITE_API_URL ?? "http://localhost:4000",
+        target: "https://hak-api-dev.askend-lab.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, "/api"),
         configure: (proxy) => {
