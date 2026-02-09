@@ -97,10 +97,10 @@ describe("getLogoutUrl", () => {
 });
 
 describe("getTaraLoginUrl", () => {
-  it("should return relative path for TARA auth", async () => {
+  it("should return direct URL to hak-api-dev for TARA auth", async () => {
     const { getTaraLoginUrl } = await import("./config");
     const url = getTaraLoginUrl();
-    expect(url).toBe("/auth/tara/start");
+    expect(url).toBe("https://hak-api-dev.askend-lab.com/auth/tara/start");
   });
 });
 
