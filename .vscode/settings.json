@@ -1,0 +1,31 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "eslint.workingDirectories": [
+    { "directory": "packages/frontend", "changeProcessCWD": true },
+    { "directory": "packages/shared", "changeProcessCWD": true },
+    { "directory": "packages/audio-api", "changeProcessCWD": true },
+    { "directory": "packages/merlin-api", "changeProcessCWD": true },
+    { "directory": "packages/merlin-worker", "changeProcessCWD": true },
+    { "directory": "packages/vabamorf-api", "changeProcessCWD": true },
+    { "directory": "packages/simplestore", "changeProcessCWD": true },
+    { "directory": "packages/gherkin-parser", "changeProcessCWD": true }
+  ],
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true
+  }
+}

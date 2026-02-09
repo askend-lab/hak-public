@@ -1,27 +1,34 @@
-import { Task, TaskEntry } from '@/types/task';
-import mockTasksData from '../../../public/data/mock-tasks.json';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { Task, TaskEntry } from "@/types/task";
+import mockTasksData from "../../../public/data/mock-tasks.json";
 
 export class MockDataLoader {
   private generateShareToken(): string {
     return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('')
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
       .substring(0, 16);
   }
 
-  private normalizeTaskEntry(entry: TaskEntry, taskId: string, taskCreatedAt: Date): TaskEntry {
+  private normalizeTaskEntry(
+    entry: TaskEntry,
+    taskId: string,
+    taskCreatedAt: Date,
+  ): TaskEntry {
     return {
       ...entry,
       taskId: entry.taskId || taskId,
       audioBlob: entry.audioBlob || null,
-      createdAt: entry.createdAt ? new Date(entry.createdAt) : taskCreatedAt
+      createdAt: entry.createdAt ? new Date(entry.createdAt) : taskCreatedAt,
     };
   }
 
   async loadBaselineTasks(): Promise<Task[]> {
     try {
       const data = mockTasksData;
-      
+
       return (data.tasks as unknown[]).map((task: unknown) => {
         const taskData = task as Record<string, unknown>;
         const taskId = taskData.id as string;
@@ -30,17 +37,21 @@ export class MockDataLoader {
 
         return {
           ...taskData,
-          shareToken: (taskData.shareToken as string) || this.generateShareToken(),
-          speechSequences: (taskData.speechSequences as string[]) || entries.map((e: TaskEntry) => e.text) || [],
-          entries: entries.map((entry: TaskEntry) => 
-            this.normalizeTaskEntry(entry, taskId, createdAt)
+          shareToken:
+            (taskData.shareToken as string) || this.generateShareToken(),
+          speechSequences:
+            (taskData.speechSequences as string[]) ||
+            entries.map((e: TaskEntry) => e.text) ||
+            [],
+          entries: entries.map((entry: TaskEntry) =>
+            this.normalizeTaskEntry(entry, taskId, createdAt),
           ),
           createdAt,
-          updatedAt: new Date(taskData.updatedAt as string)
+          updatedAt: new Date(taskData.updatedAt as string),
         } as Task;
       });
     } catch (error) {
-      console.error('Failed to load baseline tasks:', error);
+      console.error("Failed to load baseline tasks:", error);
       return [];
     }
   }
@@ -64,15 +75,18 @@ export class MockDataLoader {
 
       return {
         ...task,
-        speechSequences: (task.speechSequences as string[]) || entries.map((e: TaskEntry) => e.text) || [],
-        entries: entries.map((entry: TaskEntry) => 
-          this.normalizeTaskEntry(entry, taskId, createdAt)
+        speechSequences:
+          (task.speechSequences as string[]) ||
+          entries.map((e: TaskEntry) => e.text) ||
+          [],
+        entries: entries.map((entry: TaskEntry) =>
+          this.normalizeTaskEntry(entry, taskId, createdAt),
         ),
         createdAt,
-        updatedAt: new Date(task.updatedAt as string)
+        updatedAt: new Date(task.updatedAt as string),
       } as Task;
     } catch (error) {
-      console.error('Failed to find task by share token:', error);
+      console.error("Failed to find task by share token:", error);
       return null;
     }
   }

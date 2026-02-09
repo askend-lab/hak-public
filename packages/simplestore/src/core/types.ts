@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Core types for SimpleStore - no external dependencies
  */
@@ -9,7 +12,7 @@
  * - public: everyone sees/searches, owner modifies
  * - shared: everyone sees, everyone can modify
  */
-export type DataType = 'private' | 'unlisted' | 'public' | 'shared';
+export type DataType = "private" | "unlisted" | "public" | "shared";
 
 /**
  * Server-side context extracted from authentication and configuration

@@ -94,7 +94,7 @@ Add to the appropriate token file in `styles/tokens/`:
 // In styles/tokens/_colors.scss
 :root {
   // ... existing tokens ...
-  
+
   // New token with comment explaining usage
   --color-new-semantic-name: #HEX; // Usage: Where this color is used
 }
@@ -112,14 +112,15 @@ $color-new-semantic-name: var(--color-new-semantic-name);
 ### Step 3: Document the Token
 
 Add a comment explaining:
+
 - Where it's used
 - Why it exists
 - Any relationships to other tokens
 
 ```scss
 // Tag colors (for word tags, labels)
---color-tag-bg: #F6FBFF; // Tag background - light blue
---color-tag-border: #BED3E5; // Tag border - matches tag background
+--color-tag-bg: #f6fbff; // Tag background - light blue
+--color-tag-border: #bed3e5; // Tag border - matches tag background
 ```
 
 ### Step 4: Verify Build
@@ -131,5 +132,6 @@ npm run build
 ---
 
 **See also:**
+
 - [Token Categories](./Token-Categories.md) - Complete list of token categories
 - [Token Examples](./Token-Examples.md) - Usage examples and best practices

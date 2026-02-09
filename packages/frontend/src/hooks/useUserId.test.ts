@@ -1,16 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { useUserId } from './useUserId';
-import { useAuth } from '@/services/auth';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-vi.mock('@/services/auth');
+import { describe, it, expect, vi } from "vitest";
+import { renderHook } from "@testing-library/react";
+import { useUserId } from "./useUserId";
+import { useAuth } from "@/services/auth";
+
+vi.mock("@/services/auth");
 
 const mockUseAuth = useAuth as ReturnType<typeof vi.fn>;
 
-describe('useUserId', () => {
-  it('returns user id when user is authenticated', () => {
+describe("useUserId", () => {
+  it("returns user id when user is authenticated", () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'real-user-123', email: 'test@example.com' },
+      user: { id: "real-user-123", email: "test@example.com" },
       isAuthenticated: true,
       showLoginModal: false,
       setShowLoginModal: vi.fn(),
@@ -25,10 +28,10 @@ describe('useUserId', () => {
     });
 
     const { result } = renderHook(() => useUserId());
-    expect(result.current).toBe('real-user-123');
+    expect(result.current).toBe("real-user-123");
   });
 
-  it('returns test-user when user is not authenticated', () => {
+  it("returns test-user when user is not authenticated", () => {
     mockUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
@@ -45,6 +48,6 @@ describe('useUserId', () => {
     });
 
     const { result } = renderHook(() => useUserId());
-    expect(result.current).toBe('test-user');
+    expect(result.current).toBe("test-user");
   });
 });

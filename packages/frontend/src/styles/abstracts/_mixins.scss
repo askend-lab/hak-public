@@ -4,10 +4,10 @@
 // Reusable style patterns for consistent component styling
 // =========================================================================
 
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
 
 // ---------------------------------------------------------------------------
 // Phonetic Marker Badge
@@ -28,7 +28,7 @@
     outline: 2px solid $color-input-border-focus;
     outline-offset: 2px;
   }
-  
+
   // Remove outline for mouse interactions while keeping keyboard focus visible
   &:focus:not(:focus-visible) {
     outline: none;
@@ -39,9 +39,11 @@
 @mixin focus-visible-ring {
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px $color-white, 0 0 0 4px $color-input-border-focus;
+    box-shadow:
+      0 0 0 2px $color-white,
+      0 0 0 4px $color-input-border-focus;
   }
-  
+
   &:focus:not(:focus-visible) {
     outline: none;
     box-shadow: none;
@@ -54,7 +56,7 @@
     outline: 2px solid $color-white;
     outline-offset: 2px;
   }
-  
+
   &:focus:not(:focus-visible) {
     outline: none;
   }

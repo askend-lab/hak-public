@@ -1,8 +1,8 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // =========================================================================
 // Marker Tooltip Component
@@ -113,7 +113,7 @@
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     border-left: 6px solid transparent;

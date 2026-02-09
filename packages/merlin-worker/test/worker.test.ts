@@ -1,40 +1,48 @@
-import { synthesize } from '../src/merlin';
-import { uploadAudio } from '../src/s3';
-import { receiveMessage, parseMessage, deleteMessage, isWarmMessage } from '../src/sqs';
-import { processMessage } from '../src/worker';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-jest.mock('../src/sqs', () => ({
+import { synthesize } from "../src/merlin";
+import { uploadAudio } from "../src/s3";
+import {
+  receiveMessage,
+  parseMessage,
+  deleteMessage,
+  isWarmMessage,
+} from "../src/sqs";
+import { processMessage } from "../src/worker";
+
+jest.mock("../src/sqs", () => ({
   receiveMessage: jest.fn(),
   parseMessage: jest.fn(),
   deleteMessage: jest.fn(),
   isWarmMessage: jest.fn(),
 }));
 
-jest.mock('../src/merlin', () => ({
+jest.mock("../src/merlin", () => ({
   synthesize: jest.fn(),
 }));
 
-jest.mock('../src/s3', () => ({
+jest.mock("../src/s3", () => ({
   uploadAudio: jest.fn(),
 }));
 
 const mockSqsClient = { send: jest.fn() } as any;
 const mockS3Client = { send: jest.fn() } as any;
 const config = {
-  queueUrl: 'https://queue-url',
-  bucketName: 'test-bucket',
-  merlinUrl: 'https://merlin-url/synthesize',
+  queueUrl: "https://queue-url",
+  bucketName: "test-bucket",
+  merlinUrl: "https://merlin-url/synthesize",
 };
 
-describe('Worker', () => {
+describe("Worker", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(console, 'log').mockImplementation();
-    jest.spyOn(console, 'error').mockImplementation();
+    jest.spyOn(console, "log").mockImplementation();
+    jest.spyOn(console, "error").mockImplementation();
   });
 
-  describe('processMessage', () => {
-    it('should return false when no message in queue', async () => {
+  describe("processMessage", () => {
+    it("should return false when no message in queue", async () => {
       (receiveMessage as jest.Mock).mockResolvedValue(null);
 
       const result = await processMessage(mockSqsClient, mockS3Client, config);
@@ -43,16 +51,19 @@ describe('Worker', () => {
       expect(synthesize).not.toHaveBeenCalled();
     });
 
-    it('should process message end-to-end', async () => {
+    it("should process message end-to-end", async () => {
       const mockMessage = {
-        MessageId: 'msg-123',
-        Body: JSON.stringify({ text: 'tere', hash: 'abc123' }),
-        ReceiptHandle: 'receipt-123',
+        MessageId: "msg-123",
+        Body: JSON.stringify({ text: "tere", hash: "abc123" }),
+        ReceiptHandle: "receipt-123",
       };
-      const mockAudioBuffer = Buffer.from('fake audio');
+      const mockAudioBuffer = Buffer.from("fake audio");
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
-      (parseMessage as jest.Mock).mockReturnValue({ text: 'tere', hash: 'abc123' });
+      (parseMessage as jest.Mock).mockReturnValue({
+        text: "tere",
+        hash: "abc123",
+      });
       (isWarmMessage as unknown as jest.Mock).mockReturnValue(false);
       (synthesize as jest.Mock).mockResolvedValue(mockAudioBuffer);
       (uploadAudio as jest.Mock).mockResolvedValue(undefined);
@@ -62,29 +73,29 @@ describe('Worker', () => {
 
       expect(result).toBe(true);
       expect(parseMessage).toHaveBeenCalledWith(mockMessage);
-      expect(synthesize).toHaveBeenCalledWith('tere', config.merlinUrl);
+      expect(synthesize).toHaveBeenCalledWith("tere", config.merlinUrl);
       expect(uploadAudio).toHaveBeenCalledWith(
         mockS3Client,
         config.bucketName,
-        'abc123',
-        mockAudioBuffer
+        "abc123",
+        mockAudioBuffer,
       );
       expect(deleteMessage).toHaveBeenCalledWith(
         mockSqsClient,
         config.queueUrl,
-        'receipt-123'
+        "receipt-123",
       );
     });
 
-    it('should handle warm message without synthesizing', async () => {
+    it("should handle warm message without synthesizing", async () => {
       const mockMessage = {
-        MessageId: 'msg-warm',
-        Body: JSON.stringify({ type: 'warm', timestamp: Date.now() }),
-        ReceiptHandle: 'receipt-warm',
+        MessageId: "msg-warm",
+        Body: JSON.stringify({ type: "warm", timestamp: Date.now() }),
+        ReceiptHandle: "receipt-warm",
       };
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
-      (parseMessage as jest.Mock).mockReturnValue({ type: 'warm' });
+      (parseMessage as jest.Mock).mockReturnValue({ type: "warm" });
       (isWarmMessage as unknown as jest.Mock).mockReturnValue(true);
       (deleteMessage as jest.Mock).mockResolvedValue(undefined);
 
@@ -96,24 +107,28 @@ describe('Worker', () => {
       expect(deleteMessage).toHaveBeenCalledWith(
         mockSqsClient,
         config.queueUrl,
-        'receipt-warm'
+        "receipt-warm",
       );
     });
 
-    it('should throw error when synthesis fails', async () => {
+    it("should throw error when synthesis fails", async () => {
       const mockMessage = {
-        MessageId: 'msg-123',
-        Body: JSON.stringify({ text: 'tere', hash: 'abc123' }),
-        ReceiptHandle: 'receipt-123',
+        MessageId: "msg-123",
+        Body: JSON.stringify({ text: "tere", hash: "abc123" }),
+        ReceiptHandle: "receipt-123",
       };
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
-      (parseMessage as jest.Mock).mockReturnValue({ text: 'tere', hash: 'abc123' });
+      (parseMessage as jest.Mock).mockReturnValue({
+        text: "tere",
+        hash: "abc123",
+      });
       (isWarmMessage as unknown as jest.Mock).mockReturnValue(false);
-      (synthesize as jest.Mock).mockRejectedValue(new Error('TTS failed'));
+      (synthesize as jest.Mock).mockRejectedValue(new Error("TTS failed"));
 
-      await expect(processMessage(mockSqsClient, mockS3Client, config))
-        .rejects.toThrow('TTS failed');
+      await expect(
+        processMessage(mockSqsClient, mockS3Client, config),
+      ).rejects.toThrow("TTS failed");
     });
   });
 });

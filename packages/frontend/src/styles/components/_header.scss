@@ -6,11 +6,11 @@
 // Used within .page-layout__header
 // =========================================================================
 
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
 
 // Logo container
 .eki-logo {
@@ -31,16 +31,16 @@
   align-items: center;
   height: 100%;
   justify-self: center;
-  
+
   // Mobile: Hide nav, show in mobile menu
   display: none;
-  
+
   // Tablet: Show nav
   @include tablet {
     display: flex;
     gap: 32px;
   }
-  
+
   // Desktop: Full spacing
   @include desktop {
     gap: 40px;
@@ -74,7 +74,7 @@
 
   // Active tab underline
   &.active::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
@@ -92,15 +92,15 @@
   align-items: center;
   height: 36px;
   justify-self: end;
-  
+
   // Mobile: Compact spacing
   gap: 12px;
-  
+
   // Tablet: Standard spacing
   @include tablet {
     gap: 16px;
   }
-  
+
   // Desktop: Full spacing
   @include desktop {
     gap: 24px;

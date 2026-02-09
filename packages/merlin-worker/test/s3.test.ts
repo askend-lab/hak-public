@@ -1,68 +1,66 @@
-import type { S3Client } from '@aws-sdk/client-s3';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-import { uploadAudio } from '../src/s3';
+import type { S3Client } from "@aws-sdk/client-s3";
+
+import { uploadAudio } from "../src/s3";
 
 const mockS3Client = {
   send: jest.fn(),
 } as unknown as S3Client & { send: jest.Mock };
 
-describe('S3 Operations', () => {
+describe("S3 Operations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('uploadAudio', () => {
-    it('should upload audio buffer to S3 with correct key', async () => {
+  describe("uploadAudio", () => {
+    it("should upload audio buffer to S3 with correct key", async () => {
       mockS3Client.send.mockResolvedValue({});
-      const audioBuffer = Buffer.from('fake audio data');
+      const audioBuffer = Buffer.from("fake audio data");
 
       await uploadAudio(
         mockS3Client,
-        'hak-audio-dev',
-        'abc123def456',
-        audioBuffer
+        "hak-audio-dev",
+        "abc123def456",
+        audioBuffer,
       );
 
       expect(mockS3Client.send).toHaveBeenCalledTimes(1);
     });
 
-    it('should use cache/{hash}.mp3 as key format', async () => {
+    it("should use cache/{hash}.mp3 as key format", async () => {
       mockS3Client.send.mockResolvedValue({});
-      const audioBuffer = Buffer.from('fake audio data');
+      const audioBuffer = Buffer.from("fake audio data");
 
       await uploadAudio(
         mockS3Client,
-        'hak-audio-dev',
-        'myhash123',
-        audioBuffer
+        "hak-audio-dev",
+        "myhash123",
+        audioBuffer,
       );
 
       const call = mockS3Client.send.mock.calls[0][0];
-      expect(call.input.Key).toBe('cache/myhash123.mp3');
+      expect(call.input.Key).toBe("cache/myhash123.mp3");
     });
 
-    it('should set correct content type', async () => {
+    it("should set correct content type", async () => {
       mockS3Client.send.mockResolvedValue({});
-      const audioBuffer = Buffer.from('fake audio data');
+      const audioBuffer = Buffer.from("fake audio data");
 
-      await uploadAudio(
-        mockS3Client,
-        'hak-audio-dev',
-        'hash123',
-        audioBuffer
-      );
+      await uploadAudio(mockS3Client, "hak-audio-dev", "hash123", audioBuffer);
 
       const call = mockS3Client.send.mock.calls[0][0];
-      expect(call.input.ContentType).toBe('audio/mpeg');
+      expect(call.input.ContentType).toBe("audio/mpeg");
     });
 
-    it('should throw error on upload failure', async () => {
-      mockS3Client.send.mockRejectedValue(new Error('Upload failed'));
-      const audioBuffer = Buffer.from('fake audio data');
+    it("should throw error on upload failure", async () => {
+      mockS3Client.send.mockRejectedValue(new Error("Upload failed"));
+      const audioBuffer = Buffer.from("fake audio data");
 
       await expect(
-        uploadAudio(mockS3Client, 'bucket', 'hash', audioBuffer)
-      ).rejects.toThrow('Upload failed');
+        uploadAudio(mockS3Client, "bucket", "hash", audioBuffer),
+      ).rejects.toThrow("Upload failed");
     });
   });
 });

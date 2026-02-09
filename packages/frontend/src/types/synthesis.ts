@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 export type SentenceState = {
   id: string;
   text: string;
@@ -21,19 +24,27 @@ export type OpenTagMenu = {
   tagIndex: number;
 } | null;
 
-export function getVoiceModel(text: string): 'efm_s' | 'efm_l' {
-  const words = text.trim().split(/\s+/).filter(word => word.length > 0);
-  return words.length === 1 ? 'efm_s' : 'efm_l';
+export function getVoiceModel(text: string): "efm_s" | "efm_l" {
+  const words = text
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
+  return words.length === 1 ? "efm_s" : "efm_l";
 }
 
 export function convertTextToTags(text: string): string[] {
-  return text.trim().split(/\s+/).filter(word => word.length > 0);
+  return text
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
 }
 
 /**
  * Filters sentences that have non-empty text.
  * Common pattern used across components for playlist/task operations.
  */
-export function filterNonEmptySentences<T extends { text: string }>(sentences: T[]): T[] {
-  return sentences.filter(s => s.text.trim());
+export function filterNonEmptySentences<T extends { text: string }>(
+  sentences: T[],
+): T[] {
+  return sentences.filter((s) => s.text.trim());
 }

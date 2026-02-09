@@ -1,9 +1,22 @@
- 
-'use client';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { UserRole, OnboardingState, StoredOnboardingState } from '@/types/onboarding';
-import { ROLE_CONFIGS, STORAGE_KEY } from '@/config/onboardingConfig';
+"use client";
+
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
+import {
+  UserRole,
+  OnboardingState,
+  StoredOnboardingState,
+} from "@/types/onboarding";
+import { ROLE_CONFIGS, STORAGE_KEY } from "@/config/onboardingConfig";
 
 interface OnboardingContextType {
   state: OnboardingState;
@@ -22,10 +35,12 @@ const defaultState: OnboardingState = {
   completed: false,
   selectedRole: null,
   currentStep: 0,
-  skipped: false
+  skipped: false,
 };
 
-const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
+const OnboardingContext = createContext<OnboardingContextType | undefined>(
+  undefined,
+);
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<OnboardingState>(defaultState);
@@ -42,12 +57,12 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
             completed: true,
             selectedRole: parsedState.selectedRole,
             currentStep: 0,
-            skipped: false
+            skipped: false,
           });
         }
       }
     } catch (error) {
-      console.error('Failed to load onboarding state:', error);
+      console.error("Failed to load onboarding state:", error);
       localStorage.removeItem(STORAGE_KEY);
     } finally {
       setIsLoading(false);
@@ -55,32 +70,35 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Save completed state to localStorage
-  const saveToStorage = useCallback((completed: boolean, role: UserRole | null) => {
-    try {
-      const storageState: StoredOnboardingState = {
-        completed,
-        selectedRole: role,
-        completedAt: completed ? new Date().toISOString() : null
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(storageState));
-    } catch (error) {
-      console.error('Failed to save onboarding state:', error);
-    }
-  }, []);
+  const saveToStorage = useCallback(
+    (completed: boolean, role: UserRole | null) => {
+      try {
+        const storageState: StoredOnboardingState = {
+          completed,
+          selectedRole: role,
+          completedAt: completed ? new Date().toISOString() : null,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageState));
+      } catch (error) {
+        console.error("Failed to save onboarding state:", error);
+      }
+    },
+    [],
+  );
 
   const selectRole = useCallback((role: UserRole) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       selectedRole: role,
       currentStep: 0,
-      completed: false  // Reset so wizard can run again (for returning users clicking help)
+      completed: false, // Reset so wizard can run again (for returning users clicking help)
     }));
   }, []);
 
   const nextStep = useCallback(() => {
-    setState(prev => {
+    setState((prev) => {
       if (!prev.selectedRole) return prev;
-      
+
       const totalSteps = ROLE_CONFIGS[prev.selectedRole].steps.length;
       if (prev.currentStep >= totalSteps - 1) {
         // Complete the wizard
@@ -88,41 +106,41 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         return {
           ...prev,
           completed: true,
-          currentStep: 0
+          currentStep: 0,
         };
       }
-      
+
       return {
         ...prev,
-        currentStep: prev.currentStep + 1
+        currentStep: prev.currentStep + 1,
       };
     });
   }, [saveToStorage]);
 
   const prevStep = useCallback(() => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      currentStep: Math.max(0, prev.currentStep - 1)
+      currentStep: Math.max(0, prev.currentStep - 1),
     }));
   }, []);
 
   const skipWizard = useCallback(() => {
-    setState(prev => {
+    setState((prev) => {
       saveToStorage(true, prev.selectedRole);
       return {
         ...prev,
         completed: true,
-        skipped: true
+        skipped: true,
       };
     });
   }, [saveToStorage]);
 
   const completeWizard = useCallback(() => {
-    setState(prev => {
+    setState((prev) => {
       saveToStorage(true, prev.selectedRole);
       return {
         ...prev,
-        completed: true
+        completed: true,
       };
     });
   }, [saveToStorage]);
@@ -136,12 +154,12 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const isWizardActive = !state.completed && state.selectedRole !== null;
 
   // Get current steps based on selected role
-  const currentSteps = state.selectedRole 
-    ? ROLE_CONFIGS[state.selectedRole].steps 
+  const currentSteps = state.selectedRole
+    ? ROLE_CONFIGS[state.selectedRole].steps
     : [];
 
   return (
-    <OnboardingContext.Provider 
+    <OnboardingContext.Provider
       value={{
         state,
         selectRole,
@@ -152,7 +170,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         resetOnboarding,
         isWizardActive,
         currentSteps,
-        isLoading
+        isLoading,
       }}
     >
       {children}
@@ -163,7 +181,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 export function useOnboarding() {
   const context = useContext(OnboardingContext);
   if (context === undefined) {
-    throw new Error('useOnboarding must be used within an OnboardingProvider');
+    throw new Error("useOnboarding must be used within an OnboardingProvider");
   }
   return context;
 }

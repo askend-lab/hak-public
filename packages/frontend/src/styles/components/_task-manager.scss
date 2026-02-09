@@ -1,8 +1,8 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // Paper component mixins available from main.scss cascade
 
@@ -48,12 +48,12 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: $color-soft-primary;
     transform: translateY(-1px);
   }
-  
+
   svg {
     flex-shrink: 0;
   }
@@ -85,8 +85,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .task-manager__error {
@@ -95,7 +99,7 @@
   border: 1px solid $color-outlined-danger;
   border-radius: $border-radius;
   margin-bottom: $spacing-4;
-  
+
   p {
     margin: 0;
     color: $color-soft-danger;

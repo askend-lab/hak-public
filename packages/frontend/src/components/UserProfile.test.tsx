@@ -1,22 +1,24 @@
- 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import UserProfile from './UserProfile';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-vi.mock('@/services/auth', () => ({
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import UserProfile from "./UserProfile";
+
+vi.mock("@/services/auth", () => ({
   useAuth: vi.fn(() => ({
     logout: vi.fn(),
   })),
 }));
 
-import { useAuth } from '@/services/auth';
+import { useAuth } from "@/services/auth";
 
-describe('UserProfile', () => {
+describe("UserProfile", () => {
   const mockUser = {
-    id: 'user-123',
-    name: 'Margus Tamm',
-    email: 'margus@test.ee'
+    id: "user-123",
+    name: "Margus Tamm",
+    email: "margus@test.ee",
   };
   const mockLogout = vi.fn();
 
@@ -27,91 +29,135 @@ describe('UserProfile', () => {
     });
   });
 
-  describe('rendering', () => {
-    it('renders user avatar with initials', () => {
+  describe("rendering", () => {
+    it("renders user avatar with initials", () => {
       render(<UserProfile user={mockUser} />);
-      expect(screen.getByText('MT')).toBeInTheDocument();
+      expect(screen.getByText("MT")).toBeInTheDocument();
     });
 
-    it('renders user name', () => {
+    it("renders user name", () => {
       render(<UserProfile user={mockUser} />);
-      expect(screen.getByText('Margus Tamm')).toBeInTheDocument();
+      expect(screen.getByText("Margus Tamm")).toBeInTheDocument();
     });
 
-    it('renders user id', () => {
+    it("renders user id", () => {
       render(<UserProfile user={mockUser} />);
-      expect(screen.getByText('user-123')).toBeInTheDocument();
+      expect(screen.getByText("user-123")).toBeInTheDocument();
     });
 
-    it('dropdown is closed by default', () => {
+    it("dropdown is closed by default", () => {
       render(<UserProfile user={mockUser} />);
-      expect(screen.queryByText('Logi välja')).not.toBeInTheDocument();
+      expect(screen.queryByText("Logi välja")).not.toBeInTheDocument();
     });
   });
 
-  describe('dropdown interaction', () => {
-    it('opens dropdown when button clicked', async () => {
+  describe("dropdown interaction", () => {
+    it("opens dropdown when button clicked", async () => {
       const user = userEvent.setup();
       render(<UserProfile user={mockUser} />);
 
-      await user.click(screen.getByRole('button'));
-      
-      expect(screen.getByText('Logi välja')).toBeInTheDocument();
-      expect(screen.getByText('Kustuta kohalikud andmed')).toBeInTheDocument();
+      await user.click(screen.getByRole("button"));
+
+      expect(screen.getByText("Logi välja")).toBeInTheDocument();
+      expect(screen.getByText("Kustuta kohalikud andmed")).toBeInTheDocument();
     });
 
-    it('shows user details in dropdown', async () => {
+    it("shows user details in dropdown", async () => {
       const user = userEvent.setup();
       render(<UserProfile user={mockUser} />);
 
-      await user.click(screen.getByRole('button'));
-      
-      expect(screen.getByText('margus@test.ee')).toBeInTheDocument();
-      expect(screen.getByText('ID: user-123')).toBeInTheDocument();
+      await user.click(screen.getByRole("button"));
+
+      expect(screen.getByText("margus@test.ee")).toBeInTheDocument();
+      expect(screen.getByText("ID: user-123")).toBeInTheDocument();
     });
 
-    it('closes dropdown when backdrop clicked', async () => {
+    it("closes dropdown when backdrop clicked", async () => {
       const user = userEvent.setup();
       render(<UserProfile user={mockUser} />);
 
-      await user.click(screen.getByRole('button'));
-      expect(screen.getByText('Logi välja')).toBeInTheDocument();
+      await user.click(screen.getByRole("button"));
+      expect(screen.getByText("Logi välja")).toBeInTheDocument();
 
-      const backdrop = document.querySelector('.user-profile__backdrop');
+      const backdrop = document.querySelector(".user-profile__backdrop");
       if (backdrop) {
         await user.click(backdrop);
       }
 
-      expect(screen.queryByText('Logi välja')).not.toBeInTheDocument();
+      expect(screen.queryByText("Logi välja")).not.toBeInTheDocument();
     });
   });
 
-  describe('logout', () => {
-    it('calls logout when logout button clicked', async () => {
+  describe("logout", () => {
+    it("calls logout when logout button clicked", async () => {
       const user = userEvent.setup();
       render(<UserProfile user={mockUser} />);
 
-      await user.click(screen.getByRole('button'));
-      await user.click(screen.getByText('Logi välja'));
+      await user.click(screen.getByRole("button"));
+      await user.click(screen.getByText("Logi välja"));
 
       expect(mockLogout).toHaveBeenCalled();
     });
   });
 
-  describe('avatar initials', () => {
-    it('handles single name', () => {
-      render(<UserProfile user={{ ...mockUser, name: 'Margus' }} />);
-      expect(screen.getByText('M')).toBeInTheDocument();
+  describe("clear local data", () => {
+    it("does nothing when confirm is cancelled", async () => {
+      window.confirm = vi.fn().mockReturnValue(false);
+
+      const user = userEvent.setup();
+      render(<UserProfile user={mockUser} />);
+
+      await user.click(screen.getByRole("button"));
+      await user.click(screen.getByText("Kustuta kohalikud andmed"));
+
+      expect(window.confirm).toHaveBeenCalled();
     });
 
-    it('handles multiple names', () => {
-      render(<UserProfile user={{ ...mockUser, name: 'Margus Erik Tamm' }} />);
-      expect(screen.getByText('MET')).toBeInTheDocument();
+    it("clears localStorage and reloads when confirmed", async () => {
+      window.confirm = vi.fn().mockReturnValue(true);
+      const originalClear = localStorage.clear.bind(localStorage);
+      const clearMock = vi.fn();
+      localStorage.clear = clearMock;
+      const originalLocation = window.location;
+      Object.defineProperty(window, "location", {
+        writable: true,
+        value: { ...originalLocation, reload: vi.fn() },
+      });
+
+      const user = userEvent.setup();
+      render(<UserProfile user={mockUser} />);
+
+      await user.click(screen.getByRole("button"));
+      await user.click(screen.getByText("Kustuta kohalikud andmed"));
+
+      expect(window.confirm).toHaveBeenCalled();
+      expect(clearMock).toHaveBeenCalled();
+      expect(window.location.reload).toHaveBeenCalled();
+
+      localStorage.clear = originalClear;
+      Object.defineProperty(window, "location", {
+        writable: true,
+        value: originalLocation,
+      });
+    });
+  });
+
+  describe("avatar initials", () => {
+    it("handles single name", () => {
+      render(<UserProfile user={{ ...mockUser, name: "Margus" }} />);
+      expect(screen.getByText("M")).toBeInTheDocument();
     });
 
-    it('handles user without name', () => {
-      render(<UserProfile user={{ id: 'user-456', email: 'test@example.com' }} />);
-      expect(screen.getByText('T')).toBeInTheDocument();
+    it("handles multiple names", () => {
+      render(<UserProfile user={{ ...mockUser, name: "Margus Erik Tamm" }} />);
+      expect(screen.getByText("MET")).toBeInTheDocument();
+    });
+
+    it("handles user without name", () => {
+      render(
+        <UserProfile user={{ id: "user-456", email: "test@example.com" }} />,
+      );
+      expect(screen.getByText("T")).toBeInTheDocument();
     });
   });
 });

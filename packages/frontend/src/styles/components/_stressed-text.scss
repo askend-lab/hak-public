@@ -1,8 +1,8 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // =========================================================================
 // Stressed Text Display Component
@@ -36,7 +36,7 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-1;
-  
+
   @media (min-width: $breakpoint-md) {
     flex-direction: row;
     align-items: flex-start;
@@ -49,7 +49,7 @@
   flex-direction: column;
   gap: $spacing-3;
   flex: 1;
-  
+
   @media (min-width: $breakpoint-md) {
     flex-direction: row;
     align-items: center;
@@ -73,22 +73,22 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &--play {
     background: $color-primary;
     color: $color-white;
-    
+
     &:hover:not(:disabled) {
       background: $color-soft-primary;
       transform: translateY(-1px);
     }
-    
+
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
   }
-  
+
   &--play-round {
     width: 36px;
     height: 36px;
@@ -99,43 +99,43 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &:hover:not(:disabled) {
       background: $color-soft-primary;
       transform: scale(1.05);
     }
-    
+
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
     }
-    
+
     svg {
       flex-shrink: 0;
     }
   }
-  
+
   &--add {
     background: $color-white;
     color: $color-primary;
     border: 1px solid $color-outlined-primary;
-    
+
     &:hover:not(:disabled) {
       background: $color-soft-primary-bg;
       transform: translateY(-1px);
     }
-    
+
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
   }
-  
+
   svg {
     flex-shrink: 0;
   }
-  
+
   span {
     white-space: nowrap;
   }
@@ -219,7 +219,7 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: $border-radius;
   flex: 1;
-  
+
   &--stressed {
     font-weight: 400;
     color: $color-text-secondary;
@@ -229,18 +229,48 @@
 }
 
 // Legacy class aliases for backwards compatibility
-.stressed-text-display { @extend .stressed-text; }
-.stressed-text-title { @extend .stressed-text__title; }
-.text-comparison { @extend .stressed-text__comparison; }
-.original-text { @extend .stressed-text__row; }
-.stressed-text-row { @extend .stressed-text__row; }
-.stressed-text-container { @extend .stressed-text__container; }
-.stressed-text-actions { @extend .stressed-text__actions; }
-.stressed-action-button { @extend .stressed-text__action-button; }
-.play-button { @extend .stressed-text__action-button--play; }
-.play-button-round { @extend .stressed-text__action-button--play-round; }
-.add-button { @extend .stressed-text__action-button--add; }
-.text-label { @extend .stressed-text__label; }
-.text-words { @extend .stressed-text__words; }
-.word-element { @extend .stressed-text__word; }
-.text-value { @extend .stressed-text__value; }
+.stressed-text-display {
+  @extend .stressed-text;
+}
+.stressed-text-title {
+  @extend .stressed-text__title;
+}
+.text-comparison {
+  @extend .stressed-text__comparison;
+}
+.original-text {
+  @extend .stressed-text__row;
+}
+.stressed-text-row {
+  @extend .stressed-text__row;
+}
+.stressed-text-container {
+  @extend .stressed-text__container;
+}
+.stressed-text-actions {
+  @extend .stressed-text__actions;
+}
+.stressed-action-button {
+  @extend .stressed-text__action-button;
+}
+.play-button {
+  @extend .stressed-text__action-button--play;
+}
+.play-button-round {
+  @extend .stressed-text__action-button--play-round;
+}
+.add-button {
+  @extend .stressed-text__action-button--add;
+}
+.text-label {
+  @extend .stressed-text__label;
+}
+.text-words {
+  @extend .stressed-text__words;
+}
+.word-element {
+  @extend .stressed-text__word;
+}
+.text-value {
+  @extend .stressed-text__value;
+}

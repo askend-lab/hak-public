@@ -1,95 +1,140 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { TaskDetailHeader } from './TaskDetailHeader';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { TaskDetailHeader } from "./TaskDetailHeader";
 
 const mockTask = {
-  id: 'task-1', name: 'Test Task', description: 'Test description', userId: 'user-1',
-  entries: [], speechSequences: [], shareToken: 'share-token-123', createdAt: new Date(), updatedAt: new Date(),
+  id: "task-1",
+  name: "Test Task",
+  description: "Test description",
+  userId: "user-1",
+  entries: [],
+  speechSequences: [],
+  shareToken: "share-token-123",
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const defaultProps = {
-  task: mockTask, entriesCount: 5, isLoadingPlayAll: false, isPlayingAll: false,
-  isHeaderMenuOpen: false, setIsHeaderMenuOpen: vi.fn(), onShare: vi.fn(), onPlayAll: vi.fn(), onEditTask: vi.fn(), onDeleteTask: vi.fn(),
+  task: mockTask,
+  entriesCount: 5,
+  isLoadingPlayAll: false,
+  isPlayingAll: false,
+  isHeaderMenuOpen: false,
+  setIsHeaderMenuOpen: vi.fn(),
+  onShare: vi.fn(),
+  onPlayAll: vi.fn(),
+  onEditTask: vi.fn(),
+  onDeleteTask: vi.fn(),
 };
 
-describe('TaskDetailHeader rendering', () => {
-  it('returns null when entriesCount is 0', () => {
-    const { container } = render(<TaskDetailHeader {...defaultProps} entriesCount={0} />);
+describe("TaskDetailHeader rendering", () => {
+  it("returns null when entriesCount is 0", () => {
+    const { container } = render(
+      <TaskDetailHeader {...defaultProps} entriesCount={0} />,
+    );
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders task name and description', () => {
+  it("renders task name and description", () => {
     render(<TaskDetailHeader {...defaultProps} />);
-    expect(screen.getByText('Test Task')).toBeInTheDocument();
-    expect(screen.getByText('Test description')).toBeInTheDocument();
+    expect(screen.getByText("Test Task")).toBeInTheDocument();
+    expect(screen.getByText("Test description")).toBeInTheDocument();
   });
 
-  it('renders without description when null', () => {
-    render(<TaskDetailHeader {...defaultProps} task={{ ...mockTask, description: null }} />);
-    expect(screen.queryByText('Test description')).not.toBeInTheDocument();
+  it("renders without description when null", () => {
+    render(
+      <TaskDetailHeader
+        {...defaultProps}
+        task={{ ...mockTask, description: null }}
+      />,
+    );
+    expect(screen.queryByText("Test description")).not.toBeInTheDocument();
   });
 });
 
-describe('TaskDetailHeader actions', () => {
-  it('calls onShare when clicked', async () => {
+describe("TaskDetailHeader actions", () => {
+  it("calls onShare when clicked", async () => {
     const onShare = vi.fn();
     render(<TaskDetailHeader {...defaultProps} onShare={onShare} />);
-    await userEvent.click(screen.getByText('Jaga'));
+    await userEvent.click(screen.getByText("Jaga"));
     expect(onShare).toHaveBeenCalled();
   });
 
-  it('calls onPlayAll when clicked', async () => {
+  it("calls onPlayAll when clicked", async () => {
     const onPlayAll = vi.fn();
     render(<TaskDetailHeader {...defaultProps} onPlayAll={onPlayAll} />);
-    await userEvent.click(screen.getByText('Mängi kõik'));
+    await userEvent.click(screen.getByText("Mängi kõik"));
     expect(onPlayAll).toHaveBeenCalled();
   });
 
-  it('shows loading state', () => {
+  it("shows loading state", () => {
     render(<TaskDetailHeader {...defaultProps} isLoadingPlayAll={true} />);
-    expect(screen.getByText('Laadimine')).toBeInTheDocument();
+    expect(screen.getByText("Laadimine")).toBeInTheDocument();
   });
 
-  it('shows pause state', () => {
+  it("shows pause state", () => {
     render(<TaskDetailHeader {...defaultProps} isPlayingAll={true} />);
-    expect(screen.getByText('Peata')).toBeInTheDocument();
+    expect(screen.getByText("Peata")).toBeInTheDocument();
   });
 });
 
-describe('TaskDetailHeader menu open', () => {
-  it('opens menu on click', async () => {
+describe("TaskDetailHeader menu open", () => {
+  it("opens menu on click", async () => {
     const setMenu = vi.fn();
-    render(<TaskDetailHeader {...defaultProps} setIsHeaderMenuOpen={setMenu} />);
-    await userEvent.click(screen.getByLabelText('Rohkem valikuid'));
+    render(
+      <TaskDetailHeader {...defaultProps} setIsHeaderMenuOpen={setMenu} />,
+    );
+    await userEvent.click(screen.getByLabelText("Rohkem valikuid"));
     expect(setMenu).toHaveBeenCalledWith(true);
   });
 
-  it('shows menu items when open', () => {
+  it("shows menu items when open", () => {
     render(<TaskDetailHeader {...defaultProps} isHeaderMenuOpen={true} />);
-    expect(screen.getByText('Muuda')).toBeInTheDocument();
+    expect(screen.getByText("Muuda")).toBeInTheDocument();
   });
 });
 
-describe('TaskDetailHeader menu actions', () => {
-  it('handles edit click', async () => {
+describe("TaskDetailHeader menu actions", () => {
+  it("handles edit click", async () => {
     const onEdit = vi.fn();
-    render(<TaskDetailHeader {...defaultProps} isHeaderMenuOpen={true} onEditTask={onEdit} />);
-    await userEvent.click(screen.getByText('Muuda'));
-    expect(onEdit).toHaveBeenCalledWith('task-1');
+    render(
+      <TaskDetailHeader
+        {...defaultProps}
+        isHeaderMenuOpen={true}
+        onEditTask={onEdit}
+      />,
+    );
+    await userEvent.click(screen.getByText("Muuda"));
+    expect(onEdit).toHaveBeenCalledWith("task-1");
   });
 
-  it('handles delete click', async () => {
+  it("handles delete click", async () => {
     const onDelete = vi.fn();
-    render(<TaskDetailHeader {...defaultProps} isHeaderMenuOpen={true} onDeleteTask={onDelete} />);
-    await userEvent.click(screen.getByText('Kustuta'));
-    expect(onDelete).toHaveBeenCalledWith('task-1');
+    render(
+      <TaskDetailHeader
+        {...defaultProps}
+        isHeaderMenuOpen={true}
+        onDeleteTask={onDelete}
+      />,
+    );
+    await userEvent.click(screen.getByText("Kustuta"));
+    expect(onDelete).toHaveBeenCalledWith("task-1");
   });
 
-  it('closes on backdrop click', async () => {
+  it("closes on backdrop click", async () => {
     const setMenu = vi.fn();
-    render(<TaskDetailHeader {...defaultProps} isHeaderMenuOpen={true} setIsHeaderMenuOpen={setMenu} />);
-    const bd = document.querySelector('.task-detail__menu-backdrop');
+    render(
+      <TaskDetailHeader
+        {...defaultProps}
+        isHeaderMenuOpen={true}
+        setIsHeaderMenuOpen={setMenu}
+      />,
+    );
+    const bd = document.querySelector(".task-detail__menu-backdrop");
     if (bd) await userEvent.click(bd);
     expect(setMenu).toHaveBeenCalledWith(false);
   });

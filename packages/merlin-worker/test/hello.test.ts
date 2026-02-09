@@ -1,10 +1,12 @@
-describe('Audio Worker Hello Test', () => {
-  it('should pass a simple test', () => {
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+describe("Audio Worker Hello Test", () => {
+  it("should pass a simple test", () => {
     expect(true).toBe(true);
   });
 
-  it('should verify module exists', () => {
-     
-    expect('audio-worker').toBeDefined();
+  it("should verify module exists", () => {
+    expect("audio-worker").toBeDefined();
   });
 });

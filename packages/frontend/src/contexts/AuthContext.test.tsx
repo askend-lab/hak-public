@@ -1,65 +1,73 @@
- 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { AuthProvider, useAuth } from './AuthContext';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { AuthProvider, useAuth } from "./AuthContext";
 
 function TestComponent() {
   const { isAuthenticated, user } = useAuth();
   return (
     <div>
-      <span data-testid="auth-status">{isAuthenticated ? 'authenticated' : 'not-authenticated'}</span>
-      <span data-testid="user">{user ? user.email : 'no-user'}</span>
+      <span data-testid="auth-status">
+        {isAuthenticated ? "authenticated" : "not-authenticated"}
+      </span>
+      <span data-testid="user">{user ? user.email : "no-user"}</span>
     </div>
   );
 }
 
-describe('AuthContext', () => {
-  it('provides auth context to children', () => {
+describe("AuthContext", () => {
+  it("provides auth context to children", () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
-    
-    expect(screen.getByTestId('auth-status')).toBeInTheDocument();
+
+    expect(screen.getByTestId("auth-status")).toBeInTheDocument();
   });
 
-  it('initially not authenticated', () => {
+  it("initially not authenticated", () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
-    
-    expect(screen.getByTestId('auth-status')).toHaveTextContent('not-authenticated');
+
+    expect(screen.getByTestId("auth-status")).toHaveTextContent(
+      "not-authenticated",
+    );
   });
 
-  it('throws error when used outside provider', () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    
+  it("throws error when used outside provider", () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
     expect(() => {
       render(<TestComponent />);
     }).toThrow();
-    
+
     consoleSpy.mockRestore();
   });
 
-  it('shows no user initially', () => {
+  it("shows no user initially", () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
-    
-    expect(screen.getByTestId('user')).toHaveTextContent('no-user');
+
+    expect(screen.getByTestId("user")).toHaveTextContent("no-user");
   });
 
-  it('provides setShowLoginModal function', async () => {
+  it("provides setShowLoginModal function", async () => {
     function ModalTestComponent() {
       const { showLoginModal, setShowLoginModal } = useAuth();
       return (
         <div>
-          <span data-testid="modal-status">{showLoginModal ? 'open' : 'closed'}</span>
+          <span data-testid="modal-status">
+            {showLoginModal ? "open" : "closed"}
+          </span>
           <button onClick={() => setShowLoginModal(true)}>Open</button>
         </div>
       );
@@ -68,24 +76,26 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <ModalTestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
-    
-    expect(screen.getByTestId('modal-status')).toHaveTextContent('closed');
+
+    expect(screen.getByTestId("modal-status")).toHaveTextContent("closed");
   });
 
-  it('provides isLoading state', () => {
+  it("provides isLoading state", () => {
     function LoadingTestComponent() {
       const { isLoading } = useAuth();
-      return <span data-testid="loading">{isLoading ? 'loading' : 'loaded'}</span>;
+      return (
+        <span data-testid="loading">{isLoading ? "loading" : "loaded"}</span>
+      );
     }
 
     render(
       <AuthProvider>
         <LoadingTestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
-    
-    expect(screen.getByTestId('loading')).toBeInTheDocument();
+
+    expect(screen.getByTestId("loading")).toBeInTheDocument();
   });
 });

@@ -1,38 +1,48 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Auth Step Definitions
  * Implements steps for US-025 (login), US-026 (profile), US-027 (logout), US-028 (redirect)
  */
 
-import { Given, When, Then } from '@cucumber/cucumber';
-import { TestWorld } from './setup';
+import { Given, When, Then } from "@cucumber/cucumber";
+import { TestWorld } from "./setup";
 
-Given('I am not authenticated', async function(this: TestWorld) {
+Given("I am not authenticated", async function (this: TestWorld) {
   await this.renderApp();
   // Clear any existing auth state
-  localStorage.removeItem('auth_user');
+  localStorage.removeItem("auth_user");
   sessionStorage.clear();
 });
 
-Given('I am authenticated', async function(this: TestWorld) {
+Given("I am authenticated", async function (this: TestWorld) {
   await this.renderApp();
   // Set up authenticated state
-  localStorage.setItem('auth_user', JSON.stringify({ id: 'test-user', name: 'Test User' }));
+  localStorage.setItem(
+    "auth_user",
+    JSON.stringify({ id: "test-user", name: "Test User" }),
+  );
 });
 
-Given('I am logged in', async function(this: TestWorld) {
+Given("I am logged in", async function (this: TestWorld) {
   await this.renderApp();
-  localStorage.setItem('auth_user', JSON.stringify({ id: 'test-user', name: 'Test User' }));
+  localStorage.setItem(
+    "auth_user",
+    JSON.stringify({ id: "test-user", name: "Test User" }),
+  );
 });
 
-When('I visit the application', async function(this: TestWorld) {
+When("I visit the application", async function (this: TestWorld) {
   await this.renderApp();
 });
 
-When('I click the login button', async function(this: TestWorld) {
+When("I click the login button", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const loginButton = this.queryByText('Logi sisse') || 
-                        this.queryByText('Login') ||
-                        this.container?.querySelector('[data-testid="login-button"]');
+    const loginButton =
+      this.queryByText("Logi sisse") ||
+      this.queryByText("Login") ||
+      this.container?.querySelector('[data-testid="login-button"]');
     if (loginButton) {
       this.click(loginButton);
       return true;
@@ -41,11 +51,12 @@ When('I click the login button', async function(this: TestWorld) {
   });
 });
 
-When('I click the logout button', async function(this: TestWorld) {
+When("I click the logout button", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const logoutButton = this.queryByText('Logi välja') || 
-                         this.queryByText('Logout') ||
-                         this.container?.querySelector('[data-testid="logout-button"]');
+    const logoutButton =
+      this.queryByText("Logi välja") ||
+      this.queryByText("Logout") ||
+      this.container?.querySelector('[data-testid="logout-button"]');
     if (logoutButton) {
       this.click(logoutButton);
       return true;
@@ -54,9 +65,11 @@ When('I click the logout button', async function(this: TestWorld) {
   });
 });
 
-When('I view my profile', async function(this: TestWorld) {
+When("I view my profile", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const profileButton = this.container?.querySelector('[data-testid="profile-button"], .user-profile');
+    const profileButton = this.container?.querySelector(
+      '[data-testid="profile-button"], .user-profile',
+    );
     if (profileButton) {
       this.click(profileButton);
       return true;
@@ -65,94 +78,117 @@ When('I view my profile', async function(this: TestWorld) {
   });
 });
 
-Then('I see a login button', async function(this: TestWorld) {
+Then("I see a login button", async function (this: TestWorld) {
   await this.waitFor(() => {
-    return this.queryByText('Logi sisse') || 
-           this.queryByText('Login') ||
-           this.container?.querySelector('[data-testid="login-button"]');
+    return (
+      this.queryByText("Logi sisse") ||
+      this.queryByText("Login") ||
+      this.container?.querySelector('[data-testid="login-button"]')
+    );
   });
 });
 
-Then('I am logged in successfully', async function(this: TestWorld) {
+Then("I am logged in successfully", async function (this: TestWorld) {
   await this.waitFor(() => {
     // Check for authenticated state indicators
-    const profileElement = this.container?.querySelector('.user-profile, [data-testid="user-profile"]');
-    const logoutButton = this.queryByText('Logi välja');
+    const profileElement = this.container?.querySelector(
+      '.user-profile, [data-testid="user-profile"]',
+    );
+    const logoutButton = this.queryByText("Logi välja");
     return profileElement || logoutButton;
   });
 });
 
-Then('I see my profile information', async function(this: TestWorld) {
+Then("I see my profile information", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const profile = this.container?.querySelector('.user-profile, [data-testid="user-profile"]');
+    const profile = this.container?.querySelector(
+      '.user-profile, [data-testid="user-profile"]',
+    );
     return profile;
   });
 });
 
-Then('I am logged out', async function(this: TestWorld) {
+Then("I am logged out", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const loginButton = this.queryByText('Logi sisse') || this.queryByText('Login');
+    const loginButton =
+      this.queryByText("Logi sisse") || this.queryByText("Login");
     return loginButton;
   });
 });
 
-Then('I am redirected to the login page', async function(this: TestWorld) {
+Then("I am redirected to the login page", async function (this: TestWorld) {
   await this.waitFor(() => {
-    return this.queryByText('Logi sisse') || this.container?.querySelector('.login-modal');
+    return (
+      this.queryByText("Logi sisse") ||
+      this.container?.querySelector(".login-modal")
+    );
   });
 });
 
-Then('I am redirected back to my original page', async function(this: TestWorld) {
-  // After login, user should be back at their intended destination
-  await this.waitFor(() => {
-    return !this.container?.querySelector('.login-modal');
-  });
-});
+Then(
+  "I am redirected back to my original page",
+  async function (this: TestWorld) {
+    // After login, user should be back at their intended destination
+    await this.waitFor(() => {
+      return !this.container?.querySelector(".login-modal");
+    });
+  },
+);
 
-When('I view the navigation menu', async function(this: TestWorld) {
+When("I view the navigation menu", async function (this: TestWorld) {
   // Navigation menu should be visible
   await this.waitFor(() => {
-    return this.container?.querySelector('nav, .navigation, [data-testid="nav"]');
+    return this.container?.querySelector(
+      'nav, .navigation, [data-testid="nav"]',
+    );
   });
 });
 
-Then('I see a logout button', async function(this: TestWorld) {
+Then("I see a logout button", async function (this: TestWorld) {
   await this.waitFor(() => {
-    return this.queryByText('Logi välja') || 
-           this.queryByText('Logout') ||
-           this.container?.querySelector('[data-testid="logout-button"]');
+    return (
+      this.queryByText("Logi välja") ||
+      this.queryByText("Logout") ||
+      this.container?.querySelector('[data-testid="logout-button"]')
+    );
   });
 });
 
-Then('my session is terminated', async function(this: TestWorld) {
+Then("my session is terminated", async function (this: TestWorld) {
   // Session should be cleared
   await this.waitFor(() => {
-    return !localStorage.getItem('auth_user');
+    return !localStorage.getItem("auth_user");
   });
 });
 
-Then('I am redirected to the home page', async function(this: TestWorld) {
+Then("I am redirected to the home page", async function (this: TestWorld) {
   await this.waitFor(() => {
-    return this.container?.querySelector('.synthesis-view, [data-testid="home"]');
+    return this.container?.querySelector(
+      '.synthesis-view, [data-testid="home"]',
+    );
   });
 });
 
-Given('I have logged out', async function(this: TestWorld) {
+Given("I have logged out", async function (this: TestWorld) {
   await this.renderApp();
-  localStorage.removeItem('auth_user');
+  localStorage.removeItem("auth_user");
 });
 
-When('I try to access a protected feature', async function(this: TestWorld) {
+When("I try to access a protected feature", async function (this: TestWorld) {
   // Try to navigate to tasks (protected)
-  const tasksButton = this.container?.querySelector('[data-testid="tasks-nav"]');
+  const tasksButton = this.container?.querySelector(
+    '[data-testid="tasks-nav"]',
+  );
   if (tasksButton) {
     this.click(tasksButton);
   }
 });
 
-Then('I am prompted to log in again', async function(this: TestWorld) {
+Then("I am prompted to log in again", async function (this: TestWorld) {
   await this.waitFor(() => {
-    return this.container?.querySelector('.login-modal') ||
-           this.queryByText('Logi sisse');
+    return (
+      this.container?.querySelector(".login-modal") ||
+      this.queryByText("Logi sisse")
+    );
   });
 });

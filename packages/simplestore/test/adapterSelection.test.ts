@@ -1,13 +1,16 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Tests for adapter selection logic in Lambda handler
  * Verifies correct adapter is used based on environment variables
  */
 
-import { setAdapter, handler } from '../src/lambda/handler';
-import { InMemoryAdapter } from '../src/adapters/memory';
-import { createPostEvent } from './setup';
+import { setAdapter, handler } from "../src/lambda/handler";
+import { InMemoryAdapter } from "../src/adapters/memory";
+import { createPostEvent } from "./setup";
 
-describe('Adapter Selection', () => {
+describe("Adapter Selection", () => {
   beforeEach(() => {
     // Reset adapter between tests
     setAdapter(null);
@@ -17,39 +20,39 @@ describe('Adapter Selection', () => {
     setAdapter(null);
   });
 
-  describe('setAdapter function', () => {
-    it('should allow injecting custom adapter for testing', () => {
+  describe("setAdapter function", () => {
+    it("should allow injecting custom adapter for testing", () => {
       const customAdapter = new InMemoryAdapter();
       setAdapter(customAdapter);
-      
+
       expect(customAdapter).toBeInstanceOf(InMemoryAdapter);
     });
 
-    it('should allow resetting adapter to null', () => {
+    it("should allow resetting adapter to null", () => {
       const adapter = new InMemoryAdapter();
       setAdapter(adapter);
       setAdapter(null);
-      
+
       // No error should be thrown
       expect(true).toBe(true);
     });
   });
 
-  describe('handler uses adapter correctly', () => {
-    it('should persist data across handler calls with same adapter', async () => {
+  describe("handler uses adapter correctly", () => {
+    it("should persist data across handler calls with same adapter", async () => {
       // Set up adapter
       const adapter = new InMemoryAdapter();
       setAdapter(adapter);
 
       // Save data
-      const saveEvent = createPostEvent('/save', {
-        pk: 'adapter-test',
-        sk: 'item-1',
-        type: 'private',
+      const saveEvent = createPostEvent("/save", {
+        pk: "adapter-test",
+        sk: "item-1",
+        type: "private",
         ttl: 3600,
-        data: { value: 'test' }
+        data: { value: "test" },
       });
-      saveEvent.headers['X-User-Id'] = 'test-user';
+      saveEvent.headers["X-User-Id"] = "test-user";
 
       const saveResult = await handler(saveEvent);
       expect(saveResult.statusCode).toBe(200);
@@ -57,19 +60,21 @@ describe('Adapter Selection', () => {
       // Retrieve via handler (not direct adapter call)
       const getEvent = {
         ...saveEvent,
-        httpMethod: 'GET',
-        resource: '/get',
+        httpMethod: "GET",
+        resource: "/get",
         queryStringParameters: {
-          pk: 'adapter-test',
-          sk: 'item-1',
-          type: 'private'
+          pk: "adapter-test",
+          sk: "item-1",
+          type: "private",
         },
-        body: null
+        body: null,
       };
 
       const getResult = await handler(getEvent);
       expect(getResult.statusCode).toBe(200);
-      expect(JSON.parse(getResult.body).item.data).toStrictEqual({ value: 'test' });
+      expect(JSON.parse(getResult.body).item.data).toStrictEqual({
+        value: "test",
+      });
     });
   });
 });

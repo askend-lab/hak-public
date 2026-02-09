@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'packages/merlin-worker/**'
+      - "packages/merlin-worker/**"
   workflow_dispatch:
 
 permissions:
@@ -15,28 +15,28 @@ jobs:
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
-      
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      
+
       - name: Get AWS credentials for Docker build
         id: aws-creds
         run: |
           echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> $GITHUB_OUTPUT
           echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_OUTPUT
           echo "aws_session_token=$AWS_SESSION_TOKEN" >> $GITHUB_OUTPUT
-      
+
       - name: Build and push Docker image
         working-directory: packages/merlin-worker
         env:
@@ -52,7 +52,7 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-      
+
       - name: Update ECS service (dev)
         run: |
           aws ecs update-service \
@@ -60,7 +60,7 @@ jobs:
             --service merlin-worker \
             --force-new-deployment \
             --region eu-west-1
-      
+
       - name: Update ECS service (prod)
         run: |
           aws ecs update-service \

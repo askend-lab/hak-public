@@ -1,22 +1,25 @@
-/* eslint-disable complexity */
-'use client';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-import React, { useRef } from 'react';
-import { DragHandleIcon, MoreIcon } from './ui/Icons';
-import { PlayButton, RowMenu, TagsInput, TagsList } from './SentenceSynthesis';
+/* eslint-disable complexity */
+"use client";
+
+import React, { useRef } from "react";
+import { DragHandleIcon, MoreIcon } from "./ui/Icons";
+import { PlayButton, RowMenu, TagsInput, TagsList } from "./SentenceSynthesis";
 
 interface SentenceSynthesisItemProps {
   // Identity
   id: string;
-  
+
   // Content
   text: string;
   tags?: string[];
   stressedTags?: string[];
-  
+
   // Display mode
-  mode: 'input' | 'tags' | 'readonly';
-  
+  mode: "input" | "tags" | "readonly";
+
   // Drag and drop
   draggable?: boolean;
   isDragging?: boolean;
@@ -26,17 +29,17 @@ interface SentenceSynthesisItemProps {
   onDragOver?: (e: React.DragEvent, id: string) => void;
   onDragLeave?: () => void;
   onDrop?: (e: React.DragEvent, id: string) => void;
-  
+
   // Playback
   isPlaying?: boolean;
   isLoading?: boolean;
   onPlay: (id: string) => void;
-  
+
   // Tag interactions (for tags mode)
   onTagClick?: (id: string, tagIndex: number, word: string) => void;
   selectedTagIndex?: number | null;
   isPronunciationPanelOpen?: boolean;
-  
+
   // Tag menu (for input mode - synthesis page)
   onTagMenuOpen?: (sentenceId: string, tagIndex: number) => void;
   openTagMenu?: { sentenceId: string; tagIndex: number } | null;
@@ -46,16 +49,16 @@ interface SentenceSynthesisItemProps {
     onClick: (sentenceId: string, tagIndex: number, word: string) => void;
     danger?: boolean;
   }>;
-  
+
   // Tag loading state (for variants prefetch)
   loadingTagIndex?: number | null;
-  
+
   // Tag editing (for input mode)
   editingTag?: { sentenceId: string; tagIndex: number; value: string } | null;
   onEditTagChange?: (value: string) => void;
   onEditTagKeyDown?: (e: React.KeyboardEvent) => void;
   onEditTagCommit?: () => void;
-  
+
   // Input mode (synthesis)
   currentInput?: string;
   onInputChange?: (id: string, value: string) => void;
@@ -63,7 +66,7 @@ interface SentenceSynthesisItemProps {
   onInputBlur?: (id: string) => void;
   onClear?: (id: string) => void;
   placeholder?: string;
-  
+
   // Row menu (like TaskRow pattern - cleaner)
   openMenuId?: string | null;
   onMenuOpen?: (id: string) => void;
@@ -74,11 +77,11 @@ interface SentenceSynthesisItemProps {
     danger?: boolean;
     icon?: React.ReactNode;
   }>;
-  
+
   // Legacy: Complex menu content (for synthesis page custom menu)
   menuContent?: React.ReactNode;
   onMenuOpenLegacy?: (e: React.MouseEvent, id: string) => void;
-  
+
   // Visual states
   className?: string;
   sentenceIndex?: number;
@@ -113,7 +116,7 @@ export default function SentenceSynthesisItem({
   onEditTagChange,
   onEditTagKeyDown,
   onEditTagCommit,
-  currentInput = '',
+  currentInput = "",
   onInputChange,
   onInputKeyDown,
   onInputBlur,
@@ -125,17 +128,21 @@ export default function SentenceSynthesisItem({
   rowMenuItems = [],
   menuContent,
   onMenuOpenLegacy,
-  className = '',
-  sentenceIndex = 0
+  className = "",
+  sentenceIndex = 0,
 }: SentenceSynthesisItemProps): React.ReactElement {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleDragStartInternal = (e: React.DragEvent): void => {
     if (containerRef.current) {
-      e.dataTransfer.setDragImage(containerRef.current, 20, containerRef.current.offsetHeight / 2);
+      e.dataTransfer.setDragImage(
+        containerRef.current,
+        20,
+        containerRef.current.offsetHeight / 2,
+      );
       setTimeout(() => {
         if (containerRef.current) {
-          containerRef.current.style.opacity = '0.5';
+          containerRef.current.style.opacity = "0.5";
         }
       }, 0);
     }
@@ -146,7 +153,7 @@ export default function SentenceSynthesisItem({
 
   const handleDragEndInternal = (e: React.DragEvent): void => {
     if (containerRef.current) {
-      containerRef.current.style.opacity = '1';
+      containerRef.current.style.opacity = "1";
     }
     if (onDragEnd) {
       onDragEnd(e);
@@ -154,15 +161,17 @@ export default function SentenceSynthesisItem({
   };
 
   const containerClasses = [
-    'sentence-synthesis-item',
-    isDragging && 'sentence-synthesis-item--dragging',
-    isDragOver && 'sentence-synthesis-item--drag-over',
-    className
-  ].filter(Boolean).join(' ');
+    "sentence-synthesis-item",
+    isDragging && "sentence-synthesis-item--dragging",
+    isDragOver && "sentence-synthesis-item--drag-over",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const renderContent = (): React.ReactElement => {
     switch (mode) {
-      case 'input':
+      case "input":
         return (
           <TagsInput
             id={id}
@@ -188,7 +197,7 @@ export default function SentenceSynthesisItem({
           />
         );
 
-      case 'tags':
+      case "tags":
         return (
           <TagsList
             id={id}
@@ -199,12 +208,10 @@ export default function SentenceSynthesisItem({
           />
         );
 
-      case 'readonly':
+      case "readonly":
         return (
           <div className="sentence-synthesis-item__content">
-            <div className="sentence-synthesis-item__text-readonly">
-              {text}
-            </div>
+            <div className="sentence-synthesis-item__text-readonly">{text}</div>
           </div>
         );
     }
@@ -218,7 +225,7 @@ export default function SentenceSynthesisItem({
       onDragLeave={onDragLeave}
       onDrop={onDrop ? (e) => onDrop(e, id) : undefined}
     >
-      {draggable && mode !== 'readonly' && (
+      {draggable && mode !== "readonly" && (
         <div
           className="sentence-synthesis-item__drag-handle"
           draggable
@@ -235,7 +242,10 @@ export default function SentenceSynthesisItem({
       <PlayButton
         isPlaying={isPlaying}
         isLoading={isLoading}
-        disabled={isLoading || (mode === 'input' && tags.length === 0 && !currentInput.trim())}
+        disabled={
+          isLoading ||
+          (mode === "input" && tags.length === 0 && !currentInput.trim())
+        }
         onClick={() => onPlay(id)}
         data-onboarding-target={`sentence-${sentenceIndex}-play`}
       />

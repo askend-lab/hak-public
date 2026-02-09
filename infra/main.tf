@@ -18,7 +18,7 @@ data "terraform_remote_state" "infra" {
   backend = "s3"
 
   config = {
-    bucket = "askend-lab-terraform-state"
+    bucket = var.terraform_state_bucket
     key    = "infra/terraform.tfstate"
     region = "eu-west-1"
   }

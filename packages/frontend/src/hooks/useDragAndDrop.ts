@@ -1,8 +1,11 @@
-import { useState, useCallback } from 'react';
-import { SentenceState } from '@/types/synthesis';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { useState, useCallback } from "react";
+import { SentenceState } from "@/types/synthesis";
 
 export function useDragAndDrop(
-  setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>
+  setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>,
 ): {
   draggedId: string | null;
   dragOverId: string | null;
@@ -17,8 +20,8 @@ export function useDragAndDrop(
 
   const handleDragStart = useCallback((e: React.DragEvent, id: string) => {
     setDraggedId(id);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', id);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", id);
   }, []);
 
   const handleDragEnd = useCallback(() => {
@@ -26,36 +29,42 @@ export function useDragAndDrop(
     setDragOverId(null);
   }, []);
 
-  const handleDragOver = useCallback((e: React.DragEvent, id: string) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    if (draggedId && draggedId !== id) {
-      setDragOverId(id);
-    }
-  }, [draggedId]);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent, id: string) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      if (draggedId && draggedId !== id) {
+        setDragOverId(id);
+      }
+    },
+    [draggedId],
+  );
 
   const handleDragLeave = useCallback(() => {
     setDragOverId(null);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent, targetId: string) => {
-    e.preventDefault();
-    if (!draggedId || draggedId === targetId) return;
+  const handleDrop = useCallback(
+    (e: React.DragEvent, targetId: string) => {
+      e.preventDefault();
+      if (!draggedId || draggedId === targetId) return;
 
-    setSentences(prev => {
-      const draggedIndex = prev.findIndex(s => s.id === draggedId);
-      const targetIndex = prev.findIndex(s => s.id === targetId);
-      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      setSentences((prev) => {
+        const draggedIndex = prev.findIndex((s) => s.id === draggedId);
+        const targetIndex = prev.findIndex((s) => s.id === targetId);
+        if (draggedIndex === -1 || targetIndex === -1) return prev;
 
-      const newSentences = [...prev];
-      const [draggedItem] = newSentences.splice(draggedIndex, 1);
-      if (draggedItem) newSentences.splice(targetIndex, 0, draggedItem);
-      return newSentences;
-    });
+        const newSentences = [...prev];
+        const [draggedItem] = newSentences.splice(draggedIndex, 1);
+        if (draggedItem) newSentences.splice(targetIndex, 0, draggedItem);
+        return newSentences;
+      });
 
-    setDraggedId(null);
-    setDragOverId(null);
-  }, [draggedId, setSentences]);
+      setDraggedId(null);
+      setDragOverId(null);
+    },
+    [draggedId, setSentences],
+  );
 
   return {
     draggedId,

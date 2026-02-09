@@ -1,8 +1,14 @@
- 
-'use client';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
-import Notification, { NotificationType, NotificationColor, NotificationAction } from './Notification';
+"use client";
+
+import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
+import Notification, {
+  NotificationType,
+  NotificationColor,
+  NotificationAction,
+} from "./Notification";
 
 export interface NotificationData {
   id: string;
@@ -15,45 +21,59 @@ export interface NotificationData {
 }
 
 export interface NotificationRef {
-  show: (type: NotificationType, message: string, description?: string, duration?: number, color?: NotificationColor, action?: NotificationAction) => void;
+  show: (
+    type: NotificationType,
+    message: string,
+    description?: string,
+    duration?: number,
+    color?: NotificationColor,
+    action?: NotificationAction,
+  ) => void;
 }
 
 const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
 
   const removeNotification = useCallback((id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  const show = useCallback((
-    type: NotificationType,
-    message: string,
-    description?: string,
-    duration?: number,
-    color?: NotificationColor,
-    action?: NotificationAction
-  ) => {
-    const id = `notification-${Date.now()}-${Math.random()}`;
-    const notification: NotificationData = {
-      id,
-      type,
-      color,
-      message,
-      description,
-      action,
-      duration
-    };
-    
-    setNotifications(prev => [...prev, notification]);
-  }, []);
+  const show = useCallback(
+    (
+      type: NotificationType,
+      message: string,
+      description?: string,
+      duration?: number,
+      color?: NotificationColor,
+      action?: NotificationAction,
+    ) => {
+      const id = `notification-${Date.now()}-${Math.random()}`;
+      const notification: NotificationData = {
+        id,
+        type,
+        color,
+        message,
+        description,
+        action,
+        duration,
+      };
 
-  useImperativeHandle(ref, () => ({
-    show
-  }), [show]);
+      setNotifications((prev) => [...prev, notification]);
+    },
+    [],
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      show,
+    }),
+    [show],
+  );
 
   return (
     <div className="notification-container">
-      {notifications.map(notification => (
+      {notifications.map((notification) => (
         <Notification
           key={notification.id}
           type={notification.type}
@@ -69,6 +89,6 @@ const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
   );
 });
 
-NotificationContainer.displayName = 'NotificationContainer';
+NotificationContainer.displayName = "NotificationContainer";
 
 export default NotificationContainer;

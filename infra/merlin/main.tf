@@ -10,13 +10,13 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-west-1"
+  region = var.aws_region
 }
 
 locals {
   name_prefix = "${var.project}-merlin-${var.env}"
-  ecr_repo    = "465168436856.dkr.ecr.eu-west-1.amazonaws.com/merlin-worker"
-  
+  ecr_repo    = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/merlin-worker"
+
   tags = {
     Project     = var.project
     Environment = var.env
@@ -31,24 +31,24 @@ locals {
 
 resource "aws_sqs_queue" "merlin_dlq" {
   name = "${local.name_prefix}-dlq"
-  
+
   message_retention_seconds = 1209600  # 14 days
-  
+
   tags = local.tags
 }
 
 resource "aws_sqs_queue" "merlin" {
   name = "${local.name_prefix}-queue"
-  
+
   visibility_timeout_seconds = 300  # 5 minutes (longer than generation time)
   message_retention_seconds  = 86400  # 1 day
   receive_wait_time_seconds  = 20  # Long polling
-  
+
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.merlin_dlq.arn
     maxReceiveCount     = 3
   })
-  
+
   tags = local.tags
 }
 
@@ -58,7 +58,7 @@ resource "aws_sqs_queue" "merlin" {
 
 resource "aws_s3_bucket" "merlin_audio" {
   bucket = "${local.name_prefix}-audio"
-  
+
   tags = local.tags
 }
 
@@ -98,7 +98,7 @@ resource "aws_s3_bucket_public_access_block" "merlin_audio" {
 
 resource "aws_s3_bucket_policy" "merlin_audio_public_read" {
   bucket = aws_s3_bucket.merlin_audio.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -111,7 +111,7 @@ resource "aws_s3_bucket_policy" "merlin_audio_public_read" {
       }
     ]
   })
-  
+
   depends_on = [aws_s3_bucket_public_access_block.merlin_audio]
 }
 
@@ -126,7 +126,7 @@ resource "aws_ecr_repository" "merlin_worker" {
   image_scanning_configuration {
     scan_on_push = false
   }
-  
+
   tags = local.tags
 }
 
@@ -162,7 +162,7 @@ resource "aws_ecs_cluster" "merlin" {
     name  = "containerInsights"
     value = "disabled"
   }
-  
+
   tags = local.tags
 }
 
@@ -197,7 +197,7 @@ resource "aws_iam_role" "ecs_task_execution" {
       }
     ]
   })
-  
+
   tags = local.tags
 }
 
@@ -225,7 +225,7 @@ resource "aws_iam_role" "ecs_task" {
       }
     ]
   })
-  
+
   tags = local.tags
 }
 
@@ -274,7 +274,7 @@ resource "aws_iam_role_policy" "ecs_task" {
 resource "aws_cloudwatch_log_group" "merlin" {
   name              = "/ecs/${local.name_prefix}"
   retention_in_days = 14
-  
+
   tags = local.tags
 }
 
@@ -295,9 +295,9 @@ resource "aws_ecs_task_definition" "merlin_worker" {
     {
       name  = "merlin-worker"
       image = "${local.ecr_repo}:${var.merlin_image_tag}"
-      
+
       essential = true
-      
+
       environment = [
         {
           name  = "SQS_QUEUE_URL"
@@ -312,7 +312,7 @@ resource "aws_ecs_task_definition" "merlin_worker" {
           value = "eu-west-1"
         }
       ]
-      
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -323,7 +323,7 @@ resource "aws_ecs_task_definition" "merlin_worker" {
       }
     }
   ])
-  
+
   tags = local.tags
 }
 
@@ -348,7 +348,7 @@ resource "aws_ecs_service" "merlin_worker" {
     security_groups  = [aws_security_group.merlin_worker.id]
     assign_public_ip = true
   }
-  
+
   tags = local.tags
 
   depends_on = [aws_ecs_cluster_capacity_providers.merlin]
@@ -396,6 +396,6 @@ resource "aws_security_group" "merlin_worker" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   tags = local.tags
 }

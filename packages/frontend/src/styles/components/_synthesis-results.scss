@@ -1,9 +1,9 @@
 // Synthesis Results Component
-@import '../tokens/colors';
-@import '../tokens/spacing';
-@import '../tokens/typography';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/spacing";
+@import "../tokens/typography";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
 
 // Unified Synthesis Results Section
 .eki-synthesis-results {
@@ -17,8 +17,12 @@
 .synthesis-results-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid $color-outlined-neutral;
-  background: linear-gradient(to right, $color-soft-primary-bg 0%, $color-gradient-light-end 100%);
-  
+  background: linear-gradient(
+    to right,
+    $color-soft-primary-bg 0%,
+    $color-gradient-light-end 100%
+  );
+
   .synthesis-title {
     font-size: $font-size-lg;
     font-weight: 600;
@@ -32,7 +36,7 @@
   padding: 1.5rem;
   border-bottom: 1px solid $color-outlined-neutral;
   background: $color-gradient-soft-bg;
-  
+
   .section-label {
     font-size: $font-size-xs;
     font-weight: 600;
@@ -47,57 +51,57 @@
 // Phonetic Section within Synthesis Results
 .synthesis-phonetic-section {
   padding: 2rem;
-  
+
   .phonetic-content {
     .text-comparison {
       display: flex;
       flex-direction: column;
       gap: 1.75rem;
     }
-    
+
     .original-text,
     .phonetic-text {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
     }
-    
+
     .original-text-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      
+
       .interaction-hint {
         font-size: $font-size-xs;
         color: $color-gray;
         font-weight: 500;
         opacity: 0.8;
-        
+
         @include respond-below($breakpoint-md) {
           display: none; // Hide on mobile to save space
         }
       }
     }
-    
+
     .phonetic-label-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
     }
-    
+
     .text-label {
       font-size: $font-size-sm;
       font-weight: 600;
       color: $color-text-secondary;
     }
-    
+
     .text-words {
       display: flex;
       flex-wrap: wrap;
       gap: 0.75rem;
-      
+
       .word-element {
         display: inline-flex;
         align-items: center;
@@ -109,13 +113,13 @@
         font-size: $font-size-md;
         color: $color-primary;
         transition: all 0.2s ease;
-        
+
         &.clickable {
           cursor: pointer;
           background: $color-white;
           border-color: $color-outlined-primary;
           box-shadow: 0 2px 4px $color-shadow-subtle;
-          
+
           // Elegant chevron indicating sidebar direction
           &::after {
             content: "›";
@@ -126,25 +130,25 @@
             transition: all 0.2s ease;
             font-weight: 600;
           }
-          
+
           &:hover {
             background: $color-soft-primary-bg;
             border-color: $color-primary;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(11, 107, 203, 0.15);
-            
+
             &::after {
               opacity: 1;
               transform: translateY(1px);
             }
           }
-          
+
           &:active {
             transform: translateY(0);
             box-shadow: 0 2px 8px rgba(11, 107, 203, 0.2);
           }
         }
-        
+
         // Non-clickable state (when in edit mode)
         &:not(.clickable) {
           opacity: 0.7;
@@ -153,16 +157,22 @@
         }
       }
     }
-    
+
     .phonetic-text-container {
       padding: 1rem 1.25rem;
       background: rgba(248, 251, 255, 0.6);
       border: 1px solid $color-outlined-neutral;
       border-radius: 8px;
       margin-bottom: 1rem;
-      
+
       .phonetic-value {
-        font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+        font-family: var(
+          --font-family-mono,
+          "Monaco",
+          "Menlo",
+          "Ubuntu Mono",
+          monospace
+        );
         font-size: $font-size-lg;
         color: $color-text-secondary;
         font-weight: 500;
@@ -172,20 +182,20 @@
         line-height: 1.4;
       }
     }
-    
+
     // Action buttons now outside text container
     .phonetic-actions {
       display: flex;
       align-items: center;
       gap: 1rem;
       margin-top: 1.25rem;
-      
+
       @include respond-below($breakpoint-md) {
         flex-direction: column;
         align-items: stretch;
         gap: 0.5rem;
       }
-      
+
       .phonetic-play-button {
         display: flex;
         align-items: center;
@@ -200,23 +210,23 @@
         cursor: pointer;
         transition: all 0.2s ease;
         box-shadow: 0 2px 8px $color-shadow-primary-sm;
-        
+
         &:hover:not(:disabled) {
           background: $color-soft-primary;
           transform: translateY(-2px);
           box-shadow: 0 4px 12px $color-shadow-primary-lg;
         }
-        
+
         &:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
-        
+
         svg {
           flex-shrink: 0;
         }
       }
-      
+
       .phonetic-add-button {
         display: flex;
         align-items: center;
@@ -231,19 +241,21 @@
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s ease;
-        
+
         &:hover:not(:disabled) {
           background: $color-soft-primary-bg;
-          box-shadow: inset 0 0 0 1px $color-soft-primary, 0 2px 8px $color-shadow-focus;
+          box-shadow:
+            inset 0 0 0 1px $color-soft-primary,
+            0 2px 8px $color-shadow-focus;
           color: $color-soft-primary;
           transform: translateY(-1px);
         }
-        
+
         &:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
-        
+
         svg {
           flex-shrink: 0;
         }
@@ -273,17 +285,17 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: $color-soft-primary-bg;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px $color-shadow-focus;
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   svg {
     flex-shrink: 0;
   }
@@ -292,7 +304,7 @@
 .guide-button {
   border-color: $color-outlined-neutral;
   color: $color-text-secondary;
-  
+
   &:hover {
     background: $color-soft-neutral-bg;
     border-color: $color-outlined-primary;
@@ -303,7 +315,7 @@
 .edit-mode-actions {
   display: flex;
   gap: 0.5rem;
-  
+
   .edit-save-button,
   .edit-cancel-button {
     display: flex;
@@ -316,26 +328,26 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    
+
     svg {
       flex-shrink: 0;
     }
   }
-  
+
   .edit-save-button {
     background: $color-success;
     color: $color-white;
-    
+
     &:hover {
       background: $color-success-hover;
       transform: translateY(-1px);
     }
   }
-  
+
   .edit-cancel-button {
     background: $color-soft-danger-bg;
     color: $color-soft-danger;
-    
+
     &:hover {
       background: $color-soft-danger-bg-hover;
       transform: translateY(-1px);
@@ -349,15 +361,19 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: 12px;
   overflow: hidden;
-  
+
   .phonetic-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.25rem;
-    background: linear-gradient(to right, $color-soft-primary-bg 0%, $color-gradient-light-end 100%);
+    background: linear-gradient(
+      to right,
+      $color-soft-primary-bg 0%,
+      $color-gradient-light-end 100%
+    );
     border-bottom: 1px solid $color-outlined-neutral;
-    
+
     .text-label {
       font-size: $font-size-sm;
       font-weight: 600;
@@ -365,7 +381,7 @@
       margin: 0;
     }
   }
-  
+
   .edit-button-inline {
     display: flex;
     align-items: center;
@@ -379,18 +395,18 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: $color-soft-primary-bg;
       transform: translateY(-1px);
       box-shadow: 0 2px 4px $color-shadow-focus;
     }
-    
+
     svg {
       flex-shrink: 0;
     }
   }
-  
+
   // Save and Cancel buttons with proper color coding
   .edit-save-button {
     display: flex;
@@ -405,18 +421,18 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: $color-success-hover;
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
     }
-    
+
     svg {
       flex-shrink: 0;
     }
   }
-  
+
   .edit-cancel-button {
     display: flex;
     align-items: center;
@@ -430,31 +446,31 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: $color-outlined-danger-hover;
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(196, 28, 28, 0.3);
     }
-    
+
     svg {
       flex-shrink: 0;
     }
   }
-  
+
   // Smooth transitioning edit controls in header
   .edit-controls-area {
     min-height: 36px;
     display: flex;
     align-items: center;
-    
+
     .edit-actions-inline {
       display: flex;
       gap: 0.5rem;
       align-items: center;
     }
   }
-  
+
   .phonetic-edit-mode {
     .phonetic-edit-area {
       padding: 1.25rem;
@@ -463,7 +479,7 @@
       gap: 1rem;
     }
   }
-  
+
   .phonetic-content-card {
     padding: 1.25rem;
     display: flex;
@@ -477,7 +493,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  
+
   @include respond-below($breakpoint-md) {
     flex-direction: column;
     align-items: stretch;
@@ -499,18 +515,18 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px $color-shadow-primary-sm;
-  
+
   &:hover:not(:disabled) {
     background: $color-soft-primary;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px $color-shadow-primary-lg;
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
-  
+
   svg {
     flex-shrink: 0;
   }
@@ -530,18 +546,18 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover:not(:disabled) {
     background: $color-soft-primary-bg;
     transform: translateY(-1px);
     box-shadow: inset 0 0 0 1px $color-primary;
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
-  
+
   svg {
     flex-shrink: 0;
   }
@@ -553,7 +569,13 @@
   background: $color-white;
   border: 2px solid $color-outlined-primary;
   border-radius: 12px;
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-lg;
   color: $color-soft-primary;
   font-weight: 500;
@@ -561,7 +583,7 @@
   resize: vertical;
   min-height: 80px;
   transition: all 0.2s ease;
-  
+
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px $color-focus-ring-blue;
@@ -571,7 +593,7 @@
   &:focus:not(:focus-visible) {
     outline: none;
   }
-  
+
   &::placeholder {
     color: $color-gray;
     font-weight: normal;
@@ -587,7 +609,7 @@
   background: $color-soft-neutral-bg;
   border: 1px solid $color-outlined-neutral;
   border-radius: 8px;
-  
+
   @include respond-below($breakpoint-md) {
     flex-direction: column;
     gap: 1rem;
@@ -598,7 +620,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  
+
   .toolbar-label {
     font-size: $font-size-xs;
     font-weight: 600;
@@ -606,13 +628,13 @@
     white-space: nowrap;
     min-width: 70px;
   }
-  
+
   .symbol-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 0.375rem;
   }
-  
+
   .symbol-btn {
     width: 32px;
     height: 32px;
@@ -620,7 +642,13 @@
     background: $color-white;
     border-radius: 6px;
     color: $color-primary;
-    font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+    font-family: var(
+      --font-family-mono,
+      "Monaco",
+      "Menlo",
+      "Ubuntu Mono",
+      monospace
+    );
     font-weight: 600;
     font-size: $font-size-md;
     cursor: pointer;
@@ -628,19 +656,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &:hover {
       background: $color-soft-primary-bg;
       border-color: $color-outlined-primary;
       transform: translateY(-1px);
       box-shadow: 0 2px 4px $color-shadow-focus;
     }
-    
+
     &:active {
       transform: translateY(0);
     }
   }
-  
+
   .guide-toolbar-button {
     width: 32px;
     height: 32px;
@@ -653,7 +681,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &:hover {
       background: $color-soft-primary-bg;
       border-color: $color-outlined-primary;
@@ -661,11 +689,11 @@
       transform: translateY(-1px);
       box-shadow: 0 2px 4px $color-shadow-focus;
     }
-    
+
     &:active {
       transform: translateY(0);
     }
-    
+
     svg {
       flex-shrink: 0;
     }
@@ -680,19 +708,23 @@
   overflow: hidden;
   transition: all 0.3s ease;
   min-height: 120px; // Stable height
-  
+
   &.reference {
     opacity: 0.7;
-    background: linear-gradient(to bottom, $color-gradient-light-bg, $color-soft-neutral-bg);
+    background: linear-gradient(
+      to bottom,
+      $color-gradient-light-bg,
+      $color-soft-neutral-bg
+    );
   }
-  
+
   &.active {
     opacity: 1;
     background: $color-soft-neutral-bg;
     border-color: $color-outlined-primary;
     box-shadow: 0 0 0 1px $color-focus-ring-blue;
   }
-  
+
   @include respond-below($breakpoint-lg) {
     order: -1; // Show guide first on mobile
   }
@@ -700,9 +732,13 @@
 
 .guide-sidebar-header {
   padding: 1rem 1.25rem;
-  background: linear-gradient(to right, $color-soft-primary-bg, $color-gradient-light-end);
+  background: linear-gradient(
+    to right,
+    $color-soft-primary-bg,
+    $color-gradient-light-end
+  );
   border-bottom: 1px solid $color-outlined-neutral;
-  
+
   h4 {
     margin: 0;
     font-size: $font-size-sm;
@@ -719,11 +755,11 @@
 
 .guide-group {
   margin-bottom: 1.25rem;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
-  
+
   h5 {
     margin: 0 0 0.75rem 0;
     font-size: $font-size-xs;
@@ -744,7 +780,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  
+
   span {
     font-size: $font-size-xs;
     color: $color-text-secondary;
@@ -759,7 +795,13 @@
   background: $color-white;
   border-radius: 4px;
   color: $color-primary;
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-weight: 600;
   font-size: $font-size-sm;
   cursor: pointer;
@@ -768,16 +810,16 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  
+
   &:hover:not(:disabled) {
     background: $color-soft-primary-bg;
     transform: scale(1.05);
   }
-  
+
   &:active:not(:disabled) {
     transform: scale(0.95);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -799,22 +841,28 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: 6px;
   color: $color-primary;
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-xs;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover:not(:disabled) {
     background: $color-soft-primary-bg;
     border-color: $color-outlined-primary;
     transform: translateY(-1px);
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -828,14 +876,14 @@
   .synthesis-results-header {
     padding: 1rem 1.25rem;
   }
-  
+
   .synthesis-phonetic-section {
     padding: 1.25rem;
-    
+
     .phonetic-text-container {
       flex-direction: column;
       align-items: stretch;
-      
+
       .phonetic-actions {
         justify-content: center;
       }
@@ -858,16 +906,20 @@
 // Symbol Palette Structure
 .palette-header {
   padding: 1rem 1.25rem;
-  background: linear-gradient(to right, $color-soft-primary-bg, $color-gradient-light-end);
+  background: linear-gradient(
+    to right,
+    $color-soft-primary-bg,
+    $color-gradient-light-end
+  );
   border-bottom: 1px solid $color-outlined-neutral;
-  
+
   h4 {
     margin: 0;
     font-size: $font-size-sm;
     font-weight: 600;
     color: $color-primary;
   }
-  
+
   .palette-hint {
     display: block;
     font-size: $font-size-xs;
@@ -885,17 +937,17 @@
 
 .symbol-category {
   margin-bottom: 1.25rem;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
-  
+
   &.examples {
     border-top: 1px solid $color-outlined-neutral;
     padding-top: 1rem;
     margin-top: 1rem;
   }
-  
+
   h5 {
     margin: 0 0 0.75rem 0;
     font-size: $font-size-xs;
@@ -924,38 +976,44 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
-  
+
   &:hover:not(:disabled) {
     background: $color-soft-primary-bg;
     border-color: $color-outlined-primary;
     transform: translateY(-1px);
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-  
+
   &:disabled,
   &.reference-only {
     cursor: default;
     background: $color-soft-neutral-bg;
     opacity: 0.7;
-    
+
     &:hover {
       transform: none;
       background: $color-soft-neutral-bg;
       border-color: $color-outlined-neutral;
     }
   }
-  
+
   .symbol {
-    font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+    font-family: var(
+      --font-family-mono,
+      "Monaco",
+      "Menlo",
+      "Ubuntu Mono",
+      monospace
+    );
     font-size: $font-size-xl;
     font-weight: 600;
     color: $color-primary;
     line-height: 1;
   }
-  
+
   .description {
     font-size: $font-size-2xs;
     color: $color-text-secondary;
@@ -982,21 +1040,27 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
-  font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
   font-size: $font-size-md;
   color: $color-primary;
   font-weight: 500;
-  
+
   &:hover:not(:disabled) {
     background: $color-soft-primary-bg;
     border-color: $color-outlined-primary;
     transform: translateY(-1px);
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-  
+
   .example-desc {
     font-family: var(--font-family-body);
     font-size: $font-size-2xs;
@@ -1011,19 +1075,23 @@
   border: 1px solid $color-outlined-neutral;
   border-radius: 12px;
   overflow: hidden;
-  
+
   .help-header {
     padding: 1rem 1.25rem;
-    background: linear-gradient(to right, $color-soft-primary-bg, $color-gradient-light-end);
+    background: linear-gradient(
+      to right,
+      $color-soft-primary-bg,
+      $color-gradient-light-end
+    );
     border-bottom: 1px solid $color-outlined-neutral;
-    
+
     h4 {
       margin: 0;
       font-size: $font-size-sm;
       font-weight: 600;
       color: $color-primary;
     }
-    
+
     .help-hint {
       display: block;
       font-size: $font-size-xs;
@@ -1032,11 +1100,11 @@
       margin-top: 0.25rem;
     }
   }
-  
+
   .help-content {
     padding: 1rem;
   }
-  
+
   .help-section {
     h5 {
       margin: 0 0 0.75rem 0;
@@ -1047,19 +1115,19 @@
       letter-spacing: 0.5px;
     }
   }
-  
+
   .help-items {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
-  
+
   .help-item {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    
+
     .help-symbol {
       width: 24px;
       height: 24px;
@@ -1067,7 +1135,13 @@
       border: 1px solid $color-outlined-neutral;
       border-radius: 4px;
       color: $color-primary;
-      font-family: var(--font-family-mono, 'Monaco', 'Menlo', 'Ubuntu Mono', monospace);
+      font-family: var(
+        --font-family-mono,
+        "Monaco",
+        "Menlo",
+        "Ubuntu Mono",
+        monospace
+      );
       font-weight: 600;
       font-size: $font-size-sm;
       display: flex;
@@ -1075,14 +1149,14 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    
+
     .help-desc {
       font-size: $font-size-xs;
       color: $color-text-secondary;
       line-height: 1.3;
     }
   }
-  
+
   .help-edit-prompt {
     display: flex;
     align-items: center;
@@ -1098,16 +1172,16 @@
     transition: all 0.2s ease;
     width: 100%;
     text-align: left;
-    
+
     &:hover {
       background: $color-soft-primary-bg-hover;
       transform: translateY(-1px);
     }
-    
+
     svg {
       flex-shrink: 0;
     }
-    
+
     span {
       flex: 1;
     }
@@ -1117,9 +1191,9 @@
 // Visual connection between sections
 .synthesis-audio-section + .synthesis-phonetic-section {
   position: relative;
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -1px;
     left: 1.5rem;

@@ -1,1 +1,42 @@
-{"parent":null,"pid":118065,"argv":["/home/alex/.nvm/versions/node/v20.19.5/bin/node","/home/alex/users/kate/hak/packages/frontend/node_modules/nyc/bin/nyc.js","--reporter=json-summary","--report-dir=coverage-cucumber","cucumber-js","--config","cucumber.cjs","--profile","coverage"],"execArgv":[],"cwd":"/home/alex/users/kate/hak/packages/frontend","time":1766766551127,"ppid":118064,"coverageFilename":"/home/alex/users/kate/hak/packages/frontend/.nyc_output/44c06ee9-034c-4d86-b99b-76ab5d370733.json","externalId":"","uuid":"44c06ee9-034c-4d86-b99b-76ab5d370733","files":["/home/alex/users/kate/hak/packages/frontend/src/features/steps/common.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/fixtures.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/shared-steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us001-synthesis.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us003-download.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us004-stressed-text.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us005-variants.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us009-playlist.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us010-play-entry.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us011-play-all.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us012-delete-entry.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us013-reorder.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us022-share-link.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us024-phonetic-guide.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us025-login.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us027-logout.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us029-feedback.steps.mjs","/home/alex/users/kate/hak/packages/frontend/src/features/steps/us031-caching.steps.mjs"]}
+{
+  "parent": null,
+  "pid": 118065,
+  "argv": [
+    "/home/alex/.nvm/versions/node/v20.19.5/bin/node",
+    "/home/alex/users/kate/hak/packages/frontend/node_modules/nyc/bin/nyc.js",
+    "--reporter=json-summary",
+    "--report-dir=coverage-cucumber",
+    "cucumber-js",
+    "--config",
+    "cucumber.cjs",
+    "--profile",
+    "coverage"
+  ],
+  "execArgv": [],
+  "cwd": "/home/alex/users/kate/hak/packages/frontend",
+  "time": 1766766551127,
+  "ppid": 118064,
+  "coverageFilename": "/home/alex/users/kate/hak/packages/frontend/.nyc_output/44c06ee9-034c-4d86-b99b-76ab5d370733.json",
+  "externalId": "",
+  "uuid": "44c06ee9-034c-4d86-b99b-76ab5d370733",
+  "files": [
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/common.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/fixtures.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/shared-steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us001-synthesis.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us003-download.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us004-stressed-text.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us005-variants.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us009-playlist.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us010-play-entry.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us011-play-all.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us012-delete-entry.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us013-reorder.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us022-share-link.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us024-phonetic-guide.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us025-login.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us027-logout.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us029-feedback.steps.mjs",
+    "/home/alex/users/kate/hak/packages/frontend/src/features/steps/us031-caching.steps.mjs"
+  ]
+}

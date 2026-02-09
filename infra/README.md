@@ -4,8 +4,8 @@ Terraform configuration for HAK.
 
 ## Environments
 
-- **dev**: `hak-dev.askend-lab.com`
-- **prod**: `hak.askend-lab.com`
+- **dev**: `hak-dev.<your-domain>` (configured via `domain_name` variable)
+- **prod**: `hak.<your-domain>` (configured via `domain_name` variable)
 
 ## Local Testing
 

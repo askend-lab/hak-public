@@ -1,8 +1,8 @@
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
 
 // =========================================================================
 // User Profile Component
@@ -59,9 +59,9 @@
   align-items: flex-start;
   text-align: left;
   gap: 1px;
-  min-width: 11ch;  // Minimum width of 11 characters
+  min-width: 11ch; // Minimum width of 11 characters
   // Width is determined by content (the name)
-  
+
   // Cap max width on smaller screens to prevent header overflow
   @include respond-below($breakpoint-lg) {
     max-width: 150px;
@@ -70,14 +70,14 @@
 
 .user-profile__name {
   font-family: $font-body;
-  font-size: $font-size-sm;           // 14px
-  font-weight: $font-weight-bold;     // 700
-  line-height: $line-height-medium;   // 150%
+  font-size: $font-size-sm; // 14px
+  font-weight: $font-weight-bold; // 700
+  line-height: $line-height-medium; // 150%
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-primary;
   white-space: nowrap;
   // Name is never truncated - it determines the container width
-  
+
   // On mobile, allow truncation if max-width is hit on parent
   @include respond-below($breakpoint-lg) {
     overflow: hidden;
@@ -87,13 +87,13 @@
 }
 
 .user-profile__id {
-  font-family: $font-body;            // Inter (not mono)
-  font-size: $font-size-xs;           // 12px
-  font-weight: $font-weight-regular;  // 400
-  line-height: $line-height-medium;   // 150%
+  font-family: $font-body; // Inter (not mono)
+  font-size: $font-size-xs; // 12px
+  font-weight: $font-weight-regular; // 400
+  line-height: $line-height-medium; // 150%
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-text-primary;
-  
+
   // Truncation: don't contribute to parent width, but fill it
   width: 0;
   min-width: 100%;
@@ -105,7 +105,7 @@
 .user-profile__arrow {
   color: $color-gray;
   transition: transform 0.2s ease;
-  
+
   &--open {
     transform: rotate(180deg);
   }
@@ -137,15 +137,15 @@
 
 .user-profile__details {
   flex: 1;
-  min-width: 11ch;  // Minimum 11 characters
+  min-width: 11ch; // Minimum 11 characters
   // Width determined by name
 }
 
 .user-profile__name--large {
   font-family: $font-body;
-  font-size: $font-size-sm;           // 14px
-  font-weight: $font-weight-bold;     // 700
-  line-height: $line-height-medium;   // 150%
+  font-size: $font-size-sm; // 14px
+  font-weight: $font-weight-bold; // 700
+  line-height: $line-height-medium; // 150%
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-primary;
   margin-bottom: $spacing-1;
@@ -155,13 +155,13 @@
 
 .user-profile__email {
   font-family: $font-body;
-  font-size: $font-size-xs;           // 12px
-  font-weight: $font-weight-regular;  // 400
-  line-height: $line-height-medium;   // 150%
+  font-size: $font-size-xs; // 12px
+  font-weight: $font-weight-regular; // 400
+  line-height: $line-height-medium; // 150%
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-text-primary;
   margin-bottom: $spacing-1;
-  
+
   // Truncation: don't contribute to parent width, but fill it
   width: 0;
   min-width: 100%;
@@ -171,13 +171,13 @@
 }
 
 .user-profile__id--formatted {
-  font-family: $font-body;            // Inter (not mono)
-  font-size: $font-size-xs;           // 12px
-  font-weight: $font-weight-regular;  // 400
-  line-height: $line-height-medium;   // 150%
+  font-family: $font-body; // Inter (not mono)
+  font-size: $font-size-xs; // 12px
+  font-weight: $font-weight-regular; // 400
+  line-height: $line-height-medium; // 150%
   letter-spacing: $letter-spacing-subtle; // 0.15px
   color: $color-text-primary;
-  
+
   // Truncation: don't contribute to parent width, but fill it
   width: 0;
   min-width: 100%;
@@ -192,7 +192,7 @@
 
 .user-profile__action-button {
   @include paper-item;
-  
+
   // Danger variant (for logout button)
   &--danger {
     @include paper-item-danger;

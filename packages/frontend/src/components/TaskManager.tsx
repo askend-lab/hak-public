@@ -1,9 +1,12 @@
-'use client';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useEffect, useRef } from 'react';
-import { TaskSummary } from '@/types/task';
-import { MoreIcon } from './ui/Icons';
-import { formatDate } from '@/utils/formatDate';
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { TaskSummary } from "@/types/task";
+import { MoreIcon } from "./ui/Icons";
+import { formatDate } from "@/utils/formatDate";
 
 interface TaskRowProps {
   task: TaskSummary;
@@ -28,7 +31,7 @@ function TaskRow({
   onShareTask,
   openMenuId,
   onMenuOpen,
-  onMenuClose
+  onMenuClose,
 }: TaskRowProps) {
   const descriptionRef = useRef<HTMLSpanElement>(null);
   const [needsExpansion, setNeedsExpansion] = useState(false);
@@ -43,14 +46,16 @@ function TaskRow({
   }, [task.description]);
 
   return (
-    <div className={`task-row-simple ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`task-row-simple ${isExpanded ? "expanded" : ""}`}>
       <div className="task-row-content" onClick={() => onViewTask(task.id)}>
         <div className="task-row-info">
-          <span className={`task-row-name ${isExpanded ? 'expanded' : ''}`}>{task.name}</span>
+          <span className={`task-row-name ${isExpanded ? "expanded" : ""}`}>
+            {task.name}
+          </span>
           <div className="task-row-description-wrapper">
             <span
               ref={descriptionRef}
-              className={`task-row-description ${isExpanded ? 'expanded' : ''}`}
+              className={`task-row-description ${isExpanded ? "expanded" : ""}`}
             >
               {task.description}
             </span>
@@ -59,14 +64,14 @@ function TaskRow({
                 className="task-show-more"
                 onClick={(e) => onToggleExpand(task.id, e)}
               >
-                {isExpanded ? 'Näita vähem' : 'Näita rohkem'}
+                {isExpanded ? "Näita vähem" : "Näita rohkem"}
               </button>
             )}
           </div>
         </div>
         <div className="task-row-meta">
           <span className="task-row-count">
-            [{task.entryCount}] {task.entryCount === 1 ? 'lauset' : 'lauset'}
+            [{task.entryCount}] {task.entryCount === 1 ? "lauset" : "lauset"}
           </span>
           <span className="task-row-date">
             Loodud {formatDate(task.createdAt)}
@@ -86,7 +91,10 @@ function TaskRow({
 
           {openMenuId === task.id && (
             <>
-              <div className="task-manager__menu-backdrop" onClick={onMenuClose} />
+              <div
+                className="task-manager__menu-backdrop"
+                onClick={onMenuClose}
+              />
               <div className="task-manager__dropdown-menu">
                 <button
                   className="task-manager__menu-item"
@@ -95,9 +103,7 @@ function TaskRow({
                     onMenuClose();
                   }}
                 >
-                  <div className="task-manager__menu-item-content">
-                    Muuda
-                  </div>
+                  <div className="task-manager__menu-item-content">Muuda</div>
                 </button>
                 <button
                   className="task-manager__menu-item"
@@ -106,9 +112,7 @@ function TaskRow({
                     onMenuClose();
                   }}
                 >
-                  <div className="task-manager__menu-item-content">
-                    Jaga
-                  </div>
+                  <div className="task-manager__menu-item-content">Jaga</div>
                 </button>
                 <button
                   className="task-manager__menu-item task-manager__menu-item--danger"
@@ -117,9 +121,7 @@ function TaskRow({
                     onMenuClose();
                   }}
                 >
-                  <div className="task-manager__menu-item-content">
-                    Kustuta
-                  </div>
+                  <div className="task-manager__menu-item-content">Kustuta</div>
                 </button>
               </div>
             </>
@@ -143,7 +145,7 @@ export default function TaskManager({
   onEditTask,
   onViewTask,
   onDeleteTask,
-  onShareTask
+  onShareTask,
 }: TaskManagerProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
@@ -162,7 +164,7 @@ export default function TaskManager({
 
   const toggleExpanded = (taskId: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering onViewTask
-    setExpandedTasks(prev => {
+    setExpandedTasks((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(taskId)) {
         newSet.delete(taskId);

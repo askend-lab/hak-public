@@ -1,44 +1,46 @@
- 
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', () => ({ useNavigate: () => mockNavigate }));
+vi.mock("react-router-dom", () => ({ useNavigate: () => mockNavigate }));
 
 const mockHandleCodeCallback = vi.fn();
 const mockHandleTaraTokens = vi.fn();
-vi.mock('../services/auth', () => ({
-  useAuth: () => ({ 
+vi.mock("../services/auth", () => ({
+  useAuth: () => ({
     handleCodeCallback: mockHandleCodeCallback,
     handleTaraTokens: mockHandleTaraTokens,
   }),
 }));
 
-import { AuthCallbackPage } from './AuthCallbackPage';
+import { AuthCallbackPage } from "./AuthCallbackPage";
 
-describe('AuthCallbackPage', () => {
+describe("AuthCallbackPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.defineProperty(window, 'location', {
-      value: { search: '', hash: '' },
+    Object.defineProperty(window, "location", {
+      value: { search: "", hash: "" },
       writable: true,
     });
   });
 
-  it('redirects to home when code callback succeeds', async () => {
-    window.location.search = '?code=test-auth-code';
+  it("redirects to home when code callback succeeds", async () => {
+    window.location.search = "?code=test-auth-code";
     mockHandleCodeCallback.mockResolvedValue(true);
 
     render(<AuthCallbackPage />);
 
     await waitFor(() => {
-      expect(mockHandleCodeCallback).toHaveBeenCalledWith('test-auth-code');
-      expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
+      expect(mockHandleCodeCallback).toHaveBeenCalledWith("test-auth-code");
+      expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
     });
   });
 
-  it('shows error when code callback fails', async () => {
-    window.location.search = '?code=invalid-code';
+  it("shows error when code callback fails", async () => {
+    window.location.search = "?code=invalid-code";
     mockHandleCodeCallback.mockResolvedValue(false);
 
     render(<AuthCallbackPage />);
@@ -48,8 +50,9 @@ describe('AuthCallbackPage', () => {
     });
   });
 
-  it('shows error from query params', async () => {
-    window.location.search = '?error=access_denied&error_description=User%20denied';
+  it("shows error from query params", async () => {
+    window.location.search =
+      "?error=access_denied&error_description=User%20denied";
 
     render(<AuthCallbackPage />);
 
@@ -58,22 +61,62 @@ describe('AuthCallbackPage', () => {
     });
   });
 
-  it('redirects to home when no code or error', async () => {
-    window.location.search = '';
+  it("redirects to home when no code or error", async () => {
+    window.location.search = "";
 
     render(<AuthCallbackPage />);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
     });
   });
 
-  it('shows loading state initially', () => {
-    window.location.search = '?code=test-code';
+  it("shows loading state initially", () => {
+    window.location.search = "?code=test-code";
     mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
 
     render(<AuthCallbackPage />);
 
-    expect(screen.getByText('Sisenen...')).toBeInTheDocument();
+    expect(screen.getByText("Sisenen...")).toBeInTheDocument();
+  });
+
+  it("redirects to home when TARA tokens succeed", async () => {
+    window.location.search = "?access_token=at&id_token=it&refresh_token=rt";
+    mockHandleTaraTokens.mockReturnValue(true);
+
+    render(<AuthCallbackPage />);
+
+    await waitFor(() => {
+      expect(mockHandleTaraTokens).toHaveBeenCalledWith({
+        accessToken: "at",
+        idToken: "it",
+        refreshToken: "rt",
+      });
+      expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
+    });
+  });
+
+  it("shows error when TARA tokens fail", async () => {
+    window.location.search = "?access_token=at&id_token=it&refresh_token=rt";
+    mockHandleTaraTokens.mockReturnValue(false);
+
+    render(<AuthCallbackPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/TARA autentimise viga/)).toBeInTheDocument();
+    });
+  });
+
+  it("navigates home when error back button clicked", async () => {
+    window.location.search = "?error=access_denied";
+    const user = (await import("@testing-library/user-event")).default.setup();
+
+    render(<AuthCallbackPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Tagasi avalehele/)).toBeInTheDocument();
+    });
+    await user.click(screen.getByText("Tagasi avalehele"));
+    expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
   });
 });

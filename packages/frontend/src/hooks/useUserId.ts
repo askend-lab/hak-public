@@ -1,4 +1,7 @@
-import { useAuth } from '@/services/auth';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { useAuth } from "@/services/auth";
 
 /**
  * Get the current user ID or fallback to test user
@@ -6,5 +9,5 @@ import { useAuth } from '@/services/auth';
  */
 export function useUserId(): string {
   const { user } = useAuth();
-  return user?.id ?? 'test-user';
+  return user?.id ?? "test-user";
 }

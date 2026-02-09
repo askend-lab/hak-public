@@ -1,10 +1,13 @@
-import type { User } from './types';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import type { User } from "./types";
 
 const STORAGE_KEYS = {
-  USER: 'hak_user',
-  ACCESS_TOKEN: 'hak_access_token',
-  ID_TOKEN: 'hak_id_token',
-  REFRESH_TOKEN: 'hak_refresh_token',
+  USER: "hak_user",
+  ACCESS_TOKEN: "hak_access_token",
+  ID_TOKEN: "hak_id_token",
+  REFRESH_TOKEN: "hak_refresh_token",
 };
 
 export const AuthStorage = {
@@ -46,14 +49,14 @@ export const AuthStorage = {
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.ID_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    
+
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('CognitoIdentityServiceProvider')) {
+      if (key && key.startsWith("CognitoIdentityServiceProvider")) {
         keysToRemove.push(key);
       }
     }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
   },
 };

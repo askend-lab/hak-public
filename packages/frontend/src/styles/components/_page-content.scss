@@ -4,10 +4,10 @@
 // Content container and empty state styling
 // =========================================================================
 
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
 
 // =============================================================================
 // CONTENT AREA (Flexible, scrollable)
@@ -20,27 +20,27 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  
+
   // Mobile: 320px - 639px
   padding: 0 16px 24px 16px;
   max-width: 100%;
-  
+
   // Mobile landscape: 640px+
   @include mobile-landscape {
     padding: 0 20px 28px 20px;
   }
-  
+
   // Tablet: 768px+
   @include tablet {
     padding: 0 24px 32px 24px;
     max-width: $content-default;
   }
-  
+
   // Desktop: 1024px+
   @include desktop {
     padding: 0 32px 36px 32px;
   }
-  
+
   // Large desktop: Remove padding when max-width reached
   @include respond-above($content-default + 64px) {
     padding-left: 0;
@@ -59,12 +59,12 @@
   text-align: center;
   min-height: 300px;
   padding: 32px 16px;
-  
+
   @include tablet {
     min-height: 400px;
     padding: 48px 24px;
   }
-  
+
   @include desktop {
     min-height: 500px;
   }
@@ -76,12 +76,12 @@
     width: 100%;
     gap: 16px;
     max-width: 100%;
-    
+
     @include tablet {
       gap: 20px;
       max-width: 400px;
     }
-    
+
     @include desktop {
       gap: 24px;
       max-width: 480px;
@@ -90,21 +90,21 @@
     // SVG icon style (muted, smaller)
     .empty-state__icon {
       display: block;
-      
+
       // For SVG icons: apply muted styling
       &:not(img) {
         color: $color-gray;
         opacity: 0.5;
       }
-      
+
       width: 60px;
       height: 60px;
-      
+
       @include tablet {
         width: 72px;
         height: 72px;
       }
-      
+
       @include desktop {
         width: 80px;
         height: 80px;
@@ -124,7 +124,7 @@
       color: $color-primary;
       margin: 0;
       font-size: $font-size-lg;
-      
+
       @include tablet {
         font-size: $heading-page-title-size-mobile;
       }
@@ -137,7 +137,7 @@
       color: $color-gray;
       margin: 0;
       font-size: $heading-page-description-size-mobile;
-      
+
       @include tablet {
         font-size: $heading-page-description-size;
       }
@@ -146,11 +146,11 @@
     .empty-state__action {
       margin-top: 8px;
       width: 100%;
-      
+
       @include mobile-landscape {
         width: auto;
       }
-      
+
       @include tablet {
         margin-top: 16px;
       }

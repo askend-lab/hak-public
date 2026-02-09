@@ -1,13 +1,16 @@
-'use client';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useEffect, useRef } from 'react';
-import { transformToUI, transformToVabamorf } from '@/utils/phoneticMarkers';
-import { synthesizeWithPolling } from '@/utils/synthesize';
-import { createAudioPlayer } from '@/utils/audioPlayer';
-import { getVoiceModel } from '@/types/synthesis';
-import { BackIcon, PlayIcon, PauseIcon, CloseIcon } from './ui/Icons';
-import MarkersGuideBox from './ui/MarkersGuideBox';
-import { markers } from '@/data/markerData';
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { transformToUI, transformToVabamorf } from "@/utils/phoneticMarkers";
+import { synthesizeWithPolling } from "@/utils/synthesize";
+import { createAudioPlayer } from "@/utils/audioPlayer";
+import { getVoiceModel } from "@/types/synthesis";
+import { BackIcon, PlayIcon, PauseIcon, CloseIcon } from "./ui/Icons";
+import MarkersGuideBox from "./ui/MarkersGuideBox";
+import { markers } from "@/data/markerData";
 
 interface SentencePhoneticPanelProps {
   sentenceText: string;
@@ -17,7 +20,7 @@ interface SentencePhoneticPanelProps {
   onApply: (newPhoneticText: string) => void;
 }
 
-const MarkerItem = ({ m }: { m: typeof markers[0] }) => (
+const MarkerItem = ({ m }: { m: (typeof markers)[0] }) => (
   <div className="sentence-phonetic-panel__marker-item">
     <div className="sentence-phonetic-panel__marker-symbol">
       <code>{m.symbol}</code>
@@ -26,39 +29,61 @@ const MarkerItem = ({ m }: { m: typeof markers[0] }) => (
     <div className="sentence-phonetic-panel__marker-rule">{m.rule}</div>
     <div className="sentence-phonetic-panel__marker-examples">
       {m.examples.map((ex, i) => (
-        <span key={i} className="sentence-phonetic-panel__marker-tag">{ex}</span>
+        <span key={i} className="sentence-phonetic-panel__marker-tag">
+          {ex}
+        </span>
       ))}
     </div>
   </div>
 );
 
-const GuideView = ({ onBack, onClose }: { onBack: () => void; onClose: () => void }) => (
+const GuideView = ({
+  onBack,
+  onClose,
+}: {
+  onBack: () => void;
+  onClose: () => void;
+}) => (
   <div className="sentence-phonetic-panel__guide-view">
     <div className="sentence-phonetic-panel__guide-header">
-      <button 
-        onClick={onBack} 
-        className="sentence-phonetic-panel__back-button--icon-only" 
+      <button
+        onClick={onBack}
+        className="sentence-phonetic-panel__back-button--icon-only"
         aria-label="Tagasi"
         type="button"
       >
         <BackIcon size="2xl" />
       </button>
       <h4>Hääldusmärkide juhend</h4>
-      <button onClick={onClose} className="sentence-phonetic-panel__close" aria-label="Sulge" type="button">
+      <button
+        onClick={onClose}
+        className="sentence-phonetic-panel__close"
+        aria-label="Sulge"
+        type="button"
+      >
         <CloseIcon size="2xl" />
       </button>
     </div>
     <div className="sentence-phonetic-panel__guide-content">
       <p className="sentence-phonetic-panel__guide-intro">
-        Hääldusmärgid aitavad täpsustada lause hääldust. Klõpsa märgil, et lisada see kursori asukohta.
+        Hääldusmärgid aitavad täpsustada lause hääldust. Klõpsa märgil, et
+        lisada see kursori asukohta.
       </p>
-      {markers.map((m, i) => <MarkerItem key={i} m={m} />)}
+      {markers.map((m, i) => (
+        <MarkerItem key={i} m={m} />
+      ))}
     </div>
   </div>
 );
 
-export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOpen, onClose, onApply }: SentencePhoneticPanelProps) {
-  const [editedText, setEditedText] = useState('');
+export default function SentencePhoneticPanel({
+  sentenceText,
+  phoneticText,
+  isOpen,
+  onClose,
+  onApply,
+}: SentencePhoneticPanelProps) {
+  const [editedText, setEditedText] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
@@ -67,7 +92,7 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
 
   useEffect(() => {
     if (isOpen && phoneticText) {
-      setEditedText(transformToUI(phoneticText) || '');
+      setEditedText(transformToUI(phoneticText) || "");
     } else if (isOpen && sentenceText && !phoneticText) {
       setEditedText(sentenceText);
     }
@@ -76,7 +101,10 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);
+      inputRef.current.setSelectionRange(
+        inputRef.current.value.length,
+        inputRef.current.value.length,
+      );
     }
   }, [isOpen]);
 
@@ -94,7 +122,9 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
     if (!ta) return;
     const s = ta.selectionStart || 0;
     const e = ta.selectionEnd || 0;
-    setEditedText(editedText.substring(0, s) + marker + editedText.substring(e));
+    setEditedText(
+      editedText.substring(0, s) + marker + editedText.substring(e),
+    );
     setTimeout(() => {
       ta.focus();
       ta.setSelectionRange(s + marker.length, s + marker.length);
@@ -111,16 +141,30 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
     setIsPlaying(false);
     try {
       const vt = transformToVabamorf(editedText);
-      const url = await synthesizeWithPolling(vt || '', getVoiceModel(vt || ''));
+      const url = await synthesizeWithPolling(
+        vt || "",
+        getVoiceModel(vt || ""),
+      );
       const { audio } = createAudioPlayer(url, {
-        onLoaded: () => { setIsLoading(false); setIsPlaying(true); },
-        onEnded: () => { setIsPlaying(false); setIsLoading(false); audioRef.current = null; },
-        onError: () => { setIsPlaying(false); setIsLoading(false); audioRef.current = null; },
+        onLoaded: () => {
+          setIsLoading(false);
+          setIsPlaying(true);
+        },
+        onEnded: () => {
+          setIsPlaying(false);
+          setIsLoading(false);
+          audioRef.current = null;
+        },
+        onError: () => {
+          setIsPlaying(false);
+          setIsLoading(false);
+          audioRef.current = null;
+        },
       });
       audioRef.current = audio;
       await audio.play();
     } catch (e) {
-      console.error('Failed to play:', e);
+      console.error("Failed to play:", e);
       setIsPlaying(false);
       setIsLoading(false);
     }
@@ -128,7 +172,7 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
 
   const handleApply = () => {
     if (!editedText.trim()) return;
-    onApply(transformToVabamorf(editedText) || '');
+    onApply(transformToVabamorf(editedText) || "");
     onClose();
   };
 
@@ -149,10 +193,16 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
       {!showGuide && (
         <div className="sentence-phonetic-panel__header">
           <div className="sentence-phonetic-panel__title-section">
-            <h3 className="sentence-phonetic-panel__title">Muuda häälduskuju</h3>
+            <h3 className="sentence-phonetic-panel__title">
+              Muuda häälduskuju
+            </h3>
           </div>
           <div className="sentence-phonetic-panel__header-actions">
-            <button onClick={handleClose} className="sentence-phonetic-panel__close" aria-label="Sulge">
+            <button
+              onClick={handleClose}
+              className="sentence-phonetic-panel__close"
+              aria-label="Sulge"
+            >
               <CloseIcon size="2xl" />
             </button>
           </div>
@@ -185,8 +235,8 @@ export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOp
               <button
                 onClick={handlePlay}
                 disabled={!editedText.trim() || isLoading}
-                className={`button button--primary ${isLoading ? 'loading' : ''} ${isPlaying ? 'playing' : ''}`}
-                title={isLoading ? 'Laen...' : isPlaying ? 'Mängib' : 'Kuula'}
+                className={`button button--primary ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
+                title={isLoading ? "Laen..." : isPlaying ? "Mängib" : "Kuula"}
               >
                 {isLoading ? (
                   <div className="loader-spinner"></div>

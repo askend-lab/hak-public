@@ -2,7 +2,8 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
 }
 
 .test-container {
@@ -187,7 +188,7 @@
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
-    font-family: 'Monaco', 'Courier New', monospace;
+    font-family: "Monaco", "Courier New", monospace;
     font-size: 0.9rem;
     color: #333;
     overflow-x: auto;
@@ -247,7 +248,7 @@
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: "Monaco", "Courier New", monospace;
   font-size: 0.9rem;
   color: #333;
 }
@@ -348,7 +349,7 @@
 }
 
 .log-time {
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: "Monaco", "Courier New", monospace;
   font-size: 0.85rem;
   color: #666;
   font-weight: 600;
@@ -396,7 +397,7 @@
 }
 
 .log-endpoint {
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: "Monaco", "Courier New", monospace;
   font-size: 0.85rem;
   color: #555;
   font-weight: 600;
@@ -407,7 +408,7 @@
 
   pre {
     margin: 0;
-    font-family: 'Monaco', 'Courier New', monospace;
+    font-family: "Monaco", "Courier New", monospace;
     font-size: 0.85rem;
     color: #333;
     overflow-x: auto;

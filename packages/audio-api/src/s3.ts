@@ -1,4 +1,7 @@
-import { HeadObjectCommand } from '@aws-sdk/client-s3';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { HeadObjectCommand } from "@aws-sdk/client-s3";
 
 export interface S3ClientLike {
   send(command: HeadObjectCommand): Promise<unknown>;
@@ -15,21 +18,21 @@ interface S3Error {
 
 function isS3Error(error: unknown): error is S3Error {
   return (
-    typeof error === 'object' &&
+    typeof error === "object" &&
     error !== null &&
-    ('name' in error || '$metadata' in error)
+    ("name" in error || "$metadata" in error)
   );
 }
 
 export async function checkFileExists(
   s3Client: S3ClientLike,
   bucket: string,
-  key: string
+  key: string,
 ): Promise<boolean> {
   try {
     const command = new HeadObjectCommand({
       Bucket: bucket,
-      Key: key
+      Key: key,
     });
     await s3Client.send(command);
     return true;
@@ -42,9 +45,13 @@ export async function checkFileExists(
     const errorName = s3Error.name;
     const errorMessage = s3Error.message;
     const errorCode = s3Error.code;
-    
+
     const NOT_FOUND_STATUS = 404;
-    if (errorName === 'NotFound' || errorName === 'NoSuchKey' || statusCode === NOT_FOUND_STATUS) {
+    if (
+      errorName === "NotFound" ||
+      errorName === "NoSuchKey" ||
+      statusCode === NOT_FOUND_STATUS
+    ) {
       return false;
     }
     const errorDetails = JSON.stringify({
@@ -53,7 +60,7 @@ export async function checkFileExists(
       code: errorCode,
       statusCode,
       bucket,
-      key
+      key,
     });
     throw new Error(`S3 error: ${errorDetails}`);
   }

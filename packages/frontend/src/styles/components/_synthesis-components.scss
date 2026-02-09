@@ -5,12 +5,12 @@
 // Components specific to the text synthesis page
 // =========================================================================
 
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/opacity';
-@import '../tokens/spacing';
-@import '../tokens/borders';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/opacity";
+@import "../tokens/spacing";
+@import "../tokens/borders";
 
 // Sentences section container
 .sentences-section {
@@ -27,7 +27,7 @@
 // Play button specific states (extends button component)
 .button--circular {
   // Loading state inherited from button component mixin
-  
+
   &.playing {
     background-color: $color-primary;
   }
@@ -174,7 +174,7 @@
   // Loading state
   &.menu-item-loading {
     cursor: default;
-    
+
     .menu-item-content {
       color: $color-gray;
     }

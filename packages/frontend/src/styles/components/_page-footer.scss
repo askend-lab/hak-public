@@ -4,9 +4,9 @@
 // Footer layout and responsive styling
 // =========================================================================
 
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/spacing';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/spacing";
 
 // =============================================================================
 // FOOTER (Always full width, below content)
@@ -21,20 +21,20 @@
 
 .page-footer--full {
   position: relative;
-  
+
   // Mobile
   padding: 24px 16px 20px 16px;
-  
+
   // Mobile landscape
   @include mobile-landscape {
     padding: 28px 20px 24px 20px;
   }
-  
+
   // Tablet
   @include tablet {
     padding: 32px 24px 28px 24px;
   }
-  
+
   // Desktop
   @include desktop {
     padding: 36px 32px 24px 32px;
@@ -49,13 +49,13 @@
     flex-direction: column;
     gap: 32px;
     overflow: hidden;
-    
+
     @include tablet {
       flex-direction: row;
       flex-wrap: wrap;
       gap: 24px;
     }
-    
+
     @include desktop {
       flex-wrap: nowrap;
       gap: 40px;
@@ -68,29 +68,29 @@
     gap: $spacing-6;
     width: 100%;
     min-width: 0;
-    
+
     @include tablet {
       width: calc(50% - 12px);
       flex-shrink: 0;
     }
-    
+
     @include desktop {
       width: auto;
       flex: 1 1 auto;
       max-width: 305px;
     }
   }
-  
+
   // BuildInfo positioned separately
   .footer-build-info {
     position: absolute;
     bottom: 8px;
     right: 16px;
-    
+
     @include tablet {
       right: 24px;
     }
-    
+
     @include desktop {
       position: static;
       align-self: flex-end;

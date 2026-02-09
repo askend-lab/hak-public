@@ -1,9 +1,11 @@
 terraform {
   backend "s3" {
-    bucket         = "askend-lab-terraform-state"
+    # Set via: terraform init -backend-config="bucket=your-terraform-state-bucket"
+    bucket         = ""
     # Key will be set via -backend-config in workflow: hak/dev/terraform.tfstate or hak/prod/terraform.tfstate
     region         = "eu-west-1"
-    dynamodb_table = "askend-lab-terraform-locks"
+    # Set via: terraform init -backend-config="dynamodb_table=your-terraform-locks"
+    dynamodb_table = ""
     encrypt        = true
   }
 }

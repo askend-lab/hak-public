@@ -1,8 +1,11 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * In-memory storage adapter for testing
  */
 
-import { StorageAdapter, StoreItem } from '../core/types';
+import { StorageAdapter, StoreItem } from "../core/types";
 
 /**
  * In-memory store implementing StorageAdapter interface
@@ -31,15 +34,18 @@ export class InMemoryAdapter implements StorageAdapter {
     this.data.delete(key);
   }
 
-  async queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]> {
+  async queryBySortKeyPrefix(
+    pk: string,
+    skPrefix: string,
+  ): Promise<StoreItem[]> {
     const results: StoreItem[] = [];
-    
+
     for (const [_key, item] of this.data) {
       if (item.PK === pk && item.SK.startsWith(skPrefix)) {
         results.push({ ...item });
       }
     }
-    
+
     return results;
   }
 

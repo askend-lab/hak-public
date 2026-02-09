@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * SimpleStore - Universal Key-Value Backend
- * 
+ *
  * Clean Architecture:
  * - core/     Pure business logic, no external dependencies
  * - adapters/ Storage implementations (DynamoDB, Memory)
@@ -8,8 +11,8 @@
  */
 
 // Core - pure business logic (use this for library usage)
-export { 
-  Store, 
+export {
+  Store,
   ERRORS,
   buildKeys,
   buildPartitionKey,
@@ -20,26 +23,36 @@ export {
   validateServerContext,
   parseTtl,
   isValidType,
-  getValidTypes
-} from './core';
+  getValidTypes,
+} from "./core";
 
-export type { 
-  DataType, 
-  ServerContext, 
-  StoreRequest, 
-  StoreItem, 
+export type {
+  DataType,
+  ServerContext,
+  StoreRequest,
+  StoreItem,
   StoreResult,
   StoreConfig,
   StorageAdapter,
   ValidationResult,
-  TtlResult
-} from './core';
+  TtlResult,
+} from "./core";
 
 // Adapters - storage implementations
-export { InMemoryAdapter, DynamoDBAdapter } from './adapters';
+export { InMemoryAdapter, DynamoDBAdapter } from "./adapters";
 
 // Lambda - HTTP layer (use this for AWS Lambda deployment)
-export { handler, setAdapter, handleSave, handleGet, handleDelete, handleQuery, createResponse, HTTP_STATUS, HTTP_ERRORS } from './lambda';
+export {
+  handler,
+  setAdapter,
+  handleSave,
+  handleGet,
+  handleDelete,
+  handleQuery,
+  createResponse,
+  HTTP_STATUS,
+  HTTP_ERRORS,
+} from "./lambda";
 
 // Legacy exports for backward compatibility (deprecated)
-export { Store as default } from './core';
+export { Store as default } from "./core";

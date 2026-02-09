@@ -1,8 +1,8 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../abstracts/mixins';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../abstracts/mixins";
 
 // =========================================================================
 // Sentence Phonetic Panel Component
@@ -82,7 +82,7 @@
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
-  
+
   &:hover {
     color: $color-soft-primary;
   }
@@ -335,7 +335,7 @@
       gap: $spacing-2;
 
       &:before {
-        content: '•';
+        content: "•";
         color: $color-gray;
         font-size: $font-size-md;
       }

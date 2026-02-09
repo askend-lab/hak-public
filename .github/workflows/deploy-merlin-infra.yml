@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'infra/merlin/**'
+      - "infra/merlin/**"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy'
+        description: "Environment to deploy"
         required: true
         type: choice
         options:
@@ -24,27 +24,27 @@ jobs:
     name: Deploy Merlin Infrastructure
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'dev' }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
-      
+
       - name: Terraform Init
         working-directory: infra/merlin
         run: |
           terraform init -backend-config="key=merlin/${{ github.event.inputs.environment || 'dev' }}/terraform.tfstate"
-      
+
       - name: Import ECR repository (one-time)
         working-directory: infra/merlin
         run: |
@@ -55,12 +55,12 @@ jobs:
         working-directory: infra/merlin
         run: |
           terraform plan -var="env=${{ github.event.inputs.environment || 'dev' }}" -out=tfplan
-      
+
       - name: Terraform Apply
         working-directory: infra/merlin
         run: |
           terraform apply -auto-approve tfplan
-      
+
       - name: Output values
         working-directory: infra/merlin
         run: |

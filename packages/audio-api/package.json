@@ -2,6 +2,7 @@
   "name": "audio-api",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
@@ -12,21 +13,21 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.130",
+    "@types/axios": "^0.14.0",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.6",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.1",
-    "typescript": "^5.3.3",
     "axios": "^1.6.2",
-    "@types/axios": "^0.14.0",
+    "esbuild": "^0.20.0",
+    "jest": "^29.7.0",
+    "jest-cucumber": "^3.0.1",
     "serverless": "^3.38.0",
     "serverless-esbuild": "^1.52.0",
-    "esbuild": "^0.20.0",
-    "jest-cucumber": "^3.0.1"
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@hak/shared": "workspace:*",
-    "@aws-sdk/client-s3": "^3.478.0",
-    "@aws-sdk/client-sqs": "^3.478.0"
+    "@aws-sdk/client-s3": "^3.985.0",
+    "@aws-sdk/client-sqs": "^3.985.0",
+    "@hak/shared": "workspace:*"
   }
 }

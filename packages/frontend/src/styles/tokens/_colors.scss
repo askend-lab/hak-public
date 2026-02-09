@@ -13,113 +13,118 @@
 :root {
   // Brand colors
   --color-primary: #173148;
-  --color-secondary: #D7E5F2;
+  --color-secondary: #d7e5f2;
   --color-tertiary: rgba(23, 49, 72, 0.75);
-  
+
   // Text colors
   --color-text-primary: #173148;
-  --color-text-secondary: #32383E;
-  
+  --color-text-secondary: #32383e;
+
   // Neutral colors
-  --color-white: #FFF;
+  --color-white: #fff;
   --color-black: #000;
-  --color-gray: #636B74;
+  --color-gray: #636b74;
   --color-overlay: rgba(23, 49, 72, 0.25);
-  
+
   // Surface/Background colors
-  --color-surface-bg: #FBFCFE;
-  
+  --color-surface-bg: #fbfcfe;
+
   // Status colors - Base
-  --color-error: #E70505;
-  --color-warning: #EF6C00;
-  --color-success: #2E7D32;
-  --color-red: #D32F2F;
-  --color-orange: #DE6837;
-  --color-light-orange: #FFF5F1;
-  
+  --color-error: #e70505;
+  --color-warning: #ef6c00;
+  --color-success: #2e7d32;
+  --color-red: #d32f2f;
+  --color-orange: #de6837;
+  --color-light-orange: #fff5f1;
+
   // Soft variants - Primary
-  --color-soft-primary: #12467B;
-  --color-soft-primary-bg: #E3EFFB;
-  
+  --color-soft-primary: #12467b;
+  --color-soft-primary-bg: #e3effb;
+
   // Soft variants - Danger
-  --color-soft-danger: #7D1212;
-  --color-soft-danger-bg: #FCE4E4;
-  
+  --color-soft-danger: #7d1212;
+  --color-soft-danger-bg: #fce4e4;
+
   // Soft variants - Success
-  --color-soft-success: #0A470A;
-  --color-soft-success-bg: #E3FBE3;
-  
+  --color-soft-success: #0a470a;
+  --color-soft-success-bg: #e3fbe3;
+
   // Soft variants - Warning
-  --color-soft-warning: #492B08;
-  --color-soft-warning-bg: #FDF0E1;
-  
+  --color-soft-warning: #492b08;
+  --color-soft-warning-bg: #fdf0e1;
+
   // Soft variants - Neutral
-  --color-soft-neutral-bg: #F0F4F8;
-  
+  --color-soft-neutral-bg: #f0f4f8;
+
   // Outlined variants
-  --color-outlined-primary: #97C3F0;
-  --color-outlined-neutral: #A8C4DDBF;
-  --color-outlined-danger: #C41C1C;
-  --color-outlined-success: #1F7A1F;
-  --color-outlined-warning: #9A5B13;
-  --color-outlined-warning-border: #F3C896;
-  
+  --color-outlined-primary: #97c3f0;
+  --color-outlined-neutral: #a8c4ddbf;
+  --color-outlined-danger: #c41c1c;
+  --color-outlined-success: #1f7a1f;
+  --color-outlined-warning: #9a5b13;
+  --color-outlined-warning-border: #f3c896;
+
   // Hover state colors (pre-computed darken/lighten variants)
-  --color-outlined-danger-hover: #A31717; // darken(#C41C1C, 5%)
+  --color-outlined-danger-hover: #a31717; // darken(#C41C1C, 5%)
   --color-outlined-success-hover: #196619; // darken(#1F7A1F, 5%)
-  --color-outlined-warning-hover: #7A490F; // darken(#9A5B13, 5%)
-  --color-soft-danger-hover: #5F0E0E; // darken(#7D1212, 10%)
-  --color-soft-danger-bg-hover: #F8D4D4; // darken(#FCE4E4, 5%)
-  --color-success-hover: #246B27; // darken(#2E7D32, 10%)
-  --color-warning-hover: #CC5900; // darken(#EF6C00, 10%)
-  --color-orange-hover: #F28051; // lighten(#DE6837, 10%)
-  --color-secondary-hover: #C5D9ED; // darken(#D7E5F2, 8%)
-  --color-soft-primary-bg-hover: #EDF5FC; // lighten(#E3EFFB, 3%)
-  
+  --color-outlined-warning-hover: #7a490f; // darken(#9A5B13, 5%)
+  --color-soft-danger-hover: #5f0e0e; // darken(#7D1212, 10%)
+  --color-soft-danger-bg-hover: #f8d4d4; // darken(#FCE4E4, 5%)
+  --color-success-hover: #246b27; // darken(#2E7D32, 10%)
+  --color-warning-hover: #cc5900; // darken(#EF6C00, 10%)
+  --color-orange-hover: #f28051; // lighten(#DE6837, 10%)
+  --color-secondary-hover: #c5d9ed; // darken(#D7E5F2, 8%)
+  --color-soft-primary-bg-hover: #edf5fc; // lighten(#E3EFFB, 3%)
+
   // Border colors (for inputs, containers, dividers)
-  --color-border-light: #BED3E5; // Light blue border
-  --color-border-input: #E0E0E0; // Input field border
-  --color-border-neutral: #E8EAED; // Neutral gray border
-  --color-border-neutral-light: #C5CBD1; // Light gray border
-  
+  --color-border-light: #bed3e5; // Light blue border
+  --color-border-input: #e0e0e0; // Input field border
+  --color-border-neutral: #e8eaed; // Neutral gray border
+  --color-border-neutral-light: #c5cbd1; // Light gray border
+
   // Input & Form colors
-  --color-input-bg-light: #F6FBFF; // Light blue input background
-  --color-input-bg-soft: #FAFCFE; // Very soft background
-  --color-input-border-focus: #4A90E2; // Input focus border
-  
+  --color-input-bg-light: #f6fbff; // Light blue input background
+  --color-input-bg-soft: #fafcfe; // Very soft background
+  --color-input-border-focus: #4a90e2; // Input focus border
+
   // Text colors - Extended
   --color-text-placeholder: #747676; // Placeholder text
   --color-text-disabled: #999999; // Disabled text
   --color-text-dark: #000000; // Pure black text (87% opacity typically applied)
-  
+
   // Menu & Dropdown colors
   --color-menu-hover: rgba(0, 0, 0, 0.04); // Menu item hover background
   --color-menu-active: rgba(0, 0, 0, 0.08); // Menu item active background
-  --color-menu-danger: #C74848DE; // Danger menu item text
-  --color-menu-danger-bg: #F2D9D7; // Danger menu item background
-  
+  --color-menu-danger: #c74848de; // Danger menu item text
+  --color-menu-danger-bg: #f2d9d7; // Danger menu item background
+
   // Tag colors (for word tags, labels)
-  --color-tag-bg: #F6FBFF; // Tag background
-  --color-tag-border: #BED3E5; // Tag border
-  --color-tag-hover-bg: #E3F2FF; // Tag hover background
-  --color-tag-hover-border: #4A90E2; // Tag hover border
-  --color-tag-active-bg: #D0E8FF; // Tag active background
+  --color-tag-bg: #f6fbff; // Tag background
+  --color-tag-border: #bed3e5; // Tag border
+  --color-tag-hover-bg: #e3f2ff; // Tag hover background
+  --color-tag-hover-border: #4a90e2; // Tag hover border
+  --color-tag-active-bg: #d0e8ff; // Tag active background
   --color-tag-selected-bg: #173148; // Tag selected background (primary)
   --color-tag-selected-border: #173148; // Tag selected border
-  --color-tag-selected-text: #FFFFFF; // Tag selected text
-  
+  --color-tag-selected-text: #ffffff; // Tag selected text
+
   // Gradient colors (for backgrounds, headers)
   --color-gradient-light-end: #f8fbff; // Light blue gradient end
   --color-gradient-soft-bg: #fafbfc; // Soft gray gradient
   --color-gradient-light-bg: #f8f9fa; // Light gray gradient
-  
+
   // Utility colors
-  --color-disabled-bg: #CCC; // Disabled element background
-  --color-spinner-primary: #008FD3; // Loading spinner color
-  --color-spinner-secondary: #4A90E2; // Secondary spinner color
+  --color-disabled-bg: #ccc; // Disabled element background
+  --color-spinner-primary: #008fd3; // Loading spinner color
+  --color-spinner-secondary: #4a90e2; // Secondary spinner color
   --color-shadow-light: rgba(0, 0, 0, 0.12); // Light shadow
   --color-shadow-medium: rgba(0, 51, 57, 0.25); // Medium shadow
-  --color-shadow-primary-xs: rgba(23, 49, 72, 0.08); // Primary shadow extra small
+  --color-shadow-primary-xs: rgba(
+    23,
+    49,
+    72,
+    0.08
+  ); // Primary shadow extra small
   --color-shadow-primary-sm: rgba(23, 49, 72, 0.15); // Primary shadow small
   --color-shadow-primary-md: rgba(23, 49, 72, 0.2); // Primary shadow medium
   --color-shadow-primary-lg: rgba(23, 49, 72, 0.25); // Primary shadow large
@@ -129,10 +134,10 @@
   --color-shadow-backdrop: rgba(0, 0, 0, 0.5); // Modal backdrop
   --color-shadow-backdrop-light: rgba(0, 0, 0, 0.25); // Light backdrop
   --color-focus-ring-blue: rgba(11, 107, 203, 0.1); // Blue focus ring
-  
+
   // Additional hover states
   --color-primary-hover: #1a3a52; // Primary color hover (slightly lighter)
-  --color-secondary-active: #D6E9F7; // Secondary active state
+  --color-secondary-active: #d6e9f7; // Secondary active state
 }
 
 // ---------------------------------------------------------------------------

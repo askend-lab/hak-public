@@ -5,16 +5,16 @@ on:
     branches:
       - main
     paths:
-      - 'infra/**'
+      - "infra/**"
   pull_request:
     branches:
       - main
     paths:
-      - 'infra/**'
+      - "infra/**"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy'
+        description: "Environment to deploy"
         required: true
         type: choice
         options:
@@ -33,11 +33,11 @@ jobs:
     strategy:
       matrix:
         environment: [dev, prod]
-    
+
     defaults:
       run:
         working-directory: infra
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -45,7 +45,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Setup Terraform
@@ -84,24 +84,24 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const output = `### Terraform Plan - ${{ matrix.environment }} 
-            
+            const output = `### Terraform Plan - ${{ matrix.environment }}
+
             #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            
+
             <details><summary>Show Plan</summary>
-            
+
             \`\`\`terraform
             ${{ steps.plan.outputs.stdout }}
             \`\`\`
-            
+
             </details>
-            
+
             *Environment: \`${{ matrix.environment }}\`*
             *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -117,12 +117,12 @@ jobs:
     strategy:
       matrix:
         environment: [dev, prod]
-      max-parallel: 1  # Apply sequentially to avoid conflicts
-    
+      max-parallel: 1 # Apply sequentially to avoid conflicts
+
     defaults:
       run:
         working-directory: infra
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -130,7 +130,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Setup Terraform
@@ -161,7 +161,7 @@ jobs:
           else
             terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
           fi
-      
+
       - name: Invalidate CloudFront Cache
         run: |
           # Get CloudFront distribution ID from terraform output
@@ -177,4 +177,4 @@ jobs:
       - name: Deployment Summary
         run: |
           echo "✅ Terraform applied for ${{ matrix.environment }}"
-          echo "🌐 Website: https://hak${{ matrix.environment == 'prod' && '' || format('-{0}', matrix.environment) }}.askend-lab.com"
+          echo "🌐 Terraform applied for environment: ${{ matrix.environment }}"

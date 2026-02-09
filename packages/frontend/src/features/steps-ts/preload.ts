@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Preload script - sets up import.meta.env before any other imports
  * Must be loaded first via NODE_OPTIONS
@@ -16,11 +19,11 @@ interface ImportMetaWithEnv {
 
 // Shim import.meta.env for Vite compatibility in Node.js
 const meta = import.meta as unknown as ImportMetaWithEnv;
-if (typeof meta.env === 'undefined') {
+if (typeof meta.env === "undefined") {
   meta.env = {
     PROD: false,
     DEV: true,
-    MODE: 'test',
-    VITE_API_BASE_URL: '/api',
+    MODE: "test",
+    VITE_API_BASE_URL: "/api",
   };
 }

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /** Maximum text length limits for various API endpoints */
 export const TEXT_LIMITS = {
   MAX_AUDIO_TEXT_LENGTH: 1000,

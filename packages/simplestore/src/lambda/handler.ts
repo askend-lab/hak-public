@@ -1,13 +1,26 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Lambda handler - thin as paper
  * Only HTTP concerns, delegates everything to core
  */
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
-import { Store, ServerContext, StorageAdapter } from '../core';
-import { InMemoryAdapter, DynamoDBAdapter } from '../adapters';
-import { handleSave, handleGet, handleGetPublic, handleDelete, handleQuery, handleDebugError, createResponse, HTTP_STATUS, HTTP_ERRORS } from './routes';
+import { Store, ServerContext, StorageAdapter } from "../core";
+import { InMemoryAdapter, DynamoDBAdapter } from "../adapters";
+import {
+  handleSave,
+  handleGet,
+  handleGetPublic,
+  handleDelete,
+  handleQuery,
+  handleDebugError,
+  createResponse,
+  HTTP_STATUS,
+  HTTP_ERRORS,
+} from "./routes";
 
 /** Shared adapter instance for persistence across calls */
 let sharedAdapter: StorageAdapter | null = null;
@@ -21,8 +34,8 @@ export function setAdapter(adapter: StorageAdapter | null): void {
 function getAdapter(): StorageAdapter {
   if (!sharedAdapter) {
     const tableName = process.env.TABLE_NAME;
-    const isOffline = process.env.IS_OFFLINE === 'true';
-    
+    const isOffline = process.env.IS_OFFLINE === "true";
+
     if (tableName && !isOffline) {
       // Production: use DynamoDB
       sharedAdapter = new DynamoDBAdapter(tableName);
@@ -38,15 +51,18 @@ function getAdapter(): StorageAdapter {
  * Get user ID from Cognito claims or local header
  */
 function getUserId(event: APIGatewayProxyEvent): string | null {
-  const cognitoId = event.requestContext.authorizer?.claims?.sub as string | undefined;
-  if (cognitoId !== undefined && cognitoId !== '') return cognitoId;
-  
+  const cognitoId = event.requestContext.authorizer?.claims?.sub as
+    | string
+    | undefined;
+  if (cognitoId !== undefined && cognitoId !== "") return cognitoId;
+
   // In offline/test mode, allow X-User-Id header for testing
-  if (process.env.IS_OFFLINE === 'true') {
-    const localUserId = event.headers['X-User-Id'] ?? event.headers['x-user-id'];
+  if (process.env.IS_OFFLINE === "true") {
+    const localUserId =
+      event.headers["X-User-Id"] ?? event.headers["x-user-id"];
     if (localUserId) return localUserId;
   }
-  
+
   return null;
 }
 
@@ -55,7 +71,7 @@ function getUserId(event: APIGatewayProxyEvent): string | null {
  */
 function getEnv(name: string, defaultValue: string): string {
   const value = process.env[name];
-  return (value && value.trim() !== '') ? value : defaultValue;
+  return value && value.trim() !== "" ? value : defaultValue;
 }
 
 /**
@@ -63,10 +79,10 @@ function getEnv(name: string, defaultValue: string): string {
  */
 function createContext(userId: string): ServerContext {
   return {
-    app: getEnv('APP_NAME', 'default'),
-    tenant: getEnv('TENANT', 'default'),
-    env: getEnv('ENVIRONMENT', 'dev'),
-    userId
+    app: getEnv("APP_NAME", "default"),
+    tenant: getEnv("TENANT", "default"),
+    env: getEnv("ENVIRONMENT", "dev"),
+    userId,
   };
 }
 
@@ -80,16 +96,19 @@ function createStore(userId: string): Store {
 interface Route {
   method: string;
   path: string;
-  handler: (event: APIGatewayProxyEvent, store: Store) => Promise<APIGatewayProxyResult>;
+  handler: (
+    event: APIGatewayProxyEvent,
+    store: Store,
+  ) => Promise<APIGatewayProxyResult>;
 }
 
 const routes: Route[] = [
-  { method: 'POST', path: '/save', handler: handleSave },
-  { method: 'GET', path: '/get', handler: handleGet },
-  { method: 'GET', path: '/get-shared', handler: handleGet },
-  { method: 'GET', path: '/get-public', handler: handleGetPublic },
-  { method: 'DELETE', path: '/delete', handler: handleDelete },
-  { method: 'GET', path: '/query', handler: handleQuery }
+  { method: "POST", path: "/save", handler: handleSave },
+  { method: "GET", path: "/get", handler: handleGet },
+  { method: "GET", path: "/get-shared", handler: handleGet },
+  { method: "GET", path: "/get-public", handler: handleGetPublic },
+  { method: "DELETE", path: "/delete", handler: handleDelete },
+  { method: "GET", path: "/query", handler: handleQuery },
 ];
 
 /**
@@ -99,46 +118,55 @@ const routes: Route[] = [
  * - public: everyone can read, only owner can modify
  */
 function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
-  if (event.httpMethod !== 'GET') return false;
-  
+  if (event.httpMethod !== "GET") return false;
+
   // /get-public endpoint always allows anonymous access (type validation done in handler)
-  if (event.resource === '/get-public') return true;
-  
+  if (event.resource === "/get-public") return true;
+
   const type = event.queryStringParameters?.type;
-  return type === 'shared' || type === 'unlisted' || type === 'public';
+  return type === "shared" || type === "unlisted" || type === "public";
 }
 
 /**
  * Main Lambda handler
  */
-export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function handler(
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> {
   // Debug endpoint - no auth required
-  if (event.httpMethod === 'POST' && event.resource === '/debug/error') {
+  if (event.httpMethod === "POST" && event.resource === "/debug/error") {
     return handleDebugError();
   }
 
   const userId = getUserId(event);
-  
+
   // Allow unauthenticated GET requests for shared data
   const isAnonymousSharedAccess = !userId && isPublicReadableRequest(event);
-  
+
   if (!userId && !isAnonymousSharedAccess) {
-    return createResponse(HTTP_STATUS.UNAUTHORIZED, { 
-      error: 'Authentication required. Provide a valid token or use a public-readable endpoint.' 
+    return createResponse(HTTP_STATUS.UNAUTHORIZED, {
+      error:
+        "Authentication required. Provide a valid token or use a public-readable endpoint.",
     });
   }
 
   // Use event.resource (API Gateway resource path) instead of event.path (which includes basePath)
-  const route = routes.find(r => r.method === event.httpMethod && r.path === event.resource);
+  const route = routes.find(
+    (r) => r.method === event.httpMethod && r.path === event.resource,
+  );
   if (!route) {
-    return createResponse(HTTP_STATUS.NOT_FOUND, { error: HTTP_ERRORS.NOT_FOUND });
+    return createResponse(HTTP_STATUS.NOT_FOUND, {
+      error: HTTP_ERRORS.NOT_FOUND,
+    });
   }
 
   try {
     // For anonymous shared access, use 'anonymous' as userId
-    const effectiveUserId = userId || 'anonymous';
+    const effectiveUserId = userId || "anonymous";
     return await route.handler(event, createStore(effectiveUserId));
   } catch {
-    return createResponse(HTTP_STATUS.INTERNAL_ERROR, { error: HTTP_ERRORS.INTERNAL });
+    return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
+      error: HTTP_ERRORS.INTERNAL,
+    });
   }
 }

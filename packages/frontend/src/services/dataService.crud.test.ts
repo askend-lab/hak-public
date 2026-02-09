@@ -1,10 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { DataService } from './dataService';
-import { setupSimpleStoreMock, resetSimpleStoreMock, getStoredUserTasks } from './__mocks__/simpleStoreMock';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-describe('DataService CRUD Operations', () => {
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { DataService } from "./dataService";
+import {
+  setupSimpleStoreMock,
+  resetSimpleStoreMock,
+  getStoredUserTasks,
+} from "./__mocks__/simpleStoreMock";
+
+describe("DataService CRUD Operations", () => {
   let dataService: DataService;
-  const mockUserId = '38001085718';
+  const mockUserId = "38001085718";
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -15,107 +22,107 @@ describe('DataService CRUD Operations', () => {
     dataService = DataService.getInstance();
   });
 
-  describe('createTask', () => {
-    it('creates a new task with basic data', async () => {
+  describe("createTask", () => {
+    it("creates a new task with basic data", async () => {
       const taskData = {
-        name: 'Test Task',
-        description: 'Test Description'
+        name: "Test Task",
+        description: "Test Description",
       };
 
       const result = await dataService.createTask(mockUserId, taskData);
 
-      expect(result.name).toBe('Test Task');
-      expect(result.description).toBe('Test Description');
+      expect(result.name).toBe("Test Task");
+      expect(result.description).toBe("Test Description");
       expect(result.userId).toBe(mockUserId);
       expect(result.id).toBeDefined();
       expect(result.shareToken).toBeDefined();
     });
 
-    it('creates task with speech sequences', async () => {
+    it("creates task with speech sequences", async () => {
       const taskData = {
-        name: 'Speech Task',
-        description: 'With sequences',
-        speechSequences: ['Hello', 'World']
+        name: "Speech Task",
+        description: "With sequences",
+        speechSequences: ["Hello", "World"],
       };
 
       const result = await dataService.createTask(mockUserId, taskData);
 
-      expect(result.speechSequences).toEqual(['Hello', 'World']);
+      expect(result.speechSequences).toEqual(["Hello", "World"]);
       expect(result.entries).toHaveLength(2);
-      expect(result.entries[0]?.text).toBe('Hello');
-      expect(result.entries[1]?.text).toBe('World');
+      expect(result.entries[0]?.text).toBe("Hello");
+      expect(result.entries[1]?.text).toBe("World");
     });
 
-    it('creates task with speech entries', async () => {
+    it("creates task with speech entries", async () => {
       const taskData = {
-        name: 'Entry Task',
-        description: 'With entries',
+        name: "Entry Task",
+        description: "With entries",
         speechEntries: [
-          { text: 'Hello', stressedText: 'Hel·lo' },
-          { text: 'World', stressedText: 'World' }
-        ]
+          { text: "Hello", stressedText: "Hel·lo" },
+          { text: "World", stressedText: "World" },
+        ],
       };
 
       const result = await dataService.createTask(mockUserId, taskData);
 
       expect(result.entries).toHaveLength(2);
-      expect(result.entries[0]?.text).toBe('Hello');
-      expect(result.entries[0]?.stressedText).toBe('Hel·lo');
+      expect(result.entries[0]?.text).toBe("Hello");
+      expect(result.entries[0]?.stressedText).toBe("Hel·lo");
     });
 
-    it('saves task to SimpleStore', async () => {
+    it("saves task to SimpleStore", async () => {
       const taskData = {
-        name: 'Saved Task',
-        description: 'Should be saved'
+        name: "Saved Task",
+        description: "Should be saved",
       };
 
       await dataService.createTask(mockUserId, taskData);
 
       const tasks = getStoredUserTasks(mockUserId);
       expect(tasks).toHaveLength(1);
-      expect(tasks[0]?.name).toBe('Saved Task');
+      expect(tasks[0]?.name).toBe("Saved Task");
     });
   });
 
-  describe('getTask', () => {
-    it('returns user-created task', async () => {
-      const taskData = { name: 'User Task', description: 'Test' };
+  describe("getTask", () => {
+    it("returns user-created task", async () => {
+      const taskData = { name: "User Task", description: "Test" };
       const created = await dataService.createTask(mockUserId, taskData);
 
       const result = await dataService.getTask(created.id, mockUserId);
 
       expect(result).toBeDefined();
-      expect(result?.name).toBe('User Task');
+      expect(result?.name).toBe("User Task");
     });
 
-    it('returns null for non-existent task', async () => {
-      const result = await dataService.getTask('non-existent', mockUserId);
+    it("returns null for non-existent task", async () => {
+      const result = await dataService.getTask("non-existent", mockUserId);
       expect(result).toBeNull();
     });
   });
 
-  describe('updateTask', () => {
-    it('updates user-created task', async () => {
-      const taskData = { name: 'Original', description: 'Test' };
+  describe("updateTask", () => {
+    it("updates user-created task", async () => {
+      const taskData = { name: "Original", description: "Test" };
       const created = await dataService.createTask(mockUserId, taskData);
 
       const result = await dataService.updateTask(mockUserId, created.id, {
-        name: 'Updated'
+        name: "Updated",
       });
 
-      expect(result?.name).toBe('Updated');
+      expect(result?.name).toBe("Updated");
     });
 
-    it('throws for non-existent task', async () => {
+    it("throws for non-existent task", async () => {
       await expect(
-        dataService.updateTask(mockUserId, 'non-existent', { name: 'Test' })
-      ).rejects.toThrow('Task not found');
+        dataService.updateTask(mockUserId, "non-existent", { name: "Test" }),
+      ).rejects.toThrow("Task not found");
     });
   });
 
-  describe('deleteTask', () => {
-    it('deletes user-created task', async () => {
-      const taskData = { name: 'To Delete', description: 'Test' };
+  describe("deleteTask", () => {
+    it("deletes user-created task", async () => {
+      const taskData = { name: "To Delete", description: "Test" };
       const created = await dataService.createTask(mockUserId, taskData);
 
       const result = await dataService.deleteTask(mockUserId, created.id);
@@ -125,101 +132,119 @@ describe('DataService CRUD Operations', () => {
       expect(task).toBeNull();
     });
 
-    it('throws for non-existent task', async () => {
+    it("throws for non-existent task", async () => {
       await expect(
-        dataService.deleteTask(mockUserId, 'non-existent')
-      ).rejects.toThrow('Task not found');
+        dataService.deleteTask(mockUserId, "non-existent"),
+      ).rejects.toThrow("Task not found");
     });
   });
 
-  describe('getUserTasks', () => {
-    it('returns empty array for user with no tasks', async () => {
-      const result = await dataService.getUserTasks('new-user');
+  describe("getUserTasks", () => {
+    it("returns empty array for user with no tasks", async () => {
+      const result = await dataService.getUserTasks("new-user");
       // May include baseline tasks
       expect(Array.isArray(result)).toBe(true);
     });
 
-    it('returns user-created tasks', async () => {
-      await dataService.createTask(mockUserId, { name: 'Task 1', description: '' });
-      await dataService.createTask(mockUserId, { name: 'Task 2', description: '' });
+    it("returns user-created tasks", async () => {
+      await dataService.createTask(mockUserId, {
+        name: "Task 1",
+        description: "",
+      });
+      await dataService.createTask(mockUserId, {
+        name: "Task 2",
+        description: "",
+      });
 
       const result = await dataService.getUserTasks(mockUserId);
 
-      const userTaskNames = result.map(t => t.name);
-      expect(userTaskNames).toContain('Task 1');
-      expect(userTaskNames).toContain('Task 2');
+      const userTaskNames = result.map((t) => t.name);
+      expect(userTaskNames).toContain("Task 1");
+      expect(userTaskNames).toContain("Task 2");
     });
   });
 
-  describe('getUserCreatedTasks', () => {
-    it('returns only user-created tasks', async () => {
-      await dataService.createTask(mockUserId, { name: 'User Task', description: '' });
+  describe("getUserCreatedTasks", () => {
+    it("returns only user-created tasks", async () => {
+      await dataService.createTask(mockUserId, {
+        name: "User Task",
+        description: "",
+      });
 
       const result = await dataService.getUserCreatedTasks(mockUserId);
 
       expect(result).toHaveLength(1);
-      expect(result[0]?.name).toBe('User Task');
+      expect(result[0]?.name).toBe("User Task");
     });
   });
 
-  describe('getModifiableTasks', () => {
-    it('returns user-created tasks only', async () => {
-      await dataService.createTask(mockUserId, { name: 'Modifiable', description: '' });
+  describe("getModifiableTasks", () => {
+    it("returns user-created tasks only", async () => {
+      await dataService.createTask(mockUserId, {
+        name: "Modifiable",
+        description: "",
+      });
 
       const result = await dataService.getModifiableTasks(mockUserId);
 
       expect(result).toHaveLength(1);
-      expect(result[0]?.name).toBe('Modifiable');
+      expect(result[0]?.name).toBe("Modifiable");
     });
   });
 
-  describe('Task visibility after creation', () => {
-    it('newly created task is immediately visible in getUserTasks', async () => {
+  describe("Task visibility after creation", () => {
+    it("newly created task is immediately visible in getUserTasks", async () => {
       // RED TEST: Verifies task is visible immediately after creation
       // Bug: User creates task but it doesn't appear in task list
-      const taskData = { name: 'New Task', description: 'Should be visible' };
-      
+      const taskData = { name: "New Task", description: "Should be visible" };
+
       await dataService.createTask(mockUserId, taskData);
-      
+
       // Task should be immediately visible
       const tasks = await dataService.getUserTasks(mockUserId);
-      const taskNames = tasks.map(t => t.name);
-      
-      expect(taskNames).toContain('New Task');
+      const taskNames = tasks.map((t) => t.name);
+
+      expect(taskNames).toContain("New Task");
     });
 
-    it('newly created task is visible after fresh DataService instance', async () => {
+    it("newly created task is visible after fresh DataService instance", async () => {
       // RED TEST: Verifies task persists and is visible after "page reload"
-      const taskData = { name: 'Persistent Task', description: 'Should persist' };
-      
+      const taskData = {
+        name: "Persistent Task",
+        description: "Should persist",
+      };
+
       await dataService.createTask(mockUserId, taskData);
-      
+
       // Simulate page reload - get fresh DataService instance
       const freshDataService = DataService.getInstance();
-      
+
       const tasks = await freshDataService.getUserTasks(mockUserId);
-      const taskNames = tasks.map(t => t.name);
-      
-      expect(taskNames).toContain('Persistent Task');
+      const taskNames = tasks.map((t) => t.name);
+
+      expect(taskNames).toContain("Persistent Task");
     });
 
-    it('created task appears in getUserTasks after navigation', async () => {
+    it("created task appears in getUserTasks after navigation", async () => {
       // RED TEST: Bug - task saved but not visible when navigating to /tasks
       // Scenario: User creates task, task saved to API, then navigates to tasks page
-      
+
       // 1. Create task
-      const taskData = { name: 'Navigation Test Task', description: 'Should appear after navigation' };
+      const taskData = {
+        name: "Navigation Test Task",
+        description: "Should appear after navigation",
+      };
       const created = await dataService.createTask(mockUserId, taskData);
       expect(created.id).toBeDefined();
-      
+
       // 2. Simulate navigation - fresh load of tasks (like opening /tasks page)
       const tasks = await dataService.getUserTasks(mockUserId);
-      
+
       // 3. Task should be in the list
       expect(tasks.length).toBeGreaterThan(0);
-      const foundTask = tasks.find(t => t.id === created.id);
+      const foundTask = tasks.find((t) => t.id === created.id);
       expect(foundTask).toBeDefined();
-      expect(foundTask?.name).toBe('Navigation Test Task');
+      expect(foundTask?.name).toBe("Navigation Test Task");
     });
   });
 });

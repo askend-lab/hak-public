@@ -1,10 +1,12 @@
- 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import ConfirmationModal from './ConfirmationModal';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-describe('ConfirmationModal', () => {
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import ConfirmationModal from "./ConfirmationModal";
+
+describe("ConfirmationModal", () => {
   const mockOnConfirm = vi.fn();
   const mockOnCancel = vi.fn();
 
@@ -12,8 +14,8 @@ describe('ConfirmationModal', () => {
     vi.clearAllMocks();
   });
 
-  describe('rendering', () => {
-    it('returns null when not open', () => {
+  describe("rendering", () => {
+    it("returns null when not open", () => {
       const { container } = render(
         <ConfirmationModal
           isOpen={false}
@@ -21,12 +23,12 @@ describe('ConfirmationModal', () => {
           message="Test message"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
       expect(container.firstChild).toBeNull();
     });
 
-    it('renders when open', () => {
+    it("renders when open", () => {
       render(
         <ConfirmationModal
           isOpen={true}
@@ -34,13 +36,13 @@ describe('ConfirmationModal', () => {
           message="Test message"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
-      expect(screen.getByText('Test Title')).toBeInTheDocument();
-      expect(screen.getByText('Test message')).toBeInTheDocument();
+      expect(screen.getByText("Test Title")).toBeInTheDocument();
+      expect(screen.getByText("Test message")).toBeInTheDocument();
     });
 
-    it('renders default button texts', () => {
+    it("renders default button texts", () => {
       render(
         <ConfirmationModal
           isOpen={true}
@@ -48,13 +50,15 @@ describe('ConfirmationModal', () => {
           message="Test"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
-      expect(screen.getByRole('button', { name: 'OK' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "OK" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Cancel" }),
+      ).toBeInTheDocument();
     });
 
-    it('renders custom button texts', () => {
+    it("renders custom button texts", () => {
       render(
         <ConfirmationModal
           isOpen={true}
@@ -64,15 +68,19 @@ describe('ConfirmationModal', () => {
           cancelText="Dismiss"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
-      expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Confirm" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Dismiss" }),
+      ).toBeInTheDocument();
     });
   });
 
-  describe('interactions', () => {
-    it('calls onConfirm when confirm button clicked', async () => {
+  describe("interactions", () => {
+    it("calls onConfirm when confirm button clicked", async () => {
       const user = userEvent.setup();
       render(
         <ConfirmationModal
@@ -81,14 +89,14 @@ describe('ConfirmationModal', () => {
           message="Test"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
 
-      await user.click(screen.getByRole('button', { name: 'OK' }));
+      await user.click(screen.getByRole("button", { name: "OK" }));
       expect(mockOnConfirm).toHaveBeenCalled();
     });
 
-    it('calls onCancel when cancel button clicked', async () => {
+    it("calls onCancel when cancel button clicked", async () => {
       const user = userEvent.setup();
       render(
         <ConfirmationModal
@@ -97,16 +105,16 @@ describe('ConfirmationModal', () => {
           message="Test"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
 
-      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      await user.click(screen.getByRole("button", { name: "Cancel" }));
       expect(mockOnCancel).toHaveBeenCalled();
     });
   });
 
-  describe('variants', () => {
-    it('applies danger variant class', () => {
+  describe("variants", () => {
+    it("applies danger variant class", () => {
       render(
         <ConfirmationModal
           isOpen={true}
@@ -115,12 +123,14 @@ describe('ConfirmationModal', () => {
           variant="danger"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
-      expect(document.querySelector('.confirmation-modal--danger')).toBeInTheDocument();
+      expect(
+        document.querySelector(".confirmation-modal--danger"),
+      ).toBeInTheDocument();
     });
 
-    it('applies warning variant class', () => {
+    it("applies warning variant class", () => {
       render(
         <ConfirmationModal
           isOpen={true}
@@ -129,12 +139,14 @@ describe('ConfirmationModal', () => {
           variant="warning"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
-      expect(document.querySelector('.confirmation-modal--warning')).toBeInTheDocument();
+      expect(
+        document.querySelector(".confirmation-modal--warning"),
+      ).toBeInTheDocument();
     });
 
-    it('applies info variant class', () => {
+    it("applies info variant class", () => {
       render(
         <ConfirmationModal
           isOpen={true}
@@ -143,12 +155,14 @@ describe('ConfirmationModal', () => {
           variant="info"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
-      expect(document.querySelector('.confirmation-modal--info')).toBeInTheDocument();
+      expect(
+        document.querySelector(".confirmation-modal--info"),
+      ).toBeInTheDocument();
     });
 
-    it('defaults to danger variant', () => {
+    it("defaults to danger variant", () => {
       render(
         <ConfirmationModal
           isOpen={true}
@@ -156,9 +170,11 @@ describe('ConfirmationModal', () => {
           message="Test"
           onConfirm={mockOnConfirm}
           onCancel={mockOnCancel}
-        />
+        />,
       );
-      expect(document.querySelector('.confirmation-modal--danger')).toBeInTheDocument();
+      expect(
+        document.querySelector(".confirmation-modal--danger"),
+      ).toBeInTheDocument();
     });
   });
 });

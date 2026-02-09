@@ -1,15 +1,18 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Accessibility E2E Tests
- * 
+ *
  * Full-page accessibility audits using Playwright and axe-core
  * for WCAG 2.1 AA compliance.
  */
 
-import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 // WCAG 2.1 AA tags to test against
-const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
+const WCAG_AA_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
 /**
  * Run axe accessibility audit on current page
@@ -25,163 +28,194 @@ async function runAccessibilityAudit(page: ReturnType<typeof test.page>) {
 /**
  * Assert no critical or serious accessibility violations
  */
-function expectNoSeriousViolations(results: Awaited<ReturnType<typeof runAccessibilityAudit>>) {
+function expectNoSeriousViolations(
+  results: Awaited<ReturnType<typeof runAccessibilityAudit>>,
+) {
   const seriousViolations = results.violations.filter(
-    v => v.impact === 'critical' || v.impact === 'serious'
+    (v) => v.impact === "critical" || v.impact === "serious",
   );
 
   if (seriousViolations.length > 0) {
-    const summary = seriousViolations.map(v => 
-      `[${v.impact?.toUpperCase()}] ${v.id}: ${v.description} (${v.nodes.length} instances)`
-    ).join('\n');
-    
-    throw new Error(`Found ${seriousViolations.length} serious accessibility violations:\n${summary}`);
+    const summary = seriousViolations
+      .map(
+        (v) =>
+          `[${v.impact?.toUpperCase()}] ${v.id}: ${v.description} (${v.nodes.length} instances)`,
+      )
+      .join("\n");
+
+    throw new Error(
+      `Found ${seriousViolations.length} serious accessibility violations:\n${summary}`,
+    );
   }
 }
 
-test.describe('Accessibility - WCAG 2.1 AA Compliance', () => {
-  test.describe('Synthesis Page (Main View)', () => {
-    test('should have no critical accessibility violations on synthesis page', async ({ page }) => {
-      await page.goto('/');
-      
+test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
+  test.describe("Synthesis Page (Main View)", () => {
+    test("should have no critical accessibility violations on synthesis page", async ({
+      page,
+    }) => {
+      await page.goto("/");
+
       // Wait for page to fully load
-      await page.waitForLoadState('networkidle');
-      
+      await page.waitForLoadState("networkidle");
+
       const results = await runAccessibilityAudit(page);
       expectNoSeriousViolations(results);
-      
+
       // Log all violations for review (including minor ones)
       if (results.violations.length > 0) {
-        console.log('Accessibility issues found:', JSON.stringify(results.violations, null, 2));
+        console.log(
+          "Accessibility issues found:",
+          JSON.stringify(results.violations, null, 2),
+        );
       }
     });
 
-    test('should maintain accessibility during user interactions', async ({ page }) => {
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
-      
+    test("should maintain accessibility during user interactions", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+
       // Interact with the page - add a sentence
-      const input = page.locator('input[placeholder], textarea').first();
+      const input = page.locator("input[placeholder], textarea").first();
       if (await input.isVisible()) {
-        await input.fill('Tere, kuidas läheb?');
-        await input.press('Enter');
+        await input.fill("Tere, kuidas läheb?");
+        await input.press("Enter");
         await page.waitForTimeout(500);
       }
-      
+
       const results = await runAccessibilityAudit(page);
       expectNoSeriousViolations(results);
     });
   });
 
-  test.describe('Tasks Page', () => {
-    test('should have no critical accessibility violations on tasks page', async ({ page }) => {
-      await page.goto('/tasks');
-      await page.waitForLoadState('networkidle');
-      
+  test.describe("Tasks Page", () => {
+    test("should have no critical accessibility violations on tasks page", async ({
+      page,
+    }) => {
+      await page.goto("/tasks");
+      await page.waitForLoadState("networkidle");
+
       const results = await runAccessibilityAudit(page);
       expectNoSeriousViolations(results);
     });
   });
 
-  test.describe('Modal Accessibility', () => {
-    test('login modal should be accessible', async ({ page }) => {
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
-      
+  test.describe("Modal Accessibility", () => {
+    test("login modal should be accessible", async ({ page }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+
       // Try to trigger login modal
-      const loginButton = page.getByRole('button', { name: /logi sisse|login/i });
+      const loginButton = page.getByRole("button", {
+        name: /logi sisse|login/i,
+      });
       if (await loginButton.isVisible()) {
         await loginButton.click();
         await page.waitForTimeout(300);
-        
+
         const results = await runAccessibilityAudit(page);
         expectNoSeriousViolations(results);
       }
     });
   });
 
-  test.describe('Keyboard Navigation', () => {
-    test('should be navigable with keyboard only', async ({ page }) => {
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
-      
+  test.describe("Keyboard Navigation", () => {
+    test("should be navigable with keyboard only", async ({ page }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+
       // Tab through interactive elements
       for (let i = 0; i < 10; i++) {
-        await page.keyboard.press('Tab');
-        
+        await page.keyboard.press("Tab");
+
         // Check that focus is visible
         const focusedElement = await page.evaluate(() => {
           const el = document.activeElement;
           if (!el || el === document.body) return null;
-          
+
           const styles = window.getComputedStyle(el);
           return {
             tagName: el.tagName,
-            hasOutline: styles.outlineStyle !== 'none' || styles.boxShadow !== 'none',
+            hasOutline:
+              styles.outlineStyle !== "none" || styles.boxShadow !== "none",
             outlineStyle: styles.outline,
             boxShadow: styles.boxShadow,
           };
         });
-        
-        if (focusedElement && focusedElement.tagName !== 'BODY') {
+
+        if (focusedElement && focusedElement.tagName !== "BODY") {
           // Log focus state for debugging
-          console.log(`Focus on ${focusedElement.tagName}:`, focusedElement.hasOutline);
+          console.log(
+            `Focus on ${focusedElement.tagName}:`,
+            focusedElement.hasOutline,
+          );
         }
       }
     });
 
-    test('Escape key should close modals', async ({ page }) => {
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
-      
+    test("Escape key should close modals", async ({ page }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+
       // Try to open and close login modal
-      const loginButton = page.getByRole('button', { name: /logi sisse|login/i });
+      const loginButton = page.getByRole("button", {
+        name: /logi sisse|login/i,
+      });
       if (await loginButton.isVisible()) {
         await loginButton.click();
         await page.waitForTimeout(300);
-        
+
         // Press Escape to close
-        await page.keyboard.press('Escape');
+        await page.keyboard.press("Escape");
         await page.waitForTimeout(300);
-        
+
         // Modal should be closed
-        const modal = page.locator('.base-modal');
+        const modal = page.locator(".base-modal");
         await expect(modal).not.toBeVisible();
       }
     });
   });
 
-  test.describe('Focus Management', () => {
-    test('focus should be visible on interactive elements', async ({ page }) => {
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
-      
+  test.describe("Focus Management", () => {
+    test("focus should be visible on interactive elements", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+
       // Get all focusable elements
-      const focusableElements = await page.locator(
-        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      ).all();
-      
+      const focusableElements = await page
+        .locator(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        )
+        .all();
+
       for (const element of focusableElements.slice(0, 5)) {
         await element.focus();
-        
+
         // Check for visible focus indicator
         const hasFocusIndicator = await element.evaluate((el) => {
           const styles = window.getComputedStyle(el);
           const outline = styles.outline;
           const boxShadow = styles.boxShadow;
-          
+
           // Check if there's a visible focus indicator
-          const hasOutline = outline && !outline.includes('none') && !outline.includes('0px');
-          const hasBoxShadow = boxShadow && boxShadow !== 'none';
-          
+          const hasOutline =
+            outline && !outline.includes("none") && !outline.includes("0px");
+          const hasBoxShadow = boxShadow && boxShadow !== "none";
+
           return hasOutline || hasBoxShadow;
         });
-        
+
         // This is informational - we'll fix issues in remediation phase
         if (!hasFocusIndicator) {
-          const tagName = await element.evaluate(el => el.tagName);
-          const className = await element.evaluate(el => el.className);
-          console.log(`WARNING: No visible focus indicator on ${tagName}.${className}`);
+          const tagName = await element.evaluate((el) => el.tagName);
+          const className = await element.evaluate((el) => el.className);
+          console.log(
+            `WARNING: No visible focus indicator on ${tagName}.${className}`,
+          );
         }
       }
     });

@@ -1,8 +1,11 @@
-import { parseFeatureContent } from './index';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-describe('feature-parser', () => {
-  describe('parseFeatureContent', () => {
-    it('should parse a simple feature', () => {
+import { parseFeatureContent } from "./index";
+
+describe("feature-parser", () => {
+  describe("parseFeatureContent", () => {
+    it("should parse a simple feature", () => {
       const content = `
 Feature: User Login
   Scenario: Successful login
@@ -12,13 +15,13 @@ Feature: User Login
 `;
       const result = parseFeatureContent(content);
       expect(result).not.toBeNull();
-      expect(result?.name).toBe('User Login');
+      expect(result?.name).toBe("User Login");
       expect(result?.scenarios).toHaveLength(1);
-      expect(result?.scenarios[0].name).toBe('Successful login');
+      expect(result?.scenarios[0].name).toBe("Successful login");
       expect(result?.scenarios[0].steps).toHaveLength(3);
     });
 
-    it('should parse feature with tags', () => {
+    it("should parse feature with tags", () => {
       const content = `
 @login @smoke
 Feature: User Login
@@ -27,12 +30,12 @@ Feature: User Login
     Given user is on login page
 `;
       const result = parseFeatureContent(content);
-      expect(result?.tags).toContain('@login');
-      expect(result?.tags).toContain('@smoke');
-      expect(result?.scenarios[0].tags).toContain('@critical');
+      expect(result?.tags).toContain("@login");
+      expect(result?.tags).toContain("@smoke");
+      expect(result?.scenarios[0].tags).toContain("@critical");
     });
 
-    it('should parse multiple scenarios', () => {
+    it("should parse multiple scenarios", () => {
       const content = `
 Feature: Auth
   Scenario: Login
@@ -42,11 +45,11 @@ Feature: Auth
 `;
       const result = parseFeatureContent(content);
       expect(result?.scenarios).toHaveLength(2);
-      expect(result?.scenarios[0].name).toBe('Login');
-      expect(result?.scenarios[1].name).toBe('Logout');
+      expect(result?.scenarios[0].name).toBe("Login");
+      expect(result?.scenarios[1].name).toBe("Logout");
     });
 
-    it('should skip Background steps', () => {
+    it("should skip Background steps", () => {
       const content = `
 Feature: Auth
   Background:
@@ -56,15 +59,15 @@ Feature: Auth
 `;
       const result = parseFeatureContent(content);
       expect(result?.scenarios[0].steps).toHaveLength(1);
-      expect(result?.scenarios[0].steps[0]).toBe('Given specific setup');
+      expect(result?.scenarios[0].steps[0]).toBe("Given specific setup");
     });
 
-    it('should return null for empty content', () => {
-      const result = parseFeatureContent('');
+    it("should return null for empty content", () => {
+      const result = parseFeatureContent("");
       expect(result).toBeNull();
     });
 
-    it('should parse And/But steps', () => {
+    it("should parse And/But steps", () => {
       const content = `
 Feature: Test
   Scenario: Complex

@@ -1,4 +1,7 @@
-export { useDragAndDrop } from './useDragAndDrop';
-export { useAudioPlayback } from './useAudioPlayback';
-export { usePronunciationVariants } from './usePronunciationVariants';
-export { usePhoneticPanel } from './usePhoneticPanel';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+export { useDragAndDrop } from "./useDragAndDrop";
+export { useAudioPlayback } from "./useAudioPlayback";
+export { usePronunciationVariants } from "./usePronunciationVariants";
+export { usePhoneticPanel } from "./usePhoneticPanel";

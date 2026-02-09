@@ -1,163 +1,170 @@
-import { validateStoreRequest, validateGetRequest, validateQueryRequest } from '../src/core/validation';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-describe('Validation', () => {
-  describe('validateStoreRequest', () => {
-    it('should accept valid request', () => {
+import {
+  validateStoreRequest,
+  validateGetRequest,
+  validateQueryRequest,
+} from "../src/core/validation";
+
+describe("Validation", () => {
+  describe("validateStoreRequest", () => {
+    it("should accept valid request", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        sk: 'sort1',
-        type: 'private',
+        pk: "entity1",
+        sk: "sort1",
+        type: "private",
         ttl: 3600,
-        data: { key: 'value' }
+        data: { key: "value" },
       });
 
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should reject missing pk', () => {
+    it("should reject missing pk", () => {
       const result = validateStoreRequest({
-        sk: 'sort1',
-        type: 'private',
-        ttl: 3600
+        sk: "sort1",
+        type: "private",
+        ttl: 3600,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('pk is required and must be a string');
+      expect(result.errors).toContain("pk is required and must be a string");
     });
 
-    it('should reject missing sk', () => {
+    it("should reject missing sk", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        type: 'private',
-        ttl: 3600
+        pk: "entity1",
+        type: "private",
+        ttl: 3600,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('sk is required and must be a string');
+      expect(result.errors).toContain("sk is required and must be a string");
     });
 
-    it('should reject invalid type', () => {
+    it("should reject invalid type", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        sk: 'sort1',
-        type: 'invalid' as any,
-        ttl: 3600
+        pk: "entity1",
+        sk: "sort1",
+        type: "invalid" as any,
+        ttl: 3600,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors[0]).toContain('type must be one of');
+      expect(result.errors[0]).toContain("type must be one of");
     });
 
-    it('should accept zero ttl (no expiration)', () => {
+    it("should accept zero ttl (no expiration)", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        sk: 'sort1',
-        type: 'private',
-        ttl: 0
+        pk: "entity1",
+        sk: "sort1",
+        type: "private",
+        ttl: 0,
       });
 
       expect(result.valid).toBe(true);
     });
 
-    it('should reject negative ttl', () => {
+    it("should reject negative ttl", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        sk: 'sort1',
-        type: 'private',
-        ttl: -1
+        pk: "entity1",
+        sk: "sort1",
+        type: "private",
+        ttl: -1,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors[0]).toContain('TTL must be 0');
+      expect(result.errors[0]).toContain("TTL must be 0");
     });
 
-    it('should reject ttl exceeding max', () => {
+    it("should reject ttl exceeding max", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        sk: 'sort1',
-        type: 'private',
-        ttl: 31536001
+        pk: "entity1",
+        sk: "sort1",
+        type: "private",
+        ttl: 31536001,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors[0]).toContain('exceeds maximum');
+      expect(result.errors[0]).toContain("exceeds maximum");
     });
 
-    it('should reject invalid data type', () => {
+    it("should reject invalid data type", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        sk: 'sort1',
-        type: 'private',
+        pk: "entity1",
+        sk: "sort1",
+        type: "private",
         ttl: 3600,
-        data: 'not an object' as unknown as Record<string, unknown>
+        data: "not an object" as unknown as Record<string, unknown>,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('data must be an object');
+      expect(result.errors).toContain("data must be an object");
     });
 
-    it('should accept request without data', () => {
+    it("should accept request without data", () => {
       const result = validateStoreRequest({
-        pk: 'entity1',
-        sk: 'sort1',
-        type: 'public',
-        ttl: 3600
+        pk: "entity1",
+        sk: "sort1",
+        type: "public",
+        ttl: 3600,
       });
 
       expect(result.valid).toBe(true);
     });
   });
 
-  describe('validateGetRequest', () => {
-    it('should accept valid request', () => {
-      const result = validateGetRequest('entity1', 'sort1', 'private');
+  describe("validateGetRequest", () => {
+    it("should accept valid request", () => {
+      const result = validateGetRequest("entity1", "sort1", "private");
 
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should reject invalid pk', () => {
-      const result = validateGetRequest(null, 'sort1', 'private');
+    it("should reject invalid pk", () => {
+      const result = validateGetRequest(null, "sort1", "private");
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('pk is required and must be a string');
+      expect(result.errors).toContain("pk is required and must be a string");
     });
 
-    it('should reject invalid type', () => {
-      const result = validateGetRequest('entity1', 'sort1', 'invalid');
+    it("should reject invalid type", () => {
+      const result = validateGetRequest("entity1", "sort1", "invalid");
 
       expect(result.valid).toBe(false);
-      expect(result.errors[0]).toContain('type must be one of');
+      expect(result.errors[0]).toContain("type must be one of");
     });
   });
 
-  describe('validateQueryRequest', () => {
-    it('should accept valid request', () => {
-      const result = validateQueryRequest('prefix-', 'private');
+  describe("validateQueryRequest", () => {
+    it("should accept valid request", () => {
+      const result = validateQueryRequest("prefix-", "private");
 
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should accept empty prefix', () => {
-      const result = validateQueryRequest('', 'public');
+    it("should accept empty prefix", () => {
+      const result = validateQueryRequest("", "public");
 
       expect(result.valid).toBe(true);
     });
 
-    it('should reject non-string prefix', () => {
-      const result = validateQueryRequest(123, 'private');
+    it("should reject non-string prefix", () => {
+      const result = validateQueryRequest(123, "private");
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('prefix must be a string');
+      expect(result.errors).toContain("prefix must be a string");
     });
 
-    it('should reject invalid type', () => {
-      const result = validateQueryRequest('prefix-', null);
+    it("should reject invalid type", () => {
+      const result = validateQueryRequest("prefix-", null);
 
       expect(result.valid).toBe(false);
-      expect(result.errors[0]).toContain('type must be one of');
+      expect(result.errors[0]).toContain("type must be one of");
     });
   });
 });

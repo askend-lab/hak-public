@@ -1,22 +1,81 @@
-'use client';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-import { useState } from 'react';
-import { useNotification } from '@/contexts/NotificationContext';
-import BaseModal from './BaseModal';
+"use client";
 
-interface ShareTaskModalProps { isOpen: boolean; shareToken: string; taskName: string; onClose: () => void; }
+import { useState } from "react";
+import { useNotification } from "@/contexts/NotificationContext";
+import BaseModal from "./BaseModal";
 
-export default function ShareTaskModal({ isOpen, shareToken, taskName: _taskName, onClose }: ShareTaskModalProps) {
+interface ShareTaskModalProps {
+  isOpen: boolean;
+  shareToken: string;
+  taskName: string;
+  onClose: () => void;
+}
+
+export default function ShareTaskModal({
+  isOpen,
+  shareToken,
+  taskName: _taskName,
+  onClose,
+}: ShareTaskModalProps) {
   const { showNotification } = useNotification();
   const [isCopying, setIsCopying] = useState(false);
   if (!isOpen) return null;
   const shareUrl = `${window.location.origin}/shared/task/${shareToken}`;
-  const handleCopyLink = async () => { setIsCopying(true); try { await navigator.clipboard.writeText(shareUrl); showNotification('success', 'Jagamislink kopeeritud!', undefined, undefined, 'success'); } catch (e) { console.error('Failed to copy share link:', e); showNotification('error', 'Viga lingi kopeerimisel'); } finally { setIsCopying(false); } };
+  const handleCopyLink = async () => {
+    setIsCopying(true);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showNotification(
+        "success",
+        "Jagamislink kopeeritud!",
+        undefined,
+        undefined,
+        "success",
+      );
+    } catch (e) {
+      console.error("Failed to copy share link:", e);
+      showNotification("error", "Viga lingi kopeerimisel");
+    } finally {
+      setIsCopying(false);
+    }
+  };
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title="Jaga ülesanne" size="medium" className="share-task-modal">
-      <p className="share-task-modal__description">Kopeeri ja jaga seda linki, et teised saaksid ülesannet vaadata. Sisselogimine pole vajalik.</p>
-      <div className="share-task-modal__field"><label htmlFor="share-url" className="share-task-modal__label">Jagamislink</label><input id="share-url" type="text" value={shareUrl} readOnly className="share-task-modal__input" /></div>
-      <div className="share-task-modal__actions"><button onClick={handleCopyLink} disabled={isCopying} className="button button--primary" type="button">{isCopying ? 'Kopeeritud!' : 'Kopeeri'}</button></div>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Jaga ülesanne"
+      size="medium"
+      className="share-task-modal"
+    >
+      <p className="share-task-modal__description">
+        Kopeeri ja jaga seda linki, et teised saaksid ülesannet vaadata.
+        Sisselogimine pole vajalik.
+      </p>
+      <div className="share-task-modal__field">
+        <label htmlFor="share-url" className="share-task-modal__label">
+          Jagamislink
+        </label>
+        <input
+          id="share-url"
+          type="text"
+          value={shareUrl}
+          readOnly
+          className="share-task-modal__input"
+        />
+      </div>
+      <div className="share-task-modal__actions">
+        <button
+          onClick={handleCopyLink}
+          disabled={isCopying}
+          className="button button--primary"
+          type="button"
+        >
+          {isCopying ? "Kopeeritud!" : "Kopeeri"}
+        </button>
+      </div>
     </BaseModal>
   );
 }

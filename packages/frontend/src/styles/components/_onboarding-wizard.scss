@@ -1,9 +1,9 @@
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
-@import '../tokens/breakpoints';
-@import 'panel';
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "panel";
 
 // =========================================================================
 // Onboarding Wizard Component
@@ -23,7 +23,9 @@
 .wizard__highlight {
   position: relative;
   z-index: 9999 !important;
-  box-shadow: 0 0 0 4px $color-primary, 0 0 0 8px $color-shadow-primary-md !important;
+  box-shadow:
+    0 0 0 4px $color-primary,
+    0 0 0 8px $color-shadow-primary-md !important;
   border-radius: $border-radius;
   background: $color-white !important;
 }
@@ -43,7 +45,7 @@
   gap: $spacing-2;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 12px;
     height: 12px;
@@ -221,14 +223,36 @@
 }
 
 // Legacy class aliases for backwards compatibility
-.wizard-overlay { @extend .wizard__overlay; }
-.wizard-highlight { @extend .wizard__highlight; }
-.wizard-tooltip { @extend .wizard__tooltip; }
-.wizard-close { @extend .wizard__close; }
-.wizard-tooltip-title { @extend .wizard__title; }
-.wizard-tooltip-description { @extend .wizard__description; }
-.wizard-tooltip-footer { @extend .wizard__footer; }
-.wizard-progress { @extend .wizard__progress; }
-.wizard-nav { @extend .wizard__nav; }
-.wizard-nav-button { @extend .wizard__nav-button; }
-.header-help-button { @extend .wizard__help-button; }
+.wizard-overlay {
+  @extend .wizard__overlay;
+}
+.wizard-highlight {
+  @extend .wizard__highlight;
+}
+.wizard-tooltip {
+  @extend .wizard__tooltip;
+}
+.wizard-close {
+  @extend .wizard__close;
+}
+.wizard-tooltip-title {
+  @extend .wizard__title;
+}
+.wizard-tooltip-description {
+  @extend .wizard__description;
+}
+.wizard-tooltip-footer {
+  @extend .wizard__footer;
+}
+.wizard-progress {
+  @extend .wizard__progress;
+}
+.wizard-nav {
+  @extend .wizard__nav;
+}
+.wizard-nav-button {
+  @extend .wizard__nav-button;
+}
+.header-help-button {
+  @extend .wizard__help-button;
+}

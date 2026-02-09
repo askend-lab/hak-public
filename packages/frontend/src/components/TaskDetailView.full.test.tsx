@@ -1,28 +1,45 @@
- 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import TaskDetailView from './TaskDetailView';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-vi.mock('@/services/auth', () => ({
-  useAuth: vi.fn(() => ({ user: { id: 'user-1', name: 'Test' }, isAuthenticated: true })),
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import TaskDetailView from "./TaskDetailView";
+
+vi.mock("@/services/auth", () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: "user-1", name: "Test" },
+    isAuthenticated: true,
+  })),
 }));
 
-vi.mock('@/contexts/NotificationContext', () => ({
+vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({ showNotification: vi.fn() })),
 }));
 
-vi.mock('@/utils/synthesize', () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue('mock-audio-url'),
+vi.mock("@/utils/synthesize", () => ({
+  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 
 const mockTask = {
-  id: 'task-1',
-  name: 'Test Task',
-  description: 'Description',
-  shareToken: 'token-1',
+  id: "task-1",
+  name: "Test Task",
+  description: "Description",
+  shareToken: "token-1",
   entries: [
-    { id: 'e1', text: 'Entry 1', stressedText: 'Entry 1', order: 0, audioUrl: null },
-    { id: 'e2', text: 'Entry 2', stressedText: 'Entry 2', order: 1, audioUrl: null },
+    {
+      id: "e1",
+      text: "Entry 1",
+      stressedText: "Entry 1",
+      order: 0,
+      audioUrl: null,
+    },
+    {
+      id: "e2",
+      text: "Entry 2",
+      stressedText: "Entry 2",
+      order: 1,
+      audioUrl: null,
+    },
   ],
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -32,7 +49,7 @@ const mockGetTask = vi.fn().mockResolvedValue(mockTask);
 const mockUpdateTaskEntry = vi.fn().mockResolvedValue({});
 const mockShareUserTask = vi.fn().mockResolvedValue({});
 
-vi.mock('@/services/dataService', () => ({
+vi.mock("@/services/dataService", () => ({
   DataService: {
     getInstance: vi.fn(() => ({
       getTask: mockGetTask,
@@ -43,9 +60,9 @@ vi.mock('@/services/dataService', () => ({
   },
 }));
 
-describe('TaskDetailView Full', () => {
+describe("TaskDetailView Full", () => {
   const props = {
-    taskId: 'task-1',
+    taskId: "task-1",
     onBack: vi.fn(),
     onEditTask: vi.fn(),
     onDeleteTask: vi.fn(),
@@ -56,41 +73,55 @@ describe('TaskDetailView Full', () => {
     vi.clearAllMocks();
     mockGetTask.mockResolvedValue(mockTask);
     class MockAudio {
-      src = ''; onended: (() => void) | null = null; onerror: (() => void) | null = null; onloadeddata: (() => void) | null = null;
+      src = "";
+      onended: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      onloadeddata: (() => void) | null = null;
       pause = vi.fn();
-      play = vi.fn().mockImplementation(() => { setTimeout(() => this.onended?.(), 10); return Promise.resolve(); });
+      play = vi.fn().mockImplementation(() => {
+        setTimeout(() => this.onended?.(), 10);
+        return Promise.resolve();
+      });
     }
     global.Audio = MockAudio as unknown as typeof Audio;
-    global.URL.createObjectURL = vi.fn(() => 'blob-url');
+    global.URL.createObjectURL = vi.fn(() => "blob-url");
     global.URL.revokeObjectURL = vi.fn();
   });
 
-  it('renders loading then task', async () => {
+  it("renders loading then task", async () => {
     render(<TaskDetailView {...props} />);
     expect(screen.getByText(/laen/i)).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
   });
 
-  it('shows error on task not found', async () => {
+  it("shows error on task not found", async () => {
     mockGetTask.mockResolvedValue(null);
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText(/ei leitud/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/ei leitud/i)).toBeInTheDocument(),
+    );
   });
 
-  it('shows loading state initially', () => {
+  it("shows loading state initially", () => {
     render(<TaskDetailView {...props} />);
     expect(screen.getByText(/laen/i)).toBeInTheDocument();
   });
 
-  it('renders with taskId prop', () => {
+  it("renders with taskId prop", () => {
     render(<TaskDetailView {...props} />);
-    expect(mockGetTask).toHaveBeenCalledWith('task-1', 'user-1');
+    expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
   });
 
-  it('opens share modal', async () => {
+  it("opens share modal", async () => {
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
-    const menuButton = screen.getAllByRole('button').find(b => b.querySelector('svg'));
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
+    const menuButton = screen
+      .getAllByRole("button")
+      .find((b) => b.querySelector("svg"));
     if (menuButton) {
       fireEvent.click(menuButton);
       await waitFor(() => {
@@ -100,41 +131,57 @@ describe('TaskDetailView Full', () => {
     }
   });
 
-  it('handles empty entries array', async () => {
+  it("handles empty entries array", async () => {
     mockGetTask.mockResolvedValue({ ...mockTask, entries: [] });
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
   });
 
-  it('handles task with no description', async () => {
-    mockGetTask.mockResolvedValue({ ...mockTask, description: '' });
+  it("handles task with no description", async () => {
+    mockGetTask.mockResolvedValue({ ...mockTask, description: "" });
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
   });
 
-  it('handles API error gracefully', async () => {
-    mockGetTask.mockRejectedValue(new Error('API Error'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  it("handles API error gracefully", async () => {
+    mockGetTask.mockRejectedValue(new Error("API Error"));
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     render(<TaskDetailView {...props} />);
     // Component handles error gracefully
     expect(screen.getByText(/laen/i)).toBeInTheDocument();
     consoleSpy.mockRestore();
   });
 
-  it('renders edit button in header menu', async () => {
+  it("renders edit button in header menu", async () => {
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
   });
 
-  it('renders delete button in header menu', async () => {
+  it("renders delete button in header menu", async () => {
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
   });
 
-  it('handles entry with audioUrl', () => {
+  it("handles entry with audioUrl", () => {
     const taskWithAudio = {
       ...mockTask,
-      entries: [{ id: 'e1', text: 'Entry 1', stressedText: 'Entry 1', order: 0, audioUrl: 'blob:audio' }],
+      entries: [
+        {
+          id: "e1",
+          text: "Entry 1",
+          stressedText: "Entry 1",
+          order: 0,
+          audioUrl: "blob:audio",
+        },
+      ],
     };
     mockGetTask.mockResolvedValue(taskWithAudio);
     render(<TaskDetailView {...props} />);
@@ -142,66 +189,100 @@ describe('TaskDetailView Full', () => {
     expect(mockGetTask).toHaveBeenCalled();
   });
 
-  it('handles task with stressedText different from text', async () => {
+  it("handles task with stressedText different from text", async () => {
     const taskWithStress = {
       ...mockTask,
-      entries: [{ id: 'e1', text: 'Hello', stressedText: 'He`llo', order: 0, audioUrl: null }],
+      entries: [
+        {
+          id: "e1",
+          text: "Hello",
+          stressedText: "He`llo",
+          order: 0,
+          audioUrl: null,
+        },
+      ],
     };
     mockGetTask.mockResolvedValue(taskWithStress);
     render(<TaskDetailView {...props} />);
     await waitFor(() => expect(screen.getByText(/Hello/)).toBeInTheDocument());
   });
 
-  it('renders task description when present', async () => {
+  it("renders task description when present", async () => {
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Description')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Description")).toBeInTheDocument(),
+    );
   });
 
-  it('handles multiple entries correctly', async () => {
+  it("handles multiple entries correctly", async () => {
     const taskWithMany = {
       ...mockTask,
       entries: [
-        { id: 'e1', text: 'First', stressedText: 'First', order: 0, audioUrl: null },
-        { id: 'e2', text: 'Second', stressedText: 'Second', order: 1, audioUrl: null },
-        { id: 'e3', text: 'Third', stressedText: 'Third', order: 2, audioUrl: null },
+        {
+          id: "e1",
+          text: "First",
+          stressedText: "First",
+          order: 0,
+          audioUrl: null,
+        },
+        {
+          id: "e2",
+          text: "Second",
+          stressedText: "Second",
+          order: 1,
+          audioUrl: null,
+        },
+        {
+          id: "e3",
+          text: "Third",
+          stressedText: "Third",
+          order: 2,
+          audioUrl: null,
+        },
       ],
     };
     mockGetTask.mockResolvedValue(taskWithMany);
     render(<TaskDetailView {...props} />);
     await waitFor(() => {
-      expect(screen.getByText('First')).toBeInTheDocument();
-      expect(screen.getByText('Second')).toBeInTheDocument();
-      expect(screen.getByText('Third')).toBeInTheDocument();
+      expect(screen.getByText("First")).toBeInTheDocument();
+      expect(screen.getByText("Second")).toBeInTheDocument();
+      expect(screen.getByText("Third")).toBeInTheDocument();
     });
   });
 
-  it('renders shareToken in task', async () => {
+  it("renders shareToken in task", async () => {
     render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
-    expect(mockGetTask).toHaveBeenCalledWith('task-1', 'user-1');
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
+    expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
   });
 
-  it('handles task refresh', async () => {
+  it("handles task refresh", async () => {
     const { rerender } = render(<TaskDetailView {...props} />);
-    await waitFor(() => expect(screen.getByText('Test Task')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
     rerender(<TaskDetailView {...props} taskId="task-2" />);
-    await waitFor(() => expect(mockGetTask).toHaveBeenCalledWith('task-2', 'user-1'));
+    await waitFor(() =>
+      expect(mockGetTask).toHaveBeenCalledWith("task-2", "user-1"),
+    );
   });
 
-  it('loads task with dynamically generated ID (e.g. task_timestamp_random)', async () => {
+  it("loads task with dynamically generated ID (e.g. task_timestamp_random)", async () => {
     // RED TEST: Bug - navigation to task with generated ID fails
     // URL pattern: /tasks/task_1769185807640_wublowec
-    const dynamicTaskId = 'task_1769185807640_wublowec';
+    const dynamicTaskId = "task_1769185807640_wublowec";
     const dynamicTask = { ...mockTask, id: dynamicTaskId };
     mockGetTask.mockResolvedValue(dynamicTask);
 
     render(<TaskDetailView {...props} taskId={dynamicTaskId} />);
-    
+
     await waitFor(() => {
-      expect(mockGetTask).toHaveBeenCalledWith(dynamicTaskId, 'user-1');
+      expect(mockGetTask).toHaveBeenCalledWith(dynamicTaskId, "user-1");
     });
     await waitFor(() => {
-      expect(screen.getByText('Test Task')).toBeInTheDocument();
+      expect(screen.getByText("Test Task")).toBeInTheDocument();
     });
   });
 });

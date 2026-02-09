@@ -1,45 +1,70 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Core Store - pure business logic, no AWS dependencies
  */
 
-import { ServerContext, StoreRequest, StoreItem, StoreResult, DataType, StorageAdapter, StoreConfig } from './types';
-import { parseTtl } from './validation';
+import {
+  ServerContext,
+  StoreRequest,
+  StoreItem,
+  StoreResult,
+  DataType,
+  StorageAdapter,
+  StoreConfig,
+} from "./types";
+import { parseTtl } from "./validation";
 
 /** Error message constants */
 export const ERRORS = {
-  NOT_FOUND: 'Item not found',
-  ACCESS_DENIED: 'Access denied: not owner'
+  NOT_FOUND: "Item not found",
+  ACCESS_DENIED: "Access denied: not owner",
 } as const;
 
 const DEFAULT_CONFIG: StoreConfig = {
   maxTtlSeconds: 31536000,
-  keyDelimiter: '#'
+  keyDelimiter: "#",
 };
 
 /**
  * Builds partition key for context-based grouping
  * Private type includes userId for user-level isolation
  */
-function buildPartitionKey(context: ServerContext, type: DataType, delimiter: string): string {
+function buildPartitionKey(
+  context: ServerContext,
+  type: DataType,
+  delimiter: string,
+): string {
   const { app, tenant, env, userId } = context;
   const base = [app, tenant, env, type].join(delimiter);
-  return type === 'private' ? `${base}${delimiter}${userId}` : base;
+  return type === "private" ? `${base}${delimiter}${userId}` : base;
 }
 
 /**
  * Builds compound sort key from entity identifiers
  */
-function buildSortKey(entityPk: string, entitySk: string, delimiter: string): string {
+function buildSortKey(
+  entityPk: string,
+  entitySk: string,
+  delimiter: string,
+): string {
   return `${entityPk}${delimiter}${entitySk}`;
 }
 
 /**
  * Builds complete PK/SK pair for DynamoDB operations
  */
-function buildKeys(context: ServerContext, type: DataType, entityPk: string, entitySk: string, delimiter: string): { pk: string; sk: string } {
+function buildKeys(
+  context: ServerContext,
+  type: DataType,
+  entityPk: string,
+  entitySk: string,
+  delimiter: string,
+): { pk: string; sk: string } {
   return {
     pk: buildPartitionKey(context, type, delimiter),
-    sk: buildSortKey(entityPk, entitySk, delimiter)
+    sk: buildSortKey(entityPk, entitySk, delimiter),
   };
 }
 
@@ -53,7 +78,7 @@ export class Store {
   constructor(
     private readonly adapter: StorageAdapter,
     private readonly context: ServerContext,
-    config: Partial<StoreConfig> = {}
+    config: Partial<StoreConfig> = {},
   ) {
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
@@ -68,13 +93,19 @@ export class Store {
       return this.failure(ttlResult.error);
     }
 
-    const keys = buildKeys(this.context, request.type, request.pk, request.sk, this.config.keyDelimiter);
-    
+    const keys = buildKeys(
+      this.context,
+      request.type,
+      request.pk,
+      request.sk,
+      this.config.keyDelimiter,
+    );
+
     try {
       // Check if item exists to preserve createdAt
       const existing = await this.adapter.get(keys.pk, keys.sk);
       const item = this.createItem(request, existing?.createdAt);
-      
+
       await this.adapter.put(item);
       return this.success(item);
     } catch (error) {
@@ -85,9 +116,19 @@ export class Store {
   /**
    * Retrieves an item by key
    */
-  async get(entityPk: string, entitySk: string, type: DataType): Promise<StoreResult> {
-    const keys = buildKeys(this.context, type, entityPk, entitySk, this.config.keyDelimiter);
-    
+  async get(
+    entityPk: string,
+    entitySk: string,
+    type: DataType,
+  ): Promise<StoreResult> {
+    const keys = buildKeys(
+      this.context,
+      type,
+      entityPk,
+      entitySk,
+      this.config.keyDelimiter,
+    );
+
     try {
       const item = await this.adapter.get(keys.pk, keys.sk);
       return item ? this.success(item) : this.failure(ERRORS.NOT_FOUND);
@@ -99,20 +140,30 @@ export class Store {
   /**
    * Deletes an item (owner only for private/unlisted/public, anyone for shared)
    */
-  async delete(entityPk: string, entitySk: string, type: DataType): Promise<StoreResult> {
-    const keys = buildKeys(this.context, type, entityPk, entitySk, this.config.keyDelimiter);
-    
+  async delete(
+    entityPk: string,
+    entitySk: string,
+    type: DataType,
+  ): Promise<StoreResult> {
+    const keys = buildKeys(
+      this.context,
+      type,
+      entityPk,
+      entitySk,
+      this.config.keyDelimiter,
+    );
+
     try {
       const existing = await this.adapter.get(keys.pk, keys.sk);
-      
+
       if (!existing) {
         return this.failure(ERRORS.NOT_FOUND);
       }
-      
-      if (type !== 'shared' && !this.isOwner(existing)) {
+
+      if (type !== "shared" && !this.isOwner(existing)) {
         return this.failure(ERRORS.ACCESS_DENIED);
       }
-      
+
       await this.adapter.delete(keys.pk, keys.sk);
       return this.successEmpty();
     } catch (error) {
@@ -125,7 +176,7 @@ export class Store {
    */
   async query(entityPkPrefix: string, type: DataType): Promise<StoreResult> {
     const pk = buildPartitionKey(this.context, type, this.config.keyDelimiter);
-    
+
     try {
       const items = await this.adapter.queryBySortKeyPrefix(pk, entityPkPrefix);
       return this.successItems(items);
@@ -134,10 +185,19 @@ export class Store {
     }
   }
 
-  private createItem(request: StoreRequest, existingCreatedAt?: string): StoreItem {
-    const keys = buildKeys(this.context, request.type, request.pk, request.sk, this.config.keyDelimiter);
+  private createItem(
+    request: StoreRequest,
+    existingCreatedAt?: string,
+  ): StoreItem {
+    const keys = buildKeys(
+      this.context,
+      request.type,
+      request.pk,
+      request.sk,
+      this.config.keyDelimiter,
+    );
     const now = new Date().toISOString();
-    
+
     return {
       PK: keys.pk,
       SK: keys.sk,
@@ -145,7 +205,7 @@ export class Store {
       owner: this.context.userId,
       createdAt: existingCreatedAt ?? now,
       updatedAt: now,
-      ttl: this.calculateTtl(request.ttl)
+      ttl: this.calculateTtl(request.ttl),
     };
   }
 

@@ -6,6 +6,7 @@ This directory contains only the Docker configuration for Merlin TTS.
 They are copied from `research/merlin/` during Docker build.
 
 ## Files in git:
+
 - `Dockerfile` - Docker image configuration
 - `app.py` - Flask API wrapper
 - `docker-entrypoint.sh` - Container startup script
@@ -29,4 +30,3 @@ Or use docker-compose which handles the context correctly.
 
 The merlin repository is ~600MB with models and compiled tools.
 To keep our git repo small, we clone it separately and copy files during Docker build.
-

@@ -1,14 +1,30 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import Home from './App';
-import { mockAuthContext, mockNotificationContext, mockOnboardingContext, mockSynthesis, mockTaskHandlers, mockDragAndDrop, mockVariantsPanel, mockSentenceMenu } from './test/mocks/appMocks';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-vi.mock('./services/auth', () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
-vi.mock('./contexts/NotificationContext', () => ({ useNotification: vi.fn(() => mockNotificationContext()) }));
-vi.mock('./contexts/OnboardingContext', () => ({ useOnboarding: vi.fn(() => mockOnboardingContext()) }));
-vi.mock('./hooks', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./hooks')>();
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import Home from "./App";
+import {
+  mockAuthContext,
+  mockNotificationContext,
+  mockOnboardingContext,
+  mockSynthesis,
+  mockTaskHandlers,
+  mockDragAndDrop,
+  mockVariantsPanel,
+  mockSentenceMenu,
+} from "./test/mocks/appMocks";
+
+vi.mock("./services/auth", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
+vi.mock("./contexts/NotificationContext", () => ({
+  useNotification: vi.fn(() => mockNotificationContext()),
+}));
+vi.mock("./contexts/OnboardingContext", () => ({
+  useOnboarding: vi.fn(() => mockOnboardingContext()),
+}));
+vi.mock("./hooks", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./hooks")>();
   return {
     ...actual,
     useSynthesis: vi.fn(() => mockSynthesis()),
@@ -16,43 +32,77 @@ vi.mock('./hooks', async (importOriginal) => {
     useDragAndDrop: vi.fn(() => mockDragAndDrop()),
     useVariantsPanel: vi.fn(() => mockVariantsPanel()),
     useSentenceMenu: vi.fn(() => mockSentenceMenu()),
-    useUserTasks: vi.fn(() => ({ tasks: [], isLoading: false, error: null, refresh: vi.fn() })),
-    useUserId: vi.fn(() => '38001085718'),
-    useTaskForm: vi.fn(() => ({ form: {}, errors: {}, handleChange: vi.fn(), handleSubmit: vi.fn(), isValid: true })),
-    useModalState: vi.fn(() => ({ isOpen: false, open: vi.fn(), close: vi.fn() })),
+    useUserTasks: vi.fn(() => ({
+      tasks: [],
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
+    })),
+    useUserId: vi.fn(() => "38001085718"),
+    useTaskForm: vi.fn(() => ({
+      form: {},
+      errors: {},
+      handleChange: vi.fn(),
+      handleSubmit: vi.fn(),
+      isValid: true,
+    })),
+    useModalState: vi.fn(() => ({
+      isOpen: false,
+      open: vi.fn(),
+      close: vi.fn(),
+    })),
   };
 });
-vi.mock('./utils/warmAudioWorker', () => ({ warmAudioWorker: vi.fn() }));
+vi.mock("./utils/warmAudioWorker", () => ({ warmAudioWorker: vi.fn() }));
 
-vi.mock('./components/Footer', () => ({ default: () => <div data-testid="footer">Footer</div> }));
-vi.mock('./components/SynthesisView', () => ({ default: () => <div data-testid="synthesis-view">SynthesisView</div> }));
-vi.mock('./components/TasksView', () => ({ default: ({ selectedTaskId }: { selectedTaskId: string | null }) => <div data-testid="tasks-view" data-task-id={selectedTaskId}>TasksView</div> }));
-vi.mock('./components/SpecsPage', () => ({ default: () => <div data-testid="specs-page">SpecsPage</div> }));
-vi.mock('./components/Dashboard', () => ({ default: () => <div data-testid="dashboard">Dashboard</div> }));
-vi.mock('./components/AppModals', () => ({ default: () => null }));
-vi.mock('./components/onboarding', () => ({ RoleSelectionContent: () => <div data-testid="role-selection">RoleSelection</div>, OnboardingWizard: () => null }));
+vi.mock("./components/Footer", () => ({
+  default: () => <div data-testid="footer">Footer</div>,
+}));
+vi.mock("./components/SynthesisView", () => ({
+  default: () => <div data-testid="synthesis-view">SynthesisView</div>,
+}));
+vi.mock("./components/TasksView", () => ({
+  default: ({ selectedTaskId }: { selectedTaskId: string | null }) => (
+    <div data-testid="tasks-view" data-task-id={selectedTaskId}>
+      TasksView
+    </div>
+  ),
+}));
+vi.mock("./components/SpecsPage", () => ({
+  default: () => <div data-testid="specs-page">SpecsPage</div>,
+}));
+vi.mock("./components/Dashboard", () => ({
+  default: () => <div data-testid="dashboard">Dashboard</div>,
+}));
+vi.mock("./components/AppModals", () => ({ default: () => null }));
+vi.mock("./components/onboarding", () => ({
+  RoleSelectionContent: () => (
+    <div data-testid="role-selection">RoleSelection</div>
+  ),
+  OnboardingWizard: () => null,
+}));
 
-describe('App Routing', () => {
+describe("App Routing", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('URL-based view rendering', () => {
-    it('renders synthesis view for /synthesis route', () => {
+  describe("URL-based view rendering", () => {
+    it("renders synthesis view for /synthesis route", () => {
       render(
-        <MemoryRouter initialEntries={['/synthesis']}>
+        <MemoryRouter initialEntries={["/synthesis"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('synthesis-view')).toBeInTheDocument();
-      expect(screen.queryByTestId('tasks-view')).not.toBeInTheDocument();
+
+      expect(screen.getByTestId("synthesis-view")).toBeInTheDocument();
+      expect(screen.queryByTestId("tasks-view")).not.toBeInTheDocument();
     });
 
-    it('renders tasks view for /tasks route', async () => {
-      const { useAuth } = await import('./services/auth');
+    it("renders tasks view for /tasks route", async () => {
+      const { useAuth } = await import("./services/auth");
       vi.mocked(useAuth).mockReturnValue({
-        user: { id: '123', name: 'Test User', email: 'test@test.com' },
+        user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -67,19 +117,19 @@ describe('App Routing', () => {
       });
 
       render(
-        <MemoryRouter initialEntries={['/tasks']}>
+        <MemoryRouter initialEntries={["/tasks"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('tasks-view')).toBeInTheDocument();
-      expect(screen.queryByTestId('synthesis-view')).not.toBeInTheDocument();
+
+      expect(screen.getByTestId("tasks-view")).toBeInTheDocument();
+      expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
-    it('renders task detail for /tasks/:id route', async () => {
-      const { useAuth } = await import('./services/auth');
+    it("renders task detail for /tasks/:id route", async () => {
+      const { useAuth } = await import("./services/auth");
       vi.mocked(useAuth).mockReturnValue({
-        user: { id: '123', name: 'Test User', email: 'test@test.com' },
+        user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -94,54 +144,54 @@ describe('App Routing', () => {
       });
 
       render(
-        <MemoryRouter initialEntries={['/tasks/task-123']}>
+        <MemoryRouter initialEntries={["/tasks/task-123"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      const tasksView = screen.getByTestId('tasks-view');
+
+      const tasksView = screen.getByTestId("tasks-view");
       expect(tasksView).toBeInTheDocument();
-      expect(tasksView).toHaveAttribute('data-task-id', 'task-123');
+      expect(tasksView).toHaveAttribute("data-task-id", "task-123");
     });
 
-    it('renders specs page for /specs route', () => {
+    it("renders specs page for /specs route", () => {
       render(
-        <MemoryRouter initialEntries={['/specs']}>
+        <MemoryRouter initialEntries={["/specs"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('specs-page')).toBeInTheDocument();
-      expect(screen.queryByTestId('synthesis-view')).not.toBeInTheDocument();
+
+      expect(screen.getByTestId("specs-page")).toBeInTheDocument();
+      expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
-    it('renders dashboard for /dashboard route', () => {
+    it("renders dashboard for /dashboard route", () => {
       render(
-        <MemoryRouter initialEntries={['/dashboard']}>
+        <MemoryRouter initialEntries={["/dashboard"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('dashboard')).toBeInTheDocument();
-      expect(screen.queryByTestId('synthesis-view')).not.toBeInTheDocument();
+
+      expect(screen.getByTestId("dashboard")).toBeInTheDocument();
+      expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
-    it('defaults to synthesis view for unknown route', () => {
+    it("defaults to synthesis view for unknown route", () => {
       render(
-        <MemoryRouter initialEntries={['/unknown-route']}>
+        <MemoryRouter initialEntries={["/unknown-route"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('synthesis-view')).toBeInTheDocument();
+
+      expect(screen.getByTestId("synthesis-view")).toBeInTheDocument();
     });
   });
 
-  describe('pathname parsing', () => {
-    it('extracts task ID from /tasks/:id URL', async () => {
-      const { useAuth } = await import('./services/auth');
+  describe("pathname parsing", () => {
+    it("extracts task ID from /tasks/:id URL", async () => {
+      const { useAuth } = await import("./services/auth");
       vi.mocked(useAuth).mockReturnValue({
-        user: { id: '123', name: 'Test User', email: 'test@test.com' },
+        user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -156,19 +206,19 @@ describe('App Routing', () => {
       });
 
       render(
-        <MemoryRouter initialEntries={['/tasks/abc-def-123']}>
+        <MemoryRouter initialEntries={["/tasks/abc-def-123"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      const tasksView = screen.getByTestId('tasks-view');
-      expect(tasksView).toHaveAttribute('data-task-id', 'abc-def-123');
+
+      const tasksView = screen.getByTestId("tasks-view");
+      expect(tasksView).toHaveAttribute("data-task-id", "abc-def-123");
     });
 
-    it('sets task ID to null for /tasks without ID', async () => {
-      const { useAuth } = await import('./services/auth');
+    it("sets task ID to null for /tasks without ID", async () => {
+      const { useAuth } = await import("./services/auth");
       vi.mocked(useAuth).mockReturnValue({
-        user: { id: '123', name: 'Test User', email: 'test@test.com' },
+        user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -183,31 +233,31 @@ describe('App Routing', () => {
       });
 
       render(
-        <MemoryRouter initialEntries={['/tasks']}>
+        <MemoryRouter initialEntries={["/tasks"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      const tasksView = screen.getByTestId('tasks-view');
-      expect(tasksView.getAttribute('data-task-id')).toBeFalsy();
+
+      const tasksView = screen.getByTestId("tasks-view");
+      expect(tasksView.getAttribute("data-task-id")).toBeFalsy();
     });
   });
 
-  describe('view detection from pathname', () => {
-    it('detects synthesis view from /synthesis pathname', () => {
+  describe("view detection from pathname", () => {
+    it("detects synthesis view from /synthesis pathname", () => {
       render(
-        <MemoryRouter initialEntries={['/synthesis']}>
+        <MemoryRouter initialEntries={["/synthesis"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('synthesis-view')).toBeInTheDocument();
+
+      expect(screen.getByTestId("synthesis-view")).toBeInTheDocument();
     });
 
-    it('detects tasks view from /tasks pathname', async () => {
-      const { useAuth } = await import('./services/auth');
+    it("detects tasks view from /tasks pathname", async () => {
+      const { useAuth } = await import("./services/auth");
       vi.mocked(useAuth).mockReturnValue({
-        user: { id: '123', name: 'Test User', email: 'test@test.com' },
+        user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -222,40 +272,45 @@ describe('App Routing', () => {
       });
 
       render(
-        <MemoryRouter initialEntries={['/tasks/123']}>
+        <MemoryRouter initialEntries={["/tasks/123"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('tasks-view')).toBeInTheDocument();
+
+      expect(screen.getByTestId("tasks-view")).toBeInTheDocument();
     });
 
-    it('detects specs view from /specs pathname', () => {
+    it("detects specs view from /specs pathname", () => {
       render(
-        <MemoryRouter initialEntries={['/specs']}>
+        <MemoryRouter initialEntries={["/specs"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('specs-page')).toBeInTheDocument();
+
+      expect(screen.getByTestId("specs-page")).toBeInTheDocument();
     });
 
-    it('detects dashboard view from /dashboard pathname', () => {
+    it("detects dashboard view from /dashboard pathname", () => {
       render(
-        <MemoryRouter initialEntries={['/dashboard']}>
+        <MemoryRouter initialEntries={["/dashboard"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('dashboard')).toBeInTheDocument();
+
+      expect(screen.getByTestId("dashboard")).toBeInTheDocument();
     });
   });
 
-  describe('authentication-based routing', () => {
-    it('shows role selection when onboarding not completed', async () => {
-      const { useOnboarding } = await import('./contexts/OnboardingContext');
+  describe("authentication-based routing", () => {
+    it("shows role selection when onboarding not completed", async () => {
+      const { useOnboarding } = await import("./contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
-        state: { completed: false, selectedRole: null, currentStep: 0, skipped: false },
+        state: {
+          completed: false,
+          selectedRole: null,
+          currentStep: 0,
+          skipped: false,
+        },
         isWizardActive: false,
         resetOnboarding: vi.fn(),
         isLoading: false,
@@ -268,13 +323,13 @@ describe('App Routing', () => {
       });
 
       render(
-        <MemoryRouter initialEntries={['/synthesis']}>
+        <MemoryRouter initialEntries={["/synthesis"]}>
           <Home />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      
-      expect(screen.getByTestId('role-selection')).toBeInTheDocument();
-      expect(screen.queryByTestId('synthesis-view')).not.toBeInTheDocument();
+
+      expect(screen.getByTestId("role-selection")).toBeInTheDocument();
+      expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
   });
 });

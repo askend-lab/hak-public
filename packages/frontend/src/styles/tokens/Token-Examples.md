@@ -8,7 +8,7 @@
   background: $color-soft-primary-bg;
   padding: $spacing-md;
   border-radius: $border-radius;
-  
+
   &:hover {
     background: $color-soft-primary-bg-hover;
   }
@@ -20,7 +20,7 @@
 ```scss
 .my-component {
   color: #173148; // ❌ Hardcoded - use $color-primary
-  background: #E3EFFB; // ❌ Hardcoded - use $color-soft-primary-bg
+  background: #e3effb; // ❌ Hardcoded - use $color-soft-primary-bg
   padding: 16px; // ❌ Hardcoded - use $spacing-md
   border-radius: 8px; // ❌ Hardcoded - use $border-radius
 }
@@ -63,6 +63,7 @@ npm run validate:design
 ```
 
 This checks:
+
 - No hardcoded colors in components
 - No inline styles in React components
 - All tokens properly documented
@@ -71,5 +72,6 @@ This checks:
 ---
 
 **See also:**
+
 - [Token Governance](./Token-Governance.md) - Rules and conventions
 - [Token Categories](./Token-Categories.md) - Complete list of categories

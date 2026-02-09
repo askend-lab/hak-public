@@ -1,0 +1,16 @@
+.design
+devbox
+.test-runner-state.json
+**/jest-results.json
+*.md
+docs/
+.project/
+.serverless/
+packages/merlin-worker/tools/
+node_modules
+dist
+build
+coverage
+.esbuild
+.old-frontend
+pnpm-lock.yaml

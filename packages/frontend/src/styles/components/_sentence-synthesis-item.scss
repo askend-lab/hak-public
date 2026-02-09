@@ -8,11 +8,11 @@
 // - Shared task page (readonly mode with plain text)
 // =========================================================================
 
-@import '../tokens/breakpoints';
-@import '../tokens/colors';
-@import '../tokens/typography';
-@import '../tokens/spacing';
-@import '../tokens/borders';
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
 
 // Paper component mixins available from main.scss cascade
 
@@ -85,8 +85,10 @@
   gap: 4px;
   align-items: center;
   overflow: visible; // Allow dropdown to overflow
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
   // Focus state on container when input is focused (WCAG 2.4.7 compliant)
   // Using focus-within to show focus on parent container instead of nested input
   &:focus-within {
@@ -120,7 +122,7 @@
   color: $color-primary;
   white-space: nowrap;
   overflow: visible; // Allow dropdown to overflow tag boundaries
-  
+
   // Ensure proper stacking when menu is open
   &:has(.sentence-synthesis-item__tag-dropdown) {
     z-index: 1001;
@@ -129,7 +131,7 @@
   // Tag text
   &-text {
     cursor: pointer;
-    
+
     &:focus {
       outline: none;
     }
@@ -171,7 +173,7 @@
     flex-shrink: 0;
 
     &::after {
-      content: '';
+      content: "";
       width: 10px;
       height: 10px;
       border: 2px solid $color-outlined-neutral;
@@ -197,7 +199,7 @@
       transform: translateY(0);
       background-color: $color-tag-active-bg;
     }
-    
+
     // When menu is open, prevent transform (it breaks fixed positioning)
     &:has(.sentence-synthesis-item__tag-dropdown) {
       transform: none;
@@ -377,7 +379,7 @@
 .sentence-synthesis-item__tag-menu-item {
   @include paper-item;
   padding: $spacing-1 $spacing-4; // Component-specific padding
-  
+
   &--danger {
     @include paper-item-danger;
   }
@@ -399,7 +401,7 @@
   @include paper-base;
   @include paper-dropdown;
   @include paper-sm;
-  
+
   // Fixed positioning variant for scrollable containers
   // Prevents clipping by overflow:auto/hidden containers (task-detail__entries-list, page-content)
   // Position is calculated dynamically in component using getBoundingClientRect()
@@ -412,7 +414,7 @@
 
 .sentence-synthesis-item__menu-item {
   @include paper-item;
-  
+
   &--danger {
     @include paper-item-danger;
   }
@@ -438,7 +440,7 @@
   .sentence-synthesis-item {
     padding: $spacing-3;
     gap: $spacing-3;
-    
+
     &__tags-group {
       padding: 8px 32px 8px 10px;
     }
@@ -448,20 +450,20 @@
 @media (max-width: $breakpoint-mobile) {
   .sentence-synthesis-item {
     flex-wrap: wrap;
-    
+
     &__drag-handle {
       order: 1;
     }
-    
+
     &__content {
       order: 2;
       width: 100%;
     }
-    
+
     &__play {
       order: 3;
     }
-    
+
     &__menu-container {
       order: 4;
     }

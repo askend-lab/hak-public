@@ -2,7 +2,7 @@
 
 This document describes the CSS/SCSS conventions used in this application, aligned with the EKI Storybook design system.
 
-> **📚 For complete architecture overview, see [Design System Architecture](../../../docs/02-DESIGN-SYSTEM/README.md)**
+> **📚 For complete architecture overview, see the Design System Architecture documentation**
 
 ## Architecture
 
@@ -33,7 +33,7 @@ For detailed token governance (naming conventions, when to add tokens, etc.), se
 ### Usage
 
 ```scss
-@import '../tokens/colors';
+@import "../tokens/colors";
 
 .my-component {
   color: $color-primary;
@@ -50,10 +50,14 @@ All component classes follow the BEM (Block Element Modifier) methodology, match
 ### Structure
 
 ```scss
-.block {}                    // Component root
-.block__element {}           // Child element (use __ double underscore)
-.block--modifier {}          // Variant (use -- double dash)
-.block__element--modifier {} // Element variant
+.block {
+} // Component root
+.block__element {
+} // Child element (use __ double underscore)
+.block--modifier {
+} // Variant (use -- double dash)
+.block__element--modifier {
+} // Element variant
 ```
 
 ### Examples
@@ -62,49 +66,78 @@ All component classes follow the BEM (Block Element Modifier) methodology, match
 
 ```scss
 // Button component
-.button {}
-.button--primary {}
-.button--secondary {}
-.button--small {}
-.button--large {}
+.button {
+}
+.button--primary {
+}
+.button--secondary {
+}
+.button--small {
+}
+.button--large {
+}
 
 // Modal component
-.modal {}
-.modal__top {}
-.modal__title {}
-.modal--small {}
-.modal--medium {}
-.modal--large {}
+.modal {
+}
+.modal__top {
+}
+.modal__title {
+}
+.modal--small {
+}
+.modal--medium {
+}
+.modal--large {
+}
 
 // Input component
-.input {}
-.input--small {}
-.input--medium {}
-.input--large {}
-.input-wrapper {}
-.input-label {}
+.input {
+}
+.input--small {
+}
+.input--medium {
+}
+.input--large {
+}
+.input-wrapper {
+}
+.input-label {
+}
 ```
 
 #### App-Specific Components
 
 ```scss
 // Task Manager
-.task-manager {}
-.task-manager__header {}
-.task-manager__list {}
-.task-manager--loading {}
+.task-manager {
+}
+.task-manager__header {
+}
+.task-manager__list {
+}
+.task-manager--loading {
+}
 
 // Playlist
-.playlist {}
-.playlist__item {}
-.playlist__controls {}
-.playlist--playing {}
+.playlist {
+}
+.playlist__item {
+}
+.playlist__controls {
+}
+.playlist--playing {
+}
 
 // Audio Player
-.audio-player {}
-.audio-player__play-button {}
-.audio-player__progress {}
-.audio-player--loading {}
+.audio-player {
+}
+.audio-player__play-button {
+}
+.audio-player__progress {
+}
+.audio-player--loading {
+}
 ```
 
 ## Responsive Layout System
@@ -116,11 +149,12 @@ The app uses a universal layout system with 4 variants:
 3. **With Actions**: List pages with title and actions (task list)
 4. **Empty State**: Error/empty pages
 
-See [Layout System Documentation](../../../docs/02-DESIGN-SYSTEM/05-Responsive-Layout.md) for details.
+See the Layout System Documentation for details.
 
 ### Breakpoints
 
 Mobile-first approach with 6 breakpoints:
+
 - xs: 375px (small mobile)
 - sm: 640px (mobile landscape)
 - md: 768px (tablet)
@@ -149,5 +183,6 @@ Mobile-first approach with 6 breakpoints:
 ---
 
 **See also:**
+
 - [Color Usage Guide](./Style-Guide-Colors.md) - Color tokens and usage
 - [Token Governance](./tokens/Token-Governance.md) - Token management rules

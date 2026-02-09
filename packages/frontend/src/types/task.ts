@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 export interface Task {
   id: string;
   userId: string;
@@ -25,7 +28,7 @@ export interface CreateTaskRequest {
   name: string;
   description?: string | null;
   speechSequences?: string[] | null;
-  speechEntries?: Array<{text: string; stressedText: string}> | null;
+  speechEntries?: Array<{ text: string; stressedText: string }> | null;
 }
 
 export interface UpdateTaskRequest {

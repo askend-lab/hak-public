@@ -1,22 +1,26 @@
- 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import SentencePhoneticPanel from './SentencePhoneticPanel';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-vi.mock('@/utils/phoneticMarkers', () => ({
-  transformToUI: (text: string | null) => text?.replace(/</, '`').replace(/\?/, '´') ?? null,
-  transformToVabamorf: (text: string | null) => text?.replace(/`/, '<').replace(/´/, '?') ?? null,
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import SentencePhoneticPanel from "./SentencePhoneticPanel";
+
+vi.mock("@/utils/phoneticMarkers", () => ({
+  transformToUI: (text: string | null) =>
+    text?.replace(/</, "`").replace(/\?/, "´") ?? null,
+  transformToVabamorf: (text: string | null) =>
+    text?.replace(/`/, "<").replace(/´/, "?") ?? null,
 }));
 
-vi.mock('@/utils/synthesize', () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue('mock-audio-url'),
+vi.mock("@/utils/synthesize", () => ({
+  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 
-describe('SentencePhoneticPanel', () => {
+describe("SentencePhoneticPanel", () => {
   const defaultProps = {
-    sentenceText: 'Hello world',
-    phoneticText: 'H`ello w`orld',
+    sentenceText: "Hello world",
+    phoneticText: "H`ello w`orld",
     isOpen: true,
     onClose: vi.fn(),
     onApply: vi.fn(),
@@ -24,180 +28,206 @@ describe('SentencePhoneticPanel', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock Audio
     class MockAudio {
-      src = ''; onloadeddata: (() => void) | null = null; onended: (() => void) | null = null; onerror: (() => void) | null = null;
+      src = "";
+      onloadeddata: (() => void) | null = null;
+      onended: (() => void) | null = null;
+      onerror: (() => void) | null = null;
       pause = vi.fn();
-      play = vi.fn().mockImplementation(() => { setTimeout(() => this.onended?.(), 10); return Promise.resolve(); });
+      play = vi.fn().mockImplementation(() => {
+        setTimeout(() => this.onended?.(), 10);
+        return Promise.resolve();
+      });
     }
     global.Audio = MockAudio as unknown as typeof Audio;
-    
+
     // Mock URL methods
-    global.URL.createObjectURL = vi.fn(() => 'mock-blob-url');
+    global.URL.createObjectURL = vi.fn(() => "mock-blob-url");
     global.URL.revokeObjectURL = vi.fn();
   });
 
-  describe('rendering', () => {
-    it('returns null when not open', () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} isOpen={false} />);
+  describe("rendering", () => {
+    it("returns null when not open", () => {
+      const { container } = render(
+        <SentencePhoneticPanel {...defaultProps} isOpen={false} />,
+      );
       expect(container.firstChild).toBeNull();
     });
 
-    it('renders panel when open', () => {
+    it("renders panel when open", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText('Muuda häälduskuju')).toBeInTheDocument();
+      expect(screen.getByText("Muuda häälduskuju")).toBeInTheDocument();
     });
 
-    it('renders close button', () => {
+    it("renders close button", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByLabelText('Sulge')).toBeInTheDocument();
+      expect(screen.getByLabelText("Sulge")).toBeInTheDocument();
     });
 
-    it('renders textarea with phonetic text', () => {
+    it("renders textarea with phonetic text", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      const textarea = screen.getByRole('textbox');
-      expect(textarea).toHaveValue('H`ello w`orld');
+      const textarea = screen.getByRole("textbox");
+      expect(textarea).toHaveValue("H`ello w`orld");
     });
 
-    it('uses sentence text when no phonetic text', () => {
+    it("uses sentence text when no phonetic text", () => {
       render(<SentencePhoneticPanel {...defaultProps} phoneticText={null} />);
-      const textarea = screen.getByRole('textbox');
-      expect(textarea).toHaveValue('Hello world');
+      const textarea = screen.getByRole("textbox");
+      expect(textarea).toHaveValue("Hello world");
     });
 
-    it('renders marker buttons', () => {
+    it("renders marker buttons", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByRole('button', { name: 'kolmas välde' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'ebareeglipärase rõhu märk' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'peenendus' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'liitsõnapiir' })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "kolmas välde" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "ebareeglipärase rõhu märk" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "peenendus" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "liitsõnapiir" }),
+      ).toBeInTheDocument();
     });
 
-    it('renders play button', () => {
+    it("renders play button", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText('Kuula')).toBeInTheDocument();
+      expect(screen.getByText("Kuula")).toBeInTheDocument();
     });
 
-    it('renders apply button', () => {
+    it("renders apply button", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText('Rakenda')).toBeInTheDocument();
+      expect(screen.getByText("Rakenda")).toBeInTheDocument();
     });
   });
 
-  describe('close functionality', () => {
-    it('calls onClose when close button clicked', async () => {
+  describe("close functionality", () => {
+    it("calls onClose when close button clicked", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} />);
-      
-      await user.click(screen.getByLabelText('Sulge'));
+
+      await user.click(screen.getByLabelText("Sulge"));
       expect(defaultProps.onClose).toHaveBeenCalled();
     });
   });
 
-  describe('text editing', () => {
-    it('allows editing text in textarea', async () => {
+  describe("text editing", () => {
+    it("allows editing text in textarea", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} />);
-      
-      const textarea = screen.getByRole('textbox');
+
+      const textarea = screen.getByRole("textbox");
       await user.clear(textarea);
-      await user.type(textarea, 'New text');
-      expect(textarea).toHaveValue('New text');
+      await user.type(textarea, "New text");
+      expect(textarea).toHaveValue("New text");
     });
 
-    it('inserts marker when marker button clicked', async () => {
+    it("inserts marker when marker button clicked", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} phoneticText="test" />);
-      
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-      
+
+      const textarea = screen.getByRole("textbox") as HTMLTextAreaElement;
+
       // Focus and position cursor at the end
       textarea.focus();
       textarea.setSelectionRange(4, 4);
-      
-      await user.click(screen.getByRole('button', { name: 'kolmas välde' }));
-      expect(textarea.value).toContain('`');
+
+      await user.click(screen.getByRole("button", { name: "kolmas välde" }));
+      expect(textarea.value).toContain("`");
     });
   });
 
-  describe('apply functionality', () => {
-    it('calls onApply with transformed text when apply clicked', async () => {
+  describe("apply functionality", () => {
+    it("calls onApply with transformed text when apply clicked", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} phoneticText="test`" />);
-      
-      await user.click(screen.getByText('Rakenda'));
-      
-      expect(defaultProps.onApply).toHaveBeenCalledWith('test<');
+
+      await user.click(screen.getByText("Rakenda"));
+
+      expect(defaultProps.onApply).toHaveBeenCalledWith("test<");
       expect(defaultProps.onClose).toHaveBeenCalled();
     });
 
-    it('disables apply button when text is empty', async () => {
+    it("disables apply button when text is empty", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} phoneticText="test" />);
-      
-      const textarea = screen.getByRole('textbox');
+
+      const textarea = screen.getByRole("textbox");
       await user.clear(textarea);
-      
-      expect(screen.getByText('Rakenda')).toBeDisabled();
+
+      expect(screen.getByText("Rakenda")).toBeDisabled();
     });
   });
 
-  describe('play functionality', () => {
-    it('disables play button when text is empty', async () => {
+  describe("play functionality", () => {
+    it("disables play button when text is empty", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} phoneticText="test" />);
-      
-      const textarea = screen.getByRole('textbox');
+
+      const textarea = screen.getByRole("textbox");
       await user.clear(textarea);
-      
-      expect(screen.getByText('Kuula').closest('button')).toBeDisabled();
+
+      expect(screen.getByText("Kuula").closest("button")).toBeDisabled();
     });
   });
 
-  describe('markers guide box', () => {
-    it('shows markers guide box with title', () => {
+  describe("markers guide box", () => {
+    it("shows markers guide box with title", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText('Hääldusmärgid')).toBeInTheDocument();
+      expect(screen.getByText("Hääldusmärgid")).toBeInTheDocument();
     });
 
-    it('shows intro text in guide box', () => {
+    it("shows intro text in guide box", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText('Kasuta märke häälduse täpsustamiseks. Klõpsa märgil selle lisamiseks või hõlju kohal juhiste nägemiseks.')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Kasuta märke häälduse täpsustamiseks. Klõpsa märgil selle lisamiseks või hõlju kohal juhiste nägemiseks.",
+        ),
+      ).toBeInTheDocument();
     });
 
-    it('shows info button to open full guide', () => {
+    it("shows info button to open full guide", () => {
       render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByLabelText('Ava hääldusmärkide juhend')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText("Ava hääldusmärkide juhend"),
+      ).toBeInTheDocument();
     });
 
-    it('shows guide view when info button clicked', async () => {
+    it("shows guide view when info button clicked", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} />);
-      
-      await user.click(screen.getByLabelText('Ava hääldusmärkide juhend'));
-      expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
+
+      await user.click(screen.getByLabelText("Ava hääldusmärkide juhend"));
+      expect(screen.getByText("Hääldusmärkide juhend")).toBeInTheDocument();
     });
 
-    it('shows marker documentation in guide', async () => {
+    it("shows marker documentation in guide", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} />);
-      
-      await user.click(screen.getByLabelText('Ava hääldusmärkide juhend'));
+
+      await user.click(screen.getByLabelText("Ava hääldusmärkide juhend"));
       // The guide view shows detailed marker info
-      expect(screen.getByText(/Hääldusmärgid aitavad täpsustada/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Hääldusmärgid aitavad täpsustada/),
+      ).toBeInTheDocument();
     });
 
-    it('returns to edit view when back button clicked', async () => {
+    it("returns to edit view when back button clicked", async () => {
       const user = userEvent.setup();
       render(<SentencePhoneticPanel {...defaultProps} />);
-      
-      await user.click(screen.getByLabelText('Ava hääldusmärkide juhend'));
-      expect(screen.getByText('Hääldusmärkide juhend')).toBeInTheDocument();
-      
-      await user.click(screen.getByLabelText('Tagasi'));
-      expect(screen.queryByRole('heading', { name: 'Hääldusmärkide juhend' })).not.toBeInTheDocument();
-      expect(screen.getByText('Kuula')).toBeInTheDocument();
+
+      await user.click(screen.getByLabelText("Ava hääldusmärkide juhend"));
+      expect(screen.getByText("Hääldusmärkide juhend")).toBeInTheDocument();
+
+      await user.click(screen.getByLabelText("Tagasi"));
+      expect(
+        screen.queryByRole("heading", { name: "Hääldusmärkide juhend" }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText("Kuula")).toBeInTheDocument();
     });
   });
 });

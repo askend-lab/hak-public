@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 /**
  * Estonian Isikukood (Personal Identification Code) validation utility
  * Format: GYYMMDDSSSC
@@ -13,8 +16,8 @@ export function validateIsikukood(code: string): boolean {
     return false;
   }
 
-  const digits = code.split('').map(Number);
-  
+  const digits = code.split("").map(Number);
+
   // Validate century/gender digit (1-6)
   const centuryGender = digits[0];
   if (centuryGender === undefined || centuryGender < 1 || centuryGender > 6) {
@@ -38,14 +41,14 @@ export function validateIsikukood(code: string): boolean {
   // Calculate and verify checksum
   const weights1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1];
   const weights2 = [3, 4, 5, 6, 7, 8, 9, 1, 2, 3];
-  
+
   let sum = 0;
   for (let i = 0; i < 10; i++) {
     sum += (digits[i] ?? 0) * (weights1[i] ?? 0);
   }
-  
+
   let checksum = sum % 11;
-  
+
   // If remainder is 10, use second weight sequence
   if (checksum === 10) {
     sum = 0;
@@ -53,13 +56,13 @@ export function validateIsikukood(code: string): boolean {
       sum += (digits[i] ?? 0) * (weights2[i] ?? 0);
     }
     checksum = sum % 11;
-    
+
     // If still 10, checksum should be 0
     if (checksum === 10) {
       checksum = 0;
     }
   }
-  
+
   return checksum === (digits[10] ?? -1);
 }
 
@@ -67,24 +70,53 @@ export function getNameFromIsikukood(code: string): string {
   // Returns a generated Estonian name based on the code
   // For demo purposes only
   const firstNames = {
-    male: ['Mart', 'Jaan', 'Toomas', 'Andres', 'Priit', 'Raivo', 'Jaak', 'Tarmo'],
-    female: ['Mari', 'Liina', 'Kadri', 'Piret', 'Kersti', 'Tiina', 'Kristiina', 'Maarja']
+    male: [
+      "Mart",
+      "Jaan",
+      "Toomas",
+      "Andres",
+      "Priit",
+      "Raivo",
+      "Jaak",
+      "Tarmo",
+    ],
+    female: [
+      "Mari",
+      "Liina",
+      "Kadri",
+      "Piret",
+      "Kersti",
+      "Tiina",
+      "Kristiina",
+      "Maarja",
+    ],
   };
-  
-  const lastNames = ['Tamm', 'Sepp', 'Saar', 'Mägi', 'Kukk', 'Rebane', 'Ilves', 'Kask'];
-  
+
+  const lastNames = [
+    "Tamm",
+    "Sepp",
+    "Saar",
+    "Mägi",
+    "Kukk",
+    "Rebane",
+    "Ilves",
+    "Kask",
+  ];
+
   if (!validateIsikukood(code)) {
-    return 'Unknown User';
+    return "Unknown User";
   }
-  
-  const genderDigit = parseInt(code[0] ?? '0');
+
+  const genderDigit = parseInt(code[0] ?? "0");
   const isMale = genderDigit % 2 === 1;
   const nameIndex = parseInt(code.substring(7, 9)) % 8;
   const surnameIndex = parseInt(code.substring(9, 11)) % 8;
-  
-  const firstName = isMale ? firstNames.male[nameIndex] : firstNames.female[nameIndex];
+
+  const firstName = isMale
+    ? firstNames.male[nameIndex]
+    : firstNames.female[nameIndex];
   const lastName = lastNames[surnameIndex];
-  
+
   return `${firstName} ${lastName}`;
 }
 

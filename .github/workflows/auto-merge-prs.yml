@@ -13,7 +13,7 @@ jobs:
   enable-auto-merge:
     name: Enable auto-merge
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Enable auto-merge for PR
         uses: actions/github-script@v8
@@ -21,7 +21,7 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const prNumber = context.payload.pull_request.number;
-            
+
             try {
               await github.graphql(`
                 mutation($prId: ID!) {

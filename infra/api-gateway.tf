@@ -1,10 +1,9 @@
 # API Gateway Custom Domain for SimpleStore
-# Domain: hak-api-{env}.askend-lab.com (dev) / hak-api.askend-lab.com (prod)
+# Domain: hak-api-{env}.domain.com (dev) / hak-api.domain.com (prod)
 
 locals {
-  api_domain_name = var.env == "prod" ? "hak-api.askend-lab.com" : "hak-api-${var.env}.askend-lab.com"
-  # Wildcard certificate ARN (created by admin)
-  wildcard_cert_arn = "arn:aws:acm:eu-west-1:465168436856:certificate/f91069e3-9ca9-4651-b912-765c9f49fc0d"
+  api_domain_name  = var.env == "prod" ? "hak-api.${var.domain_name}" : "hak-api-${var.env}.${var.domain_name}"
+  wildcard_cert_arn = var.wildcard_cert_arn
 }
 
 # API Gateway Custom Domain

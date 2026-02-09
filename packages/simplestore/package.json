@@ -2,6 +2,7 @@
   "name": "simplestore",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
@@ -15,20 +16,20 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.0",
-    "serverless-domain-manager": "^7.0.0",
-    "serverless-esbuild": "^1.52.0",
-    "esbuild": "^0.20.0",
     "@types/aws-lambda": "^8.10.159",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
+    "esbuild": "^0.20.0",
     "jest": "^29.7.0",
+    "serverless": "^3.38.0",
+    "serverless-domain-manager": "^7.0.0",
+    "serverless-esbuild": "^1.52.0",
+    "serverless-offline": "^13.3.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.0.0",
-    "@aws-sdk/lib-dynamodb": "^3.0.0"
+    "@aws-sdk/client-dynamodb": "^3.985.0",
+    "@aws-sdk/lib-dynamodb": "^3.985.0"
   }
 }

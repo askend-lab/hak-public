@@ -4,9 +4,9 @@
 // Uses EKI Storybook modal component for visual styling
 // This file only handles notification-specific positioning and animations
 // =========================================================================
-@import '../tokens/colors';
-@import '../tokens/spacing';
-@import '../tokens/breakpoints';
+@import "../tokens/colors";
+@import "../tokens/spacing";
+@import "../tokens/breakpoints";
 
 // Notification Container - fixed positioning for toast notifications
 .notification-container {
@@ -34,7 +34,7 @@
   box-shadow: 0 4px 20px $color-shadow-primary-sm;
   min-width: 320px;
   max-width: 420px;
-  
+
   @media (max-width: $breakpoint-sm) {
     max-width: 100%;
     min-width: auto;
@@ -53,7 +53,7 @@
   text-decoration: underline;
   cursor: pointer;
   transition: opacity 0.2s ease;
-  
+
   &:hover {
     opacity: 0.8;
   }

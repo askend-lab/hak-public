@@ -1,135 +1,156 @@
-import { useState, useCallback } from 'react';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { useState, useCallback } from "react";
 
 export function useAudioPlayer(): {
   currentAudio: HTMLAudioElement | null;
   stopCurrentAudio: () => void;
-  playAudio: (audioUrl: string, callbacks?: {
-    onLoadStart?: () => void;
-    onLoadComplete?: () => void;
-    onEnded?: () => void;
-    onError?: () => void;
-  }) => Promise<boolean>;
-  playWithAbort: (audioUrl: string, abortSignal: AbortSignal, callbacks?: {
-    onStart?: () => void;
-    onEnded?: () => void;
-    onError?: () => void;
-  }) => Promise<boolean>;
+  playAudio: (
+    audioUrl: string,
+    callbacks?: {
+      onLoadStart?: () => void;
+      onLoadComplete?: () => void;
+      onEnded?: () => void;
+      onError?: () => void;
+    },
+  ) => Promise<boolean>;
+  playWithAbort: (
+    audioUrl: string,
+    abortSignal: AbortSignal,
+    callbacks?: {
+      onStart?: () => void;
+      onEnded?: () => void;
+      onError?: () => void;
+    },
+  ) => Promise<boolean>;
 } {
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
+    null,
+  );
 
   const stopCurrentAudio = useCallback(() => {
     if (currentAudio) {
       currentAudio.pause();
-      currentAudio.src = '';
+      currentAudio.src = "";
       setCurrentAudio(null);
     }
   }, [currentAudio]);
 
-  const playAudio = useCallback((audioUrl: string, callbacks: {
-    onLoadStart?: () => void;
-    onLoadComplete?: () => void;
-    onEnded?: () => void;
-    onError?: () => void;
-  } = {}): Promise<boolean> => {
-    return new Promise((resolve): void => {
-      const audio = new Audio(audioUrl);
-      setCurrentAudio(audio);
+  const playAudio = useCallback(
+    (
+      audioUrl: string,
+      callbacks: {
+        onLoadStart?: () => void;
+        onLoadComplete?: () => void;
+        onEnded?: () => void;
+        onError?: () => void;
+      } = {},
+    ): Promise<boolean> => {
+      return new Promise((resolve): void => {
+        const audio = new Audio(audioUrl);
+        setCurrentAudio(audio);
 
-      if (callbacks.onLoadStart) {
-        callbacks.onLoadStart();
-      }
-
-      audio.onloadeddata = (): void => {
-        if (callbacks.onLoadComplete) {
-          callbacks.onLoadComplete();
+        if (callbacks.onLoadStart) {
+          callbacks.onLoadStart();
         }
-      };
 
-      audio.onended = (): void => {
-        setCurrentAudio(null);
-        if (callbacks.onEnded) {
-          callbacks.onEnded();
-        }
-        resolve(true);
-      };
+        audio.onloadeddata = (): void => {
+          if (callbacks.onLoadComplete) {
+            callbacks.onLoadComplete();
+          }
+        };
 
-      audio.onerror = (): void => {
-        setCurrentAudio(null);
-        if (callbacks.onError) {
-          callbacks.onError();
-        }
-        resolve(false);
-      };
+        audio.onended = (): void => {
+          setCurrentAudio(null);
+          if (callbacks.onEnded) {
+            callbacks.onEnded();
+          }
+          resolve(true);
+        };
 
-      audio.play().catch((): void => {
-        setCurrentAudio(null);
-        if (callbacks.onError) {
-          callbacks.onError();
-        }
-        resolve(false);
+        audio.onerror = (): void => {
+          setCurrentAudio(null);
+          if (callbacks.onError) {
+            callbacks.onError();
+          }
+          resolve(false);
+        };
+
+        audio.play().catch((): void => {
+          setCurrentAudio(null);
+          if (callbacks.onError) {
+            callbacks.onError();
+          }
+          resolve(false);
+        });
       });
-    });
-  }, []);
+    },
+    [],
+  );
 
-  const playWithAbort = useCallback((
-    audioUrl: string,
-    abortSignal: AbortSignal,
-    callbacks: {
-      onStart?: () => void;
-      onEnded?: () => void;
-      onError?: () => void;
-    } = {}
-  ): Promise<boolean> => {
-    if (abortSignal.aborted) return Promise.resolve(false);
+  const playWithAbort = useCallback(
+    (
+      audioUrl: string,
+      abortSignal: AbortSignal,
+      callbacks: {
+        onStart?: () => void;
+        onEnded?: () => void;
+        onError?: () => void;
+      } = {},
+    ): Promise<boolean> => {
+      if (abortSignal.aborted) return Promise.resolve(false);
 
-    return new Promise((resolve): void => {
-      const audio = new Audio(audioUrl);
-      setCurrentAudio(audio);
+      return new Promise((resolve): void => {
+        const audio = new Audio(audioUrl);
+        setCurrentAudio(audio);
 
-      if (callbacks.onStart) {
-        callbacks.onStart();
-      }
-
-      const cleanup = (): void => {
-        setCurrentAudio(null);
-      };
-
-      audio.onended = (): void => {
-        cleanup();
-        if (callbacks.onEnded) {
-          callbacks.onEnded();
+        if (callbacks.onStart) {
+          callbacks.onStart();
         }
-        resolve(true);
-      };
 
-      audio.onerror = (): void => {
-        cleanup();
-        if (callbacks.onError) {
-          callbacks.onError();
-        }
-        resolve(false);
-      };
+        const cleanup = (): void => {
+          setCurrentAudio(null);
+        };
 
-      abortSignal.addEventListener('abort', (): void => {
-        audio.pause();
-        cleanup();
-        resolve(false);
+        audio.onended = (): void => {
+          cleanup();
+          if (callbacks.onEnded) {
+            callbacks.onEnded();
+          }
+          resolve(true);
+        };
+
+        audio.onerror = (): void => {
+          cleanup();
+          if (callbacks.onError) {
+            callbacks.onError();
+          }
+          resolve(false);
+        };
+
+        abortSignal.addEventListener("abort", (): void => {
+          audio.pause();
+          cleanup();
+          resolve(false);
+        });
+
+        audio.play().catch((): void => {
+          cleanup();
+          if (callbacks.onError) {
+            callbacks.onError();
+          }
+          resolve(false);
+        });
       });
-
-      audio.play().catch((): void => {
-        cleanup();
-        if (callbacks.onError) {
-          callbacks.onError();
-        }
-        resolve(false);
-      });
-    });
-  }, []);
+    },
+    [],
+  );
 
   return {
     currentAudio,
     stopCurrentAudio,
     playAudio,
-    playWithAbort
+    playWithAbort,
   };
 }

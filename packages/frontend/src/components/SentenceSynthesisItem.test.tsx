@@ -1,15 +1,18 @@
-/* eslint-disable max-lines-per-function, max-lines */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import SentenceSynthesisItem from './SentenceSynthesisItem';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-describe('SentenceSynthesisItem', () => {
+/* eslint-disable max-lines-per-function, max-lines */
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import SentenceSynthesisItem from "./SentenceSynthesisItem";
+
+describe("SentenceSynthesisItem", () => {
   const defaultProps = {
-    id: 'test-sentence',
-    text: 'Hello world test',
-    tags: ['Hello', 'world', 'test'],
-    mode: 'tags' as const,
+    id: "test-sentence",
+    text: "Hello world test",
+    tags: ["Hello", "world", "test"],
+    mode: "tags" as const,
     onPlay: vi.fn(),
   };
 
@@ -17,420 +20,593 @@ describe('SentenceSynthesisItem', () => {
     vi.clearAllMocks();
   });
 
-  describe('rendering modes', () => {
-    it('renders tags in tags mode', () => {
+  describe("rendering modes", () => {
+    it("renders tags in tags mode", () => {
       render(<SentenceSynthesisItem {...defaultProps} mode="tags" />);
-      expect(screen.getByText('Hello')).toBeInTheDocument();
-      expect(screen.getByText('world')).toBeInTheDocument();
-      expect(screen.getByText('test')).toBeInTheDocument();
+      expect(screen.getByText("Hello")).toBeInTheDocument();
+      expect(screen.getByText("world")).toBeInTheDocument();
+      expect(screen.getByText("test")).toBeInTheDocument();
     });
 
-    it('renders text in readonly mode', () => {
+    it("renders text in readonly mode", () => {
       render(<SentenceSynthesisItem {...defaultProps} mode="readonly" />);
-      expect(screen.getByText('Hello world test')).toBeInTheDocument();
+      expect(screen.getByText("Hello world test")).toBeInTheDocument();
     });
 
-    it('renders input field in input mode', () => {
+    it("renders input field in input mode", () => {
       const onInputChange = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
-          mode="input" 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="input"
           onInputChange={onInputChange}
           currentInput=""
-        />
+        />,
       );
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      expect(screen.getByRole("textbox")).toBeInTheDocument();
     });
 
-    it('shows placeholder when no tags in input mode', () => {
+    it("shows placeholder when no tags in input mode", () => {
       const onInputChange = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
-          mode="input" 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="input"
           tags={[]}
           onInputChange={onInputChange}
           currentInput=""
           placeholder="Enter text here"
-        />
+        />,
       );
-      expect(screen.getByPlaceholderText('Enter text here')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText("Enter text here"),
+      ).toBeInTheDocument();
     });
   });
 
-  describe('play button', () => {
-    it('renders play button', () => {
+  describe("play button", () => {
+    it("renders play button", () => {
       render(<SentenceSynthesisItem {...defaultProps} />);
-      expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /play/i })).toBeInTheDocument();
     });
 
-    it('calls onPlay when clicked', async () => {
+    it("calls onPlay when clicked", async () => {
       const user = userEvent.setup();
       render(<SentenceSynthesisItem {...defaultProps} />);
-      
-      await user.click(screen.getByRole('button', { name: /play/i }));
-      expect(defaultProps.onPlay).toHaveBeenCalledWith('test-sentence');
+
+      await user.click(screen.getByRole("button", { name: /play/i }));
+      expect(defaultProps.onPlay).toHaveBeenCalledWith("test-sentence");
     });
 
-    it('shows loading state', () => {
+    it("shows loading state", () => {
       render(<SentenceSynthesisItem {...defaultProps} isLoading={true} />);
-      expect(screen.getByRole('button', { name: /loading/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /loading/i }),
+      ).toBeInTheDocument();
     });
 
-    it('shows playing state', () => {
+    it("shows playing state", () => {
       render(<SentenceSynthesisItem {...defaultProps} isPlaying={true} />);
-      expect(screen.getByRole('button', { name: /playing/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /playing/i }),
+      ).toBeInTheDocument();
     });
 
-    it('disables play button when loading', () => {
+    it("disables play button when loading", () => {
       render(<SentenceSynthesisItem {...defaultProps} isLoading={true} />);
-      expect(screen.getByRole('button', { name: /loading/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /loading/i })).toBeDisabled();
     });
 
-    it('disables play button in input mode with no tags and empty input', () => {
+    it("disables play button in input mode with no tags and empty input", () => {
       const onInputChange = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
-          mode="input" 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="input"
           tags={[]}
           onInputChange={onInputChange}
           currentInput=""
-        />
+        />,
       );
-      expect(screen.getByRole('button', { name: /play/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /play/i })).toBeDisabled();
     });
 
-    it('enables play button in input mode with tags', () => {
+    it("enables play button in input mode with tags", () => {
       const onInputChange = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
-          mode="input" 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="input"
           onInputChange={onInputChange}
           currentInput=""
-        />
+        />,
       );
-      expect(screen.getByRole('button', { name: /play/i })).not.toBeDisabled();
+      expect(screen.getByRole("button", { name: /play/i })).not.toBeDisabled();
     });
   });
 
-  describe('drag and drop', () => {
-    it('shows drag handle when draggable', () => {
+  describe("drag and drop", () => {
+    it("shows drag handle when draggable", () => {
       render(<SentenceSynthesisItem {...defaultProps} draggable={true} />);
-      expect(screen.getByLabelText('Drag to reorder')).toBeInTheDocument();
+      expect(screen.getByLabelText("Drag to reorder")).toBeInTheDocument();
     });
 
-    it('does not show drag handle when not draggable', () => {
+    it("does not show drag handle when not draggable", () => {
       render(<SentenceSynthesisItem {...defaultProps} draggable={false} />);
-      expect(screen.queryByLabelText('Drag to reorder')).not.toBeInTheDocument();
+      expect(
+        screen.queryByLabelText("Drag to reorder"),
+      ).not.toBeInTheDocument();
     });
 
-    it('does not show drag handle in readonly mode', () => {
-      render(<SentenceSynthesisItem {...defaultProps} mode="readonly" draggable={true} />);
-      expect(screen.queryByLabelText('Drag to reorder')).not.toBeInTheDocument();
+    it("does not show drag handle in readonly mode", () => {
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="readonly"
+          draggable={true}
+        />,
+      );
+      expect(
+        screen.queryByLabelText("Drag to reorder"),
+      ).not.toBeInTheDocument();
     });
 
-    it('applies dragging class', () => {
-      const { container } = render(<SentenceSynthesisItem {...defaultProps} isDragging={true} />);
-      expect(container.querySelector('.sentence-synthesis-item--dragging')).toBeInTheDocument();
+    it("applies dragging class", () => {
+      const { container } = render(
+        <SentenceSynthesisItem {...defaultProps} isDragging={true} />,
+      );
+      expect(
+        container.querySelector(".sentence-synthesis-item--dragging"),
+      ).toBeInTheDocument();
     });
 
-    it('applies drag-over class', () => {
-      const { container } = render(<SentenceSynthesisItem {...defaultProps} isDragOver={true} />);
-      expect(container.querySelector('.sentence-synthesis-item--drag-over')).toBeInTheDocument();
+    it("applies drag-over class", () => {
+      const { container } = render(
+        <SentenceSynthesisItem {...defaultProps} isDragOver={true} />,
+      );
+      expect(
+        container.querySelector(".sentence-synthesis-item--drag-over"),
+      ).toBeInTheDocument();
     });
   });
 
-  describe('tag interactions in tags mode', () => {
-    it('makes tags clickable when onTagClick provided', () => {
+  describe("tag interactions in tags mode", () => {
+    it("makes tags clickable when onTagClick provided", () => {
       const onTagClick = vi.fn();
       const { container } = render(
-        <SentenceSynthesisItem {...defaultProps} onTagClick={onTagClick} />
+        <SentenceSynthesisItem {...defaultProps} onTagClick={onTagClick} />,
       );
-      expect(container.querySelectorAll('.sentence-synthesis-item__tag--clickable').length).toBe(3);
+      expect(
+        container.querySelectorAll(".sentence-synthesis-item__tag--clickable")
+          .length,
+      ).toBe(3);
     });
 
-    it('calls onTagClick when tag clicked', async () => {
+    it("calls onTagClick when tag clicked", async () => {
       const user = userEvent.setup();
       const onTagClick = vi.fn();
-      render(<SentenceSynthesisItem {...defaultProps} onTagClick={onTagClick} />);
-      
-      await user.click(screen.getByText('world'));
-      expect(onTagClick).toHaveBeenCalledWith('test-sentence', 1, 'world');
+      render(
+        <SentenceSynthesisItem {...defaultProps} onTagClick={onTagClick} />,
+      );
+
+      await user.click(screen.getByText("world"));
+      expect(onTagClick).toHaveBeenCalledWith("test-sentence", 1, "world");
     });
 
-    it('highlights selected tag when panel open', () => {
+    it("highlights selected tag when panel open", () => {
       const onTagClick = vi.fn();
       const { container } = render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
+        <SentenceSynthesisItem
+          {...defaultProps}
           onTagClick={onTagClick}
           selectedTagIndex={1}
           isPronunciationPanelOpen={true}
-        />
+        />,
       );
-      expect(container.querySelector('.sentence-synthesis-item__tag--selected')).toBeInTheDocument();
+      expect(
+        container.querySelector(".sentence-synthesis-item__tag--selected"),
+      ).toBeInTheDocument();
     });
 
-    it('handles keyboard navigation on tags', () => {
+    it("handles keyboard navigation on tags", () => {
       const onTagClick = vi.fn();
-      render(<SentenceSynthesisItem {...defaultProps} onTagClick={onTagClick} />);
-      
-      const tag = screen.getByText('Hello');
-      fireEvent.keyDown(tag, { key: 'Enter' });
-      expect(onTagClick).toHaveBeenCalledWith('test-sentence', 0, 'Hello');
+      render(
+        <SentenceSynthesisItem {...defaultProps} onTagClick={onTagClick} />,
+      );
+
+      const tag = screen.getByText("Hello");
+      fireEvent.keyDown(tag, { key: "Enter" });
+      expect(onTagClick).toHaveBeenCalledWith("test-sentence", 0, "Hello");
     });
   });
 
-  describe('input mode features', () => {
-    it('calls onInputChange when typing', async () => {
+  describe("input mode features", () => {
+    it("calls onInputChange when typing", async () => {
       const user = userEvent.setup();
       const onInputChange = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
+        <SentenceSynthesisItem
+          {...defaultProps}
           mode="input"
           tags={[]}
           onInputChange={onInputChange}
           currentInput=""
-        />
+        />,
       );
-      
-      await user.type(screen.getByRole('textbox'), 'test');
+
+      await user.type(screen.getByRole("textbox"), "test");
       expect(onInputChange).toHaveBeenCalled();
     });
 
-    it('shows clear button when has content', () => {
+    it("shows clear button when has content", () => {
       const onClear = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
+        <SentenceSynthesisItem
+          {...defaultProps}
           mode="input"
           onInputChange={vi.fn()}
           onClear={onClear}
           currentInput="test"
-        />
+        />,
       );
-      expect(screen.getByLabelText('Clear all')).toBeInTheDocument();
+      expect(screen.getByLabelText("Clear all")).toBeInTheDocument();
     });
 
-    it('calls onClear when clear button clicked', async () => {
+    it("calls onClear when clear button clicked", async () => {
       const user = userEvent.setup();
       const onClear = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
+        <SentenceSynthesisItem
+          {...defaultProps}
           mode="input"
           onInputChange={vi.fn()}
           onClear={onClear}
           currentInput="test"
-        />
+        />,
       );
-      
-      await user.click(screen.getByLabelText('Clear all'));
-      expect(onClear).toHaveBeenCalledWith('test-sentence');
+
+      await user.click(screen.getByLabelText("Clear all"));
+      expect(onClear).toHaveBeenCalledWith("test-sentence");
     });
 
-    it('shows tag dropdown menu when tag menu open', () => {
+    it("shows tag dropdown menu when tag menu open", () => {
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
+        <SentenceSynthesisItem
+          {...defaultProps}
           mode="input"
           onInputChange={vi.fn()}
           onTagMenuOpen={vi.fn()}
           onTagMenuClose={vi.fn()}
-          openTagMenu={{ sentenceId: 'test-sentence', tagIndex: 0 }}
+          openTagMenu={{ sentenceId: "test-sentence", tagIndex: 0 }}
           tagMenuItems={[
-            { label: 'Edit', onClick: vi.fn() },
-            { label: 'Delete', onClick: vi.fn(), danger: true },
+            { label: "Edit", onClick: vi.fn() },
+            { label: "Delete", onClick: vi.fn(), danger: true },
           ]}
-        />
+        />,
       );
-      expect(screen.getByText('Edit')).toBeInTheDocument();
-      expect(screen.getByText('Delete')).toBeInTheDocument();
+      expect(screen.getByText("Edit")).toBeInTheDocument();
+      expect(screen.getByText("Delete")).toBeInTheDocument();
     });
 
-    it('shows inline edit input when editing tag', () => {
+    it("shows inline edit input when editing tag", () => {
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
+        <SentenceSynthesisItem
+          {...defaultProps}
           mode="input"
           onInputChange={vi.fn()}
-          editingTag={{ sentenceId: 'test-sentence', tagIndex: 0, value: 'Hello' }}
+          editingTag={{
+            sentenceId: "test-sentence",
+            tagIndex: 0,
+            value: "Hello",
+          }}
           onEditTagChange={vi.fn()}
           onEditTagKeyDown={vi.fn()}
           onEditTagCommit={vi.fn()}
-        />
+        />,
       );
-      const inputs = screen.getAllByRole('textbox');
-      expect(inputs.some(input => (input as HTMLInputElement).value === 'Hello')).toBe(true);
+      const inputs = screen.getAllByRole("textbox");
+      expect(
+        inputs.some((input) => (input as HTMLInputElement).value === "Hello"),
+      ).toBe(true);
     });
   });
 
-  describe('row menu', () => {
-    it('shows menu button when onMenuOpen provided', () => {
+  describe("row menu", () => {
+    it("shows menu button when onMenuOpen provided", () => {
       render(
-        <SentenceSynthesisItem 
+        <SentenceSynthesisItem
           {...defaultProps}
           onMenuOpen={vi.fn()}
           onMenuClose={vi.fn()}
-          rowMenuItems={[{ label: 'Delete', onClick: vi.fn() }]}
-        />
+          rowMenuItems={[{ label: "Delete", onClick: vi.fn() }]}
+        />,
       );
-      expect(screen.getByLabelText('Rohkem valikuid')).toBeInTheDocument();
+      expect(screen.getByLabelText("Rohkem valikuid")).toBeInTheDocument();
     });
 
-    it('calls onMenuOpen when menu button clicked', async () => {
+    it("calls onMenuOpen when menu button clicked", async () => {
       const user = userEvent.setup();
       const onMenuOpen = vi.fn();
       render(
-        <SentenceSynthesisItem 
+        <SentenceSynthesisItem
           {...defaultProps}
           onMenuOpen={onMenuOpen}
           onMenuClose={vi.fn()}
-          rowMenuItems={[{ label: 'Delete', onClick: vi.fn() }]}
-        />
+          rowMenuItems={[{ label: "Delete", onClick: vi.fn() }]}
+        />,
       );
-      
-      await user.click(screen.getByLabelText('Rohkem valikuid'));
-      expect(onMenuOpen).toHaveBeenCalledWith('test-sentence');
+
+      await user.click(screen.getByLabelText("Rohkem valikuid"));
+      expect(onMenuOpen).toHaveBeenCalledWith("test-sentence");
     });
   });
 
-  describe('legacy menu', () => {
-    it('shows legacy menu button when onMenuOpenLegacy provided', () => {
+  describe("legacy menu", () => {
+    it("shows legacy menu button when onMenuOpenLegacy provided", () => {
       render(
-        <SentenceSynthesisItem 
+        <SentenceSynthesisItem
           {...defaultProps}
           onMenuOpenLegacy={vi.fn()}
           menuContent={<div>Menu Content</div>}
-        />
+        />,
       );
-      expect(screen.getByLabelText('More options')).toBeInTheDocument();
+      expect(screen.getByLabelText("More options")).toBeInTheDocument();
     });
 
-    it('renders menu content', () => {
+    it("renders menu content", () => {
       render(
-        <SentenceSynthesisItem 
+        <SentenceSynthesisItem
           {...defaultProps}
           onMenuOpenLegacy={vi.fn()}
           menuContent={<div data-testid="custom-menu">Custom Menu</div>}
-        />
+        />,
       );
-      expect(screen.getByTestId('custom-menu')).toBeInTheDocument();
+      expect(screen.getByTestId("custom-menu")).toBeInTheDocument();
     });
   });
 
-  describe('custom className', () => {
-    it('applies custom className', () => {
+  describe("custom className", () => {
+    it("applies custom className", () => {
       const { container } = render(
-        <SentenceSynthesisItem {...defaultProps} className="custom-class" />
+        <SentenceSynthesisItem {...defaultProps} className="custom-class" />,
       );
-      expect(container.querySelector('.custom-class')).toBeInTheDocument();
+      expect(container.querySelector(".custom-class")).toBeInTheDocument();
     });
   });
 
-  describe('drag handle', () => {
-    it('renders drag handle when draggable', () => {
-      render(<SentenceSynthesisItem {...defaultProps} draggable={true} mode="input" />);
-      expect(screen.getByLabelText('Drag to reorder')).toBeInTheDocument();
+  describe("drag handle", () => {
+    it("renders drag handle when draggable", () => {
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          draggable={true}
+          mode="input"
+        />,
+      );
+      expect(screen.getByLabelText("Drag to reorder")).toBeInTheDocument();
     });
 
-    it('does not render drag handle in readonly mode', () => {
-      render(<SentenceSynthesisItem {...defaultProps} draggable={true} mode="readonly" />);
-      expect(screen.queryByLabelText('Drag to reorder')).not.toBeInTheDocument();
+    it("does not render drag handle in readonly mode", () => {
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          draggable={true}
+          mode="readonly"
+        />,
+      );
+      expect(
+        screen.queryByLabelText("Drag to reorder"),
+      ).not.toBeInTheDocument();
     });
   });
 
-  describe('tag click', () => {
-    it('calls onTagClick when tag clicked', async () => {
+  describe("tag click", () => {
+    it("calls onTagClick when tag clicked", async () => {
       const user = userEvent.setup();
       const onTagClick = vi.fn();
-      render(<SentenceSynthesisItem {...defaultProps} mode="tags" onTagClick={onTagClick} />);
-      
-      await user.click(screen.getByText('Hello'));
-      expect(onTagClick).toHaveBeenCalledWith('test-sentence', 0, 'Hello');
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="tags"
+          onTagClick={onTagClick}
+        />,
+      );
+
+      await user.click(screen.getByText("Hello"));
+      expect(onTagClick).toHaveBeenCalledWith("test-sentence", 0, "Hello");
     });
 
-    it('tags are not clickable without onTagClick', () => {
+    it("tags are not clickable without onTagClick", () => {
       render(<SentenceSynthesisItem {...defaultProps} mode="tags" />);
-      const tag = screen.getByText('Hello');
-      expect(tag).not.toHaveAttribute('role', 'button');
+      const tag = screen.getByText("Hello");
+      expect(tag).not.toHaveAttribute("role", "button");
     });
   });
 
-  describe('input mode interactions', () => {
-    it('calls onInputChange when typing', async () => {
+  describe("input mode interactions", () => {
+    it("calls onInputChange when typing", async () => {
       const user = userEvent.setup();
       const onInputChange = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
-          mode="input" 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="input"
           onInputChange={onInputChange}
           currentInput=""
-        />
+        />,
       );
-      
-      const input = screen.getByRole('textbox');
-      await user.type(input, 'a');
+
+      const input = screen.getByRole("textbox");
+      await user.type(input, "a");
       expect(onInputChange).toHaveBeenCalled();
     });
 
-    it('calls onInputKeyDown on key press', async () => {
+    it("calls onInputKeyDown on key press", async () => {
       const onInputKeyDown = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
-          mode="input" 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="input"
           onInputChange={vi.fn()}
           onInputKeyDown={onInputKeyDown}
           currentInput=""
-        />
+        />,
       );
-      
-      const input = screen.getByRole('textbox');
-      fireEvent.keyDown(input, { key: 'Enter' });
+
+      const input = screen.getByRole("textbox");
+      fireEvent.keyDown(input, { key: "Enter" });
       expect(onInputKeyDown).toHaveBeenCalled();
     });
 
-    it('calls onInputBlur on blur', () => {
+    it("calls onInputBlur on blur", () => {
       const onInputBlur = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
-          mode="input" 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          mode="input"
           onInputChange={vi.fn()}
           onInputBlur={onInputBlur}
           currentInput=""
-        />
+        />,
       );
-      
-      const input = screen.getByRole('textbox');
+
+      const input = screen.getByRole("textbox");
       fireEvent.blur(input);
-      expect(onInputBlur).toHaveBeenCalledWith('test-sentence');
+      expect(onInputBlur).toHaveBeenCalledWith("test-sentence");
     });
   });
 
-  describe('play button disabled states', () => {
-    it('disables play when loading', () => {
-      render(<SentenceSynthesisItem {...defaultProps} isLoading={true} />);
-      expect(screen.getByRole('button', { name: /loading/i })).toBeDisabled();
+  describe("drag start and end internal handlers", () => {
+    it("calls onDragStart with id on drag start", () => {
+      const onDragStart = vi.fn();
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          draggable={true}
+          onDragStart={onDragStart}
+        />,
+      );
+      const handle = screen.getByLabelText("Drag to reorder");
+      const mockDataTransfer = { setDragImage: vi.fn() };
+      fireEvent.dragStart(handle, { dataTransfer: mockDataTransfer });
+      expect(onDragStart).toHaveBeenCalledWith(
+        expect.anything(),
+        "test-sentence",
+      );
     });
 
-    it('disables play in input mode with no tags and empty input', () => {
+    it("calls onDragEnd on drag end", () => {
+      const onDragEnd = vi.fn();
       render(
-        <SentenceSynthesisItem 
-          {...defaultProps} 
+        <SentenceSynthesisItem
+          {...defaultProps}
+          draggable={true}
+          onDragEnd={onDragEnd}
+        />,
+      );
+      const handle = screen.getByLabelText("Drag to reorder");
+      fireEvent.dragEnd(handle);
+      expect(onDragEnd).toHaveBeenCalled();
+    });
+
+    it("calls onDragOver on container dragover", () => {
+      const onDragOver = vi.fn();
+      const { container } = render(
+        <SentenceSynthesisItem {...defaultProps} onDragOver={onDragOver} />,
+      );
+      const item = container.querySelector(".sentence-synthesis-item")!;
+      fireEvent.dragOver(item);
+      expect(onDragOver).toHaveBeenCalledWith(
+        expect.anything(),
+        "test-sentence",
+      );
+    });
+
+    it("calls onDragLeave on container dragleave", () => {
+      const onDragLeave = vi.fn();
+      const { container } = render(
+        <SentenceSynthesisItem {...defaultProps} onDragLeave={onDragLeave} />,
+      );
+      const item = container.querySelector(".sentence-synthesis-item")!;
+      fireEvent.dragLeave(item);
+      expect(onDragLeave).toHaveBeenCalled();
+    });
+
+    it("calls onDrop on container drop", () => {
+      const onDrop = vi.fn();
+      const { container } = render(
+        <SentenceSynthesisItem {...defaultProps} onDrop={onDrop} />,
+      );
+      const item = container.querySelector(".sentence-synthesis-item")!;
+      fireEvent.drop(item);
+      expect(onDrop).toHaveBeenCalledWith(expect.anything(), "test-sentence");
+    });
+  });
+
+  describe("legacy menu click handler", () => {
+    it("calls onMenuOpenLegacy with event and id", async () => {
+      const user = userEvent.setup();
+      const onMenuOpenLegacy = vi.fn();
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          onMenuOpenLegacy={onMenuOpenLegacy}
+        />,
+      );
+      await user.click(screen.getByLabelText("More options"));
+      expect(onMenuOpenLegacy).toHaveBeenCalledWith(
+        expect.anything(),
+        "test-sentence",
+      );
+    });
+  });
+
+  describe("row menu open state", () => {
+    it("shows open menu when openMenuId matches", () => {
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          openMenuId="test-sentence"
+          onMenuOpen={vi.fn()}
+          onMenuClose={vi.fn()}
+          rowMenuItems={[{ label: "Delete", onClick: vi.fn(), danger: true }]}
+        />,
+      );
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+      expect(screen.getByText("Delete")).toBeInTheDocument();
+    });
+
+    it("does not show menu when openMenuId does not match", () => {
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
+          openMenuId="other-id"
+          onMenuOpen={vi.fn()}
+          onMenuClose={vi.fn()}
+          rowMenuItems={[{ label: "Delete", onClick: vi.fn() }]}
+        />,
+      );
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("play button disabled states", () => {
+    it("disables play when loading", () => {
+      render(<SentenceSynthesisItem {...defaultProps} isLoading={true} />);
+      expect(screen.getByRole("button", { name: /loading/i })).toBeDisabled();
+    });
+
+    it("disables play in input mode with no tags and empty input", () => {
+      render(
+        <SentenceSynthesisItem
+          {...defaultProps}
           mode="input"
           tags={[]}
           currentInput=""
           onInputChange={vi.fn()}
-        />
+        />,
       );
-      expect(screen.getByRole('button', { name: /play/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /play/i })).toBeDisabled();
     });
   });
 });

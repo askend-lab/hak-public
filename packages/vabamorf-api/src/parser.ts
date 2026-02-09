@@ -1,19 +1,32 @@
-import { extractTokenText, createVariantFromMrf, isDuplicateVariant } from './parser-helpers';
-import { VmetajsonResponse, Variant } from './types';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
 
-export function extractStressedText(response: VmetajsonResponse, originalText: string): string {
+import {
+  extractTokenText,
+  createVariantFromMrf,
+  isDuplicateVariant,
+} from "./parser-helpers";
+import { VmetajsonResponse, Variant } from "./types";
+
+export function extractStressedText(
+  response: VmetajsonResponse,
+  originalText: string,
+): string {
   const tokens = response.annotations?.tokens ?? [];
   const stressedTokens = tokens
     .map(extractTokenText)
     .filter((t): t is string => t !== null);
-  
-  return stressedTokens.length > 0 ? stressedTokens.join(' ') : originalText;
+
+  return stressedTokens.length > 0 ? stressedTokens.join(" ") : originalText;
 }
 
-export function extractVariants(response: VmetajsonResponse, word: string): Variant[] {
+export function extractVariants(
+  response: VmetajsonResponse,
+  word: string,
+): Variant[] {
   const tokens = response.annotations?.tokens ?? [];
   const variants: Variant[] = [];
-  
+
   for (const tokenData of tokens) {
     const mrfList = tokenData.features?.mrf ?? [];
     for (const mrfVariant of mrfList) {
@@ -23,6 +36,6 @@ export function extractVariants(response: VmetajsonResponse, word: string): Vari
       }
     }
   }
-  
+
   return variants;
 }

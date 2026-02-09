@@ -1,8 +1,10 @@
- 
-import SynthesisPageHeader from './SynthesisPageHeader';
-import SentenceMenu from './SentenceMenu';
-import SentenceSynthesisItem from './SentenceSynthesisItem';
-import { SentenceState } from '@/types/synthesis';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import SynthesisPageHeader from "./SynthesisPageHeader";
+import SentenceMenu from "./SentenceMenu";
+import SentenceSynthesisItem from "./SentenceSynthesisItem";
+import { SentenceState } from "@/types/synthesis";
 
 interface Task {
   id: string;
@@ -44,7 +46,11 @@ interface SynthesisViewProps {
   onDrop: (e: React.DragEvent, id: string) => void;
   onTagMenuOpen: (sentenceId: string, tagIndex: number) => void;
   onTagMenuClose: () => void;
-  onOpenVariantsFromMenu: (sentenceId: string, tagIndex: number, word: string) => void;
+  onOpenVariantsFromMenu: (
+    sentenceId: string,
+    tagIndex: number,
+    word: string,
+  ) => void;
   onEditTag: (sentenceId: string, tagIndex: number) => void;
   onDeleteTag: (sentenceId: string, tagIndex: number) => void;
   onEditTagChange: (value: string) => void;
@@ -54,7 +60,10 @@ interface SynthesisViewProps {
   onInputKeyDown: (e: React.KeyboardEvent, id: string) => void;
   onInputBlur: (id: string) => void;
   onClearSentence: (id: string) => void;
-  onMenuOpen: (event: React.MouseEvent<Element, MouseEvent>, id: string) => void;
+  onMenuOpen: (
+    event: React.MouseEvent<Element, MouseEvent>,
+    id: string,
+  ) => void;
   onMenuClose: () => void;
   onMenuSearchChange: (value: string) => void;
   onAddToTask: (sentenceId: string, taskId: string, taskName: string) => void;
@@ -74,9 +83,19 @@ interface TagMenuItem {
 }
 
 const getTagMenuItems = (p: SynthesisViewProps): TagMenuItem[] => [
-  { label: 'Vali sõna häälduskuju', onClick: (sid, tidx, w) => p.onOpenVariantsFromMenu(sid, tidx, w) },
-  { label: 'Muuda sõna kirjakuju', onClick: (sid, tidx) => p.onEditTag(sid, tidx) },
-  { label: 'Kustuta sõna', onClick: (sid, tidx) => p.onDeleteTag(sid, tidx), danger: true },
+  {
+    label: "Vali sõna häälduskuju",
+    onClick: (sid, tidx, w) => p.onOpenVariantsFromMenu(sid, tidx, w),
+  },
+  {
+    label: "Muuda sõna kirjakuju",
+    onClick: (sid, tidx) => p.onEditTag(sid, tidx),
+  },
+  {
+    label: "Kustuta sõna",
+    onClick: (sid, tidx) => p.onDeleteTag(sid, tidx),
+    danger: true,
+  },
 ];
 
 interface SentenceItemProps {
@@ -86,8 +105,12 @@ interface SentenceItemProps {
 }
 
 const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
-  const isMenuOpen = p.menuOpenId === sentence.id && p.menuAnchorEl[sentence.id];
-  const isTagSelected = (p.isVariantsPanelOpen || p.showSentencePhoneticPanel) && (p.variantsSelectedSentenceId === sentence.id || p.sentencePhoneticId === sentence.id);
+  const isMenuOpen =
+    p.menuOpenId === sentence.id && p.menuAnchorEl[sentence.id];
+  const isTagSelected =
+    (p.isVariantsPanelOpen || p.showSentencePhoneticPanel) &&
+    (p.variantsSelectedSentenceId === sentence.id ||
+      p.sentencePhoneticId === sentence.id);
   return (
     <SentenceSynthesisItem
       key={sentence.id}
@@ -110,40 +133,48 @@ const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
       openTagMenu={p.openTagMenu}
       onTagMenuClose={p.onTagMenuClose}
       tagMenuItems={getTagMenuItems(p)}
-      loadingTagIndex={p.loadingVariantsTag?.sentenceId === sentence.id ? p.loadingVariantsTag.tagIndex : null}
+      loadingTagIndex={
+        p.loadingVariantsTag?.sentenceId === sentence.id
+          ? p.loadingVariantsTag.tagIndex
+          : null
+      }
       selectedTagIndex={isTagSelected ? p.variantsSelectedTagIndex : null}
-      isPronunciationPanelOpen={p.isVariantsPanelOpen || p.showSentencePhoneticPanel}
+      isPronunciationPanelOpen={
+        p.isVariantsPanelOpen || p.showSentencePhoneticPanel
+      }
       editingTag={p.editingTag}
       onEditTagChange={p.onEditTagChange}
       onEditTagKeyDown={p.onEditTagKeyDown}
       onEditTagCommit={p.onEditTagCommit}
-      currentInput={sentence.currentInput ?? ''}
+      currentInput={sentence.currentInput ?? ""}
       onInputChange={p.onInputChange}
       onInputKeyDown={(e) => p.onInputKeyDown(e, sentence.id)}
       onInputBlur={() => p.onInputBlur(sentence.id)}
       onClear={p.onClearSentence}
       sentenceIndex={sentenceIndex}
       onMenuOpenLegacy={p.onMenuOpen}
-      menuContent={isMenuOpen ? (
-        <SentenceMenu
-          isAuthenticated={p.isAuthenticated}
-          sentenceId={sentence.id}
-          sentenceText={sentence.text}
-          menuSearchQuery={p.menuSearchQuery}
-          onSearchChange={p.onMenuSearchChange}
-          isLoadingTasks={p.isLoadingMenuTasks}
-          tasks={p.menuTasks}
-          onAddToTask={p.onAddToTask}
-          onCreateNewTask={p.onCreateNewTask}
-          onExplorePhonetic={p.onExplorePhonetic}
-          onDownload={p.onDownload}
-          onCopyText={p.onCopyText}
-          onRemove={p.onRemoveSentence}
-          onLogin={p.onLogin}
-          onClose={p.onMenuClose}
-          anchorEl={p.menuAnchorEl[sentence.id]}
-        />
-      ) : undefined}
+      menuContent={
+        isMenuOpen ? (
+          <SentenceMenu
+            isAuthenticated={p.isAuthenticated}
+            sentenceId={sentence.id}
+            sentenceText={sentence.text}
+            menuSearchQuery={p.menuSearchQuery}
+            onSearchChange={p.onMenuSearchChange}
+            isLoadingTasks={p.isLoadingMenuTasks}
+            tasks={p.menuTasks}
+            onAddToTask={p.onAddToTask}
+            onCreateNewTask={p.onCreateNewTask}
+            onExplorePhonetic={p.onExplorePhonetic}
+            onDownload={p.onDownload}
+            onCopyText={p.onCopyText}
+            onRemove={p.onRemoveSentence}
+            onLogin={p.onLogin}
+            onClose={p.onMenuClose}
+            anchorEl={p.menuAnchorEl[sentence.id]}
+          />
+        ) : undefined
+      }
     />
   );
 };
@@ -151,8 +182,33 @@ const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
 export default function SynthesisView(props: SynthesisViewProps) {
   return (
     <>
-      <SynthesisPageHeader sentenceCount={props.sentences.filter(s => s.text.trim()).length} isPlayingAll={props.isPlayingAll} isLoadingPlayAll={props.isLoadingPlayAll} onAddAllClick={props.onAddAllClick} onPlayAllClick={props.onPlayAllClick} showDropdown={props.showAddToTaskDropdown} onDropdownClose={props.onDropdownClose} onSelectTask={props.onSelectTask} onCreateNew={props.onCreateNew} />
-      <div className="page-content"><div className="sentences-section">{props.sentences.map((s, i) => <SentenceItem key={s.id} sentence={s} sentenceIndex={i} p={props} />)}<div className="add-sentence-button-wrapper"><button className="button button--secondary" onClick={props.onAddSentence} data-onboarding-target="add-sentence-button">Lisa lause</button></div></div></div>
+      <SynthesisPageHeader
+        sentenceCount={props.sentences.filter((s) => s.text.trim()).length}
+        isPlayingAll={props.isPlayingAll}
+        isLoadingPlayAll={props.isLoadingPlayAll}
+        onAddAllClick={props.onAddAllClick}
+        onPlayAllClick={props.onPlayAllClick}
+        showDropdown={props.showAddToTaskDropdown}
+        onDropdownClose={props.onDropdownClose}
+        onSelectTask={props.onSelectTask}
+        onCreateNew={props.onCreateNew}
+      />
+      <div className="page-content">
+        <div className="sentences-section">
+          {props.sentences.map((s, i) => (
+            <SentenceItem key={s.id} sentence={s} sentenceIndex={i} p={props} />
+          ))}
+          <div className="add-sentence-button-wrapper">
+            <button
+              className="button button--secondary"
+              onClick={props.onAddSentence}
+              data-onboarding-target="add-sentence-button"
+            >
+              Lisa lause
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

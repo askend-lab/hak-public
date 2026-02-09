@@ -13,35 +13,35 @@ This audit validates frontend code compliance with the design system guidelines.
 
 ### Current Status ✅
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Files Checked | 152 | 152 | - |
-| Files with Violations | 45 | 11 | **-75%** |
-| Total Violations | 473 | 24 | **-95%** |
-| Compliance Grade | **F** | **A-** | **+5 grades** |
+| Metric                | Before | After  | Change        |
+| --------------------- | ------ | ------ | ------------- |
+| Files Checked         | 152    | 152    | -             |
+| Files with Violations | 45     | 11     | **-75%**      |
+| Total Violations      | 473    | 24     | **-95%**      |
+| Compliance Grade      | **F**  | **A-** | **+5 grades** |
 
 ### Violations by Severity
 
-| Severity | Before | After | Status |
-|----------|--------|-------|--------|
-| 🔴 Critical | 69 | 0 | ✅ **All fixed** |
-| 🟠 High | 41 | 0 | ✅ **All fixed** |
-| 🟡 Medium | 362 | 24 | **-94%** |
-| 🔵 Low | 1 | 0 | ✅ **All fixed** |
+| Severity    | Before | After | Status           |
+| ----------- | ------ | ----- | ---------------- |
+| 🔴 Critical | 69     | 0     | ✅ **All fixed** |
+| 🟠 High     | 41     | 0     | ✅ **All fixed** |
+| 🟡 Medium   | 362    | 24    | **-94%**         |
+| 🔵 Low      | 1      | 0     | ✅ **All fixed** |
 
 ### Violations by Type - Remediation Summary
 
-| Type | Before | After | Status |
-|------|--------|-------|--------|
-| `hardcoded-font-size-rem` | 115 | 0 | ✅ **Fixed** |
-| `hardcoded-font-size-px` | 99 | 0 | ✅ **Fixed** |
-| `hardcoded-rgba` | 81 | 24 | ⚠️ **70% fixed** (remaining are context-specific) |
-| `hardcoded-hex-color` | 56 | 0 | ✅ **Fixed** |
-| `hardcoded-breakpoint` | 54 | 0 | ✅ **Fixed** |
-| `white-keyword` | 41 | 0 | ✅ **Fixed** |
-| `missing-token-import` | 14 | 0 | ✅ **Fixed** |
-| `inline-style` | 3 | 0 | ✅ **Fixed** |
-| `deprecated-scss-function` | 1 | 0 | ✅ **Fixed** |
+| Type                       | Before | After | Status                                            |
+| -------------------------- | ------ | ----- | ------------------------------------------------- |
+| `hardcoded-font-size-rem`  | 115    | 0     | ✅ **Fixed**                                      |
+| `hardcoded-font-size-px`   | 99     | 0     | ✅ **Fixed**                                      |
+| `hardcoded-rgba`           | 81     | 24    | ⚠️ **70% fixed** (remaining are context-specific) |
+| `hardcoded-hex-color`      | 56     | 0     | ✅ **Fixed**                                      |
+| `hardcoded-breakpoint`     | 54     | 0     | ✅ **Fixed**                                      |
+| `white-keyword`            | 41     | 0     | ✅ **Fixed**                                      |
+| `missing-token-import`     | 14     | 0     | ✅ **Fixed**                                      |
+| `inline-style`             | 3      | 0     | ✅ **Fixed**                                      |
+| `deprecated-scss-function` | 1      | 0     | ✅ **Fixed**                                      |
 
 ---
 
@@ -50,7 +50,9 @@ This audit validates frontend code compliance with the design system guidelines.
 ### Phase 1: Critical Priority Fixes ✅ COMPLETE
 
 #### 1.1 Missing Token Imports - FIXED
+
 Added required token imports to all component SCSS files:
+
 - `@import '../tokens/colors'`
 - `@import '../tokens/typography'`
 - `@import '../tokens/spacing'`
@@ -61,7 +63,9 @@ Added required token imports to all component SCSS files:
 **Files Updated:** 25+ component files
 
 #### 1.2 Hardcoded Hex Colors - FIXED
+
 Replaced 56 hardcoded hex colors with design tokens:
+
 - `#FFFFFF` → `$color-white`
 - `#173148` → `$color-primary`
 - `#D7E5F2` → `$color-secondary`
@@ -69,9 +73,11 @@ Replaced 56 hardcoded hex colors with design tokens:
 - And 50+ more...
 
 #### 1.3 White Keyword - FIXED
+
 Replaced 41 instances of `white` with `$color-white`
 
 #### 1.4 Deprecated SCSS Functions - FIXED
+
 Replaced `darken()` function calls with appropriate color tokens
 
 ---
@@ -79,7 +85,9 @@ Replaced `darken()` function calls with appropriate color tokens
 ### Phase 2: High Priority Fixes ✅ COMPLETE
 
 #### 2.1 RGBA Shadows - 70% FIXED
+
 Created new shadow tokens in `_colors.scss`:
+
 - `$color-shadow-dropdown` - rgba(23, 49, 72, 0.12)
 - `$color-shadow-subtle` - rgba(0, 0, 0, 0.08)
 - `$color-shadow-backdrop` - rgba(0, 0, 0, 0.5)
@@ -89,6 +97,7 @@ Created new shadow tokens in `_colors.scss`:
 Replaced 57 of 81 RGBA values with tokens.
 
 **Remaining 24 RGBA values** are context-specific:
+
 - Special blue focus rings
 - Text opacity values
 - Error state colors
@@ -99,10 +108,13 @@ Replaced 57 of 81 RGBA values with tokens.
 ### Phase 3: Medium Priority Fixes ✅ COMPLETE
 
 #### 3.1 Hardcoded Breakpoints - 100% FIXED
+
 Created new breakpoint token:
+
 - `$breakpoint-mobile: 480px`
 
 Replaced all 54 hardcoded breakpoints with tokens:
+
 - `768px` → `$breakpoint-md`
 - `640px` → `$breakpoint-sm`
 - `1024px` → `$breakpoint-lg`
@@ -113,13 +125,16 @@ Replaced all 54 hardcoded breakpoints with tokens:
 **Files Updated:** 24 component files
 
 #### 3.2 Hardcoded Font Sizes - 100% FIXED
+
 Created new typography tokens in `_typography.scss`:
+
 - `$font-size-2xs: 0.625rem` (10px)
 - `$font-size-3xl: 1.75rem` (28px)
 - `$font-size-4xl: 2rem` (32px)
 - `$font-size-5xl: 2.25rem` (36px)
 
 Replaced all 214 hardcoded font sizes with tokens:
+
 - `14px` / `0.875rem` → `$font-size-sm`
 - `12px` / `0.75rem` → `$font-size-xs`
 - `16px` / `1rem` → `$font-size-md`
@@ -133,7 +148,9 @@ Replaced all 214 hardcoded font sizes with tokens:
 **Files Updated:** 35+ component files
 
 #### 3.3 Inline Styles - 100% FIXED
+
 Moved 3 inline styles to CSS classes:
+
 - `Dashboard.tsx` - Loader spinner size → `.loader-spinner--lg`
 - `LoginModal.tsx` - Button flex styles → `.login-modal__google-button--flex`
 - `LoginModal.tsx` - Privacy text styles → `.login-modal__privacy`
@@ -147,14 +164,14 @@ Moved 3 inline styles to CSS classes:
 
 These RGBA values are intentionally not tokenized as they serve specific purposes:
 
-| Pattern | Count | Purpose |
-|---------|-------|---------|
-| `rgba(66, 153, 225, 0.1)` | 2 | Blue focus ring accent |
-| `rgba(23, 49, 72, 0.5)` | 2 | Primary color overlay |
-| `rgba(16, 24, 40, 0.1)` | 2 | Dark gray shadow |
-| `rgba(0, 51, 153, 0.25)` | 2 | Blue shadow accent |
-| `rgba(0, 0, 0, 0.04)` | 2 | Ultra-subtle shadow |
-| Other specialized | 14 | Various overlays and effects |
+| Pattern                   | Count | Purpose                      |
+| ------------------------- | ----- | ---------------------------- |
+| `rgba(66, 153, 225, 0.1)` | 2     | Blue focus ring accent       |
+| `rgba(23, 49, 72, 0.5)`   | 2     | Primary color overlay        |
+| `rgba(16, 24, 40, 0.1)`   | 2     | Dark gray shadow             |
+| `rgba(0, 51, 153, 0.25)`  | 2     | Blue shadow accent           |
+| `rgba(0, 0, 0, 0.04)`     | 2     | Ultra-subtle shadow          |
+| Other specialized         | 14    | Various overlays and effects |
 
 **Recommendation:** Leave as-is unless consolidation is specifically needed.
 
@@ -163,18 +180,21 @@ These RGBA values are intentionally not tokenized as they serve specific purpose
 ## Architecture Status
 
 ### BEM Naming Convention ✅ PASS
+
 - **Proper `__element` classes:** 330+ instances
 - **Proper `--modifier` classes:** 26+ instances
 - **Deep nesting violations:** 0
 - **Non-BEM class definitions:** 0
 
 ### React Component Architecture ✅ EXCELLENT
+
 - **TaskDetailView:** Refactored from 781 to 167 lines
 - **Custom hooks:** Extensive coverage in `/src/hooks/`
 - **State management:** Clean Context usage
 - **Type safety:** Good TypeScript coverage
 
 ### Token Usage ✅ EXCELLENT
+
 - **Color tokens:** 100% compliant
 - **Typography tokens:** 100% compliant
 - **Spacing tokens:** Used consistently
@@ -230,13 +250,13 @@ npm run validate:design:json
 
 ### Files Most Improved
 
-| File | Before | After | Improvement |
-|------|--------|-------|-------------|
-| `_synthesis-results.scss` | 84 | 5 | -94% |
-| `_simple-layout.scss` | 71 | 3 | -96% |
-| `_eki-app.scss` | 51 | 2 | -96% |
-| `_pronunciation-variants.scss` | 17 | 0 | -100% |
-| `_task-detail.scss` | 15 | 0 | -100% |
+| File                           | Before | After | Improvement |
+| ------------------------------ | ------ | ----- | ----------- |
+| `_synthesis-results.scss`      | 84     | 5     | -94%        |
+| `_simple-layout.scss`          | 71     | 3     | -96%        |
+| `_eki-app.scss`                | 51     | 2     | -96%        |
+| `_pronunciation-variants.scss` | 17     | 0     | -100%       |
+| `_task-detail.scss`            | 15     | 0     | -100%       |
 
 ### Build Status ✅
 
@@ -249,5 +269,5 @@ npm run validate:design:json
 
 **Audit Complete.**
 
-*Generated: January 17, 2026*  
-*Validation Script: `scripts/validate-design.js`*
+_Generated: January 17, 2026_  
+_Validation Script: `scripts/validate-design.js`_

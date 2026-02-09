@@ -1,5 +1,8 @@
-import { HeadObjectCommand } from '@aws-sdk/client-s3';
-import { SendMessageCommand } from '@aws-sdk/client-sqs';
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { HeadObjectCommand } from "@aws-sdk/client-s3";
+import { SendMessageCommand } from "@aws-sdk/client-sqs";
 
 export class MockS3Client {
   private readonly files = new Map<string, boolean>();
@@ -9,22 +12,28 @@ export class MockS3Client {
     this.files.set(key, exists);
   }
 
-  send(command: HeadObjectCommand | SendMessageCommand): Promise<{ $metadata: { httpStatusCode: number } } | { MessageId: string }> {
+  send(
+    command: HeadObjectCommand | SendMessageCommand,
+  ): Promise<
+    { $metadata: { httpStatusCode: number } } | { MessageId: string }
+  > {
     if (this.shouldThrow) {
-      throw new Error('Mock S3 error');
+      throw new Error("Mock S3 error");
     }
     if (command instanceof HeadObjectCommand) {
       const params = command.input;
-      const exists = this.files.get(params.Key ?? '');
+      const exists = this.files.get(params.Key ?? "");
       if (exists === true) {
         return Promise.resolve({ $metadata: { httpStatusCode: 200 } });
       }
-      const error = new Error('Not Found') as Error & { name: string };
-      error.name = 'NotFound';
+      const error = new Error("Not Found") as Error & { name: string };
+      error.name = "NotFound";
       throw error;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    throw new Error(`Unknown command: ${(command as any).constructor?.name ?? 'Unknown'}`);
+    throw new Error(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      `Unknown command: ${(command as any).constructor?.name ?? "Unknown"}`,
+    );
   }
 
   reset(): void {
@@ -33,15 +42,17 @@ export class MockS3Client {
 }
 
 export class MockSQSClient {
-  public messages: SendMessageCommand['input'][] = [];
+  public messages: SendMessageCommand["input"][] = [];
 
   send(command: SendMessageCommand): Promise<{ MessageId: string }> {
     if (command instanceof SendMessageCommand) {
       this.messages.push(command.input);
-      return Promise.resolve({ MessageId: 'mock-message-id' });
+      return Promise.resolve({ MessageId: "mock-message-id" });
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    throw new Error(`Unknown command: ${(command as any).constructor?.name ?? 'Unknown'}`);
+    throw new Error(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      `Unknown command: ${(command as any).constructor?.name ?? "Unknown"}`,
+    );
   }
 
   reset(): void {
