@@ -49,6 +49,8 @@ env:
   # CloudFront distribution IDs per environment
   CF_DIST_DEV: E232G8TMX7360Y
   CF_DIST_PROD: E2D4DEJKUQ1SXC
+  # Cognito for SimpleStore authorizer
+  COGNITO_USER_POOL_ARN: arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
 
 jobs:
   deploy:
