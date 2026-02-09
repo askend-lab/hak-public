@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-ecs": "^3.985.0",
-    "@babel/core": "^7.24.0",
+    "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.24.0",
     "@babel/preset-react": "^7.24.0",
     "@babel/preset-typescript": "^7.24.0",
