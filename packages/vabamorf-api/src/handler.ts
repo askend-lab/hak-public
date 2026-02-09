@@ -12,7 +12,13 @@ import {
 } from "./validation";
 import { analyze } from "./vmetajson";
 
-const { version } = require("../package.json") as { version: string };
+// Docker: both files in /var/task/, Dev: package.json is one level up from src/
+let version = "0.0.0";
+try {
+  version = require("./package.json").version;
+} catch {
+  version = require("../package.json").version;
+}
 
 // Kept in sync with @hak/shared TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH
 const MAX_TEXT_LENGTH = 10_000;
