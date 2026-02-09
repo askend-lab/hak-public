@@ -102,7 +102,7 @@ export function getLogoutUrl(): string {
 }
 
 export function getTaraLoginUrl(): string {
-  return "https://auth.askend-lab.com/auth/tara/start";
+  return "/auth/tara/start";
 }
 
 export async function exchangeCodeForTokens(code: string): Promise<{
