@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
           aws-region: eu-west-1
@@ -128,7 +128,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
           aws-region: eu-west-1
