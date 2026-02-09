@@ -43,9 +43,9 @@ export function getLogoutUri(
  */
 export const cognitoConfig = {
   region: import.meta.env.VITE_COGNITO_REGION ?? "eu-west-1",
-  userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID ?? "",
-  clientId: import.meta.env.VITE_COGNITO_CLIENT_ID ?? "",
-  domain: import.meta.env.VITE_COGNITO_DOMAIN ?? "",
+  userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID ?? "eu-west-1_wlRtuLkG2",
+  clientId: import.meta.env.VITE_COGNITO_CLIENT_ID ?? "64tf6nf61n6sgftqif6q975hka",
+  domain: import.meta.env.VITE_COGNITO_DOMAIN ?? "askend-lab-auth.auth.eu-west-1.amazoncognito.com",
 
   get redirectUri(): string {
     return getRedirectUri();
