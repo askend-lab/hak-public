@@ -17,6 +17,13 @@ describe("cognitoConfig", () => {
     expect(typeof cognitoConfig.domain).toBe("string");
   });
 
+  it("should have hardcoded defaults for local development", () => {
+    expect(cognitoConfig.region).toBe("eu-west-1");
+    expect(cognitoConfig.userPoolId).toBe("eu-west-1_wlRtuLkG2");
+    expect(cognitoConfig.clientId).toBe("64tf6nf61n6sgftqif6q975hka");
+    expect(cognitoConfig.domain).toBe("askend-lab-auth.auth.eu-west-1.amazoncognito.com");
+  });
+
   it("should have OAuth scopes", () => {
     expect(cognitoConfig.scopes).toContain("email");
     expect(cognitoConfig.scopes).toContain("openid");
@@ -90,10 +97,10 @@ describe("getLogoutUrl", () => {
 });
 
 describe("getTaraLoginUrl", () => {
-  it("should return localhost API base for localhost", async () => {
+  it("should return relative path for TARA auth (proxied in vite.config.ts)", async () => {
     const { getTaraLoginUrl } = await import("./config");
     const url = getTaraLoginUrl();
-    expect(url).toContain("/auth/tara/start");
+    expect(url).toBe("/auth/tara/start");
   });
 });
 
