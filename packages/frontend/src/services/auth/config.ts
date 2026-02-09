@@ -102,19 +102,7 @@ export function getLogoutUrl(): string {
 }
 
 export function getTaraLoginUrl(): string {
-  const hostname =
-    typeof window !== "undefined"
-      ? (window.location.hostname || "localhost")
-      : "localhost";
-  let apiBase: string;
-
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:4001";
-  } else {
-    apiBase = import.meta.env.VITE_API_URL ?? `https://${hostname.replace(/^hak/, "hak-api")}`;
-  }
-
-  return `${apiBase}/auth/tara/start`;
+  return "https://auth.askend-lab.com/auth/tara/start";
 }
 
 export async function exchangeCodeForTokens(code: string): Promise<{
