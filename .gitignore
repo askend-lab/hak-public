@@ -21,3 +21,4 @@ packages/frontend/cucumber-results.json
 test-results
 playwright-report
 .lhci
+.stryker-tmp

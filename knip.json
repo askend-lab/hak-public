@@ -4,12 +4,15 @@
     ".design/**",
     "tmp/**",
     "infra/**",
+    ".stryker-tmp/**",
     "packages/vabamorf-api/src/local-server.ts",
     "packages/merlin-api/src/handler.ts",
     "packages/frontend/**",
     "packages/simplestore/test/**",
     "lighthouserc.js",
-    ".size-limit.json"
+    ".size-limit.json",
+    "stryker.config.mjs",
+    "bundlesize.config.json"
   ],
   "ignoreDependencies": [
     "@babel/*",
