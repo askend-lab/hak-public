@@ -41,16 +41,26 @@ After certificates are validated, client adds:
 ### Frontend Domain
 
 ```
-haaldusabiline.eki.ee  CNAME  <cloudfront-domain>.cloudfront.net.
+haaldusabiline.eki.ee  CNAME  hak.askend-lab.com.
 ```
 
-### TARA Auth Domain (if separate subdomain)
+*(Points to same CloudFront distribution as hak.askend-lab.com)*
+
+### TARA Auth Domain
 
 ```
-auth.eki.ee  CNAME  <api-gateway-domain>.execute-api.eu-west-1.amazonaws.com.
+; Option A: Subdomain
+auth.haaldusabiline.eki.ee  CNAME  auth.askend-lab.com.
+
+; Option B: Path on main domain (no DNS needed, handled by CloudFront)
+; eki.ee/taraauth → routed internally
 ```
 
-*Exact CNAME targets will be provided.*
+### API Domain (if separate)
+
+```
+api.haaldusabiline.eki.ee  CNAME  hak-api.askend-lab.com.
+```
 
 ---
 
