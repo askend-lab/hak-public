@@ -193,8 +193,6 @@ export async function handleDebugError(): Promise<APIGatewayProxyResult> {
   });
 }
 
-const PUBLIC_READABLE_TYPES = ["unlisted", "public", "shared"];
-
 export async function handleGetPublic(
   event: APIGatewayProxyEvent,
   store: Store,
@@ -212,13 +210,6 @@ export async function handleGetPublic(
   if (type === "private") {
     return createResponse(HTTP_STATUS.BAD_REQUEST, {
       error: "private type not allowed on /get-public endpoint",
-    });
-  }
-
-  // Verify type is one of the allowed public-readable types
-  if (!PUBLIC_READABLE_TYPES.includes(type as string)) {
-    return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      error: `Invalid type. Allowed: ${PUBLIC_READABLE_TYPES.join(", ")}`,
     });
   }
 

@@ -43,10 +43,14 @@ describe("DynamoDBAdapter", () => {
   describe("put", () => {
     it("should send PutCommand with correct params", async () => {
       mockSend.mockResolvedValue({});
+      const item = makeItem("user#1", "task#1");
 
-      await adapter.put(makeItem("user#1", "task#1"));
+      await adapter.put(item);
 
       expect(mockSend).toHaveBeenCalledTimes(1);
+      const call = mockSend.mock.calls[0][0];
+      expect(call.input.TableName).toBe(TABLE);
+      expect(call.input.Item).toStrictEqual(item);
     });
   });
 
@@ -67,15 +71,28 @@ describe("DynamoDBAdapter", () => {
 
       expect(result).toBeNull();
     });
+
+    it("should send GetCommand with correct Key", async () => {
+      mockSend.mockResolvedValue({});
+
+      await adapter.get("user#1", "task#1");
+
+      const call = mockSend.mock.calls[0][0];
+      expect(call.input.TableName).toBe(TABLE);
+      expect(call.input.Key).toStrictEqual({ PK: "user#1", SK: "task#1" });
+    });
   });
 
   describe("delete", () => {
-    it("should send DeleteCommand", async () => {
+    it("should send DeleteCommand with correct Key", async () => {
       mockSend.mockResolvedValue({});
 
       await adapter.delete("user#1", "task#1");
 
       expect(mockSend).toHaveBeenCalledTimes(1);
+      const call = mockSend.mock.calls[0][0];
+      expect(call.input.TableName).toBe(TABLE);
+      expect(call.input.Key).toStrictEqual({ PK: "user#1", SK: "task#1" });
     });
   });
 
@@ -90,6 +107,21 @@ describe("DynamoDBAdapter", () => {
       const result = await adapter.queryBySortKeyPrefix("user#1", "task#");
 
       expect(result).toStrictEqual(items);
+    });
+
+    it("should send QueryCommand with correct params", async () => {
+      mockSend.mockResolvedValue({ Items: [] });
+
+      await adapter.queryBySortKeyPrefix("user#1", "task#");
+
+      const call = mockSend.mock.calls[0][0];
+      expect(call.input.TableName).toBe(TABLE);
+      expect(call.input.KeyConditionExpression).toContain("PK = :pk");
+      expect(call.input.KeyConditionExpression).toContain("begins_with");
+      expect(call.input.ExpressionAttributeValues).toStrictEqual({
+        ":pk": "user#1",
+        ":skPrefix": "task#",
+      });
     });
 
     it("should handle pagination", async () => {

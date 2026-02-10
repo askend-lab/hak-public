@@ -15,7 +15,6 @@ import { Store } from "../src/core/store";
 import { ServerContext, DataType } from "../src/core/types";
 import { InMemoryAdapter } from "../src/adapters/memory";
 
-// eslint-disable-next-line max-lines-per-function
 describe("Data Types Access Control", () => {
   let db: InMemoryAdapter;
 

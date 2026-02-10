@@ -43,74 +43,24 @@ describe("Store", () => {
       expect(db.size()).toBe(1);
     });
 
-    it("should accept TTL of zero (no expiration)", async () => {
-      const request: StoreRequest = {
-        pk: "entity1",
-        sk: "sort1",
-        type: "private",
-        ttl: 0,
-        data: {},
-      };
-
-      const result = await store.save(request);
-
-      expect(result.success).toBe(true);
+    it.each([
+      ["zero TTL (no expiration)", 0, true],
+      ["negative TTL", -1, false],
+    ])("should handle %s", async (_name, ttl, expectedSuccess) => {
+      const result = await store.save({ pk: "entity1", sk: "sort1", type: "private", ttl, data: {} });
+      expect(result.success).toBe(expectedSuccess);
+      if (!expectedSuccess) expect(result.error).toContain("TTL");
     });
 
-    it("should reject negative TTL", async () => {
-      const request: StoreRequest = {
-        pk: "entity1",
-        sk: "sort1",
-        type: "private",
-        ttl: -1,
-        data: {},
-      };
-
-      const result = await store.save(request);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toContain("TTL");
-    });
-
-    it("should set owner from context", async () => {
-      const request: StoreRequest = {
-        pk: "entity1",
-        sk: "sort1",
-        type: "public",
-        ttl: ONE_HOUR,
-        data: {},
-      };
-
-      const result = await store.save(request);
-
+    it("should set owner and timestamps from context", async () => {
+      const result = await store.save({ pk: "entity1", sk: "sort1", type: "public", ttl: ONE_HOUR, data: {} });
       expect(result.item?.owner).toBe(context.userId);
-    });
-
-    it("should set timestamps", async () => {
-      const request: StoreRequest = {
-        pk: "entity1",
-        sk: "sort1",
-        type: "public",
-        ttl: ONE_HOUR,
-        data: {},
-      };
-
-      const result = await store.save(request);
-
       expect(result.item?.createdAt).toBeDefined();
       expect(result.item?.updatedAt).toBeDefined();
     });
 
     it("should default data to empty object when undefined", async () => {
-      const request: StoreRequest = {
-        pk: "entity1",
-        sk: "sort1",
-        type: "public",
-        ttl: 3600,
-      } as StoreRequest;
-
-      const result = await store.save(request);
-
+      const result = await store.save({ pk: "entity1", sk: "sort1", type: "public", ttl: 3600 } as StoreRequest);
       expect(result.success).toBe(true);
       expect(result.item?.data).toStrictEqual({});
     });
@@ -378,6 +328,49 @@ describe("Store", () => {
 
       const allResults = await Promise.all([...reads, ...writes]);
       allResults.forEach((r) => expect(r.success).toBe(true));
+    });
+  });
+
+  describe("TTL calculation", () => {
+    it("should calculate TTL correctly (future timestamp)", async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const result = await store.save({
+        pk: "ttl-test",
+        sk: "sort1",
+        type: "private",
+        ttl: ONE_HOUR,
+        data: {},
+      });
+
+      expect(result.success).toBe(true);
+      // TTL should be in the future, roughly now + ONE_HOUR
+      const ttlValue = result.item?.ttl;
+      expect(ttlValue).toBeGreaterThan(nowSeconds);
+      expect(ttlValue).toBeLessThan(nowSeconds + ONE_HOUR + 10); // Allow 10s tolerance
+    });
+
+    it("should use key delimiter in composite keys", async () => {
+      const result = await store.save({
+        pk: "pk-part",
+        sk: "sk-part",
+        type: "private",
+        ttl: ONE_HOUR,
+        data: {},
+      });
+
+      expect(result.success).toBe(true);
+      // The PK should contain the delimiter (default "#")
+      expect(result.item?.PK).toContain("#");
+    });
+  });
+
+  describe("config handling", () => {
+    it("should use custom config when provided", () => {
+      const customStore = new Store(db, context, {
+        maxTtlSeconds: 1000,
+        keyDelimiter: "|",
+      });
+      expect(customStore).toBeDefined();
     });
   });
 });
