@@ -1,0 +1,6 @@
+[
+  {
+    "path": "packages/frontend/dist/**/*.js",
+    "limit": "500 kB"
+  }
+]

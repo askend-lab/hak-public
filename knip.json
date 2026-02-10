@@ -7,7 +7,9 @@
     "packages/vabamorf-api/src/local-server.ts",
     "packages/merlin-api/src/handler.ts",
     "packages/frontend/**",
-    "packages/simplestore/test/**"
+    "packages/simplestore/test/**",
+    "lighthouserc.js",
+    ".size-limit.json"
   ],
   "ignoreDependencies": [
     "@babel/*",
