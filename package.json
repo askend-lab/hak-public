@@ -64,6 +64,7 @@
     "jest-cucumber": "^3.0.0",
     "jest-environment-jsdom": "^29.7.0",
     "knip": "^5.83.1",
+    "madge": "^8.0.0",
     "ts-jest": "^29.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.1"
