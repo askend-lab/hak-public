@@ -149,7 +149,6 @@ hooks:
       - "**/e2e/accessibility.spec.ts"
       - "**/scripts/a11y-audit.mjs"
       - "**/scripts/validate-design.js"
-      - "**/scripts/install-security-tools.js"
 
   run-typecheck:
     command: "pnpm -r exec tsc --noEmit"
