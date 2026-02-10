@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { buildDescription } from "../src/description-builder";
+
+describe("buildDescription", () => {
+  it.each([
+    ["S", "nimisõna"],
+    ["V", "tegusõna"],
+    ["A", "omadussõna"],
+    ["D", "määrsõna"],
+    ["P", "asesõna"],
+    ["K", "sidesõna"],
+    ["J", "kaassõna"],
+    ["I", "hüüdsõna"],
+    ["Y", "lühend"],
+  ])("should map POS %s to %s", (pos, expected) => {
+    const result = buildDescription("word", pos, "", "word");
+    expect(result).toBe(expected);
+  });
+
+  it("should return 'tavaline' when no parts", () => {
+    const result = buildDescription("word", "", "", "word");
+    expect(result).toBe("tavaline");
+  });
+
+  it("should include lemma when different from word", () => {
+    const result = buildDescription("lemma", "S", "", "word");
+    expect(result).toContain("lemma: lemma");
+    expect(result).toContain("nimisõna");
+  });
+
+  it("should not include lemma when same as word (case insensitive)", () => {
+    const result = buildDescription("Word", "S", "", "word");
+    expect(result).not.toContain("lemma:");
+    expect(result).toBe("nimisõna");
+  });
+
+  it("should not include empty lemma", () => {
+    const result = buildDescription("", "S", "", "word");
+    expect(result).not.toContain("lemma:");
+  });
+
+  it("should include fs when provided", () => {
+    const result = buildDescription("word", "S", "sg n", "word");
+    expect(result).toContain("sg n");
+  });
+
+  it("should join all parts with comma", () => {
+    const result = buildDescription("lemma", "V", "da", "word");
+    expect(result).toBe("lemma: lemma, tegusõna, da");
+  });
+
+  it("should handle unknown POS", () => {
+    const result = buildDescription("word", "X", "", "word");
+    expect(result).toBe("tavaline");
+  });
+
+  it("should handle only fs", () => {
+    const result = buildDescription("word", "", "sg g", "word");
+    expect(result).toBe("sg g");
+  });
+});
