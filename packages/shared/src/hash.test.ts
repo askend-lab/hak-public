@@ -46,6 +46,39 @@ describe("hash", () => {
     });
   });
 
+  describe("calculateHash browser path", () => {
+    const globalAny = globalThis as Record<string, unknown>;
+    const originalWindow = globalAny.window;
+
+    afterEach(() => {
+      globalAny.window = originalWindow;
+    });
+
+    it("should use browser crypto when window.crypto.subtle available", async () => {
+      const mockDigest = jest.fn().mockResolvedValue(
+        new Uint8Array([
+          159, 134, 208, 129, 136, 76, 125, 101, 154, 47, 234, 160, 197, 90,
+          208, 21, 163, 191, 79, 27, 43, 11, 130, 44, 209, 93, 108, 21, 176,
+          240, 10, 8,
+        ]).buffer,
+      );
+
+      globalAny.window = {
+        crypto: {
+          subtle: {
+            digest: mockDigest,
+          },
+        },
+      };
+
+      const hash = await calculateHash("test");
+      expect(hash).toBe(
+        "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      );
+      expect(mockDigest).toHaveBeenCalledWith("SHA-256", expect.any(Uint8Array));
+    });
+  });
+
   describe("calculateHashSync", () => {
     it("should calculate SHA-256 hash", () => {
       const hash = calculateHashSync("test");

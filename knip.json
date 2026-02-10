@@ -3,7 +3,11 @@
   "ignore": [
     ".design/**",
     "tmp/**",
-    "infra/**"
+    "infra/**",
+    "packages/vabamorf-api/src/local-server.ts",
+    "packages/merlin-api/src/handler.ts",
+    "packages/frontend/**",
+    "packages/simplestore/test/**"
   ],
   "ignoreDependencies": [
     "@babel/*",
