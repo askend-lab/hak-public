@@ -30,6 +30,7 @@ export default [
       "**/e2e/accessibility.spec.ts",
       "**/scripts/a11y-audit.mjs",
       "**/scripts/validate-design.js",
+      "**/scripts/install-security-tools.js",
     ],
   },
 

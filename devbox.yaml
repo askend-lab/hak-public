@@ -149,6 +149,7 @@ hooks:
       - "**/e2e/accessibility.spec.ts"
       - "**/scripts/a11y-audit.mjs"
       - "**/scripts/validate-design.js"
+      - "**/scripts/install-security-tools.js"
 
   run-typecheck:
     command: "pnpm -r exec tsc --noEmit"
@@ -223,5 +224,13 @@ hooks:
 
   license-check:
     mode: error
+
+  # docker-lint and iac-security - tools installed, hooks need registry implementation
+  # docker-lint:
+  #   excludePaths:
+  #     - "**/node_modules/**"
+  # iac-security:
+  #   excludePaths:
+  #     - "**/node_modules/**"
 
 # final
