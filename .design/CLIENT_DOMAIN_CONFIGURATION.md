@@ -2,13 +2,18 @@
 
 ## Overview
 
-This document describes how to configure HAK application with a client's own domain while using our backend infrastructure.
+This document describes how to configure HAK application with a client's own domain while keeping **ALL infrastructure on our side**.
 
 **Architecture:**
 - Frontend: Client's domain (e.g., `haaldusabiline.eki.ee`)
 - TARA Auth: Client's subdomain (e.g., `eki.ee/taraauth`)
-- Backend Servers: Our AWS infrastructure
-- Cognito: Our User Pool (multi-tenant)
+- Backend Servers: **Our AWS infrastructure (100%)**
+- Cognito: **Our User Pool (multi-tenant)**
+- Lambda, API Gateway, CloudFront: **All ours**
+
+**Client provides ONLY:**
+- DNS records pointing to our infrastructure
+- Domain ownership verification for ACM certificates
 
 ---
 
