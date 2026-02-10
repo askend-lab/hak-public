@@ -32,6 +32,7 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
+    min_coverage_lines: 94
     min_coverage_branches: 75
     command: "pnpm test"
     command_full: "pnpm test:coverage"
