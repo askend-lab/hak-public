@@ -225,12 +225,12 @@ hooks:
   license-check:
     mode: error
 
-  # docker-lint and iac-security - tools installed, hooks need registry implementation
-  # docker-lint:
-  #   excludePaths:
-  #     - "**/node_modules/**"
-  # iac-security:
-  #   excludePaths:
-  #     - "**/node_modules/**"
+  docker-lint:
+    excludePaths:
+      - "**/node_modules/**"
+
+  iac-security:
+    excludePaths:
+      - "**/node_modules/**"
 
 # final
