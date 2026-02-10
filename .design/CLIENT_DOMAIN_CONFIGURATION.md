@@ -12,9 +12,10 @@ Client provides the following domain names:
 
 | Purpose | Domain | Example |
 |---------|--------|---------|
-| Frontend | Main application | `haaldusabiline.eki.ee` |
-| TARA Auth | Authentication endpoint | `eki.ee/taraauth` |
+| Frontend + TARA | Main application | `haaldusabiline.eki.ee` |
 | API | Backend API (optional) | `api.haaldusabiline.eki.ee` |
+
+*TARA authentication uses the same domain: `haaldusabiline.eki.ee/authtara/*`*
 
 ---
 
@@ -27,7 +28,6 @@ We will create SSL certificates for client domains. Client needs to add CNAME re
 
 ```
 _acme-challenge.haaldusabiline.eki.ee  CNAME  _xxxxx.acm-validations.aws.
-_acme-challenge.eki.ee                 CNAME  _yyyyy.acm-validations.aws.
 ```
 
 *Exact values will be provided after certificate request.*
@@ -38,25 +38,15 @@ _acme-challenge.eki.ee                 CNAME  _yyyyy.acm-validations.aws.
 
 After certificates are validated, client adds:
 
-### Frontend Domain
+### Frontend Domain (includes TARA)
 
 ```
 haaldusabiline.eki.ee  CNAME  hak.askend-lab.com.
 ```
 
-*(Points to same CloudFront distribution as hak.askend-lab.com)*
+*CloudFront routes `/authtara/*` to TARA Lambda automatically. No separate DNS needed.*
 
-### TARA Auth Domain
-
-```
-; Option A: Subdomain
-auth.haaldusabiline.eki.ee  CNAME  auth.askend-lab.com.
-
-; Option B: Path on main domain (no DNS needed, handled by CloudFront)
-; eki.ee/taraauth → routed internally
-```
-
-### API Domain (if separate)
+### API Domain (optional)
 
 ```
 api.haaldusabiline.eki.ee  CNAME  hak-api.askend-lab.com.
@@ -71,7 +61,7 @@ For production TARA (tara.ria.ee), client needs to:
 1. Apply to RIA (klient@ria.ee)
 2. Provide:
    - **Service name:** Hääldusabiline
-   - **Redirect URI:** `https://auth.haaldusabiline.eki.ee/authtara/callback`
+   - **Redirect URI:** `https://haaldusabiline.eki.ee/authtara/callback`
    - **IP whitelist:** `34.253.56.45` *(shared NAT Gateway for all environments)*
    - **Organization:** Eesti Keele Instituut
 
