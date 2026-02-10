@@ -176,6 +176,7 @@ hooks:
 
   source-size:
     excludePaths:
+      - "**/.stryker-tmp/**"
       - "**/.old-frontend/**"
       - "**/.esbuild/**"
       - "**/.serverless/**"
