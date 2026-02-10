@@ -83,6 +83,26 @@ describe("logger", () => {
     });
   });
 
+  describe("log level filtering", () => {
+    it("logs warn at warn level", () => {
+      const log = createLogger("warn");
+      log.warn("warning");
+      expect(mockConsole.warn).toHaveBeenCalledWith(expect.stringContaining("[WARN] warning"));
+    });
+
+    it("error always logs at error level", () => {
+      const log = createLogger("error");
+      log.error("error msg");
+      expect(mockConsole.error).toHaveBeenCalledWith(expect.stringContaining("[ERROR] error msg"));
+    });
+
+    it("debug includes DEBUG in message", () => {
+      const log = createLogger("debug");
+      log.debug("debug msg");
+      expect(mockConsole.debug).toHaveBeenCalledWith(expect.stringContaining("[DEBUG]"));
+    });
+  });
+
   describe("LOG_LEVEL env detection", () => {
     const originalLogLevel = process.env.LOG_LEVEL;
 
@@ -111,6 +131,26 @@ describe("logger", () => {
       const log = mod.logger;
       log.debug("should-not-appear");
       expect(mockConsole.debug).not.toHaveBeenCalled();
+    });
+
+    it("uses warn level from env", async () => {
+      process.env.LOG_LEVEL = "warn";
+      jest.resetModules();
+      const mod = await import("./logger");
+      mod.logger.info("should-not-appear");
+      mod.logger.warn("should-appear");
+      expect(mockConsole.info).not.toHaveBeenCalled();
+      expect(mockConsole.warn).toHaveBeenCalled();
+    });
+
+    it("uses error level from env", async () => {
+      process.env.LOG_LEVEL = "error";
+      jest.resetModules();
+      const mod = await import("./logger");
+      mod.logger.warn("should-not-appear");
+      mod.logger.error("should-appear");
+      expect(mockConsole.warn).not.toHaveBeenCalled();
+      expect(mockConsole.error).toHaveBeenCalled();
     });
   });
 });
