@@ -70,12 +70,18 @@ For production TARA (tara.ria.ee), client needs to:
 
 1. Apply to RIA (klient@ria.ee)
 2. Provide:
-   - **Service name:** Application name
-   - **Redirect URI:** `https://eki.ee/taraauth/callback`
-   - **IP whitelist:** `34.253.56.45`
-   - **Organization:** Client organization name
+   - **Service name:** Hääldusabiline
+   - **Redirect URI:** `https://auth.haaldusabiline.eki.ee/auth/tara/callback`
+   - **IP whitelist:** `34.253.56.45` *(shared NAT Gateway for all environments)*
+   - **Organization:** Eesti Keele Instituut
 
 3. Send received credentials to us (securely)
+
+**Note:** The same IP `34.253.56.45` serves all domains:
+- Client production (haaldusabiline.eki.ee)
+- Our production (hak.askend-lab.com)
+- Our development (hak-dev.askend-lab.com)
+- Local development
 
 ---
 
