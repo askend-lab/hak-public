@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignore": [
+    ".design/**",
+    "tmp/**",
+    "infra/**"
+  ],
+  "ignoreDependencies": [
+    "@babel/*",
+    "babel-jest",
+    "ts-jest"
+  ]
+}

@@ -232,4 +232,12 @@ hooks:
     excludePaths:
       - "**/node_modules/**"
 
+  dead-code:
+    mode: warn
+    excludePaths:
+      - "**/node_modules/**"
+      - "**/*.test.ts"
+      - "**/*.spec.ts"
+      - ".design/**"
+
 # final
