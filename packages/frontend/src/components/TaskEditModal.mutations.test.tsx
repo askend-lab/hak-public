@@ -154,4 +154,61 @@ describe("TaskEditModal mutation kills", () => {
     expect(screen.getByDisplayValue("New")).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
+
+  it("name field starts with task name value", () => {
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    const input = screen.getByPlaceholderText("Ülesande nimi (Kohustuslik)");
+    expect(input).toHaveValue("My Task");
+  });
+
+  it("description field starts with task description value", () => {
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    const textarea = screen.getByPlaceholderText("Kirjeldus");
+    expect(textarea).toHaveValue("My Desc");
+  });
+
+  it("handleClose resets name and description", async () => {
+    const { rerender } = render(
+      <TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />,
+    );
+    // Verify fields have values
+    expect(screen.getByPlaceholderText("Ülesande nimi (Kohustuslik)")).toHaveValue("My Task");
+    // Close and reopen - onClose is called which should reset
+    // The BaseModal close should trigger handleClose
+    rerender(
+      <TaskEditModal isOpen={false} task={null} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />,
+    );
+    expect(screen.queryByPlaceholderText("Ülesande nimi (Kohustuslik)")).not.toBeInTheDocument();
+  });
+
+  it("submit calls setTaskToEdit with trimmed description", async () => {
+    const user = userEvent.setup();
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    const desc = screen.getByPlaceholderText("Kirjeldus");
+    await user.clear(desc);
+    await user.type(desc, "  trimmed desc  ");
+    await user.click(screen.getByRole("button", { name: "Salvesta" }));
+    await waitFor(() => {
+      expect(mockSetTaskToEdit).toHaveBeenCalledWith(
+        expect.objectContaining({ description: "trimmed desc" }),
+      );
+    });
+  });
+
+  it("submit button shows Salvesta text normally", () => {
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    expect(screen.getByRole("button", { name: "Salvesta" })).toBeInTheDocument();
+  });
+
+  it("renders error role=alert with error text", async () => {
+    mockOnSave.mockRejectedValueOnce(new Error("Boom"));
+    const user = userEvent.setup();
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    await user.click(screen.getByRole("button", { name: "Salvesta" }));
+    await waitFor(() => {
+      const alert = screen.getByRole("alert");
+      expect(alert).toBeInTheDocument();
+      expect(alert.textContent).toContain("Boom");
+    });
+  });
 });

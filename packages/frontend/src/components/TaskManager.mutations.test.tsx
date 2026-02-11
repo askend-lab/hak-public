@@ -130,4 +130,50 @@ describe("TaskManager mutation kills", () => {
     await user.click(screen.getByText("Muuda"));
     expect(screen.queryByText("Kustuta")).not.toBeInTheDocument();
   });
+
+  it("renders task-row-simple class on each row", () => {
+    render(<TaskManager tasks={makeTasks()} {...handlers} />);
+    const rows = document.querySelectorAll(".task-row-simple");
+    expect(rows.length).toBe(2);
+  });
+
+  it("renders task-row-name class", () => {
+    render(<TaskManager tasks={makeTasks()} {...handlers} />);
+    const names = document.querySelectorAll(".task-row-name");
+    expect(names.length).toBe(2);
+    expect(names[0]?.textContent).toBe("Task One");
+  });
+
+  it("renders task-row-description class", () => {
+    render(<TaskManager tasks={makeTasks()} {...handlers} />);
+    const descs = document.querySelectorAll(".task-row-description");
+    expect(descs.length).toBe(2);
+    expect(descs[0]?.textContent).toBe("Short desc");
+  });
+
+  it("renders task-row-count with brackets and 'lauset'", () => {
+    render(<TaskManager tasks={makeTasks()} {...handlers} />);
+    const counts = document.querySelectorAll(".task-row-count");
+    expect(counts[0]?.textContent).toContain("[1]");
+    expect(counts[0]?.textContent).toContain("lauset");
+    expect(counts[1]?.textContent).toContain("[3]");
+  });
+
+  it("row does not have expanded class by default", () => {
+    render(<TaskManager tasks={makeTasks()} {...handlers} />);
+    const rows = document.querySelectorAll(".task-row-simple");
+    rows.forEach(row => expect(row.classList.contains("expanded")).toBe(false));
+  });
+
+  it("task-row-description-wrapper contains description", () => {
+    render(<TaskManager tasks={makeTasks()} {...handlers} />);
+    const wrapper = document.querySelector(".task-row-description-wrapper");
+    expect(wrapper).toBeInTheDocument();
+  });
+
+  it("renders task-row-date with 'Loodud' prefix", () => {
+    render(<TaskManager tasks={makeTasks()} {...handlers} />);
+    const dates = document.querySelectorAll(".task-row-date");
+    expect(dates[0]?.textContent).toContain("Loodud");
+  });
 });
