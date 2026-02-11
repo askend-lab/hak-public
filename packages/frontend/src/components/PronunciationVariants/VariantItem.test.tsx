@@ -19,7 +19,7 @@ vi.mock("./phoneticHelpers", () => ({
 vi.mock("../ui/Icons", () => ({
   PlayIcon: () => <span data-testid="play-icon">▶</span>,
   PauseIcon: () => <span data-testid="pause-icon">⏸</span>,
-  VolumeIcon: ({ className }: any) => <span data-testid="volume-icon" className={className}>🔊</span>,
+  VolumeIcon: ({ className }: { className?: string }) => <span data-testid="volume-icon" className={className}>🔊</span>,
 }));
 
 describe("VariantItem", () => {

@@ -12,7 +12,7 @@ vi.mock("../ui/Icons", () => ({
 }));
 
 vi.mock("../ui/MarkersGuideBox", () => ({
-  default: ({ onInsertMarker, onShowGuide, className }: any) => (
+  default: ({ onInsertMarker, onShowGuide, className }: { onInsertMarker: (m: string) => void; onShowGuide: () => void; className?: string }) => (
     <div data-testid="markers-guide" className={className}>
       <button onClick={() => onInsertMarker("`")}>Insert</button>
       <button onClick={onShowGuide}>Guide</button>

@@ -275,7 +275,7 @@ describe("WizardTooltip", () => {
   it("scrolls target into view", () => {
     render(<WizardTooltip {...defaultProps} />);
     const target = document.querySelector('[data-onboarding-target="test"]');
-    expect((target as any).scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+    expect((target as HTMLElement).scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
   });
 
   it("has --arrow-offset CSS variable", () => {

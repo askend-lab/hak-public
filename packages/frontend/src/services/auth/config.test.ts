@@ -206,8 +206,8 @@ describe("exchangeCodeForTokens", () => {
       }),
     );
 
-    const callArgs = (global.fetch as any).mock.calls[0];
-    const body = callArgs[1].body as URLSearchParams;
+    const callArgs = vi.mocked(global.fetch).mock.calls[0] ?? [];
+    const body = callArgs[1]?.body as URLSearchParams;
     expect(body.get("grant_type")).toBe("authorization_code");
     expect(body.get("code")).toBe("my-code");
     expect(body.get("code_verifier")).toBe("my-verifier");

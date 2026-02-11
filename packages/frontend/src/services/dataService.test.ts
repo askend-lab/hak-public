@@ -55,7 +55,7 @@ describe("DataService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (DataService as any).instance = undefined;
+    (DataService as unknown as { instance: undefined }).instance = undefined;
     service = DataService.getInstance();
   });
 
@@ -103,7 +103,7 @@ describe("DataService", () => {
   });
 
   it("createTask delegates", async () => {
-    await service.createTask("u1", { name: "T" } as any);
+    await service.createTask("u1", { name: "T" } as Parameters<typeof service.createTask>[1]);
     expect(mockRepo.createTask).toHaveBeenCalledWith("u1", { name: "T" });
   });
 

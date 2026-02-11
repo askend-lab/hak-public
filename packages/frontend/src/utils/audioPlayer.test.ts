@@ -168,7 +168,7 @@ describe("audioPlayer", () => {
         true,
       );
 
-      mockAudio.onended!();
+      mockAudio.onended?.();
       await playPromise;
 
       expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(
@@ -183,7 +183,7 @@ describe("audioPlayer", () => {
         false,
       );
 
-      mockAudio.onended!();
+      mockAudio.onended?.();
       await playPromise;
 
       expect(global.URL.revokeObjectURL).not.toHaveBeenCalled();
@@ -196,7 +196,7 @@ describe("audioPlayer", () => {
         true,
       );
 
-      mockAudio.onerror!();
+      mockAudio.onerror?.();
 
       await expect(playPromise).rejects.toThrow("Audio playback failed");
       expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(

@@ -59,7 +59,7 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
     isBase64Encoded: false,
     pathParameters: null,
     stageVariables: null,
-    requestContext: {} as any,
+    requestContext: {} as unknown as APIGatewayProxyEvent['requestContext'],
     resource: '',
     multiValueHeaders: {},
     multiValueQueryStringParameters: null,
@@ -80,7 +80,7 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
     expect(result.headers?.Location).toBeDefined();
 
     // Tokens should NOT be in URL params
-    const locationUrl = new URL(result.headers!.Location as string);
+    const locationUrl = new URL(String(result.headers?.Location ?? ''));
     expect(locationUrl.searchParams.get('access_token')).toBeNull();
     expect(locationUrl.searchParams.get('id_token')).toBeNull();
     expect(locationUrl.searchParams.get('refresh_token')).toBeNull();

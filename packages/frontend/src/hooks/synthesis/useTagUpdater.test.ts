@@ -124,53 +124,53 @@ describe("useTagUpdater", () => {
     const mockSetSentences = vi.fn();
     const { result } = renderHook(() => useTagUpdater(mockSetSentences));
     act(() => result.current.replaceTag("s1", 0, ["x"]));
-    const updater = mockSetSentences.mock.calls[0]![0] as (prev: never) => { stressedTags?: unknown; phoneticText?: unknown; audioUrl?: unknown }[];
+    const updater = mockSetSentences.mock.calls[0]?.[0] as (prev: never) => { stressedTags?: unknown; phoneticText?: unknown; audioUrl?: unknown }[];
     const res = updater([{ id: "s1", tags: ["a", "b"], text: "a b" }] as never);
-    expect(res[0]!.stressedTags).toBeUndefined();
-    expect(res[0]!.phoneticText).toBeUndefined();
-    expect(res[0]!.audioUrl).toBeUndefined();
+    expect(res[0]?.stressedTags).toBeUndefined();
+    expect(res[0]?.phoneticText).toBeUndefined();
+    expect(res[0]?.audioUrl).toBeUndefined();
   });
 
   it("deleteTag clears phoneticText and audioUrl", () => {
     const mockSetSentences = vi.fn();
     const { result } = renderHook(() => useTagUpdater(mockSetSentences));
     act(() => result.current.deleteTag("s1", 0));
-    const updater = mockSetSentences.mock.calls[0]![0] as (prev: never) => { tags: string[]; text: string; phoneticText?: unknown; audioUrl?: unknown }[];
+    const updater = mockSetSentences.mock.calls[0]?.[0] as (prev: never) => { tags: string[]; text: string; phoneticText?: unknown; audioUrl?: unknown }[];
     const res = updater([{ id: "s1", tags: ["a", "b"], text: "a b" }] as never);
-    expect(res[0]!.tags).toStrictEqual(["b"]);
-    expect(res[0]!.text).toBe("b");
-    expect(res[0]!.phoneticText).toBeUndefined();
-    expect(res[0]!.audioUrl).toBeUndefined();
+    expect(res[0]?.tags).toStrictEqual(["b"]);
+    expect(res[0]?.text).toBe("b");
+    expect(res[0]?.phoneticText).toBeUndefined();
+    expect(res[0]?.audioUrl).toBeUndefined();
   });
 
   it("updateStressedTag creates stressedTags from tags when none exist", () => {
     const mockSetSentences = vi.fn();
     const { result } = renderHook(() => useTagUpdater(mockSetSentences));
     act(() => result.current.updateStressedTag("s1", 1, "stressed-b"));
-    const updater = mockSetSentences.mock.calls[0]![0] as (prev: never) => { stressedTags: string[]; phoneticText: string; audioUrl?: unknown }[];
+    const updater = mockSetSentences.mock.calls[0]?.[0] as (prev: never) => { stressedTags: string[]; phoneticText: string; audioUrl?: unknown }[];
     const res = updater([{ id: "s1", tags: ["a", "b"], text: "a b" }] as never);
-    expect(res[0]!.stressedTags).toStrictEqual(["a", "stressed-b"]);
-    expect(res[0]!.phoneticText).toBe("a stressed-b");
-    expect(res[0]!.audioUrl).toBeUndefined();
+    expect(res[0]?.stressedTags).toStrictEqual(["a", "stressed-b"]);
+    expect(res[0]?.phoneticText).toBe("a stressed-b");
+    expect(res[0]?.audioUrl).toBeUndefined();
   });
 
   it("updateStressedTag updates existing stressedTags", () => {
     const mockSetSentences = vi.fn();
     const { result } = renderHook(() => useTagUpdater(mockSetSentences));
     act(() => result.current.updateStressedTag("s1", 0, "new-sa"));
-    const updater = mockSetSentences.mock.calls[0]![0] as (prev: never) => { stressedTags: string[]; phoneticText: string }[];
+    const updater = mockSetSentences.mock.calls[0]?.[0] as (prev: never) => { stressedTags: string[]; phoneticText: string }[];
     const res = updater([{ id: "s1", tags: ["a", "b"], stressedTags: ["sa", "sb"], text: "a b" }] as never);
-    expect(res[0]!.stressedTags).toStrictEqual(["new-sa", "sb"]);
-    expect(res[0]!.phoneticText).toBe("new-sa sb");
+    expect(res[0]?.stressedTags).toStrictEqual(["new-sa", "sb"]);
+    expect(res[0]?.phoneticText).toBe("new-sa sb");
   });
 
   it("updateSentenceTags does not modify non-matching sentences", () => {
     const mockSetSentences = vi.fn();
     const { result } = renderHook(() => useTagUpdater(mockSetSentences));
     act(() => result.current.updateSentenceTags("s1", () => ({ text: "new" })));
-    const updater = mockSetSentences.mock.calls[0]![0] as (prev: never) => { id: string; text: string }[];
+    const updater = mockSetSentences.mock.calls[0]?.[0] as (prev: never) => { id: string; text: string }[];
     const res = updater([{ id: "s1", text: "old" }, { id: "s2", text: "keep" }] as never);
-    expect(res[0]!.text).toBe("new");
-    expect(res[1]!.text).toBe("keep");
+    expect(res[0]?.text).toBe("new");
+    expect(res[1]?.text).toBe("keep");
   });
 });

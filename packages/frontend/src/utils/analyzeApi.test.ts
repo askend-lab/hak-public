@@ -98,20 +98,20 @@ describe("analyzeApi", () => {
     });
 
     it("should return original text if stressedText is null", async () => {
-      (global.fetch as any).mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({ stressedText: null }),
-      });
+      } as unknown as Response);
 
       const result = await analyzeTextOrThrow("fallback");
       expect(result).toBe("fallback");
     });
 
     it("sends correct request parameters", async () => {
-      (global.fetch as any).mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({ stressedText: "result" }),
-      });
+      } as unknown as Response);
 
       await analyzeTextOrThrow("hello world");
       expect(global.fetch).toHaveBeenCalledWith("/api/analyze", {

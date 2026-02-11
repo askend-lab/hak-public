@@ -17,7 +17,6 @@ describe("useTagEditor", () => {
     ...overrides,
   });
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const setup = (sentence?: SentenceState) => {
     const s = sentence ?? makeSentence();
     const getSentence = vi.fn((id: string) => (id === s.id ? s : undefined));

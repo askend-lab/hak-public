@@ -8,11 +8,11 @@ vi.mock("@hak/shared", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
-const mockBaselineTasks: any[] = [];
+const mockBaselineTasks: Record<string, unknown>[] = [];
 vi.mock("./MockDataLoader", () => {
   return {
     MockDataLoader: class {
-      loadBaselineTasks(): Promise<any[]> { return Promise.resolve([...mockBaselineTasks]); }
+      loadBaselineTasks(): Promise<Record<string, unknown>[]> { return Promise.resolve([...mockBaselineTasks]); }
       findTaskByShareToken(): Promise<null> { return Promise.resolve(null); }
     },
   };
@@ -44,7 +44,7 @@ describe("ShareService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new ShareService(mockStorage as any, mockLoader as any);
+    service = new ShareService(mockStorage as unknown as ConstructorParameters<typeof ShareService>[0], mockLoader as unknown as ConstructorParameters<typeof ShareService>[1]);
   });
 
   describe("generateShareToken", () => {
@@ -77,13 +77,13 @@ describe("ShareService", () => {
 
   describe("shareUserTask", () => {
     it("calls saveTaskAsUnlisted", async () => {
-      await service.shareUserTask(mockTask as any);
+      await service.shareUserTask(mockTask as unknown as Parameters<typeof service.shareUserTask>[0]);
       expect(mockStorage.saveTaskAsUnlisted).toHaveBeenCalledWith(mockTask);
     });
 
     it("throws on storage error", async () => {
       mockStorage.saveTaskAsUnlisted.mockRejectedValueOnce(new Error("storage fail"));
-      await expect(service.shareUserTask(mockTask as any)).rejects.toThrow("Failed to share task");
+      await expect(service.shareUserTask(mockTask as unknown as Parameters<typeof service.shareUserTask>[0])).rejects.toThrow("Failed to share task");
     });
   });
 
