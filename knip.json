@@ -11,7 +11,7 @@
     "packages/simplestore/test/**",
     "lighthouserc.js",
     ".size-limit.json",
-    "stryker.config.mjs",
+    "**/stryker.config.mjs",
     "bundlesize.config.json"
   ],
   "ignoreDependencies": [
