@@ -102,4 +102,61 @@ describe("ErrorBoundary", () => {
     expect(screen.queryByText("Fallback")).not.toBeInTheDocument();
     expect(screen.queryByText("Midagi läks valesti")).not.toBeInTheDocument();
   });
+
+  it("shows empty message text when error message is empty string", () => {
+    const ThrowEmpty = (): never => { throw new Error(""); };
+    render(
+      <ErrorBoundary>
+        <ThrowEmpty />
+      </ErrorBoundary>
+    );
+    // Empty string message is still rendered (not null/undefined), so heading still shows
+    expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
+  });
+
+  it("error UI has correct container styles", () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    const container = screen.getByText("Midagi läks valesti").parentElement;
+    expect(container?.style.padding).toBe("2rem");
+    expect(container?.style.textAlign).toBe("center");
+  });
+
+  it("error message paragraph has correct style", () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    const p = screen.getByText("Test error message");
+    expect(p.style.color).toBe("#666");
+    expect(p.style.marginTop).toBe("0.5rem");
+  });
+
+  it("retry button has correct styles", () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    const btn = screen.getByText("Proovi uuesti");
+    expect(btn.style.marginTop).toBe("1rem");
+    expect(btn.style.borderRadius).toBe("0.5rem");
+    expect(btn.style.cursor).toBe("pointer");
+    expect(btn.style.background).toBe("#fff");
+  });
+
+  it("prefers custom fallback over default error UI", () => {
+    render(
+      <ErrorBoundary fallback={<div>Custom</div>}>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    expect(screen.getByText("Custom")).toBeInTheDocument();
+    expect(screen.queryByText("Proovi uuesti")).not.toBeInTheDocument();
+    expect(screen.queryByText("Midagi läks valesti")).not.toBeInTheDocument();
+  });
 });
