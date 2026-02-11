@@ -29,6 +29,8 @@ test_modules:
   - name: tara-auth
     path: packages/tara-auth
     type: jest
+    min_coverage_lines: 60
+    min_coverage_branches: 30
   - name: shared
     path: packages/shared
     type: jest
