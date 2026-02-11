@@ -150,4 +150,68 @@ describe("TagsInput", () => {
       screen.getByPlaceholderText("Kirjuta sõna või lause ja vajuta Enter"),
     ).toBeInTheDocument();
   });
+
+  it("tags have role=button and tabIndex=0", () => {
+    render(<TagsInput {...baseProps} />);
+    const tag = screen.getByText("hello").closest("[role='button']");
+    expect(tag).toBeTruthy();
+    expect(tag?.getAttribute("tabindex")).toBe("0");
+  });
+
+  it("sets data-onboarding-target on tags group", () => {
+    const { container } = render(<TagsInput {...baseProps} />);
+    const group = container.querySelector('[data-onboarding-target="sentence-0-input"]');
+    expect(group).toBeTruthy();
+  });
+
+  it("sets data-onboarding-target on individual tags", () => {
+    const { container } = render(<TagsInput {...baseProps} />);
+    expect(container.querySelector('[data-onboarding-target="sentence-0-tag-0"]')).toBeTruthy();
+    expect(container.querySelector('[data-onboarding-target="sentence-0-tag-1"]')).toBeTruthy();
+  });
+
+  it("renders tag text in span with correct class", () => {
+    const { container } = render(<TagsInput {...baseProps} />);
+    const tagText = container.querySelector(".sentence-synthesis-item__tag-text");
+    expect(tagText?.textContent).toBe("hello");
+  });
+
+  it("opens tag menu on Space key", () => {
+    const onTagMenuOpen = vi.fn();
+    render(<TagsInput {...baseProps} onTagMenuOpen={onTagMenuOpen} />);
+    fireEvent.keyDown(screen.getByText("hello"), { key: " " });
+    expect(onTagMenuOpen).toHaveBeenCalledWith("s1", 0);
+  });
+
+  it("renders danger class on menu item when danger=true", () => {
+    const { container } = render(
+      <TagsInput
+        {...baseProps}
+        openTagMenu={{ sentenceId: "s1", tagIndex: 0 }}
+        tagMenuItems={[{ label: "Delete", onClick: vi.fn(), danger: true }]}
+        onTagMenuClose={vi.fn()}
+      />,
+    );
+    const dangerItem = container.querySelector(".sentence-synthesis-item__tag-menu-item--danger");
+    expect(dangerItem).toBeTruthy();
+  });
+
+  it("renders clear button when currentInput has value", () => {
+    const onClear = vi.fn();
+    render(<TagsInput {...baseProps} tags={[]} currentInput="text" onClear={onClear} />);
+    expect(screen.getByLabelText("Clear all")).toBeInTheDocument();
+  });
+
+  it("empty placeholder when tags exist", () => {
+    const onInputChange = vi.fn();
+    render(<TagsInput {...baseProps} onInputChange={onInputChange} />);
+    const input = screen.getByRole("textbox");
+    expect(input.getAttribute("placeholder")).toBe("");
+  });
+
+  it("tags group has lang=et attribute", () => {
+    const { container } = render(<TagsInput {...baseProps} />);
+    const group = container.querySelector(".sentence-synthesis-item__tags-group");
+    expect(group?.getAttribute("lang")).toBe("et");
+  });
 });

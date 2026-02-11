@@ -224,4 +224,94 @@ describe("useAudioPlayback with existing audio", () => {
     });
     expect(result.current.currentPlayingId).toBeNull();
   });
+
+  it("ignores audioBlob with size 0 and synthesizes", async () => {
+    const emptyBlob = new Blob([], { type: "audio/wav" });
+    const entries = [mockEntry("1", "test", null, emptyBlob)];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    await act(async () => {
+      result.current.handlePlayEntry("1");
+    });
+    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    expect(synthesizeWithPolling).toHaveBeenCalled();
+  });
+
+  it("creates blob URL for audioBlob entries", () => {
+    const blob = new Blob(["audio"], { type: "audio/wav" });
+    const entries = [mockEntry("1", "test", null, blob)];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    act(() => { result.current.handlePlayEntry("1"); });
+    expect(URL.createObjectURL).toHaveBeenCalledWith(blob);
+  });
+
+  it("onended callback resets currentPlayingId to null", async () => {
+    const entries = [mockEntry("1", "test", "http://audio.mp3")];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    act(() => { result.current.handlePlayEntry("1"); });
+    expect(result.current.currentPlayingId).toBe("1");
+    await new Promise((r) => setTimeout(r, 15));
+    expect(result.current.currentPlayingId).toBeNull();
+  });
+
+  it("handlePlayAll resets all states when called twice", async () => {
+    const { waitFor } = await import("@testing-library/react");
+    const entries = [mockEntry("1", "test", "http://a.mp3")];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    act(() => { result.current.handlePlayAll(); });
+    await waitFor(() => {
+      expect(result.current.isLoadingPlayAll || result.current.isPlayingAll).toBe(true);
+    });
+    await act(async () => { await result.current.handlePlayAll(); });
+    expect(result.current.isPlayingAll).toBe(false);
+    expect(result.current.isLoadingPlayAll).toBe(false);
+  });
+
+  it("revokeObjectURL called for blob entry after playback", async () => {
+    const blob = new Blob(["audio"], { type: "audio/wav" });
+    const entries = [mockEntry("1", "test", null, blob)];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    await act(async () => { await result.current.handlePlayAll(); });
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
+  });
+
+  it("handlePlayAll stops current audio when toggled off", async () => {
+    const { waitFor } = await import("@testing-library/react");
+    const entries = [mockEntry("1", "test", "http://a.mp3")];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    act(() => { result.current.handlePlayAll(); });
+    await waitFor(() => {
+      expect(result.current.isLoadingPlayAll || result.current.isPlayingAll).toBe(true);
+    });
+    await act(async () => { await result.current.handlePlayAll(); });
+    expect(result.current.currentPlayingId).toBeNull();
+    expect(result.current.currentLoadingId).toBeNull();
+  });
+
+  it("handlePlayAll transitions from loading to playing after first entry", async () => {
+    const entries = [
+      mockEntry("1", "t1", "http://a1.mp3"),
+      mockEntry("2", "t2", "http://a2.mp3"),
+    ];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    await act(async () => { await result.current.handlePlayAll(); });
+    // After completion, all states reset
+    expect(result.current.isPlayingAll).toBe(false);
+    expect(result.current.currentPlayingId).toBeNull();
+  });
+
+  it("handlePlayEntry with audioUrl sets playing state", () => {
+    const entries = [mockEntry("1", "test", "http://audio.mp3")];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    act(() => { result.current.handlePlayEntry("1"); });
+    expect(result.current.currentPlayingId).toBe("1");
+    expect(result.current.currentLoadingId).toBeNull();
+  });
+
+  it("handlePlayEntry with non-trimmed empty audioUrl synthesizes", async () => {
+    const entries = [mockEntry("1", "test", "")];
+    const { result } = renderHook(() => useAudioPlayback(entries));
+    await act(async () => { result.current.handlePlayEntry("1"); });
+    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    expect(synthesizeWithPolling).toHaveBeenCalled();
+  });
 });

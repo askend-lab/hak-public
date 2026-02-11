@@ -117,4 +117,109 @@ describe("usePlaylistControl", () => {
     });
     expect(mockPlaySingle).toHaveBeenCalledTimes(1);
   });
+
+  it("calls playSingle with sentence id and abort signal", async () => {
+    const { result } = renderHook(() =>
+      usePlaylistControl(
+        sentences,
+        mockPlaySingle,
+        mockStopAudio,
+        mockUpdateAll,
+      ),
+    );
+    await act(async () => {
+      await result.current.handlePlayAll();
+    });
+    expect(mockPlaySingle).toHaveBeenCalledWith("1", expect.any(AbortSignal));
+    expect(mockPlaySingle).toHaveBeenCalledWith("2", expect.any(AbortSignal));
+  });
+
+  it("calls updateAllSentences with isPlaying false on stop", async () => {
+    const slowPlay = vi.fn().mockImplementation(
+      (): Promise<boolean> => new Promise((r) => setTimeout(() => r(true), 50)),
+    );
+    const { result } = renderHook(() =>
+      usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
+    );
+    act(() => { result.current.handlePlayAll(); });
+    await act(async () => {
+      await result.current.handlePlayAll();
+    });
+    expect(mockUpdateAll).toHaveBeenCalledWith({
+      isPlaying: false,
+      isLoading: false,
+    });
+  });
+
+  it("resets all state after successful complete playback", async () => {
+    const { result } = renderHook(() =>
+      usePlaylistControl(
+        sentences,
+        mockPlaySingle,
+        mockStopAudio,
+        mockUpdateAll,
+      ),
+    );
+    await act(async () => {
+      await result.current.handlePlayAll();
+    });
+    expect(result.current.isPlayingAll).toBe(false);
+    expect(result.current.isLoadingPlayAll).toBe(false);
+  });
+
+  it("transitions from loading to playing after first success", async () => {
+    const trackingPlay = vi.fn().mockImplementation(async () => {
+      return true;
+    });
+    const { result } = renderHook(() =>
+      usePlaylistControl(sentences, trackingPlay, mockStopAudio, mockUpdateAll),
+    );
+    await act(async () => {
+      await result.current.handlePlayAll();
+    });
+    // Both sentences played
+    expect(trackingPlay).toHaveBeenCalledTimes(2);
+    // After completion both flags are false
+    expect(result.current.isPlayingAll).toBe(false);
+    expect(result.current.isLoadingPlayAll).toBe(false);
+  });
+
+  it("does not transition to playing when first entry fails", async () => {
+    mockPlaySingle.mockResolvedValue(false);
+    const { result } = renderHook(() =>
+      usePlaylistControl(sentences, mockPlaySingle, mockStopAudio, mockUpdateAll),
+    );
+    await act(async () => {
+      await result.current.handlePlayAll();
+    });
+    expect(result.current.isPlayingAll).toBe(false);
+  });
+
+  it("filters out whitespace-only sentences", async () => {
+    const mixed = [
+      makeSentence("1", "  "),
+      makeSentence("2", ""),
+      makeSentence("3", "valid"),
+    ];
+    const { result } = renderHook(() =>
+      usePlaylistControl(mixed, mockPlaySingle, mockStopAudio, mockUpdateAll),
+    );
+    await act(async () => {
+      await result.current.handlePlayAll();
+    });
+    expect(mockPlaySingle).toHaveBeenCalledTimes(1);
+    expect(mockPlaySingle).toHaveBeenCalledWith("3", expect.any(AbortSignal));
+  });
+
+  it("stopAudio is called when toggling off", async () => {
+    const slowPlay = vi.fn().mockImplementation(
+      (): Promise<boolean> => new Promise((r) => setTimeout(() => r(true), 50)),
+    );
+    const { result } = renderHook(() =>
+      usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
+    );
+    act(() => { result.current.handlePlayAll(); });
+    await act(async () => { await result.current.handlePlayAll(); });
+    expect(mockStopAudio).toHaveBeenCalledTimes(1);
+  });
 });

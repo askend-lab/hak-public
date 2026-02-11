@@ -6,66 +6,31 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import BaseModal from "./BaseModal";
 
 describe("BaseModal", () => {
-  it("renders nothing when isOpen is false", () => {
-    render(
-      <BaseModal isOpen={false} onClose={vi.fn()} title="Test Modal">
-        <p>Modal content</p>
-      </BaseModal>,
+  it("renders nothing when closed, renders content when open", () => {
+    const { rerender } = render(
+      <BaseModal isOpen={false} onClose={vi.fn()} title="Test Modal"><p>Modal content</p></BaseModal>,
     );
-
     expect(screen.queryByText("Test Modal")).not.toBeInTheDocument();
-  });
-
-  it("renders modal content when isOpen is true", () => {
-    render(
-      <BaseModal isOpen={true} onClose={vi.fn()} title="Test Modal">
-        <p>Modal content</p>
-      </BaseModal>,
+    rerender(
+      <BaseModal isOpen={true} onClose={vi.fn()} title="Test Modal"><p>Modal content</p></BaseModal>,
     );
-
     expect(screen.getByText("Test Modal")).toBeInTheDocument();
     expect(screen.getByText("Modal content")).toBeInTheDocument();
   });
 
-  it("calls onClose when close button is clicked", () => {
-    const onClose = vi.fn();
-    render(
-      <BaseModal isOpen={true} onClose={onClose} title="Test Modal">
-        <p>Modal content</p>
-      </BaseModal>,
-    );
-
-    const closeButton = screen.getByRole("button", { name: /sulge/i });
-    fireEvent.click(closeButton);
-
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("calls onClose when clicking backdrop", () => {
+  it("calls onClose via close button and backdrop but not content click", () => {
     const onClose = vi.fn();
     const { container } = render(
-      <BaseModal isOpen={true} onClose={onClose} title="Test Modal">
-        <p>Modal content</p>
-      </BaseModal>,
+      <BaseModal isOpen={true} onClose={onClose} title="Test Modal"><p>Modal content</p></BaseModal>,
     );
-
+    fireEvent.click(screen.getByRole("button", { name: /sulge/i }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    onClose.mockClear();
     const backdrop = container.querySelector(".base-modal__backdrop");
     if (backdrop) fireEvent.click(backdrop);
-
     expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not call onClose when clicking modal content", () => {
-    const onClose = vi.fn();
-    render(
-      <BaseModal isOpen={true} onClose={onClose} title="Test Modal">
-        <p>Modal content</p>
-      </BaseModal>,
-    );
-
-    const content = screen.getByText("Modal content");
-    fireEvent.click(content);
-
+    onClose.mockClear();
+    fireEvent.click(screen.getByText("Modal content"));
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -127,47 +92,100 @@ describe("BaseModal", () => {
     expect(dialog.getAttribute("aria-labelledby")).toBeNull();
   });
 
-  it("traps focus with Tab key", () => {
+  it("traps focus with Tab and Shift+Tab", () => {
     render(
       <BaseModal isOpen={true} onClose={vi.fn()} title="Focus Test">
         <button>First</button>
         <button>Last</button>
       </BaseModal>,
     );
-    const lastBtn = screen.getByText("Last");
-    lastBtn.focus();
+    screen.getByText("Last").focus();
     fireEvent.keyDown(document, { key: "Tab", shiftKey: false });
-  });
-
-  it("traps focus with Shift+Tab key", () => {
-    render(
-      <BaseModal isOpen={true} onClose={vi.fn()} title="Focus Test">
-        <button>First</button>
-        <button>Last</button>
-      </BaseModal>,
-    );
-    const firstBtn = screen.getByText("First");
-    firstBtn.focus();
+    screen.getByText("First").focus();
     fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
   });
 
-  it("restores focus on close", () => {
-    const button = document.createElement("button");
-    document.body.appendChild(button);
-    button.focus();
+  it("applies size classes and defaults to medium", () => {
+    const { container, rerender } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()} size="small"><p>Content</p></BaseModal>,
+    );
+    expect(container.querySelector(".base-modal--small")).toBeTruthy();
+    rerender(<BaseModal isOpen={true} onClose={vi.fn()} size="large"><p>Content</p></BaseModal>);
+    expect(container.querySelector(".base-modal--large")).toBeTruthy();
+    rerender(<BaseModal isOpen={true} onClose={vi.fn()}><p>Content</p></BaseModal>);
+    expect(container.querySelector(".base-modal--medium")).toBeTruthy();
+  });
 
-    const { rerender } = render(
-      <BaseModal isOpen={true} onClose={vi.fn()} title="Test">
+  it("applies custom className, headerClassName, contentClassName", () => {
+    const { container } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()} title="T" className="cc" headerClassName="hc" contentClassName="xc">
         <p>Content</p>
       </BaseModal>,
     );
+    expect(container.querySelector(".cc")).toBeTruthy();
+    expect(container.querySelector(".hc")).toBeTruthy();
+    expect(container.querySelector(".xc")).toBeTruthy();
+  });
 
-    rerender(
-      <BaseModal isOpen={false} onClose={vi.fn()} title="Test">
+  it("has correct aria attributes and body overflow", () => {
+    render(<BaseModal isOpen={true} onClose={vi.fn()} title="Aria Test"><p>Content</p></BaseModal>);
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(dialog.getAttribute("aria-labelledby")).toBeTruthy();
+    expect(document.body.style.overflow).toBe("hidden");
+  });
+
+  it("does not close on non-Escape keys", () => {
+    const onClose = vi.fn();
+    render(
+      <BaseModal isOpen={true} onClose={onClose}>
         <p>Content</p>
       </BaseModal>,
     );
+    fireEvent.keyDown(document, { key: "Enter" });
+    expect(onClose).not.toHaveBeenCalled();
+  });
 
-    document.body.removeChild(button);
+  it("restores body overflow to unset on close, backdrop has aria-hidden", () => {
+    const { container, rerender } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()}><p>Content</p></BaseModal>,
+    );
+    expect(document.body.style.overflow).toBe("hidden");
+    expect(container.querySelector(".base-modal__backdrop")?.getAttribute("aria-hidden")).toBe("true");
+    rerender(<BaseModal isOpen={false} onClose={vi.fn()}><p>Content</p></BaseModal>);
+    expect(document.body.style.overflow).toBe("unset");
+  });
+
+  it("close button has type=button and base-modal__close class", () => {
+    render(<BaseModal isOpen={true} onClose={vi.fn()} title="T"><p>Content</p></BaseModal>);
+    const closeBtn = screen.getByRole("button", { name: /sulge/i });
+    expect(closeBtn.getAttribute("type")).toBe("button");
+    expect(closeBtn.className).toContain("base-modal__close");
+  });
+
+  it("title element linked via aria-labelledby with correct class", () => {
+    render(<BaseModal isOpen={true} onClose={vi.fn()} title="My Title"><p>Content</p></BaseModal>);
+    const labelledBy = screen.getByRole("dialog").getAttribute("aria-labelledby");
+    expect(labelledBy).toBeTruthy();
+    const titleEl = document.getElementById(labelledBy!);
+    expect(titleEl?.className).toContain("base-modal__title");
+    expect(titleEl?.textContent).toBe("My Title");
+  });
+
+  it("header visibility depends on title and showCloseButton", () => {
+    const { container, rerender } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()} title={null} showCloseButton={false}><p>C</p></BaseModal>,
+    );
+    expect(container.querySelector(".base-modal__header")).toBeNull();
+    rerender(<BaseModal isOpen={true} onClose={vi.fn()} title={null} showCloseButton={true}><p>C</p></BaseModal>);
+    expect(container.querySelector(".base-modal__header")).toBeTruthy();
+    expect(container.querySelector(".base-modal__title")).toBeNull();
+  });
+
+  it("content div has base-modal__content class", () => {
+    const { container } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()}><p>Content</p></BaseModal>,
+    );
+    expect(container.querySelector(".base-modal__content")).toBeTruthy();
   });
 });

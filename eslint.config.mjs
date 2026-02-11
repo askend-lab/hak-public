@@ -33,7 +33,7 @@ export default [
       "test-results/**",
       "playwright-report/**",
       ".lhci/**",
-      ".stryker-tmp/**",
+      "**/.stryker-tmp/**",
     ],
   },
 

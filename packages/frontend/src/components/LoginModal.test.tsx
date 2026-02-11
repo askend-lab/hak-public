@@ -50,6 +50,45 @@ describe("LoginModal", () => {
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
       expect(screen.getByText(/Sisene oma Google kontoga/)).toBeInTheDocument();
     });
+
+    it("renders TARA button with correct classes", () => {
+      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
+      const taraBtn = screen.getByText(/Logi sisse TARA/);
+      expect(taraBtn.className).toContain("button--primary");
+      expect(taraBtn.className).toContain("login-modal__tara-button");
+    });
+
+    it("renders Google button with correct classes", () => {
+      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
+      const googleBtn = screen.getByText(/Jätka Google/);
+      expect(googleBtn.className).toContain("button--secondary");
+      expect(googleBtn.className).toContain("login-modal__google-button");
+    });
+
+    it("renders divider with 'või' text", () => {
+      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
+      expect(screen.getByText("või")).toBeInTheDocument();
+    });
+
+    it("renders privacy text", () => {
+      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
+      expect(screen.getByText(/kasutustingimustega/)).toBeInTheDocument();
+    });
+
+    it("renders logo image", () => {
+      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
+      const logo = document.querySelector(".login-modal__intro-logo") as HTMLImageElement;
+      expect(logo).toBeTruthy();
+      expect(logo?.alt).toBe("Logo");
+    });
+
+    it("buttons are not disabled initially", () => {
+      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
+      const taraBtn = screen.getByText(/Logi sisse TARA/);
+      const googleBtn = screen.getByText(/Jätka Google/);
+      expect(taraBtn).not.toBeDisabled();
+      expect(googleBtn).not.toBeDisabled();
+    });
   });
 
   describe("login flow", () => {
@@ -62,7 +101,7 @@ describe("LoginModal", () => {
       expect(mockLogin).toHaveBeenCalled();
     });
 
-    it("shows loading state during login", async () => {
+    it("shows loading state during login with disabled buttons", async () => {
       mockLogin.mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100)),
       );
@@ -72,10 +111,12 @@ describe("LoginModal", () => {
       await user.click(screen.getByText(/Jätka Google/));
 
       // Both buttons show loading text when loading
-      expect(screen.getAllByText("Suunan...").length).toBeGreaterThan(0);
+      const loadingBtns = screen.getAllByText("Suunan...");
+      expect(loadingBtns.length).toBe(2);
+      loadingBtns.forEach((btn) => expect(btn).toBeDisabled());
     });
 
-    it("shows error on login failure", async () => {
+    it("shows error on login failure with alert role", async () => {
       mockLogin.mockRejectedValue(new Error("Login failed"));
       const user = userEvent.setup();
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
@@ -84,6 +125,7 @@ describe("LoginModal", () => {
 
       await vi.waitFor(() => {
         expect(screen.getByText("Login failed")).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toBeInTheDocument();
       });
     });
 

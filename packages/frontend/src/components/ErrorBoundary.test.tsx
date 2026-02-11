@@ -51,7 +51,7 @@ describe("ErrorBoundary", () => {
     expect(screen.getByText("Custom fallback")).toBeInTheDocument();
   });
 
-  it("shows retry button after error", () => {
+  it("shows retry button and clicking it attempts to re-render children", () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -60,17 +60,103 @@ describe("ErrorBoundary", () => {
 
     expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
     expect(screen.getByText("Proovi uuesti")).toBeInTheDocument();
-    
-    // Click retry button - this resets the error state
+    expect(screen.getByText("Test error message")).toBeInTheDocument();
+
+    // Click retry button - this calls setState to reset hasError and error
     fireEvent.click(screen.getByText("Proovi uuesti"));
+    // The child will throw again, so error UI reappears
+    expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
   });
 
-  it("logs error to console", () => {
+  it("shows default error message when error has no message", () => {
+    const ThrowNoMsg = () => { throw new Error(); };
+    render(
+      <ErrorBoundary>
+        <ThrowNoMsg />
+      </ErrorBoundary>
+    );
+    // The fallback text "Tekkis ootamatu viga" should appear when error.message is empty
+    expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
+  });
+
+  it("logs error to console with error info", () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
-    expect(console.error).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(
+      "[ErrorBoundary] Uncaught error:",
+      expect.any(Error),
+      expect.objectContaining({ componentStack: expect.any(String) }),
+    );
+  });
+
+  it("does not render fallback or error UI when no error", () => {
+    render(
+      <ErrorBoundary fallback={<div>Fallback</div>}>
+        <div>Normal content</div>
+      </ErrorBoundary>
+    );
+    expect(screen.getByText("Normal content")).toBeInTheDocument();
+    expect(screen.queryByText("Fallback")).not.toBeInTheDocument();
+    expect(screen.queryByText("Midagi läks valesti")).not.toBeInTheDocument();
+  });
+
+  it("shows empty message text when error message is empty string", () => {
+    const ThrowEmpty = (): never => { throw new Error(""); };
+    render(
+      <ErrorBoundary>
+        <ThrowEmpty />
+      </ErrorBoundary>
+    );
+    // Empty string message is still rendered (not null/undefined), so heading still shows
+    expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
+  });
+
+  it("error UI has correct container styles", () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    const container = screen.getByText("Midagi läks valesti").parentElement;
+    expect(container?.style.padding).toBe("2rem");
+    expect(container?.style.textAlign).toBe("center");
+  });
+
+  it("error message paragraph has correct style", () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    const p = screen.getByText("Test error message");
+    expect(p.style.color).toBe("#666");
+    expect(p.style.marginTop).toBe("0.5rem");
+  });
+
+  it("retry button has correct styles", () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    const btn = screen.getByText("Proovi uuesti");
+    expect(btn.style.marginTop).toBe("1rem");
+    expect(btn.style.borderRadius).toBe("0.5rem");
+    expect(btn.style.cursor).toBe("pointer");
+    expect(btn.style.background).toBe("#fff");
+  });
+
+  it("prefers custom fallback over default error UI", () => {
+    render(
+      <ErrorBoundary fallback={<div>Custom</div>}>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    expect(screen.getByText("Custom")).toBeInTheDocument();
+    expect(screen.queryByText("Proovi uuesti")).not.toBeInTheDocument();
+    expect(screen.queryByText("Midagi läks valesti")).not.toBeInTheDocument();
   });
 });

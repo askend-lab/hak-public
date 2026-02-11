@@ -98,20 +98,21 @@ describe("SimpleStoreAdapter", () => {
   });
 
   describe("saveUserTasks", () => {
-    it("saves tasks to SimpleStore", async () => {
+    it("saves tasks to SimpleStore with exact body", async () => {
       const tasks = [createMockTask("task-1", "user-1")];
       mockFetch.mockResolvedValueOnce({ ok: true });
 
       await adapter.saveUserTasks("user-1", tasks);
 
-      expect(mockFetch).toHaveBeenCalledWith("/api/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer test-token",
-        },
-        body: expect.stringContaining('"pk":"tasks"'),
-      });
+      const call = mockFetch.mock.calls[0] as [string, RequestInit];
+      const callBody = JSON.parse(call[1].body as string);
+      expect(callBody.pk).toBe("tasks");
+      expect(callBody.sk).toBe("user-1");
+      expect(callBody.type).toBe("private");
+      expect(callBody.ttl).toBe(31536000);
+      expect(callBody.data.tasks).toHaveLength(1);
+      expect(callBody.data.tasks[0].id).toBe("task-1");
+      expect(call[1].method).toBe("POST");
     });
 
     it("throws error on save failure instead of silently swallowing", async () => {
@@ -164,17 +165,17 @@ describe("SimpleStoreAdapter", () => {
   });
 
   describe("saveBaselineTaskAdditions", () => {
-    it("saves baseline additions", async () => {
+    it("saves baseline additions with correct sk", async () => {
       mockFetch.mockResolvedValueOnce({ ok: true });
 
       await adapter.saveBaselineTaskAdditions("user-1", {});
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        "/api/save",
-        expect.objectContaining({
-          method: "POST",
-        }),
-      );
+      const call = mockFetch.mock.calls[0] as [string, RequestInit];
+      const callBody = JSON.parse(call[1].body as string);
+      expect(callBody.pk).toBe("tasks");
+      expect(callBody.sk).toBe("baseline-user-1");
+      expect(callBody.type).toBe("private");
+      expect(callBody.data).toStrictEqual({ additions: {} });
     });
 
     it("throws error on save failure instead of silently swallowing", async () => {
@@ -230,23 +231,28 @@ describe("SimpleStoreAdapter", () => {
   });
 
   describe("saveSharedTasks", () => {
-    it("saves shared tasks", async () => {
+    it("saves shared tasks with correct params", async () => {
       mockFetch.mockResolvedValueOnce({ ok: true });
 
       await adapter.saveSharedTasks([createMockTask("shared-1", "user-1")]);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        "/api/save",
-        expect.objectContaining({
-          method: "POST",
-        }),
-      );
+      const call = mockFetch.mock.calls[0] as [string, RequestInit];
+      const callBody = JSON.parse(call[1].body as string);
+      expect(callBody.pk).toBe("shared");
+      expect(callBody.sk).toBe("tasks");
+      expect(callBody.type).toBe("shared");
     });
 
-    it("throws on save error", async () => {
+    it("throws on save error and logs to console", async () => {
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       mockFetch.mockResolvedValueOnce({ ok: false, text: async () => "Error" });
 
       await expect(adapter.saveSharedTasks([])).rejects.toThrow();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to save shared tasks:",
+        expect.any(Error),
+      );
+      consoleSpy.mockRestore();
     });
   });
 
@@ -284,15 +290,22 @@ describe("SimpleStoreAdapter", () => {
   });
 
   describe("getTaskByShareToken", () => {
-    it("returns task when found", async () => {
+    it("returns task when found via unlisted endpoint", async () => {
       const task = createMockTask("task-1", "user-1");
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, item: { data: task } }),
       });
 
-      const result = await adapter.getTaskByShareToken("test-token");
-      expect(result).toBeTruthy();
+      const result = await adapter.getTaskByShareToken("share-abc");
+      expect(result).toStrictEqual(task);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("get-public"),
+        expect.any(Object),
+      );
+      const url = mockFetch.mock.calls[0]?.[0] as string;
+      expect(url).toContain("type=unlisted");
+      expect(url).toContain("sk=share-abc");
     });
 
     it("returns null when not found", async () => {
@@ -316,12 +329,17 @@ describe("SimpleStoreAdapter", () => {
   });
 
   describe("saveTaskAsUnlisted", () => {
-    it("saves task with shareToken", async () => {
+    it("saves task with shareToken using unlisted type", async () => {
       const task = createMockTask("task-1", "user-1");
+      task.shareToken = "share-xyz";
       mockFetch.mockResolvedValueOnce({ ok: true });
 
       await adapter.saveTaskAsUnlisted(task);
-      expect(mockFetch).toHaveBeenCalled();
+      const call = mockFetch.mock.calls[0] as [string, RequestInit];
+      const callBody = JSON.parse(call[1].body as string);
+      expect(callBody.pk).toBe("tasks");
+      expect(callBody.sk).toBe("share-xyz");
+      expect(callBody.type).toBe("unlisted");
     });
 
     it("throws when task has no shareToken", async () => {
@@ -333,6 +351,44 @@ describe("SimpleStoreAdapter", () => {
       await expect(adapter.saveTaskAsUnlisted(task)).rejects.toThrow(
         "Task must have shareToken",
       );
+    });
+
+    it("throws when task shareToken is undefined", async () => {
+      const task = createMockTask("task-1", "user-1");
+      (task as unknown as Record<string, unknown>).shareToken = undefined;
+
+      await expect(adapter.saveTaskAsUnlisted(task)).rejects.toThrow(
+        "Task must have shareToken",
+      );
+    });
+  });
+
+  describe("auth headers", () => {
+    it("omits Authorization header when no token", async () => {
+      const { AuthStorage } = await import("../auth/storage");
+      (AuthStorage.getIdToken as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, item: { data: { tasks: [] } } }),
+      });
+
+      await adapter.loadUserTasks("user-1");
+      const call = mockFetch.mock.calls[0] as [string, RequestInit];
+      const headers = call[1].headers as Record<string, string>;
+      expect(headers["Content-Type"]).toBe("application/json");
+      expect(headers["Authorization"]).toBeUndefined();
+    });
+  });
+
+  describe("get returns null for missing item.data", () => {
+    it("returns empty array when response has no item", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      const result = await adapter.loadUserTasks("user-1");
+      expect(result).toStrictEqual([]);
     });
   });
 });

@@ -88,4 +88,73 @@ describe("RowMenu", () => {
     const deleteBtn = screen.getByText("Delete").closest("button");
     expect(deleteBtn?.className).toContain("danger");
   });
+
+  it("non-danger items don't have danger class", () => {
+    render(<RowMenu {...baseProps} isOpen={true} />);
+    const editBtn = screen.getByText("Edit").closest("button");
+    expect(editBtn?.className).not.toContain("danger");
+  });
+
+  it("menu button has aria-haspopup=menu", () => {
+    render(<RowMenu {...baseProps} />);
+    const btn = screen.getByLabelText("Rohkem valikuid");
+    expect(btn.getAttribute("aria-haspopup")).toBe("menu");
+  });
+
+  it("menu button has aria-expanded matching isOpen", () => {
+    const { rerender } = render(<RowMenu {...baseProps} isOpen={false} />);
+    expect(screen.getByLabelText("Rohkem valikuid").getAttribute("aria-expanded")).toBe("false");
+    rerender(<RowMenu {...baseProps} isOpen={true} />);
+    expect(screen.getByLabelText("Rohkem valikuid").getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("dropdown menu has aria-label", () => {
+    render(<RowMenu {...baseProps} isOpen={true} />);
+    expect(screen.getByRole("menu").getAttribute("aria-label")).toBe("Lausungi valikud");
+  });
+
+  it("backdrop has aria-hidden=true", () => {
+    const { container } = render(<RowMenu {...baseProps} isOpen={true} />);
+    const bd = container.querySelector(".sentence-synthesis-item__menu-backdrop");
+    expect(bd?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("menu items have role=menuitem", () => {
+    render(<RowMenu {...baseProps} isOpen={true} />);
+    const items = screen.getAllByRole("menuitem");
+    expect(items.length).toBe(2);
+  });
+
+  it("icon span has aria-hidden=true", () => {
+    const { container } = render(<RowMenu {...baseProps} isOpen={true} />);
+    const iconSpan = container.querySelector(".sentence-synthesis-item__menu-item-icon");
+    expect(iconSpan?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("sets data-onboarding-target when provided", () => {
+    render(<RowMenu {...baseProps} data-onboarding-target="row-menu" />);
+    const btn = screen.getByLabelText("Rohkem valikuid");
+    expect(btn.getAttribute("data-onboarding-target")).toBe("row-menu");
+  });
+
+  it("dropdown has fixed class", () => {
+    const { container } = render(<RowMenu {...baseProps} isOpen={true} />);
+    expect(container.querySelector(".sentence-synthesis-item__dropdown-menu--fixed")).toBeTruthy();
+  });
+
+  it("does not render dropdown when closed", () => {
+    render(<RowMenu {...baseProps} isOpen={false} />);
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("menu button has correct class", () => {
+    const { container } = render(<RowMenu {...baseProps} />);
+    expect(container.querySelector(".sentence-synthesis-item__menu-button")).toBeTruthy();
+  });
+
+  it("menu item content has correct class", () => {
+    const { container } = render(<RowMenu {...baseProps} isOpen={true} />);
+    const contents = container.querySelectorAll(".sentence-synthesis-item__menu-item-content");
+    expect(contents.length).toBe(2);
+  });
 });

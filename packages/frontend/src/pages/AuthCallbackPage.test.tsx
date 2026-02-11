@@ -39,18 +39,22 @@ describe("AuthCallbackPage", () => {
     });
   });
 
-  it("shows error when code callback fails", async () => {
+  it("shows error when code callback fails with exact text", async () => {
     window.location.search = "?code=invalid-code";
     mockHandleCodeCallback.mockResolvedValue(false);
 
     render(<AuthCallbackPage />);
 
     await waitFor(() => {
+      expect(
+        screen.getByText(/Sisselogimine ebaõnnestus/),
+      ).toBeInTheDocument();
       expect(screen.getByText(/Autentimise viga/)).toBeInTheDocument();
     });
   });
 
-  it("shows error from query params", async () => {
+  it("shows error_description from query params", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     window.location.search =
       "?error=access_denied&error_description=User%20denied";
 
@@ -59,6 +63,24 @@ describe("AuthCallbackPage", () => {
     await waitFor(() => {
       expect(screen.getByText(/User denied/)).toBeInTheDocument();
     });
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Auth callback error:",
+      "access_denied",
+      "User denied",
+    );
+    consoleSpy.mockRestore();
+  });
+
+  it("falls back to error param when no description", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    window.location.search = "?error=server_error";
+
+    render(<AuthCallbackPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/server_error/)).toBeInTheDocument();
+    });
+    consoleSpy.mockRestore();
   });
 
   it("redirects to home when no code or error", async () => {
@@ -71,13 +93,15 @@ describe("AuthCallbackPage", () => {
     });
   });
 
-  it("shows loading state initially", () => {
+  it("shows loading spinner and text initially", () => {
     window.location.search = "?code=test-code";
     mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
 
     render(<AuthCallbackPage />);
 
     expect(screen.getByText("Sisenen...")).toBeInTheDocument();
+    const spinner = document.querySelector(".loader-spinner");
+    expect(spinner).toBeTruthy();
   });
 
   it("redirects to home when TARA tokens succeed", async () => {
@@ -96,7 +120,7 @@ describe("AuthCallbackPage", () => {
     });
   });
 
-  it("shows error when TARA tokens fail", async () => {
+  it("shows TARA error with exact message and back button", async () => {
     window.location.search = "?access_token=at&id_token=it&refresh_token=rt";
     mockHandleTaraTokens.mockReturnValue(false);
 
@@ -104,7 +128,21 @@ describe("AuthCallbackPage", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/TARA autentimise viga/)).toBeInTheDocument();
+      const btn = screen.getByText("Tagasi avalehele");
+      expect(btn.className).toContain("button--primary");
     });
+  });
+
+  it("does not call handleCodeCallback for TARA token flow", async () => {
+    window.location.search = "?access_token=at&id_token=it&refresh_token=rt";
+    mockHandleTaraTokens.mockReturnValue(true);
+
+    render(<AuthCallbackPage />);
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalled();
+    });
+    expect(mockHandleCodeCallback).not.toHaveBeenCalled();
   });
 
   it("navigates home when error back button clicked", async () => {
@@ -118,5 +156,48 @@ describe("AuthCallbackPage", () => {
     });
     await user.click(screen.getByText("Tagasi avalehele"));
     expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
+  });
+
+  it("error view has correct container styles", async () => {
+    window.location.search = "?error=test_error";
+    render(<AuthCallbackPage />);
+    await waitFor(() => {
+      const container = screen.getByText(/Sisselogimine ebaõnnestus/).parentElement;
+      expect(container?.style.display).toBe("flex");
+      expect(container?.style.flexDirection).toBe("column");
+      expect(container?.style.justifyContent).toBe("center");
+      expect(container?.style.alignItems).toBe("center");
+      expect(container?.style.height).toBe("100vh");
+    });
+  });
+
+  it("loading spinner has correct dimensions", () => {
+    window.location.search = "?code=c";
+    mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
+    render(<AuthCallbackPage />);
+    const spinner = document.querySelector(".loader-spinner") as HTMLElement;
+    expect(spinner?.style.width).toBe("48px");
+    expect(spinner?.style.height).toBe("48px");
+  });
+
+  it("loading view has flex centered layout", () => {
+    window.location.search = "?code=c";
+    mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
+    render(<AuthCallbackPage />);
+    const container = screen.getByText("Sisenen...").parentElement;
+    expect(container?.style.display).toBe("flex");
+    expect(container?.style.justifyContent).toBe("center");
+    expect(container?.style.alignItems).toBe("center");
+    expect(container?.style.height).toBe("100vh");
+  });
+
+  it("error text includes 'Sisselogimine ebaõnnestus' prefix with error detail", async () => {
+    window.location.search = "?error=oops";
+    render(<AuthCallbackPage />);
+    await waitFor(() => {
+      const p = screen.getByText(/Sisselogimine ebaõnnestus/);
+      expect(p.textContent).toContain("oops");
+      expect(p.tagName).toBe("P");
+    });
   });
 });

@@ -200,3 +200,79 @@ describe("SentenceMenu keyboard and positioning", () => {
     expect(stopProp).toHaveBeenCalled();
   });
 });
+
+describe("SentenceMenu structure and classes", () => {
+  it("menu has role=menu and aria-label", () => {
+    render(<SentenceMenu {...defaultProps} />);
+    const menu = screen.getByRole("menu");
+    expect(menu.getAttribute("aria-label")).toBe("Lausungi valikud");
+  });
+
+  it("backdrop has aria-hidden=true", () => {
+    const { container } = render(<SentenceMenu {...defaultProps} />);
+    const bd = container.querySelector(".synthesis__menu-backdrop");
+    expect(bd?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("remove button has danger class", () => {
+    const { container } = render(<SentenceMenu {...defaultProps} />);
+    const danger = container.querySelector(".synthesis__menu-item--danger");
+    expect(danger).toBeTruthy();
+    expect(danger?.textContent).toContain("Eemalda");
+  });
+
+  it("authenticated menu shows divider", () => {
+    const { container } = render(<SentenceMenu {...defaultProps} isAuthenticated={true} />);
+    const divider = container.querySelector('[role="separator"]');
+    expect(divider).toBeTruthy();
+    expect(divider?.className).toContain("synthesis__menu-divider");
+  });
+
+  it("loading state has aria-busy=true", () => {
+    const { container } = render(
+      <SentenceMenu {...defaultProps} isAuthenticated={true} isLoadingTasks={true} />,
+    );
+    const loading = container.querySelector('[aria-busy="true"]');
+    expect(loading).toBeTruthy();
+  });
+
+  it("task list has role=group and aria-label", () => {
+    const { container } = render(
+      <SentenceMenu {...defaultProps} isAuthenticated={true} />,
+    );
+    const group = container.querySelector('[role="group"]');
+    expect(group?.getAttribute("aria-label")).toBe("Ülesanded");
+  });
+
+  it("search input has visually-hidden label", () => {
+    render(<SentenceMenu {...defaultProps} isAuthenticated={true} />);
+    expect(screen.getByLabelText("Otsi ülesandeid")).toBeInTheDocument();
+  });
+
+  it("create button icon has aria-hidden=true", () => {
+    const { container } = render(<SentenceMenu {...defaultProps} isAuthenticated={true} />);
+    const icon = container.querySelector(".synthesis__menu-item-create-icon");
+    expect(icon?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("menu items have role=menuitem", () => {
+    render(<SentenceMenu {...defaultProps} />);
+    const items = screen.getAllByRole("menuitem");
+    expect(items.length).toBeGreaterThan(0);
+  });
+
+  it("onClose called when task is added", async () => {
+    const onClose = vi.fn();
+    const tasks = [{ id: "t1", name: "T1" }];
+    render(<SentenceMenu {...defaultProps} isAuthenticated={true} tasks={tasks} onClose={onClose} />);
+    await userEvent.click(screen.getByText("T1"));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("onClose called when create new task clicked", async () => {
+    const onClose = vi.fn();
+    render(<SentenceMenu {...defaultProps} isAuthenticated={true} onClose={onClose} />);
+    await userEvent.click(screen.getByText("Loo uus ülesanne"));
+    expect(onClose).toHaveBeenCalled();
+  });
+});

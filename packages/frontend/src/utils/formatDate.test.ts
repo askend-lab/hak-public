@@ -33,5 +33,13 @@ describe("formatDateTime", () => {
     const date = new Date("2024-03-15T10:30:00");
     const result = formatDateTime(date);
     expect(result).toMatch(/15.*03.*2024/);
+    expect(result).toMatch(/10.*30/);
+  });
+
+  it("string and Date produce identical results", () => {
+    const dateStr = "2024-03-15T10:30:00";
+    const dateObj = new Date(dateStr);
+    expect(formatDateTime(dateStr)).toBe(formatDateTime(dateObj));
+    expect(formatDate(dateStr)).toBe(formatDate(dateObj));
   });
 });

@@ -41,7 +41,15 @@ describe("phoneticHelpers", () => {
 
     it("detects multiple markers", () => {
       const result = parsePhoneticMarkers("te<re_maailm?");
-      expect(result.length).toBeGreaterThanOrEqual(3);
+      expect(result.length).toBe(3);
+      expect(result).toContainEqual({ tag: "kolmas välde", type: "phonetic" });
+      expect(result).toContainEqual({ tag: "ebareeglipärane rõhk", type: "phonetic" });
+      expect(result).toContainEqual({ tag: "liitsõna piir", type: "boundary" });
+    });
+
+    it("does not include default marker when other markers found", () => {
+      const result = parsePhoneticMarkers("te<re");
+      expect(result.some(m => m.type === "default")).toBe(false);
     });
   });
 
@@ -51,24 +59,37 @@ describe("phoneticHelpers", () => {
       expect(result).toContain("Häälda nii");
     });
 
-    it("explains long vowel marker", () => {
+    it("explains long vowel marker with uppercase letter", () => {
       const result = generatePronunciationExplanation("te`re");
-      expect(result).toContain("pikk");
+      expect(result).toBe('"R" on pikk');
     });
 
-    it("explains stress marker", () => {
+    it("explains stress marker with exact letter", () => {
       const result = generatePronunciationExplanation("te´re");
-      expect(result).toContain("Rõhk");
+      expect(result).toBe('Rõhk on "r" peal');
     });
 
-    it("explains palatal marker", () => {
+    it("explains palatal marker with uppercase letter", () => {
       const result = generatePronunciationExplanation("t'ere");
-      expect(result).toContain("pehme");
+      expect(result).toBe('"T" on pehme hääldusega');
     });
 
     it("explains compound word marker", () => {
       const result = generatePronunciationExplanation("liit+sõna");
+      expect(result).toBe("Põhirõhk esimesel osal – häälda seda nagu eraldi sõna");
+    });
+
+    it("joins multiple explanations with period and space", () => {
+      const result = generatePronunciationExplanation("te`re+maailm");
+      expect(result).toContain(". ");
+      expect(result).toContain('"R" on pikk');
       expect(result).toContain("Põhirõhk");
+    });
+
+    it("handles multiple long vowels", () => {
+      const result = generatePronunciationExplanation("`a`e");
+      expect(result).toContain('"A" on pikk');
+      expect(result).toContain('"E" on pikk');
     });
   });
 });

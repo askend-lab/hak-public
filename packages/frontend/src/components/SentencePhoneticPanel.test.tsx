@@ -214,4 +214,58 @@ describe("SentencePhoneticPanel", () => {
 
     expect(onApply).not.toHaveBeenCalled();
   });
+
+  it("shows correct title and description", () => {
+    render(<SentencePhoneticPanel {...defaultProps} />);
+    expect(screen.getByText("Muuda häälduskuju")).toBeInTheDocument();
+    expect(screen.getByText(/Sisesta hääldusmärgid/)).toBeInTheDocument();
+  });
+
+  it("textarea has correct placeholder and class", () => {
+    const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
+    const ta = container.querySelector(".sentence-phonetic-panel__textarea");
+    expect(ta).toBeTruthy();
+    expect(ta?.getAttribute("placeholder")).toBe("Kirjuta oma foneetiline variant");
+  });
+
+  it("apply button has button--secondary class", () => {
+    render(<SentencePhoneticPanel {...defaultProps} />);
+    const btn = screen.getByRole("button", { name: /rakenda/i });
+    expect(btn.className).toContain("button--secondary");
+  });
+
+  it("play button is disabled when text is empty", () => {
+    render(<SentencePhoneticPanel {...defaultProps} phoneticText={null} sentenceText="" />);
+    const playBtn = screen.getByText("Kuula").closest("button");
+    expect(playBtn?.disabled).toBe(true);
+  });
+
+  it("apply button is disabled when text is empty", () => {
+    render(<SentencePhoneticPanel {...defaultProps} phoneticText={null} sentenceText="" />);
+    const applyBtn = screen.getByRole("button", { name: /rakenda/i });
+    expect(applyBtn).toBeDisabled();
+  });
+
+  it("panel has correct root class", () => {
+    const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
+    expect(container.querySelector(".sentence-phonetic-panel")).toBeTruthy();
+  });
+
+  it("header has correct structure", () => {
+    const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
+    expect(container.querySelector(".sentence-phonetic-panel__header")).toBeTruthy();
+    expect(container.querySelector(".sentence-phonetic-panel__title-section")).toBeTruthy();
+    expect(container.querySelector(".sentence-phonetic-panel__header-actions")).toBeTruthy();
+  });
+
+  it("close button has correct class", () => {
+    const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
+    expect(container.querySelector(".sentence-phonetic-panel__close")).toBeTruthy();
+  });
+
+  it("play button has button--primary class", () => {
+    render(<SentencePhoneticPanel {...defaultProps} />);
+    const btn = screen.getByText("Kuula").closest("button");
+    expect(btn?.className).toContain("button--primary");
+  });
 });

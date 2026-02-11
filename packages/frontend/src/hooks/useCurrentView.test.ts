@@ -99,4 +99,42 @@ describe("useCurrentView", () => {
     const { result } = renderHook(() => useCurrentView());
     expect(result.current.currentView).toBe("role-selection");
   });
+
+  it("returns pathname from location", () => {
+    mockUseLocation.mockReturnValue({
+      pathname: "/tasks/abc",
+      search: "",
+      hash: "",
+      state: null,
+      key: "default",
+    });
+    const { result } = renderHook(() => useCurrentView());
+    expect(result.current.pathname).toBe("/tasks/abc");
+  });
+
+  it("does not extract task id for nested task paths", () => {
+    mockUseLocation.mockReturnValue({
+      pathname: "/tasks/abc/edit",
+      search: "",
+      hash: "",
+      state: null,
+      key: "default",
+    });
+    const { result } = renderHook(() => useCurrentView());
+    expect(result.current.currentView).toBe("tasks");
+    expect(result.current.selectedTaskId).toBeNull();
+  });
+
+  it("returns null selectedTaskId for specs path", () => {
+    mockUseLocation.mockReturnValue({
+      pathname: "/specs/something",
+      search: "",
+      hash: "",
+      state: null,
+      key: "default",
+    });
+    const { result } = renderHook(() => useCurrentView());
+    expect(result.current.currentView).toBe("specs");
+    expect(result.current.selectedTaskId).toBeNull();
+  });
 });
