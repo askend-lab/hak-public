@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+import { generateCodeVerifier, generateCodeChallenge } from "./pkce";
+
 const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
-function getBaseUrl(
+export function getBaseUrl(
   hostname: string = typeof window !== "undefined"
     ? window.location.hostname
     : "localhost",
@@ -57,25 +59,6 @@ export const cognitoConfig = {
 
   scopes: ["email", "openid", "profile"],
 };
-
-function generateCodeVerifier(): string {
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  return btoa(String.fromCharCode(...array))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-async function generateCodeChallenge(verifier: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(verifier);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  return btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
 
 export async function getLoginUrl(): Promise<string> {
   const codeVerifier = generateCodeVerifier();
