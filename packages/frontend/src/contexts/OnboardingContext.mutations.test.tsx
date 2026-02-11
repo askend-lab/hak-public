@@ -102,4 +102,32 @@ describe("OnboardingContext precise mutation kills", () => {
     expect(stored.completed).toBe(true);
     expect(stored.completedAt).toBeTruthy();
   });
+
+  it("saveToStorage catch block logs error on localStorage failure", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    render(
+      <OnboardingProvider>
+        <TestConsumer />
+      </OnboardingProvider>,
+    );
+    await vi.waitFor(() => {
+      expect(screen.getByTestId("loading")).toHaveTextContent("ready");
+    });
+    await act(async () => { screen.getByText("selectLearner").click(); });
+    // Advance to step 4 (last step for learner with 5 steps)
+    for (let i = 0; i < 4; i++) {
+      await act(async () => { screen.getByText("next").click(); });
+    }
+    // Now mock setItem to throw — next click triggers saveToStorage
+    const setItemSpy = vi.spyOn(localStorage, "setItem").mockImplementation(() => {
+      throw new Error("QuotaExceeded");
+    });
+    await act(async () => { screen.getByText("next").click(); });
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Failed to save onboarding state:",
+      expect.any(Error),
+    );
+    setItemSpy.mockRestore();
+    consoleSpy.mockRestore();
+  });
 });

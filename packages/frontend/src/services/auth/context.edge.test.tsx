@@ -93,6 +93,48 @@ describe("refreshSession with successful refresh", () => {
   });
 });
 
+describe("parseIdToken and isTokenExpired catch blocks", () => {
+  const origFetch = global.fetch;
+  afterEach(() => { global.fetch = origFetch; });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAuthStorage.getUser.mockReturnValue(null);
+    mockAuthStorage.getAccessToken.mockReturnValue(null);
+    mockAuthStorage.getRefreshToken.mockReturnValue(null);
+  });
+
+  it("parseIdToken catch: 3-part token with invalid base64 payload returns null", () => {
+    // 3 parts so it passes length check, but payload is invalid base64 → atob throws → catch → null
+    const badToken = "header.!!!invalid!!!.signature";
+    let result: boolean | undefined;
+    function Comp() {
+      const { handleTaraTokens } = useAuth();
+      return <button onClick={() => {
+        result = handleTaraTokens({ accessToken: "a", idToken: badToken, refreshToken: "r" });
+      }}>go</button>;
+    }
+    render(<AuthProvider><Comp /></AuthProvider>);
+    act(() => { screen.getByText("go").click(); });
+    expect(result).toBe(false);
+  });
+
+  it("isTokenExpired catch: 3-part token with invalid base64 triggers refresh", async () => {
+    // 3-part token with invalid base64 → isTokenExpired catch → return true → refresh path
+    const badToken = "header.!!!invalid!!!.signature";
+    mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
+    mockAuthStorage.getAccessToken.mockReturnValue(badToken);
+    mockAuthStorage.getRefreshToken.mockReturnValue(null);
+    function Checker() {
+      const { isAuthenticated } = useAuth();
+      return <span data-testid="a">{String(isAuthenticated)}</span>;
+    }
+    render(<AuthProvider><Checker /></AuthProvider>);
+    await waitFor(() => expect(screen.getByTestId("a")).toHaveTextContent("false"));
+    expect(mockAuthStorage.clear).toHaveBeenCalled();
+  });
+});
+
 describe("parseIdToken exp boundary precision", () => {
   beforeEach(() => {
     vi.clearAllMocks();
