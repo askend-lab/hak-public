@@ -94,5 +94,29 @@ describe("analyzeApi", () => {
       const result = await analyzeTextOrThrow("test");
       expect(result).toBe("test");
     });
+
+    it("should return original text if stressedText is null", async () => {
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: null }),
+      });
+
+      const result = await analyzeTextOrThrow("fallback");
+      expect(result).toBe("fallback");
+    });
+
+    it("sends correct request parameters", async () => {
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: "result" }),
+      });
+
+      await analyzeTextOrThrow("hello world");
+      expect(global.fetch).toHaveBeenCalledWith("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "hello world" }),
+      });
+    });
   });
 });

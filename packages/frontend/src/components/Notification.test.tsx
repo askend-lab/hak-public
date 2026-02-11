@@ -108,4 +108,69 @@ describe("Notification", () => {
     expect(onClose).toHaveBeenCalled();
     vi.useFakeTimers();
   });
+
+  it("applies correct color class for each type", () => {
+    const { container, unmount } = render(
+      <Notification type="success" message="ok" onClose={vi.fn()} />,
+    );
+    expect(container.querySelector(".modal--success--outlined")).toBeTruthy();
+    unmount();
+
+    const { container: c2, unmount: u2 } = render(
+      <Notification type="error" message="err" onClose={vi.fn()} />,
+    );
+    expect(c2.querySelector(".modal--danger--outlined")).toBeTruthy();
+    u2();
+
+    const { container: c3, unmount: u3 } = render(
+      <Notification type="warning" message="warn" onClose={vi.fn()} />,
+    );
+    expect(c3.querySelector(".modal--warning--outlined")).toBeTruthy();
+    u3();
+
+    const { container: c4 } = render(
+      <Notification type="info" message="info" onClose={vi.fn()} />,
+    );
+    expect(c4.querySelector(".modal--primary--outlined")).toBeTruthy();
+  });
+
+  it("uses custom color when provided", () => {
+    const { container } = render(
+      <Notification type="success" color="neutral" message="msg" onClose={vi.fn()} />,
+    );
+    expect(container.querySelector(".modal--neutral--outlined")).toBeTruthy();
+  });
+
+  it("renders description and action with separator space", () => {
+    const { container } = render(
+      <Notification
+        type="info"
+        message="msg"
+        description="Some desc"
+        action={{ label: "Act", onClick: vi.fn() }}
+        onClose={vi.fn()}
+      />,
+    );
+    const p = container.querySelector("p");
+    expect(p?.textContent).toContain("Some desc");
+    expect(p?.textContent).toContain("Act");
+  });
+
+  it("has close button with aria-label", () => {
+    render(
+      <Notification type="info" message="msg" onClose={vi.fn()} />,
+    );
+    expect(screen.getByLabelText("Sulge teade")).toBeInTheDocument();
+  });
+
+  it("uses default duration of 4000ms", () => {
+    const onClose = vi.fn();
+    render(
+      <Notification type="info" message="msg" onClose={onClose} />,
+    );
+    act(() => { vi.advanceTimersByTime(3999); });
+    expect(onClose).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

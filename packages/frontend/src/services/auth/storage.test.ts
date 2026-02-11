@@ -22,6 +22,28 @@ describe("AuthStorage", () => {
       AuthStorage.setUser(user);
       expect(AuthStorage.getUser()).toStrictEqual(user);
     });
+
+    it("stores user under correct key", () => {
+      AuthStorage.setUser({ id: "u1", email: "e" });
+      expect(localStorage.getItem("hak_user")).not.toBeNull();
+    });
+  });
+
+  describe("Token key verification", () => {
+    it("stores access token under correct key", () => {
+      AuthStorage.setAccessToken("tok");
+      expect(localStorage.getItem("hak_access_token")).toBe("tok");
+    });
+
+    it("stores id token under correct key", () => {
+      AuthStorage.setIdToken("tok");
+      expect(localStorage.getItem("hak_id_token")).toBe("tok");
+    });
+
+    it("stores refresh token under correct key", () => {
+      AuthStorage.setRefreshToken("tok");
+      expect(localStorage.getItem("hak_refresh_token")).toBe("tok");
+    });
   });
 
   describe("Token storage", () => {

@@ -170,4 +170,85 @@ describe("BaseModal", () => {
 
     document.body.removeChild(button);
   });
+
+  it("applies correct size class", () => {
+    const { container, rerender } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()} size="small">
+        <p>Content</p>
+      </BaseModal>,
+    );
+    expect(container.querySelector(".base-modal--small")).toBeTruthy();
+
+    rerender(
+      <BaseModal isOpen={true} onClose={vi.fn()} size="large">
+        <p>Content</p>
+      </BaseModal>,
+    );
+    expect(container.querySelector(".base-modal--large")).toBeTruthy();
+  });
+
+  it("defaults to medium size", () => {
+    const { container } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()}>
+        <p>Content</p>
+      </BaseModal>,
+    );
+    expect(container.querySelector(".base-modal--medium")).toBeTruthy();
+  });
+
+  it("applies custom className", () => {
+    const { container } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()} className="custom-class">
+        <p>Content</p>
+      </BaseModal>,
+    );
+    expect(container.querySelector(".custom-class")).toBeTruthy();
+  });
+
+  it("applies custom headerClassName and contentClassName", () => {
+    const { container } = render(
+      <BaseModal
+        isOpen={true}
+        onClose={vi.fn()}
+        title="T"
+        headerClassName="hdr-cls"
+        contentClassName="cnt-cls"
+      >
+        <p>Content</p>
+      </BaseModal>,
+    );
+    expect(container.querySelector(".hdr-cls")).toBeTruthy();
+    expect(container.querySelector(".cnt-cls")).toBeTruthy();
+  });
+
+  it("has correct aria attributes", () => {
+    render(
+      <BaseModal isOpen={true} onClose={vi.fn()} title="Aria Test">
+        <p>Content</p>
+      </BaseModal>,
+    );
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(dialog.getAttribute("aria-labelledby")).toBeTruthy();
+  });
+
+  it("sets body overflow hidden when open", () => {
+    render(
+      <BaseModal isOpen={true} onClose={vi.fn()}>
+        <p>Content</p>
+      </BaseModal>,
+    );
+    expect(document.body.style.overflow).toBe("hidden");
+  });
+
+  it("does not close on non-Escape keys", () => {
+    const onClose = vi.fn();
+    render(
+      <BaseModal isOpen={true} onClose={onClose}>
+        <p>Content</p>
+      </BaseModal>,
+    );
+    fireEvent.keyDown(document, { key: "Enter" });
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });

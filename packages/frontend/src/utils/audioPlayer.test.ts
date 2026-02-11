@@ -160,5 +160,48 @@ describe("audioPlayer", () => {
 
       expect(mockAudio.play).toHaveBeenCalled();
     });
+
+    it("should revoke URL on ended when shouldRevokeUrl is true", async () => {
+      const playPromise = playAudioWithCallbacks(
+        "blob:https://example.com/audio",
+        {},
+        true,
+      );
+
+      mockAudio.onended!();
+      await playPromise;
+
+      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(
+        "blob:https://example.com/audio",
+      );
+    });
+
+    it("should not revoke URL when shouldRevokeUrl is false", async () => {
+      const playPromise = playAudioWithCallbacks(
+        "https://example.com/audio.mp3",
+        {},
+        false,
+      );
+
+      mockAudio.onended!();
+      await playPromise;
+
+      expect(global.URL.revokeObjectURL).not.toHaveBeenCalled();
+    });
+
+    it("should revoke URL on error", async () => {
+      const playPromise = playAudioWithCallbacks(
+        "blob:https://example.com/audio",
+        {},
+        true,
+      );
+
+      mockAudio.onerror!();
+
+      await expect(playPromise).rejects.toThrow("Audio playback failed");
+      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(
+        "blob:https://example.com/audio",
+      );
+    });
   });
 });

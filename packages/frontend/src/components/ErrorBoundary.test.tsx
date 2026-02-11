@@ -51,7 +51,7 @@ describe("ErrorBoundary", () => {
     expect(screen.getByText("Custom fallback")).toBeInTheDocument();
   });
 
-  it("shows retry button after error", () => {
+  it("shows retry button and clicking it attempts to re-render children", () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -60,17 +60,46 @@ describe("ErrorBoundary", () => {
 
     expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
     expect(screen.getByText("Proovi uuesti")).toBeInTheDocument();
-    
-    // Click retry button - this resets the error state
+    expect(screen.getByText("Test error message")).toBeInTheDocument();
+
+    // Click retry button - this calls setState to reset hasError and error
     fireEvent.click(screen.getByText("Proovi uuesti"));
+    // The child will throw again, so error UI reappears
+    expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
   });
 
-  it("logs error to console", () => {
+  it("shows default error message when error has no message", () => {
+    const ThrowNoMsg = () => { throw new Error(); };
+    render(
+      <ErrorBoundary>
+        <ThrowNoMsg />
+      </ErrorBoundary>
+    );
+    // The fallback text "Tekkis ootamatu viga" should appear when error.message is empty
+    expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
+  });
+
+  it("logs error to console with error info", () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
-    expect(console.error).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(
+      "[ErrorBoundary] Uncaught error:",
+      expect.any(Error),
+      expect.objectContaining({ componentStack: expect.any(String) }),
+    );
+  });
+
+  it("does not render fallback or error UI when no error", () => {
+    render(
+      <ErrorBoundary fallback={<div>Fallback</div>}>
+        <div>Normal content</div>
+      </ErrorBoundary>
+    );
+    expect(screen.getByText("Normal content")).toBeInTheDocument();
+    expect(screen.queryByText("Fallback")).not.toBeInTheDocument();
+    expect(screen.queryByText("Midagi läks valesti")).not.toBeInTheDocument();
   });
 });

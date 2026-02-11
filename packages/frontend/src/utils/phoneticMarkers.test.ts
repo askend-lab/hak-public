@@ -64,10 +64,15 @@ describe("phoneticMarkers", () => {
     it("returns array of UI symbol objects", () => {
       const symbols = getUISymbols();
       expect(Array.isArray(symbols)).toBe(true);
-      expect(symbols[0]).toHaveProperty("symbol", "`");
-      expect(symbols[0]).toHaveProperty("label");
-      expect(symbols[0]).toHaveProperty("description");
       expect(symbols.length).toBe(4);
+    });
+
+    it("returns exact symbols in order", () => {
+      const symbols = getUISymbols();
+      expect(symbols[0]).toStrictEqual({ symbol: "`", label: "Kolmas välde", description: "Third pitch accent" });
+      expect(symbols[1]).toStrictEqual({ symbol: "´", label: "Rõhuline silp", description: "Stressed syllable" });
+      expect(symbols[2]).toStrictEqual({ symbol: "'", label: "Palatalisatsioon", description: "Palatalization" });
+      expect(symbols[3]).toStrictEqual({ symbol: "+", label: "Liitsõna piir", description: "Compound word boundary" });
     });
   });
 
@@ -78,16 +83,44 @@ describe("phoneticMarkers", () => {
       expect(stripPhoneticMarkers("te+re")).toBe("tere");
     });
 
+    it("removes Vabamorf markers (< ? ] ~ _ = [ . ´)", () => {
+      expect(stripPhoneticMarkers("te<re")).toBe("tere");
+      expect(stripPhoneticMarkers("te?re")).toBe("tere");
+      expect(stripPhoneticMarkers("te]re")).toBe("tere");
+      expect(stripPhoneticMarkers("te~re")).toBe("tere");
+      expect(stripPhoneticMarkers("te_re")).toBe("tere");
+      expect(stripPhoneticMarkers("te=re")).toBe("tere");
+      expect(stripPhoneticMarkers("te[re")).toBe("tere");
+      expect(stripPhoneticMarkers("te.re")).toBe("tere");
+      expect(stripPhoneticMarkers("te´re")).toBe("tere");
+    });
+
     it("returns null for null input", () => {
       expect(stripPhoneticMarkers(null)).toBeNull();
+    });
+
+    it("returns empty string for empty input", () => {
+      expect(stripPhoneticMarkers("")).toBe("");
+    });
+
+    it("handles text with multiple markers", () => {
+      expect(stripPhoneticMarkers("m<ee_s")).toBe("mees");
     });
   });
 
   describe("isVabamorfMarker", () => {
-    it("identifies Vabamorf markers", () => {
-      expect(isVabamorfMarker("<")).toBe(true);
-      expect(isVabamorfMarker("?")).toBe(true);
+    it("identifies all known Vabamorf markers", () => {
+      const markers = ["<", "?", "]", "~", "+", "_", "=", "[", "'", ".", "´", "`"];
+      for (const m of markers) {
+        expect(isVabamorfMarker(m)).toBe(true);
+      }
+    });
+
+    it("rejects non-marker characters", () => {
       expect(isVabamorfMarker("a")).toBe(false);
+      expect(isVabamorfMarker("1")).toBe(false);
+      expect(isVabamorfMarker(" ")).toBe(false);
+      expect(isVabamorfMarker("-")).toBe(false);
     });
   });
 });

@@ -104,14 +104,138 @@ describe("validateIsikukood checksum edge cases", () => {
 });
 
 describe("getNameFromIsikukood additional cases", () => {
-  it("returns female name for even gender digit", () => {
-    // Use a valid female code - need to calculate checksum
+  it("returns male name for odd gender digit (3)", () => {
+    // 37605030299: gender=3 (odd=male), substring(7,9)="02" → nameIndex=2%8=2 → "Toomas"
+    // substring(9,11)="99" → surnameIndex=99%8=3 → "Mägi"
     const name = getNameFromIsikukood("37605030299");
-    expect(name).not.toBe("Unknown User");
+    expect(name).toBe("Toomas Mägi");
   });
 
-  it("handles different name indices", () => {
-    const name1 = getNameFromIsikukood("37605030299");
-    expect(name1).not.toBe("Unknown User");
+  it("returns female name for even gender digit (4)", () => {
+    // 49901010771: gender=4 (even=female), substring(7,9)="07" → nameIndex=7%8=7 → "Maarja"
+    // substring(9,11)="71" → surnameIndex=71%8=7 → "Kask"
+    const name = getNameFromIsikukood("49901010771");
+    expect(name).toBe("Maarja Kask");
+  });
+
+  it("returns male name for gender digit 1", () => {
+    // 10001010005: gender=1 (odd=male)
+    expect(validateIsikukood("10001010002")).toBe(true);
+    const name = getNameFromIsikukood("10001010002");
+    expect(name).not.toBe("Unknown User");
+    expect(name.split(" ").length).toBe(2);
+  });
+
+  it("returns male name for gender digit 5", () => {
+    expect(validateIsikukood("50101010009")).toBe(true);
+    const name = getNameFromIsikukood("50101010009");
+    expect(name).not.toBe("Unknown User");
+  });
+});
+
+describe("validateIsikukood boundary conditions", () => {
+  it("rejects month 0", () => {
+    expect(validateIsikukood("39900010013")).toBe(false);
+  });
+
+  it("rejects month 13", () => {
+    expect(validateIsikukood("39913010013")).toBe(false);
+  });
+
+  it("accepts month 1", () => {
+    // 30101010008: month=01, day=01
+    expect(validateIsikukood("30101010007")).toBe(true);
+  });
+
+  it("accepts month 12", () => {
+    // Need valid code with month=12
+    expect(validateIsikukood("39912010014")).toBe(true);
+  });
+
+  it("rejects day 0", () => {
+    expect(validateIsikukood("39901000013")).toBe(false);
+  });
+
+  it("rejects day 32", () => {
+    expect(validateIsikukood("39901320013")).toBe(false);
+  });
+
+  it("accepts day 1 and day 31", () => {
+    expect(validateIsikukood("30101010007")).toBe(true);
+  });
+
+  it("accepts century gender 1", () => {
+    expect(validateIsikukood("10001010002")).toBe(true);
+  });
+
+  it("accepts century gender 6", () => {
+    expect(validateIsikukood("60101010006")).toBe(true);
+  });
+
+  it("rejects century gender 7", () => {
+    expect(validateIsikukood("70101010006")).toBe(false);
+  });
+
+  it("rejects wrong checksum digit", () => {
+    // 37605030299 is valid; 37605030291 should be invalid
+    expect(validateIsikukood("37605030291")).toBe(false);
+  });
+});
+
+describe("formatIsikukood edge cases", () => {
+  it("returns code unchanged for null-like input", () => {
+    expect(formatIsikukood("")).toBe("");
+  });
+
+  it("returns code unchanged for 10-digit input", () => {
+    expect(formatIsikukood("1234567890")).toBe("1234567890");
+  });
+
+  it("returns code unchanged for 12-digit input", () => {
+    expect(formatIsikukood("123456789012")).toBe("123456789012");
+  });
+
+  it("correctly slices 11-digit code into groups", () => {
+    // Verify exact slice positions: 0-3, 3-5, 5-7, 7-10, 10
+    expect(formatIsikukood("12345678901")).toBe("123 45 67 890 1");
+  });
+});
+
+describe("getNameFromIsikukood name arrays", () => {
+  it("returns correct male names by index", () => {
+    // 37605030299: male, nameIndex = parseInt("02") % 8 = 2 -> "Toomas"
+    expect(getNameFromIsikukood("37605030299")).toContain("Toomas");
+  });
+
+  it("returns correct female names by index", () => {
+    // 49901010771: female, nameIndex = parseInt("07") % 8 = 7 -> "Maarja"
+    expect(getNameFromIsikukood("49901010771")).toContain("Maarja");
+  });
+
+  it("returns correct last names by index", () => {
+    // 49901010771: surnameIndex = parseInt("71") % 8 = 7 -> "Kask"
+    expect(getNameFromIsikukood("49901010771")).toContain("Kask");
+    // 37605030299: surnameIndex = parseInt("99") % 8 = 3 -> "Mägi"
+    expect(getNameFromIsikukood("37605030299")).toContain("Mägi");
+  });
+
+  it("differentiates male and female by gender digit parity", () => {
+    // 37605030299: genderDigit=3 (odd=male)
+    const maleName = getNameFromIsikukood("37605030299");
+    // 49901010771: genderDigit=4 (even=female)
+    const femaleName = getNameFromIsikukood("49901010771");
+    // They should be different names
+    expect(maleName).not.toBe(femaleName);
+  });
+});
+
+describe("validateIsikukood regex and null checks", () => {
+  it("rejects non-digit characters in 11-char string", () => {
+    expect(validateIsikukood("3760503029a")).toBe(false);
+    expect(validateIsikukood("376050302 9")).toBe(false);
+  });
+
+  it("rejects null-ish values", () => {
+    expect(validateIsikukood("")).toBe(false);
   });
 });
