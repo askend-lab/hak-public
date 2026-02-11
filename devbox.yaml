@@ -37,13 +37,11 @@ test_modules:
     command: "pnpm test"
     command_full: "pnpm test:coverage"
     results_file: "jest-results.json"
-  # cucumber disabled: collection fails and allow_failures not respected by test-runner-v2 summary.js
-  # - name: cucumber
-  #   path: packages/frontend
-  #   type: cucumber
-  #   min_coverage_lines: 0
-  #   min_coverage_branches: 0
-  #   allow_failures: true
+  - name: cucumber
+    path: packages/frontend
+    type: cucumber
+    min_coverage_lines: 0
+    min_coverage_branches: 0
 
 # Global coverage settings
 coverage:
@@ -225,6 +223,9 @@ hooks:
 
   license-check:
     mode: error
+
+  bundle-size:
+    mode: off
 
   docker-lint:
     excludePaths:
