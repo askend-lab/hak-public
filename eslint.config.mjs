@@ -30,6 +30,10 @@ export default [
       "**/e2e/accessibility.spec.ts",
       "**/scripts/a11y-audit.mjs",
       "**/scripts/validate-design.js",
+      "test-results/**",
+      "playwright-report/**",
+      ".lhci/**",
+      ".stryker-tmp/**",
     ],
   },
 

@@ -18,3 +18,7 @@ tmp/
 tfplan-*.out
 packages/frontend/cucumber-results.json
 .agent-channel
+test-results
+playwright-report
+.lhci
+.stryker-tmp

@@ -45,7 +45,7 @@ function validateRequiredString(
   errors: string[],
   maxLength = MAX_KEY_LENGTH,
 ): void {
-  if (value === null || value === undefined || typeof value !== "string") {
+  if (typeof value !== "string") {
     errors.push(`${name} is required and must be a string`);
   } else if (value.trim() === "") {
     errors.push(`${name} cannot be empty`);
@@ -58,11 +58,7 @@ function validateRequiredString(
  * Validates data type field
  */
 function validateType(type: unknown, errors: string[]): void {
-  if (
-    type === null ||
-    type === undefined ||
-    !VALID_TYPES.includes(type as DataType)
-  ) {
+  if (!VALID_TYPES.includes(type as DataType)) {
     errors.push(`type must be one of: ${VALID_TYPES.join(", ")}`);
   }
 }
