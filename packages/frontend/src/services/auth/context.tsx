@@ -34,7 +34,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-async function refreshTokens(): Promise<boolean> {
+export async function refreshTokens(): Promise<boolean> {
   const refreshToken = AuthStorage.getRefreshToken();
   if (!refreshToken) return false;
 
@@ -77,26 +77,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const accessToken = AuthStorage.getAccessToken();
 
       if (storedUser && accessToken) {
-        if (isTokenExpired(accessToken)) {
-          const refreshed = await refreshTokens();
-          if (refreshed) {
-            setState({
-              user: storedUser,
-              isAuthenticated: true,
-              isLoading: false,
-              error: null,
-            });
-          } else {
-            AuthStorage.clear();
-            setState({ ...initialState, isLoading: false });
-          }
-        } else {
+        const needsRefresh = isTokenExpired(accessToken);
+        const canContinue = !needsRefresh || await refreshTokens();
+
+        if (canContinue) {
           setState({
             user: storedUser,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
+        } else {
+          AuthStorage.clear();
+          setState({ ...initialState, isLoading: false });
         }
       } else {
         setState({ ...initialState, isLoading: false });

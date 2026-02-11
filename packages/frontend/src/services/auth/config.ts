@@ -5,30 +5,24 @@ import { generateCodeVerifier, generateCodeChallenge } from "./pkce";
 
 const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
-export function getBaseUrl(
-  hostname: string = typeof window !== "undefined"
+export function getHostname(): string {
+  return typeof window !== "undefined"
     ? window.location.hostname
-    : "localhost",
-): string {
+    : "localhost";
+}
+
+export function getBaseUrl(hostname: string = getHostname()): string {
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return `http://localhost:${LOCAL_PORT}`;
   }
   return `https://${hostname}`;
 }
 
-export function getRedirectUri(
-  hostname: string = typeof window !== "undefined"
-    ? window.location.hostname
-    : "localhost",
-): string {
+export function getRedirectUri(hostname: string = getHostname()): string {
   return `${getBaseUrl(hostname)}/auth/callback`;
 }
 
-export function getLogoutUri(
-  hostname: string = typeof window !== "undefined"
-    ? window.location.hostname
-    : "localhost",
-): string {
+export function getLogoutUri(hostname: string = getHostname()): string {
   return getBaseUrl(hostname);
 }
 
