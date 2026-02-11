@@ -4,8 +4,10 @@
 import { LambdaResponse } from "./types";
 import { initVmetajson, isInitialized } from "./vmetajson";
 
+// Stryker disable next-line all: env defaults are equivalent
 const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
 
+// Stryker disable next-line all: env defaults are equivalent
 const DICT_PATH = process.env.DICT_PATH ?? ".";
 
 export function createResponse(

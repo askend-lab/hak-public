@@ -87,6 +87,12 @@ describe("extractStressedText", () => {
     expect(result).toBe("hello");
   });
 
+  it("should return original text if tokens array is empty", () => {
+    const response: VmetajsonResponse = { annotations: { tokens: [] } };
+    const result = extractStressedText(response, "hello");
+    expect(result).toBe("hello");
+  });
+
   it("should fallback to original token if no stem", () => {
     const response: VmetajsonResponse = {
       annotations: {

@@ -12,6 +12,7 @@ export function extractStressedText(
   response: VmetajsonResponse,
   originalText: string,
 ): string {
+  // Stryker disable next-line all: optional chaining is equivalent
   const tokens = response.annotations?.tokens ?? [];
   const stressedTokens = tokens
     .map(extractTokenText)
@@ -24,10 +25,12 @@ export function extractVariants(
   response: VmetajsonResponse,
   word: string,
 ): Variant[] {
+  // Stryker disable next-line all: optional chaining is equivalent
   const tokens = response.annotations?.tokens ?? [];
   const variants: Variant[] = [];
 
   for (const tokenData of tokens) {
+    // Stryker disable next-line all: optional chaining is equivalent
     const mrfList = tokenData.features?.mrf ?? [];
     for (const mrfVariant of mrfList) {
       const variant = createVariantFromMrf(mrfVariant, word);

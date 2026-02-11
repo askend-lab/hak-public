@@ -61,4 +61,43 @@ describe("S3 Cache Check", () => {
       checkFileExists(mockS3Primitive, "test-bucket", "key"),
     ).rejects.toThrow("Unknown S3 error");
   });
+
+  it("should return false for NoSuchKey error", async () => {
+    const mockS3NoSuchKey = {
+      send: (): Promise<never> => {
+        const error = { name: "NoSuchKey", $metadata: {} };
+        return Promise.reject(error);
+      },
+    };
+    const exists = await checkFileExists(mockS3NoSuchKey, "test-bucket", "key");
+    expect(exists).toBe(false);
+  });
+
+  it("should return false for 404 status code", async () => {
+    const mockS3Status404 = {
+      send: (): Promise<never> => {
+        const error = { name: "SomeError", $metadata: { httpStatusCode: 404 } };
+        return Promise.reject(error);
+      },
+    };
+    const exists = await checkFileExists(mockS3Status404, "test-bucket", "key");
+    expect(exists).toBe(false);
+  });
+
+  it("should throw on null error", async () => {
+    const mockS3Null = {
+      send: (): Promise<never> => Promise.reject(null),
+    };
+    await expect(checkFileExists(mockS3Null, "test-bucket", "key")).rejects.toThrow("Unknown S3 error");
+  });
+
+  it("should throw on error with only $metadata (no name)", async () => {
+    const mockS3Meta = {
+      send: (): Promise<never> => {
+        const error = { $metadata: { httpStatusCode: 500 } };
+        return Promise.reject(error);
+      },
+    };
+    await expect(checkFileExists(mockS3Meta, "test-bucket", "key")).rejects.toThrow("S3 error");
+  });
 });

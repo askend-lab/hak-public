@@ -32,6 +32,7 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
+    min_coverage_lines: 94
     min_coverage_branches: 75
     command: "pnpm test"
     command_full: "pnpm test:coverage"
@@ -175,6 +176,7 @@ hooks:
 
   source-size:
     excludePaths:
+      - "**/.stryker-tmp/**"
       - "**/.old-frontend/**"
       - "**/.esbuild/**"
       - "**/.serverless/**"
@@ -223,5 +225,20 @@ hooks:
 
   license-check:
     mode: error
+
+  docker-lint:
+    excludePaths:
+      - "**/node_modules/**"
+
+  iac-security:
+    excludePaths:
+      - "**/node_modules/**"
+
+  dead-code:
+    excludePaths:
+      - "**/node_modules/**"
+      - "**/*.test.ts"
+      - "**/*.spec.ts"
+      - ".design/**"
 
 # final
