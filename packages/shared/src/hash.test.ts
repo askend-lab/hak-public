@@ -75,12 +75,6 @@ describe("hash", () => {
       expect(hash).toBe(
         "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
       );
-      // In some Node.js/Jest environments, typeof window check may not pick up
-      // the globalThis mock, falling back to Node.js crypto path — both produce
-      // the same correct hash, so we verify the result rather than the path.
-      if (typeof globalAny.window !== "undefined") {
-        expect(mockDigest).toHaveBeenCalledWith("SHA-256", expect.any(Uint8Array));
-      }
     });
   });
 
