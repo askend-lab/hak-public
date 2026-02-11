@@ -4,7 +4,7 @@
     ".design/**",
     "tmp/**",
     "infra/**",
-    ".stryker-tmp/**",
+    "**/.stryker-tmp/**",
     "packages/vabamorf-api/src/local-server.ts",
     "packages/merlin-api/src/handler.ts",
     "packages/frontend/**",
