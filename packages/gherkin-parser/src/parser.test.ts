@@ -17,8 +17,8 @@ Feature: User Login
       expect(result).not.toBeNull();
       expect(result?.name).toBe("User Login");
       expect(result?.scenarios).toHaveLength(1);
-      expect(result?.scenarios[0].name).toBe("Successful login");
-      expect(result?.scenarios[0].steps).toHaveLength(3);
+      expect(result?.scenarios[0]?.name).toBe("Successful login");
+      expect(result?.scenarios[0]?.steps).toHaveLength(3);
     });
 
     it("should parse feature with tags", () => {
@@ -32,7 +32,7 @@ Feature: User Login
       const result = parseFeatureContent(content);
       expect(result?.tags).toContain("@login");
       expect(result?.tags).toContain("@smoke");
-      expect(result?.scenarios[0].tags).toContain("@critical");
+      expect(result?.scenarios[0]?.tags).toContain("@critical");
     });
 
     it("should parse multiple scenarios", () => {
@@ -45,8 +45,8 @@ Feature: Auth
 `;
       const result = parseFeatureContent(content);
       expect(result?.scenarios).toHaveLength(2);
-      expect(result?.scenarios[0].name).toBe("Login");
-      expect(result?.scenarios[1].name).toBe("Logout");
+      expect(result?.scenarios[0]?.name).toBe("Login");
+      expect(result?.scenarios[1]?.name).toBe("Logout");
     });
 
     it("should skip Background steps", () => {
@@ -58,8 +58,8 @@ Feature: Auth
     Given specific setup
 `;
       const result = parseFeatureContent(content);
-      expect(result?.scenarios[0].steps).toHaveLength(1);
-      expect(result?.scenarios[0].steps[0]).toBe("Given specific setup");
+      expect(result?.scenarios[0]?.steps).toHaveLength(1);
+      expect(result?.scenarios[0]?.steps[0]).toBe("Given specific setup");
     });
 
     it("should return null for empty content", () => {
@@ -78,7 +78,7 @@ Feature: Test
     Then result
 `;
       const result = parseFeatureContent(content);
-      expect(result?.scenarios[0].steps).toHaveLength(5);
+      expect(result?.scenarios[0]?.steps).toHaveLength(5);
     });
   });
 });

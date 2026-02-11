@@ -20,9 +20,9 @@ describe("SQS Message Publishing", () => {
     await publishToQueue(mockSQS, queueUrl, text, hash);
 
     expect(mockSQS.messages).toHaveLength(1);
-    expect(mockSQS.messages[0].QueueUrl).toBe(queueUrl);
+    expect(mockSQS.messages[0]?.QueueUrl).toBe(queueUrl);
 
-    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody ?? "{}");
+    const messageBody = JSON.parse(mockSQS.messages[0]?.MessageBody ?? "{}");
     expect(messageBody.text).toBe(text);
     expect(messageBody.hash).toBe(hash);
   });
@@ -34,7 +34,7 @@ describe("SQS Message Publishing", () => {
 
     await publishToQueue(mockSQS, queueUrl, text, hash);
 
-    const messageBody = JSON.parse(mockSQS.messages[0].MessageBody ?? "{}");
+    const messageBody = JSON.parse(mockSQS.messages[0]?.MessageBody ?? "{}");
     expect(messageBody.text).toBeDefined();
     expect(messageBody.hash).toBeDefined();
     expect(messageBody.timestamp).toBeDefined();
@@ -62,9 +62,9 @@ describe("SQS Warm Message", () => {
     await publishWarmMessage(mockSQS, queueUrl);
 
     expect(mockSQS.messages).toHaveLength(1);
-    expect(mockSQS.messages[0].QueueUrl).toBe(queueUrl);
+    expect(mockSQS.messages[0]?.QueueUrl).toBe(queueUrl);
 
-    const body = JSON.parse(mockSQS.messages[0].MessageBody ?? "{}");
+    const body = JSON.parse(mockSQS.messages[0]?.MessageBody ?? "{}");
     expect(body.type).toBe("warm");
     expect(body.timestamp).toBeDefined();
   });

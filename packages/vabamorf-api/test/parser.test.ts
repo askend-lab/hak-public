@@ -144,8 +144,8 @@ describe("extractVariants", () => {
 
     const result = extractVariants(response, "noormees");
     expect(result).toHaveLength(2);
-    expect(result[0].text).toBe("n<oor_m<ees");
-    expect(result[1].text).toBe("n<oor_m<ehe");
+    expect(result[0]?.text).toBe("n<oor_m<ees");
+    expect(result[1]?.text).toBe("n<oor_m<ehe");
   });
 
   it("should include morphology info in variants", () => {
@@ -171,9 +171,9 @@ describe("extractVariants", () => {
     };
 
     const result = extractVariants(response, "mees");
-    expect(result[0].morphology.lemma).toBe("mees");
-    expect(result[0].morphology.pos).toBe("S");
-    expect(result[0].morphology.fs).toBe("sg n");
+    expect(result[0]?.morphology.lemma).toBe("mees");
+    expect(result[0]?.morphology.pos).toBe("S");
+    expect(result[0]?.morphology.fs).toBe("sg n");
   });
 
   it("should generate description with POS translation", () => {
@@ -199,7 +199,7 @@ describe("extractVariants", () => {
     };
 
     const result = extractVariants(response, "mees");
-    expect(result[0].description).toContain("nimisõna");
+    expect(result[0]?.description).toContain("nimisõna");
   });
 
   it("should avoid duplicate variants", () => {
@@ -264,7 +264,7 @@ describe("extractVariants", () => {
     };
 
     const result = extractVariants(response, "meest");
-    expect(result[0].description).toContain("lemma: mees");
+    expect(result[0]?.description).toContain("lemma: mees");
   });
 
   it("should handle token without mrf", () => {

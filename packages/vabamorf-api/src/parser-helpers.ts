@@ -13,9 +13,10 @@ export function formatPhoneticText(stem: string, ending: string): string {
 function getFirstMrfStem(
   mrf: { stem?: string; ending?: string }[] | undefined,
 ): { stem: string; ending: string } | null {
-  if (mrf == null || mrf.length === 0 || mrf[0].stem == null) return null;
+  const first = mrf?.[0];
+  if (first == null || first.stem == null) return null;
 
-  return { stem: mrf[0].stem, ending: mrf[0].ending ?? "" };
+  return { stem: first.stem, ending: first.ending ?? "" };
 }
 
 export function extractTokenText(tokenData: {
