@@ -121,5 +121,68 @@ describe("useSynthesisAPI", () => {
 
       expect(res?.audioUrl).toBe("mock-audio-url");
     });
+
+    it("synthesizes when no cached phoneticText", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ stressedText: "te`re" }),
+      });
+      const { result } = renderHook(() => useSynthesisAPI());
+      let res: { audioUrl: string; phoneticText: string } | undefined;
+      await act(async () => {
+        res = await result.current.synthesizeWithCache("tere", null, "cached-url");
+      });
+
+      expect(res?.audioUrl).toBe("mock-audio-url");
+      expect(res?.phoneticText).toBe("te`re");
+    });
+  });
+
+  describe("analyzeText request details", () => {
+    it("sends correct request parameters", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ stressedText: "te`re" }),
+      });
+
+      const { result } = renderHook(() => useSynthesisAPI());
+      await act(async () => {
+        await result.current.analyzeText("tere");
+      });
+
+      expect(global.fetch).toHaveBeenCalledWith("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "tere" }),
+      });
+    });
+  });
+
+  describe("synthesizeText edge cases", () => {
+    it("falls back to original text when stressedText is empty", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ stressedText: "" }),
+      });
+
+      const { result } = renderHook(() => useSynthesisAPI());
+      let res: { phoneticText: string; stressedTags?: string[] | undefined } | undefined;
+      await act(async () => {
+        res = await result.current.synthesizeText("tere");
+      });
+
+      expect(res?.phoneticText).toBe("tere");
+      expect(res?.stressedTags).toBeUndefined();
+    });
+
+    it("does not set stressedTags when phoneticText is provided", async () => {
+      const { result } = renderHook(() => useSynthesisAPI());
+      let res: { stressedTags?: string[] | undefined } | undefined;
+      await act(async () => {
+        res = await result.current.synthesizeText("tere", "te`re");
+      });
+
+      expect(res?.stressedTags).toBeUndefined();
+    });
   });
 });
