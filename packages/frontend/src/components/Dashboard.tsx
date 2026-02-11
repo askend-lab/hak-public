@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../services/auth/context";
 import { DataService } from "../services/dataService";
 
 interface ActivityMetric {

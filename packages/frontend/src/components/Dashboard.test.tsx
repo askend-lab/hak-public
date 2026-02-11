@@ -5,15 +5,20 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Dashboard from "./Dashboard";
 
-vi.mock("../contexts/AuthContext", () => ({
+vi.mock("../services/auth/context", () => ({
   useAuth: vi.fn(() => ({
     user: null,
     isAuthenticated: false,
     isLoading: false,
+    error: null,
     showLoginModal: false,
     setShowLoginModal: vi.fn(),
     login: vi.fn(),
+    loginWithTara: vi.fn(),
     logout: vi.fn(),
+    refreshSession: vi.fn(),
+    handleCodeCallback: vi.fn(),
+    handleTaraTokens: vi.fn(),
   })),
 }));
 
@@ -23,7 +28,7 @@ vi.mock("../services/dataService", () => ({
   },
 }));
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../services/auth/context";
 
 describe("Dashboard", () => {
   beforeEach(() => {
@@ -50,10 +55,15 @@ describe("Dashboard", () => {
       user: { id: "1", email: "t@t.com", name: "T" },
       isAuthenticated: true,
       isLoading: false,
+      error: null,
       showLoginModal: false,
       setShowLoginModal: vi.fn(),
       login: vi.fn(),
+      loginWithTara: vi.fn(),
       logout: vi.fn(),
+      refreshSession: vi.fn(),
+      handleCodeCallback: vi.fn(),
+      handleTaraTokens: vi.fn(),
     });
     render(<Dashboard />);
     await waitFor(() => expect(screen.getByText("Ülesanded")).toBeTruthy());
@@ -121,10 +131,15 @@ describe("Dashboard", () => {
       user: { id: "1", email: "t@t.com", name: "T" },
       isAuthenticated: true,
       isLoading: false,
+      error: null,
       showLoginModal: false,
       setShowLoginModal: vi.fn(),
       login: vi.fn(),
+      loginWithTara: vi.fn(),
       logout: vi.fn(),
+      refreshSession: vi.fn(),
+      handleCodeCallback: vi.fn(),
+      handleTaraTokens: vi.fn(),
     });
     render(<Dashboard />);
     await waitFor(() => expect(screen.getByText("Töölaud")).toBeTruthy());

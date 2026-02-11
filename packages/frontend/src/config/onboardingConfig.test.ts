@@ -119,6 +119,23 @@ describe("onboardingConfig", () => {
       expect(createStep?.targetSelector).toBe('[data-onboarding-target="save-to-task-button"]');
       expect(createStep?.description).toContain("jagada");
     });
+
+    it("has exact step titles for teacher", () => {
+      expect(config.steps[0]?.title).toBe("Sisesta lause");
+      expect(config.steps[1]?.title).toBe("Kuula hääldust");
+    });
+
+    it("has exact step descriptions for teacher", () => {
+      expect(config.steps[0]?.description).toBe("Kirjuta siia sõna või lause, mille hääldust soovid kuulata.");
+      expect(config.steps[1]?.description).toBe("Vajuta, et kuulata sisestatud teksti korrektset hääldust.");
+      expect(config.steps[2]?.description).toBe("Lisa mitu lauset ja kuula neid järjest.");
+      expect(config.steps[3]?.description).toBe("Kliki sõnal, et näha erinevaid häälduse variante.");
+    });
+
+    it("has exact step targetSelectors for teacher", () => {
+      expect(config.steps[2]?.targetSelector).toBe('[data-onboarding-target="add-sentence-button"]');
+      expect(config.steps[3]?.targetSelector).toBe('[data-onboarding-target="sentence-0-tag-0"]');
+    });
   });
 
   describe("specialist role", () => {
@@ -163,6 +180,23 @@ describe("onboardingConfig", () => {
 
     it("has correct descriptionEt", () => {
       expect(config.descriptionEt).toContain("Helinda");
+    });
+
+    it("has exact step titles for specialist", () => {
+      expect(config.steps[0]?.title).toBe("Sisesta lause");
+      expect(config.steps[1]?.title).toBe("Kuula hääldust");
+      expect(config.steps[2]?.title).toBe("Lisa rohkem lauseid");
+    });
+
+    it("has exact step descriptions for specialist", () => {
+      expect(config.steps[0]?.description).toBe("Kirjuta siia sõna või lause, mille hääldust soovid kuulata.");
+      expect(config.steps[1]?.description).toBe("Vajuta, et kuulata sisestatud teksti korrektset hääldust.");
+      expect(config.steps[2]?.description).toBe("Lisa mitu lauset ja kuula neid järjest.");
+    });
+
+    it("has exact step targetSelectors for specialist", () => {
+      expect(config.steps[2]?.targetSelector).toBe('[data-onboarding-target="add-sentence-button"]');
+      expect(config.steps[3]?.targetSelector).toBe('[data-onboarding-target="sentence-0-tag-0"]');
     });
   });
 
