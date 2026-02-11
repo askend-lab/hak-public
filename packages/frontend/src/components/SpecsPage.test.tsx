@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import SpecsPage from "./SpecsPage";
 
 vi.mock("./specs", () => ({
-  SpecsNav: ({ onToggleGroup, onToggleFeature, onSelectFeature }: any) => (
+  SpecsNav: ({ onToggleGroup, onToggleFeature, onSelectFeature }: { onToggleGroup: (g: string) => void; onToggleFeature: (f: string) => void; onSelectFeature: (f: string) => void }) => (
     <div data-testid="specs-nav">
       <button onClick={() => onToggleGroup("Group A")}>Toggle Group</button>
       <button onClick={() => onToggleFeature("Test Feature")}>

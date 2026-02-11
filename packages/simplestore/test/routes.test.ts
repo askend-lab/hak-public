@@ -269,7 +269,7 @@ describe("Routes", () => {
 
     it("should return BAD_REQUEST for validation errors", async () => {
       const event = createMockEvent({
-        queryStringParameters: { prefix: 123 as any, type: "invalid" },
+        queryStringParameters: { prefix: 123 as unknown as string, type: "invalid" },
       });
       const response = await handleQuery(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);

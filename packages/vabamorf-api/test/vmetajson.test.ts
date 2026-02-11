@@ -10,6 +10,7 @@ import {
   closeVmetajson,
   isInitialized,
 } from "../src/vmetajson";
+import type { ChildProcess } from "child_process";
 
 jest.mock("child_process");
 
@@ -42,7 +43,7 @@ describe("vmetajson", () => {
     jest.clearAllMocks();
     closeVmetajson();
     mockProcess = createMockProcess();
-    mockSpawn.mockReturnValue(mockProcess as any);
+    mockSpawn.mockReturnValue(mockProcess as unknown as ChildProcess);
   });
 
   afterEach(() => {

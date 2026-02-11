@@ -253,7 +253,7 @@ describe("MarkerTooltip", () => {
       });
 
       // Cleanup
-      delete (window as any).ontouchstart;
+      delete (window as unknown as Record<string, unknown>).ontouchstart;
       Object.defineProperty(navigator, "maxTouchPoints", {
         value: 0,
         configurable: true,

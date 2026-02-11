@@ -5,9 +5,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { analyzeText, analyzeTextOrThrow } from "./analyzeApi";
 
 describe("analyzeApi", () => {
+  const mockFetch = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
+    global.fetch = mockFetch;
   });
 
   afterEach(() => {
@@ -16,14 +18,14 @@ describe("analyzeApi", () => {
 
   describe("analyzeText", () => {
     it("should return stressed text on success", async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({ stressedText: "ˈtɛst" }),
       });
 
       const result = await analyzeText("test");
       expect(result).toBe("ˈtɛst");
-      expect(global.fetch).toHaveBeenCalledWith("/api/analyze", {
+      expect(mockFetch).toHaveBeenCalledWith("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: "test" }),
@@ -31,7 +33,7 @@ describe("analyzeApi", () => {
     });
 
     it("should return null if response not ok", async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
       });
 
@@ -40,7 +42,7 @@ describe("analyzeApi", () => {
     });
 
     it("should return null if fetch throws", async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(
+      mockFetch.mockRejectedValue(
         new Error("Network error"),
       );
       const consoleSpy = vi
@@ -54,7 +56,7 @@ describe("analyzeApi", () => {
     });
 
     it("should return null if stressedText is empty", async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({ stressedText: "" }),
       });
@@ -66,7 +68,7 @@ describe("analyzeApi", () => {
 
   describe("analyzeTextOrThrow", () => {
     it("should return stressed text on success", async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({ stressedText: "ˈtɛst" }),
       });
@@ -76,7 +78,7 @@ describe("analyzeApi", () => {
     });
 
     it("should throw error if response not ok", async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
       });
 
@@ -86,7 +88,7 @@ describe("analyzeApi", () => {
     });
 
     it("should return original text if stressedText is empty", async () => {
-      (global.fetch as any).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({ stressedText: "" }),
       });

@@ -7,6 +7,7 @@ import {
   createVariantFromMrf,
   isDuplicateVariant,
 } from "../src/parser-helpers";
+import type { MorphologyInfo } from "../src/types";
 
 describe("parser-helpers", () => {
   describe("formatPhoneticText", () => {
@@ -62,8 +63,8 @@ describe("parser-helpers", () => {
         "majas"
       );
       expect(result).not.toBeNull();
-      expect(result!.text).toBe("maja+s");
-      expect(result!.morphology.lemma).toBe("maja");
+      expect(result?.text).toBe("maja+s");
+      expect(result?.morphology.lemma).toBe("maja");
     });
 
     it("should return null when stem is missing", () => {
@@ -73,29 +74,29 @@ describe("parser-helpers", () => {
     it("should handle missing optional fields", () => {
       const result = createVariantFromMrf({ stem: "maja" }, "maja");
       expect(result).not.toBeNull();
-      expect(result!.text).toBe("maja");
+      expect(result?.text).toBe("maja");
     });
   });
 
   describe("isDuplicateVariant", () => {
     const existing = [
-      { text: "maja+s", description: "nimisõna", morphology: {} as any },
+      { text: "maja+s", description: "nimisõna", morphology: {} as unknown as MorphologyInfo },
     ];
 
     it("should return true for duplicate", () => {
-      expect(isDuplicateVariant(existing, { text: "maja+s", description: "nimisõna", morphology: {} as any })).toBe(true);
+      expect(isDuplicateVariant(existing, { text: "maja+s", description: "nimisõna", morphology: {} as unknown as MorphologyInfo })).toBe(true);
     });
 
     it("should return false for different text", () => {
-      expect(isDuplicateVariant(existing, { text: "maja+d", description: "nimisõna", morphology: {} as any })).toBe(false);
+      expect(isDuplicateVariant(existing, { text: "maja+d", description: "nimisõna", morphology: {} as unknown as MorphologyInfo })).toBe(false);
     });
 
     it("should return false for different description", () => {
-      expect(isDuplicateVariant(existing, { text: "maja+s", description: "tegusõna", morphology: {} as any })).toBe(false);
+      expect(isDuplicateVariant(existing, { text: "maja+s", description: "tegusõna", morphology: {} as unknown as MorphologyInfo })).toBe(false);
     });
 
     it("should return false for empty variants array", () => {
-      expect(isDuplicateVariant([], { text: "maja+s", description: "nimisõna", morphology: {} as any })).toBe(false);
+      expect(isDuplicateVariant([], { text: "maja+s", description: "nimisõna", morphology: {} as unknown as MorphologyInfo })).toBe(false);
     });
   });
 });

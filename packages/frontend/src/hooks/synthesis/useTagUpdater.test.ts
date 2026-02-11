@@ -60,7 +60,7 @@ describe("useTagUpdater", () => {
       result.current.deleteTag("s1", 1);
     });
 
-    const updater = mockSetSentences.mock.calls[0]![0] as (
+    const updater = mockSetSentences.mock.calls[0]?.[0] as (
       prev: {
         id: string;
         tags: string[];
@@ -82,8 +82,8 @@ describe("useTagUpdater", () => {
       },
     ];
     const result2 = updater(prev as never);
-    expect(result2[0]!.tags).toEqual(["a", "c"]);
-    expect(result2[0]!.stressedTags).toEqual(["sa", "sc"]);
+    expect(result2[0]?.tags).toEqual(["a", "c"]);
+    expect(result2[0]?.stressedTags).toEqual(["sa", "sc"]);
   });
 
   it("replaceTag splices stressedTags when present", () => {
@@ -94,7 +94,7 @@ describe("useTagUpdater", () => {
       result.current.replaceTag("s1", 1, ["x", "y"]);
     });
 
-    const updater = mockSetSentences.mock.calls[0]![0] as (
+    const updater = mockSetSentences.mock.calls[0]?.[0] as (
       prev: {
         id: string;
         tags: string[];
@@ -116,8 +116,8 @@ describe("useTagUpdater", () => {
       },
     ];
     const result2 = updater(prev as never);
-    expect(result2[0]!.tags).toEqual(["a", "x", "y", "c"]);
-    expect(result2[0]!.text).toBe("a x y c");
+    expect(result2[0]?.tags).toEqual(["a", "x", "y", "c"]);
+    expect(result2[0]?.text).toBe("a x y c");
   });
 
   it("replaceTag without stressedTags leaves them undefined", () => {

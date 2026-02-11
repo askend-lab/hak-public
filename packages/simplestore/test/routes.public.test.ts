@@ -4,6 +4,7 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { handleGetPublic, HTTP_STATUS } from "../src/lambda/routes";
 import { Store, ServerContext } from "../src/core";
+import type { DataType } from "../src/core/types";
 import { InMemoryDynamoDB } from "./mockDynamoDB";
 
 const testContext: ServerContext = {
@@ -85,7 +86,7 @@ describe("Routes - handleGetPublic", () => {
     ["shared", "shared-test"],
     ["public", "public-test"],
   ])("should return OK for %s type", async (type, pk) => {
-    await store.save({ pk, sk: "sort1", type: type as any, ttl: 3600, data: { test: true } });
+    await store.save({ pk, sk: "sort1", type: type as DataType, ttl: 3600, data: { test: true } });
     const event = createMockEvent({
       queryStringParameters: { pk, sk: "sort1", type },
     });

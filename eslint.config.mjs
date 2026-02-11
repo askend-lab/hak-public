@@ -51,8 +51,6 @@ export default [
     rules: {
       "jest/no-standalone-expect": "off",
       "jest/no-disabled-tests": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
     },
   },
 

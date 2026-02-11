@@ -5,6 +5,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useDragAndDrop } from "./useDragAndDrop";
 import type { SentenceState } from "@/types/synthesis";
+import type { Dispatch, SetStateAction } from "react";
+import type { Mock } from "vitest";
 
 describe("useDragAndDrop", () => {
   const createMockSentences = (): SentenceState[] => [
@@ -37,10 +39,10 @@ describe("useDragAndDrop", () => {
     },
   ];
 
-  let mockSetSentences: any;
+  let mockSetSentences: Mock & Dispatch<SetStateAction<SentenceState[]>>;
 
   beforeEach(() => {
-    mockSetSentences = vi.fn();
+    mockSetSentences = vi.fn() as Mock & Dispatch<SetStateAction<SentenceState[]>>;
   });
 
   describe("initial state", () => {

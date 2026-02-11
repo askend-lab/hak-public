@@ -8,6 +8,7 @@ import {
   validateServerContext,
   parseTtl,
 } from "../src/core/validation";
+import type { StoreRequest, DataType } from "../src/core/types";
 
 describe("Validation", () => {
   describe("validateStoreRequest", () => {
@@ -32,7 +33,7 @@ describe("Validation", () => {
       ["ttl exceeding max", { pk: "entity1", sk: "sort1", type: "private", ttl: 31536001 }, "exceeds maximum"],
       ["invalid data type", { pk: "entity1", sk: "sort1", type: "private", ttl: 3600, data: "string" }, "data must be an object"],
     ])("should reject %s", (_name, input, expectedError) => {
-      const result = validateStoreRequest(input as any);
+      const result = validateStoreRequest(input as unknown as Partial<StoreRequest>);
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes(expectedError))).toBe(true);
     });
@@ -41,7 +42,7 @@ describe("Validation", () => {
       ["zero ttl", { pk: "entity1", sk: "sort1", type: "private", ttl: 0 }],
       ["without data", { pk: "entity1", sk: "sort1", type: "public", ttl: 3600 }],
     ])("should accept %s", (_name, input) => {
-      const result = validateStoreRequest(input as any);
+      const result = validateStoreRequest(input as unknown as Partial<StoreRequest>);
       expect(result.valid).toBe(true);
     });
   });
@@ -101,7 +102,7 @@ describe("Validation", () => {
   describe("string validation edge cases", () => {
     it("should reject null pk", () => {
       const result = validateStoreRequest({
-        pk: null as any,
+        pk: null as unknown as string,
         sk: "sort1",
         type: "private",
         ttl: 3600,
@@ -112,7 +113,7 @@ describe("Validation", () => {
 
     it("should reject undefined pk", () => {
       const result = validateStoreRequest({
-        pk: undefined as any,
+        pk: undefined as unknown as string,
         sk: "sort1",
         type: "private",
         ttl: 3600,
@@ -123,7 +124,7 @@ describe("Validation", () => {
 
     it("should reject non-string pk (number)", () => {
       const result = validateStoreRequest({
-        pk: 123 as any,
+        pk: 123 as unknown as string,
         sk: "sort1",
         type: "private",
         ttl: 3600,
@@ -181,7 +182,7 @@ describe("Validation", () => {
       const result = validateStoreRequest({
         pk: "entity1",
         sk: "sort1",
-        type: null as any,
+        type: null as unknown as DataType,
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
@@ -192,7 +193,7 @@ describe("Validation", () => {
       const result = validateStoreRequest({
         pk: "entity1",
         sk: "sort1",
-        type: undefined as any,
+        type: undefined as unknown as DataType,
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
@@ -204,7 +205,7 @@ describe("Validation", () => {
         pk: "entity1",
         sk: "sort1",
         type: "private",
-        ttl: "3600" as any,
+        ttl: "3600" as unknown as number,
       });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("ttl must be a number");
@@ -215,7 +216,7 @@ describe("Validation", () => {
         pk: "entity1",
         sk: "sort1",
         type: "private",
-        ttl: null as any,
+        ttl: null as unknown as number,
       });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("ttl must be a number");
@@ -226,7 +227,7 @@ describe("Validation", () => {
         pk: "entity1",
         sk: "sort1",
         type: "private",
-        ttl: undefined as any,
+        ttl: undefined as unknown as number,
       });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("ttl must be a number");
@@ -299,7 +300,7 @@ describe("Validation", () => {
         ...fields,
         type: "private",
         ttl: 3600,
-      } as any);
+      } as unknown as Partial<StoreRequest>);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain(`${expectedField} is required and must be a string`);
     });
@@ -383,7 +384,7 @@ describe("Validation", () => {
       ["null app", { app: null, tenant: "t", env: "e", userId: "u" }, "app"],
       ["empty tenant", { app: "a", tenant: "", env: "e", userId: "u" }, "tenant"],
     ])("should reject %s", (_name, context, expectedField) => {
-      const result = validateServerContext(context as any);
+      const result = validateServerContext(context as unknown as Partial<Record<string, unknown>>);
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes(expectedField))).toBe(true);
     });

@@ -55,10 +55,10 @@ describe("audioPlayer", () => {
       expect(audio).toBe(mockAudio);
       expect(mockAudio.src).toBe("https://example.com/audio.mp3");
 
-      mockAudio.onloadeddata!();
+      mockAudio.onloadeddata?.();
       expect(onLoaded).toHaveBeenCalled();
 
-      mockAudio.onended!();
+      mockAudio.onended?.();
       expect(onEnded).toHaveBeenCalled();
       expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(
         "https://example.com/audio.mp3",
@@ -74,7 +74,7 @@ describe("audioPlayer", () => {
         false,
       );
 
-      mockAudio.onended!();
+      mockAudio.onended?.();
       expect(global.URL.revokeObjectURL).not.toHaveBeenCalled();
 
       cleanup();
@@ -85,7 +85,7 @@ describe("audioPlayer", () => {
 
       createAudioPlayer("https://example.com/audio.mp3", { onError });
 
-      mockAudio.onerror!();
+      mockAudio.onerror?.();
       expect(onError).toHaveBeenCalled();
       expect(global.URL.revokeObjectURL).toHaveBeenCalled();
     });
@@ -104,10 +104,10 @@ describe("audioPlayer", () => {
         },
       );
 
-      mockAudio.onloadeddata!();
+      mockAudio.onloadeddata?.();
       expect(onLoaded).toHaveBeenCalled();
 
-      mockAudio.onended!();
+      mockAudio.onended?.();
       await playPromise;
 
       expect(onEnded).toHaveBeenCalled();
@@ -122,7 +122,7 @@ describe("audioPlayer", () => {
         { onError },
       );
 
-      mockAudio.onerror!();
+      mockAudio.onerror?.();
 
       await expect(playPromise).rejects.toThrow("Audio playback failed");
       expect(onError).toHaveBeenCalled();
@@ -155,7 +155,7 @@ describe("audioPlayer", () => {
         "https://example.com/audio.mp3",
       );
 
-      mockAudio.onended!();
+      mockAudio.onended?.();
       await playPromise;
 
       expect(mockAudio.play).toHaveBeenCalled();

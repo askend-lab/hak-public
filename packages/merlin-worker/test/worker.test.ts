@@ -10,6 +10,8 @@ import {
   isWarmMessage,
 } from "../src/sqs";
 import { processMessage } from "../src/worker";
+import type { SQSClient } from "@aws-sdk/client-sqs";
+import type { S3Client } from "@aws-sdk/client-s3";
 
 jest.mock("../src/sqs", () => ({
   receiveMessage: jest.fn(),
@@ -26,8 +28,8 @@ jest.mock("../src/s3", () => ({
   uploadAudio: jest.fn(),
 }));
 
-const mockSqsClient = { send: jest.fn() } as any;
-const mockS3Client = { send: jest.fn() } as any;
+const mockSqsClient = { send: jest.fn() } as unknown as SQSClient;
+const mockS3Client = { send: jest.fn() } as unknown as S3Client;
 const config = {
   queueUrl: "https://queue-url",
   bucketName: "test-bucket",

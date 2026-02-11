@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { checkFileExists } from "../src/s3";
+import type { S3ClientLike } from "../src/s3";
 
 import { MockS3Client } from "./mocks";
 
@@ -16,7 +17,7 @@ describe("S3 Cache Check", () => {
     mockS3.setFileExists("cache/abc123.mp3", true);
 
     const exists = await checkFileExists(
-      mockS3 as any,
+      mockS3 as unknown as S3ClientLike,
       "test-bucket",
       "cache/abc123.mp3",
     );
@@ -28,7 +29,7 @@ describe("S3 Cache Check", () => {
     mockS3.setFileExists("cache/abc123.mp3", false);
 
     const exists = await checkFileExists(
-      mockS3 as any,
+      mockS3 as unknown as S3ClientLike,
       "test-bucket",
       "cache/abc123.mp3",
     );

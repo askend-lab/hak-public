@@ -5,15 +5,54 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesisOrchestrator } from "./useSynthesisOrchestrator";
+import type { Mock } from "vitest";
+
+interface AudioHandlers {
+  onLoadStart?: () => void;
+  onLoadComplete?: () => void;
+  onEnded?: () => void;
+  onError?: (err?: unknown) => void;
+}
+
+interface MockSentence {
+  id: string;
+  text: string;
+  tags: string[];
+  audioUrl?: string | null;
+  phoneticText?: string | null;
+  stressedTags?: string[];
+  isLoading?: boolean;
+  isPlaying?: boolean;
+}
+
+interface MockSentenceState {
+  sentences: MockSentence[];
+  updateSentence: Mock;
+  getSentence: Mock;
+  addSentence: Mock;
+  deleteSentence: Mock;
+}
+
+interface MockAudioPlayer {
+  currentAudio: HTMLAudioElement | null;
+  stopCurrentAudio: Mock;
+  playAudio: Mock;
+  playWithAbort: Mock;
+}
+
+interface MockSynthesisAPI {
+  synthesizeText: Mock;
+  synthesizeWithCache: Mock;
+}
 
 vi.mock("./useSentenceState");
 vi.mock("./useAudioPlayer");
 vi.mock("./useSynthesisAPI");
 
 describe("useSynthesisOrchestrator", () => {
-  let mockSentenceState: any;
-  let mockAudioPlayer: any;
-  let mockSynthesisAPI: any;
+  let mockSentenceState: MockSentenceState;
+  let mockAudioPlayer: MockAudioPlayer;
+  let mockSynthesisAPI: MockSynthesisAPI;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -30,7 +69,7 @@ describe("useSynthesisOrchestrator", () => {
       ],
       updateSentence: vi.fn(),
       getSentence: vi.fn((id) =>
-        mockSentenceState.sentences.find((s: any) => s.id === id),
+        mockSentenceState.sentences.find((s: MockSentence) => s.id === id),
       ),
       addSentence: vi.fn(),
       deleteSentence: vi.fn(),
@@ -350,7 +389,7 @@ describe("useSynthesisOrchestrator", () => {
 
     it("should invoke synthesizeAndPlay onLoadComplete with stressedTags", async () => {
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onLoadComplete?.();
           handlers?.onEnded?.();
           return true;
@@ -383,7 +422,7 @@ describe("useSynthesisOrchestrator", () => {
 
     it("should invoke cached path callbacks in synthesizeWithText when text matches", async () => {
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onLoadStart?.();
           handlers?.onLoadComplete?.();
           handlers?.onEnded?.();
@@ -442,7 +481,7 @@ describe("useSynthesisOrchestrator", () => {
 
     it("should invoke synthesizeWithText onLoadComplete and onEnded for new synthesis", async () => {
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onLoadComplete?.();
           handlers?.onEnded?.();
           return true;
@@ -480,7 +519,7 @@ describe("useSynthesisOrchestrator", () => {
 
     it("should invoke synthesizeWithText onError for new synthesis", async () => {
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onError?.();
           return false;
         },
@@ -509,7 +548,7 @@ describe("useSynthesisOrchestrator", () => {
 
     it("should invoke synthesizeAndPlay cached onLoadComplete callback", async () => {
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onLoadComplete?.();
           return true;
         },
@@ -538,7 +577,7 @@ describe("useSynthesisOrchestrator", () => {
     it("should invoke synthesizeAndPlay cached onError with retry", async () => {
       vi.useFakeTimers();
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onError?.();
           return false;
         },
@@ -592,7 +631,7 @@ describe("useSynthesisOrchestrator", () => {
 
     it("should invoke synthesizeAndPlay onEnded callback", async () => {
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onEnded?.();
           return true;
         },
@@ -618,7 +657,7 @@ describe("useSynthesisOrchestrator", () => {
     it("should invoke onError in cached path and retry via setTimeout", async () => {
       vi.useFakeTimers();
       mockAudioPlayer.playAudio.mockImplementation(
-        async (_url: string, handlers: any) => {
+        async (_url: string, handlers: AudioHandlers) => {
           handlers?.onError?.();
           return false;
         },

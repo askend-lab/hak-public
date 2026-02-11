@@ -184,7 +184,7 @@ describe("useSentenceState", () => {
     });
     const stored = localStorage.getItem("eki_synthesis_state");
     expect(stored).toBeTruthy();
-    const parsed = JSON.parse(stored!);
+    const parsed = JSON.parse(stored ?? "[]");
     expect(parsed[0].text).toBe("Noormees läks kooli");
     expect(parsed[0].isPlaying).toBeUndefined();
     expect(parsed[0].isLoading).toBeUndefined();

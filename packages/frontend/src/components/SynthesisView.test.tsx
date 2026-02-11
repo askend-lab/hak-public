@@ -6,8 +6,21 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import SynthesisView from "./SynthesisView";
 import { SentenceState } from "@/types/synthesis";
 
+interface MockHeaderProps { onPlayAllClick: () => void }
+interface MockItemProps {
+  id: string;
+  onPlay: (id: string) => void;
+  onClear: (id: string) => void;
+  menuContent: React.ReactNode;
+  onMenuOpenLegacy: (e: React.MouseEvent, id: string) => void;
+  onInputKeyDown?: (e: { key: string }) => void;
+  onInputBlur?: () => void;
+  tagMenuItems?: { label: string; onClick: (id: string, idx: number, word: string) => void }[];
+}
+interface MockMenuProps { sentenceId: string; onClose: () => void }
+
 vi.mock("./SynthesisPageHeader", () => ({
-  default: ({ onPlayAllClick }: any) => (
+  default: ({ onPlayAllClick }: MockHeaderProps) => (
     <div data-testid="header">
       <button onClick={onPlayAllClick}>Play All</button>
     </div>
@@ -24,7 +37,7 @@ vi.mock("./SentenceSynthesisItem", () => ({
     onInputKeyDown,
     onInputBlur,
     tagMenuItems,
-  }: any) => (
+  }: MockItemProps) => (
     <div data-testid={`item-${id}`}>
       <button onClick={() => onPlay(id)}>Play {id}</button>
       <button onClick={() => onClear(id)}>Clear {id}</button>
@@ -37,7 +50,7 @@ vi.mock("./SentenceSynthesisItem", () => ({
         </button>
       )}
       {onInputBlur && <button onClick={() => onInputBlur()}>Blur {id}</button>}
-      {tagMenuItems?.map((item: any, i: number) => (
+      {tagMenuItems?.map((item: { label: string; onClick: (id: string, idx: number, word: string) => void }, i: number) => (
         <button key={i} onClick={() => item.onClick(id, 0, "word")}>
           TagMenu-{item.label}
         </button>
@@ -48,7 +61,7 @@ vi.mock("./SentenceSynthesisItem", () => ({
 }));
 
 vi.mock("./SentenceMenu", () => ({
-  default: ({ sentenceId, onClose }: any) => (
+  default: ({ sentenceId, onClose }: MockMenuProps) => (
     <div data-testid={`menu-${sentenceId}`}>
       <button onClick={onClose}>Close Menu</button>
     </div>

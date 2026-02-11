@@ -5,8 +5,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAudioPlayer } from "./useAudioPlayer";
 
+interface MockAudioInstance {
+  src: string;
+  onloadeddata: (() => void) | null;
+  onended: (() => void) | null;
+  onerror: (() => void) | null;
+  pause: ReturnType<typeof vi.fn>;
+  play: ReturnType<typeof vi.fn>;
+}
+
+function getAudioAt(arr: (MockAudioInstance | null)[], i: number): MockAudioInstance {
+  const inst = arr[i];
+  if (!inst) throw new Error(`audioInstances[${i}] is null/undefined`);
+  return inst;
+}
+
 describe("useAudioPlayer", () => {
-  let audioInstances: any[] = [];
+  let audioInstances: (MockAudioInstance | null)[] = [];
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -49,15 +64,15 @@ describe("useAudioPlayer", () => {
       });
 
       expect(onLoadStart).toHaveBeenCalled();
-      expect(audioInstances[0].play).toHaveBeenCalled();
+      expect(getAudioAt(audioInstances, 0).play).toHaveBeenCalled();
 
       act(() => {
-        audioInstances[0].onloadeddata?.();
+        getAudioAt(audioInstances, 0).onloadeddata?.();
       });
       expect(onLoadComplete).toHaveBeenCalled();
 
       act(() => {
-        audioInstances[0].onended?.();
+        getAudioAt(audioInstances, 0).onended?.();
       });
 
       const playResult = await playPromise;
@@ -77,7 +92,7 @@ describe("useAudioPlayer", () => {
       });
 
       act(() => {
-        audioInstances[0].onerror?.();
+        getAudioAt(audioInstances, 0).onerror?.();
       });
 
       const playResult = await playPromise;
@@ -104,7 +119,7 @@ describe("useAudioPlayer", () => {
           audioInstances[0] = this;
         }
       }
-      global.Audio = MockAudioWithError as any;
+      global.Audio = MockAudioWithError as unknown as typeof Audio;
 
       const playResult = await act(async () => {
         return result.current.playAudio("https://example.com/audio.mp3", {
@@ -125,7 +140,7 @@ describe("useAudioPlayer", () => {
       });
 
       act(() => {
-        audioInstances[0].onended?.();
+        getAudioAt(audioInstances, 0).onended?.();
       });
 
       const playResult = await playPromise;
@@ -151,7 +166,7 @@ describe("useAudioPlayer", () => {
       expect(onStart).toHaveBeenCalled();
 
       act(() => {
-        audioInstances[0].onended?.();
+        getAudioAt(audioInstances, 0).onended?.();
       });
 
       const playResult = await playPromise;
@@ -181,7 +196,7 @@ describe("useAudioPlayer", () => {
 
       const playResult = await playPromise;
       expect(playResult).toBe(false);
-      expect(audioInstances[0].pause).toHaveBeenCalled();
+      expect(getAudioAt(audioInstances, 0).pause).toHaveBeenCalled();
       expect(result.current.currentAudio).toBeNull();
     });
 
@@ -214,7 +229,7 @@ describe("useAudioPlayer", () => {
       });
 
       act(() => {
-        audioInstances[0].onerror?.();
+        getAudioAt(audioInstances, 0).onerror?.();
       });
 
       const playResult = await playPromise;
@@ -270,8 +285,8 @@ describe("useAudioPlayer", () => {
         result.current.stopCurrentAudio();
       });
 
-      expect(audioInstances[0].pause).toHaveBeenCalled();
-      expect(audioInstances[0].src).toBe("");
+      expect(getAudioAt(audioInstances, 0).pause).toHaveBeenCalled();
+      expect(getAudioAt(audioInstances, 0).src).toBe("");
       expect(result.current.currentAudio).toBeNull();
     });
 
