@@ -209,7 +209,9 @@ describe("useSharedTaskAudio", () => {
     });
 
     // Wait for error handler to be called
-    await new Promise((r) => setTimeout(r, 20));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
     expect(result.current.currentPlayingId).toBeNull();
   });
 
@@ -240,7 +242,9 @@ describe("useSharedTaskAudio", () => {
     });
 
     // Wait for rejection handler
-    await new Promise((r) => setTimeout(r, 20));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
     expect(result.current.currentPlayingId).toBeNull();
   });
 
