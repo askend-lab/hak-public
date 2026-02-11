@@ -180,3 +180,92 @@ describe("SpecsNav test status", () => {
     expect(screen.getByText("○")).toBeInTheDocument();
   });
 });
+
+describe("SpecsNav badge classes and icons", () => {
+  it("group header has expanded class when expanded", () => {
+    const { container } = render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 1"])} />,
+    );
+    expect(container.querySelector(".specs-group__header--expanded")).toBeTruthy();
+  });
+
+  it("group header has no expanded class when collapsed", () => {
+    const { container } = render(<SpecsNav {...defaultProps} />);
+    expect(container.querySelector(".specs-group__header--expanded")).toBeNull();
+  });
+
+  it("shows folder open icon for expanded group", () => {
+    render(<SpecsNav {...defaultProps} expandedGroups={new Set(["Group 1"])} />);
+    expect(screen.getByText(/📂/)).toBeInTheDocument();
+  });
+
+  it("shows folder closed icon for collapsed group", () => {
+    render(<SpecsNav {...defaultProps} />);
+    expect(screen.getAllByText(/📁/).length).toBeGreaterThan(0);
+  });
+
+  it("shows down arrow for expanded feature", () => {
+    render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        expandedFeatures={new Set(["Feature 1"])}
+      />,
+    );
+    expect(screen.getByText(/▼/)).toBeInTheDocument();
+  });
+
+  it("shows right arrow for collapsed feature", () => {
+    render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 1"])} />,
+    );
+    expect(screen.getByText(/▶/)).toBeInTheDocument();
+  });
+
+  it("skipped feature has skipped class", () => {
+    const { container } = render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 2"])} />,
+    );
+    expect(container.querySelector(".specs-feature__item--skipped")).toBeTruthy();
+  });
+
+  it("calls onToggleFeature and onSelectFeature on feature click", async () => {
+    const onToggleFeature = vi.fn();
+    const onSelectFeature = vi.fn();
+    render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        onToggleFeature={onToggleFeature}
+        onSelectFeature={onSelectFeature}
+      />,
+    );
+    await userEvent.click(screen.getByText(/Feature 1/));
+    expect(onToggleFeature).toHaveBeenCalledWith("Feature 1");
+    expect(onSelectFeature).toHaveBeenCalledWith("Feature 1");
+  });
+
+  it("badge has correct class based on pass status", () => {
+    const { container } = render(
+      <SpecsNav {...defaultProps} expandedGroups={new Set(["Group 1"])} />,
+    );
+    expect(container.querySelector(".specs-badge--pending")).toBeTruthy();
+  });
+
+  it("scenario item has correct class", () => {
+    const { container } = render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        expandedFeatures={new Set(["Feature 1"])}
+      />,
+    );
+    expect(container.querySelector(".specs-scenario__item")).toBeTruthy();
+    expect(container.querySelector(".specs-scenario__name")).toBeTruthy();
+  });
+
+  it("nav title shows Features text", () => {
+    render(<SpecsNav {...defaultProps} />);
+    expect(screen.getByText(/Features/)).toBeInTheDocument();
+  });
+});
