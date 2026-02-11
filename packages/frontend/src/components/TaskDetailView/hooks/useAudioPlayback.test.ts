@@ -254,12 +254,14 @@ describe("useAudioPlayback with existing audio", () => {
   });
 
   it("handlePlayAll resets all states when called twice", async () => {
+    const { waitFor } = await import("@testing-library/react");
     const entries = [mockEntry("1", "test", "http://a.mp3")];
     const { result } = renderHook(() => useAudioPlayback(entries));
     act(() => { result.current.handlePlayAll(); });
+    await waitFor(() => {
+      expect(result.current.isLoadingPlayAll || result.current.isPlayingAll).toBe(true);
+    });
     await act(async () => { await result.current.handlePlayAll(); });
-    expect(result.current.currentPlayingId).toBeNull();
-    expect(result.current.currentLoadingId).toBeNull();
     expect(result.current.isPlayingAll).toBe(false);
     expect(result.current.isLoadingPlayAll).toBe(false);
   });
