@@ -70,4 +70,81 @@ describe("Dashboard", () => {
       expect(screen.getByText("Hiljutine tegevus")).toBeTruthy(),
     );
   });
+
+  it("shows loading spinner initially", () => {
+    const { container } = render(<Dashboard />);
+    expect(container.querySelector(".loader-spinner")).toBeTruthy();
+    expect(container.querySelector(".dashboard__loading")).toBeTruthy();
+  });
+
+  it("renders subtitle", async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(screen.getByText("Rakenduse aktiivsuse ülevaade")).toBeTruthy());
+  });
+
+  it("renders all 4 metric labels", async () => {
+    render(<Dashboard />);
+    await waitFor(() => {
+      expect(screen.getByText("Ülesanded")).toBeTruthy();
+      expect(screen.getByText("Kirjed")).toBeTruthy();
+      expect(screen.getByText("Sünteesid")).toBeTruthy();
+      expect(screen.getByText("Sessioone")).toBeTruthy();
+    });
+  });
+
+  it("renders metric icons", async () => {
+    render(<Dashboard />);
+    await waitFor(() => {
+      expect(screen.getAllByText("📋").length).toBeGreaterThan(0);
+      expect(screen.getByText("📝")).toBeTruthy();
+      expect(screen.getByText("🔊")).toBeTruthy();
+      expect(screen.getByText("👤")).toBeTruthy();
+    });
+  });
+
+  it("renders quick link buttons", async () => {
+    render(<Dashboard />);
+    await waitFor(() => {
+      expect(screen.getByText("Uus süntees")).toBeTruthy();
+      expect(screen.getByText("Loo ülesanne")).toBeTruthy();
+      expect(screen.getByText("🎤")).toBeTruthy();
+    });
+  });
+
+  it("renders activity item with description", async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(screen.getByText("Sisselogimine")).toBeTruthy());
+  });
+
+  it("hides auth prompt when authenticated", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: "1", email: "t@t.com", name: "T" },
+      isAuthenticated: true,
+      isLoading: false,
+      showLoginModal: false,
+      setShowLoginModal: vi.fn(),
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    render(<Dashboard />);
+    await waitFor(() => expect(screen.getByText("Töölaud")).toBeTruthy());
+    expect(screen.queryByText(/Logi sisse/)).toBeNull();
+  });
+
+  it("renders metric value elements", async () => {
+    const { container } = render(<Dashboard />);
+    await waitFor(() => {
+      const values = container.querySelectorAll(".dashboard__metric-value");
+      expect(values.length).toBe(4);
+    });
+  });
+
+  it("has correct dashboard structure classes", async () => {
+    const { container } = render(<Dashboard />);
+    await waitFor(() => {
+      expect(container.querySelector(".dashboard__header")).toBeTruthy();
+      expect(container.querySelector(".dashboard__metrics")).toBeTruthy();
+      expect(container.querySelector(".dashboard__sections")).toBeTruthy();
+    });
+  });
 });
