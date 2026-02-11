@@ -1,4 +1,4 @@
-@playlist @playback @US-087
+@ready @playlist @playback @US-087
 Feature: Skip empty sentences during sequential playback (US-087)
   As a language learner
   I want empty sentences to be skipped during play all

@@ -1,4 +1,4 @@
-@auth @redirect @US-092
+@ready @auth @redirect @US-092
 Feature: Post-login redirect to intended page (US-092)
   As a user who was redirected to login
   I want to be taken back to my intended destination after login

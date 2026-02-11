@@ -1,4 +1,4 @@
-@playlist @storage @US-063
+@ready @playlist @storage @US-063
 Feature: Persist synthesis state in local storage (US-063)
   As a language learner
   I want my sentence data to be saved in local storage

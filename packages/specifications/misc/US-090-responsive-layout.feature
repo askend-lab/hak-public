@@ -1,4 +1,4 @@
-@misc @responsive @US-090
+@ready @misc @responsive @US-090
 Feature: Responsive page layout (US-090)
   As a user on different devices
   I want the application layout to adapt to my screen size

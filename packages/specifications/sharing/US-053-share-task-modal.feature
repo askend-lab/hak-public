@@ -1,4 +1,4 @@
-@sharing @modal @US-053
+@ready @sharing @modal @US-053
 Feature: Share task via modal with copy link (US-053)
   As a language teacher
   I want to share a task using a modal with a copy-link button

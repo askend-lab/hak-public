@@ -1,4 +1,4 @@
-@auth @storage @US-082
+@ready @auth @storage @US-082
 Feature: Authentication token storage and retrieval (US-082)
   As an authenticated user
   I want my auth tokens to be securely stored

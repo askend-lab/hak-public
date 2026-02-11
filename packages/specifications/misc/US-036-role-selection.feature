@@ -1,4 +1,4 @@
-@misc @onboarding @US-036
+@ready @misc @onboarding @US-036
 Feature: Select user role on first visit (US-036)
   As a first-time user
   I want to select my role (learner, teacher, or researcher)

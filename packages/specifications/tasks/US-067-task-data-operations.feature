@@ -1,4 +1,4 @@
-@tasks @data @US-067
+@ready @tasks @data @US-067
 Feature: Task CRUD data operations (US-067)
   As an authenticated user
   I want the data service to handle task operations reliably

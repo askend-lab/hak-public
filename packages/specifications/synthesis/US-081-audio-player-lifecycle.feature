@@ -1,4 +1,4 @@
-@synthesis @audio @US-081
+@ready @synthesis @audio @US-081
 Feature: Audio player lifecycle management (US-081)
   As a language learner
   I want the audio player to properly manage its lifecycle

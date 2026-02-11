@@ -1,4 +1,4 @@
-@tasks @detail @US-074
+@ready @tasks @detail @US-074
 Feature: Task detail view states (US-074)
   As a language teacher
   I want the task detail view to handle different states

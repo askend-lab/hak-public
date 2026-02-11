@@ -1,4 +1,4 @@
-@tasks @bulk @US-083
+@ready @tasks @bulk @US-083
 Feature: Add all playlist sentences to a task (US-083)
   As a language teacher
   I want to add all current playlist sentences to a task at once

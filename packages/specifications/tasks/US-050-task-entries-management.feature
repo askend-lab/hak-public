@@ -1,4 +1,4 @@
-@tasks @entries @US-050
+@ready @tasks @entries @US-050
 Feature: Manage entries within a task (US-050)
   As a language teacher
   I want to manage individual entries within a task

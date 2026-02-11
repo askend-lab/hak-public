@@ -1,4 +1,4 @@
-@misc @modal @US-095
+@ready @misc @modal @US-095
 Feature: Base modal common behavior (US-095)
   As a user of the application
   I want all modals to behave consistently

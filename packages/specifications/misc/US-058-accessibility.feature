@@ -1,4 +1,4 @@
-@misc @a11y @US-058
+@ready @misc @a11y @US-058
 Feature: Accessibility support for screen readers (US-058)
   As a user with assistive technology
   I want the application to have proper ARIA labels and roles

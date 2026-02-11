@@ -1,4 +1,4 @@
-@tasks @variants @US-073
+@ready @tasks @variants @US-073
 Feature: View pronunciation variants for task entries (US-073)
   As a language teacher viewing task details
   I want to see pronunciation variants for words in task entries

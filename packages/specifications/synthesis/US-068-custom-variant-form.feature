@@ -1,4 +1,4 @@
-@synthesis @custom-variant @US-068
+@ready @synthesis @custom-variant @US-068
 Feature: Create and test custom pronunciation variant (US-068)
   As a language researcher
   I want to create custom phonetic variants with markers

@@ -1,4 +1,4 @@
-@tasks @entries @US-099
+@ready @tasks @entries @US-099
 Feature: Update task entry text and stressed text (US-099)
   As a language teacher
   I want to update the text of individual task entries

@@ -1,4 +1,4 @@
-@synthesis @menu @US-039
+@ready @synthesis @menu @US-039
 Feature: Sentence context menu actions (US-039)
   As a language learner
   I want to access actions for each sentence via a context menu

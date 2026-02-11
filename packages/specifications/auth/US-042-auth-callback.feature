@@ -1,4 +1,4 @@
-@auth @callback @US-042
+@ready @auth @callback @US-042
 Feature: Process authentication callback (US-042)
   As a user completing login
   I want the callback page to process my authentication tokens

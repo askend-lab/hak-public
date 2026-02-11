@@ -1,4 +1,4 @@
-@synthesis @api @US-064
+@ready @synthesis @api @US-064
 Feature: Asynchronous synthesis with polling (US-064)
   As a language learner
   I want synthesis to poll for results when processing takes time

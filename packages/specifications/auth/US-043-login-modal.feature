@@ -1,4 +1,4 @@
-@auth @login @US-043
+@ready @auth @login @US-043
 Feature: Login modal with provider options (US-043)
   As an unauthenticated user
   I want to see a login modal with multiple sign-in options

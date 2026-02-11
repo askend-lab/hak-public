@@ -1,4 +1,4 @@
-@synthesis @variants @US-098
+@ready @synthesis @variants @US-098
 Feature: Handle variants API errors gracefully (US-098)
   As a language learner
   I want the variants panel to handle API errors

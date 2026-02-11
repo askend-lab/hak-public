@@ -1,4 +1,4 @@
-@misc @dashboard @US-038
+@ready @misc @dashboard @US-038
 Feature: View activity dashboard (US-038)
   As an authenticated user
   I want to see a dashboard with my activity summary

@@ -1,4 +1,4 @@
-@synthesis @layout @US-091
+@ready @synthesis @layout @US-091
 Feature: Synthesis page layout and header (US-091)
   As a language learner
   I want the synthesis page to have a clear layout

@@ -1,4 +1,4 @@
-@tasks @drag-drop @US-072
+@ready @tasks @drag-drop @US-072
 Feature: Reorder task entries via drag and drop (US-072)
   As a language teacher
   I want to reorder entries in a task by dragging them

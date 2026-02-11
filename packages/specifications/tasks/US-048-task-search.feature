@@ -1,4 +1,4 @@
-@tasks @search @US-048
+@ready @tasks @search @US-048
 Feature: Search and filter tasks in sentence menu (US-048)
   As a language learner with many tasks
   I want to search for specific tasks in the sentence menu

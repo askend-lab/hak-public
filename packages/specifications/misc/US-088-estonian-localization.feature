@@ -1,4 +1,4 @@
-@misc @i18n @US-088
+@ready @misc @i18n @US-088
 Feature: Estonian language localization (US-088)
   As an Estonian-speaking user
   I want the entire UI to be in Estonian

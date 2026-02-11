@@ -1,4 +1,4 @@
-@synthesis @variants @US-061
+@ready @synthesis @variants @US-061
 Feature: Pronunciation variants panel interactions (US-061)
   As a language learner
   I want to explore pronunciation variants for a selected word

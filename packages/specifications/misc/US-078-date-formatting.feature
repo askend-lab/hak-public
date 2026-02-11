@@ -1,4 +1,4 @@
-@misc @formatting @US-078
+@ready @misc @formatting @US-078
 Feature: Estonian date and time formatting (US-078)
   As a user of the application
   I want dates and times to be displayed in Estonian format

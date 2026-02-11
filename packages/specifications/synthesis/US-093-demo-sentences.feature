@@ -1,4 +1,4 @@
-@synthesis @onboarding @US-093
+@ready @synthesis @onboarding @US-093
 Feature: Demo sentences for new users (US-093)
   As a new user going through onboarding
   I want to see pre-filled demo sentences

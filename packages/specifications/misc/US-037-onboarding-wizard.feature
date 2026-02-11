@@ -1,4 +1,4 @@
-@misc @onboarding @US-037
+@ready @misc @onboarding @US-037
 Feature: Onboarding wizard guides new users (US-037)
   As a new user who has selected a role
   I want to see guided tooltips highlighting key features

@@ -1,4 +1,4 @@
-@synthesis @analysis @US-060
+@ready @synthesis @analysis @US-060
 Feature: Text stress analysis via API (US-060)
   As a language learner
   I want my entered text to be analyzed for stress patterns

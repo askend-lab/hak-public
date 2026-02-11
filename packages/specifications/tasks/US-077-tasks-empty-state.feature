@@ -1,4 +1,4 @@
-@tasks @empty @US-077
+@ready @tasks @empty @US-077
 Feature: Tasks page empty and error states (US-077)
   As an authenticated user with no tasks
   I want to see helpful guidance when my task list is empty

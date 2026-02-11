@@ -1,4 +1,4 @@
-@synthesis @tags @US-055
+@ready @synthesis @tags @US-055
 Feature: Edit word tags in synthesized text (US-055)
   As a language learner
   I want to edit individual word tags in the synthesized output

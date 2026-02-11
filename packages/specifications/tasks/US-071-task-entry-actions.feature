@@ -1,4 +1,4 @@
-@tasks @entries @US-071
+@ready @tasks @entries @US-071
 Feature: Task entry row actions (US-071)
   As a language teacher viewing task details
   I want to perform actions on individual entries via a row menu

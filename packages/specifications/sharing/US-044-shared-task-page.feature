@@ -1,4 +1,4 @@
-@sharing @shared-page @US-044
+@ready @sharing @shared-page @US-044
 Feature: View and interact with shared task page (US-044)
   As a student accessing a shared task
   I want to view task entries and play audio on the shared page

@@ -1,4 +1,4 @@
-@synthesis @clipboard @US-085
+@ready @synthesis @clipboard @US-085
 Feature: Copy synthesized text to clipboard (US-085)
   As a language learner
   I want to copy sentence text to the system clipboard

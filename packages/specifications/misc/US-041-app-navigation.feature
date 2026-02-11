@@ -1,4 +1,4 @@
-@misc @navigation @US-041
+@ready @misc @navigation @US-041
 Feature: Navigate between application views (US-041)
   As a user of the application
   I want to navigate between synthesis, tasks, and other views

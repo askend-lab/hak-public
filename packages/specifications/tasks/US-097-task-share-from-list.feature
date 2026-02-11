@@ -1,4 +1,4 @@
-@tasks @sharing @US-097
+@ready @tasks @sharing @US-097
 Feature: Share task from task list (US-097)
   As a language teacher
   I want to share a task directly from the task list

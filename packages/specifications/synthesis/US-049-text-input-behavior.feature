@@ -1,4 +1,4 @@
-@synthesis @input @US-049
+@ready @synthesis @input @US-049
 Feature: Text input field behavior (US-049)
   As a language learner
   I want the text input to behave intuitively

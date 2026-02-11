@@ -1,4 +1,4 @@
-@playlist @audio @US-057
+@ready @playlist @audio @US-057
 Feature: Playlist audio playback controls (US-057)
   As a language learner
   I want to control audio playback for my playlist

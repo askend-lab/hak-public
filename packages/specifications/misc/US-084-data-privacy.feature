@@ -1,4 +1,4 @@
-@misc @privacy @US-084
+@ready @misc @privacy @US-084
 Feature: Data privacy and API authorization (US-084)
   As a user of the application
   I want my data to be protected by proper authorization

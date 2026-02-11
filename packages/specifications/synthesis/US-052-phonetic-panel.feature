@@ -1,4 +1,4 @@
-@synthesis @phonetic @US-052
+@ready @synthesis @phonetic @US-052
 Feature: Edit phonetic form in side panel (US-052)
   As a language researcher
   I want to edit the phonetic representation in a side panel

@@ -1,4 +1,4 @@
-@sharing @audio @US-094
+@ready @sharing @audio @US-094
 Feature: Audio playback on shared task page (US-094)
   As a student accessing a shared task
   I want to play audio for entries on the shared page

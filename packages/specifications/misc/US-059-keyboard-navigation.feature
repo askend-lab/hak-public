@@ -1,4 +1,4 @@
-@misc @keyboard @US-059
+@ready @misc @keyboard @US-059
 Feature: Keyboard navigation and shortcuts (US-059)
   As a power user
   I want to use keyboard shortcuts for common actions

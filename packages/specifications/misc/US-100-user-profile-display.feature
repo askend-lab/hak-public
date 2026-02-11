@@ -1,4 +1,4 @@
-@misc @profile @US-100
+@ready @misc @profile @US-100
 Feature: User profile display in header (US-100)
   As an authenticated user
   I want to see my profile information in the header

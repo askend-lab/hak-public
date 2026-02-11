@@ -1,4 +1,4 @@
-@synthesis @download @US-086
+@ready @synthesis @download @US-086
 Feature: Download sentence audio as WAV file (US-086)
   As a language learner
   I want to download synthesized audio as a WAV file

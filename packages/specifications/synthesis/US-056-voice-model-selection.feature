@@ -1,4 +1,4 @@
-@synthesis @voice @US-056
+@ready @synthesis @voice @US-056
 Feature: Automatic voice model selection (US-056)
   As a language learner
   I want the system to automatically select the best voice model

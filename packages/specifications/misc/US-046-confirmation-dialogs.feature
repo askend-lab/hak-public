@@ -1,4 +1,4 @@
-@misc @modal @US-046
+@ready @misc @modal @US-046
 Feature: Confirmation dialogs for destructive actions (US-046)
   As a user performing a destructive action
   I want to see a confirmation dialog before proceeding

@@ -1,4 +1,4 @@
-@synthesis @auth @US-089
+@ready @synthesis @auth @US-089
 Feature: Sentence menu adapts to auth state (US-089)
   As a user of the application
   I want the sentence menu to show different options based on login

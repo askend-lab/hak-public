@@ -1,4 +1,4 @@
-@tasks @list @US-076
+@ready @tasks @list @US-076
 Feature: Task list row with expandable description (US-076)
   As a language teacher
   I want to see task summaries in a list with expandable details

@@ -1,4 +1,4 @@
-@synthesis @markers @US-062
+@ready @synthesis @markers @US-062
 Feature: Phonetic marker symbols and transformations (US-062)
   As a language researcher
   I want to use phonetic markers in my text

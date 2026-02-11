@@ -1,4 +1,4 @@
-@sharing @token @US-079
+@ready @sharing @token @US-079
 Feature: Share token generation and access (US-079)
   As a language teacher
   I want share tokens to be generated securely

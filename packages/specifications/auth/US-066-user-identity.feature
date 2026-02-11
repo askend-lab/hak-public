@@ -1,4 +1,4 @@
-@auth @identity @US-066
+@ready @auth @identity @US-066
 Feature: User identity from Estonian ID code (US-066)
   As an authenticated user with Estonian eID
   I want my identity to be validated and displayed correctly

@@ -1,4 +1,4 @@
-@tasks @edit @US-054
+@ready @tasks @edit @US-054
 Feature: Edit task via modal form (US-054)
   As a language teacher
   I want to edit task name and description via a modal form

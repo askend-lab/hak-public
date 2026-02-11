@@ -1,4 +1,4 @@
-@misc @footer @US-045
+@ready @misc @footer @US-045
 Feature: Footer with contact info and build details (US-045)
   As a user of the application
   I want to see footer information including contact details and build info

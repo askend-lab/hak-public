@@ -1,4 +1,4 @@
-@synthesis @display @US-096
+@ready @synthesis @display @US-096
 Feature: Stressed text display with visual markers (US-096)
   As a language learner
   I want stress markers to be visually distinct in the UI

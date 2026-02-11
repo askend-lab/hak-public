@@ -1,4 +1,4 @@
-@tasks @detail @US-070
+@ready @tasks @detail @US-070
 Feature: Task detail header with actions menu (US-070)
   As a language teacher viewing task details
   I want to access edit, share, and delete actions from the header

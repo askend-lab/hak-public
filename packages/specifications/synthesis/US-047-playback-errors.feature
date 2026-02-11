@@ -1,4 +1,4 @@
-@synthesis @playback @US-047
+@ready @synthesis @playback @US-047
 Feature: Handle audio playback errors gracefully (US-047)
   As a language learner
   I want the application to handle audio playback failures

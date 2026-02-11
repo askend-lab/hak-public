@@ -1,4 +1,4 @@
-@tasks @modal @US-065
+@ready @tasks @modal @US-065
 Feature: Add new task entry via modal (US-065)
   As a language teacher
   I want to add new entries to a task via a modal form

@@ -1,4 +1,4 @@
-@misc @ux @US-069
+@ready @misc @ux @US-069
 Feature: Loading states and spinners (US-069)
   As a user of the application
   I want to see loading indicators during async operations

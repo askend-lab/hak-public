@@ -1,4 +1,4 @@
-@synthesis @component @US-075
+@ready @synthesis @component @US-075
 Feature: Sentence synthesis item display modes (US-075)
   As a user of the application
   I want sentence items to render differently based on context

@@ -1,4 +1,4 @@
-@synthesis @performance @US-080
+@ready @synthesis @performance @US-080
 Feature: Audio warm-up worker for faster playback (US-080)
   As a language learner
   I want the audio system to be pre-warmed

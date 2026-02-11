@@ -1,4 +1,4 @@
-@misc @error-handling @US-040
+@ready @misc @error-handling @US-040
 Feature: Graceful error recovery (US-040)
   As a user of the application
   I want the application to handle errors gracefully

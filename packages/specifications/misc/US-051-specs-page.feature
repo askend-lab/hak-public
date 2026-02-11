@@ -1,4 +1,4 @@
-@misc @specs @US-051
+@ready @misc @specs @US-051
 Feature: View feature specifications and test results (US-051)
   As a developer or stakeholder
   I want to view Gherkin specifications with test status
