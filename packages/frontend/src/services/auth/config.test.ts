@@ -221,7 +221,51 @@ describe("exchangeCodeForTokens", () => {
 
     const result = await exchangeCodeForTokens("auth-code");
     expect(result).toBeNull();
-    expect(consoleSpy).toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Auth] Token exchange error:",
+      expect.any(Error),
+    );
     consoleSpy.mockRestore();
+  });
+
+  it("should log missing PKCE verifier error", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await exchangeCodeForTokens("code");
+    expect(consoleSpy).toHaveBeenCalledWith("[Auth] Missing PKCE code verifier");
+    consoleSpy.mockRestore();
+  });
+
+  it("should include redirect_uri in token request body", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "v");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", refresh_token: "r", expires_in: 1 }),
+    });
+    await exchangeCodeForTokens("c");
+    const body = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]?.body as URLSearchParams;
+    expect(body.get("redirect_uri")).toBeTruthy();
+  });
+});
+
+describe("PKCE code verifier format", () => {
+  it("should store base64url-safe verifier without +, /, or = chars", async () => {
+    sessionStorage.clear();
+    await getLoginUrl();
+    const verifier = sessionStorage.getItem("pkce_code_verifier");
+    expect(verifier).not.toBeNull();
+    expect(verifier).not.toContain("+");
+    expect(verifier).not.toContain("/");
+    expect(verifier).not.toContain("=");
+  });
+
+  it("should generate login URL starting with https and containing /login", async () => {
+    const url = await getLoginUrl();
+    expect(url.startsWith(`https://${cognitoConfig.domain}/login?`)).toBe(true);
+  });
+
+  it("should generate logout URL starting with https and containing /logout", () => {
+    const url = getLogoutUrl();
+    expect(url.startsWith(`https://${cognitoConfig.domain}/logout?`)).toBe(true);
+    expect(url).toContain(`client_id=${cognitoConfig.clientId}`);
   });
 });
