@@ -56,6 +56,25 @@ describe("onboardingConfig", () => {
         expect(step.description.length).toBeGreaterThan(0);
       });
     });
+
+    it("has exact step titles", () => {
+      expect(config.steps[0]?.title).toBe("Sisesta lause");
+      expect(config.steps[1]?.title).toBe("Kuula hääldust");
+      expect(config.steps[2]?.title).toBe("Uuri sõna variante");
+      expect(config.steps[3]?.title).toBe("Lisa rohkem lauseid");
+      expect(config.steps[4]?.title).toBe("Salvesta ülesandesse");
+    });
+
+    it("has exact target selectors", () => {
+      expect(config.steps[0]?.targetSelector).toBe('[data-onboarding-target="sentence-1-input"]');
+      expect(config.steps[2]?.targetSelector).toBe('[data-onboarding-target="sentence-0-tag-0"]');
+      expect(config.steps[3]?.targetSelector).toBe('[data-onboarding-target="add-sentence-button"]');
+      expect(config.steps[4]?.targetSelector).toBe('[data-onboarding-target="save-to-task-button"]');
+    });
+
+    it("has correct descriptionEt", () => {
+      expect(config.descriptionEt).toContain("Sisesta lause");
+    });
   });
 
   describe("teacher role", () => {
@@ -83,6 +102,22 @@ describe("onboardingConfig", () => {
       expect(config.steps[2]?.position).toBe("top");
       expect(config.steps[3]?.position).toBe("bottom");
       expect(config.steps[4]?.position).toBe("bottom");
+    });
+
+    it("has exact teacher step titles", () => {
+      expect(config.steps[2]?.title).toBe("Lisa rohkem lauseid");
+      expect(config.steps[3]?.title).toBe("Uuri sõna variante");
+      expect(config.steps[4]?.title).toBe("Loo ülesanne");
+    });
+
+    it("has correct descriptionEt", () => {
+      expect(config.descriptionEt).toContain("jaga");
+    });
+
+    it("has create-task step targeting save button", () => {
+      const createStep = config.steps.find((s) => s.id === "create-task");
+      expect(createStep?.targetSelector).toBe('[data-onboarding-target="save-to-task-button"]');
+      expect(createStep?.description).toContain("jagada");
     });
   });
 
@@ -116,8 +151,18 @@ describe("onboardingConfig", () => {
     it("has phonetic-form step with menu target", () => {
       const phoneticStep = config.steps.find((s) => s.id === "phonetic-form");
       expect(phoneticStep).toBeDefined();
-      expect(phoneticStep?.targetSelector).toContain("sentence-0-menu");
-      expect(phoneticStep?.title).toContain("foneetilist");
+      expect(phoneticStep?.targetSelector).toBe('[data-onboarding-target="sentence-0-menu"]');
+      expect(phoneticStep?.title).toBe("Uuri foneetilist kuju");
+      expect(phoneticStep?.description).toContain("foneetilist esitust");
+    });
+
+    it("has exact specialist step titles", () => {
+      expect(config.steps[3]?.title).toBe("Uuri hääldusvariandid");
+      expect(config.steps[3]?.description).toContain("hääldusvariant");
+    });
+
+    it("has correct descriptionEt", () => {
+      expect(config.descriptionEt).toContain("Helinda");
     });
   });
 
