@@ -173,4 +173,53 @@ describe("Notification", () => {
     act(() => { vi.advanceTimersByTime(1); });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("has correct root class string", () => {
+    const { container } = render(
+      <Notification type="success" message="msg" onClose={vi.fn()} />,
+    );
+    const root = container.firstElementChild;
+    expect(root?.className).toContain("modal");
+    expect(root?.className).toContain("modal--small");
+    expect(root?.className).toContain("modal--outlined");
+    expect(root?.className).toContain("notification-toast");
+  });
+
+  it("does not render paragraph when no description or action", () => {
+    const { container } = render(
+      <Notification type="info" message="msg" onClose={vi.fn()} />,
+    );
+    expect(container.querySelector("p")).toBeNull();
+  });
+
+  it("action button has notification-action-link class", () => {
+    const { container } = render(
+      <Notification
+        type="info"
+        message="msg"
+        action={{ label: "Do it", onClick: vi.fn() }}
+        onClose={vi.fn()}
+      />,
+    );
+    const actionBtn = container.querySelector(".notification-action-link");
+    expect(actionBtn).toBeTruthy();
+    expect(actionBtn?.textContent).toBe("Do it");
+  });
+
+  it("renders message in h2 element", () => {
+    render(
+      <Notification type="info" message="My message" onClose={vi.fn()} />,
+    );
+    const h2 = screen.getByText("My message");
+    expect(h2.tagName).toBe("H2");
+  });
+
+  it("returns undefined cleanup when duration is 0", () => {
+    const onClose = vi.fn();
+    render(
+      <Notification type="info" message="msg" duration={0} onClose={onClose} />,
+    );
+    act(() => { vi.advanceTimersByTime(100000); });
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });
