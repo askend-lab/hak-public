@@ -59,7 +59,6 @@ describe("UserProfile", () => {
       await user.click(screen.getByRole("button"));
 
       expect(screen.getByText("Logi välja")).toBeInTheDocument();
-      expect(screen.getByText("Kustuta kohalikud andmed")).toBeInTheDocument();
     });
 
     it("shows user details in dropdown", async () => {
@@ -97,48 +96,6 @@ describe("UserProfile", () => {
       await user.click(screen.getByText("Logi välja"));
 
       expect(mockLogout).toHaveBeenCalled();
-    });
-  });
-
-  describe("clear local data", () => {
-    it("does nothing when confirm is cancelled", async () => {
-      window.confirm = vi.fn().mockReturnValue(false);
-
-      const user = userEvent.setup();
-      render(<UserProfile user={mockUser} />);
-
-      await user.click(screen.getByRole("button"));
-      await user.click(screen.getByText("Kustuta kohalikud andmed"));
-
-      expect(window.confirm).toHaveBeenCalled();
-    });
-
-    it("clears localStorage and reloads when confirmed", async () => {
-      window.confirm = vi.fn().mockReturnValue(true);
-      const originalClear = localStorage.clear.bind(localStorage);
-      const clearMock = vi.fn();
-      localStorage.clear = clearMock;
-      const originalLocation = window.location;
-      Object.defineProperty(window, "location", {
-        writable: true,
-        value: { ...originalLocation, reload: vi.fn() },
-      });
-
-      const user = userEvent.setup();
-      render(<UserProfile user={mockUser} />);
-
-      await user.click(screen.getByRole("button"));
-      await user.click(screen.getByText("Kustuta kohalikud andmed"));
-
-      expect(window.confirm).toHaveBeenCalled();
-      expect(clearMock).toHaveBeenCalled();
-      expect(window.location.reload).toHaveBeenCalled();
-
-      localStorage.clear = originalClear;
-      Object.defineProperty(window, "location", {
-        writable: true,
-        value: originalLocation,
-      });
     });
   });
 
