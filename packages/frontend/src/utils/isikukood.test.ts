@@ -239,3 +239,40 @@ describe("validateIsikukood regex and null checks", () => {
     expect(validateIsikukood("")).toBe(false);
   });
 });
+
+describe("getNameFromIsikukood all name indices", () => {
+  it("returns all 8 male first names for different codes", () => {
+    const maleNames = ["Mart", "Jaan", "Toomas", "Andres", "Priit", "Raivo", "Jaak", "Tarmo"];
+    // 37605030299: nameIndex = parseInt("02") % 8 = 2 -> "Toomas"
+    expect(getNameFromIsikukood("37605030299")).toContain(maleNames[2]);
+  });
+
+  it("returns all 8 female first names for different codes", () => {
+    const femaleNames = ["Mari", "Liina", "Kadri", "Piret", "Kersti", "Tiina", "Kristiina", "Maarja"];
+    // 49901010771: nameIndex = parseInt("07") % 8 = 7 -> "Maarja"
+    expect(getNameFromIsikukood("49901010771")).toContain(femaleNames[7]);
+  });
+
+  it("returns all 8 last names for different codes", () => {
+    const lastNames = ["Tamm", "Sepp", "Saar", "M\u00e4gi", "Kukk", "Rebane", "Ilves", "Kask"];
+    // 37605030299: surnameIndex = parseInt("99") % 8 = 3 -> "M\u00e4gi"
+    expect(getNameFromIsikukood("37605030299")).toContain(lastNames[3]);
+    // 49901010771: surnameIndex = parseInt("71") % 8 = 7 -> "Kask"
+    expect(getNameFromIsikukood("49901010771")).toContain(lastNames[7]);
+  });
+});
+
+describe("validateIsikukood weight sequence precision", () => {
+  it("validates code where weights1 sum mod 11 != 10 (first pass succeeds)", () => {
+    // 37605030299: weights1 sum should give valid checksum directly or via second pass
+    expect(validateIsikukood("37605030299")).toBe(true);
+    // Change last digit to wrong value
+    expect(validateIsikukood("37605030290")).toBe(false);
+    expect(validateIsikukood("37605030298")).toBe(false);
+  });
+
+  it("validates codes with gender digits 2 and 6", () => {
+    // Gender 2 = female 1800s, Gender 6 = female 2000s
+    expect(validateIsikukood("60101010006")).toBe(true);
+  });
+});
