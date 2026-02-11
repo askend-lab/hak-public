@@ -8,6 +8,7 @@ const TEST_FILE_PATTERNS = [
   "**/*.test.js",
   "**/*.spec.js",
   "**/test/**/*.js",
+  "**/test/**/*.ts",
   "**/tests/**/*.js",
   "**/__tests__/**/*.js",
   "**/*.test.ts",
@@ -51,6 +52,36 @@ export default [
     rules: {
       "jest/no-standalone-expect": "off",
       "jest/no-disabled-tests": "off",
+      "jest/require-top-level-describe": "off",
+      "max-lines": "off",
+      "max-lines-per-function": "off",
+    },
+  },
+
+  // React hooks return complex inferred objects — explicit return types add noise
+  {
+    files: ["**/hooks/**/*.ts"],
+    rules: {
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+    },
+  },
+
+  // Test mock factories have complex inferred return types
+  {
+    files: [...TEST_FILE_PATTERNS, "**/mocks/**/*.ts"],
+    rules: {
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+    },
+  },
+
+  // TSX components have higher cyclomatic complexity due to conditional rendering
+  {
+    files: ["**/*.tsx"],
+    ignores: TEST_FILE_PATTERNS,
+    rules: {
+      "complexity": ["error", 30],
     },
   },
 

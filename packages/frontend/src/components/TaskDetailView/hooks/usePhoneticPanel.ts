@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types */
 import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { DataService } from "@/services/dataService";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
+
+interface UsePhoneticPanelReturn {
+  showPhoneticPanel: boolean;
+  phoneticPanelEntryId: string | null;
+  handleExplorePhonetic: (entryId: string) => Promise<void>;
+  handleClosePhoneticPanel: () => void;
+  handlePhoneticApply: (newPhoneticText: string) => Promise<void>;
+}
 
 export function usePhoneticPanel(
   entries: TaskEntry[],
@@ -13,7 +20,7 @@ export function usePhoneticPanel(
   task: Task | null,
   userId: string | undefined,
   onMenuClose: () => void,
-) {
+): UsePhoneticPanelReturn {
   const [showPhoneticPanel, setShowPhoneticPanel] = useState(false);
   const [phoneticPanelEntryId, setPhoneticPanelEntryId] = useState<
     string | null

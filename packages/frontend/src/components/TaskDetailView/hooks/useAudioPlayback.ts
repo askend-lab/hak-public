@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-non-null-assertion */
 import { useState, useCallback } from "react";
 import { TaskEntry } from "@/types/task";
 import { synthesizeWithPolling } from "@/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
 
-export function useAudioPlayback(entries: TaskEntry[]) {
+interface UseAudioPlaybackReturn {
+  currentPlayingId: string | null;
+  currentLoadingId: string | null;
+  isPlayingAll: boolean;
+  isLoadingPlayAll: boolean;
+  handlePlayEntry: (id: string) => void;
+  handlePlayAll: () => Promise<void>;
+}
+
+export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
   const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);
   const [currentLoadingId, setCurrentLoadingId] = useState<string | null>(null);
   const [isPlayingAll, setIsPlayingAll] = useState(false);
@@ -127,7 +135,8 @@ export function useAudioPlayback(entries: TaskEntry[]) {
         if (!audioUrl || abortSignal.aborted) return false;
 
         return new Promise((resolve) => {
-          const audio = new Audio(audioUrl!);
+          const validUrl = audioUrl ?? "";
+          const audio = new Audio(validUrl);
           setCurrentAudio(audio);
 
           const cleanup = () => {

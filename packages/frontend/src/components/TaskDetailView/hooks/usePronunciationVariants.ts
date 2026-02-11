@@ -1,17 +1,27 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types */
 import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { DataService } from "@/services/dataService";
+
+interface UsePronunciationVariantsReturn {
+  variantsWord: string | null;
+  variantsCustomPhonetic: string | null;
+  isVariantsPanelOpen: boolean;
+  selectedEntryId: string | null;
+  selectedTagIndex: number | null;
+  handleTagClick: (entryId: string, tagIndex: number, word: string) => void;
+  handleCloseVariants: () => void;
+  handleUseVariant: (variantText: string) => Promise<void>;
+}
 
 export function usePronunciationVariants(
   entries: TaskEntry[],
   setEntries: React.Dispatch<React.SetStateAction<TaskEntry[]>>,
   task: Task | null,
   userId: string | undefined,
-) {
+): UsePronunciationVariantsReturn {
   const [variantsWord, setVariantsWord] = useState<string | null>(null);
   const [variantsCustomPhonetic, setVariantsCustomPhonetic] = useState<
     string | null

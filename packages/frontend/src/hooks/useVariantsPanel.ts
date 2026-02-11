@@ -6,7 +6,23 @@ import { SentenceState } from "@/types/synthesis";
 import { NotificationType } from "@/components/Notification";
 import { analyzeText } from "@/utils/analyzeApi";
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
+interface UseVariantsPanelReturn {
+  variantsWord: string | null;
+  variantsCustomPhonetic: string | null;
+  setVariantsCustomPhonetic: React.Dispatch<React.SetStateAction<string | null>>;
+  isVariantsPanelOpen: boolean;
+  selectedSentenceId: string | null;
+  selectedTagIndex: number | null;
+  showSentencePhoneticPanel: boolean;
+  sentencePhoneticId: string | null;
+  loadingVariantsTag: { sentenceId: string; tagIndex: number } | null;
+  handleTagClick: (sentenceId: string, tagIndex: number, word: string) => Promise<void>;
+  handleCloseVariants: () => void;
+  handleOpenVariantsFromMenu: (sentenceId: string, tagIndex: number, word: string) => Promise<void>;
+  handleExplorePhonetic: (sentenceId: string) => void;
+  handleCloseSentencePhonetic: () => void;
+}
+
 export function useVariantsPanel(
   sentences: SentenceState[],
   setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>,
@@ -15,7 +31,7 @@ export function useVariantsPanel(
     message: string,
     description?: string,
   ) => void,
-) {
+): UseVariantsPanelReturn {
   const [variantsWord, setVariantsWord] = useState<string | null>(null);
   const [variantsCustomPhonetic, setVariantsCustomPhonetic] = useState<
     string | null

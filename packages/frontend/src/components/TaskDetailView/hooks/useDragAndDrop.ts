@@ -1,13 +1,22 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types */
 import { useState, useCallback } from "react";
 import { TaskEntry } from "@/types/task";
 
+interface UseDragAndDropReturn {
+  draggedId: string | null;
+  dragOverId: string | null;
+  handleDragStart: (e: React.DragEvent, id: string) => void;
+  handleDragEnd: (_e: React.DragEvent) => void;
+  handleDragOver: (e: React.DragEvent, id: string) => void;
+  handleDragLeave: () => void;
+  handleDrop: (e: React.DragEvent, targetId: string) => void;
+}
+
 export function useDragAndDrop(
   setEntries: React.Dispatch<React.SetStateAction<TaskEntry[]>>,
-) {
+): UseDragAndDropReturn {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 

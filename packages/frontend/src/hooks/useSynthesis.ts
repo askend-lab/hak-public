@@ -12,7 +12,6 @@ import { usePlaylistControl } from "./synthesis/usePlaylistControl";
 import { useTagUpdater } from "./synthesis/useTagUpdater";
 import { useNotification } from "@/contexts/NotificationContext";
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useSynthesis() {
   const { showNotification } = useNotification();
   const orchestrator = useSynthesisOrchestrator();

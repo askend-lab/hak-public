@@ -1,10 +1,24 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types */
 import { vi } from "vitest";
 
-export const mockAuthContext = () => ({
+type MockFn = ReturnType<typeof vi.fn>;
+
+export const mockAuthContext = (): {
+  user: null;
+  isAuthenticated: false;
+  isLoading: false;
+  error: null;
+  showLoginModal: false;
+  setShowLoginModal: ReturnType<typeof vi.fn>;
+  login: ReturnType<typeof vi.fn>;
+  loginWithTara: ReturnType<typeof vi.fn>;
+  logout: ReturnType<typeof vi.fn>;
+  refreshSession: ReturnType<typeof vi.fn>;
+  handleCodeCallback: ReturnType<typeof vi.fn>;
+  handleTaraTokens: ReturnType<typeof vi.fn>;
+} => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
@@ -19,9 +33,20 @@ export const mockAuthContext = () => ({
   handleTaraTokens: vi.fn(),
 });
 
-export const mockNotificationContext = () => ({ showNotification: vi.fn() });
+export const mockNotificationContext = (): { showNotification: ReturnType<typeof vi.fn> } => ({ showNotification: vi.fn() });
 
-export const mockOnboardingContext = () => ({
+export const mockOnboardingContext = (): {
+  state: { completed: true; selectedRole: string; currentStep: number; skipped: false };
+  isWizardActive: false;
+  resetOnboarding: ReturnType<typeof vi.fn>;
+  isLoading: false;
+  nextStep: ReturnType<typeof vi.fn>;
+  prevStep: ReturnType<typeof vi.fn>;
+  skipWizard: ReturnType<typeof vi.fn>;
+  selectRole: ReturnType<typeof vi.fn>;
+  completeWizard: ReturnType<typeof vi.fn>;
+  currentSteps: never[];
+} => ({
   state: {
     completed: true,
     selectedRole: "teacher",
@@ -39,7 +64,15 @@ export const mockOnboardingContext = () => ({
   currentSteps: [],
 });
 
-export const mockSynthesis = () => ({
+export const mockSynthesis = (): {
+  sentences: { id: string; text: string; tags: never[]; isPlaying: false; isLoading: false; currentInput: string }[];
+  setSentences: MockFn; isPlayingAll: false; isLoadingPlayAll: false; editingTag: null; openTagMenu: null;
+  setOpenTagMenu: MockFn; setDemoSentences: MockFn; handleTextChange: MockFn; handleClearSentence: MockFn;
+  handleAddSentence: MockFn; handleRemoveSentence: MockFn; handleInputBlur: MockFn; handleKeyDown: MockFn;
+  handlePlay: MockFn; handlePlayAll: MockFn; handleDownload: MockFn; handleCopyText: MockFn;
+  handleDeleteTag: MockFn; handleEditTag: MockFn; handleEditTagChange: MockFn; handleEditTagCommit: MockFn;
+  handleEditTagKeyDown: MockFn; handleUseVariant: MockFn; handleSentencePhoneticApply: MockFn; synthesizeAndPlay: MockFn;
+} => ({
   sentences: [
     {
       id: "1",
@@ -77,7 +110,17 @@ export const mockSynthesis = () => ({
   synthesizeAndPlay: vi.fn(),
 });
 
-export const mockTaskHandlers = () => ({
+export const mockTaskHandlers = (): {
+  showAddToTaskDropdown: false; setShowAddToTaskDropdown: MockFn; handleAddAllSentencesToTask: MockFn;
+  handleSelectTaskFromDropdown: MockFn; handleCreateNewFromDropdown: MockFn; handleCreateTask: MockFn;
+  handleEditTask: MockFn; handleDeleteTask: MockFn; handleShareTask: MockFn;
+  handleAddSentenceToExistingTask: MockFn; handleCreateNewTaskFromMenu: MockFn; taskRefreshTrigger: number;
+  showAddTaskModal: false; setShowAddTaskModal: MockFn; handleAddTask: MockFn;
+  showTaskEditModal: false; setShowTaskEditModal: MockFn; taskToEdit: null; setTaskToEdit: MockFn;
+  handleTaskUpdated: MockFn; showShareTaskModal: false; setShowShareTaskModal: MockFn;
+  taskToShare: null; setTaskToShare: MockFn; showDeleteConfirmation: false; taskToDelete: null;
+  handleConfirmDelete: MockFn; handleCancelDelete: MockFn;
+} => ({
   showAddToTaskDropdown: false,
   setShowAddToTaskDropdown: vi.fn(),
   handleAddAllSentencesToTask: vi.fn(),
@@ -108,7 +151,10 @@ export const mockTaskHandlers = () => ({
   handleCancelDelete: vi.fn(),
 });
 
-export const mockDragAndDrop = () => ({
+export const mockDragAndDrop = (): {
+  draggedId: null; dragOverId: null;
+  handleDragStart: MockFn; handleDragEnd: MockFn; handleDragOver: MockFn; handleDragLeave: MockFn; handleDrop: MockFn;
+} => ({
   draggedId: null,
   dragOverId: null,
   handleDragStart: vi.fn(),
@@ -118,7 +164,12 @@ export const mockDragAndDrop = () => ({
   handleDrop: vi.fn(),
 });
 
-export const mockVariantsPanel = () => ({
+export const mockVariantsPanel = (): {
+  isVariantsPanelOpen: false; variantsWord: string; selectedSentenceId: null; selectedTagIndex: null;
+  variantsCustomPhonetic: string; setVariantsCustomPhonetic: MockFn; handleOpenVariantsFromMenu: MockFn;
+  handleCloseVariants: MockFn; showSentencePhoneticPanel: false; sentencePhoneticId: null;
+  handleExplorePhonetic: MockFn; handleCloseSentencePhonetic: MockFn;
+} => ({
   isVariantsPanelOpen: false,
   variantsWord: "",
   selectedSentenceId: null,
@@ -133,7 +184,10 @@ export const mockVariantsPanel = () => ({
   handleCloseSentencePhonetic: vi.fn(),
 });
 
-export const mockSentenceMenu = () => ({
+export const mockSentenceMenu = (): {
+  openMenuId: null; menuAnchorEl: Record<string, never>; menuSearchQuery: string; setMenuSearchQuery: MockFn;
+  menuTasks: never[]; isLoadingMenuTasks: false; handleMenuOpen: MockFn; handleMenuClose: MockFn;
+} => ({
   openMenuId: null,
   menuAnchorEl: {},
   menuSearchQuery: "",

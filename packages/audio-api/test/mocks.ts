@@ -31,8 +31,7 @@ export class MockS3Client {
       throw error;
     }
     throw new Error(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      `Unknown command: ${(command as any).constructor?.name ?? "Unknown"}`,
+      `Unknown command: ${command.constructor.name}`,
     );
   }
 
@@ -49,10 +48,7 @@ export class MockSQSClient {
       this.messages.push(command.input);
       return Promise.resolve({ MessageId: "mock-message-id" });
     }
-    throw new Error(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      `Unknown command: ${(command as any).constructor?.name ?? "Unknown"}`,
-    );
+    throw new Error("Unknown command");
   }
 
   reset(): void {

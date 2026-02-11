@@ -7,7 +7,6 @@ import { useAuth } from "@/services/auth";
 import { useNotification } from "@/contexts/NotificationContext";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function useTaskHandlers(
   sentences: SentenceState[],
   setCurrentView: (view: "synthesis" | "tasks") => void,
