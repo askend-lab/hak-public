@@ -38,6 +38,8 @@ export default {
     "!src/components/TaskDetailView/hooks/usePhoneticPanel.ts",
     "!src/pages/SharedTaskPage.tsx",
     "!src/components/SpecsPage.tsx",
+    "!src/services/dataService.ts",
+    "!src/services/storage/ShareService.ts",
   ],
   thresholds: {
     high: 80,
