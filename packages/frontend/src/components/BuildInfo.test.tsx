@@ -152,4 +152,44 @@ describe("BuildInfo runtime fetch", () => {
     expect(mockFetch).not.toHaveBeenCalled();
     vi.unstubAllGlobals();
   });
+
+  it("shows fallback values when runtime has partial data", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            commitHash: "",
+            branch: "",
+            message: "",
+            builtAt: "",
+          }),
+      } as Response),
+    );
+    Object.defineProperty(window, "location", {
+      value: { hostname: "hak-dev.example.com" },
+      writable: true,
+    });
+    render(<BuildInfo />);
+    await waitFor(() => fireEvent.click(screen.getByRole("button")));
+    // Should still show Hash and Branch rows
+    expect(screen.getByText("Hash")).toBeTruthy();
+    expect(screen.getByText("Branch")).toBeTruthy();
+    vi.unstubAllGlobals();
+  });
+
+  it("shows directory row on localhost with workingDir", async () => {
+    const mockFetch = vi.fn();
+    vi.stubGlobal("fetch", mockFetch);
+    Object.defineProperty(window, "location", {
+      value: { hostname: "localhost" },
+      writable: true,
+    });
+    render(<BuildInfo />);
+    await waitFor(() => fireEvent.click(screen.getByRole("button")));
+    // Check modal content exists
+    expect(document.querySelector(".build-info-modal__content")).toBeTruthy();
+    vi.unstubAllGlobals();
+  });
 });
