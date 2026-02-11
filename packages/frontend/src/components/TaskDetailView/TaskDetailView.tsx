@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
@@ -22,6 +22,7 @@ import {
   usePronunciationVariants,
   usePhoneticPanel,
 } from "./hooks";
+import { downloadTaskAsZip } from "@/utils/downloadTaskAsZip";
 
 interface TaskDetailViewProps {
   taskId: string;
@@ -51,6 +52,7 @@ export default function TaskDetailView({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isHeaderMenuOpen, setIsHeaderMenuOpen] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleMenuClose = () => setOpenMenuId(null);
 
@@ -70,6 +72,20 @@ export default function TaskDetailView({
     user?.id,
     handleMenuClose,
   );
+
+  const handleDownloadZip = useCallback(async () => {
+    if (!task || isDownloading) return;
+    setIsDownloading(true);
+    try {
+      await downloadTaskAsZip({ ...task, entries });
+      showNotification("success", "ZIP-fail allalaaditud!", undefined, undefined, "success");
+    } catch (err) {
+      console.error("ZIP download failed:", err);
+      showNotification("error", "Viga ZIP-faili loomisel");
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [task, entries, isDownloading, showNotification]);
 
   // Load task data (skip if initialTask provided)
   useEffect(() => {
@@ -162,6 +178,8 @@ export default function TaskDetailView({
         setIsHeaderMenuOpen={setIsHeaderMenuOpen}
         onShare={() => setIsShareModalOpen(true)}
         onPlayAll={audio.handlePlayAll}
+        onDownloadZip={handleDownloadZip}
+        isDownloading={isDownloading}
         onEditTask={onEditTask}
         onDeleteTask={onDeleteTask}
       />
