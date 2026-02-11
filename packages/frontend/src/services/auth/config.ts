@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-const LOCAL_PORT = import.meta.env.VITE_PORT ?? "5181";
+const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
 function getBaseUrl(
   hostname: string = typeof window !== "undefined"
@@ -42,10 +42,10 @@ export function getLogoutUri(
  * @see https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-idp-settings.html
  */
 export const cognitoConfig = {
-  region: import.meta.env.VITE_COGNITO_REGION ?? "eu-west-1",
-  userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID ?? "eu-west-1_wlRtuLkG2",
-  clientId: import.meta.env.VITE_COGNITO_CLIENT_ID ?? "64tf6nf61n6sgftqif6q975hka",
-  domain: import.meta.env.VITE_COGNITO_DOMAIN ?? "askend-lab-auth.auth.eu-west-1.amazoncognito.com",
+  region: import.meta.env?.VITE_COGNITO_REGION ?? "eu-west-1",
+  userPoolId: import.meta.env?.VITE_COGNITO_USER_POOL_ID ?? "eu-west-1_wlRtuLkG2",
+  clientId: import.meta.env?.VITE_COGNITO_CLIENT_ID ?? "64tf6nf61n6sgftqif6q975hka",
+  domain: import.meta.env?.VITE_COGNITO_DOMAIN ?? "askend-lab-auth.auth.eu-west-1.amazoncognito.com",
 
   get redirectUri(): string {
     return getRedirectUri();
