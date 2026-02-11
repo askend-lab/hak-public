@@ -204,4 +204,61 @@ describe("TaskManager", () => {
     });
     expect(defaultProps.onViewTask).not.toHaveBeenCalled();
   });
+
+  it("has correct root class", () => {
+    const { container } = render(<TaskManager {...defaultProps} />);
+    expect(container.querySelector(".task-manager-simple")).toBeTruthy();
+  });
+
+  it("renders entry count", () => {
+    render(<TaskManager {...defaultProps} />);
+    expect(screen.getByText(/\[5\]/)).toBeInTheDocument();
+    expect(screen.getByText(/\[3\]/)).toBeInTheDocument();
+  });
+
+  it("renders descriptions", () => {
+    render(<TaskManager {...defaultProps} />);
+    expect(screen.getByText("Description 1")).toBeInTheDocument();
+    expect(screen.getByText("Description 2")).toBeInTheDocument();
+  });
+
+  it("delete button has danger class", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<TaskManager {...defaultProps} />);
+    const moreButtons = screen.getAllByLabelText("More options");
+    await user.click(moreButtons[0]!);
+    await waitFor(() => expect(screen.getByText("Kustuta")).toBeInTheDocument());
+    expect(container.querySelector(".task-manager__menu-item--danger")).toBeTruthy();
+  });
+
+  it("closes menu when clicking same more button again", async () => {
+    const user = userEvent.setup();
+    render(<TaskManager {...defaultProps} />);
+    const moreButtons = screen.getAllByLabelText("More options");
+    await user.click(moreButtons[0]!);
+    await waitFor(() => expect(screen.getByText("Muuda")).toBeInTheDocument());
+    await user.click(moreButtons[0]!);
+    await waitFor(() => expect(screen.queryByText("Muuda")).not.toBeInTheDocument());
+  });
+
+  it("menu closes after edit action", async () => {
+    const user = userEvent.setup();
+    render(<TaskManager {...defaultProps} />);
+    const moreButtons = screen.getAllByLabelText("More options");
+    await user.click(moreButtons[0]!);
+    await waitFor(() => expect(screen.getByText("Muuda")).toBeInTheDocument());
+    await user.click(screen.getByText("Muuda"));
+    await waitFor(() => expect(screen.queryByText("Muuda")).not.toBeInTheDocument());
+  });
+
+  it("renders Loodud prefix for date", () => {
+    render(<TaskManager {...defaultProps} />);
+    const dates = screen.getAllByText(/^Loodud/);
+    expect(dates.length).toBe(2);
+  });
+
+  it("renders lauset suffix for entry count", () => {
+    render(<TaskManager {...defaultProps} />);
+    expect(screen.getAllByText(/lauset/).length).toBe(2);
+  });
 });
