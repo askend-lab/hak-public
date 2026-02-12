@@ -186,8 +186,16 @@ describe("SentenceSynthesisItem mutation kills", () => {
       render(<SentenceSynthesisItem {...bp} />);
       expect(screen.getByRole("button", { name: /play/i })).not.toBeDisabled();
     });
+    it("enabled in tags mode even with empty tags (kills L246 mode===input→true)", () => {
+      render(<SentenceSynthesisItem {...bp} mode="tags" tags={[]} />);
+      expect(screen.getByRole("button", { name: /play/i })).not.toBeDisabled();
+    });
     it("enabled in readonly mode", () => {
       render(<SentenceSynthesisItem {...bp} mode="readonly" />);
+      expect(screen.getByRole("button", { name: /play/i })).not.toBeDisabled();
+    });
+    it("enabled in readonly mode with empty tags (kills L246 mode===input→true)", () => {
+      render(<SentenceSynthesisItem {...bp} mode="readonly" tags={[]} />);
       expect(screen.getByRole("button", { name: /play/i })).not.toBeDisabled();
     });
   });
