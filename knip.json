@@ -7,8 +7,6 @@
     "packages/merlin-api/src/handler.ts",
     "packages/frontend/**",
     "packages/simplestore/test/**",
-    "lighthouserc.js",
-    ".size-limit.json",
     "**/stryker.config.mjs",
     "bundlesize.config.json"
   ],
