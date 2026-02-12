@@ -189,7 +189,7 @@ export function useSynthesis() {
     if (trimmedValue === "") {
       tagUpdater.deleteTag(sentenceId, tagIndex);
     } else {
-      const newWords = trimmedValue.split(/\s+/).filter((w) => w.length > 0);
+      const newWords = convertTextToTags(trimmedValue);
       tagUpdater.replaceTag(sentenceId, tagIndex, newWords);
     }
     setEditingTag(null);
@@ -213,9 +213,7 @@ export function useSynthesis() {
               const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
               newText = newTags.join(" ");
             } else {
-              const newWords = trimmedValue
-                .split(/\s+/)
-                .filter((w) => w.length > 0);
+              const newWords = convertTextToTags(trimmedValue);
               const newTags = [
                 ...sentence.tags.slice(0, tagIndex),
                 ...newWords,
