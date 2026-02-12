@@ -19,7 +19,7 @@ async function withRetry<T>(
       return await fn();
     } catch (error) {
       if (attempt === retries - 1) throw error;
-      const delay = BASE_DELAY_MS * Math.pow(2, attempt);
+      const delay = BASE_DELAY_MS * 2 ** attempt;
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }

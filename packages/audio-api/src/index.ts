@@ -4,7 +4,7 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { SQSClient } from "@aws-sdk/client-sqs";
 
-import { handler } from "./handler";
+import { handler as coreHandler } from "./handler";
 import { publishWarmMessage } from "./sqs";
 import {
   createResponse,
@@ -13,14 +13,17 @@ import {
 } from "./response";
 import { getAwsRegion, getQueueUrl } from "./env";
 
-const s3Client = new S3Client({ region: getAwsRegion() });
-const sqsClient = new SQSClient({ region: getAwsRegion() });
+const region = getAwsRegion();
+const s3Client = new S3Client({ region });
+const sqsClient = new SQSClient({ region });
 
-export async function lambdaHandler(
+export async function handler(
   event: { body: string },
 ): Promise<LambdaResponse> {
-  return handler(event, s3Client, sqsClient);
+  return coreHandler(event, s3Client, sqsClient);
 }
+
+export { handler as lambdaHandler };
 
 export async function healthHandler(): Promise<LambdaResponse> {
   return createResponse(200, {
@@ -50,4 +53,3 @@ export async function warmHandler(): Promise<LambdaResponse> {
   }
 }
 
-export { lambdaHandler as handler };

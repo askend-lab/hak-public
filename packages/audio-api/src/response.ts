@@ -7,7 +7,7 @@ export interface LambdaResponse {
   headers: Record<string, string>;
 }
 
-const HTTP_STATUS = {
+export const HTTP_STATUS = {
   OK: 200,
   BAD_REQUEST: 400,
 } as const;

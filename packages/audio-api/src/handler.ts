@@ -19,7 +19,11 @@ interface RequestBody {
   text?: unknown;
 }
 
-function validateText(
+function buildCacheKey(hash: string): string {
+  return `cache/${hash}.mp3`;
+}
+
+export function validateText(
   text: unknown,
 ): { valid: true; text: string } | { valid: false; error: string } {
   if (typeof text !== "string" || text === "") {
@@ -49,10 +53,8 @@ export async function handler(
       return createErrorResponse(validation.error);
     }
 
-    const text = validation.text;
-
-    const hash = calculateHash(text);
-    const key = `cache/${hash}.mp3`;
+    const hash = calculateHash(validation.text);
+    const key = buildCacheKey(hash);
 
     const exists = await checkFileExists(s3Client, bucketName, key);
 
@@ -64,7 +66,7 @@ export async function handler(
       });
     }
 
-    await publishToQueue(sqsClient, queueUrl, text, hash);
+    await publishToQueue(sqsClient, queueUrl, validation.text, hash);
 
     return createSuccessResponse({
       status: "processing",
