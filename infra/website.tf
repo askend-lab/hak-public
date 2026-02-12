@@ -1,10 +1,22 @@
 # S3 bucket for website hosting
+#tfsec:ignore:AVD-AWS-0132 AWS managed encryption is sufficient for static website assets
 resource "aws_s3_bucket" "website" {
   bucket = local.website_bucket_name
 
   tags = merge(local.common_tags, {
     Name = local.website_bucket_name
   })
+}
+
+#tfsec:ignore:AVD-AWS-0132 AWS managed encryption (AES256) is sufficient for static website assets
+resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 resource "aws_s3_bucket_website_configuration" "website" {
@@ -19,6 +31,10 @@ resource "aws_s3_bucket_website_configuration" "website" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0086 Public website bucket served via CloudFront requires public read access
+#tfsec:ignore:AVD-AWS-0087 Public website bucket served via CloudFront requires public read access
+#tfsec:ignore:AVD-AWS-0091 Public website bucket served via CloudFront requires public read access
+#tfsec:ignore:AVD-AWS-0093 Public website bucket served via CloudFront requires public read access
 resource "aws_s3_bucket_public_access_block" "website" {
   bucket = aws_s3_bucket.website.id
 

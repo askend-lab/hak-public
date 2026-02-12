@@ -5,9 +5,11 @@
 # SNS Topic for Alerts
 # =============================================================================
 
+#tfsec:ignore:AVD-AWS-0136 AWS managed SNS key is sufficient; CMK not needed for alert notifications
 resource "aws_sns_topic" "alerts" {
-  name = "hak-alerts-${var.env}"
-  tags = local.common_tags
+  name              = "hak-alerts-${var.env}"
+  kms_master_key_id = "alias/aws/sns"
+  tags              = local.common_tags
 }
 
 # =============================================================================

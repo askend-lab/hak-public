@@ -22,6 +22,10 @@ resource "aws_dynamodb_table" "single_table" {
     enabled        = true
   }
 
+  server_side_encryption {
+    enabled = true
+  }
+
   tags = {
     Project     = "hak"
     Environment = var.env

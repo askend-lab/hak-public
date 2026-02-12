@@ -12,6 +12,21 @@ resource "aws_s3_bucket" "audio" {
   }
 }
 
+#tfsec:ignore:AVD-AWS-0132 AWS managed encryption (AES256) is sufficient for audio cache
+resource "aws_s3_bucket_server_side_encryption_configuration" "audio" {
+  bucket = aws_s3_bucket.audio.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+#tfsec:ignore:AVD-AWS-0086 Audio cache bucket requires public read access for cached audio files
+#tfsec:ignore:AVD-AWS-0087 Audio cache bucket requires public read access for cached audio files
+#tfsec:ignore:AVD-AWS-0091 Audio cache bucket requires public read access for cached audio files
+#tfsec:ignore:AVD-AWS-0093 Audio cache bucket requires public read access for cached audio files
 resource "aws_s3_bucket_public_access_block" "audio" {
   bucket = aws_s3_bucket.audio.id
 
@@ -58,6 +73,7 @@ resource "aws_sqs_queue" "audio_generation" {
   visibility_timeout_seconds = 300   # 5 minutes for TTS processing
   message_retention_seconds  = 86400 # 1 day
   receive_wait_time_seconds  = 20    # Long polling
+  sqs_managed_sse_enabled    = true
 
   tags = {
     Project     = "hak"
@@ -70,6 +86,7 @@ resource "aws_sqs_queue" "audio_generation" {
 resource "aws_sqs_queue" "audio_generation_dlq" {
   name                      = "hak-audio-generation-dlq-${var.env}"
   message_retention_seconds = 1209600 # 14 days
+  sqs_managed_sse_enabled   = true
 
   tags = {
     Project     = "hak"
