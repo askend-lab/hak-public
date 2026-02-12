@@ -40,7 +40,7 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.964.0",
+    "@aws-sdk/client-secrets-manager": "^3.988.0",
     "@axe-core/playwright": "^4.11.0",
     "@axe-core/react": "^4.11.0",
     "@cucumber/cucumber": "^12.4.0",
@@ -77,7 +77,7 @@
     "i18next": "^25.7.3",
     "jest": "^29.7.0",
     "jest-axe": "^10.0.0",
-    "jest-cucumber": "^3.0.0",
+    "jest-cucumber": "^3.0.2",
     "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^27.3.0",
     "nyc": "^17.1.0",
