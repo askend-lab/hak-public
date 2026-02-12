@@ -14,6 +14,7 @@ interface QueuedRequest {
 
 const VMETAJSON_PARAMS = ["--stem", "--addphonetics"] as const;
 const TIMEOUT_ERROR = "vmetajson timeout";
+const NOT_INITIALIZED_ERROR = "vmetajson process not initialized";
 
 // Stryker disable next-line all: env default is equivalent
 const TIMEOUT_MS = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
@@ -113,7 +114,7 @@ function createAnalyzeInput(text: string): VmetajsonInput {
 
 export async function analyze(text: string): Promise<VmetajsonResponse> {
   if (!vmetajsonProcess) {
-    throw new Error("vmetajson process not initialized");
+    throw new Error(NOT_INITIALIZED_ERROR);
   }
 
   const input = createAnalyzeInput(text);

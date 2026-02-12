@@ -64,5 +64,5 @@ export interface VmetajsonResponse {
 export interface LambdaResponse {
   statusCode: number;
   body: string;
-  headers?: Record<string, string>;
+  headers: Record<string, string>;
 }

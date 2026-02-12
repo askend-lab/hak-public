@@ -53,16 +53,17 @@ const server = http.createServer(
       return;
     }
 
+    const method = req.method || "GET";
     let body = "";
     req.on("data", (chunk: Buffer) => {
       body += chunk.toString();
     });
     req.on("end", async () => {
-      const event = createEvent(body, path, req.method || "GET");
+      const event = createEvent(body, path, method);
       let result;
 
       try {
-        const route = LOCAL_ROUTES.find((r) => r.match(path, req.method || "GET"));
+        const route = LOCAL_ROUTES.find((r) => r.match(path, method));
         if (route) {
           result = await route.handler(event);
         } else {

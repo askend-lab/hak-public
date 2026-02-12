@@ -3,7 +3,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { extractStressedText, extractVariants } from "./parser";
-import { AnalyzeRequest, VariantsRequest, LambdaResponse } from "./types";
+import { LambdaResponse } from "./types";
 import { createResponse, parseJsonBody, validateField } from "./validation";
 import { analyze, isInitialized, initVmetajson } from "./vmetajson";
 
@@ -42,26 +42,27 @@ const ERRORS = {
   UNKNOWN: "Unknown error",
 } as const;
 
-interface ParsedInput<T> {
+const PROCESSING_ERROR_PREFIX = "Processing error: ";
+
+interface ParsedInput {
   success: true;
-  body: T;
   value: string;
 }
 interface ParseError {
   success: false;
   response: LambdaResponse;
 }
-type ParseResult<T> = ParsedInput<T> | ParseError;
+type ParseResult = ParsedInput | ParseError;
 
 function badRequest(error: string): ParseError {
   return { success: false, response: createResponse(HTTP_STATUS.BAD_REQUEST, { error }) };
 }
 
-function parseAndValidate<T>(
+function parseAndValidate(
   event: APIGatewayProxyEvent,
   fieldName: string,
   maxLength?: number,
-): ParseResult<T> {
+): ParseResult {
   ensureInitialized();
 
   if (event.body === null) return badRequest(ERRORS.MISSING_BODY);
@@ -76,13 +77,13 @@ function parseAndValidate<T>(
   );
   if ("error" in fieldResult) return badRequest(fieldResult.error);
 
-  return { success: true, body: body as T, value: fieldResult.value };
+  return { success: true, value: fieldResult.value };
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
   const message = error instanceof Error ? error.message : ERRORS.UNKNOWN;
   return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
-    error: `Processing error: ${message}`,
+    error: `${PROCESSING_ERROR_PREFIX}${message}`,
   });
 }
 
@@ -90,7 +91,7 @@ export async function analyzeHandler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
   try {
-    const parsed = parseAndValidate<AnalyzeRequest>(
+    const parsed = parseAndValidate(
       event,
       "text",
       MAX_TEXT_LENGTH,
@@ -111,7 +112,7 @@ export async function variantsHandler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
   try {
-    const parsed = parseAndValidate<VariantsRequest>(event, "word");
+    const parsed = parseAndValidate(event, "word");
     if (!parsed.success) return parsed.response;
 
     const response = await analyze(parsed.value);

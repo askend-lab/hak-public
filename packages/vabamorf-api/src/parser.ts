@@ -6,11 +6,16 @@ import {
   createVariantFromMrf,
   isDuplicateVariant,
 } from "./parser-helpers";
-import { VmetajsonResponse, VmetajsonToken, Variant } from "./types";
+import { VmetajsonResponse, VmetajsonToken, VmetajsonMrf, Variant } from "./types";
 
 function getTokens(response: VmetajsonResponse): VmetajsonToken[] {
   // Stryker disable next-line all: optional chaining is equivalent
   return response.annotations?.tokens ?? [];
+}
+
+function getMrfList(token: VmetajsonToken): VmetajsonMrf[] {
+  // Stryker disable next-line all: optional chaining is equivalent
+  return token.features?.mrf ?? [];
 }
 
 export function extractStressedText(
@@ -33,8 +38,7 @@ export function extractVariants(
   const variants: Variant[] = [];
 
   for (const tokenData of tokens) {
-    // Stryker disable next-line all: optional chaining is equivalent
-    const mrfList = tokenData.features?.mrf ?? [];
+    const mrfList = getMrfList(tokenData);
     for (const mrfVariant of mrfList) {
       const variant = createVariantFromMrf(mrfVariant, word);
       if (variant && !isDuplicateVariant(variants, variant)) {

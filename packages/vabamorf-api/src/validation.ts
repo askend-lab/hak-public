@@ -3,7 +3,7 @@
 
 import { LambdaResponse } from "./types";
 
-const RESPONSE_HEADERS = {
+export const RESPONSE_HEADERS = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
@@ -51,7 +51,8 @@ export function validateField(
   fieldName: string,
   maxLength?: number,
 ): { value: string } | { error: string } {
-  const error = getFieldError(body[fieldName], fieldName, maxLength);
+  const fieldValue = body[fieldName];
+  const error = getFieldError(fieldValue, fieldName, maxLength);
   if (error !== null) return { error };
-  return { value: (body[fieldName] as string).trim() };
+  return { value: (fieldValue as string).trim() };
 }
