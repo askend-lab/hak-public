@@ -2,13 +2,17 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { receiveMessage, deleteMessage, parseMessage, isWarmMessage, isAudioMessage, MAX_MESSAGES, WAIT_TIME_SECONDS } from "../src/sqs";
-import { createMockSqsClient } from "./setup";
+import { createMockSqsClient, TEST_QUEUE_URL } from "./setup";
 
 const mockSqsClient = createMockSqsClient();
 
 describe("SQS Operations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("receiveMessage", () => {
@@ -23,7 +27,7 @@ describe("SQS Operations", () => {
         Messages: [mockMessage],
       });
 
-      const result = await receiveMessage(mockSqsClient, "https://queue-url");
+      const result = await receiveMessage(mockSqsClient, TEST_QUEUE_URL);
 
       expect(result).toStrictEqual(mockMessage);
       expect(mockSqsClient.send).toHaveBeenCalledTimes(1);
@@ -34,7 +38,7 @@ describe("SQS Operations", () => {
         Messages: [],
       });
 
-      const result = await receiveMessage(mockSqsClient, "https://queue-url");
+      const result = await receiveMessage(mockSqsClient, TEST_QUEUE_URL);
 
       expect(result).toBeNull();
     });
@@ -42,7 +46,7 @@ describe("SQS Operations", () => {
     it("should return null when Messages is undefined", async () => {
       mockSqsClient.send.mockResolvedValue({});
 
-      const result = await receiveMessage(mockSqsClient, "https://queue-url");
+      const result = await receiveMessage(mockSqsClient, TEST_QUEUE_URL);
 
       expect(result).toBeNull();
     });
@@ -123,7 +127,7 @@ describe("SQS Operations", () => {
     it("should delete message from queue", async () => {
       mockSqsClient.send.mockResolvedValue({});
 
-      await deleteMessage(mockSqsClient, "https://queue-url", "receipt-123");
+      await deleteMessage(mockSqsClient, TEST_QUEUE_URL, "receipt-123");
 
       expect(mockSqsClient.send).toHaveBeenCalledTimes(1);
     });
