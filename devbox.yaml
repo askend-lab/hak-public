@@ -17,6 +17,10 @@ test_modules:
   - name: merlin-worker
     path: packages/merlin-worker
     type: jest
+  - name: merlin-api
+    path: packages/merlin-api
+    type: jest
+    min_coverage_lines: 85
   - name: vabamorf-api
     path: packages/vabamorf-api
     type: jest
@@ -173,6 +177,7 @@ hooks:
 
   source-size:
     excludePaths:
+      - "**/*.generated.ts"
       - "**/.stryker-tmp/**"
       - "**/.old-frontend/**"
       - "**/.esbuild/**"
