@@ -12,6 +12,7 @@ import Dashboard from "./components/Dashboard";
 import AppModals from "./components/AppModals";
 import { RoleSelectionContent } from "./components/onboarding";
 import { useAuth } from "./services/auth";
+import { COPIED_ENTRIES_KEY } from "./hooks/synthesis/useSentenceState";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./contexts/OnboardingContext";
 import {
@@ -53,7 +54,7 @@ export default function Home() {
   const hasCheckedInitialRedirect = useRef(false);
   // Capture copiedEntries presence synchronously during render (before effects clear it)
   const hadCopiedEntries = useRef(
-    sessionStorage.getItem("copiedEntries") !== null,
+    sessionStorage.getItem(COPIED_ENTRIES_KEY) !== null,
   );
 
   // Handle post-login redirect
