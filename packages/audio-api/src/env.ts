@@ -19,6 +19,4 @@ export function getRequiredEnvVars(): {
   return { bucketName, queueUrl };
 }
 
-export function getQueueUrl(): string {
-  return process.env.QUEUE_URL ?? "";
-}
+

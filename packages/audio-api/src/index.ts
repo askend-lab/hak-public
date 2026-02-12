@@ -9,9 +9,10 @@ import { publishWarmMessage } from "./sqs";
 import {
   createResponse,
   extractErrorMessage,
+  HTTP_STATUS,
   type LambdaResponse,
 } from "./response";
-import { getAwsRegion, getQueueUrl } from "./env";
+import { getAwsRegion } from "./env";
 
 const region = getAwsRegion();
 const s3Client = new S3Client({ region });
@@ -26,7 +27,7 @@ export async function handler(
 export { handler as lambdaHandler };
 
 export async function healthHandler(): Promise<LambdaResponse> {
-  return createResponse(200, {
+  return createResponse(HTTP_STATUS.OK, {
     status: "healthy",
     service: "audio-api",
     timestamp: new Date().toISOString(),
@@ -34,22 +35,21 @@ export async function healthHandler(): Promise<LambdaResponse> {
 }
 
 export async function warmHandler(): Promise<LambdaResponse> {
-  const queueUrl = getQueueUrl();
+  const queueUrl = process.env.QUEUE_URL ?? "";
   if (queueUrl === "") {
-    return createResponse(500, { error: "QUEUE_URL not configured" });
+    return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: "QUEUE_URL not configured" });
   }
 
   try {
     await publishWarmMessage(sqsClient, queueUrl);
-    return createResponse(200, {
+    return createResponse(HTTP_STATUS.OK, {
       status: "warming",
       message: "Audio worker warm-up triggered",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    return createResponse(500, {
+    return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
       error: extractErrorMessage(error, "Failed to trigger warm-up"),
     });
   }
 }
-

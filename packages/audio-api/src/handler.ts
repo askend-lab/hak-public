@@ -19,7 +19,7 @@ interface RequestBody {
   text?: unknown;
 }
 
-function buildCacheKey(hash: string): string {
+export function buildCacheKey(hash: string): string {
   return `cache/${hash}.mp3`;
 }
 

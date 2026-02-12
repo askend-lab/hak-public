@@ -154,6 +154,46 @@ describe("handler", () => {
   });
 });
 
+describe("handler - Input Validation", () => {
+  let ctx: TestContext;
+
+  beforeEach(() => {
+    ctx = createTestContext();
+    setupTestEnv();
+  });
+
+  it("should reject empty text", async () => {
+    const event = createRequestEvent("");
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
+
+    expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
+    const body = JSON.parse(response.body);
+    expect(body.error).toBe("Text field is required");
+  });
+
+  it("should reject missing text field", async () => {
+    const event = { body: JSON.stringify({}) };
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
+
+    expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(JSON.parse(response.body).error).toBeDefined();
+  });
+
+  it("should reject text longer than max length", async () => {
+    const event = createRequestEvent("a".repeat(1001));
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
+
+    expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(JSON.parse(response.body).error).toContain("too long");
+  });
+
+  it("should reject non-string text", async () => {
+    const event = { body: JSON.stringify({ text: 123 }) };
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
+    expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
+  });
+});
+
 describe("validateText", () => {
   it("should return valid for normal text", () => {
     const result = validateText("hello");

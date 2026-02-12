@@ -3,6 +3,7 @@
 
 import { calculateHashSync } from "@hak/shared";
 
+import { buildCacheKey } from "../src/handler";
 import { MockS3Client, MockSQSClient } from "./mocks";
 
 /**
@@ -11,16 +12,15 @@ import { MockS3Client, MockSQSClient } from "./mocks";
  */
 
 // Set required environment variables for tests
-process.env.ENV = "test";
-process.env.AWS_REGION = "us-east-1";
-process.env.AWS_ACCOUNT_ID = "123456789012";
-process.env.BUCKET_NAME = "test-bucket";
-process.env.QUEUE_URL =
-  "https://sqs.us-east-1.amazonaws.com/123456789012/test-queue";
-
 export const TEST_BUCKET = "test-bucket";
 export const TEST_QUEUE_URL =
   "https://sqs.us-east-1.amazonaws.com/123456789012/test-queue";
+
+process.env.ENV = "test";
+process.env.AWS_REGION = "us-east-1";
+process.env.AWS_ACCOUNT_ID = "123456789012";
+process.env.BUCKET_NAME = TEST_BUCKET;
+process.env.QUEUE_URL = TEST_QUEUE_URL;
 
 export interface TestContext {
   mockS3: MockS3Client;
@@ -45,7 +45,7 @@ export function setupCache(
   exists: boolean,
 ): string {
   const hash = calculateHashSync(text);
-  mockS3.setFileExists(`cache/${hash}.mp3`, exists);
+  mockS3.setFileExists(buildCacheKey(hash), exists);
   return hash;
 }
 
