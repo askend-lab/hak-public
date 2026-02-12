@@ -2,12 +2,17 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { synthesize, DEFAULT_VOICE, CONTENT_TYPE_JSON } from "../src/merlin";
+import { TEST_MERLIN_URL } from "./setup";
 
 global.fetch = jest.fn();
 
 describe("Merlin TTS", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("synthesize", () => {
@@ -25,17 +30,17 @@ describe("Merlin TTS", () => {
 
       const result = await synthesize(
         "tere päevast",
-        "https://merlin-url/synthesize",
+        TEST_MERLIN_URL,
       );
 
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://merlin-url/synthesize",
+        TEST_MERLIN_URL,
         expect.objectContaining({
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": CONTENT_TYPE_JSON },
           body: JSON.stringify({
             text: "tere päevast",
-            voice: "efm_s",
+            voice: DEFAULT_VOICE,
             returnBase64: true,
           }),
         }),
@@ -51,7 +56,7 @@ describe("Merlin TTS", () => {
       });
 
       await expect(
-        synthesize("tere", "https://merlin-url/synthesize"),
+        synthesize("tere", TEST_MERLIN_URL),
       ).rejects.toThrow("Merlin API error: 500");
     });
 
@@ -59,7 +64,7 @@ describe("Merlin TTS", () => {
       (global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
 
       await expect(
-        synthesize("tere", "https://merlin-url/synthesize"),
+        synthesize("tere", TEST_MERLIN_URL),
       ).rejects.toThrow("Network error");
     });
 
@@ -71,10 +76,10 @@ describe("Merlin TTS", () => {
         json: () => Promise.resolve({ audio: mockAudioBase64, format: "wav" }),
       });
 
-      await synthesize("tere", "https://merlin-url/synthesize", "custom_voice");
+      await synthesize("tere", TEST_MERLIN_URL, "custom_voice");
 
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://merlin-url/synthesize",
+        TEST_MERLIN_URL,
         expect.objectContaining({
           body: JSON.stringify({
             text: "tere",

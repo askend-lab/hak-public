@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { uploadAudio, buildCacheKey } from "../src/s3";
-import { createMockS3Client } from "./setup";
+import { uploadAudio, buildCacheKey, AUDIO_CONTENT_TYPE } from "../src/s3";
+import { createMockS3Client, TEST_BUCKET } from "./setup";
 
 const mockS3Client = createMockS3Client();
 
 describe("S3 Operations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("buildCacheKey", () => {
@@ -30,7 +34,7 @@ describe("S3 Operations", () => {
 
       await uploadAudio(
         mockS3Client,
-        "hak-audio-dev",
+        TEST_BUCKET,
         "abc123def456",
         audioBuffer,
       );
@@ -44,7 +48,7 @@ describe("S3 Operations", () => {
 
       await uploadAudio(
         mockS3Client,
-        "hak-audio-dev",
+        TEST_BUCKET,
         "myhash123",
         audioBuffer,
       );
@@ -57,10 +61,10 @@ describe("S3 Operations", () => {
       mockS3Client.send.mockResolvedValue({});
       const audioBuffer = Buffer.from("fake audio data");
 
-      await uploadAudio(mockS3Client, "hak-audio-dev", "hash123", audioBuffer);
+      await uploadAudio(mockS3Client, TEST_BUCKET, "hash123", audioBuffer);
 
       const call = mockS3Client.send.mock.calls[0][0];
-      expect(call.input.ContentType).toBe("audio/mpeg");
+      expect(call.input.ContentType).toBe(AUDIO_CONTENT_TYPE);
     });
 
     it("should throw error on upload failure", async () => {
@@ -68,8 +72,14 @@ describe("S3 Operations", () => {
       const audioBuffer = Buffer.from("fake audio data");
 
       await expect(
-        uploadAudio(mockS3Client, "bucket", "hash", audioBuffer),
+        uploadAudio(mockS3Client, TEST_BUCKET, "hash", audioBuffer),
       ).rejects.toThrow("Upload failed");
+    });
+  });
+
+  describe("AUDIO_CONTENT_TYPE", () => {
+    it("should be audio/mpeg", () => {
+      expect(AUDIO_CONTENT_TYPE).toBe("audio/mpeg");
     });
   });
 });

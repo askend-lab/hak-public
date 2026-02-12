@@ -44,6 +44,10 @@ describe("Worker", () => {
     jest.spyOn(console, "error").mockImplementation();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe("processMessage", () => {
     it("should return false when no message in queue", async () => {
       (receiveMessage as jest.Mock).mockResolvedValue(null);
@@ -87,11 +91,10 @@ describe("Worker", () => {
     });
 
     it("should handle warm message without synthesizing", async () => {
-      const mockMessage = {
-        MessageId: "msg-warm",
-        Body: JSON.stringify({ type: "warm", timestamp: Date.now() }),
-        ReceiptHandle: "receipt-warm",
-      };
+      const mockMessage = createMockMessage(
+        { type: "warm", timestamp: Date.now() },
+        { MessageId: "msg-warm", ReceiptHandle: "receipt-warm" },
+      );
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
       (parseMessage as jest.Mock).mockReturnValue({ type: "warm" });
@@ -111,11 +114,7 @@ describe("Worker", () => {
     });
 
     it("should throw error when synthesis fails", async () => {
-      const mockMessage = {
-        MessageId: "msg-123",
-        Body: JSON.stringify({ text: "tere", hash: "abc123" }),
-        ReceiptHandle: "receipt-123",
-      };
+      const mockMessage = createMockMessage({ text: "tere", hash: "abc123" });
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
       (parseMessage as jest.Mock).mockReturnValue({
@@ -131,10 +130,11 @@ describe("Worker", () => {
     });
 
     it("should handle message with undefined ReceiptHandle", async () => {
-      const mockMessage = {
-        MessageId: "msg-no-receipt",
-        Body: JSON.stringify({ text: "tere", hash: "abc123" }),
-      };
+      const mockMessage = createMockMessage(
+        { text: "tere", hash: "abc123" },
+        { MessageId: "msg-no-receipt", ReceiptHandle: undefined as unknown as string },
+      );
+      delete (mockMessage as Record<string, unknown>).ReceiptHandle;
       const mockAudioBuffer = Buffer.from("fake audio");
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
@@ -158,10 +158,11 @@ describe("Worker", () => {
     });
 
     it("should handle message with undefined MessageId", async () => {
-      const mockMessage = {
-        Body: JSON.stringify({ text: "tere", hash: "abc123" }),
-        ReceiptHandle: "receipt-123",
-      };
+      const mockMessage = createMockMessage(
+        { text: "tere", hash: "abc123" },
+        { MessageId: undefined as unknown as string },
+      );
+      delete (mockMessage as Record<string, unknown>).MessageId;
       const mockAudioBuffer = Buffer.from("fake audio");
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
@@ -180,10 +181,11 @@ describe("Worker", () => {
     });
 
     it("should handle warm message with undefined ReceiptHandle", async () => {
-      const mockMessage = {
-        MessageId: "msg-warm",
-        Body: JSON.stringify({ type: "warm" }),
-      };
+      const mockMessage = createMockMessage(
+        { type: "warm" },
+        { MessageId: "msg-warm", ReceiptHandle: undefined as unknown as string },
+      );
+      delete (mockMessage as Record<string, unknown>).ReceiptHandle;
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
       (parseMessage as jest.Mock).mockReturnValue({ type: "warm" });
