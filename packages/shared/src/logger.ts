@@ -26,46 +26,36 @@ function formatMessage(level: LogLevel, message: string): string {
   return `[${timestamp}] [${level.toUpperCase()}] ${message}`;
 }
 
-export function createLogger(minLevel: LogLevel = "info"): Logger {
-  return {
-    debug(message: string, ...args: unknown[]): void {
-      if (shouldLog("debug", minLevel)) {
-        console.debug(formatMessage("debug", message), ...args);
-      }
-    },
-    info(message: string, ...args: unknown[]): void {
-      if (shouldLog("info", minLevel)) {
-        console.info(formatMessage("info", message), ...args);
-      }
-    },
-    warn(message: string, ...args: unknown[]): void {
-      if (shouldLog("warn", minLevel)) {
-        console.warn(formatMessage("warn", message), ...args);
-      }
-    },
-    error(message: string, ...args: unknown[]): void {
-      if (shouldLog("error", minLevel)) {
-        console.error(formatMessage("error", message), ...args);
-      }
-    },
+// #3 Single factory for log methods — eliminates 4 identical method bodies
+function createLogMethod(
+  level: LogLevel,
+  minLevel: LogLevel,
+): (message: string, ...args: unknown[]) => void {
+  const consoleFn = console[level].bind(console);
+  return (message: string, ...args: unknown[]): void => {
+    if (shouldLog(level, minLevel)) {
+      consoleFn(formatMessage(level, message), ...args);
+    }
   };
 }
 
-const VALID_LOG_LEVELS: readonly LogLevel[] = [
-  "debug",
-  "info",
-  "warn",
-  "error",
-];
-
-function isValidLogLevel(level: string): level is LogLevel {
-  return VALID_LOG_LEVELS.includes(level as LogLevel);
+export function createLogger(minLevel: LogLevel = "info"): Logger {
+  return {
+    debug: createLogMethod("debug", minLevel),
+    info: createLogMethod("info", minLevel),
+    warn: createLogMethod("warn", minLevel),
+    error: createLogMethod("error", minLevel),
+  };
 }
 
-// Environment-safe log level detection
-const getLogLevel = (): LogLevel => {
+// #4 + #5 Derived from LOG_LEVELS — no separate array, uses `in` operator
+function isValidLogLevel(level: string): level is LogLevel {
+  return level in LOG_LEVELS;
+}
+
+// #6 Consistent function declaration style
+function getLogLevel(): LogLevel {
   try {
-    // Node.js environment (works in Jest and Node)
     // eslint-disable-next-line no-restricted-globals
     if (typeof process !== "undefined" && process.env?.LOG_LEVEL) {
       // eslint-disable-next-line no-restricted-globals
@@ -78,6 +68,6 @@ const getLogLevel = (): LogLevel => {
     // Ignore errors in environment detection
   }
   return "info";
-};
+}
 
 export const logger = createLogger(getLogLevel());
