@@ -81,8 +81,3 @@ packages/frontend/src/services/vabamorf/vmetajson
 *.vcxproj
 *.vcxproj.filters
 
-# Internal DevBox tooling
-devbox
-devbox.yaml
-defaults.yaml
-.githooks/

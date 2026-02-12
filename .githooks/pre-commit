@@ -1,0 +1,7 @@
+#!/bin/sh
+# DevBox pre-commit hook
+set -e
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+node "/home/alex/users/boxer/devbox/packages/hooks/src/cli/index.js" run pre-commit
