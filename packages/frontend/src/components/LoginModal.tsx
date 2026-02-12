@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/services/auth";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import BaseModal from "./BaseModal";
 import { ErrorIcon } from "./ui/Icons";
 
@@ -80,7 +81,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       await login();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Sisselogimine ebaõnnestus",
+        getErrorMessage(err, "Sisselogimine ebaõnnestus"),
       );
       setIsLoading(false);
     }

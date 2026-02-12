@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import { convertTextToTags } from "@/types/synthesis";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
@@ -109,7 +110,7 @@ export default function TaskDetailView({
       })
       .catch((err) =>
         setError(
-          err instanceof Error ? err.message : "Viga ülesande laadimisel",
+          getErrorMessage(err, "Viga ülesande laadimisel"),
         ),
       )
       .finally(() => setIsLoading(false));

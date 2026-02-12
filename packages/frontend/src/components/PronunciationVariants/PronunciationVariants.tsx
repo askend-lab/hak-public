@@ -6,6 +6,7 @@
 import { useState, useEffect } from "react";
 import { transformToVabamorf } from "@/utils/phoneticMarkers";
 import { synthesizeAuto } from "@/utils/synthesize";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import { createAudioPlayer } from "@/utils/audioPlayer";
 import { CONTENT_TYPE_JSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
 import { CloseIcon } from "../ui/Icons";
@@ -75,7 +76,7 @@ export default function PronunciationVariants({
       const data = await response.json();
       setVariants(deduplicateByText(data.variants || []));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(getErrorMessage(err, "An error occurred"));
     } finally {
       setIsLoading(false);
     }

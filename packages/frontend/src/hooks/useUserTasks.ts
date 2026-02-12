@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { TaskSummary } from "@/types/task";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 
@@ -34,7 +35,7 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
         setTasks(userTasks);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Viga ülesannete laadimisel",
+          getErrorMessage(err, "Viga ülesannete laadimisel"),
         );
       } finally {
         setIsLoading(false);

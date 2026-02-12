@@ -4,6 +4,7 @@
 "use client";
 
 import { useState } from "react";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import BaseModal from "./BaseModal";
 
 interface AddEntryModalProps {
@@ -105,7 +106,7 @@ export default function AddEntryModal({
       resetForm();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Viga ülesande lisamisel");
+      setError(getErrorMessage(err, "Viga ülesande lisamisel"));
     } finally {
       setIsSubmitting(false);
     }
