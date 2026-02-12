@@ -147,12 +147,16 @@ export class Store {
    * Queries items by sort key prefix
    */
   async query(entityPkPrefix: string, type: DataType): Promise<StoreResult> {
-    const pk = buildPartitionKey(this.context, type, this.config.keyDelimiter);
+    const pk = this.resolvePartitionKey(type);
 
     return this.wrapAsync(async () => {
       const items = await this.adapter.queryBySortKeyPrefix(pk, entityPkPrefix);
       return { success: true, items };
     });
+  }
+
+  private resolvePartitionKey(type: DataType): string {
+    return buildPartitionKey(this.context, type, this.config.keyDelimiter);
   }
 
   private resolveKeys(

@@ -14,6 +14,8 @@
 export {
   Store,
   ERRORS,
+  VALID_DATA_TYPES,
+  DEFAULT_CONFIG,
   buildKeys,
   buildPartitionKey,
   buildSortKey,

@@ -45,7 +45,7 @@ export class InMemoryAdapter implements StorageAdapter {
   ): Promise<StoreItem[]> {
     const results: StoreItem[] = [];
 
-    for (const [_key, item] of this.data) {
+    for (const item of this.data.values()) {
       if (item.PK === pk && item.SK.startsWith(skPrefix)) {
         results.push({ ...item });
       }

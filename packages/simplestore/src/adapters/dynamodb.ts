@@ -16,6 +16,8 @@ import {
 
 import { StorageAdapter, StoreItem } from "../core/types";
 
+const SK_PREFIX_CONDITION = "PK = :pk AND begins_with(SK, :skPrefix)";
+
 /**
  * AWS DynamoDB adapter implementing StorageAdapter interface
  * Provides actual DynamoDB operations for production use
@@ -79,7 +81,7 @@ export class DynamoDBAdapter implements StorageAdapter {
       const result = await this.docClient.send(
         new QueryCommand({
           TableName: this.tableName,
-          KeyConditionExpression: "PK = :pk AND begins_with(SK, :skPrefix)",
+          KeyConditionExpression: SK_PREFIX_CONDITION,
           ExpressionAttributeValues: {
             ":pk": pk,
             ":skPrefix": skPrefix,

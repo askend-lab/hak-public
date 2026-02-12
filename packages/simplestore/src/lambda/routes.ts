@@ -28,7 +28,7 @@ export const HTTP_STATUS = {
 } as const;
 
 export const HTTP_ERRORS = {
-  UNAUTHORIZED: "Unauthorized",
+  UNAUTHORIZED: "Authentication required. Provide a valid token or use a public-readable endpoint.",
   NOT_FOUND: "Not found",
   INTERNAL: "Internal server error",
   INVALID_JSON: "Invalid JSON body",
@@ -124,7 +124,7 @@ export async function handleSave(
     : createErrorResponse(result.error, HTTP_STATUS.BAD_REQUEST);
 }
 
-async function executeGet(
+export async function handleGet(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
@@ -146,13 +146,6 @@ async function executeGet(
   }
 
   return createErrorResponse(result.error, HTTP_STATUS.FORBIDDEN);
-}
-
-export async function handleGet(
-  event: APIGatewayProxyEvent,
-  store: Store,
-): Promise<APIGatewayProxyResult> {
-  return executeGet(event, store);
 }
 
 export async function handleDelete(
@@ -189,10 +182,12 @@ export async function handleQuery(
     : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_ERROR);
 }
 
-export async function handleDebugError(): Promise<APIGatewayProxyResult> {
+const DEBUG_ERROR_MESSAGE = "Intentional test error for monitoring";
+
+export function handleDebugError(): APIGatewayProxyResult {
   console.error("[DEBUG] Intentional 500 error triggered for monitoring test");
   return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
-    error: "Intentional test error for monitoring",
+    error: DEBUG_ERROR_MESSAGE,
     timestamp: new Date().toISOString(),
   });
 }
@@ -209,5 +204,5 @@ export async function handleGetPublic(
     });
   }
 
-  return executeGet(event, store);
+  return handleGet(event, store);
 }

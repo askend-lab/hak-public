@@ -22,6 +22,16 @@ import {
   HTTP_ERRORS,
 } from "./routes";
 
+const ANONYMOUS_USER = "anonymous";
+
+const ENV = {
+  TABLE_NAME: "TABLE_NAME",
+  IS_OFFLINE: "IS_OFFLINE",
+  APP_NAME: "APP_NAME",
+  TENANT: "TENANT",
+  ENVIRONMENT: "ENVIRONMENT",
+} as const;
+
 /** Shared adapter instance for persistence across calls */
 let sharedAdapter: StorageAdapter | null = null;
 
@@ -31,13 +41,13 @@ export function setAdapter(adapter: StorageAdapter | null): void {
 }
 
 function isOfflineMode(): boolean {
-  return process.env.IS_OFFLINE === "true";
+  return process.env[ENV.IS_OFFLINE] === "true";
 }
 
 /** Get or create adapter */
 function getAdapter(): StorageAdapter {
   if (!sharedAdapter) {
-    const tableName = process.env.TABLE_NAME;
+    const tableName = process.env[ENV.TABLE_NAME];
 
     if (tableName && !isOfflineMode()) {
       sharedAdapter = new DynamoDBAdapter(tableName);
@@ -76,9 +86,9 @@ function getEnv(name: string, defaultValue: string): string {
  */
 function createContext(userId: string): ServerContext {
   return {
-    app: getEnv("APP_NAME", "default"),
-    tenant: getEnv("TENANT", "default"),
-    env: getEnv("ENVIRONMENT", "dev"),
+    app: getEnv(ENV.APP_NAME, "default"),
+    tenant: getEnv(ENV.TENANT, "default"),
+    env: getEnv(ENV.ENVIRONMENT, "dev"),
     userId,
   };
 }
@@ -132,8 +142,7 @@ export async function handler(
 
   if (!userId && !isAnonymousSharedAccess) {
     return createResponse(HTTP_STATUS.UNAUTHORIZED, {
-      error:
-        "Authentication required. Provide a valid token or use a public-readable endpoint.",
+      error: HTTP_ERRORS.UNAUTHORIZED,
     });
   }
 
@@ -149,7 +158,7 @@ export async function handler(
 
   try {
     // For anonymous shared access, use 'anonymous' as userId
-    const effectiveUserId = userId || "anonymous";
+    const effectiveUserId = userId || ANONYMOUS_USER;
     return await route.handler(event, createStore(effectiveUserId));
   } catch {
     return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
