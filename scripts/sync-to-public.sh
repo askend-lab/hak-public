@@ -192,6 +192,10 @@ fi
 # --- Push to public repository ---
 echo ">>> Pushing to public repository: $PUBLIC_REPO"
 
+# Configure git identity for the temp clone
+git config user.email "noreply@users.noreply.github.com"
+git config user.name "HAK Open-Source Sync"
+
 # Remove existing origin and add public repo
 git remote remove origin
 git remote add origin "$PUBLIC_REPO"
