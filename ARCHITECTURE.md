@@ -2,183 +2,96 @@
 
 ## System Overview
 
-```mermaid
-graph TB
-    subgraph Client
-        FE[React SPA<br/>Vite + SCSS/BEM]
-    end
+HAK is an Estonian language learning platform. Teachers create lessons with text-to-speech audio, students complete them. The system runs on AWS with a serverless backend and a React frontend.
 
-    subgraph AWS Cloud
-        CF[CloudFront CDN]
-        S3_WEB[S3 Static Assets]
-        APIGW[API Gateway]
+**Client:** React SPA (Vite + SCSS/BEM), served via CloudFront CDN from S3.
 
-        subgraph Lambda Functions
-            SS[simplestore<br/>REST API]
-            AA[audio-api<br/>Audio Processing]
-            MA[merlin-api<br/>TTS Gateway]
-            VA[vabamorf-api<br/>Morphology]
-            TA[tara-auth<br/>Authentication]
-        end
+**Backend:** Five Lambda functions behind API Gateway, plus one Docker service on ECS:
 
-        DDB[(DynamoDB)]
-        S3_A[S3 Audio Bucket]
-        SQS[SQS Queue]
-        MW[merlin-worker<br/>Docker / ECS]
-        COG[Cognito]
-    end
+- **simplestore** — REST API for lessons, users, and progress. Reads/writes DynamoDB.
+- **audio-api** — Audio file upload, playback, and storage. Uses S3 for audio files.
+- **merlin-api** — TTS gateway. Accepts synthesis requests, sends them to SQS, checks results in S3.
+- **merlin-worker** — Estonian speech synthesis engine (Merlin). Runs as a Docker container on ECS Fargate. Polls SQS for jobs, runs Merlin TTS, uploads WAV files to S3.
+- **vabamorf-api** — Estonian morphological analysis. Lambda with a native binary (vmetajson) in a Docker container.
+- **tara-auth** — Estonian eID (TARA) authentication via Cognito.
 
-    FE --> CF --> S3_WEB
-    FE --> APIGW
-    APIGW --> SS
-    APIGW --> AA
-    APIGW --> MA
-    APIGW --> VA
-    APIGW --> TA
-    SS --> DDB
-    AA --> S3_A
-    MA --> SQS --> MW
-    MW --> S3_A
-    TA --> COG
-```
+**Storage:** DynamoDB for application data, S3 for audio files and frontend assets.
+
+**Queuing:** SQS connects merlin-api (producer) to merlin-worker (consumer).
 
 ## Monorepo Structure
 
-```mermaid
-graph LR
-    subgraph packages
-        FE[frontend]
-        SS[simplestore]
-        AA[audio-api]
-        MA[merlin-api]
-        MW[merlin-worker]
-        VA[vabamorf-api]
-        TA[tara-auth]
-        SH[shared]
-        SP[specifications]
-        GP[gherkin-parser]
-    end
+pnpm workspaces monorepo. Packages and their dependencies:
 
-    FE --> SH
-    FE --> SP
-    AA --> SH
-    MW --> SH
-    SP --> GP
-```
+- **frontend** — depends on `shared`, `specifications`
+- **simplestore** — standalone
+- **audio-api** — depends on `shared`
+- **merlin-api** — standalone
+- **merlin-worker** — depends on `shared`
+- **vabamorf-api** — standalone
+- **tara-auth** — standalone
+- **shared** — shared types, utilities, constants (no dependencies)
+- **specifications** — Gherkin BDD feature specs, depends on `gherkin-parser`
+- **gherkin-parser** — Gherkin-to-test mapping (no dependencies)
 
-## Package Details
+## Packages
 
-| Package | Tech | Runtime | Purpose |
-|---------|------|---------|---------|
-| `frontend` | React, Vite, SCSS/BEM, Vitest | S3 + CloudFront | Teacher/student UI |
-| `simplestore` | TypeScript, DynamoDB SDK | Lambda | Lessons, users, progress CRUD |
-| `audio-api` | TypeScript, S3 SDK, SQS SDK | Lambda | Audio upload, playback, storage |
-| `merlin-api` | TypeScript, ECS SDK, S3 SDK, SQS SDK | Lambda | TTS request gateway |
-| `merlin-worker` | Python + TypeScript, Conda, Merlin | Docker (ECS) | Estonian speech synthesis |
-| `vabamorf-api` | TypeScript, native binary (vmetajson) | Lambda (Docker) | Estonian morphological analysis |
-| `tara-auth` | TypeScript, Cognito SDK, JOSE | Lambda | Estonian eID (TARA) authentication |
-| `shared` | TypeScript | — | Shared types, utilities, constants |
-| `specifications` | Gherkin | — | BDD feature specifications |
-| `gherkin-parser` | TypeScript | — | Gherkin-to-test mapping |
+- **frontend** — React, Vite, SCSS/BEM, Vitest. Runs on S3 + CloudFront. Teacher and student UI.
+- **simplestore** — TypeScript, DynamoDB SDK. Lambda. Lessons, users, progress CRUD.
+- **audio-api** — TypeScript, S3 SDK, SQS SDK. Lambda. Audio upload, playback, storage.
+- **merlin-api** — TypeScript, ECS SDK, S3 SDK, SQS SDK. Lambda. TTS request gateway.
+- **merlin-worker** — Python + TypeScript, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis.
+- **vabamorf-api** — TypeScript, native binary (vmetajson). Lambda (Docker). Estonian morphological analysis.
+- **tara-auth** — TypeScript, Cognito SDK, JOSE. Lambda. Estonian eID (TARA) authentication.
+- **shared** — TypeScript. Shared types, utilities, constants.
+- **specifications** — Gherkin. BDD feature specifications.
+- **gherkin-parser** — TypeScript. Gherkin-to-test mapping.
 
 ## Data Flow — Lesson Playback
 
-```mermaid
-sequenceDiagram
-    participant S as Student Browser
-    participant CF as CloudFront
-    participant API as API Gateway
-    participant SS as simplestore
-    participant DB as DynamoDB
-    participant AA as audio-api
-    participant S3 as S3 Audio
-
-    S->>CF: Load app
-    CF->>S: React SPA
-    S->>API: GET /lessons/:id
-    API->>SS: Route
-    SS->>DB: Query lesson
-    DB-->>SS: Lesson data
-    SS-->>S: Lesson JSON
-    S->>API: GET /audio/:key
-    API->>AA: Route
-    AA->>S3: GetObject
-    S3-->>AA: Audio file
-    AA-->>S: Audio stream
-```
+1. Student opens the app. CloudFront serves the React SPA from S3.
+2. Student navigates to a lesson. Frontend calls `GET /lessons/:id` via API Gateway.
+3. API Gateway routes to simplestore. Simplestore queries DynamoDB, returns lesson JSON.
+4. Frontend renders the lesson. For audio playback, it calls `GET /audio/:key`.
+5. API Gateway routes to audio-api. Audio-api fetches the WAV from S3 and streams it back.
 
 ## Data Flow — TTS Synthesis
 
-```mermaid
-sequenceDiagram
-    participant T as Teacher Browser
-    participant API as API Gateway
-    participant MA as merlin-api
-    participant SQS as SQS Queue
-    participant MW as merlin-worker
-    participant S3 as S3 Audio
+1. Teacher enters text and clicks synthesize. Frontend calls `POST /synthesize {text, voice}`.
+2. API Gateway routes to merlin-api. Merlin-api sends a message to SQS and returns `202 Accepted` with a cache key.
+3. merlin-worker picks up the message from SQS, runs Merlin TTS engine, uploads the resulting WAV to S3.
+4. Frontend polls `GET /status/:cacheKey`. When merlin-api finds the file in S3, it returns `{status: ready, url}`.
+5. Frontend plays the audio from the S3 URL.
 
-    T->>API: POST /synthesize {text, voice}
-    API->>MA: Route
-    MA->>SQS: SendMessage
-    MA-->>T: 202 Accepted {jobId}
-    SQS->>MW: ReceiveMessage
-    MW->>MW: Merlin synthesis
-    MW->>S3: PutObject (wav)
-    T->>API: GET /audio/status/:jobId
-    API->>MA: Route
-    MA-->>T: {status: ready, url}
-```
+## Infrastructure
 
-## Infrastructure (Terraform)
+All infrastructure is managed with Terraform in `infra/`.
 
-```
-infra/
-  main.tf              # Provider, backend config
-  variables.tf         # Input variables
-  locals.tf            # Local values
-  outputs.tf           # Output values
-  terraform-state.tf   # Remote state backend
-  terraform.tfvars     # Environment values (not in git)
-  api-gateway.tf       # API Gateway routes
-  dynamodb.tf          # DynamoDB tables
-  website.tf           # S3 + CloudFront for frontend
-  audio.tf             # S3 audio bucket + Lambda
-  ecr.tf               # ECR for Docker images
-  cloudfront.tf        # CDN distribution
-  route53.tf           # DNS records
-  cloudwatch-*.tf      # Monitoring, alarms, dashboard
-  slack-notifications.tf  # Alert notifications
-  merlin/              # Merlin-specific infra (ECS)
-```
+- **main.tf** — Provider and backend config
+- **variables.tf** — Input variables
+- **locals.tf** — Local values
+- **outputs.tf** — Output values
+- **terraform-state.tf** — Remote state backend (S3 + DynamoDB lock)
+- **api-gateway.tf** — API Gateway routes for all Lambda APIs
+- **dynamodb.tf** — DynamoDB tables
+- **website.tf** — S3 + CloudFront for frontend hosting
+- **audio.tf** — S3 audio bucket, SQS queue, IAM roles
+- **ecr.tf** — ECR repository for Docker images
+- **cloudfront.tf** — CDN distribution
+- **route53.tf** — DNS records
+- **cloudwatch-alarms.tf** — Monitoring alarms
+- **cloudwatch-dashboard.tf** — Monitoring dashboard
+- **slack-notifications.tf** — Alert notifications to Slack
+- **merlin/** — Merlin-specific infra: ECS cluster, Fargate service, SQS queue, S3 bucket, IAM roles, auto-scaling
 
 ## Quality System
 
-Pre-commit hooks enforce quality on every commit:
+Pre-commit hooks (DevBox) enforce quality on every commit. The commit is rejected if any check fails.
 
-```
-commit → DevBox hooks (pre-commit stage)
-  ├── TypeScript strict (run-typecheck)
-  ├── ESLint zero warnings (run-lint)
-  ├── Build check (run-build)
-  ├── All tests pass (run-tests)
-  ├── Test coverage (test-coverage)
-  ├── TDD enforcement (test-required)
-  ├── Metrics required (metrics-required)
-  ├── No any types (no-any)
-  ├── No floating promises (no-floating-promises)
-  ├── Import order (import-order)
-  ├── No console.log (no-console)
-  ├── Copy-paste detection (jscpd)
-  ├── Dead code detection (dead-code)
-  ├── File size limits (source-size, markdown-size)
-  ├── Language check (language-check)
-  ├── Broken links (broken-links)
-  ├── Dependency audit (security-audit)
-  ├── Secret detection (secret-detection)
-  ├── License check (license-check)
-  ├── Unused deps (dependency-check)
-  ├── Docker lint (docker-lint)
-  ├── IaC security (iac-security)
-  └── Plan validation (plan-validation)
-```
+- **TypeScript strict** — no `any` types, no floating promises
+- **ESLint** — zero warnings policy
+- **Build check** — code must compile
+- **Tests** — all tests must pass, coverage thresholds enforced, TDD required for new code
+- **Code quality** — no console.log, import order, copy-paste detection, dead code detection, file size limits
+- **Security** — dependency audit, secret detection, license check
+- **Infrastructure** — Docker lint, IaC security scan, plan validation
