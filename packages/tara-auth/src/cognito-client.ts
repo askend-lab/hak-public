@@ -7,7 +7,7 @@ import {
   ListUsersCommand,
   UsernameExistsException,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, buildFallbackEmail } from './types';
+import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLENGE, buildFallbackEmail } from './types';
 
 export const DEFAULT_REGION = 'eu-west-1';
 
@@ -133,7 +133,7 @@ export class CognitoClient {
     const initiateCommand = new AdminInitiateAuthCommand({
       UserPoolId: this.config.userPoolId,
       ClientId: this.config.clientId,
-      AuthFlow: 'CUSTOM_AUTH',
+      AuthFlow: 'CUSTOM_AUTH' as const,
       AuthParameters: {
         USERNAME: username,
       },
@@ -151,7 +151,7 @@ export class CognitoClient {
       const respondCommand = new AdminRespondToAuthChallengeCommand({
         UserPoolId: this.config.userPoolId,
         ClientId: this.config.clientId,
-        ChallengeName: 'CUSTOM_CHALLENGE',
+        ChallengeName: CUSTOM_CHALLENGE,
         Session: initiateResponse.Session,
         ChallengeResponses: {
           USERNAME: username,

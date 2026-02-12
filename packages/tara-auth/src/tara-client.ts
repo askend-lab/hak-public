@@ -1,17 +1,20 @@
 import * as jose from 'jose';
 import { TaraIdToken, TaraTokens } from './types';
 
-interface TaraClient {
+export const DEFAULT_TARA_ISSUER = 'https://tara-test.ria.ee';
+export const DEFAULT_CALLBACK_URL = 'https://auth.askend-lab.com/auth/tara/callback';
+
+export interface TaraClient {
   buildAuthorizationUrl(state: string, nonce: string): string;
   exchangeCodeForTokens(code: string): Promise<TaraTokens>;
   verifyIdToken(idToken: string, expectedNonce: string): Promise<TaraIdToken>;
 }
 
 export async function createTaraClient(): Promise<TaraClient> {
-  const issuer = process.env.TARA_ISSUER || 'https://tara-test.ria.ee';
+  const issuer = process.env.TARA_ISSUER || DEFAULT_TARA_ISSUER;
   const clientId = process.env.TARA_CLIENT_ID || '';
   const clientSecret = process.env.TARA_CLIENT_SECRET || '';
-  const callbackUrl = process.env.TARA_CALLBACK_URL || 'https://auth.askend-lab.com/auth/tara/callback';
+  const callbackUrl = process.env.TARA_CALLBACK_URL || DEFAULT_CALLBACK_URL;
 
   const JWKS = jose.createRemoteJWKSet(new URL(`${issuer}/oidc/jwks`));
 
