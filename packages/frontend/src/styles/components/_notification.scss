@@ -6,6 +6,7 @@
 // =========================================================================
 @import "../tokens/colors";
 @import "../tokens/spacing";
+@import "../tokens/typography";
 @import "../tokens/breakpoints";
 
 // Notification Container - fixed positioning for toast notifications
@@ -39,6 +40,14 @@
     max-width: 100%;
     min-width: auto;
   }
+}
+
+// Notification message (replaces h2 for correct heading hierarchy)
+.notification__message {
+  margin: 0;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-normal;
 }
 
 // Action link inside notification

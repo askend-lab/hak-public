@@ -19,7 +19,7 @@ const apiBase =
 
 export function DebugPage() {
   return (
-    <div style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
+    <main style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
       <h1>🔧 Debug Page</h1>
       <p style={{ color: "#666", marginBottom: "2rem" }}>
         Secret page for testing error monitoring
@@ -56,6 +56,6 @@ export function DebugPage() {
       <p style={{ marginTop: "2rem", fontSize: "0.875rem", color: "#888" }}>
         Frontend → Sentry | Backend → CloudWatch → Slack
       </p>
-    </div>
+    </main>
   );
 }

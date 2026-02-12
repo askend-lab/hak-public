@@ -133,8 +133,8 @@
 }
 
 .sentence-phonetic-panel__marker-button {
-  width: 28px;
-  height: 36px;
+  min-width: $spacing-touch-target;
+  min-height: $spacing-touch-target;
   padding: 0;
   background: $color-white;
   border: 1px solid $color-outlined-neutral;

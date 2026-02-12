@@ -135,6 +135,9 @@ export default function Home() {
 
   return (
     <div className="page-layout">
+      <a href="#main-content" className="skip-link">
+        Liigu põhisisu juurde
+      </a>
       <AppHeader
         isAuthenticated={isAuthenticated}
         user={user}
@@ -144,6 +147,8 @@ export default function Home() {
       />
 
       <main
+        id="main-content"
+        tabIndex={-1}
         className={`page-layout__main ${showRoleSelection ? "role-selection-main" : ""}`}
       >
         {showRoleSelection ? (
