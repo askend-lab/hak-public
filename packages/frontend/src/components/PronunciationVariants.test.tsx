@@ -15,6 +15,7 @@ vi.mock("@/utils/phoneticMarkers", () => ({
 
 vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+  synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 
 describe("PronunciationVariants", () => {

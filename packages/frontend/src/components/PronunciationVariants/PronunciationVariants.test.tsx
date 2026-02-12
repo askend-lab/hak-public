@@ -8,6 +8,7 @@ import PronunciationVariants from "./PronunciationVariants";
 
 vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+  synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 vi.mock("@/utils/audioPlayer", () => ({
   createAudioPlayer: vi.fn(() => ({
@@ -185,8 +186,8 @@ describe("PronunciationVariants", () => {
   });
 
   it("handles play variant error", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
-    (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+    const { synthesizeAuto } = await import("@/utils/synthesize");
+    (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("synth fail"),
     );
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
