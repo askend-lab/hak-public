@@ -1,5 +1,5 @@
 import { CognitoClient, createCognitoClient } from '../src/cognito-client';
-import { TaraIdToken } from '../src/types';
+import { TaraIdToken, TARA_VERIFIED, DEFAULT_EXPIRES_IN, PERSONAL_CODE_ATTR, buildFallbackEmail } from '../src/types';
 
 const mockSend = jest.fn();
 jest.mock('@aws-sdk/client-cognito-identity-provider', () => ({
@@ -58,7 +58,7 @@ describe('CognitoClient', () => {
       expect(attributes).toContainEqual({ Name: 'email_verified', Value: 'true' });
       expect(attributes).toContainEqual({ Name: 'given_name', Value: 'John' });
       expect(attributes).toContainEqual({ Name: 'family_name', Value: 'Doe' });
-      expect(attributes).toContainEqual({ Name: 'custom:personal_code', Value: 'EE38001085718' });
+      expect(attributes).toContainEqual({ Name: PERSONAL_CODE_ATTR, Value: 'EE38001085718' });
     });
 
     it('should exclude given_name when not provided', () => {
@@ -104,7 +104,7 @@ describe('CognitoClient', () => {
       expect(attributes).not.toContainEqual(expect.objectContaining({ Name: 'given_name' }));
       expect(attributes).not.toContainEqual(expect.objectContaining({ Name: 'family_name' }));
       expect(attributes).toContainEqual({ Name: 'email', Value: 'john@example.com' });
-      expect(attributes).toContainEqual({ Name: 'custom:personal_code', Value: 'EE38001085718' });
+      expect(attributes).toContainEqual({ Name: PERSONAL_CODE_ATTR, Value: 'EE38001085718' });
     });
 
     it('should generate fallback email when not provided', () => {
@@ -116,7 +116,7 @@ describe('CognitoClient', () => {
       const client = new CognitoClient(mockConfig);
       const attributes = client.buildUserAttributes(taraIdToken);
 
-      expect(attributes).toContainEqual({ Name: 'email', Value: 'EE38001085718@tara.ee' });
+      expect(attributes).toContainEqual({ Name: 'email', Value: buildFallbackEmail('EE38001085718') });
     });
   });
 
@@ -176,7 +176,7 @@ describe('CognitoClient', () => {
       await client.generateTokens('test@example.com');
 
       const secondCall = mockSend.mock.calls[1][0];
-      expect(secondCall.input.ChallengeResponses.ANSWER).toBe('TARA_VERIFIED');
+      expect(secondCall.input.ChallengeResponses.ANSWER).toBe(TARA_VERIFIED);
     });
 
     it('should not use password-based authentication', async () => {
@@ -242,7 +242,7 @@ describe('CognitoClient', () => {
       expect(tokens.accessToken).toBe('');
       expect(tokens.idToken).toBe('');
       expect(tokens.refreshToken).toBe('');
-      expect(tokens.expiresIn).toBe(3600);
+      expect(tokens.expiresIn).toBe(DEFAULT_EXPIRES_IN);
     });
   });
 
@@ -297,7 +297,7 @@ describe('CognitoClient', () => {
 
       const client = new CognitoClient(mockConfig);
       const username = await client.findOrCreateUser(tokenNoEmail);
-      expect(username).toBe('EE38001085718@tara.ee');
+      expect(username).toBe(buildFallbackEmail('EE38001085718'));
     });
 
     it('should handle findByPersonalCode returning null on error', async () => {
