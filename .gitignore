@@ -35,6 +35,16 @@ playwright-report
 
 # IDE project files
 **/nbproject/
+.vscode/
+
+# Build artifacts (compiled binaries, libraries)
+**/build/
+**/autom4te.cache/
+config.status
+*.a
+*.o
+*.so
+*.dylib
 
 # Internal DevBox tooling
 devbox
