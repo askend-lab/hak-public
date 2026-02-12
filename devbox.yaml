@@ -213,7 +213,8 @@ hooks:
       - "**/merlin-worker/tools/**/*"
       - "**/test.scss"
 
-  security-audit: {}
+  security-audit:
+    packageManager: pnpm
 
   secret-detection:
     required: true
@@ -239,6 +240,22 @@ hooks:
   iac-security:
     excludePaths:
       - "**/node_modules/**"
+
+  no-hardcoded-env:
+    mode: off
+    domains:
+      - "askend-lab.com"
+    checkAwsAccountId: true
+    excludePaths:
+      - "**/node_modules/**"
+      - "**/*.test.*"
+      - "**/*.spec.*"
+      - "**/test/**"
+      - "**/__tests__/**"
+      - "**/coverage/**"
+      - "**/dist/**"
+      - "**/devbox.yaml"
+      - "**/defaults.yaml"
 
   dead-code:
     excludePaths:
