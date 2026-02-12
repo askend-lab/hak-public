@@ -10,6 +10,10 @@ import { getAwsRegion, getEcsCluster, getEcsService } from "./env";
 
 const ecsClient = new ECSClient({ region: getAwsRegion() });
 
+export function isEcsConfigured(): boolean {
+  return getEcsCluster() !== "" && getEcsService() !== "";
+}
+
 interface EcsServiceState {
   desired: number;
   running: number;

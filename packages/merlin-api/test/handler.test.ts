@@ -1,15 +1,29 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { generateCacheKey, resetRateLimit } from "../src/handler";
+import {
+  generateCacheKey,
+  resetRateLimit,
+  parseRequestBody,
+  applySynthesizeDefaults,
+} from "../src/handler";
 import type { SynthesizeRequest } from "../src/handler";
 import { createResponse, createInternalError, HTTP_STATUS, CORS_HEADERS } from "../src/response";
-import { buildAudioUrl, buildCacheKey } from "../src/s3";
-import { VOICE_DEFAULTS } from "../src/env";
+import { buildAudioUrl, buildCacheKey, isNotFoundError } from "../src/s3";
+import { VOICE_DEFAULTS, getAwsRegion, getS3Bucket, getSqsQueueUrl, getEcsCluster, getEcsService } from "../src/env";
+import { isEcsConfigured } from "../src/ecs";
 
-process.env.AWS_REGION_NAME = "eu-west-1";
-process.env.S3_BUCKET = "test-bucket";
-process.env.SQS_QUEUE_URL = "https://sqs.eu-west-1.amazonaws.com/123456789/test-queue";
+const TEST_REGION = "eu-west-1";
+const TEST_BUCKET = "test-bucket";
+const TEST_QUEUE_URL = "https://sqs.eu-west-1.amazonaws.com/123456789/test-queue";
+
+beforeEach(() => {
+  process.env.AWS_REGION_NAME = TEST_REGION;
+  process.env.S3_BUCKET = TEST_BUCKET;
+  process.env.SQS_QUEUE_URL = TEST_QUEUE_URL;
+  delete process.env.ECS_CLUSTER;
+  delete process.env.ECS_SERVICE;
+});
 
 describe("generateCacheKey", () => {
   it("should return consistent hash for same input", () => {
@@ -48,6 +62,49 @@ describe("generateCacheKey", () => {
   });
 });
 
+describe("parseRequestBody", () => {
+  it("should parse valid JSON body", () => {
+    const result = parseRequestBody(JSON.stringify({ text: "hello" }));
+    expect(result.text).toBe("hello");
+  });
+
+  it("should return empty object for undefined body", () => {
+    const result = parseRequestBody(undefined);
+    expect(result).toStrictEqual({});
+  });
+
+  it("should throw on invalid JSON", () => {
+    expect(() => parseRequestBody("not json")).toThrow();
+  });
+});
+
+describe("applySynthesizeDefaults", () => {
+  it("should apply all defaults for minimal request", () => {
+    const result = applySynthesizeDefaults({ text: "hello" });
+    expect(result).toStrictEqual({
+      text: "hello",
+      voice: VOICE_DEFAULTS.voice,
+      speed: VOICE_DEFAULTS.speed,
+      pitch: VOICE_DEFAULTS.pitch,
+    });
+  });
+
+  it("should preserve provided values", () => {
+    const result = applySynthesizeDefaults({
+      text: "hello",
+      voice: "custom",
+      speed: 2.0,
+      pitch: 3,
+    });
+    expect(result).toStrictEqual({
+      text: "hello",
+      voice: "custom",
+      speed: 2.0,
+      pitch: 3,
+    });
+  });
+});
+
 describe("createResponse", () => {
   it("should return response with CORS headers", () => {
     const response = createResponse(HTTP_STATUS.OK, { status: "ok" });
@@ -68,6 +125,15 @@ describe("createInternalError", () => {
     expect(spy).toHaveBeenCalledWith("Test context:", expect.any(Error));
     spy.mockRestore();
   });
+
+  it("should handle non-Error values", () => {
+    const spy = jest.spyOn(console, "error").mockImplementation();
+    const response = createInternalError("Context", "string error");
+
+    expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(spy).toHaveBeenCalledWith("Context:", "string error");
+    spy.mockRestore();
+  });
 });
 
 describe("HTTP_STATUS", () => {
@@ -81,11 +147,11 @@ describe("HTTP_STATUS", () => {
 });
 
 describe("buildAudioUrl", () => {
-  it("should construct correct S3 URL", () => {
+  it("should construct correct S3 URL with exact format", () => {
     const url = buildAudioUrl("abc123");
-    expect(url).toContain("abc123.wav");
-    expect(url).toContain(".s3.");
-    expect(url).toContain(".amazonaws.com/cache/");
+    expect(url).toBe(
+      `https://${TEST_BUCKET}.s3.${TEST_REGION}.amazonaws.com/cache/abc123.wav`,
+    );
   });
 });
 
@@ -98,6 +164,77 @@ describe("buildCacheKey", () => {
     const key = buildCacheKey("test-key");
     expect(key).toContain("test-key");
     expect(key).toMatch(/^cache\/.+\.wav$/);
+  });
+});
+
+describe("isNotFoundError", () => {
+  it("should return true for NotFound error", () => {
+    expect(isNotFoundError({ name: "NotFound" })).toBe(true);
+  });
+
+  it("should return true for NoSuchKey error", () => {
+    expect(isNotFoundError({ name: "NoSuchKey" })).toBe(true);
+  });
+
+  it("should return true for 404 status code", () => {
+    expect(isNotFoundError({ $metadata: { httpStatusCode: 404 } })).toBe(true);
+  });
+
+  it("should return false for other errors", () => {
+    expect(isNotFoundError({ name: "AccessDenied" })).toBe(false);
+  });
+
+  it("should return false for null", () => {
+    expect(isNotFoundError(null)).toBe(false);
+  });
+
+  it("should return false for primitives", () => {
+    expect(isNotFoundError("error")).toBe(false);
+    expect(isNotFoundError(42)).toBe(false);
+  });
+});
+
+describe("env functions", () => {
+  it("getAwsRegion should return env value", () => {
+    expect(getAwsRegion()).toBe(TEST_REGION);
+  });
+
+  it("getAwsRegion should return default when unset", () => {
+    delete process.env.AWS_REGION_NAME;
+    expect(getAwsRegion()).toBe("eu-west-1");
+  });
+
+  it("getS3Bucket should return env value", () => {
+    expect(getS3Bucket()).toBe(TEST_BUCKET);
+  });
+
+  it("getSqsQueueUrl should return env value", () => {
+    expect(getSqsQueueUrl()).toBe(TEST_QUEUE_URL);
+  });
+
+  it("getEcsCluster should return empty when unset", () => {
+    expect(getEcsCluster()).toBe("");
+  });
+
+  it("getEcsService should return empty when unset", () => {
+    expect(getEcsService()).toBe("");
+  });
+});
+
+describe("isEcsConfigured", () => {
+  it("should return false when both unset", () => {
+    expect(isEcsConfigured()).toBe(false);
+  });
+
+  it("should return false when only cluster set", () => {
+    process.env.ECS_CLUSTER = "my-cluster";
+    expect(isEcsConfigured()).toBe(false);
+  });
+
+  it("should return true when both set", () => {
+    process.env.ECS_CLUSTER = "my-cluster";
+    process.env.ECS_SERVICE = "my-service";
+    expect(isEcsConfigured()).toBe(true);
   });
 });
 

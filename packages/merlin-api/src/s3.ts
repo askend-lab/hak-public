@@ -38,7 +38,7 @@ export async function checkS3Cache(cacheKey: string): Promise<boolean> {
   }
 }
 
-function isNotFoundError(error: unknown): boolean {
+export function isNotFoundError(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false;
   const err = error as S3Error;
   return (
