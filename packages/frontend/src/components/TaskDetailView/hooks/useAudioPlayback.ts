@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback } from "react";
-import { TaskEntry } from "@/types/task";
+import { TaskEntry, hasAudioSource, getEntryPlayUrl } from "@/types/task";
 import { synthesizeWithPolling } from "@/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
 
@@ -69,29 +69,22 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
       const entry = entries.find((e) => e.id === id);
       if (!entry) return;
 
-      if (
-        (entry.audioBlob && entry.audioBlob.size > 0) ||
-        (entry.audioUrl && entry.audioUrl.trim() !== "")
-      ) {
+      if (hasAudioSource(entry)) {
         setCurrentPlayingId(id);
-        const playUrl = entry.audioBlob
-          ? URL.createObjectURL(entry.audioBlob)
-          : entry.audioUrl;
-        if (playUrl) {
+        const playResult = getEntryPlayUrl(entry);
+        if (playResult) {
+          const playUrl = playResult.url;
           const audio = new Audio(playUrl);
           audio.onended = () => {
             setCurrentPlayingId(null);
-            if (entry.audioBlob && playUrl !== entry.audioUrl)
-              URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
           };
           audio.onerror = () => {
-            if (entry.audioBlob && playUrl !== entry.audioUrl)
-              URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
             synthesizeAndPlay(entry.stressedText, entry.text, id);
           };
           audio.play().catch(() => {
-            if (entry.audioBlob && playUrl !== entry.audioUrl)
-              URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
             synthesizeAndPlay(entry.stressedText, entry.text, id);
           });
         }
@@ -110,11 +103,10 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
       let shouldRevokeUrl = false;
 
       try {
-        if (entry.audioBlob && entry.audioBlob.size > 0) {
-          audioUrl = URL.createObjectURL(entry.audioBlob);
-          shouldRevokeUrl = true;
-        } else if (entry.audioUrl && entry.audioUrl.trim() !== "") {
-          audioUrl = entry.audioUrl;
+        const cachedAudio = getEntryPlayUrl(entry);
+        if (cachedAudio) {
+          audioUrl = cachedAudio.url;
+          shouldRevokeUrl = cachedAudio.shouldRevoke;
         } else {
           setCurrentLoadingId(entry.id);
           try {

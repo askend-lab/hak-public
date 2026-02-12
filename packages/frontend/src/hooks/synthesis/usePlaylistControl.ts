@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback } from "react";
-import { SentenceState } from "@/types/synthesis";
+import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
 
 export function usePlaylistControl(
   sentences: SentenceState[],
@@ -30,7 +30,7 @@ export function usePlaylistControl(
       return;
     }
 
-    const sentencesWithText = sentences.filter((s) => s.text.trim());
+    const sentencesWithText = filterNonEmptySentences(sentences);
     if (sentencesWithText.length === 0) return;
 
     const abortController = new AbortController();
