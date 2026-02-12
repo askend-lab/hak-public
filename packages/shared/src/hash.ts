@@ -5,6 +5,8 @@
  * SHA-256 hash utility that works in both browser and Node.js
  */
 
+import { isEmpty } from "./utils";
+
 interface BrowserSubtleCrypto {
   digest(algorithm: string, data: ArrayBuffer | ArrayBufferView): Promise<ArrayBuffer>;
 }
@@ -12,12 +14,12 @@ interface BrowserSubtleCrypto {
 declare const window: { crypto?: { subtle?: BrowserSubtleCrypto } } | undefined;
 
 const HASH_ALGORITHM = "sha256";
-const BROWSER_HASH_ALGORITHM = "SHA-256";
+const BROWSER_HASH_ALGORITHM = `SHA-${HASH_ALGORITHM.slice(3)}`;
 const CRYPTO_MODULE = "node:crypto";
 const ERROR_EMPTY_TEXT = "Text cannot be empty";
 
 function validateHashInput(text: string): void {
-  if (text.trim().length === 0) {
+  if (isEmpty(text)) {
     throw new Error(ERROR_EMPTY_TEXT);
   }
 }
@@ -32,10 +34,7 @@ function toHexString(buffer: ArrayBuffer): string {
 }
 
 function getSubtleCrypto(): BrowserSubtleCrypto | undefined {
-  if (typeof window !== "undefined") {
-    return window?.crypto?.subtle;
-  }
-  return undefined;
+  return typeof window !== "undefined" ? window?.crypto?.subtle : undefined;
 }
 
 function nodeHashHex(crypto: typeof import("node:crypto"), text: string): string {

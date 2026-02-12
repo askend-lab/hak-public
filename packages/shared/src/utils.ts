@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+/** Nullable string — common parameter type for text validation */
+export type NullableString = string | null | undefined;
+
 /**
  * Delays execution for the specified duration
  * @param ms - Duration in milliseconds
@@ -13,7 +16,7 @@ export function sleep(ms: number): Promise<void> {
  * Checks if a string is non-empty (not null, undefined, or whitespace-only)
  * @param value - String to check
  */
-export function isNonEmpty(value: string | null | undefined): value is string {
+export function isNonEmpty(value: NullableString): value is string {
   return value != null && value.trim() !== "";
 }
 
@@ -21,6 +24,6 @@ export function isNonEmpty(value: string | null | undefined): value is string {
  * Checks if a string is empty (null, undefined, or whitespace-only)
  * @param value - String to check
  */
-export function isEmpty(value: string | null | undefined): boolean {
+export function isEmpty(value: NullableString): boolean {
   return !isNonEmpty(value);
 }

@@ -3,7 +3,7 @@
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
-type LogMethod = (message: string, ...args: unknown[]) => void;
+export type LogMethod = (message: string, ...args: unknown[]) => void;
 export type Logger = Record<LogLevel, LogMethod>;
 
 const LOG_LEVELS: Record<LogLevel, number> = {
