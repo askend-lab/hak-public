@@ -7,7 +7,9 @@ import {
   ListUsersCommand,
   UsernameExistsException,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { CognitoConfig, CognitoTokens, TaraIdToken } from './types';
+import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLENGE, PERSONAL_CODE_ATTR, DEFAULT_EXPIRES_IN, buildFallbackEmail } from './types';
+
+export const DEFAULT_REGION = 'eu-west-1';
 
 export class CognitoClient {
   private client: CognitoIdentityProviderClient;
@@ -45,7 +47,7 @@ export class CognitoClient {
     try {
       const command = new ListUsersCommand({
         UserPoolId: this.config.userPoolId,
-        Filter: `"custom:personal_code" = "${personalCode}"`,
+        Filter: `"${PERSONAL_CODE_ATTR}" = "${personalCode}"`,
         Limit: 1,
       });
       const response = await this.client.send(command);
@@ -74,19 +76,19 @@ export class CognitoClient {
       UserPoolId: this.config.userPoolId,
       Username: username,
       UserAttributes: [
-        { Name: 'custom:personal_code', Value: personalCode },
+        { Name: PERSONAL_CODE_ATTR, Value: personalCode },
       ],
     });
     await this.client.send(command);
   }
 
   buildUserAttributes(taraIdToken: TaraIdToken): Array<{ Name: string; Value: string }> {
-    const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
+    const email = taraIdToken.email || buildFallbackEmail(taraIdToken.sub);
     
     const attributes: Array<{ Name: string; Value: string }> = [
       { Name: 'email', Value: email },
       { Name: 'email_verified', Value: 'true' },
-      { Name: 'custom:personal_code', Value: taraIdToken.sub },
+      { Name: PERSONAL_CODE_ATTR, Value: taraIdToken.sub },
     ];
 
     // Add optional attributes only if they have values
@@ -102,7 +104,7 @@ export class CognitoClient {
 
   private async createUser(taraIdToken: TaraIdToken): Promise<string> {
     // Cognito requires email as username (UsernameAttributes: ["email"])
-    const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
+    const email = taraIdToken.email || buildFallbackEmail(taraIdToken.sub);
     const username = email;
 
     try {
@@ -131,7 +133,7 @@ export class CognitoClient {
     const initiateCommand = new AdminInitiateAuthCommand({
       UserPoolId: this.config.userPoolId,
       ClientId: this.config.clientId,
-      AuthFlow: 'CUSTOM_AUTH',
+      AuthFlow: 'CUSTOM_AUTH' as const,
       AuthParameters: {
         USERNAME: username,
       },
@@ -149,11 +151,11 @@ export class CognitoClient {
       const respondCommand = new AdminRespondToAuthChallengeCommand({
         UserPoolId: this.config.userPoolId,
         ClientId: this.config.clientId,
-        ChallengeName: 'CUSTOM_CHALLENGE',
+        ChallengeName: CUSTOM_CHALLENGE,
         Session: initiateResponse.Session,
         ChallengeResponses: {
           USERNAME: username,
-          ANSWER: 'TARA_VERIFIED',
+          ANSWER: TARA_VERIFIED,
         },
       });
 
@@ -167,7 +169,7 @@ export class CognitoClient {
         accessToken: authResponse.AuthenticationResult.AccessToken || '',
         idToken: authResponse.AuthenticationResult.IdToken || '',
         refreshToken: authResponse.AuthenticationResult.RefreshToken || '',
-        expiresIn: authResponse.AuthenticationResult.ExpiresIn || 3600,
+        expiresIn: authResponse.AuthenticationResult.ExpiresIn || DEFAULT_EXPIRES_IN,
       };
     } catch (error) {
       throw new Error(`Token generation failed: ${error}`);
@@ -179,7 +181,7 @@ export function createCognitoClient(): CognitoClient {
   const config: CognitoConfig = {
     userPoolId: process.env.COGNITO_USER_POOL_ID || '',
     clientId: process.env.COGNITO_CLIENT_ID || '',
-    region: process.env.AWS_REGION || 'eu-west-1',
+    region: process.env.AWS_REGION || DEFAULT_REGION,
   };
 
   if (!config.userPoolId || !config.clientId) {

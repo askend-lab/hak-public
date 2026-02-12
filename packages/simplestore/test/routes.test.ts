@@ -264,7 +264,7 @@ describe("Routes", () => {
       const response = await handleQuery(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe("Missing prefix parameter");
+      expect(body.errors).toContain("prefix is required");
     });
 
     it("should return BAD_REQUEST for validation errors", async () => {

@@ -17,6 +17,10 @@ test_modules:
   - name: merlin-worker
     path: packages/merlin-worker
     type: jest
+  - name: merlin-api
+    path: packages/merlin-api
+    type: jest
+    min_coverage_lines: 85
   - name: vabamorf-api
     path: packages/vabamorf-api
     type: jest
@@ -173,6 +177,7 @@ hooks:
 
   source-size:
     excludePaths:
+      - "**/*.generated.ts"
       - "**/.stryker-tmp/**"
       - "**/.old-frontend/**"
       - "**/.esbuild/**"
@@ -211,7 +216,8 @@ hooks:
   security-audit:
     packageManager: pnpm
 
-  secret-detection: {}
+  secret-detection:
+    required: true
 
   dependency-check: {}
 
@@ -236,8 +242,21 @@ hooks:
       - "**/node_modules/**"
 
   no-hardcoded-env:
+    mode: off
+    domains:
+      - "askend-lab.com"
+    checkAwsAccountId: true
     excludePaths:
       - ".github/workflows/**"
+      - "**/node_modules/**"
+      - "**/*.test.*"
+      - "**/*.spec.*"
+      - "**/test/**"
+      - "**/__tests__/**"
+      - "**/coverage/**"
+      - "**/dist/**"
+      - "**/devbox.yaml"
+      - "**/defaults.yaml"
 
   dead-code:
     excludePaths:

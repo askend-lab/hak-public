@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+const DEFAULT_DESCRIPTION = "tavaline";
+const PARTS_SEPARATOR = ", ";
+
 const POS_MAP: Record<string, string> = {
   S: "nimisõna",
   V: "tegusõna",
@@ -10,18 +16,6 @@ const POS_MAP: Record<string, string> = {
   Y: "lühend",
 };
 
-function isLemmaDifferent(lemma: string, word: string): boolean {
-  return lemma !== "" && lemma.toLowerCase() !== word.toLowerCase();
-}
-
-function addLemmaPart(parts: string[], lemma: string, word: string): void {
-  if (isLemmaDifferent(lemma, word)) parts.push(`lemma: ${lemma}`);
-}
-
-function addPosPart(parts: string[], pos: string): void {
-  if (pos && POS_MAP[pos]) parts.push(POS_MAP[pos]);
-}
-
 export function buildDescription(
   lemma: string,
   pos: string,
@@ -29,8 +23,8 @@ export function buildDescription(
   word: string,
 ): string {
   const parts: string[] = [];
-  addLemmaPart(parts, lemma, word);
-  addPosPart(parts, pos);
+  if (lemma && lemma.toLowerCase() !== word.toLowerCase()) parts.push(`lemma: ${lemma}`);
+  if (pos && POS_MAP[pos]) parts.push(POS_MAP[pos]);
   if (fs) parts.push(fs);
-  return parts.length > 0 ? parts.join(", ") : "tavaline";
+  return parts.length > 0 ? parts.join(PARTS_SEPARATOR) : DEFAULT_DESCRIPTION;
 }

@@ -22,6 +22,16 @@ import {
   HTTP_ERRORS,
 } from "./routes";
 
+const ANONYMOUS_USER = "anonymous";
+
+const ENV = {
+  TABLE_NAME: "TABLE_NAME",
+  IS_OFFLINE: "IS_OFFLINE",
+  APP_NAME: "APP_NAME",
+  TENANT: "TENANT",
+  ENVIRONMENT: "ENVIRONMENT",
+} as const;
+
 /** Shared adapter instance for persistence across calls */
 let sharedAdapter: StorageAdapter | null = null;
 
@@ -30,17 +40,18 @@ export function setAdapter(adapter: StorageAdapter | null): void {
   sharedAdapter = adapter;
 }
 
+function isOfflineMode(): boolean {
+  return process.env[ENV.IS_OFFLINE] === "true";
+}
+
 /** Get or create adapter */
 function getAdapter(): StorageAdapter {
   if (!sharedAdapter) {
-    const tableName = process.env.TABLE_NAME;
-    const isOffline = process.env.IS_OFFLINE === "true";
+    const tableName = process.env[ENV.TABLE_NAME];
 
-    if (tableName && !isOffline) {
-      // Production: use DynamoDB
+    if (tableName && !isOfflineMode()) {
       sharedAdapter = new DynamoDBAdapter(tableName);
     } else {
-      // Local/test: use in-memory
       sharedAdapter = new InMemoryAdapter();
     }
   }
@@ -54,10 +65,10 @@ function getUserId(event: APIGatewayProxyEvent): string | null {
   const cognitoId = event.requestContext.authorizer?.claims?.sub as
     | string
     | undefined;
-  if (cognitoId !== undefined && cognitoId !== "") return cognitoId;
+  if (cognitoId) return cognitoId;
 
   // In offline/test mode, allow X-User-Id header for testing
-  if (process.env.IS_OFFLINE === "true") {
+  if (isOfflineMode()) {
     const localUserId =
       event.headers["X-User-Id"] ?? event.headers["x-user-id"];
     if (localUserId) return localUserId;
@@ -66,12 +77,8 @@ function getUserId(event: APIGatewayProxyEvent): string | null {
   return null;
 }
 
-/**
- * Get required env variable or default
- */
 function getEnv(name: string, defaultValue: string): string {
-  const value = process.env[name];
-  return value && value.trim() !== "" ? value : defaultValue;
+  return process.env[name]?.trim() || defaultValue;
 }
 
 /**
@@ -79,9 +86,9 @@ function getEnv(name: string, defaultValue: string): string {
  */
 function createContext(userId: string): ServerContext {
   return {
-    app: getEnv("APP_NAME", "default"),
-    tenant: getEnv("TENANT", "default"),
-    env: getEnv("ENVIRONMENT", "dev"),
+    app: getEnv(ENV.APP_NAME, "default"),
+    tenant: getEnv(ENV.TENANT, "default"),
+    env: getEnv(ENV.ENVIRONMENT, "dev"),
     userId,
   };
 }
@@ -93,16 +100,9 @@ function createStore(userId: string): Store {
   return new Store(getAdapter(), createContext(userId));
 }
 
-interface Route {
-  method: string;
-  path: string;
-  handler: (
-    event: APIGatewayProxyEvent,
-    store: Store,
-  ) => Promise<APIGatewayProxyResult>;
-}
+type RouteHandler = (event: APIGatewayProxyEvent, store: Store) => Promise<APIGatewayProxyResult>;
 
-const routes: Route[] = [
+const routes: { method: string; path: string; handler: RouteHandler }[] = [
   { method: "POST", path: "/save", handler: handleSave },
   { method: "GET", path: "/get", handler: handleGet },
   { method: "GET", path: "/get-shared", handler: handleGet },
@@ -111,20 +111,17 @@ const routes: Route[] = [
   { method: "GET", path: "/query", handler: handleQuery },
 ];
 
+const PUBLIC_READABLE_TYPES = new Set(["shared", "unlisted", "public"]);
+
 /**
  * Check if request is for publicly readable data (read-only access allowed without auth)
- * - shared: everyone can read and modify
- * - unlisted: everyone can read, only owner can modify
- * - public: everyone can read, only owner can modify
  */
 function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
   if (event.httpMethod !== "GET") return false;
-
-  // /get-public endpoint always allows anonymous access (type validation done in handler)
   if (event.resource === "/get-public") return true;
 
   const type = event.queryStringParameters?.type;
-  return type === "shared" || type === "unlisted" || type === "public";
+  return type !== undefined && PUBLIC_READABLE_TYPES.has(type);
 }
 
 /**
@@ -145,8 +142,7 @@ export async function handler(
 
   if (!userId && !isAnonymousSharedAccess) {
     return createResponse(HTTP_STATUS.UNAUTHORIZED, {
-      error:
-        "Authentication required. Provide a valid token or use a public-readable endpoint.",
+      error: HTTP_ERRORS.UNAUTHORIZED,
     });
   }
 
@@ -162,7 +158,7 @@ export async function handler(
 
   try {
     // For anonymous shared access, use 'anonymous' as userId
-    const effectiveUserId = userId || "anonymous";
+    const effectiveUserId = userId || ANONYMOUS_USER;
     return await route.handler(event, createStore(effectiveUserId));
   } catch {
     return createResponse(HTTP_STATUS.INTERNAL_ERROR, {

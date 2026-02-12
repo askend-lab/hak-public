@@ -1,19 +1,22 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-interface MerlinResponse {
+export interface MerlinResponse {
   audio: string;
   format: string;
 }
 
+export const DEFAULT_VOICE = "efm_s";
+export const CONTENT_TYPE_JSON = "application/json";
+
 export async function synthesize(
   text: string,
   merlinUrl: string,
-  voice = "efm_s",
+  voice = DEFAULT_VOICE,
 ): Promise<Buffer> {
   const response = await fetch(merlinUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": CONTENT_TYPE_JSON },
     body: JSON.stringify({
       text,
       voice,

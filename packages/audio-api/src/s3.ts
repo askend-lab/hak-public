@@ -16,12 +16,22 @@ interface S3Error {
   };
 }
 
+const NOT_FOUND_STATUS = 404;
+
 function isS3Error(error: unknown): error is S3Error {
   return (
     typeof error === "object" &&
     error !== null &&
     ("name" in error || "$metadata" in error)
   );
+}
+
+export function buildS3Url(
+  bucketName: string,
+  region: string,
+  key: string,
+): string {
+  return `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
 }
 
 export async function checkFileExists(
@@ -40,28 +50,24 @@ export async function checkFileExists(
     if (!isS3Error(error)) {
       throw new Error(`Unknown S3 error: ${String(error)}`);
     }
-    const s3Error = error;
-    const statusCode = s3Error.$metadata?.httpStatusCode;
-    const errorName = s3Error.name;
-    const errorMessage = s3Error.message;
-    const errorCode = s3Error.code;
 
-    const NOT_FOUND_STATUS = 404;
     if (
-      errorName === "NotFound" ||
-      errorName === "NoSuchKey" ||
-      statusCode === NOT_FOUND_STATUS
+      error.name === "NotFound" ||
+      error.name === "NoSuchKey" ||
+      error.$metadata?.httpStatusCode === NOT_FOUND_STATUS
     ) {
       return false;
     }
-    const errorDetails = JSON.stringify({
-      name: errorName,
-      message: errorMessage,
-      code: errorCode,
-      statusCode,
-      bucket,
-      key,
-    });
-    throw new Error(`S3 error: ${errorDetails}`);
+
+    throw new Error(
+      `S3 error: ${JSON.stringify({
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        statusCode: error.$metadata?.httpStatusCode,
+        bucket,
+        key,
+      })}`,
+    );
   }
 }

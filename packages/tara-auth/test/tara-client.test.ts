@@ -1,4 +1,13 @@
-import { createTaraClient } from '../src/tara-client';
+import {
+  createTaraClient,
+  DEFAULT_TARA_ISSUER,
+  DEFAULT_CALLBACK_URL,
+  OIDC_AUTHORIZE_PATH,
+  OIDC_TOKEN_PATH,
+  OIDC_JWKS_PATH,
+  CONTENT_TYPE_FORM_URLENCODED,
+  UI_LOCALE,
+} from '../src/tara-client';
 import * as jose from 'jose';
 
 // Mock jose
@@ -25,7 +34,7 @@ describe('createTaraClient', () => {
     process.env.TARA_CALLBACK_URL = 'https://auth.example.com/callback';
   });
 
-  afterAll(() => {
+  afterEach(() => {
     process.env = originalEnv;
   });
 
@@ -183,6 +192,36 @@ describe('createTaraClient', () => {
         issuer: 'https://custom-issuer.ee',
         audience: 'my-aud',
       });
+    });
+  });
+
+  describe('constants', () => {
+    it('DEFAULT_TARA_ISSUER should be tara-test URL', () => {
+      expect(DEFAULT_TARA_ISSUER).toBe('https://tara-test.ria.ee');
+    });
+
+    it('DEFAULT_CALLBACK_URL should be askend-lab callback', () => {
+      expect(DEFAULT_CALLBACK_URL).toContain('auth.askend-lab.com');
+    });
+
+    it('OIDC_AUTHORIZE_PATH should be /oidc/authorize', () => {
+      expect(OIDC_AUTHORIZE_PATH).toBe('/oidc/authorize');
+    });
+
+    it('OIDC_TOKEN_PATH should be /oidc/token', () => {
+      expect(OIDC_TOKEN_PATH).toBe('/oidc/token');
+    });
+
+    it('OIDC_JWKS_PATH should be /oidc/jwks', () => {
+      expect(OIDC_JWKS_PATH).toBe('/oidc/jwks');
+    });
+
+    it('CONTENT_TYPE_FORM_URLENCODED should be application/x-www-form-urlencoded', () => {
+      expect(CONTENT_TYPE_FORM_URLENCODED).toBe('application/x-www-form-urlencoded');
+    });
+
+    it('UI_LOCALE should be et', () => {
+      expect(UI_LOCALE).toBe('et');
     });
   });
 });

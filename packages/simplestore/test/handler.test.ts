@@ -179,7 +179,7 @@ describe("Lambda Handler", () => {
       const event = createGetEvent("/query", { type: "public" });
       const result = await handler(event);
       expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toHaveProperty("error");
+      expect(JSON.parse(result.body)).toHaveProperty("errors");
     });
   });
 

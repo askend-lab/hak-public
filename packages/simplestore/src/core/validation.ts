@@ -5,7 +5,7 @@
  * Validation logic - pure functions, no external dependencies
  */
 
-import { DataType, StoreRequest, StoreConfig } from "./types";
+import { DataType, StoreRequest, StoreConfig, VALID_DATA_TYPES, DEFAULT_CONFIG } from "./types";
 
 /**
  * Validation result with collected errors
@@ -15,25 +15,21 @@ export interface ValidationResult {
   readonly errors: string[];
 }
 
-const VALID_TYPES: readonly DataType[] = [
-  "private",
-  "unlisted",
-  "public",
-  "shared",
-] as const;
-
 const MAX_KEY_LENGTH = 1024;
-
-const DEFAULT_CONFIG: StoreConfig = {
-  maxTtlSeconds: 31536000, // 1 year
-  keyDelimiter: "#",
-};
+const VALID_TYPES_SET = new Set<string>(VALID_DATA_TYPES);
+const VALID_TYPES_MESSAGE = `type must be one of: ${VALID_DATA_TYPES.join(", ")}`;
 
 /**
  * Creates a validation result
  */
 function result(errors: string[]): ValidationResult {
   return { valid: errors.length === 0, errors };
+}
+
+function collectErrors(fn: (errors: string[]) => void): ValidationResult {
+  const errors: string[] = [];
+  fn(errors);
+  return result(errors);
 }
 
 /**
@@ -58,8 +54,8 @@ function validateRequiredString(
  * Validates data type field
  */
 function validateType(type: unknown, errors: string[]): void {
-  if (!VALID_TYPES.includes(type as DataType)) {
-    errors.push(`type must be one of: ${VALID_TYPES.join(", ")}`);
+  if (typeof type !== "string" || !VALID_TYPES_SET.has(type)) {
+    errors.push(VALID_TYPES_MESSAGE);
   }
 }
 
@@ -90,7 +86,7 @@ export function parseTtl(
   if (ttl > config.maxTtlSeconds) {
     return {
       valid: false,
-      error: `TTL exceeds maximum of ${String(config.maxTtlSeconds)} seconds (1 year)`,
+      error: `TTL exceeds maximum of ${config.maxTtlSeconds} seconds (1 year)`,
     };
   }
 
@@ -104,26 +100,24 @@ export function validateStoreRequest(
   request: Partial<StoreRequest>,
   config: StoreConfig = DEFAULT_CONFIG,
 ): ValidationResult {
-  const errors: string[] = [];
+  return collectErrors((errors) => {
+    validateRequiredString(request.pk, "pk", errors);
+    validateRequiredString(request.sk, "sk", errors);
+    validateType(request.type, errors);
 
-  validateRequiredString(request.pk, "pk", errors);
-  validateRequiredString(request.sk, "sk", errors);
-  validateType(request.type, errors);
-
-  if (typeof request.ttl !== "number") {
-    errors.push("ttl must be a number");
-  } else {
-    const ttlResult = parseTtl(request.ttl, config);
-    if (!ttlResult.valid) {
-      errors.push(ttlResult.error);
+    if (typeof request.ttl !== "number") {
+      errors.push("ttl must be a number");
+    } else {
+      const ttlResult = parseTtl(request.ttl, config);
+      if (!ttlResult.valid) {
+        errors.push(ttlResult.error);
+      }
     }
-  }
 
-  if (request.data !== undefined && typeof request.data !== "object") {
-    errors.push("data must be an object");
-  }
-
-  return result(errors);
+    if (request.data !== undefined && typeof request.data !== "object") {
+      errors.push("data must be an object");
+    }
+  });
 }
 
 /**
@@ -134,22 +128,11 @@ export function validateGetRequest(
   sk: unknown,
   type: unknown,
 ): ValidationResult {
-  const errors: string[] = [];
-
-  validateRequiredString(pk, "pk", errors);
-  validateRequiredString(sk, "sk", errors);
-  validateType(type, errors);
-
-  return result(errors);
-}
-
-/**
- * Validates prefix string (allows empty string for query all)
- */
-function validatePrefix(value: unknown, name: string, errors: string[]): void {
-  if (value !== undefined && typeof value !== "string") {
-    errors.push(`${name} must be a string`);
-  }
+  return collectErrors((errors) => {
+    validateRequiredString(pk, "pk", errors);
+    validateRequiredString(sk, "sk", errors);
+    validateType(type, errors);
+  });
 }
 
 /**
@@ -159,12 +142,14 @@ export function validateQueryRequest(
   pkPrefix: unknown,
   type: unknown,
 ): ValidationResult {
-  const errors: string[] = [];
-
-  validatePrefix(pkPrefix, "prefix", errors);
-  validateType(type, errors);
-
-  return result(errors);
+  return collectErrors((errors) => {
+    if (pkPrefix == null) {
+      errors.push("prefix is required");
+    } else if (typeof pkPrefix !== "string") {
+      errors.push("prefix must be a string");
+    }
+    validateType(type, errors);
+  });
 }
 
 /**
@@ -173,26 +158,17 @@ export function validateQueryRequest(
 export function validateServerContext(
   context: Partial<Record<string, unknown>>,
 ): ValidationResult {
-  const errors: string[] = [];
-
-  validateRequiredString(context.app, "app", errors);
-  validateRequiredString(context.tenant, "tenant", errors);
-  validateRequiredString(context.env, "env", errors);
-  validateRequiredString(context.userId, "userId", errors);
-
-  return result(errors);
+  return collectErrors((errors) => {
+    validateRequiredString(context.app, "app", errors);
+    validateRequiredString(context.tenant, "tenant", errors);
+    validateRequiredString(context.env, "env", errors);
+    validateRequiredString(context.userId, "userId", errors);
+  });
 }
 
 /**
  * Check if type is valid
  */
 export function isValidType(type: unknown): type is DataType {
-  return VALID_TYPES.includes(type as DataType);
-}
-
-/**
- * Get valid types list
- */
-export function getValidTypes(): readonly DataType[] {
-  return VALID_TYPES;
+  return typeof type === "string" && VALID_TYPES_SET.has(type);
 }

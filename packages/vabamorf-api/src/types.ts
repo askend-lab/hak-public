@@ -35,7 +35,7 @@ export interface VariantsResponse {
 
 export interface VmetajsonInput {
   params: {
-    vmetajson: string[];
+    vmetajson: readonly string[];
   };
   content: string;
 }
@@ -64,5 +64,5 @@ export interface VmetajsonResponse {
 export interface LambdaResponse {
   statusCode: number;
   body: string;
-  headers?: Record<string, string>;
+  headers: Record<string, string>;
 }

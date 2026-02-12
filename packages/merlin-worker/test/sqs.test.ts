@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import type { SQSClient } from "@aws-sdk/client-sqs";
+import { receiveMessage, deleteMessage, parseMessage, isWarmMessage, isAudioMessage, MAX_MESSAGES, WAIT_TIME_SECONDS } from "../src/sqs";
+import { createMockSqsClient, TEST_QUEUE_URL } from "./setup";
 
-import { receiveMessage, deleteMessage, parseMessage } from "../src/sqs";
-
-const mockSqsClient = {
-  send: jest.fn(),
-} as unknown as SQSClient & { send: jest.Mock };
+const mockSqsClient = createMockSqsClient();
 
 describe("SQS Operations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("receiveMessage", () => {
@@ -26,7 +27,7 @@ describe("SQS Operations", () => {
         Messages: [mockMessage],
       });
 
-      const result = await receiveMessage(mockSqsClient, "https://queue-url");
+      const result = await receiveMessage(mockSqsClient, TEST_QUEUE_URL);
 
       expect(result).toStrictEqual(mockMessage);
       expect(mockSqsClient.send).toHaveBeenCalledTimes(1);
@@ -37,7 +38,7 @@ describe("SQS Operations", () => {
         Messages: [],
       });
 
-      const result = await receiveMessage(mockSqsClient, "https://queue-url");
+      const result = await receiveMessage(mockSqsClient, TEST_QUEUE_URL);
 
       expect(result).toBeNull();
     });
@@ -45,7 +46,7 @@ describe("SQS Operations", () => {
     it("should return null when Messages is undefined", async () => {
       mockSqsClient.send.mockResolvedValue({});
 
-      const result = await receiveMessage(mockSqsClient, "https://queue-url");
+      const result = await receiveMessage(mockSqsClient, TEST_QUEUE_URL);
 
       expect(result).toBeNull();
     });
@@ -126,9 +127,61 @@ describe("SQS Operations", () => {
     it("should delete message from queue", async () => {
       mockSqsClient.send.mockResolvedValue({});
 
-      await deleteMessage(mockSqsClient, "https://queue-url", "receipt-123");
+      await deleteMessage(mockSqsClient, TEST_QUEUE_URL, "receipt-123");
 
       expect(mockSqsClient.send).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("isWarmMessage", () => {
+    it("should return true for warm message", () => {
+      expect(isWarmMessage({ type: "warm" })).toBe(true);
+    });
+
+    it("should return false for audio message", () => {
+      expect(isWarmMessage({ text: "hello", hash: "abc" })).toBe(false);
+    });
+  });
+
+  describe("parseMessage edge cases", () => {
+    it("should throw for empty text string", () => {
+      const message = { Body: JSON.stringify({ text: "", hash: "abc" }) };
+      expect(() => parseMessage(message as { Body: string })).toThrow("Missing text field");
+    });
+
+    it("should throw for empty hash string", () => {
+      const message = { Body: JSON.stringify({ text: "hello", hash: "" }) };
+      expect(() => parseMessage(message as { Body: string })).toThrow("Missing hash field");
+    });
+
+    it("should throw for numeric text", () => {
+      const message = { Body: JSON.stringify({ text: 123, hash: "abc" }) };
+      expect(() => parseMessage(message as { Body: string })).toThrow("Missing text field");
+    });
+
+    it("should throw for numeric hash", () => {
+      const message = { Body: JSON.stringify({ text: "hello", hash: 123 }) };
+      expect(() => parseMessage(message as { Body: string })).toThrow("Missing hash field");
+    });
+  });
+
+  describe("isAudioMessage", () => {
+    it("should return true for audio message", () => {
+      expect(isAudioMessage({ text: "hello", hash: "abc" })).toBe(true);
+    });
+
+    it("should return false for warm message", () => {
+      expect(isAudioMessage({ type: "warm" })).toBe(false);
+    });
+  });
+
+  describe("SQS constants", () => {
+    it("MAX_MESSAGES should be 1", () => {
+      expect(MAX_MESSAGES).toBe(1);
+    });
+
+    it("WAIT_TIME_SECONDS should be 20", () => {
+      expect(WAIT_TIME_SECONDS).toBe(20);
     });
   });
 });

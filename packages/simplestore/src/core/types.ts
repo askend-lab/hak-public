@@ -5,6 +5,14 @@
  * Core types for SimpleStore - no external dependencies
  */
 
+/** Single source of truth for valid data types */
+export const VALID_DATA_TYPES = [
+  "private",
+  "unlisted",
+  "public",
+  "shared",
+] as const;
+
 /**
  * Data access type determining visibility and access rules
  * - private: only owner sees and modifies
@@ -12,7 +20,7 @@
  * - public: everyone sees/searches, owner modifies
  * - shared: everyone sees, everyone can modify
  */
-export type DataType = "private" | "unlisted" | "public" | "shared";
+export type DataType = (typeof VALID_DATA_TYPES)[number];
 
 /**
  * Server-side context extracted from authentication and configuration
@@ -66,6 +74,15 @@ export interface StoreConfig {
   readonly maxTtlSeconds: number;
   readonly keyDelimiter: string;
 }
+
+/** One year in seconds — default max TTL */
+export const MAX_TTL_SECONDS = 31_536_000;
+
+/** Shared default configuration — used by store and validation */
+export const DEFAULT_CONFIG: StoreConfig = {
+  maxTtlSeconds: MAX_TTL_SECONDS,
+  keyDelimiter: "#",
+};
 
 /**
  * Storage adapter interface - dependency injection point

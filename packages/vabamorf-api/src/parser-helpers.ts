@@ -2,16 +2,16 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { buildDescription } from "./description-builder";
-import { Variant, MorphologyInfo } from "./types";
+import { Variant, VmetajsonMrf, VmetajsonToken } from "./types";
 
-export { buildDescription };
+const ZERO_ENDING = "0";
 
 export function formatPhoneticText(stem: string, ending: string): string {
-  return ending && ending !== "0" ? `${stem}+${ending}` : stem;
+  return ending && ending !== ZERO_ENDING ? `${stem}+${ending}` : stem;
 }
 
 function getFirstMrfStem(
-  mrf: { stem?: string; ending?: string }[] | undefined,
+  mrf: VmetajsonMrf[] | undefined,
 ): { stem: string; ending: string } | null {
   const first = mrf?.[0];
   if (first == null || first.stem == null) return null;
@@ -19,9 +19,7 @@ function getFirstMrfStem(
   return { stem: first.stem, ending: first.ending ?? "" };
 }
 
-export function extractTokenText(tokenData: {
-  features?: { mrf?: { stem?: string; ending?: string }[]; token?: string };
-}): string | null {
+export function extractTokenText(tokenData: VmetajsonToken): string | null {
   const first = getFirstMrfStem(tokenData.features?.mrf);
   if (first) return formatPhoneticText(first.stem, first.ending);
 
@@ -29,13 +27,7 @@ export function extractTokenText(tokenData: {
 }
 
 export function createVariantFromMrf(
-  mrfVariant: {
-    stem?: string;
-    ending?: string;
-    pos?: string;
-    lemma?: string;
-    fs?: string;
-  },
+  mrfVariant: VmetajsonMrf,
   word: string,
 ): Variant | null {
   if (mrfVariant.stem == null) return null;
@@ -47,7 +39,7 @@ export function createVariantFromMrf(
   return {
     text,
     description,
-    morphology: { lemma, pos, fs, stem, ending } as MorphologyInfo,
+    morphology: { lemma, pos, fs, stem, ending },
   };
 }
 

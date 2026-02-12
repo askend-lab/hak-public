@@ -3,6 +3,7 @@ import {
   CreateAuthChallengeTriggerEvent,
   VerifyAuthChallengeResponseTriggerEvent,
 } from 'aws-lambda';
+import { TARA_VERIFIED, CUSTOM_CHALLENGE, TARA_AUTH_METADATA } from './types';
 
 export async function handleDefineAuthChallenge(
   event: DefineAuthChallengeTriggerEvent
@@ -11,13 +12,13 @@ export async function handleDefineAuthChallenge(
 
   if (session.length === 0) {
     // First attempt - issue CUSTOM_CHALLENGE
-    event.response.challengeName = 'CUSTOM_CHALLENGE';
+    event.response.challengeName = CUSTOM_CHALLENGE;
     event.response.issueTokens = false;
     event.response.failAuthentication = false;
   } else {
     const lastChallenge = session[session.length - 1];
     
-    if (lastChallenge.challengeName === 'CUSTOM_CHALLENGE' && lastChallenge.challengeResult) {
+    if (lastChallenge.challengeName === CUSTOM_CHALLENGE && lastChallenge.challengeResult) {
       // Challenge passed - issue tokens
       event.response.issueTokens = true;
       event.response.failAuthentication = false;
@@ -38,7 +39,7 @@ export async function handleCreateAuthChallenge(
     type: 'TARA',
   };
   event.response.privateChallengeParameters = {};
-  event.response.challengeMetadata = 'TARA_AUTH';
+  event.response.challengeMetadata = TARA_AUTH_METADATA;
 
   return event;
 }
@@ -47,7 +48,7 @@ export async function handleVerifyAuthChallengeResponse(
   event: VerifyAuthChallengeResponseTriggerEvent
 ): Promise<VerifyAuthChallengeResponseTriggerEvent> {
   // TARA Lambda sends 'TARA_VERIFIED' as challenge answer after successful TARA authentication
-  event.response.answerCorrect = event.request.challengeAnswer === 'TARA_VERIFIED';
+  event.response.answerCorrect = event.request.challengeAnswer === TARA_VERIFIED;
 
   return event;
 }

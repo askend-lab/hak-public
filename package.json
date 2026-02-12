@@ -75,7 +75,6 @@
     "fast-check": "^4.5.3",
     "gherkin-lint": "^4.2.4",
     "gitleaks": "^1.0.0",
-    "hadolint": "^0.4.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "knip": "^5.83.1",

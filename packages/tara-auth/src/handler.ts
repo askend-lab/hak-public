@@ -4,26 +4,32 @@ import { createCognitoClient } from './cognito-client';
 import { AuthState } from './types';
 import * as crypto from 'crypto';
 
-const STATE_COOKIE_NAME = 'tara_auth_state';
-const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+export const STATE_COOKIE_NAME = 'tara_auth_state';
+export const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+export const REFRESH_TOKEN_MAX_AGE_S = 30 * 24 * 60 * 60; // 30 days
+export const AUTH_CALLBACK_PATH = '/auth/callback';
+export const DEFAULT_FRONTEND_URL_PROD = 'https://hak.askend-lab.com';
+export const DEFAULT_FRONTEND_URL_DEV = 'https://hak-dev.askend-lab.com';
+export const TOKEN_COOKIE_OPTIONS = 'HttpOnly; Secure; SameSite=Strict; Path=/';
+export const RANDOM_STRING_LENGTH = 32;
 
-function getFrontendUrl(): string {
+export function getFrontendUrl(): string {
   const stage = process.env.STAGE || 'dev';
   return stage === 'prod'
-    ? process.env.FRONTEND_URL_PROD || 'https://hak.askend-lab.com'
-    : process.env.FRONTEND_URL_DEV || 'https://hak-dev.askend-lab.com';
+    ? process.env.FRONTEND_URL_PROD || DEFAULT_FRONTEND_URL_PROD
+    : process.env.FRONTEND_URL_DEV || DEFAULT_FRONTEND_URL_DEV;
 }
 
-function generateRandomString(length: number): string {
+export function generateRandomString(length: number): string {
   return crypto.randomBytes(length).toString('base64url').substring(0, length);
 }
 
-function createStateCookie(state: AuthState): string {
+export function createStateCookie(state: AuthState): string {
   const encoded = Buffer.from(JSON.stringify(state)).toString('base64url');
   return `${STATE_COOKIE_NAME}=${encoded}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`;
 }
 
-function parseStateCookie(cookieHeader: string | undefined): AuthState | null {
+export function parseStateCookie(cookieHeader: string | undefined): AuthState | null {
   if (!cookieHeader) return null;
 
   const cookies = cookieHeader.split(';').map(c => c.trim());
@@ -40,7 +46,7 @@ function parseStateCookie(cookieHeader: string | undefined): AuthState | null {
   }
 }
 
-function clearStateCookie(): string {
+export function clearStateCookie(): string {
   return `${STATE_COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/`;
 }
 
@@ -50,8 +56,8 @@ export async function startHandler(
   try {
     const taraClient = await createTaraClient();
 
-    const state = generateRandomString(32);
-    const nonce = generateRandomString(32);
+    const state = generateRandomString(RANDOM_STRING_LENGTH);
+    const nonce = generateRandomString(RANDOM_STRING_LENGTH);
     
     const authState: AuthState = {
       state,
@@ -146,7 +152,7 @@ function redirectToFrontend(
   params: Record<string, string>,
   setCookie?: string
 ): APIGatewayProxyResult {
-  const url = new URL('/auth/callback', baseUrl);
+  const url = new URL(AUTH_CALLBACK_PATH, baseUrl);
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.set(key, value);
   });
@@ -171,12 +177,12 @@ function redirectToFrontendWithCookies(
   baseUrl: string,
   tokens: { accessToken: string; idToken: string; refreshToken: string; expiresIn: number }
 ): APIGatewayProxyResult {
-  const url = new URL('/auth/callback', baseUrl);
+  const url = new URL(AUTH_CALLBACK_PATH, baseUrl);
   
   // Token cookies - HttpOnly, Secure, SameSite=Strict
-  const cookieOptions = 'HttpOnly; Secure; SameSite=Strict; Path=/';
+  const cookieOptions = TOKEN_COOKIE_OPTIONS;
   const maxAge = tokens.expiresIn;
-  const refreshMaxAge = 30 * 24 * 60 * 60; // 30 days for refresh token
+  const refreshMaxAge = REFRESH_TOKEN_MAX_AGE_S;
 
   const cookies = [
     `access_token=${tokens.accessToken}; ${cookieOptions}; Max-Age=${maxAge}`,

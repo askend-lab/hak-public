@@ -6,15 +6,26 @@ import { SQSClient } from "@aws-sdk/client-sqs";
 import { createLogger } from "@hak/shared";
 
 import { synthesize } from "./merlin";
-import { uploadAudio } from "./s3";
+import { uploadAudio, buildCacheKey } from "./s3";
 import {
   receiveMessage,
   parseMessage,
   deleteMessage,
   isWarmMessage,
 } from "./sqs";
+import type { Message } from "@aws-sdk/client-sqs";
 
 const logger = createLogger("info");
+
+export const TEXT_PREVIEW_LENGTH = 50;
+
+export function getReceiptHandle(message: Message): string {
+  return message.ReceiptHandle ?? "";
+}
+
+export function getMessageId(message: Message): string {
+  return message.MessageId ?? "unknown";
+}
 
 export interface WorkerConfig {
   queueUrl: string;
@@ -41,38 +52,38 @@ export async function processMessage(
       await deleteMessage(
         sqsClient,
         config.queueUrl,
-        message.ReceiptHandle ?? "",
+        getReceiptHandle(message),
       );
       return true;
     }
 
     const { text, hash } = parsed;
-    logger.info(`Processing: hash=${hash}, text="${text.substring(0, 50)}..."`);
+    logger.info(`Processing: hash=${hash}, text="${text.substring(0, TEXT_PREVIEW_LENGTH)}..."`);
 
     const audioBuffer = await synthesize(text, config.merlinUrl);
     logger.info(`Synthesized: ${String(audioBuffer.length)} bytes`);
 
     await uploadAudio(s3Client, config.bucketName, hash, audioBuffer);
-    logger.info(`Uploaded: cache/${hash}.mp3`);
+    logger.info(`Uploaded: ${buildCacheKey(hash)}`);
 
     await deleteMessage(
       sqsClient,
       config.queueUrl,
-      message.ReceiptHandle ?? "",
+      getReceiptHandle(message),
     );
-    logger.info(`Deleted message: ${message.MessageId ?? "unknown"}`);
+    logger.info(`Deleted message: ${getMessageId(message)}`);
 
     return true;
   } catch (error) {
     logger.error(
-      `Error processing message ${message.MessageId ?? "unknown"}:`,
+      `Error processing message ${getMessageId(message)}:`,
       error,
     );
     throw error;
   }
 }
 
-const ERROR_RETRY_DELAY_MS = 5000;
+export const ERROR_RETRY_DELAY_MS = 5000;
 
 /* istanbul ignore next */
 export async function runWorker(

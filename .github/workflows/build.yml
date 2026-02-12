@@ -17,7 +17,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARTIFACTS_BUCKET: askend-lab-artifacts
   ARTIFACTS_PREFIX: hak/builds
 
 jobs:
@@ -56,8 +55,15 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@fb7eb401298e393da51cdcb2feb1ed0183619014 # v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
+
+      - name: Load config from SSM
+        run: |
+          echo "COGNITO_USER_POOL_ID=$(aws ssm get-parameter --name /hak/shared/cognito-user-pool-id --query Parameter.Value --output text 2>/dev/null || aws ssm get-parameter --name /hak/dev/cognito-user-pool-id --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "COGNITO_CLIENT_ID=$(aws ssm get-parameter --name /hak/shared/cognito-client-id --query Parameter.Value --output text 2>/dev/null || aws ssm get-parameter --name /hak/dev/cognito-client-id --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "COGNITO_DOMAIN=$(aws ssm get-parameter --name /hak/shared/cognito-domain --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "ARTIFACTS_BUCKET=$(aws ssm get-parameter --name /hak/shared/artifacts-bucket --query Parameter.Value --output text)" >> $GITHUB_ENV
 
       - name: Detect changes and prepare build
         id: detect
@@ -114,9 +120,9 @@ jobs:
         env:
           VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
           VITE_COGNITO_REGION: eu-west-1
-          VITE_COGNITO_USER_POOL_ID: eu-west-1_wlRtuLkG2
-          VITE_COGNITO_CLIENT_ID: 64tf6nf61n6sgftqif6q975hka
-          VITE_COGNITO_DOMAIN: askend-lab-auth.auth.eu-west-1.amazoncognito.com
+          VITE_COGNITO_USER_POOL_ID: ${{ env.COGNITO_USER_POOL_ID }}
+          VITE_COGNITO_CLIENT_ID: ${{ env.COGNITO_CLIENT_ID }}
+          VITE_COGNITO_DOMAIN: ${{ env.COGNITO_DOMAIN }}
         run: pnpm --filter @hak/frontend build
 
       - name: Build SimpleStore

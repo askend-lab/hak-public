@@ -9,12 +9,11 @@ const args = process.argv.slice(2);
 // Local development path
 const localDevbox = '/home/alex/users/boxer/devbox/cli.js';
 
-if (!fs.existsSync(localDevbox)) {
-  console.error('Error: Local devbox not found at', localDevbox);
-  process.exit(1);
-}
+// npm package path
+const npmDevbox = path.join(__dirname, 'node_modules/@askend-lab/devbox/cli.js');
 
-const devboxPath = localDevbox;
+// Use local if exists, otherwise npm package (for CI)
+const devboxPath = fs.existsSync(localDevbox) ? localDevbox : npmDevbox;
 
 const result = spawnSync('node', [devboxPath, ...args], { stdio: 'inherit' });
 process.exit(result.status || 0);

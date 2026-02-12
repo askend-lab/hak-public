@@ -12,6 +12,15 @@ interface QueuedRequest {
   timeoutId: ReturnType<typeof setTimeout>;
 }
 
+const VMETAJSON_PARAMS = ["--stem", "--addphonetics"] as const;
+const TIMEOUT_ERROR = "vmetajson timeout";
+const NOT_INITIALIZED_ERROR = "vmetajson process not initialized";
+const PARSE_ERROR_PREFIX = "Failed to parse vmetajson response: ";
+const EXIT_ERROR_PREFIX = "vmetajson exited with code ";
+
+// Stryker disable next-line all: env default is equivalent
+const TIMEOUT_MS = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
+
 let vmetajsonProcess: ChildProcess | null = null;
 const requestQueue: QueuedRequest[] = [];
 let currentRequest: QueuedRequest | null = null;
@@ -29,22 +38,21 @@ function processNextRequest(): void {
   vmetajsonProcess.stdin.write(`${JSON.stringify(currentRequest.input)}\n`);
 }
 
-function completeCurrentRequest(response: VmetajsonResponse): void {
+function finishCurrentRequest(action: (req: QueuedRequest) => void): void {
   if (currentRequest) {
     clearTimeout(currentRequest.timeoutId);
-    currentRequest.resolve(response);
+    action(currentRequest);
     currentRequest = null;
     processNextRequest();
   }
 }
 
+function completeCurrentRequest(response: VmetajsonResponse): void {
+  finishCurrentRequest((req) => req.resolve(response));
+}
+
 function failCurrentRequest(error: Error): void {
-  if (currentRequest) {
-    clearTimeout(currentRequest.timeoutId);
-    currentRequest.reject(error);
-    currentRequest = null;
-    processNextRequest();
-  }
+  finishCurrentRequest((req) => req.reject(error));
 }
 
 export function initVmetajson(
@@ -79,9 +87,7 @@ export function initVmetajson(
           completeCurrentRequest(response);
         } catch {
           failCurrentRequest(
-            new Error(
-              `Failed to parse vmetajson response: ${line ?? "unknown"}`,
-            ),
+            new Error(`${PARSE_ERROR_PREFIX}${line}`),
           );
         }
       }
@@ -96,40 +102,37 @@ export function initVmetajson(
 
   vmetajsonProcess.on("exit", (code: number | null) => {
     failCurrentRequest(
-      new Error(`vmetajson exited with code ${String(code ?? "unknown")}`),
+      new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`),
     );
     vmetajsonProcess = null;
   });
 }
 
+function createAnalyzeInput(text: string): VmetajsonInput {
+  return { params: { vmetajson: VMETAJSON_PARAMS }, content: text };
+}
+
 export async function analyze(text: string): Promise<VmetajsonResponse> {
   if (!vmetajsonProcess) {
-    throw new Error("vmetajson process not initialized");
+    throw new Error(NOT_INITIALIZED_ERROR);
   }
 
-  const input: VmetajsonInput = {
-    params: {
-      vmetajson: ["--stem", "--addphonetics"],
-    },
-    content: text,
-  };
+  const input = createAnalyzeInput(text);
 
   return new Promise((resolve, reject) => {
-    // Stryker disable next-line all: env default is equivalent
-    const timeoutMs = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
     const timeoutId = setTimeout(() => {
       const index = requestQueue.findIndex((r) => r.timeoutId === timeoutId);
       // Stryker disable next-line all: boundary condition is equivalent
       if (index !== -1) {
         requestQueue.splice(index, 1);
-        reject(new Error("vmetajson timeout"));
+        reject(new Error(TIMEOUT_ERROR));
         // Stryker disable next-line all: optional chaining is equivalent
       } else if (currentRequest?.timeoutId === timeoutId) {
         currentRequest = null;
-        reject(new Error("vmetajson timeout"));
+        reject(new Error(TIMEOUT_ERROR));
         processNextRequest();
       }
-    }, timeoutMs);
+    }, TIMEOUT_MS);
 
     requestQueue.push({ resolve, reject, input, timeoutId });
     processNextRequest();

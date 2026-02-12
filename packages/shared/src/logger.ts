@@ -3,12 +3,8 @@
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
-export interface Logger {
-  debug(message: string, ...args: unknown[]): void;
-  info(message: string, ...args: unknown[]): void;
-  warn(message: string, ...args: unknown[]): void;
-  error(message: string, ...args: unknown[]): void;
-}
+export type LogMethod = (message: string, ...args: unknown[]) => void;
+export type Logger = Record<LogLevel, LogMethod>;
 
 const LOG_LEVELS: Record<LogLevel, number> = {
   debug: 0,
@@ -17,67 +13,62 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   error: 3,
 };
 
-function shouldLog(level: LogLevel, minLevel: LogLevel): boolean {
-  return LOG_LEVELS[level] >= LOG_LEVELS[minLevel];
-}
+const DEFAULT_LEVEL: LogLevel = "info";
+const LOG_LEVEL_ENV = "LOG_LEVEL";
+
+// Derived once — avoids repeated Object.keys cast
+const LOG_LEVEL_KEYS = Object.keys(LOG_LEVELS) as LogLevel[];
+
+const LEVEL_TAGS = Object.fromEntries(
+  LOG_LEVEL_KEYS.map((k) => [k, `[${k.toUpperCase()}]`]),
+) as Record<LogLevel, string>;
+
+// Shared no-op — one instance for all filtered-out log methods
+const NO_OP: LogMethod = (): void => {};
 
 function formatMessage(level: LogLevel, message: string): string {
-  const timestamp = new Date().toISOString();
-  return `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+  return `[${new Date().toISOString()}] ${LEVEL_TAGS[level]} ${message}`;
 }
 
-export function createLogger(minLevel: LogLevel = "info"): Logger {
-  return {
-    debug(message: string, ...args: unknown[]): void {
-      if (shouldLog("debug", minLevel)) {
-        console.debug(formatMessage("debug", message), ...args);
-      }
-    },
-    info(message: string, ...args: unknown[]): void {
-      if (shouldLog("info", minLevel)) {
-        console.info(formatMessage("info", message), ...args);
-      }
-    },
-    warn(message: string, ...args: unknown[]): void {
-      if (shouldLog("warn", minLevel)) {
-        console.warn(formatMessage("warn", message), ...args);
-      }
-    },
-    error(message: string, ...args: unknown[]): void {
-      if (shouldLog("error", minLevel)) {
-        console.error(formatMessage("error", message), ...args);
-      }
-    },
+function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
+  if (LOG_LEVELS[level] < LOG_LEVELS[minLevel]) {
+    return NO_OP;
+  }
+  const consoleFn = console[level].bind(console);
+  return (message: string, ...args: unknown[]): void => {
+    consoleFn(formatMessage(level, message), ...args);
   };
 }
 
-const VALID_LOG_LEVELS: readonly LogLevel[] = [
-  "debug",
-  "info",
-  "warn",
-  "error",
-];
-
-function isValidLogLevel(level: string): level is LogLevel {
-  return VALID_LOG_LEVELS.includes(level as LogLevel);
+export function createLogger(minLevel: LogLevel = DEFAULT_LEVEL): Logger {
+  return Object.fromEntries(
+    LOG_LEVEL_KEYS.map((level) => [level, createLogMethod(level, minLevel)]),
+  ) as Logger;
 }
 
-// Environment-safe log level detection
-const getLogLevel = (): LogLevel => {
+function isValidLogLevel(level: string): level is LogLevel {
+  return level in LOG_LEVELS;
+}
+
+function isNodeEnv(): boolean {
+  // eslint-disable-next-line no-restricted-globals
+  return typeof process !== "undefined";
+}
+
+function getLogLevel(): LogLevel {
   try {
-    // Node.js environment (works in Jest and Node)
-    // eslint-disable-next-line no-restricted-globals
-    if (typeof process !== "undefined" && process.env?.LOG_LEVEL) {
-      // eslint-disable-next-line no-restricted-globals
-      const envLevel = process.env.LOG_LEVEL;
-      if (isValidLogLevel(envLevel)) {
+    /* eslint-disable no-restricted-globals */
+    if (isNodeEnv() && process.env?.[LOG_LEVEL_ENV]) {
+      const envLevel = process.env[LOG_LEVEL_ENV];
+      if (envLevel && isValidLogLevel(envLevel)) {
         return envLevel;
       }
     }
+    /* eslint-enable no-restricted-globals */
   } catch {
     // Ignore errors in environment detection
   }
-  return "info";
-};
+  return DEFAULT_LEVEL;
+}
 
 export const logger = createLogger(getLogLevel());

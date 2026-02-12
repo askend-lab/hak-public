@@ -9,8 +9,10 @@ export { handler, setAdapter } from "./handler";
 export {
   handleSave,
   handleGet,
+  handleGetPublic,
   handleDelete,
   handleQuery,
+  handleDebugError,
   createResponse,
   HTTP_STATUS,
   HTTP_ERRORS,

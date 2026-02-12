@@ -5,33 +5,54 @@
  * SHA-256 hash utility that works in both browser and Node.js
  */
 
-// Define SubtleCrypto interface for environments without DOM types
-interface SubtleCryptoLike {
-  digest(
-    algorithm: string,
-    data: ArrayBuffer | ArrayBufferView,
-  ): Promise<ArrayBuffer>;
+import { isEmpty } from "./utils";
+
+interface BrowserSubtleCrypto {
+  digest(algorithm: string, data: ArrayBuffer | ArrayBufferView): Promise<ArrayBuffer>;
 }
 
-declare const window: { crypto?: { subtle?: SubtleCryptoLike } } | undefined;
+declare const window: { crypto?: { subtle?: BrowserSubtleCrypto } } | undefined;
+
+const HASH_ALGORITHM = "sha256";
+const BROWSER_HASH_ALGORITHM = "SHA-256";
+const CRYPTO_MODULE = "node:crypto";
+const ERROR_EMPTY_TEXT = "Text cannot be empty";
+
+function validateHashInput(text: string): void {
+  if (isEmpty(text)) {
+    throw new Error(ERROR_EMPTY_TEXT);
+  }
+}
+
+function toHexString(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let hex = "";
+  for (let i = 0; i < bytes.length; i++) {
+    hex += (bytes[i] ?? 0).toString(16).padStart(2, "0");
+  }
+  return hex;
+}
+
+function getSubtleCrypto(): BrowserSubtleCrypto | undefined {
+  return typeof window !== "undefined" ? window?.crypto?.subtle : undefined;
+}
+
+function nodeHashHex(crypto: typeof import("node:crypto"), text: string): string {
+  return crypto.createHash(HASH_ALGORITHM).update(text).digest("hex");
+}
 
 export async function calculateHash(text: string): Promise<string> {
-  if (!text || text.trim().length === 0) {
-    throw new Error("Text cannot be empty");
+  validateHashInput(text);
+
+  const subtle = getSubtleCrypto();
+  if (subtle) {
+    const data = new TextEncoder().encode(text);
+    const hashBuffer = await subtle.digest(BROWSER_HASH_ALGORITHM, data);
+    return toHexString(hashBuffer);
   }
 
-  // Browser environment
-  if (typeof window !== "undefined" && window?.crypto?.subtle) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  }
-
-  // Node.js environment
-  const crypto = await import("node:crypto");
-  return crypto.createHash("sha256").update(text).digest("hex");
+  const crypto = await import(CRYPTO_MODULE);
+  return nodeHashHex(crypto, text);
 }
 
 /**
@@ -39,10 +60,8 @@ export async function calculateHash(text: string): Promise<string> {
  * @deprecated Use async calculateHash() instead for ESM compatibility
  */
 export function calculateHashSync(text: string): string {
-  if (!text || text.trim().length === 0) {
-    throw new Error("Text cannot be empty");
-  }
+  validateHashInput(text);
 
-  const crypto = require("node:crypto") as typeof import("node:crypto");
-  return crypto.createHash("sha256").update(text).digest("hex");
+  const crypto = require(CRYPTO_MODULE) as typeof import("node:crypto");
+  return nodeHashHex(crypto, text);
 }
