@@ -4,6 +4,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import BaseModal from "./BaseModal";
 
 interface TaskEditModalProps {
@@ -68,7 +69,7 @@ export default function TaskEditModal({
       await onSave(updatedTask);
       handleClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Viga ülesande muutmisel");
+      setError(getErrorMessage(err, "Viga ülesande muutmisel"));
     } finally {
       setIsSubmitting(false);
     }
