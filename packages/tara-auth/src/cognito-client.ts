@@ -7,7 +7,9 @@ import {
   ListUsersCommand,
   UsernameExistsException,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { CognitoConfig, CognitoTokens, TaraIdToken } from './types';
+import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, buildFallbackEmail } from './types';
+
+export const DEFAULT_REGION = 'eu-west-1';
 
 export class CognitoClient {
   private client: CognitoIdentityProviderClient;
@@ -81,7 +83,7 @@ export class CognitoClient {
   }
 
   buildUserAttributes(taraIdToken: TaraIdToken): Array<{ Name: string; Value: string }> {
-    const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
+    const email = taraIdToken.email || buildFallbackEmail(taraIdToken.sub);
     
     const attributes: Array<{ Name: string; Value: string }> = [
       { Name: 'email', Value: email },
@@ -102,7 +104,7 @@ export class CognitoClient {
 
   private async createUser(taraIdToken: TaraIdToken): Promise<string> {
     // Cognito requires email as username (UsernameAttributes: ["email"])
-    const email = taraIdToken.email || `${taraIdToken.sub}@tara.ee`;
+    const email = taraIdToken.email || buildFallbackEmail(taraIdToken.sub);
     const username = email;
 
     try {
@@ -153,7 +155,7 @@ export class CognitoClient {
         Session: initiateResponse.Session,
         ChallengeResponses: {
           USERNAME: username,
-          ANSWER: 'TARA_VERIFIED',
+          ANSWER: TARA_VERIFIED,
         },
       });
 
@@ -179,7 +181,7 @@ export function createCognitoClient(): CognitoClient {
   const config: CognitoConfig = {
     userPoolId: process.env.COGNITO_USER_POOL_ID || '',
     clientId: process.env.COGNITO_CLIENT_ID || '',
-    region: process.env.AWS_REGION || 'eu-west-1',
+    region: process.env.AWS_REGION || DEFAULT_REGION,
   };
 
   if (!config.userPoolId || !config.clientId) {
