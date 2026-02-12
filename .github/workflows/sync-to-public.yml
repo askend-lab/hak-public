@@ -1,0 +1,29 @@
+name: Sync to Public Repository
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Sync to hak-public
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run sync script
+        env:
+          PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
+        run: |
+          scripts/sync-to-public.sh \
+            "https://x-access-token:${PUBLIC_REPO_TOKEN}@github.com/askend-lab/hak-public.git"
