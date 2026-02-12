@@ -2,7 +2,7 @@
  * HAK ESLint Configuration
  * Extends base config from DevBox with project-specific overrides
  */
-import baseConfig from "../../boxer/devbox/eslint.config.js";
+import baseConfig from "./eslint.base.config.mjs";
 
 const TEST_FILE_PATTERNS = [
   "**/*.test.js",
@@ -22,6 +22,7 @@ export default [
 
   {
     ignores: [
+      "eslint.base.config.mjs",
       "packages/vendor/**",
       "**/.esbuild/**",
       "**/dist/**",

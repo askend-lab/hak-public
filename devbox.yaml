@@ -177,6 +177,7 @@ hooks:
 
   source-size:
     excludePaths:
+      - "**/eslint.base.config.mjs"
       - "**/*.generated.ts"
       - "**/.stryker-tmp/**"
       - "**/.old-frontend/**"
