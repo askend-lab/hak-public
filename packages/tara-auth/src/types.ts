@@ -36,3 +36,10 @@ export interface CognitoTokens {
   refreshToken: string;
   expiresIn: number;
 }
+
+export const TARA_VERIFIED = 'TARA_VERIFIED';
+export const FALLBACK_EMAIL_DOMAIN = 'tara.ee';
+
+export function buildFallbackEmail(personalCode: string): string {
+  return `${personalCode}@${FALLBACK_EMAIL_DOMAIN}`;
+}

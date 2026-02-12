@@ -3,6 +3,7 @@ import {
   CreateAuthChallengeTriggerEvent,
   VerifyAuthChallengeResponseTriggerEvent,
 } from 'aws-lambda';
+import { TARA_VERIFIED } from './types';
 
 export async function handleDefineAuthChallenge(
   event: DefineAuthChallengeTriggerEvent
@@ -47,7 +48,7 @@ export async function handleVerifyAuthChallengeResponse(
   event: VerifyAuthChallengeResponseTriggerEvent
 ): Promise<VerifyAuthChallengeResponseTriggerEvent> {
   // TARA Lambda sends 'TARA_VERIFIED' as challenge answer after successful TARA authentication
-  event.response.answerCorrect = event.request.challengeAnswer === 'TARA_VERIFIED';
+  event.response.answerCorrect = event.request.challengeAnswer === TARA_VERIFIED;
 
   return event;
 }
