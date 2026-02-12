@@ -81,12 +81,15 @@ describe("useAudioPlayback handlePlayAll", () => {
   });
 
   it("starts loading when called with entries", async () => {
+    const { waitFor } = await import("@testing-library/react");
     const entries = [mockEntry("1", "test")];
     const { result } = renderHook(() => useAudioPlayback(entries));
     act(() => {
       result.current.handlePlayAll();
     });
-    expect(result.current.isLoadingPlayAll).toBe(true);
+    await waitFor(() => {
+      expect(result.current.isLoadingPlayAll).toBe(true);
+    });
   });
 });
 
@@ -245,12 +248,14 @@ describe("useAudioPlayback with existing audio", () => {
   });
 
   it("onended callback resets currentPlayingId to null", async () => {
+    const { waitFor } = await import("@testing-library/react");
     const entries = [mockEntry("1", "test", "http://audio.mp3")];
     const { result } = renderHook(() => useAudioPlayback(entries));
     act(() => { result.current.handlePlayEntry("1"); });
     expect(result.current.currentPlayingId).toBe("1");
-    await new Promise((r) => setTimeout(r, 15));
-    expect(result.current.currentPlayingId).toBeNull();
+    await waitFor(() => {
+      expect(result.current.currentPlayingId).toBeNull();
+    });
   });
 
   it("handlePlayAll resets all states when called twice", async () => {
