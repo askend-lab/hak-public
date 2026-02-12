@@ -3,9 +3,16 @@
 
 import * as http from "http";
 import { analyzeHandler, variantsHandler, healthHandler } from "./handler";
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { createResponse } from "./validation";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 const PORT = process.env.PORT || 8080;
+
+const LOCAL_ROUTES = [
+  { match: (p: string, m: string): boolean => p.endsWith("/analyze") && m === "POST", handler: analyzeHandler },
+  { match: (p: string, m: string): boolean => p.endsWith("/variants") && m === "POST", handler: variantsHandler },
+  { match: (p: string, _m: string): boolean => p.endsWith("/health") || p === "/", handler: (_e: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => Promise.resolve(healthHandler()) },
+];
 
 function createEvent(
   body: string,
@@ -38,47 +45,33 @@ const server = http.createServer(
     const url = new URL(req.url || "/", `http://localhost:${PORT}`);
     const path = url.pathname;
 
-    console.log(`[REQUEST] ${req.method} ${path} (raw: ${req.url})`);
+    const method = req.method || "GET";
+    console.log(`[REQUEST] ${method} ${path} (raw: ${req.url})`);
 
-    if (req.method === "OPTIONS") {
+    if (method === "OPTIONS") {
       res.writeHead(200);
       res.end();
       return;
     }
-
     let body = "";
     req.on("data", (chunk: Buffer) => {
       body += chunk.toString();
     });
     req.on("end", async () => {
-      const event = createEvent(body, path, req.method || "GET");
+      const event = createEvent(body, path, method);
       let result;
 
       try {
-        // Flexible path matching (handles with/without trailing slash, stage prefixes)
-        if (path.endsWith("/analyze") && req.method === "POST") {
-          result = await analyzeHandler(event);
-        } else if (path.endsWith("/variants") && req.method === "POST") {
-          result = await variantsHandler(event);
-        } else if (path.endsWith("/health") || path === "/") {
-          result = healthHandler();
+        const route = LOCAL_ROUTES.find((r) => r.match(path, method));
+        if (route) {
+          result = await route.handler(event);
         } else {
           console.log(`[404] Path not found: ${path}`);
-          result = {
-            statusCode: 404,
-            body: JSON.stringify({
-              error: "Not found",
-              path,
-              method: req.method,
-            }),
-          };
+          result = createResponse(404, { error: "Not found", path, method: req.method });
         }
       } catch (error) {
         console.error(`[ERROR] ${error}`);
-        result = {
-          statusCode: 500,
-          body: JSON.stringify({ error: String(error) }),
-        };
+        result = createResponse(500, { error: String(error) });
       }
 
       res.writeHead(result.statusCode);

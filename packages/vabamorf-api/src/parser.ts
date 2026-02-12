@@ -6,14 +6,23 @@ import {
   createVariantFromMrf,
   isDuplicateVariant,
 } from "./parser-helpers";
-import { VmetajsonResponse, Variant } from "./types";
+import { VmetajsonResponse, VmetajsonToken, VmetajsonMrf, Variant } from "./types";
+
+function getTokens(response: VmetajsonResponse): VmetajsonToken[] {
+  // Stryker disable next-line all: optional chaining is equivalent
+  return response.annotations?.tokens ?? [];
+}
+
+function getMrfList(token: VmetajsonToken): VmetajsonMrf[] {
+  // Stryker disable next-line all: optional chaining is equivalent
+  return token.features?.mrf ?? [];
+}
 
 export function extractStressedText(
   response: VmetajsonResponse,
   originalText: string,
 ): string {
-  // Stryker disable next-line all: optional chaining is equivalent
-  const tokens = response.annotations?.tokens ?? [];
+  const tokens = getTokens(response);
   const stressedTokens = tokens
     .map(extractTokenText)
     .filter((t): t is string => t !== null);
@@ -25,13 +34,11 @@ export function extractVariants(
   response: VmetajsonResponse,
   word: string,
 ): Variant[] {
-  // Stryker disable next-line all: optional chaining is equivalent
-  const tokens = response.annotations?.tokens ?? [];
+  const tokens = getTokens(response);
   const variants: Variant[] = [];
 
   for (const tokenData of tokens) {
-    // Stryker disable next-line all: optional chaining is equivalent
-    const mrfList = tokenData.features?.mrf ?? [];
+    const mrfList = getMrfList(tokenData);
     for (const mrfVariant of mrfList) {
       const variant = createVariantFromMrf(mrfVariant, word);
       if (variant && !isDuplicateVariant(variants, variant)) {

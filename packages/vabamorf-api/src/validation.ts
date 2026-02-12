@@ -2,13 +2,13 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { LambdaResponse } from "./types";
-import { initVmetajson, isInitialized } from "./vmetajson";
 
-// Stryker disable next-line all: env defaults are equivalent
-const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
-
-// Stryker disable next-line all: env defaults are equivalent
-const DICT_PATH = process.env.DICT_PATH ?? ".";
+export const RESPONSE_HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+} as const;
 
 export function createResponse(
   statusCode: number,
@@ -17,17 +17,8 @@ export function createResponse(
   return {
     statusCode,
     body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type,Authorization",
-      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    },
+    headers: RESPONSE_HEADERS,
   };
-}
-
-export function ensureInitialized(): void {
-  if (!isInitialized()) initVmetajson(VMETAJSON_PATH, DICT_PATH);
 }
 
 export function parseJsonBody(eventBody: string | null): unknown {
@@ -45,13 +36,13 @@ export function getFieldError(
   fieldName: string,
   maxLength?: number,
 ): string | null {
-  if (fieldValue === null || typeof fieldValue !== "string")
+  if (typeof fieldValue !== "string")
     return `Missing '${fieldName}' field in request body`;
 
   if (!fieldValue.trim()) return `'${fieldName}' must be a non-empty string`;
 
   if (maxLength != null && fieldValue.length > maxLength)
-    return `Text is too long (max ${String(maxLength)} characters)`;
+    return `Text is too long (max ${maxLength} characters)`;
   return null;
 }
 
@@ -60,7 +51,8 @@ export function validateField(
   fieldName: string,
   maxLength?: number,
 ): { value: string } | { error: string } {
-  const error = getFieldError(body[fieldName], fieldName, maxLength);
+  const fieldValue = body[fieldName];
+  const error = getFieldError(fieldValue, fieldName, maxLength);
   if (error !== null) return { error };
-  return { value: (body[fieldName] as string).trim() };
+  return { value: (fieldValue as string).trim() };
 }
