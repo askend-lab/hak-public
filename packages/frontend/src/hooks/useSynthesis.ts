@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu } from "@/types/synthesis";
+import { EditingTag, OpenTagMenu, convertTextToTags } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
 import { synthesizeWithPolling } from "@/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
@@ -76,10 +76,7 @@ export function useSynthesis() {
       const sentence = getSentence(id);
       if (!sentence) return;
       if (sentence.currentInput.trim()) {
-        const inputWords = sentence.currentInput
-          .trim()
-          .split(/\s+/)
-          .filter((word) => word.length > 0);
+        const inputWords = convertTextToTags(sentence.currentInput);
         const allTags = [...sentence.tags, ...inputWords];
         const fullText = allTags.join(" ");
         updateSentence(id, {

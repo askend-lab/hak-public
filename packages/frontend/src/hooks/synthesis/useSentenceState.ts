@@ -19,8 +19,8 @@ const ensureSentenceState = (
   stressedTags: sentence.stressedTags ?? null,
 });
 
-const INITIAL_SENTENCE: SentenceState = {
-  id: "1",
+const createEmptySentence = (id: string): SentenceState => ({
+  id,
   text: "",
   tags: [],
   isPlaying: false,
@@ -29,7 +29,9 @@ const INITIAL_SENTENCE: SentenceState = {
   phoneticText: null,
   audioUrl: null,
   stressedTags: null,
-};
+});
+
+const INITIAL_SENTENCE: SentenceState = createEmptySentence("1");
 
 // Helper to sanitize sentences for storage (strip transient UI state)
 const sanitizeForStorage = (
@@ -45,6 +47,40 @@ const sanitizeForStorage = (
     stressedTags: s.stressedTags,
     // Intentionally omit isPlaying and isLoading - these are transient UI state
   }));
+};
+
+// Helper to transform a raw entry (from legacy storage or shared task) into SentenceState
+interface RawEntry {
+  id?: string;
+  text: string;
+  stressedText?: string;
+  audioUrl?: string | null;
+}
+
+const transformEntryToSentence = (entry: RawEntry): SentenceState => {
+  const words = entry.text
+    .trim()
+    .split(/\s+/)
+    .filter((w: string) => w.length > 0);
+  const stressedWords =
+    entry.stressedText
+      ?.trim()
+      .split(/\s+/)
+      .filter((w: string) => w.length > 0) || [];
+  return ensureSentenceState({
+    id: entry.id || `entry_${Date.now()}_${Math.random()}`,
+    text: entry.text,
+    tags: words,
+    isPlaying: false,
+    isLoading: false,
+    currentInput: "",
+    stressedTags:
+      stressedWords.length === words.length
+        ? stressedWords
+        : undefined,
+    audioUrl: entry.audioUrl,
+    phoneticText: entry.stressedText,
+  });
 };
 
 // Helper to restore sentences from storage
@@ -118,39 +154,7 @@ export function useSentenceState(): {
       if (storedPlaylist) {
         const entries = JSON.parse(storedPlaylist);
         if (Array.isArray(entries) && entries.length > 0) {
-          const transformed: SentenceState[] = entries.map(
-            (entry: {
-              id?: string;
-              text: string;
-              stressedText?: string;
-              audioUrl?: string;
-            }) => {
-              const words = entry.text
-                .trim()
-                .split(/\s+/)
-                .filter((w: string) => w.length > 0);
-              const stressedWords =
-                entry.stressedText
-                  ?.trim()
-                  .split(/\s+/)
-                  .filter((w: string) => w.length > 0) || [];
-              return ensureSentenceState({
-                id: entry.id || `entry_${Date.now()}_${Math.random()}`,
-                text: entry.text,
-                tags: words,
-                isPlaying: false,
-                isLoading: false,
-                currentInput: "",
-                stressedTags:
-                  stressedWords.length === words.length
-                    ? stressedWords
-                    : undefined,
-                audioUrl: entry.audioUrl,
-                phoneticText: entry.stressedText,
-              });
-            },
-          );
-          setSentences(transformed);
+          setSentences(entries.map(transformEntryToSentence));
           localStorage.removeItem("eki_playlist_entries");
         }
       }
@@ -167,39 +171,7 @@ export function useSentenceState(): {
       if (copied) {
         const entries = JSON.parse(copied);
         if (Array.isArray(entries) && entries.length > 0) {
-          const transformed: SentenceState[] = entries.map(
-            (entry: {
-              id?: string;
-              text: string;
-              stressedText?: string;
-              audioUrl?: string | null;
-            }) => {
-              const words = entry.text
-                .trim()
-                .split(/\s+/)
-                .filter((w: string) => w.length > 0);
-              const stressedWords =
-                entry.stressedText
-                  ?.trim()
-                  .split(/\s+/)
-                  .filter((w: string) => w.length > 0) || [];
-              return ensureSentenceState({
-                id: entry.id || `entry_${Date.now()}_${Math.random()}`,
-                text: entry.text,
-                tags: words,
-                isPlaying: false,
-                isLoading: false,
-                currentInput: "",
-                stressedTags:
-                  stressedWords.length === words.length
-                    ? stressedWords
-                    : undefined,
-                audioUrl: entry.audioUrl,
-                phoneticText: entry.stressedText,
-              });
-            },
-          );
-          setSentences(transformed);
+          setSentences(entries.map(transformEntryToSentence));
           sessionStorage.removeItem("copiedEntries");
         }
       }
@@ -225,17 +197,7 @@ export function useSentenceState(): {
         audioUrl: null,
         stressedTags: null,
       },
-      {
-        id: "demo-2",
-        text: "",
-        tags: [],
-        isPlaying: false,
-        isLoading: false,
-        currentInput: "",
-        phoneticText: null,
-        audioUrl: null,
-        stressedTags: null,
-      },
+      createEmptySentence("demo-2"),
     ]);
   }, []);
 
@@ -266,17 +228,7 @@ export function useSentenceState(): {
   const handleAddSentence = useCallback(() => {
     setSentences((prev) => [
       ...prev,
-      {
-        id: Date.now().toString(),
-        text: "",
-        tags: [],
-        isPlaying: false,
-        isLoading: false,
-        currentInput: "",
-        phoneticText: null,
-        audioUrl: null,
-        stressedTags: null,
-      },
+      createEmptySentence(Date.now().toString()),
     ]);
   }, []);
 

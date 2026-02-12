@@ -17,6 +17,8 @@ import {
   getTaraLoginUrl,
   cognitoConfig,
   exchangeCodeForTokens,
+  CONTENT_TYPE_FORM,
+  OAUTH2_TOKEN_PATH,
 } from "./config";
 import type { AuthContextValue, AuthState } from "./types";
 import { parseIdToken, isTokenExpired } from "./token";
@@ -40,10 +42,10 @@ export async function refreshTokens(): Promise<boolean> {
 
   try {
     const response = await fetch(
-      `https://${cognitoConfig.domain}/oauth2/token`,
+      `https://${cognitoConfig.domain}${OAUTH2_TOKEN_PATH}`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: { "Content-Type": CONTENT_TYPE_FORM },
         body: new URLSearchParams({
           grant_type: "refresh_token",
           client_id: cognitoConfig.clientId,
@@ -65,6 +67,27 @@ export async function refreshTokens(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+function storeTokensAndSetAuth(
+  tokens: { accessToken: string; idToken: string; refreshToken: string },
+  setState: React.Dispatch<React.SetStateAction<AuthState>>,
+): boolean {
+  const user = parseIdToken(tokens.idToken);
+  if (user) {
+    AuthStorage.setUser(user);
+    AuthStorage.setAccessToken(tokens.accessToken);
+    AuthStorage.setIdToken(tokens.idToken);
+    AuthStorage.setRefreshToken(tokens.refreshToken);
+    setState({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+      error: null,
+    });
+    return true;
+  }
+  return false;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -121,22 +144,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async (code: string): Promise<boolean> => {
       const tokens = await exchangeCodeForTokens(code);
       if (!tokens) return false;
-
-      const user = parseIdToken(tokens.idToken);
-      if (user) {
-        AuthStorage.setUser(user);
-        AuthStorage.setAccessToken(tokens.accessToken);
-        AuthStorage.setIdToken(tokens.idToken);
-        AuthStorage.setRefreshToken(tokens.refreshToken);
-        setState({
-          user,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        });
-        return true;
-      }
-      return false;
+      return storeTokensAndSetAuth(tokens, setState);
     },
     [],
   );
@@ -160,21 +168,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       idToken: string;
       refreshToken: string;
     }): boolean => {
-      const user = parseIdToken(tokens.idToken);
-      if (user) {
-        AuthStorage.setUser(user);
-        AuthStorage.setAccessToken(tokens.accessToken);
-        AuthStorage.setIdToken(tokens.idToken);
-        AuthStorage.setRefreshToken(tokens.refreshToken);
-        setState({
-          user,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        });
-        return true;
-      }
-      return false;
+      return storeTokensAndSetAuth(tokens, setState);
     },
     [],
   );

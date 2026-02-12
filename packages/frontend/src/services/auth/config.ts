@@ -5,6 +5,11 @@ import { generateCodeVerifier, generateCodeChallenge } from "./pkce";
 
 const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
+export const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
+export const TARA_LOGIN_URL = "https://hak-api-dev.askend-lab.com/auth/tara/start";
+export const PKCE_STORAGE_KEY = "pkce_code_verifier";
+export const OAUTH2_TOKEN_PATH = "/oauth2/token";
+
 export function getHostname(): string {
   return typeof window !== "undefined"
     ? window.location.hostname
@@ -56,7 +61,7 @@ export const cognitoConfig = {
 
 export async function getLoginUrl(): Promise<string> {
   const codeVerifier = generateCodeVerifier();
-  sessionStorage.setItem("pkce_code_verifier", codeVerifier);
+  sessionStorage.setItem(PKCE_STORAGE_KEY, codeVerifier);
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
   const params = new URLSearchParams({
@@ -79,7 +84,7 @@ export function getLogoutUrl(): string {
 }
 
 export function getTaraLoginUrl(): string {
-  return "https://hak-api-dev.askend-lab.com/auth/tara/start";
+  return TARA_LOGIN_URL;
 }
 
 export async function exchangeCodeForTokens(code: string): Promise<{
@@ -88,7 +93,7 @@ export async function exchangeCodeForTokens(code: string): Promise<{
   refreshToken: string;
   expiresIn: number;
 } | null> {
-  const codeVerifier = sessionStorage.getItem("pkce_code_verifier");
+  const codeVerifier = sessionStorage.getItem(PKCE_STORAGE_KEY);
   if (!codeVerifier) {
     console.error("[Auth] Missing PKCE code verifier");
     return null;
@@ -104,10 +109,10 @@ export async function exchangeCodeForTokens(code: string): Promise<{
 
   try {
     const response = await fetch(
-      `https://${cognitoConfig.domain}/oauth2/token`,
+      `https://${cognitoConfig.domain}${OAUTH2_TOKEN_PATH}`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: { "Content-Type": CONTENT_TYPE_FORM },
         body: requestBody,
       },
     );
@@ -123,7 +128,7 @@ export async function exchangeCodeForTokens(code: string): Promise<{
     }
 
     const data = await response.json();
-    sessionStorage.removeItem("pkce_code_verifier");
+    sessionStorage.removeItem(PKCE_STORAGE_KEY);
 
     return {
       accessToken: data.access_token,
