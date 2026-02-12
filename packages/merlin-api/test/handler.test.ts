@@ -15,20 +15,18 @@ import { createResponse, createBadRequest, createInternalError, HTTP_STATUS, COR
 import { buildAudioUrl, buildCacheKey, isNotFoundError } from "../src/s3";
 import { VOICE_DEFAULTS, getAwsRegion, getS3Bucket, getSqsQueueUrl, getEcsCluster, getEcsService } from "../src/env";
 import { isEcsConfigured } from "../src/ecs";
-
-const TEST_REGION = "eu-west-1";
-const TEST_BUCKET = "test-bucket";
-const TEST_QUEUE_URL = "https://sqs.eu-west-1.amazonaws.com/123456789/test-queue";
-const DEFAULT_VOICE = "efm_l";
-const DEFAULT_SPEED = 1.0;
-const DEFAULT_PITCH = 0;
+import {
+  setupTestEnv,
+  TEST_REGION,
+  TEST_BUCKET,
+  TEST_QUEUE_URL,
+  DEFAULT_VOICE,
+  DEFAULT_SPEED,
+  DEFAULT_PITCH,
+} from "./setup";
 
 beforeEach(() => {
-  process.env.AWS_REGION_NAME = TEST_REGION;
-  process.env.S3_BUCKET = TEST_BUCKET;
-  process.env.SQS_QUEUE_URL = TEST_QUEUE_URL;
-  delete process.env.ECS_CLUSTER;
-  delete process.env.ECS_SERVICE;
+  setupTestEnv();
 });
 
 describe("generateCacheKey", () => {
@@ -216,6 +214,16 @@ describe("env functions", () => {
 
   it("getSqsQueueUrl should return env value", () => {
     expect(getSqsQueueUrl()).toBe(TEST_QUEUE_URL);
+  });
+
+  it("getS3Bucket should return empty when unset", () => {
+    delete process.env.S3_BUCKET;
+    expect(getS3Bucket()).toBe("");
+  });
+
+  it("getSqsQueueUrl should return empty when unset", () => {
+    delete process.env.SQS_QUEUE_URL;
+    expect(getSqsQueueUrl()).toBe("");
   });
 
   it("getEcsCluster should return empty when unset", () => {

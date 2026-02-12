@@ -32,7 +32,7 @@ export interface StatusEvent {
   pathParameters?: { cacheKey?: string };
 }
 
-interface SynthesizeParams {
+export interface SynthesizeParams {
   text: string;
   voice: string;
   speed: number;
@@ -66,7 +66,7 @@ export function validateText(text: unknown): text is string {
   return typeof text === "string" && text !== "";
 }
 
-const WARMUP_COOLDOWN_MS = 60_000;
+export const WARMUP_COOLDOWN_MS = 60_000;
 let lastWarmupTime = 0;
 
 export function resetRateLimit(): void {
