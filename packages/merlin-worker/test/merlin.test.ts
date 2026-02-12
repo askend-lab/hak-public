@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { synthesize, DEFAULT_VOICE } from "../src/merlin";
+import { synthesize, DEFAULT_VOICE, CONTENT_TYPE_JSON } from "../src/merlin";
 
 global.fetch = jest.fn();
 
@@ -89,6 +89,12 @@ describe("Merlin TTS", () => {
   describe("DEFAULT_VOICE", () => {
     it("should be efm_s", () => {
       expect(DEFAULT_VOICE).toBe("efm_s");
+    });
+  });
+
+  describe("CONTENT_TYPE_JSON", () => {
+    it("should be application/json", () => {
+      expect(CONTENT_TYPE_JSON).toBe("application/json");
     });
   });
 });
