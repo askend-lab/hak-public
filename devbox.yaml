@@ -4,9 +4,6 @@ extends: "./defaults.yaml"
 project:
   name: "HAK"
 
-global_excludes:
-  - "**/.design/**"
-
 # Incremental testing - only runs affected tests (requires module-level opt-in)
 
 # Test modules with coverage requirements
@@ -71,7 +68,6 @@ hooks:
       - "**/test/fixtures/**"
       - "docs/DAILY_ITERATIONS.md"
       - "docs/open-source/MASTER_PLAN.md"
-      - ".design/**"
       - "CodeReview_*.md"
       - "GHERKIN_PLAN.md"
       - "docs/CUCUMBER_STEPS_CHECKLIST.md"
@@ -86,7 +82,6 @@ hooks:
     excludePaths:
       - "**/drafts/**"
       - "**/test/fixtures/**"
-      - ".design/**"
       - "**/node_modules/**"
       - "docs/**"
       - ".project/**"
@@ -95,7 +90,6 @@ hooks:
   broken-links:
     excludePaths:
       - "**/test/fixtures/**"
-      - ".design/**"
 
   no-console:
     mode: error
@@ -245,6 +239,5 @@ hooks:
       - "**/node_modules/**"
       - "**/*.test.ts"
       - "**/*.spec.ts"
-      - ".design/**"
 
 # final
