@@ -3,12 +3,9 @@
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
-export interface Logger {
-  debug(message: string, ...args: unknown[]): void;
-  info(message: string, ...args: unknown[]): void;
-  warn(message: string, ...args: unknown[]): void;
-  error(message: string, ...args: unknown[]): void;
-}
+// #4 Logger as mapped type — derived from LogLevel, no manual listing
+type LogMethod = (message: string, ...args: unknown[]) => void;
+export type Logger = Record<LogLevel, LogMethod>;
 
 const LOG_LEVELS: Record<LogLevel, number> = {
   debug: 0,
@@ -17,35 +14,38 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   error: 3,
 };
 
-function shouldLog(level: LogLevel, minLevel: LogLevel): boolean {
-  return LOG_LEVELS[level] >= LOG_LEVELS[minLevel];
-}
+// #6 Pre-computed level tags — avoids toUpperCase() on every log call
+const LEVEL_TAGS: Record<LogLevel, string> = {
+  debug: "[DEBUG]",
+  info: "[INFO]",
+  warn: "[WARN]",
+  error: "[ERROR]",
+};
 
 function formatMessage(level: LogLevel, message: string): string {
-  const timestamp = new Date().toISOString();
-  return `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+  return `[${new Date().toISOString()}] ${LEVEL_TAGS[level]} ${message}`;
 }
 
-// #3 Single factory for log methods — eliminates 4 identical method bodies
-function createLogMethod(
-  level: LogLevel,
-  minLevel: LogLevel,
-): (message: string, ...args: unknown[]) => void {
+// #7 + #8 Pre-evaluate level at creation — returns no-op if filtered
+function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
+  if (LOG_LEVELS[level] < LOG_LEVELS[minLevel]) {
+    return (): void => { /* filtered out */ };
+  }
   const consoleFn = console[level].bind(console);
   return (message: string, ...args: unknown[]): void => {
-    if (shouldLog(level, minLevel)) {
-      consoleFn(formatMessage(level, message), ...args);
-    }
+    consoleFn(formatMessage(level, message), ...args);
   };
 }
 
+// #9 Generate all methods from LOG_LEVELS keys
+const ALL_LEVELS = Object.keys(LOG_LEVELS) as LogLevel[];
+
 export function createLogger(minLevel: LogLevel = "info"): Logger {
-  return {
-    debug: createLogMethod("debug", minLevel),
-    info: createLogMethod("info", minLevel),
-    warn: createLogMethod("warn", minLevel),
-    error: createLogMethod("error", minLevel),
-  };
+  const logger = {} as Logger;
+  for (const level of ALL_LEVELS) {
+    logger[level] = createLogMethod(level, minLevel);
+  }
+  return logger;
 }
 
 // #4 + #5 Derived from LOG_LEVELS — no separate array, uses `in` operator
