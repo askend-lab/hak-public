@@ -81,6 +81,6 @@ const server = http.createServer(
 );
 
 server.listen(PORT, () => {
-  console.log(`Vabamorf API running on http://localhost:${PORT}`);
-  console.log("Endpoints: POST /analyze, POST /variants, GET /health");
+  console.info(`Vabamorf API running on http://localhost:${PORT}`);
+  console.info("Endpoints: POST /analyze, POST /variants, GET /health");
 });

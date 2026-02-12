@@ -127,7 +127,7 @@ export async function callbackHandler(
     // Verify and decode ID token
     const taraIdToken = await taraClient.verifyIdToken(taraTokens.id_token, savedState.nonce);
 
-    console.log('TARA authentication successful for:', taraIdToken.sub);
+    console.info('TARA authentication successful');
 
     // Find or create Cognito user
     const cognitoClient = createCognitoClient();

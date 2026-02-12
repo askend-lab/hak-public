@@ -45,7 +45,7 @@ export async function initA11yDevMode(): Promise<void> {
       ],
     });
 
-    console.log("🔍 Accessibility checker enabled (axe-core)");
+    console.info("🔍 Accessibility checker enabled (axe-core)");
   } catch (error) {
     console.warn("Failed to initialize accessibility checker:", error);
   }
@@ -70,17 +70,17 @@ export async function runPageAudit(): Promise<void> {
       console.group("🚨 Accessibility Violations Found");
       results.violations.forEach((violation) => {
         console.group(`[${violation.impact?.toUpperCase()}] ${violation.id}`);
-        console.log("Description:", violation.description);
-        console.log("Help:", violation.helpUrl);
-        console.log("Affected elements:", violation.nodes.length);
+        console.info("Description:", violation.description);
+        console.info("Help:", violation.helpUrl);
+        console.info("Affected elements:", violation.nodes.length);
         violation.nodes.forEach((node) => {
-          console.log("  -", node.html);
+          console.info("  -", node.html);
         });
         console.groupEnd();
       });
       console.groupEnd();
     } else {
-      console.log("✅ No accessibility violations found!");
+      console.info("✅ No accessibility violations found!");
     }
   } catch (error) {
     console.error("Failed to run accessibility audit:", error);
