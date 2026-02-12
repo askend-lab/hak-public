@@ -1,5 +1,17 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import { callbackHandler, startHandler } from '../src/handler';
+import {
+  callbackHandler,
+  startHandler,
+  STATE_COOKIE_NAME,
+  STATE_TTL_MS,
+  REFRESH_TOKEN_MAX_AGE_S,
+  AUTH_CALLBACK_PATH,
+  DEFAULT_FRONTEND_URL_PROD,
+  DEFAULT_FRONTEND_URL_DEV,
+  TOKEN_COOKIE_OPTIONS,
+  RANDOM_STRING_LENGTH,
+  generateRandomString,
+} from '../src/handler';
 
 // Mock dependencies
 jest.mock('../src/tara-client', () => ({
@@ -200,6 +212,54 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
   });
 });
 
+describe('handler constants', () => {
+  it('STATE_COOKIE_NAME should be tara_auth_state', () => {
+    expect(STATE_COOKIE_NAME).toBe('tara_auth_state');
+  });
+
+  it('STATE_TTL_MS should be 10 minutes', () => {
+    expect(STATE_TTL_MS).toBe(10 * 60 * 1000);
+  });
+
+  it('REFRESH_TOKEN_MAX_AGE_S should be 30 days', () => {
+    expect(REFRESH_TOKEN_MAX_AGE_S).toBe(30 * 24 * 60 * 60);
+  });
+
+  it('AUTH_CALLBACK_PATH should be /auth/callback', () => {
+    expect(AUTH_CALLBACK_PATH).toBe('/auth/callback');
+  });
+
+  it('DEFAULT_FRONTEND_URL_PROD should contain askend-lab', () => {
+    expect(DEFAULT_FRONTEND_URL_PROD).toContain('askend-lab.com');
+  });
+
+  it('DEFAULT_FRONTEND_URL_DEV should contain hak-dev', () => {
+    expect(DEFAULT_FRONTEND_URL_DEV).toContain('hak-dev');
+  });
+
+  it('TOKEN_COOKIE_OPTIONS should contain HttpOnly and Secure', () => {
+    expect(TOKEN_COOKIE_OPTIONS).toContain('HttpOnly');
+    expect(TOKEN_COOKIE_OPTIONS).toContain('Secure');
+  });
+
+  it('RANDOM_STRING_LENGTH should be 32', () => {
+    expect(RANDOM_STRING_LENGTH).toBe(32);
+  });
+});
+
+describe('generateRandomString', () => {
+  it('should generate string of specified length', () => {
+    const result = generateRandomString(16);
+    expect(result).toHaveLength(16);
+  });
+
+  it('should generate different strings each call', () => {
+    const a = generateRandomString(32);
+    const b = generateRandomString(32);
+    expect(a).not.toBe(b);
+  });
+});
+
 describe('startHandler', () => {
   beforeEach(() => {
     process.env.STAGE = 'dev';
@@ -231,7 +291,7 @@ describe('startHandler', () => {
     const result = await startHandler(event);
     expect(result.statusCode).toBe(302);
     expect(result.headers?.Location).toBeDefined();
-    expect(result.headers?.['Set-Cookie']).toContain('tara_auth_state=');
+    expect(result.headers?.['Set-Cookie']).toContain(`${STATE_COOKIE_NAME}=`);
     expect(result.headers?.['Cache-Control']).toBe('no-store');
   });
 
