@@ -7,7 +7,7 @@ Thank you for your interest in contributing to HAK - the Estonian language learn
 ### Prerequisites
 
 - Node.js 20+
-- pnpm 10+
+- pnpm 9+
 - AWS CLI (for deployment)
 
 ### Setup
@@ -21,7 +21,7 @@ cd hak
 pnpm install
 
 # Start the development server
-pnpm dev
+pnpm start
 ```
 
 ## Development Workflow
@@ -62,6 +62,7 @@ packages/
   vabamorf-api/ - Estonian morphological analysis
   merlin-api/   - TTS synthesis with Merlin
   shared/       - Shared utilities and types
+  tara-auth/      - Estonian eID (TARA) authentication
   gherkin-parser/ - Gherkin specification parser
   specifications/ - BDD specifications
 
@@ -72,7 +73,7 @@ docs/           - Documentation
 ## Code Style
 
 - TypeScript strict mode
-- ESLint + Prettier
+- ESLint
 - No `any` types without justification
 - Tests for new functionality
 
