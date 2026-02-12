@@ -72,8 +72,7 @@ packages/merlin-worker/tools/WORLD/test/ctest.c
 packages/merlin-worker/tools/WORLD/test/*.wav
 packages/merlin-worker/tools/WORLD/wav_test/
 
-# Native binaries
-packages/vabamorf-api/vmetajson
+# Native binaries (keep vabamorf-api/vmetajson — needed for Docker build)
 packages/frontend/src/services/vabamorf/vmetajson
 
 # Visual Studio files
