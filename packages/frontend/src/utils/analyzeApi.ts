@@ -9,6 +9,9 @@
  * - usePhoneticPanel.ts (1 call)
  */
 
+export const CONTENT_TYPE_JSON = "application/json";
+export const ANALYZE_API_PATH = "/api/analyze";
+
 export interface AnalyzeResponse {
   stressedText: string;
 }
@@ -20,9 +23,9 @@ export interface AnalyzeResponse {
  */
 export async function analyzeText(text: string): Promise<string | null> {
   try {
-    const response = await fetch("/api/analyze", {
+    const response = await fetch(ANALYZE_API_PATH, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": CONTENT_TYPE_JSON },
       body: JSON.stringify({ text }),
     });
 
@@ -43,9 +46,9 @@ export async function analyzeText(text: string): Promise<string | null> {
  * Use when you need to handle the error explicitly.
  */
 export async function analyzeTextOrThrow(text: string): Promise<string> {
-  const response = await fetch("/api/analyze", {
+  const response = await fetch(ANALYZE_API_PATH, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": CONTENT_TYPE_JSON },
     body: JSON.stringify({ text }),
   });
 

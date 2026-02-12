@@ -9,9 +9,13 @@ vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 
-vi.mock("@/types/synthesis", () => ({
-  getVoiceModel: (): string => "mari",
-}));
+vi.mock("@/types/synthesis", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/types/synthesis")>();
+  return {
+    ...actual,
+    getVoiceModel: (): string => "mari",
+  };
+});
 
 describe("useSynthesisAPI", () => {
   beforeEach(() => {
