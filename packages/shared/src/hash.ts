@@ -14,7 +14,7 @@ interface BrowserSubtleCrypto {
 declare const window: { crypto?: { subtle?: BrowserSubtleCrypto } } | undefined;
 
 const HASH_ALGORITHM = "sha256";
-const BROWSER_HASH_ALGORITHM = `SHA-${HASH_ALGORITHM.slice(3)}`;
+const BROWSER_HASH_ALGORITHM = "SHA-256";
 const CRYPTO_MODULE = "node:crypto";
 const ERROR_EMPTY_TEXT = "Text cannot be empty";
 

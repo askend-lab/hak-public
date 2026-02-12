@@ -14,20 +14,25 @@ const LOG_LEVELS: Record<LogLevel, number> = {
 };
 
 const DEFAULT_LEVEL: LogLevel = "info";
+const LOG_LEVEL_ENV = "LOG_LEVEL";
 
-// Derived from LOG_LEVELS — single source of truth for level names
+// Derived once — avoids repeated Object.keys cast
+const LOG_LEVEL_KEYS = Object.keys(LOG_LEVELS) as LogLevel[];
+
 const LEVEL_TAGS = Object.fromEntries(
-  Object.keys(LOG_LEVELS).map((k) => [k, `[${k.toUpperCase()}]`]),
+  LOG_LEVEL_KEYS.map((k) => [k, `[${k.toUpperCase()}]`]),
 ) as Record<LogLevel, string>;
+
+// Shared no-op — one instance for all filtered-out log methods
+const NO_OP: LogMethod = (): void => {};
 
 function formatMessage(level: LogLevel, message: string): string {
   return `[${new Date().toISOString()}] ${LEVEL_TAGS[level]} ${message}`;
 }
 
-// Pre-evaluates level check at creation — returns no-op for filtered levels
 function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
   if (LOG_LEVELS[level] < LOG_LEVELS[minLevel]) {
-    return (): void => { /* filtered out */ };
+    return NO_OP;
   }
   const consoleFn = console[level].bind(console);
   return (message: string, ...args: unknown[]): void => {
@@ -35,13 +40,9 @@ function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
   };
 }
 
-// Builds logger from LOG_LEVELS keys via Object.fromEntries — type-safe, no cast
 export function createLogger(minLevel: LogLevel = DEFAULT_LEVEL): Logger {
   return Object.fromEntries(
-    (Object.keys(LOG_LEVELS) as LogLevel[]).map((level) => [
-      level,
-      createLogMethod(level, minLevel),
-    ]),
+    LOG_LEVEL_KEYS.map((level) => [level, createLogMethod(level, minLevel)]),
   ) as Logger;
 }
 
@@ -49,12 +50,16 @@ function isValidLogLevel(level: string): level is LogLevel {
   return level in LOG_LEVELS;
 }
 
+function isNodeEnv(): boolean {
+  return typeof process !== "undefined";
+}
+
 function getLogLevel(): LogLevel {
   try {
     /* eslint-disable no-restricted-globals */
-    if (typeof process !== "undefined" && process.env?.LOG_LEVEL) {
-      const envLevel = process.env.LOG_LEVEL;
-      if (isValidLogLevel(envLevel)) {
+    if (isNodeEnv() && process.env?.[LOG_LEVEL_ENV]) {
+      const envLevel = process.env[LOG_LEVEL_ENV];
+      if (envLevel && isValidLogLevel(envLevel)) {
         return envLevel;
       }
     }
