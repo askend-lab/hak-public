@@ -7,9 +7,13 @@ import { useVariantsPanel } from "./useVariantsPanel";
 import { SentenceState } from "@/types/synthesis";
 import { NotificationType } from "@/components/Notification";
 
-vi.mock("@/utils/analyzeApi", () => ({
-  analyzeText: vi.fn().mockResolvedValue("Héllo wórld"),
-}));
+vi.mock("@/utils/analyzeApi", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/utils/analyzeApi")>();
+  return {
+    ...actual,
+    analyzeText: vi.fn().mockResolvedValue("Héllo wórld"),
+  };
+});
 
 const makeSentences = (): SentenceState[] => [
   { id: "1", text: "Hello world", tags: ["Hello", "world"],

@@ -2,8 +2,9 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { getVoiceModel } from "@/types/synthesis";
+import { getVoiceModel, convertTextToTags } from "@/types/synthesis";
 import { synthesizeWithPolling } from "@/utils/synthesize";
+import { CONTENT_TYPE_JSON, ANALYZE_API_PATH } from "@/utils/analyzeApi";
 
 export interface SynthesisResult {
   audioUrl: string;
@@ -25,9 +26,9 @@ export function useSynthesisAPI(): {
 } {
   const analyzeText = useCallback(
     async (text: string): Promise<{ stressedText: string }> => {
-      const response = await fetch("/api/analyze", {
+      const response = await fetch(ANALYZE_API_PATH, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": CONTENT_TYPE_JSON },
         body: JSON.stringify({ text }),
       });
 
@@ -51,10 +52,7 @@ export function useSynthesisAPI(): {
         const { stressedText } = await analyzeText(text);
         actualPhoneticText = stressedText || text;
         if (stressedText) {
-          stressedTags = stressedText
-            .trim()
-            .split(/\s+/)
-            .filter((w: string) => w.length > 0);
+          stressedTags = convertTextToTags(stressedText);
         }
       }
 

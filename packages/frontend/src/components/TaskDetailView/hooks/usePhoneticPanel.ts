@@ -5,6 +5,7 @@ import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { DataService } from "@/services/dataService";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
+import { analyzeText } from "@/utils/analyzeApi";
 
 interface UsePhoneticPanelReturn {
   showPhoneticPanel: boolean;
@@ -34,25 +35,13 @@ export function usePhoneticPanel(
       onMenuClose();
 
       if (!entry.stressedText) {
-        try {
-          const analyzeResponse = await fetch("/api/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: entry.text }),
-          });
-
-          if (analyzeResponse.ok) {
-            const { stressedText } = await analyzeResponse.json();
-            if (stressedText) {
-              setEntries((prev) =>
-                prev.map((e) =>
-                  e.id === entryId ? { ...e, stressedText } : e,
-                ),
-              );
-            }
-          }
-        } catch (error) {
-          console.error("Failed to analyze entry:", error);
+        const stressedText = await analyzeText(entry.text);
+        if (stressedText) {
+          setEntries((prev) =>
+            prev.map((e) =>
+              e.id === entryId ? { ...e, stressedText } : e,
+            ),
+          );
         }
       }
 

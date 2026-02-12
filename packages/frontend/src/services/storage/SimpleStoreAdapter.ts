@@ -3,6 +3,7 @@
 
 import { Task, TaskEntry } from "@/types/task";
 import { AuthStorage } from "../auth/storage";
+import { CONTENT_TYPE_JSON } from "@/utils/analyzeApi";
 
 interface SimpleStoreResponse {
   success: boolean;
@@ -17,7 +18,7 @@ export class SimpleStoreAdapter {
 
   private getAuthHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      "Content-Type": CONTENT_TYPE_JSON,
     };
     // Cognito authorizer requires ID token, not access token
     const token = AuthStorage.getIdToken();

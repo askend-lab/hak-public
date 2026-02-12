@@ -2,9 +2,12 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback } from "react";
-import { SentenceState } from "@/types/synthesis";
+import { SentenceState, convertTextToTags } from "@/types/synthesis";
 import { NotificationType } from "@/components/Notification";
-import { analyzeText } from "@/utils/analyzeApi";
+import { analyzeText, CONTENT_TYPE_JSON } from "@/utils/analyzeApi";
+
+const VARIANTS_API_TIMEOUT_MS = 10000;
+const MIN_SPINNER_DISPLAY_MS = 500;
 
 interface UseVariantsPanelReturn {
   variantsWord: string | null;
@@ -59,10 +62,7 @@ export function useVariantsPanel(
         const fullText = sentence?.tags.join(" ") || "";
         const stressedText = await analyzeText(fullText);
         if (stressedText) {
-          const stressedWords = stressedText
-            .trim()
-            .split(/\s+/)
-            .filter((w: string) => w.length > 0);
+          const stressedWords = convertTextToTags(stressedText);
           setSentences((prev) =>
             prev.map((s) => {
               if (s.id !== sentenceId) return s;
@@ -112,16 +112,16 @@ export function useVariantsPanel(
       setLoadingVariantsTag({ sentenceId, tagIndex });
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const timeoutId = setTimeout(() => controller.abort(), VARIANTS_API_TIMEOUT_MS);
 
       // Minimum spinner display time for better UX
-      const minDisplayTime = new Promise((resolve) => setTimeout(resolve, 500));
+      const minDisplayTime = new Promise((resolve) => setTimeout(resolve, MIN_SPINNER_DISPLAY_MS));
 
       try {
         const [response] = await Promise.all([
           fetch("/api/variants", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": CONTENT_TYPE_JSON },
             body: JSON.stringify({ word }),
             signal: controller.signal,
           }),
