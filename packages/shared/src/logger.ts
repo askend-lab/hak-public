@@ -3,7 +3,6 @@
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
-// #4 Logger as mapped type — derived from LogLevel, no manual listing
 type LogMethod = (message: string, ...args: unknown[]) => void;
 export type Logger = Record<LogLevel, LogMethod>;
 
@@ -14,19 +13,18 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   error: 3,
 };
 
-// #6 Pre-computed level tags — avoids toUpperCase() on every log call
-const LEVEL_TAGS: Record<LogLevel, string> = {
-  debug: "[DEBUG]",
-  info: "[INFO]",
-  warn: "[WARN]",
-  error: "[ERROR]",
-};
+const DEFAULT_LEVEL: LogLevel = "info";
+
+// Derived from LOG_LEVELS — single source of truth for level names
+const LEVEL_TAGS = Object.fromEntries(
+  Object.keys(LOG_LEVELS).map((k) => [k, `[${k.toUpperCase()}]`]),
+) as Record<LogLevel, string>;
 
 function formatMessage(level: LogLevel, message: string): string {
   return `[${new Date().toISOString()}] ${LEVEL_TAGS[level]} ${message}`;
 }
 
-// #7 + #8 Pre-evaluate level at creation — returns no-op if filtered
+// Pre-evaluates level check at creation — returns no-op for filtered levels
 function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
   if (LOG_LEVELS[level] < LOG_LEVELS[minLevel]) {
     return (): void => { /* filtered out */ };
@@ -37,37 +35,34 @@ function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
   };
 }
 
-// #9 Generate all methods from LOG_LEVELS keys
-const ALL_LEVELS = Object.keys(LOG_LEVELS) as LogLevel[];
-
-export function createLogger(minLevel: LogLevel = "info"): Logger {
-  const logger = {} as Logger;
-  for (const level of ALL_LEVELS) {
-    logger[level] = createLogMethod(level, minLevel);
-  }
-  return logger;
+// Builds logger from LOG_LEVELS keys via Object.fromEntries — type-safe, no cast
+export function createLogger(minLevel: LogLevel = DEFAULT_LEVEL): Logger {
+  return Object.fromEntries(
+    (Object.keys(LOG_LEVELS) as LogLevel[]).map((level) => [
+      level,
+      createLogMethod(level, minLevel),
+    ]),
+  ) as Logger;
 }
 
-// #4 + #5 Derived from LOG_LEVELS — no separate array, uses `in` operator
 function isValidLogLevel(level: string): level is LogLevel {
   return level in LOG_LEVELS;
 }
 
-// #6 Consistent function declaration style
 function getLogLevel(): LogLevel {
   try {
-    // eslint-disable-next-line no-restricted-globals
+    /* eslint-disable no-restricted-globals */
     if (typeof process !== "undefined" && process.env?.LOG_LEVEL) {
-      // eslint-disable-next-line no-restricted-globals
       const envLevel = process.env.LOG_LEVEL;
       if (isValidLogLevel(envLevel)) {
         return envLevel;
       }
     }
+    /* eslint-enable no-restricted-globals */
   } catch {
     // Ignore errors in environment detection
   }
-  return "info";
+  return DEFAULT_LEVEL;
 }
 
 export const logger = createLogger(getLogLevel());
