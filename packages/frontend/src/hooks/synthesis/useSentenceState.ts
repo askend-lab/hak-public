@@ -223,7 +223,7 @@ export function useSentenceState(): {
   const handleAddSentence = useCallback(() => {
     setSentences((prev) => [
       ...prev,
-      createEmptySentence(Date.now().toString()),
+      createEmptySentence(crypto.randomUUID()),
     ]);
   }, []);
 

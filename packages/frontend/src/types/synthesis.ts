@@ -48,3 +48,12 @@ export function filterNonEmptySentences<T extends { text: string }>(
 ): T[] {
   return sentences.filter((s) => s.text.trim());
 }
+
+/**
+ * Standard updates to invalidate cached synthesis results.
+ * Used when text/tags change and audio needs re-synthesis.
+ */
+export const CACHE_INVALIDATION: Pick<SentenceState, "phoneticText" | "audioUrl"> = {
+  phoneticText: undefined,
+  audioUrl: undefined,
+};
