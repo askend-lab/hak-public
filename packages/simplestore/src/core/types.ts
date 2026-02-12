@@ -5,6 +5,14 @@
  * Core types for SimpleStore - no external dependencies
  */
 
+/** Single source of truth for valid data types */
+export const VALID_DATA_TYPES = [
+  "private",
+  "unlisted",
+  "public",
+  "shared",
+] as const;
+
 /**
  * Data access type determining visibility and access rules
  * - private: only owner sees and modifies
@@ -12,7 +20,7 @@
  * - public: everyone sees/searches, owner modifies
  * - shared: everyone sees, everyone can modify
  */
-export type DataType = "private" | "unlisted" | "public" | "shared";
+export type DataType = (typeof VALID_DATA_TYPES)[number];
 
 /**
  * Server-side context extracted from authentication and configuration
@@ -66,14 +74,6 @@ export interface StoreConfig {
   readonly maxTtlSeconds: number;
   readonly keyDelimiter: string;
 }
-
-/** Single source of truth for valid data types */
-export const VALID_DATA_TYPES: readonly DataType[] = [
-  "private",
-  "unlisted",
-  "public",
-  "shared",
-] as const;
 
 /** Shared default configuration — used by store and validation */
 export const DEFAULT_CONFIG: StoreConfig = {

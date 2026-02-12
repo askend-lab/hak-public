@@ -52,6 +52,3 @@ export {
   HTTP_STATUS,
   HTTP_ERRORS,
 } from "./lambda";
-
-// Legacy exports for backward compatibility (deprecated)
-export { Store as default } from "./core";

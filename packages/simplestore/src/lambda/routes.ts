@@ -32,6 +32,12 @@ export const HTTP_ERRORS = {
   NOT_FOUND: "Not found",
   INTERNAL: "Internal server error",
   INVALID_JSON: "Invalid JSON body",
+  PRIVATE_NOT_ALLOWED: "private type not allowed on /get-public endpoint",
+} as const;
+
+const RESPONSE_HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
 } as const;
 
 const ERROR_STATUS_MAP: Record<string, number> = {
@@ -45,10 +51,7 @@ export function createResponse(
 ): APIGatewayProxyResult {
   return {
     statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    },
+    headers: RESPONSE_HEADERS,
     body: JSON.stringify(body),
   };
 }
@@ -200,10 +203,9 @@ export async function handleGetPublic(
 ): Promise<APIGatewayProxyResult> {
   const { type } = getQueryParams(event);
 
-  // Reject private type - this endpoint is only for public-readable data
   if (type === "private") {
     return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      error: "private type not allowed on /get-public endpoint",
+      error: HTTP_ERRORS.PRIVATE_NOT_ALLOWED,
     });
   }
 

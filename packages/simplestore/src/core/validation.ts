@@ -16,6 +16,7 @@ export interface ValidationResult {
 }
 
 const MAX_KEY_LENGTH = 1024;
+const VALID_TYPES_MESSAGE = `type must be one of: ${VALID_DATA_TYPES.join(", ")}`;
 
 /**
  * Creates a validation result
@@ -47,7 +48,7 @@ function validateRequiredString(
  */
 function validateType(type: unknown, errors: string[]): void {
   if (!VALID_DATA_TYPES.includes(type as DataType)) {
-    errors.push(`type must be one of: ${VALID_DATA_TYPES.join(", ")}`);
+    errors.push(VALID_TYPES_MESSAGE);
   }
 }
 
@@ -78,7 +79,7 @@ export function parseTtl(
   if (ttl > config.maxTtlSeconds) {
     return {
       valid: false,
-      error: `TTL exceeds maximum of ${String(config.maxTtlSeconds)} seconds (1 year)`,
+      error: `TTL exceeds maximum of ${config.maxTtlSeconds} seconds (1 year)`,
     };
   }
 
@@ -140,7 +141,7 @@ export function validateQueryRequest(
 ): ValidationResult {
   const errors: string[] = [];
 
-  if (pkPrefix === undefined || pkPrefix === null) {
+  if (pkPrefix == null) {
     errors.push("prefix is required");
   } else if (typeof pkPrefix !== "string") {
     errors.push("prefix must be a string");
@@ -172,4 +173,3 @@ export function validateServerContext(
 export function isValidType(type: unknown): type is DataType {
   return VALID_DATA_TYPES.includes(type as DataType);
 }
-

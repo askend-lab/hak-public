@@ -155,7 +155,6 @@ export class Store {
     });
   }
 
-  // Eliminates repeated buildKeys(this.context, ..., this.config.keyDelimiter)
   private resolveKeys(
     type: DataType,
     entityPk: string,
@@ -164,7 +163,6 @@ export class Store {
     return buildKeys(this.context, type, entityPk, entitySk, this.config.keyDelimiter);
   }
 
-  // Eliminates repeated try/catch + failure(String(error)) pattern
   private async wrapAsync(
     fn: () => Promise<StoreResult>,
   ): Promise<StoreResult> {
