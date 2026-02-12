@@ -9,6 +9,7 @@ import {
   handleVerifyAuthChallengeResponse,
   handler,
 } from '../src/cognito-triggers';
+import { CUSTOM_CHALLENGE, TARA_AUTH_METADATA, TARA_VERIFIED } from '../src/types';
 
 describe('Cognito Custom Auth Triggers', () => {
   describe('DefineAuthChallenge', () => {
@@ -39,7 +40,7 @@ describe('Cognito Custom Auth Triggers', () => {
 
       const result = await handleDefineAuthChallenge(event);
 
-      expect(result.response.challengeName).toBe('CUSTOM_CHALLENGE');
+      expect(result.response.challengeName).toBe(CUSTOM_CHALLENGE);
       expect(result.response.issueTokens).toBe(false);
       expect(result.response.failAuthentication).toBe(false);
     });
@@ -62,7 +63,7 @@ describe('Cognito Custom Auth Triggers', () => {
           },
           session: [
             {
-              challengeName: 'CUSTOM_CHALLENGE',
+              challengeName: CUSTOM_CHALLENGE,
               challengeResult: true,
               challengeMetadata: undefined,
             },
@@ -99,7 +100,7 @@ describe('Cognito Custom Auth Triggers', () => {
           },
           session: [
             {
-              challengeName: 'CUSTOM_CHALLENGE',
+              challengeName: CUSTOM_CHALLENGE,
               challengeResult: false,
               challengeMetadata: undefined,
             },
@@ -136,7 +137,7 @@ describe('Cognito Custom Auth Triggers', () => {
             sub: 'test-sub',
             email: 'test@example.com',
           },
-          challengeName: 'CUSTOM_CHALLENGE',
+          challengeName: CUSTOM_CHALLENGE,
           session: [],
         },
         response: {
@@ -149,7 +150,7 @@ describe('Cognito Custom Auth Triggers', () => {
       const result = await handleCreateAuthChallenge(event);
 
       expect(result.response.publicChallengeParameters).toBeDefined();
-      expect(result.response.challengeMetadata).toBe('TARA_AUTH');
+      expect(result.response.challengeMetadata).toBe(TARA_AUTH_METADATA);
     });
   });
 
@@ -171,7 +172,7 @@ describe('Cognito Custom Auth Triggers', () => {
             email: 'test@example.com',
           },
           privateChallengeParameters: {},
-          challengeAnswer: 'TARA_VERIFIED',
+          challengeAnswer: TARA_VERIFIED,
         },
         response: {
           answerCorrect: false,
@@ -231,19 +232,19 @@ describe('Cognito Custom Auth Triggers', () => {
       } as DefineAuthChallengeTriggerEvent;
 
       const result = await handler(event);
-      expect(result.response).toHaveProperty('challengeName', 'CUSTOM_CHALLENGE');
+      expect(result.response).toHaveProperty('challengeName', CUSTOM_CHALLENGE);
     });
 
     it('should route CreateAuthChallenge_Authentication', async () => {
       const event = {
         ...baseEvent,
         triggerSource: 'CreateAuthChallenge_Authentication' as const,
-        request: { userAttributes: { sub: 's', email: 'e' }, challengeName: 'CUSTOM_CHALLENGE', session: [] },
+        request: { userAttributes: { sub: 's', email: 'e' }, challengeName: CUSTOM_CHALLENGE, session: [] },
         response: { publicChallengeParameters: {}, privateChallengeParameters: {}, challengeMetadata: '' },
       } as CreateAuthChallengeTriggerEvent;
 
       const result = await handler(event);
-      expect(result.response).toHaveProperty('challengeMetadata', 'TARA_AUTH');
+      expect(result.response).toHaveProperty('challengeMetadata', TARA_AUTH_METADATA);
     });
 
     it('should route VerifyAuthChallengeResponse_Authentication', async () => {

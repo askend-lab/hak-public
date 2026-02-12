@@ -11,7 +11,7 @@ jest.mock('../src/cognito-client', () => ({
 }));
 
 // Import handlers after mocks are set up
-import { callbackHandler, startHandler } from '../src/handler';
+import { callbackHandler, startHandler, STATE_COOKIE_NAME, AUTH_CALLBACK_PATH } from '../src/handler';
 import { createTaraClient } from '../src/tara-client';
 import { createCognitoClient } from '../src/cognito-client';
 
@@ -56,7 +56,7 @@ describe('TARA Custom Auth Integration Tests', () => {
     httpMethod: 'GET',
     path: '/auth/tara/callback',
     queryStringParameters: { code, state },
-    headers: { Cookie: `tara_auth_state=${stateCookie}` },
+    headers: { Cookie: `${STATE_COOKIE_NAME}=${stateCookie}` },
     body: null,
     isBase64Encoded: false,
     pathParameters: null,
@@ -127,7 +127,7 @@ describe('TARA Custom Auth Integration Tests', () => {
 
       // State cookie is set in headers, not multiValueHeaders
       expect(result.headers?.['Set-Cookie']).toBeDefined();
-      expect(result.headers?.['Set-Cookie']).toContain('tara_auth_state=');
+      expect(result.headers?.['Set-Cookie']).toContain(`${STATE_COOKIE_NAME}=`);
       expect(result.headers?.['Set-Cookie']).toContain('HttpOnly');
       expect(result.headers?.['Set-Cookie']).toContain('Secure');
     });
@@ -167,7 +167,7 @@ describe('TARA Custom Auth Integration Tests', () => {
       const result = await callbackHandler(event);
 
       expect(result.statusCode).toBe(302);
-      expect(result.headers?.Location).toBe(`${FRONTEND_URL}/auth/callback`);
+      expect(result.headers?.Location).toBe(`${FRONTEND_URL}${AUTH_CALLBACK_PATH}`);
     });
 
     it('should set HttpOnly cookies for tokens', async () => {
