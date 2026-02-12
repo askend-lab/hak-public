@@ -12,9 +12,12 @@ interface SimpleStoreResponse {
   error?: string;
 }
 
+const SIMPLE_STORE_BASE_URL = "/api";
+const SIMPLE_STORE_TTL_SECONDS = 31536000; // 1 year in seconds
+
 export class SimpleStoreAdapter {
-  private readonly baseUrl = "/api";
-  private readonly ttl = 31536000; // 1 year in seconds
+  private readonly baseUrl = SIMPLE_STORE_BASE_URL;
+  private readonly ttl = SIMPLE_STORE_TTL_SECONDS;
 
   private getAuthHeaders(): Record<string, string> {
     const headers: Record<string, string> = {

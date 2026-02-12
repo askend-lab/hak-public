@@ -9,6 +9,7 @@ export const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
 export const TARA_LOGIN_URL = "https://hak-api-dev.askend-lab.com/auth/tara/start";
 export const PKCE_STORAGE_KEY = "pkce_code_verifier";
 export const OAUTH2_TOKEN_PATH = "/oauth2/token";
+export const AUTH_CALLBACK_PATH = "/auth/callback";
 
 export function getHostname(): string {
   return typeof window !== "undefined"
@@ -24,7 +25,7 @@ export function getBaseUrl(hostname: string = getHostname()): string {
 }
 
 export function getRedirectUri(hostname: string = getHostname()): string {
-  return `${getBaseUrl(hostname)}/auth/callback`;
+  return `${getBaseUrl(hostname)}${AUTH_CALLBACK_PATH}`;
 }
 
 export function getLogoutUri(hostname: string = getHostname()): string {

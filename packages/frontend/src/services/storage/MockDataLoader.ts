@@ -3,15 +3,9 @@
 
 import { Task, TaskEntry } from "@/types/task";
 import mockTasksData from "../../../public/data/mock-tasks.json";
+import { generateShareToken } from "./shareTokenUtils";
 
 export class MockDataLoader {
-  private generateShareToken(): string {
-    return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("")
-      .substring(0, 16);
-  }
-
   private normalizeTaskEntry(
     entry: TaskEntry,
     taskId: string,
@@ -38,7 +32,7 @@ export class MockDataLoader {
         return {
           ...taskData,
           shareToken:
-            (taskData.shareToken as string) || this.generateShareToken(),
+            (taskData.shareToken as string) || generateShareToken(),
           speechSequences:
             (taskData.speechSequences as string[]) ||
             entries.map((e: TaskEntry) => e.text) ||

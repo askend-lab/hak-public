@@ -5,6 +5,7 @@ import { Task } from "@/types/task";
 import { logger } from "@hak/shared";
 import { SimpleStoreAdapter } from "./SimpleStoreAdapter";
 import { MockDataLoader } from "./MockDataLoader";
+import { generateShareToken } from "./shareTokenUtils";
 
 export class ShareService {
   constructor(
@@ -13,10 +14,7 @@ export class ShareService {
   ) {}
 
   generateShareToken(): string {
-    return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("")
-      .substring(0, 16);
+    return generateShareToken();
   }
 
   async getSharedTask(taskId: string): Promise<Task | null> {
