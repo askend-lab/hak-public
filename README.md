@@ -25,7 +25,7 @@ pnpm start         # Start dev server (http://localhost:5180)
 
 | Package | Description |
 |---------|-------------|
-| `packages/frontend` | React SPA — Vite, TailwindCSS, React Router |
+| `packages/frontend` | React SPA — Vite, SCSS/BEM, React Router |
 | `packages/simplestore` | REST API — Lambda + DynamoDB |
 | `packages/audio-api` | Audio processing — Lambda + S3 |
 | `packages/merlin-api` | Estonian TTS gateway — Lambda |
@@ -33,6 +33,7 @@ pnpm start         # Start dev server (http://localhost:5180)
 | `packages/vabamorf-api` | Morphological analysis — Lambda + native binary |
 | `packages/shared` | Shared types and utilities |
 | `packages/specifications` | Gherkin specs (BDD) |
+| `packages/tara-auth` | Estonian eID (TARA) authentication |
 | `packages/gherkin-parser` | Gherkin → test mapping |
 
 ## Development
@@ -75,7 +76,7 @@ Serverless on AWS, managed with Terraform.
 - **Audio** — S3 + Lambda processing
 - **TTS** — ECS/Docker (Merlin synthesis engine)
 
-See [`docs/`](docs/) for detailed documentation.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture and [`docs/`](docs/) for more documentation.
 
 ## Contributing
 

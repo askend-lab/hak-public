@@ -22,9 +22,7 @@ export default [
 
   {
     ignores: [
-      "tmp/**",
       "packages/vendor/**",
-      ".design/**",
       "**/.esbuild/**",
       "**/dist/**",
       "**/.old-frontend/**",

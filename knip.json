@@ -1,8 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "ignore": [
-    ".design/**",
-    "tmp/**",
     "infra/**",
     "**/.stryker-tmp/**",
     "packages/vabamorf-api/src/local-server.ts",
