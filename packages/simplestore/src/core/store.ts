@@ -86,27 +86,17 @@ export class Store {
   async save(request: StoreRequest): Promise<StoreResult> {
     const ttlResult = parseTtl(request.ttl, this.config);
     if (!ttlResult.valid) {
-      return this.failure(ttlResult.error);
+      return { success: false, error: ttlResult.error };
     }
 
-    const keys = buildKeys(
-      this.context,
-      request.type,
-      request.pk,
-      request.sk,
-      this.config.keyDelimiter,
-    );
+    const keys = this.resolveKeys(request.type, request.pk, request.sk);
 
-    try {
-      // Check if item exists to preserve createdAt
+    return this.wrapAsync(async () => {
       const existing = await this.adapter.get(keys.pk, keys.sk);
       const item = this.createItem(keys, request, existing?.createdAt);
-
       await this.adapter.put(item);
-      return this.success(item);
-    } catch (error) {
-      return this.failure(String(error));
-    }
+      return { success: true, item };
+    });
   }
 
   /**
@@ -117,20 +107,14 @@ export class Store {
     entitySk: string,
     type: DataType,
   ): Promise<StoreResult> {
-    const keys = buildKeys(
-      this.context,
-      type,
-      entityPk,
-      entitySk,
-      this.config.keyDelimiter,
-    );
+    const keys = this.resolveKeys(type, entityPk, entitySk);
 
-    try {
+    return this.wrapAsync(async () => {
       const item = await this.adapter.get(keys.pk, keys.sk);
-      return item ? this.success(item) : this.failure(ERRORS.NOT_FOUND);
-    } catch (error) {
-      return this.failure(String(error));
-    }
+      return item
+        ? { success: true, item }
+        : { success: false, error: ERRORS.NOT_FOUND };
+    });
   }
 
   /**
@@ -141,30 +125,22 @@ export class Store {
     entitySk: string,
     type: DataType,
   ): Promise<StoreResult> {
-    const keys = buildKeys(
-      this.context,
-      type,
-      entityPk,
-      entitySk,
-      this.config.keyDelimiter,
-    );
+    const keys = this.resolveKeys(type, entityPk, entitySk);
 
-    try {
+    return this.wrapAsync(async () => {
       const existing = await this.adapter.get(keys.pk, keys.sk);
 
       if (!existing) {
-        return this.failure(ERRORS.NOT_FOUND);
+        return { success: false, error: ERRORS.NOT_FOUND };
       }
 
       if (type !== "shared" && !this.isOwner(existing)) {
-        return this.failure(ERRORS.ACCESS_DENIED);
+        return { success: false, error: ERRORS.ACCESS_DENIED };
       }
 
       await this.adapter.delete(keys.pk, keys.sk);
-      return this.successEmpty();
-    } catch (error) {
-      return this.failure(String(error));
-    }
+      return { success: true };
+    });
   }
 
   /**
@@ -173,11 +149,29 @@ export class Store {
   async query(entityPkPrefix: string, type: DataType): Promise<StoreResult> {
     const pk = buildPartitionKey(this.context, type, this.config.keyDelimiter);
 
-    try {
+    return this.wrapAsync(async () => {
       const items = await this.adapter.queryBySortKeyPrefix(pk, entityPkPrefix);
-      return this.successItems(items);
+      return { success: true, items };
+    });
+  }
+
+  // Eliminates repeated buildKeys(this.context, ..., this.config.keyDelimiter)
+  private resolveKeys(
+    type: DataType,
+    entityPk: string,
+    entitySk: string,
+  ): { pk: string; sk: string } {
+    return buildKeys(this.context, type, entityPk, entitySk, this.config.keyDelimiter);
+  }
+
+  // Eliminates repeated try/catch + failure(String(error)) pattern
+  private async wrapAsync(
+    fn: () => Promise<StoreResult>,
+  ): Promise<StoreResult> {
+    try {
+      return await fn();
     } catch (error) {
-      return this.failure(String(error));
+      return { success: false, error: String(error) };
     }
   }
 
@@ -205,22 +199,6 @@ export class Store {
 
   private isOwner(item: StoreItem): boolean {
     return item.owner === this.context.userId;
-  }
-
-  private success(item: StoreItem): StoreResult {
-    return { success: true, item };
-  }
-
-  private successItems(items: StoreItem[]): StoreResult {
-    return { success: true, items };
-  }
-
-  private successEmpty(): StoreResult {
-    return { success: true };
-  }
-
-  private failure(error: string): StoreResult {
-    return { success: false, error };
   }
 }
 

@@ -63,12 +63,10 @@ function createErrorResponse(
   return createResponse(status, { error });
 }
 
-// #5 Extracted query param helper — eliminates 4x `?? {}` pattern
 function getQueryParams(event: APIGatewayProxyEvent): Record<string, string> {
   return (event.queryStringParameters ?? {}) as Record<string, string>;
 }
 
-// #3 Extracted validation gate — eliminates repeated validate+error pattern
 function validateOrError(
   validation: ValidationResult,
 ): APIGatewayProxyResult | null {
@@ -123,7 +121,6 @@ export async function handleSave(
     : createErrorResponse(result.error, HTTP_STATUS.BAD_REQUEST);
 }
 
-// #2 Extracted common get logic — shared by handleGet and handleGetPublic
 async function executeGet(
   event: APIGatewayProxyEvent,
   store: Store,

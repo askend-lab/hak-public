@@ -30,17 +30,18 @@ export function setAdapter(adapter: StorageAdapter | null): void {
   sharedAdapter = adapter;
 }
 
+function isOfflineMode(): boolean {
+  return process.env.IS_OFFLINE === "true";
+}
+
 /** Get or create adapter */
 function getAdapter(): StorageAdapter {
   if (!sharedAdapter) {
     const tableName = process.env.TABLE_NAME;
-    const isOffline = process.env.IS_OFFLINE === "true";
 
-    if (tableName && !isOffline) {
-      // Production: use DynamoDB
+    if (tableName && !isOfflineMode()) {
       sharedAdapter = new DynamoDBAdapter(tableName);
     } else {
-      // Local/test: use in-memory
       sharedAdapter = new InMemoryAdapter();
     }
   }
@@ -54,10 +55,10 @@ function getUserId(event: APIGatewayProxyEvent): string | null {
   const cognitoId = event.requestContext.authorizer?.claims?.sub as
     | string
     | undefined;
-  if (cognitoId !== undefined && cognitoId !== "") return cognitoId;
+  if (cognitoId) return cognitoId;
 
   // In offline/test mode, allow X-User-Id header for testing
-  if (process.env.IS_OFFLINE === "true") {
+  if (isOfflineMode()) {
     const localUserId =
       event.headers["X-User-Id"] ?? event.headers["x-user-id"];
     if (localUserId) return localUserId;
@@ -89,16 +90,9 @@ function createStore(userId: string): Store {
   return new Store(getAdapter(), createContext(userId));
 }
 
-interface Route {
-  method: string;
-  path: string;
-  handler: (
-    event: APIGatewayProxyEvent,
-    store: Store,
-  ) => Promise<APIGatewayProxyResult>;
-}
+type RouteHandler = (event: APIGatewayProxyEvent, store: Store) => Promise<APIGatewayProxyResult>;
 
-const routes: Route[] = [
+const routes: { method: string; path: string; handler: RouteHandler }[] = [
   { method: "POST", path: "/save", handler: handleSave },
   { method: "GET", path: "/get", handler: handleGet },
   { method: "GET", path: "/get-shared", handler: handleGet },
@@ -107,7 +101,6 @@ const routes: Route[] = [
   { method: "GET", path: "/query", handler: handleQuery },
 ];
 
-// #6 Set for O(1) lookup instead of triple OR
 const PUBLIC_READABLE_TYPES = new Set(["shared", "unlisted", "public"]);
 
 /**

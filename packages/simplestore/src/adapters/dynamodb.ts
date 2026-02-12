@@ -30,15 +30,16 @@ export class DynamoDBAdapter implements StorageAdapter {
     this.tableName = tableName;
   }
 
+  private dynamoKey(pk: string, sk: string): Record<string, string> {
+    return { PK: pk, SK: sk };
+  }
+
   /**
    * Stores an item in DynamoDB
    */
   async put(item: StoreItem): Promise<void> {
     await this.docClient.send(
-      new PutCommand({
-        TableName: this.tableName,
-        Item: item,
-      }),
+      new PutCommand({ TableName: this.tableName, Item: item }),
     );
   }
 
@@ -47,10 +48,7 @@ export class DynamoDBAdapter implements StorageAdapter {
    */
   async get(pk: string, sk: string): Promise<StoreItem | null> {
     const result = await this.docClient.send(
-      new GetCommand({
-        TableName: this.tableName,
-        Key: { PK: pk, SK: sk },
-      }),
+      new GetCommand({ TableName: this.tableName, Key: this.dynamoKey(pk, sk) }),
     );
 
     return (result.Item as StoreItem) ?? null;
@@ -61,10 +59,7 @@ export class DynamoDBAdapter implements StorageAdapter {
    */
   async delete(pk: string, sk: string): Promise<void> {
     await this.docClient.send(
-      new DeleteCommand({
-        TableName: this.tableName,
-        Key: { PK: pk, SK: sk },
-      }),
+      new DeleteCommand({ TableName: this.tableName, Key: this.dynamoKey(pk, sk) }),
     );
   }
 

@@ -9,11 +9,11 @@ import {
   validateServerContext,
   parseTtl,
   isValidType,
-  getValidTypes,
 } from "../src/core/validation";
+import { VALID_DATA_TYPES } from "../src/core/types";
 
 describe("validation — property-based tests", () => {
-  const validTypes = getValidTypes();
+  const validTypes = VALID_DATA_TYPES;
 
   const validTypeArb = fc.constantFrom(...validTypes);
 

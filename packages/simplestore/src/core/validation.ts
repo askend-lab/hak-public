@@ -173,9 +173,3 @@ export function isValidType(type: unknown): type is DataType {
   return VALID_DATA_TYPES.includes(type as DataType);
 }
 
-/**
- * Get valid types list
- */
-export function getValidTypes(): readonly DataType[] {
-  return VALID_DATA_TYPES;
-}

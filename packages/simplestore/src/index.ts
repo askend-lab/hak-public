@@ -23,7 +23,6 @@ export {
   validateServerContext,
   parseTtl,
   isValidType,
-  getValidTypes,
 } from "./core";
 
 export type {
