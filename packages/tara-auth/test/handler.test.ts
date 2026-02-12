@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import { callbackHandler } from '../src/handler';
+import { callbackHandler, startHandler } from '../src/handler';
 
 // Mock dependencies
 jest.mock('../src/tara-client', () => ({
@@ -134,5 +134,128 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
     expect(authCookie).toContain('is_authenticated=true');
     // This cookie should NOT be HttpOnly so JS can read it
     expect(authCookie).not.toContain('HttpOnly');
+  });
+
+  it('should redirect with error when TARA returns error param', async () => {
+    const event = createEvent({
+      queryStringParameters: { error: 'access_denied', error_description: 'User cancelled' },
+      headers: { Cookie: `tara_auth_state=${encodedState}` },
+    });
+    const result = await callbackHandler(event);
+    expect(result.statusCode).toBe(302);
+    expect(result.headers?.Location).toContain('error=User+cancelled');
+  });
+
+  it('should redirect with error when code is missing', async () => {
+    const event = createEvent({
+      queryStringParameters: { state: 'test-state' },
+      headers: { Cookie: `tara_auth_state=${encodedState}` },
+    });
+    const result = await callbackHandler(event);
+    expect(result.statusCode).toBe(302);
+    expect(result.headers?.Location).toContain('error=Missing+code+or+state');
+  });
+
+  it('should redirect with error when no cookie/session', async () => {
+    const event = createEvent({
+      headers: {},
+    });
+    const result = await callbackHandler(event);
+    expect(result.statusCode).toBe(302);
+    expect(result.headers?.Location).toContain('error=Invalid+session');
+  });
+
+  it('should redirect with error on state mismatch', async () => {
+    const event = createEvent({
+      queryStringParameters: { code: 'test-code', state: 'wrong-state' },
+    });
+    const result = await callbackHandler(event);
+    expect(result.statusCode).toBe(302);
+    expect(result.headers?.Location).toContain('error=State+mismatch');
+  });
+
+  it('should redirect with error on expired session', async () => {
+    const expiredState = {
+      state: 'test-state',
+      nonce: 'test-nonce',
+      redirectUri: 'https://hak-dev.askend-lab.com',
+      createdAt: Date.now() - 15 * 60 * 1000, // 15 min ago
+    };
+    const expiredEncoded = Buffer.from(JSON.stringify(expiredState)).toString('base64url');
+    const event = createEvent({
+      headers: { Cookie: `tara_auth_state=${expiredEncoded}` },
+    });
+    const result = await callbackHandler(event);
+    expect(result.statusCode).toBe(302);
+    expect(result.headers?.Location).toContain('error=Session+expired');
+  });
+
+  it('should handle malformed state cookie gracefully', async () => {
+    const event = createEvent({
+      headers: { Cookie: 'tara_auth_state=not-valid-base64!!!' },
+    });
+    const result = await callbackHandler(event);
+    expect(result.statusCode).toBe(302);
+    expect(result.headers?.Location).toContain('error=');
+  });
+});
+
+describe('startHandler', () => {
+  beforeEach(() => {
+    process.env.STAGE = 'dev';
+  });
+
+  it('should redirect to TARA with state cookie', async () => {
+    const { createTaraClient } = require('../src/tara-client');
+    createTaraClient.mockResolvedValueOnce({
+      buildAuthorizationUrl: jest.fn().mockReturnValue('https://tara-test.ria.ee/authorize?state=x'),
+      exchangeCodeForTokens: jest.fn(),
+      verifyIdToken: jest.fn(),
+    });
+
+    const event = {
+      httpMethod: 'GET',
+      path: '/auth/tara/start',
+      queryStringParameters: null,
+      headers: {},
+      body: null,
+      isBase64Encoded: false,
+      pathParameters: null,
+      stageVariables: null,
+      requestContext: {} as unknown as APIGatewayProxyEvent['requestContext'],
+      resource: '',
+      multiValueHeaders: {},
+      multiValueQueryStringParameters: null,
+    } as APIGatewayProxyEvent;
+
+    const result = await startHandler(event);
+    expect(result.statusCode).toBe(302);
+    expect(result.headers?.Location).toBeDefined();
+    expect(result.headers?.['Set-Cookie']).toContain('tara_auth_state=');
+    expect(result.headers?.['Cache-Control']).toBe('no-store');
+  });
+
+  it('should return 500 when createTaraClient fails', async () => {
+    const { createTaraClient } = require('../src/tara-client');
+    createTaraClient.mockRejectedValueOnce(new Error('TARA config error'));
+
+    const event = {
+      httpMethod: 'GET',
+      path: '/auth/tara/start',
+      queryStringParameters: null,
+      headers: {},
+      body: null,
+      isBase64Encoded: false,
+      pathParameters: null,
+      stageVariables: null,
+      requestContext: {} as unknown as APIGatewayProxyEvent['requestContext'],
+      resource: '',
+      multiValueHeaders: {},
+      multiValueQueryStringParameters: null,
+    } as APIGatewayProxyEvent;
+
+    const result = await startHandler(event);
+    expect(result.statusCode).toBe(500);
+    expect(JSON.parse(result.body).error).toBe('Failed to start TARA authentication');
   });
 });

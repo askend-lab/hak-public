@@ -182,9 +182,12 @@ describe("synthesize", () => {
       }
 
       const promise = synthesizeWithPolling("test", "efm_l");
+      // Prevent unhandled rejection warning during timer advancement
+      const safePromise = promise.catch(() => {});
       for (let i = 0; i < 30; i++) {
         await vi.advanceTimersByTimeAsync(1000);
       }
+      await safePromise;
 
       await expect(promise).rejects.toThrow("Synthesis timed out");
       vi.useRealTimers();
