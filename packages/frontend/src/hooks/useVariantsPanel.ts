@@ -4,7 +4,7 @@
 import { useState, useCallback } from "react";
 import { SentenceState, convertTextToTags } from "@/types/synthesis";
 import { NotificationType } from "@/components/Notification";
-import { analyzeText, CONTENT_TYPE_JSON } from "@/utils/analyzeApi";
+import { analyzeText, CONTENT_TYPE_JSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
 
 const VARIANTS_API_TIMEOUT_MS = 10000;
 const MIN_SPINNER_DISPLAY_MS = 500;
@@ -119,7 +119,7 @@ export function useVariantsPanel(
 
       try {
         const [response] = await Promise.all([
-          fetch("/api/variants", {
+          fetch(VARIANTS_API_PATH, {
             method: "POST",
             headers: { "Content-Type": CONTENT_TYPE_JSON },
             body: JSON.stringify({ word }),

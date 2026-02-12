@@ -90,7 +90,7 @@ export class DataService {
     }
 
     const newEntry: TaskEntry = {
-      id: `entry_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      id: `entry_${crypto.randomUUID()}`,
       taskId,
       ...entryData,
       createdAt: new Date(),

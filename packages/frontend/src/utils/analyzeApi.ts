@@ -11,6 +11,7 @@
 
 export const CONTENT_TYPE_JSON = "application/json";
 export const ANALYZE_API_PATH = "/api/analyze";
+export const VARIANTS_API_PATH = "/api/variants";
 
 export interface AnalyzeResponse {
   stressedText: string;
