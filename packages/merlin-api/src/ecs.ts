@@ -14,7 +14,7 @@ export function isEcsConfigured(): boolean {
   return getEcsCluster() !== "" && getEcsService() !== "";
 }
 
-interface EcsServiceState {
+export interface EcsServiceState {
   desired: number;
   running: number;
 }

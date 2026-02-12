@@ -5,6 +5,7 @@ import { createHash } from "crypto";
 
 import {
   createResponse,
+  createBadRequest,
   createInternalError,
   HTTP_STATUS,
   type LambdaResponse,
@@ -14,7 +15,7 @@ import { checkS3Cache, buildAudioUrl } from "./s3";
 import { sendToQueue } from "./sqs";
 import { describeService, scaleService, isEcsConfigured } from "./ecs";
 
-const VERSION = "1.0.0";
+export const VERSION = "1.0.0";
 
 export interface SynthesizeRequest {
   text: string;
@@ -61,8 +62,8 @@ export function applySynthesizeDefaults(body: SynthesizeRequest): SynthesizePara
   };
 }
 
-function createBadRequest(error: string): LambdaResponse {
-  return createResponse(HTTP_STATUS.BAD_REQUEST, { error });
+export function validateText(text: unknown): text is string {
+  return typeof text === "string" && text !== "";
 }
 
 const WARMUP_COOLDOWN_MS = 60_000;
@@ -88,7 +89,7 @@ export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse
   try {
     const body = parseRequestBody(event.body);
 
-    if (typeof body.text !== "string" || body.text === "") {
+    if (!validateText(body.text)) {
       return createBadRequest("Missing text field");
     }
 

@@ -6,9 +6,12 @@ import {
   resetRateLimit,
   parseRequestBody,
   applySynthesizeDefaults,
+  validateText,
+  health,
+  VERSION,
 } from "../src/handler";
 import type { SynthesizeRequest } from "../src/handler";
-import { createResponse, createInternalError, HTTP_STATUS, CORS_HEADERS } from "../src/response";
+import { createResponse, createBadRequest, createInternalError, HTTP_STATUS, CORS_HEADERS } from "../src/response";
 import { buildAudioUrl, buildCacheKey, isNotFoundError } from "../src/s3";
 import { VOICE_DEFAULTS, getAwsRegion, getS3Bucket, getSqsQueueUrl, getEcsCluster, getEcsService } from "../src/env";
 import { isEcsConfigured } from "../src/ecs";
@@ -16,6 +19,9 @@ import { isEcsConfigured } from "../src/ecs";
 const TEST_REGION = "eu-west-1";
 const TEST_BUCKET = "test-bucket";
 const TEST_QUEUE_URL = "https://sqs.eu-west-1.amazonaws.com/123456789/test-queue";
+const DEFAULT_VOICE = "efm_l";
+const DEFAULT_SPEED = 1.0;
+const DEFAULT_PITCH = 0;
 
 beforeEach(() => {
   process.env.AWS_REGION_NAME = TEST_REGION;
@@ -27,37 +33,37 @@ beforeEach(() => {
 
 describe("generateCacheKey", () => {
   it("should return consistent hash for same input", () => {
-    const key1 = generateCacheKey("hello", "efm_l", 1.0, 0);
-    const key2 = generateCacheKey("hello", "efm_l", 1.0, 0);
+    const key1 = generateCacheKey("hello", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
+    const key2 = generateCacheKey("hello", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
     expect(key1).toBe(key2);
   });
 
   it("should return different hash for different text", () => {
-    const key1 = generateCacheKey("hello", "efm_l", 1.0, 0);
-    const key2 = generateCacheKey("world", "efm_l", 1.0, 0);
+    const key1 = generateCacheKey("hello", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
+    const key2 = generateCacheKey("world", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
     expect(key1).not.toBe(key2);
   });
 
   it("should return different hash for different voice", () => {
-    const key1 = generateCacheKey("hello", "efm_l", 1.0, 0);
-    const key2 = generateCacheKey("hello", "other", 1.0, 0);
+    const key1 = generateCacheKey("hello", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
+    const key2 = generateCacheKey("hello", "other", DEFAULT_SPEED, DEFAULT_PITCH);
     expect(key1).not.toBe(key2);
   });
 
   it("should return different hash for different speed", () => {
-    const key1 = generateCacheKey("hello", "efm_l", 1.0, 0);
-    const key2 = generateCacheKey("hello", "efm_l", 1.5, 0);
+    const key1 = generateCacheKey("hello", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
+    const key2 = generateCacheKey("hello", DEFAULT_VOICE, 1.5, DEFAULT_PITCH);
     expect(key1).not.toBe(key2);
   });
 
   it("should return different hash for different pitch", () => {
-    const key1 = generateCacheKey("hello", "efm_l", 1.0, 0);
-    const key2 = generateCacheKey("hello", "efm_l", 1.0, 1);
+    const key1 = generateCacheKey("hello", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
+    const key2 = generateCacheKey("hello", DEFAULT_VOICE, DEFAULT_SPEED, 1);
     expect(key1).not.toBe(key2);
   });
 
   it("should return a 64-char hex string (sha256)", () => {
-    const key = generateCacheKey("test", "efm_l", 1.0, 0);
+    const key = generateCacheKey("test", DEFAULT_VOICE, DEFAULT_SPEED, DEFAULT_PITCH);
     expect(key).toMatch(/^[a-f0-9]{64}$/);
   });
 });
@@ -231,6 +237,11 @@ describe("isEcsConfigured", () => {
     expect(isEcsConfigured()).toBe(false);
   });
 
+  it("should return false when only service set", () => {
+    process.env.ECS_SERVICE = "my-service";
+    expect(isEcsConfigured()).toBe(false);
+  });
+
   it("should return true when both set", () => {
     process.env.ECS_CLUSTER = "my-cluster";
     process.env.ECS_SERVICE = "my-service";
@@ -263,10 +274,55 @@ describe("SynthesizeRequest", () => {
   });
 });
 
+describe("validateText", () => {
+  it("should return true for valid text", () => {
+    expect(validateText("hello")).toBe(true);
+  });
+
+  it("should return false for empty string", () => {
+    expect(validateText("")).toBe(false);
+  });
+
+  it("should return false for non-string", () => {
+    expect(validateText(123)).toBe(false);
+    expect(validateText(null)).toBe(false);
+    expect(validateText(undefined)).toBe(false);
+  });
+});
+
+describe("createBadRequest", () => {
+  it("should return 400 with error message", () => {
+    const response = createBadRequest("test error");
+    expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(JSON.parse(response.body).error).toBe("test error");
+  });
+});
+
+describe("health", () => {
+  it("should return OK with version", async () => {
+    const response = await health();
+    expect(response.statusCode).toBe(HTTP_STATUS.OK);
+    const body = JSON.parse(response.body);
+    expect(body.status).toBe("ok");
+    expect(body.version).toBe(VERSION);
+  });
+
+  it("should include CORS headers", async () => {
+    const response = await health();
+    expect(response.headers).toStrictEqual({ ...CORS_HEADERS });
+  });
+});
+
+describe("VERSION", () => {
+  it("should be a valid semver string", () => {
+    expect(VERSION).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+});
+
 describe("VOICE_DEFAULTS", () => {
   it("should have expected default values", () => {
-    expect(VOICE_DEFAULTS.voice).toBe("efm_l");
-    expect(VOICE_DEFAULTS.speed).toBe(1.0);
-    expect(VOICE_DEFAULTS.pitch).toBe(0);
+    expect(VOICE_DEFAULTS.voice).toBe(DEFAULT_VOICE);
+    expect(VOICE_DEFAULTS.speed).toBe(DEFAULT_SPEED);
+    expect(VOICE_DEFAULTS.pitch).toBe(DEFAULT_PITCH);
   });
 });

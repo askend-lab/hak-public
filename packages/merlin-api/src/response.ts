@@ -33,6 +33,10 @@ export function createResponse(
   };
 }
 
+export function createBadRequest(error: string): LambdaResponse {
+  return createResponse(HTTP_STATUS.BAD_REQUEST, { error });
+}
+
 export function createInternalError(
   context: string,
   error: unknown,
