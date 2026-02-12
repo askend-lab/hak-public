@@ -5,21 +5,19 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { createLogger } from "@hak/shared";
 
-import { runWorker, WorkerConfig } from "./worker";
+import { loadConfig, validateConfig } from "./env";
+import { runWorker } from "./worker";
 
 const logger = createLogger("info");
 
-const config: WorkerConfig = {
-  queueUrl: process.env.QUEUE_URL ?? "",
-  bucketName: process.env.BUCKET_NAME ?? "",
-  merlinUrl: process.env.MERLIN_URL ?? "",
-};
+const config = loadConfig();
+const missing = validateConfig(config);
 
-if (!config.queueUrl || !config.bucketName || !config.merlinUrl) {
+if (missing.length > 0) {
   logger.error("Missing required environment variables:");
-  logger.error(`  QUEUE_URL: ${config.queueUrl ? "set" : "MISSING"}`);
-  logger.error(`  BUCKET_NAME: ${config.bucketName ? "set" : "MISSING"}`);
-  logger.error(`  MERLIN_URL: ${config.merlinUrl ? "set" : "MISSING"}`);
+  for (const name of missing) {
+    logger.error(`  ${name}: MISSING`);
+  }
   process.exit(1);
 }
 

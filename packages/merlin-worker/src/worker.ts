@@ -6,7 +6,7 @@ import { SQSClient } from "@aws-sdk/client-sqs";
 import { createLogger } from "@hak/shared";
 
 import { synthesize } from "./merlin";
-import { uploadAudio } from "./s3";
+import { uploadAudio, buildCacheKey } from "./s3";
 import {
   receiveMessage,
   parseMessage,
@@ -64,7 +64,7 @@ export async function processMessage(
     logger.info(`Synthesized: ${String(audioBuffer.length)} bytes`);
 
     await uploadAudio(s3Client, config.bucketName, hash, audioBuffer);
-    logger.info(`Uploaded: cache/${hash}.mp3`);
+    logger.info(`Uploaded: ${buildCacheKey(hash)}`);
 
     await deleteMessage(
       sqsClient,

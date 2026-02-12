@@ -9,7 +9,7 @@ import {
   deleteMessage,
   isWarmMessage,
 } from "../src/sqs";
-import { processMessage, getReceiptHandle, getMessageId, TEXT_PREVIEW_LENGTH } from "../src/worker";
+import { processMessage, getReceiptHandle, getMessageId, TEXT_PREVIEW_LENGTH, ERROR_RETRY_DELAY_MS } from "../src/worker";
 import {
   createMockSqsClient,
   createMockS3Client,
@@ -29,6 +29,7 @@ jest.mock("../src/merlin", () => ({
 }));
 
 jest.mock("../src/s3", () => ({
+  ...jest.requireActual("../src/s3"),
   uploadAudio: jest.fn(),
 }));
 
@@ -245,6 +246,12 @@ describe("Worker", () => {
   describe("TEXT_PREVIEW_LENGTH", () => {
     it("should be 50", () => {
       expect(TEXT_PREVIEW_LENGTH).toBe(50);
+    });
+  });
+
+  describe("ERROR_RETRY_DELAY_MS", () => {
+    it("should be 5000", () => {
+      expect(ERROR_RETRY_DELAY_MS).toBe(5000);
     });
   });
 });
