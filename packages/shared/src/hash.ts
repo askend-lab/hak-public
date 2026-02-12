@@ -51,7 +51,7 @@ export async function calculateHash(text: string): Promise<string> {
     return toHexString(hashBuffer);
   }
 
-  const crypto = await import(CRYPTO_MODULE);
+  const crypto = await import(/* @vite-ignore */ CRYPTO_MODULE);
   return nodeHashHex(crypto, text);
 }
 
