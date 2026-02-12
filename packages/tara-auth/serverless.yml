@@ -17,14 +17,14 @@ custom:
     packager: 'pnpm'
     
   domainName:
-    dev: hak-api-dev.askend-lab.com
-    prod: hak-api.askend-lab.com
+    dev: ${ssm:/hak/dev/api-domain}
+    prod: ${ssm:/hak/prod/api-domain}
   
   customDomain:
     domainName: ${self:custom.domainName.${self:provider.stage}}
     basePath: auth
     stage: ${self:provider.stage}
-    certificateName: '*.askend-lab.com'
+    certificateName: ${ssm:/hak/shared/certificate-name}
     createRoute53Record: true
     endpointType: regional
     securityPolicy: tls_1_2
@@ -44,19 +44,19 @@ provider:
   
   environment:
     TARA_ISSUER: ${self:custom.taraConfig.${self:provider.stage}.issuer}
-    TARA_SECRETS_ARN: arn:aws:secretsmanager:eu-west-1:465168436856:secret:askend-lab/llm-keys-qiGKhS
-    COGNITO_USER_POOL_ID: eu-west-1_wlRtuLkG2
-    COGNITO_CLIENT_ID: 64tf6nf61n6sgftqif6q975hka
-    FRONTEND_URL_DEV: https://hak-dev.askend-lab.com
-    FRONTEND_URL_PROD: https://hak.askend-lab.com
+    TARA_SECRETS_ARN: ${ssm:/hak/${self:provider.stage}/tara-secrets-arn}
+    COGNITO_USER_POOL_ID: ${ssm:/hak/${self:provider.stage}/cognito-user-pool-id}
+    COGNITO_CLIENT_ID: ${ssm:/hak/${self:provider.stage}/cognito-client-id}
+    FRONTEND_URL_DEV: ${ssm:/hak/dev/frontend-url}
+    FRONTEND_URL_PROD: ${ssm:/hak/prod/frontend-url}
     STAGE: ${self:provider.stage}
   
   vpc:
     securityGroupIds:
-      - ${ssm:/askend-lab/lambda-security-group-id}
+      - ${ssm:/hak/shared/lambda-security-group-id}
     subnetIds:
-      - ${ssm:/askend-lab/private-subnet-id-1}
-      - ${ssm:/askend-lab/private-subnet-id-2}
+      - ${ssm:/hak/shared/private-subnet-id-1}
+      - ${ssm:/hak/shared/private-subnet-id-2}
   
   iam:
     role:
@@ -71,17 +71,17 @@ provider:
             - cognito-idp:AdminSetUserPassword
             - cognito-idp:ListUsers
           Resource:
-            - arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
+            - !Sub arn:aws:cognito-idp:${self:provider.region}:${AWS::AccountId}:userpool/${ssm:/hak/${self:provider.stage}/cognito-user-pool-id}
         - Effect: Allow
           Action:
             - ssm:GetParameter
           Resource:
-            - arn:aws:ssm:eu-west-1:465168436856:parameter/askend-lab/*
+            - !Sub arn:aws:ssm:${self:provider.region}:${AWS::AccountId}:parameter/hak/*
         - Effect: Allow
           Action:
             - secretsmanager:GetSecretValue
           Resource:
-            - arn:aws:secretsmanager:eu-west-1:465168436856:secret:askend-lab/llm-keys-*
+            - !Sub arn:aws:secretsmanager:${self:provider.region}:${AWS::AccountId}:secret:hak/*
 
 functions:
   taraStart:
