@@ -8,15 +8,19 @@ export const STATE_COOKIE_NAME = 'tara_auth_state';
 export const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 export const REFRESH_TOKEN_MAX_AGE_S = 30 * 24 * 60 * 60; // 30 days
 export const AUTH_CALLBACK_PATH = '/auth/callback';
+export const DEFAULT_FRONTEND_URL_PROD = 'https://hak.askend-lab.com';
+export const DEFAULT_FRONTEND_URL_DEV = 'https://hak-dev.askend-lab.com';
+export const TOKEN_COOKIE_OPTIONS = 'HttpOnly; Secure; SameSite=Strict; Path=/';
+export const RANDOM_STRING_LENGTH = 32;
 
 export function getFrontendUrl(): string {
   const stage = process.env.STAGE || 'dev';
   return stage === 'prod'
-    ? process.env.FRONTEND_URL_PROD || 'https://hak.askend-lab.com'
-    : process.env.FRONTEND_URL_DEV || 'https://hak-dev.askend-lab.com';
+    ? process.env.FRONTEND_URL_PROD || DEFAULT_FRONTEND_URL_PROD
+    : process.env.FRONTEND_URL_DEV || DEFAULT_FRONTEND_URL_DEV;
 }
 
-function generateRandomString(length: number): string {
+export function generateRandomString(length: number): string {
   return crypto.randomBytes(length).toString('base64url').substring(0, length);
 }
 
@@ -52,8 +56,8 @@ export async function startHandler(
   try {
     const taraClient = await createTaraClient();
 
-    const state = generateRandomString(32);
-    const nonce = generateRandomString(32);
+    const state = generateRandomString(RANDOM_STRING_LENGTH);
+    const nonce = generateRandomString(RANDOM_STRING_LENGTH);
     
     const authState: AuthState = {
       state,
@@ -176,7 +180,7 @@ function redirectToFrontendWithCookies(
   const url = new URL(AUTH_CALLBACK_PATH, baseUrl);
   
   // Token cookies - HttpOnly, Secure, SameSite=Strict
-  const cookieOptions = 'HttpOnly; Secure; SameSite=Strict; Path=/';
+  const cookieOptions = TOKEN_COOKIE_OPTIONS;
   const maxAge = tokens.expiresIn;
   const refreshMaxAge = REFRESH_TOKEN_MAX_AGE_S;
 
