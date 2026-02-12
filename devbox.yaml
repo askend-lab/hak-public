@@ -208,7 +208,8 @@ hooks:
       - "**/merlin-worker/tools/**/*"
       - "**/test.scss"
 
-  security-audit: {}
+  security-audit:
+    packageManager: pnpm
 
   secret-detection: {}
 

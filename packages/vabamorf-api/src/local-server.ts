@@ -38,7 +38,7 @@ const server = http.createServer(
     const url = new URL(req.url || "/", `http://localhost:${PORT}`);
     const path = url.pathname;
 
-    console.log(`[REQUEST] ${req.method} ${path} (raw: ${req.url})`);
+    console.info(`[REQUEST] ${req.method} ${path} (raw: ${req.url})`);
 
     if (req.method === "OPTIONS") {
       res.writeHead(200);
@@ -63,7 +63,7 @@ const server = http.createServer(
         } else if (path.endsWith("/health") || path === "/") {
           result = healthHandler();
         } else {
-          console.log(`[404] Path not found: ${path}`);
+          console.warn(`[404] Path not found: ${path}`);
           result = {
             statusCode: 404,
             body: JSON.stringify({
@@ -88,6 +88,6 @@ const server = http.createServer(
 );
 
 server.listen(PORT, () => {
-  console.log(`Vabamorf API running on http://localhost:${PORT}`);
-  console.log("Endpoints: POST /analyze, POST /variants, GET /health");
+  console.info(`Vabamorf API running on http://localhost:${PORT}`);
+  console.info("Endpoints: POST /analyze, POST /variants, GET /health");
 });
