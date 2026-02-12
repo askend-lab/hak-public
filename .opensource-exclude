@@ -34,6 +34,7 @@ packages/task-channel/
 .github/workflows/auto-approve-prs.yml
 .github/workflows/auto-merge-prs.yml
 .github/workflows/auto-update-prs.yml
+.github/workflows/sync-to-public.yml
 
 # --- Config files referencing internal packages ---
 babel.config.js
