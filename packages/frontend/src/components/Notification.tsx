@@ -60,9 +60,10 @@ export default function Notification({
   return (
     <div
       className={`modal modal--small ${colorClass} modal--outlined notification-toast`}
+      role={type === "error" ? "alert" : "status"}
     >
       <div className="modal__top">
-        <h2>{message}</h2>
+        <p className="notification__message">{message}</p>
         <button onClick={onClose} aria-label="Sulge teade">
           <CloseIcon size="2xl" />
         </button>

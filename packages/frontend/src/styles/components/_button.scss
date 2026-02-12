@@ -2,6 +2,7 @@
 @import "../tokens/borders";
 @import "../tokens/opacity";
 @import "../tokens/typography";
+@import "../tokens/spacing";
 
 // =========================================================================
 // Button Component
@@ -30,8 +31,8 @@
 
 // Menu button mixin (reusable 3-dot menu button)
 @mixin menu-button {
-  width: 36px;
-  height: 36px;
+  min-width: $spacing-touch-target;
+  min-height: $spacing-touch-target;
   border-radius: $border-radius-full;
   border: none;
   background: transparent;
@@ -56,8 +57,8 @@
 
 // Drag handle mixin (reusable drag-and-drop handle)
 @mixin drag-handle {
-  width: 36px;
-  height: 36px;
+  min-width: $spacing-touch-target;
+  min-height: $spacing-touch-target;
   border-radius: $border-radius-round;
   border: none;
   background: transparent;
@@ -220,8 +221,8 @@
 
     &.button {
       &--icon-only {
-        width: 32px;
-        height: 32px;
+        min-width: $spacing-touch-target;
+        min-height: $spacing-touch-target;
       }
 
       &--icon,
@@ -250,10 +251,10 @@
     height: 48px;
     padding: 0;
 
-    // Circular variant (36px icon-only button)
+    // Circular variant (icon-only button with touch target)
     &.button--circular {
-      width: 36px;
-      height: 36px;
+      min-width: $spacing-touch-target;
+      min-height: $spacing-touch-target;
       border-radius: 50%;
 
       svg {

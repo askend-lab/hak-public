@@ -91,15 +91,18 @@ export function SharedTaskPage() {
   // Error state
   if (error || !task) {
     return (
-      <div className="shared-task-error">
-        <h2>{error || "Ülesannet ei leitud"}</h2>
+      <main className="shared-task-error">
+        <h1>{error || "Ülesannet ei leitud"}</h1>
         <p>Kontrolli, kas jagamislink on õige.</p>
-      </div>
+      </main>
     );
   }
 
   return (
     <div className="page-layout">
+      <a href="#main-content" className="skip-link">
+        Liigu põhisisu juurde
+      </a>
       <AppHeader
         isAuthenticated={false}
         user={null}
@@ -110,7 +113,7 @@ export function SharedTaskPage() {
         }}
       />
 
-      <main className="page-layout__main">
+      <main id="main-content" tabIndex={-1} className="page-layout__main">
         <div className="page-header page-header--full">
           <div className="page-header__content">
             <h1 className="page-header__title">

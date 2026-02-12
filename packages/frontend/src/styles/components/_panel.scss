@@ -107,8 +107,8 @@
 }
 
 @mixin panel-close {
-  width: 36px;
-  height: 36px;
+  min-width: $spacing-touch-target;
+  min-height: $spacing-touch-target;
   border-radius: $border-radius-full;
   border: none;
   background: transparent;

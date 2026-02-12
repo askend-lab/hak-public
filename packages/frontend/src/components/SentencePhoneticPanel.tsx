@@ -222,7 +222,7 @@ export default function SentencePhoneticPanel({
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
                 className="sentence-phonetic-panel__textarea"
-                placeholder="Kirjuta oma foneetiline variant"
+                placeholder="Kirjuta oma hääldusvariant"
                 rows={4}
               />
             </div>

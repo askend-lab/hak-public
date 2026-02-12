@@ -40,8 +40,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  min-width: $spacing-touch-target;
+  min-height: $spacing-touch-target;
   padding: 0;
   background: transparent;
   border: none;
@@ -80,8 +80,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 36px;
-  height: 36px;
+  min-width: $spacing-touch-target;
+  min-height: $spacing-touch-target;
   padding: 0 $spacing-2;
   background: $color-white;
   border: 1px solid $color-outlined-neutral;
@@ -126,8 +126,8 @@
   }
 
   .markers-guide-box__marker-button {
-    min-width: 32px;
-    height: 32px;
+    min-width: $spacing-touch-target;
+    min-height: $spacing-touch-target;
     font-size: $font-size-sm;
   }
 }
