@@ -23,14 +23,17 @@ export function isWarmMessage(msg: ParsedMessage): msg is WarmMessage {
   return "type" in msg && msg.type === "warm";
 }
 
+export const MAX_MESSAGES = 1;
+export const WAIT_TIME_SECONDS = 20;
+
 export async function receiveMessage(
   client: SQSClient,
   queueUrl: string,
 ): Promise<Message | null> {
   const command = new ReceiveMessageCommand({
     QueueUrl: queueUrl,
-    MaxNumberOfMessages: 1,
-    WaitTimeSeconds: 20,
+    MaxNumberOfMessages: MAX_MESSAGES,
+    WaitTimeSeconds: WAIT_TIME_SECONDS,
   });
 
   const response = await client.send(command);
@@ -43,7 +46,7 @@ export async function receiveMessage(
   return messages[0] ?? null;
 }
 
-interface MessageBody {
+export interface MessageBody {
   type?: unknown;
   text?: unknown;
   hash?: unknown;

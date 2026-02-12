@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { synthesize } from "../src/merlin";
+import { synthesize, DEFAULT_VOICE } from "../src/merlin";
 
 global.fetch = jest.fn();
 
@@ -61,6 +61,34 @@ describe("Merlin TTS", () => {
       await expect(
         synthesize("tere", "https://merlin-url/synthesize"),
       ).rejects.toThrow("Network error");
+    });
+
+    it("should use custom voice when provided", async () => {
+      const mockAudioBase64 = Buffer.from("audio").toString("base64");
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ audio: mockAudioBase64, format: "wav" }),
+      });
+
+      await synthesize("tere", "https://merlin-url/synthesize", "custom_voice");
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://merlin-url/synthesize",
+        expect.objectContaining({
+          body: JSON.stringify({
+            text: "tere",
+            voice: "custom_voice",
+            returnBase64: true,
+          }),
+        }),
+      );
+    });
+  });
+
+  describe("DEFAULT_VOICE", () => {
+    it("should be efm_s", () => {
+      expect(DEFAULT_VOICE).toBe("efm_s");
     });
   });
 });
