@@ -107,17 +107,16 @@ export function initVmetajson(
   });
 }
 
+function createAnalyzeInput(text: string): VmetajsonInput {
+  return { params: { vmetajson: VMETAJSON_PARAMS }, content: text };
+}
+
 export async function analyze(text: string): Promise<VmetajsonResponse> {
   if (!vmetajsonProcess) {
     throw new Error("vmetajson process not initialized");
   }
 
-  const input: VmetajsonInput = {
-    params: {
-      vmetajson: VMETAJSON_PARAMS,
-    },
-    content: text,
-  };
+  const input = createAnalyzeInput(text);
 
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {

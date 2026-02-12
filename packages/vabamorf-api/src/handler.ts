@@ -4,13 +4,17 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { extractStressedText, extractVariants } from "./parser";
 import { AnalyzeRequest, VariantsRequest, LambdaResponse } from "./types";
-import {
-  createResponse,
-  ensureInitialized,
-  parseJsonBody,
-  validateField,
-} from "./validation";
-import { analyze } from "./vmetajson";
+import { createResponse, parseJsonBody, validateField } from "./validation";
+import { analyze, isInitialized, initVmetajson } from "./vmetajson";
+
+// Stryker disable next-line all: env defaults are equivalent
+const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
+// Stryker disable next-line all: env defaults are equivalent
+const DICT_PATH = process.env.DICT_PATH ?? ".";
+
+function ensureInitialized(): void {
+  if (!isInitialized()) initVmetajson(VMETAJSON_PATH, DICT_PATH);
+}
 
 // Docker: both files in /var/task/, Dev: package.json is one level up from src/
 function loadVersion(): string {

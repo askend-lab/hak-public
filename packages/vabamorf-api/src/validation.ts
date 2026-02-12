@@ -2,13 +2,6 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { LambdaResponse } from "./types";
-import { initVmetajson, isInitialized } from "./vmetajson";
-
-// Stryker disable next-line all: env defaults are equivalent
-const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
-
-// Stryker disable next-line all: env defaults are equivalent
-const DICT_PATH = process.env.DICT_PATH ?? ".";
 
 const RESPONSE_HEADERS = {
   "Content-Type": "application/json",
@@ -26,10 +19,6 @@ export function createResponse(
     body: JSON.stringify(body),
     headers: RESPONSE_HEADERS,
   };
-}
-
-export function ensureInitialized(): void {
-  if (!isInitialized()) initVmetajson(VMETAJSON_PATH, DICT_PATH);
 }
 
 export function parseJsonBody(eventBody: string | null): unknown {
