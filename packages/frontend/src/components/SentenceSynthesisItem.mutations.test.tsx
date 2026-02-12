@@ -18,8 +18,9 @@ describe("SentenceSynthesisItem mutation kills", () => {
   // --- Default prop values (kills ArrayDeclaration mutations) ---
   describe("defaults", () => {
     it("tags defaults to empty array (no tags rendered)", () => {
-      render(<SentenceSynthesisItem id="s1" text="t" mode="tags" onPlay={vi.fn()} />);
-      expect(screen.queryByText("t")).not.toBeInTheDocument();
+      const { container } = render(<SentenceSynthesisItem id="s1" text="t" mode="tags" onPlay={vi.fn()} />);
+      const tagsWrap = container.querySelector(".sentence-synthesis-item__tags");
+      expect(tagsWrap?.children.length ?? 0).toBe(0);
     });
     it("tagMenuItems defaults to empty (no menu items crash)", () => {
       render(
@@ -135,6 +136,17 @@ describe("SentenceSynthesisItem mutation kills", () => {
     it("no drag handle in readonly mode even with draggable", () => {
       render(<SentenceSynthesisItem {...bp} mode="readonly" draggable={true} />);
       expect(screen.queryByLabelText("Drag to reorder")).not.toBeInTheDocument();
+    });
+    it("dragStart works without onDragStart (kills L148 true)", () => {
+      render(<SentenceSynthesisItem {...bp} draggable={true} />);
+      const handle = screen.getByLabelText("Drag to reorder");
+      const cont = handle.closest(".sentence-synthesis-item") as HTMLDivElement;
+      Object.defineProperty(cont, "offsetHeight", { value: 40, configurable: true });
+      fireEvent.dragStart(handle, { dataTransfer: { setDragImage: vi.fn() } });
+    });
+    it("dragEnd works without onDragEnd (kills L157 true)", () => {
+      render(<SentenceSynthesisItem {...bp} draggable={true} />);
+      fireEvent.dragEnd(screen.getByLabelText("Drag to reorder"));
     });
   });
 
