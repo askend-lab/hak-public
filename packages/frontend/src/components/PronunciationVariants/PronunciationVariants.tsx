@@ -5,10 +5,9 @@
 
 import { useState, useEffect } from "react";
 import { transformToVabamorf } from "@/utils/phoneticMarkers";
-import { synthesizeWithPolling } from "@/utils/synthesize";
+import { synthesizeAuto } from "@/utils/synthesize";
 import { createAudioPlayer } from "@/utils/audioPlayer";
 import { CONTENT_TYPE_JSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
-import { getVoiceModel } from "@/types/synthesis";
 import { CloseIcon } from "../ui/Icons";
 import PhoneticGuide from "./PhoneticGuide";
 import { VariantItem } from "./VariantItem";
@@ -86,7 +85,7 @@ export default function PronunciationVariants({
     setLoadingVariant(variant.text);
     setPlayingVariant(null);
     try {
-      const audioUrl = await synthesizeWithPolling(variant.text, getVoiceModel(variant.text));
+      const audioUrl = await synthesizeAuto(variant.text);
       const { audio } = createAudioPlayer(audioUrl, {
         onLoaded: () => {
           setLoadingVariant(null);
@@ -119,7 +118,7 @@ export default function PronunciationVariants({
     setIsCustomPlaying(false);
     try {
       const vabamorfText = transformToVabamorf(customVariant);
-      const audioUrl = await synthesizeWithPolling(vabamorfText || "", getVoiceModel(vabamorfText || ""));
+      const audioUrl = await synthesizeAuto(vabamorfText || "");
       const { audio } = createAudioPlayer(audioUrl, {
         onLoaded: () => {
           setIsCustomLoading(false);
