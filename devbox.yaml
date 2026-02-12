@@ -235,6 +235,10 @@ hooks:
     excludePaths:
       - "**/node_modules/**"
 
+  no-hardcoded-env:
+    excludePaths:
+      - ".github/workflows/**"
+
   dead-code:
     excludePaths:
       - "**/node_modules/**"
