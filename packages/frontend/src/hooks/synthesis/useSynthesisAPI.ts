@@ -2,8 +2,8 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { getVoiceModel, convertTextToTags } from "@/types/synthesis";
-import { synthesizeWithPolling } from "@/utils/synthesize";
+import { convertTextToTags } from "@/types/synthesis";
+import { synthesizeAuto } from "@/utils/synthesize";
 import { CONTENT_TYPE_JSON, ANALYZE_API_PATH } from "@/utils/analyzeApi";
 
 export interface SynthesisResult {
@@ -56,10 +56,7 @@ export function useSynthesisAPI(): {
         }
       }
 
-      const audioUrl = await synthesizeWithPolling(
-        actualPhoneticText,
-        getVoiceModel(actualPhoneticText),
-      );
+      const audioUrl = await synthesizeAuto(actualPhoneticText);
 
       return {
         audioUrl,
