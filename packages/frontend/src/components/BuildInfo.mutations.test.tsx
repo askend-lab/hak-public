@@ -199,4 +199,52 @@ describe("BuildInfo mutation kills", () => {
     const closeBtn = document.querySelector(".build-info-modal__close");
     expect(closeBtn?.textContent?.trim()).toBe("×");
   });
+
+  it("fetch is called with /build-info.json on non-localhost (kills L73, L51)", () => {
+    const mockFetch = vi.fn().mockResolvedValue({ ok: false });
+    vi.stubGlobal("fetch", mockFetch);
+    Object.defineProperty(window, "location", {
+      value: { hostname: "example.com" },
+      writable: true,
+    });
+    render(<BuildInfo />);
+    expect(mockFetch).toHaveBeenCalledWith("/build-info.json");
+  });
+
+  it("runtimeInfo.builtAt is used when provided (kills L86 true)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            commitHash: "xyz",
+            branch: "feat",
+            builtAt: "2026-06-15T10:00:00Z",
+          }),
+      } as Response),
+    );
+    Object.defineProperty(window, "location", {
+      value: { hostname: "example.com" },
+      writable: true,
+    });
+    render(<BuildInfo />);
+    await waitFor(() => expect(screen.getByText("xyz")).toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button"));
+    const builtRow = screen.getByText("Built").closest(".build-info-row");
+    const builtValue = builtRow?.querySelector(".build-info-value");
+    expect(builtValue?.textContent?.length).toBeGreaterThan(0);
+    expect(builtValue?.textContent).not.toBe("true");
+  });
+
+  it("hostname === localhost check is exact (kills L51:21 empty string)", () => {
+    const mockFetch = vi.fn().mockResolvedValue({ ok: false });
+    vi.stubGlobal("fetch", mockFetch);
+    Object.defineProperty(window, "location", {
+      value: { hostname: "localhost" },
+      writable: true,
+    });
+    render(<BuildInfo />);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
 });
