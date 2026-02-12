@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
+import { convertTextToTags } from "@/types/synthesis";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -197,10 +198,7 @@ export default function TaskDetailView({
                 key={entry.id}
                 id={entry.id}
                 text={entry.text}
-                tags={entry.text
-                  .trim()
-                  .split(/\s+/)
-                  .filter((word) => word.length > 0)}
+                tags={convertTextToTags(entry.text)}
                 mode="tags"
                 draggable={true}
                 isDragging={dragDrop.draggedId === entry.id}

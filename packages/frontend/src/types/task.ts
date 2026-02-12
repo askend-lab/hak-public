@@ -44,3 +44,20 @@ export interface TaskSummary {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export function hasAudioSource(entry: TaskEntry): boolean {
+  return (
+    (entry.audioBlob != null && entry.audioBlob.size > 0) ||
+    (entry.audioUrl != null && entry.audioUrl.trim() !== "")
+  );
+}
+
+export function getEntryPlayUrl(entry: TaskEntry): { url: string; shouldRevoke: boolean } | null {
+  if (entry.audioBlob && entry.audioBlob.size > 0) {
+    return { url: URL.createObjectURL(entry.audioBlob), shouldRevoke: true };
+  }
+  if (entry.audioUrl && entry.audioUrl.trim() !== "") {
+    return { url: entry.audioUrl, shouldRevoke: false };
+  }
+  return null;
+}

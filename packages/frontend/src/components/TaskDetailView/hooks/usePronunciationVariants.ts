@@ -4,6 +4,7 @@
 import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { DataService } from "@/services/dataService";
+import { convertTextToTags } from "@/types/synthesis";
 
 interface UsePronunciationVariantsReturn {
   variantsWord: string | null;
@@ -35,9 +36,8 @@ export function usePronunciationVariants(
     (entryId: string, tagIndex: number, word: string) => {
       const entry = entries.find((e) => e.id === entryId);
       const stressedWords = entry?.stressedText
-        ?.trim()
-        .split(/\s+/)
-        .filter((w) => w.length > 0);
+        ? convertTextToTags(entry.stressedText)
+        : undefined;
       const customPhoneticForm = stressedWords?.[tagIndex];
 
       setSelectedEntryId(entryId);
@@ -66,14 +66,8 @@ export function usePronunciationVariants(
           return;
         }
 
-        const displayWords = entryToUpdate.text
-          .trim()
-          .split(/\s+/)
-          .filter((word) => word.length > 0);
-        const stressedWords = (entryToUpdate.stressedText || entryToUpdate.text)
-          .trim()
-          .split(/\s+/)
-          .filter((word) => word.length > 0);
+        const displayWords = convertTextToTags(entryToUpdate.text);
+        const stressedWords = convertTextToTags(entryToUpdate.stressedText || entryToUpdate.text);
 
         if (selectedTagIndex < 0 || selectedTagIndex >= displayWords.length) {
           handleCloseVariants();

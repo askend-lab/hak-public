@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { SentenceState } from "@/types/synthesis";
+import { SentenceState, convertTextToTags } from "@/types/synthesis";
 
 const STORAGE_KEY = "eki_synthesis_state";
 
@@ -58,15 +58,10 @@ interface RawEntry {
 }
 
 const transformEntryToSentence = (entry: RawEntry): SentenceState => {
-  const words = entry.text
-    .trim()
-    .split(/\s+/)
-    .filter((w: string) => w.length > 0);
-  const stressedWords =
-    entry.stressedText
-      ?.trim()
-      .split(/\s+/)
-      .filter((w: string) => w.length > 0) || [];
+  const words = convertTextToTags(entry.text);
+  const stressedWords = entry.stressedText
+    ? convertTextToTags(entry.stressedText)
+    : [];
   return ensureSentenceState({
     id: entry.id || `entry_${Date.now()}_${Math.random()}`,
     text: entry.text,

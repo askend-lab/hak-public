@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { SentenceState } from "@/types/synthesis";
+import { SentenceState, convertTextToTags } from "@/types/synthesis";
 
 export function useTagEditor(
   getSentence: (id: string) => SentenceState | undefined,
@@ -27,10 +27,7 @@ export function useTagEditor(
       )
         return;
 
-      const inputWords = sentence.currentInput
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0);
+      const inputWords = convertTextToTags(sentence.currentInput);
       const allTags = [...sentence.tags, ...inputWords];
       const newText = allTags.join(" ");
 
@@ -50,10 +47,7 @@ export function useTagEditor(
       const sentence = getSentence(id);
       if (!sentence) return null;
 
-      const inputWords = currentInput
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0);
+      const inputWords = convertTextToTags(currentInput);
       const allTags = [...sentence.tags, ...inputWords];
       const newText = allTags.join(" ");
       const cacheInvalidated = newText !== sentence.text;

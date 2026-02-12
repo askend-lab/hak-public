@@ -265,14 +265,8 @@ export function useSynthesis() {
         prev.map((s) => {
           if (s.id !== sentenceId) return s;
           const newPlainText = stripPhoneticMarkers(newPhoneticText) || "";
-          const newTags = newPlainText
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w.length > 0);
-          const newStressedTags = newPhoneticText
-            .trim()
-            .split(/\s+/)
-            .filter((w) => w.length > 0);
+          const newTags = convertTextToTags(newPlainText);
+          const newStressedTags = convertTextToTags(newPhoneticText);
           return {
             ...s,
             text: newPlainText,
