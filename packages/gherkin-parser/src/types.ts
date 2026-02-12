@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-// #1 Structured step type instead of plain strings
+import type { StepKeyword } from "./constants";
+
 export interface ParsedStep {
-  keyword: string;
+  keyword: StepKeyword;
   text: string;
   dataTable?: string[][];
   docString?: string;
 }
 
-// Background steps preserved for consumers
 export interface ParsedBackground {
   steps: ParsedStep[];
 }
 
-// Examples table for Scenario Outline
 export interface ParsedExamples {
   tags: string[];
   headers: string[];
@@ -25,10 +24,9 @@ export interface ParsedScenario {
   name: string;
   tags: string[];
   steps: ParsedStep[];
-  examples?: ParsedExamples[];
+  examples: ParsedExamples[];
 }
 
-// Rule: keyword support (Gherkin 6+)
 export interface ParsedRule {
   name: string;
   tags: string[];

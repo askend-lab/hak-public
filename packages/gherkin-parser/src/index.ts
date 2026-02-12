@@ -13,3 +13,4 @@ export type {
 
 export { parseFeatureContent } from "./parser";
 export { KEYWORDS, STEP_KEYWORDS } from "./constants";
+export type { StepKeyword } from "./constants";

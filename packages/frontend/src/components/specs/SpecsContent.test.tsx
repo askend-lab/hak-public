@@ -5,16 +5,18 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import SpecsContent from "./SpecsContent";
 
+import type { StepKeyword } from "@hak/specifications";
+
 const mockFeature = (
   name: string,
-  scenarios: { name: string; steps: { keyword: string; text: string }[] }[],
+  scenarios: { name: string; steps: { keyword: StepKeyword; text: string }[] }[],
   tags: string[] = [],
   desc = "",
 ) => ({
   name,
   description: desc,
   tags,
-  scenarios: scenarios.map((s) => ({ ...s, tags: [] })),
+  scenarios: scenarios.map((s) => ({ ...s, tags: [], examples: [] })),
   rules: [],
   errors: [],
 });

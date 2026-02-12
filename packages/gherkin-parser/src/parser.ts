@@ -10,6 +10,8 @@ import type {
   ParsedFeature,
 } from "./types";
 
+import type { StepKeyword, KeywordLineType } from "./constants";
+
 import {
   STEP_PATTERN,
   SCENARIO_NAME_PATTERN,
@@ -20,18 +22,8 @@ import {
   KEYWORD_PREFIXES,
 } from "./constants";
 
-// #3 Line classifier using sorted KEYWORD_PREFIXES (longest-first)
-type LineType =
-  | "tag"
-  | "feature"
-  | "background"
-  | "scenario"
-  | "examples"
-  | "rule"
-  | "step"
-  | "table_row"
-  | "docstring_fence"
-  | "other";
+// #6 LineType = keyword types + non-keyword types
+type LineType = KeywordLineType | "tag" | "step" | "table_row" | "docstring_fence" | "other";
 
 function classifyLine(line: string): LineType {
   if (line.startsWith("@")) return "tag";
@@ -54,15 +46,15 @@ function parseTags(line: string): string[] {
   return line.split(/\s+/).filter((t) => t.startsWith("@"));
 }
 
-// #4 Generic name extractor replaces three identical functions
 function extractName(line: string, pattern: RegExp): string {
   return line.replace(pattern, "");
 }
 
+// #1 Cast to StepKeyword for type-safe structured steps
 function parseStep(line: string): ParsedStep | null {
   const match = STEP_PATTERN.exec(line);
   if (!match || !match[1] || !match[2]) return null;
-  return { keyword: match[1], text: match[2] };
+  return { keyword: match[1] as StepKeyword, text: match[2] };
 }
 
 function parseTableRow(line: string): string[] {
@@ -72,13 +64,19 @@ function parseTableRow(line: string): string[] {
     .map((cell) => cell.trim());
 }
 
-// #5 Grouped sub-states for clarity
 interface DocStringState {
   active: boolean;
   lines: string[];
 }
 
 type SectionContext = "none" | "feature" | "background" | "scenario" | "examples" | "rule";
+
+// #8 Line context passed to handlers — rawLine for docstring/description
+interface LineContext {
+  trimmed: string;
+  rawLine: string;
+  lineNum: number;
+}
 
 interface ParserState {
   feature: ParsedFeature;
@@ -113,51 +111,44 @@ function createInitialState(): ParserState {
   };
 }
 
-// #2 Extracted addError helper
 function addError(state: ParserState, lineNum: number, message: string): void {
   state.feature.errors.push({ line: lineNum, message });
 }
 
+// #9 Flattened with guard clauses and early returns
+function finalizeExamples(state: ParserState): void {
+  if (!state.currentExamples) return;
+  if (state.currentScenario) {
+    state.currentScenario.examples.push(state.currentExamples);
+  }
+  state.currentExamples = null;
+}
+
 function finalizeScenario(state: ParserState): void {
-  if (state.currentExamples) {
-    if (state.currentScenario) {
-      if (!state.currentScenario.examples) state.currentScenario.examples = [];
-      state.currentScenario.examples.push(state.currentExamples);
-    }
-    state.currentExamples = null;
-  }
+  finalizeExamples(state);
   if (!state.currentScenario) return;
-  if (state.currentRule) {
-    state.currentRule.scenarios.push(state.currentScenario);
-  } else {
-    state.feature.scenarios.push(state.currentScenario);
-  }
+  const target = state.currentRule ?? state.feature;
+  target.scenarios.push(state.currentScenario);
   state.currentScenario = null;
 }
 
 function finalizeBackground(state: ParserState): void {
   if (!state.currentBackground) return;
-  if (state.currentRule) {
-    state.currentRule.background = state.currentBackground;
-  } else {
-    state.feature.background = state.currentBackground;
-  }
+  const target = state.currentRule ?? state.feature;
+  target.background = state.currentBackground;
   state.currentBackground = null;
 }
 
 function finalizeRule(state: ParserState): void {
   finalizeScenario(state);
   finalizeBackground(state);
-  if (state.currentRule) {
-    state.feature.rules.push(state.currentRule);
-    state.currentRule = null;
-  }
+  if (!state.currentRule) return;
+  state.feature.rules.push(state.currentRule);
+  state.currentRule = null;
 }
 
-// #9 Extracted finalization from main function
+// #3 finalizeState only calls finalizeRule (which chains the rest)
 function finalizeState(state: ParserState): void {
-  finalizeScenario(state);
-  finalizeBackground(state);
   finalizeRule(state);
   state.feature.description = state.descriptionLines.join("\n");
 }
@@ -172,7 +163,6 @@ function getLastStep(state: ParserState): ParsedStep | undefined {
   return undefined;
 }
 
-// #6 Split table row handling into two focused functions
 function handleExamplesRow(state: ParserState, cells: string[]): void {
   if (!state.currentExamples) return;
   if (state.currentExamples.headers.length === 0) {
@@ -184,68 +174,69 @@ function handleExamplesRow(state: ParserState, cells: string[]): void {
 
 function handleStepDataRow(state: ParserState, cells: string[]): void {
   const lastStep = getLastStep(state);
-  if (lastStep) {
-    if (!lastStep.dataTable) lastStep.dataTable = [];
-    lastStep.dataTable.push(cells);
-  }
+  if (!lastStep) return;
+  if (!lastStep.dataTable) lastStep.dataTable = [];
+  lastStep.dataTable.push(cells);
 }
 
-function createHandlers(state: ParserState): Record<LineType, (line: string, lineNum: number) => void> {
-  return {
-    tag: (line): void => { state.pendingTags.push(...parseTags(line)); },
+// #7 Handler type uses LineContext — no unused params
+type Handler = (ctx: LineContext, state: ParserState) => void;
 
-    feature: (line, lineNum): void => {
+function createHandlers(): Record<LineType, Handler> {
+  return {
+    tag: (ctx, state): void => { state.pendingTags.push(...parseTags(ctx.trimmed)); },
+
+    feature: (ctx, state): void => {
       if (state.feature.name) {
-        addError(state, lineNum, "Duplicate Feature: declaration");
+        addError(state, ctx.lineNum, "Duplicate Feature: declaration");
         return;
       }
-      state.feature.name = extractName(line, FEATURE_NAME_PATTERN);
+      state.feature.name = extractName(ctx.trimmed, FEATURE_NAME_PATTERN);
       state.feature.tags = consumeTags(state.pendingTags);
       state.section = "feature";
     },
 
-    background: (_line, lineNum): void => {
+    background: (ctx, state): void => {
       finalizeScenario(state);
       finalizeBackground(state);
       if (!state.feature.name) {
-        addError(state, lineNum, "Background: before Feature:");
+        addError(state, ctx.lineNum, "Background: before Feature:");
       }
       state.currentBackground = { steps: [] };
       consumeTags(state.pendingTags);
       state.section = "background";
     },
 
-    rule: (line, lineNum): void => {
+    rule: (ctx, state): void => {
       finalizeRule(state);
       if (!state.feature.name) {
-        addError(state, lineNum, "Rule: before Feature:");
+        addError(state, ctx.lineNum, "Rule: before Feature:");
       }
       state.currentRule = {
-        name: extractName(line, RULE_NAME_PATTERN),
+        name: extractName(ctx.trimmed, RULE_NAME_PATTERN),
         tags: consumeTags(state.pendingTags),
         scenarios: [],
       };
       state.section = "rule";
     },
 
-    scenario: (line, lineNum): void => {
+    // #5 examples initialized at scenario creation
+    scenario: (ctx, state): void => {
       finalizeScenario(state);
       if (!state.feature.name) {
-        addError(state, lineNum, "Scenario: before Feature:");
+        addError(state, ctx.lineNum, "Scenario: before Feature:");
       }
       state.currentScenario = {
-        name: extractName(line, SCENARIO_NAME_PATTERN),
+        name: extractName(ctx.trimmed, SCENARIO_NAME_PATTERN),
         tags: consumeTags(state.pendingTags),
         steps: [],
+        examples: [],
       };
       state.section = "scenario";
     },
 
-    examples: (_line, _lineNum): void => {
-      if (state.currentExamples && state.currentScenario) {
-        if (!state.currentScenario.examples) state.currentScenario.examples = [];
-        state.currentScenario.examples.push(state.currentExamples);
-      }
+    examples: (_ctx, state): void => {
+      finalizeExamples(state);
       state.currentExamples = {
         tags: consumeTags(state.pendingTags),
         headers: [],
@@ -254,8 +245,8 @@ function createHandlers(state: ParserState): Record<LineType, (line: string, lin
       state.section = "examples";
     },
 
-    step: (line): void => {
-      const step = parseStep(line);
+    step: (ctx, state): void => {
+      const step = parseStep(ctx.trimmed);
       if (!step) return;
       if (state.section === "background" && state.currentBackground) {
         state.currentBackground.steps.push(step);
@@ -264,9 +255,8 @@ function createHandlers(state: ParserState): Record<LineType, (line: string, lin
       }
     },
 
-    // #6 table_row delegates to focused handlers
-    table_row: (line): void => {
-      const cells = parseTableRow(line);
+    table_row: (ctx, state): void => {
+      const cells = parseTableRow(ctx.trimmed);
       if (state.section === "examples" && state.currentExamples) {
         handleExamplesRow(state, cells);
       } else {
@@ -274,8 +264,7 @@ function createHandlers(state: ParserState): Record<LineType, (line: string, lin
       }
     },
 
-    // #10 Simplified — inline docString attachment instead of addStepAttachment
-    docstring_fence: (): void => {
+    docstring_fence: (_ctx, state): void => {
       if (state.docString.active) {
         const lastStep = getLastStep(state);
         if (lastStep) {
@@ -287,24 +276,25 @@ function createHandlers(state: ParserState): Record<LineType, (line: string, lin
       }
     },
 
-    // #7 Removed dead docString branch — only collects description
-    other: (line): void => {
+    // #10 Description uses trimmed line for consistency with other text fields
+    other: (ctx, state): void => {
       if (
         state.section === "feature" &&
         !state.currentScenario &&
         !state.currentBackground &&
-        line
+        ctx.trimmed
       ) {
-        state.descriptionLines.push(line);
+        state.descriptionLines.push(ctx.trimmed);
       }
     },
   };
 }
 
+// #8 DocString handling unified — only the main loop manages docString lines
 export function parseFeatureContent(content: string): ParsedFeature | null {
   const lines = content.split("\n");
   const state = createInitialState();
-  const handlers = createHandlers(state);
+  const handlers = createHandlers();
 
   for (let i = 0; i < lines.length; i++) {
     const rawLine = lines[i] ?? "";
@@ -313,7 +303,8 @@ export function parseFeatureContent(content: string): ParsedFeature | null {
       state.docString.lines.push(rawLine);
       continue;
     }
-    handlers[classifyLine(trimmed)](trimmed, i + 1);
+    const ctx: LineContext = { trimmed, rawLine, lineNum: i + 1 };
+    handlers[classifyLine(trimmed)](ctx, state);
   }
 
   finalizeState(state);

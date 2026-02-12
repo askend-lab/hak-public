@@ -10,4 +10,5 @@ export type {
   ParsedExamples,
   ParsedRule,
   ParseError,
+  StepKeyword,
 } from "@hak/gherkin-parser";

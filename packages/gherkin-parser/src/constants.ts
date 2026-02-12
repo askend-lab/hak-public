@@ -11,20 +11,28 @@ export const KEYWORDS = {
 } as const;
 
 export const STEP_KEYWORDS = ["Given", "When", "Then", "And", "But"] as const;
+export type StepKeyword = (typeof STEP_KEYWORDS)[number];
 export const STEP_PATTERN = new RegExp(`^(${STEP_KEYWORDS.join("|")})\\b\\s*(.*)`);
 
+// #2 Name patterns derived from KEYWORDS — single source of truth
+function namePattern(keyword: string): RegExp {
+  return new RegExp(`^${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*`);
+}
+
 export const SCENARIO_NAME_PATTERN = /^Scenario(?: Outline)?:\s*/;
-export const FEATURE_NAME_PATTERN = /^Feature:\s*/;
-export const RULE_NAME_PATTERN = /^Rule:\s*/;
+export const FEATURE_NAME_PATTERN = namePattern(KEYWORDS.FEATURE);
+export const RULE_NAME_PATTERN = namePattern(KEYWORDS.RULE);
 export const TABLE_ROW_PATTERN = /^\|.*\|$/;
 export const DOCSTRING_FENCE = '"""';
 
-// #3 Keyword prefixes sorted longest-first for safe startsWith matching
-export const KEYWORD_PREFIXES = [
+// #6 Typed keyword→LineType mapping, sorted longest-first
+export type KeywordLineType = "feature" | "background" | "scenario" | "examples" | "rule";
+
+export const KEYWORD_PREFIXES: ReadonlyArray<{ prefix: string; type: KeywordLineType }> = [
   { prefix: KEYWORDS.SCENARIO_OUTLINE, type: "scenario" },
   { prefix: KEYWORDS.BACKGROUND, type: "background" },
   { prefix: KEYWORDS.EXAMPLES, type: "examples" },
   { prefix: KEYWORDS.FEATURE, type: "feature" },
   { prefix: KEYWORDS.SCENARIO, type: "scenario" },
   { prefix: KEYWORDS.RULE, type: "rule" },
-] as const;
+];
