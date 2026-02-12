@@ -37,6 +37,11 @@ describe("ShareTaskModal mutation kills", () => {
     expect(screen.getByRole("button", { name: "Kopeeri" })).not.toBeDisabled();
   });
 
+  it("copy button text says Kopeeri", () => {
+    render(<ShareTaskModal isOpen={true} shareToken="abc" taskName="T" onClose={mockOnClose} />);
+    expect(screen.getByRole("button", { name: "Kopeeri" })).toHaveTextContent("Kopeeri");
+  });
+
   it("does not call onClose when copy button clicked", async () => {
     const user = userEvent.setup();
     render(<ShareTaskModal isOpen={true} shareToken="abc" taskName="T" onClose={mockOnClose} />);
@@ -52,5 +57,10 @@ describe("ShareTaskModal mutation kills", () => {
   it("input is readonly", () => {
     render(<ShareTaskModal isOpen={true} shareToken="abc" taskName="T" onClose={mockOnClose} />);
     expect(screen.getByLabelText("Jagamislink")).toHaveAttribute("readonly");
+  });
+
+  it("renders with correct modal title", () => {
+    render(<ShareTaskModal isOpen={true} shareToken="abc" taskName="T" onClose={mockOnClose} />);
+    expect(screen.getByText("Jaga ülesanne")).toBeInTheDocument();
   });
 });

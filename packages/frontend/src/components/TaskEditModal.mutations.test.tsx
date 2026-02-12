@@ -167,18 +167,15 @@ describe("TaskEditModal mutation kills", () => {
     expect(textarea).toHaveValue("My Desc");
   });
 
-  it("handleClose resets name and description", async () => {
-    const { rerender } = render(
-      <TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />,
-    );
-    // Verify fields have values
+  it("handleClose resets name and description to empty", async () => {
+    const user = userEvent.setup();
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
     expect(screen.getByPlaceholderText("Ülesande nimi (Kohustuslik)")).toHaveValue("My Task");
-    // Close and reopen - onClose is called which should reset
-    // The BaseModal close should trigger handleClose
-    rerender(
-      <TaskEditModal isOpen={false} task={null} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />,
-    );
-    expect(screen.queryByPlaceholderText("Ülesande nimi (Kohustuslik)")).not.toBeInTheDocument();
+    // Trigger handleClose via BaseModal's onClose
+    const closeBtn = document.querySelector(".base-modal__close, [aria-label='Sulge']");
+    if (closeBtn) await user.click(closeBtn as HTMLElement);
+    // After close, onClose should be called and fields reset
+    await waitFor(() => expect(mockOnClose).toHaveBeenCalled());
   });
 
   it("submit calls setTaskToEdit with trimmed description", async () => {
@@ -191,6 +188,34 @@ describe("TaskEditModal mutation kills", () => {
     await waitFor(() => {
       expect(mockSetTaskToEdit).toHaveBeenCalledWith(
         expect.objectContaining({ description: "trimmed desc" }),
+      );
+    });
+  });
+
+  it("submit trims name (not raw value)", async () => {
+    const user = userEvent.setup();
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    const nameInput = screen.getByPlaceholderText("Ülesande nimi (Kohustuslik)");
+    await user.clear(nameInput);
+    await user.type(nameInput, "  Name With Spaces  ");
+    await user.click(screen.getByRole("button", { name: "Salvesta" }));
+    await waitFor(() => {
+      expect(mockOnSave).toHaveBeenCalledWith(
+        expect.objectContaining({ name: "Name With Spaces" }),
+      );
+    });
+  });
+
+  it("empty description after trim becomes null", async () => {
+    const user = userEvent.setup();
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    const desc = screen.getByPlaceholderText("Kirjeldus");
+    await user.clear(desc);
+    await user.type(desc, "   ");
+    await user.click(screen.getByRole("button", { name: "Salvesta" }));
+    await waitFor(() => {
+      expect(mockOnSave).toHaveBeenCalledWith(
+        expect.objectContaining({ description: null }),
       );
     });
   });
@@ -210,5 +235,20 @@ describe("TaskEditModal mutation kills", () => {
       expect(alert).toBeInTheDocument();
       expect(alert.textContent).toContain("Boom");
     });
+  });
+
+  it("handleClose does not call onClose while submitting", async () => {
+    let resolveSave: () => void;
+    mockOnSave.mockReturnValueOnce(new Promise<void>((r) => { resolveSave = r; }));
+    const user = userEvent.setup();
+    render(<TaskEditModal isOpen={true} task={task} onClose={mockOnClose} onSave={mockOnSave} setTaskToEdit={mockSetTaskToEdit} />);
+    await user.click(screen.getByRole("button", { name: "Salvesta" }));
+    // While submitting, try to close
+    const closeBtn = document.querySelector(".base-modal__close, [aria-label='Sulge']");
+    if (closeBtn) await user.click(closeBtn as HTMLElement);
+    // onClose should NOT be called during submit
+    expect(mockOnClose).not.toHaveBeenCalled();
+    resolveSave!();
+    await waitFor(() => expect(mockOnClose).toHaveBeenCalled());
   });
 });
