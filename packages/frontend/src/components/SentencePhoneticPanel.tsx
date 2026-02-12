@@ -5,9 +5,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { transformToUI, transformToVabamorf } from "@/utils/phoneticMarkers";
-import { synthesizeWithPolling } from "@/utils/synthesize";
+import { synthesizeAuto } from "@/utils/synthesize";
 import { createAudioPlayer } from "@/utils/audioPlayer";
-import { getVoiceModel } from "@/types/synthesis";
 import { BackIcon, PlayIcon, PauseIcon, CloseIcon } from "./ui/Icons";
 import MarkersGuideBox from "./ui/MarkersGuideBox";
 import { markers } from "@/data/markerData";
@@ -141,10 +140,7 @@ export default function SentencePhoneticPanel({
     setIsPlaying(false);
     try {
       const vt = transformToVabamorf(editedText);
-      const url = await synthesizeWithPolling(
-        vt || "",
-        getVoiceModel(vt || ""),
-      );
+      const url = await synthesizeAuto(vt || "");
       const { audio } = createAudioPlayer(url, {
         onLoaded: () => {
           setIsLoading(false);

@@ -7,6 +7,7 @@ import { useSynthesisAPI } from "./useSynthesisAPI";
 
 vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+  synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 
 vi.mock("@/types/synthesis", async (importOriginal) => {
