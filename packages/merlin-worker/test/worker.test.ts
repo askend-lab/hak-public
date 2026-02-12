@@ -9,10 +9,11 @@ import {
   deleteMessage,
   isWarmMessage,
 } from "../src/sqs";
-import { processMessage } from "../src/worker";
+import { processMessage, getReceiptHandle, getMessageId, TEXT_PREVIEW_LENGTH } from "../src/worker";
 import {
   createMockSqsClient,
   createMockS3Client,
+  createMockMessage,
   TEST_CONFIG,
 } from "./setup";
 
@@ -53,11 +54,7 @@ describe("Worker", () => {
     });
 
     it("should process message end-to-end", async () => {
-      const mockMessage = {
-        MessageId: "msg-123",
-        Body: JSON.stringify({ text: "tere", hash: "abc123" }),
-        ReceiptHandle: "receipt-123",
-      };
+      const mockMessage = createMockMessage({ text: "tere", hash: "abc123" });
       const mockAudioBuffer = Buffer.from("fake audio");
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
@@ -203,10 +200,11 @@ describe("Worker", () => {
     });
 
     it("should handle error with undefined MessageId", async () => {
-      const mockMessage = {
-        Body: JSON.stringify({ text: "tere", hash: "abc123" }),
-        ReceiptHandle: "receipt-123",
-      };
+      const mockMessage = createMockMessage(
+        { text: "tere", hash: "abc123" },
+        { MessageId: undefined as unknown as string },
+      );
+      delete (mockMessage as Record<string, unknown>).MessageId;
 
       (receiveMessage as jest.Mock).mockResolvedValue(mockMessage);
       (parseMessage as jest.Mock).mockReturnValue({
@@ -219,6 +217,34 @@ describe("Worker", () => {
       await expect(
         processMessage(mockSqsClient, mockS3Client, config),
       ).rejects.toThrow("TTS failed");
+    });
+  });
+
+  describe("getReceiptHandle", () => {
+    it("should return ReceiptHandle when present", () => {
+      const msg = { ReceiptHandle: "receipt-abc" };
+      expect(getReceiptHandle(msg)).toBe("receipt-abc");
+    });
+
+    it("should return empty string when undefined", () => {
+      expect(getReceiptHandle({})).toBe("");
+    });
+  });
+
+  describe("getMessageId", () => {
+    it("should return MessageId when present", () => {
+      const msg = { MessageId: "msg-abc" };
+      expect(getMessageId(msg)).toBe("msg-abc");
+    });
+
+    it("should return 'unknown' when undefined", () => {
+      expect(getMessageId({})).toBe("unknown");
+    });
+  });
+
+  describe("TEXT_PREVIEW_LENGTH", () => {
+    it("should be 50", () => {
+      expect(TEXT_PREVIEW_LENGTH).toBe(50);
     });
   });
 });

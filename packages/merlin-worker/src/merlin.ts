@@ -7,6 +7,7 @@ export interface MerlinResponse {
 }
 
 export const DEFAULT_VOICE = "efm_s";
+export const CONTENT_TYPE_JSON = "application/json";
 
 export async function synthesize(
   text: string,
@@ -15,7 +16,7 @@ export async function synthesize(
 ): Promise<Buffer> {
   const response = await fetch(merlinUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": CONTENT_TYPE_JSON },
     body: JSON.stringify({
       text,
       voice,
