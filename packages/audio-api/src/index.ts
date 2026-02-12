@@ -4,75 +4,52 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { SQSClient } from "@aws-sdk/client-sqs";
 
-import { handler } from "./handler";
+import { handler as coreHandler } from "./handler";
 import { publishWarmMessage } from "./sqs";
+import {
+  createResponse,
+  extractErrorMessage,
+  HTTP_STATUS,
+  type LambdaResponse,
+} from "./response";
+import { getAwsRegion } from "./env";
 
-const region = process.env.AWS_REGION ?? "eu-west-1";
+const region = getAwsRegion();
 const s3Client = new S3Client({ region });
 const sqsClient = new SQSClient({ region });
 
-const CORS_HEADERS = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-} as const;
-
-function createResponse(
-  statusCode: number,
-  body: object,
-): { statusCode: number; headers: typeof CORS_HEADERS; body: string } {
-  return {
-    statusCode,
-    headers: { ...CORS_HEADERS },
-    body: JSON.stringify(body),
-  };
+export async function handler(
+  event: { body: string },
+): Promise<LambdaResponse> {
+  return coreHandler(event, s3Client, sqsClient);
 }
 
-export async function lambdaHandler(event: { body: string }): Promise<{
-  statusCode: number;
-  body: string;
-  headers: Record<string, string>;
-}> {
-  const response = await handler(event, s3Client, sqsClient);
-  return { ...response, headers: { ...CORS_HEADERS } };
-}
+export { handler as lambdaHandler };
 
-export async function healthHandler(): Promise<{
-  statusCode: number;
-  body: string;
-  headers: Record<string, string>;
-}> {
-  return createResponse(200, {
+export async function healthHandler(): Promise<LambdaResponse> {
+  return createResponse(HTTP_STATUS.OK, {
     status: "healthy",
     service: "audio-api",
     timestamp: new Date().toISOString(),
   });
 }
 
-export async function warmHandler(): Promise<{
-  statusCode: number;
-  body: string;
-  headers: Record<string, string>;
-}> {
+export async function warmHandler(): Promise<LambdaResponse> {
   const queueUrl = process.env.QUEUE_URL ?? "";
   if (queueUrl === "") {
-    return createResponse(500, { error: "QUEUE_URL not configured" });
+    return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: "QUEUE_URL not configured" });
   }
 
   try {
     await publishWarmMessage(sqsClient, queueUrl);
-    return createResponse(200, {
+    return createResponse(HTTP_STATUS.OK, {
       status: "warming",
       message: "Audio worker warm-up triggered",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    return createResponse(500, {
-      error:
-        error instanceof Error ? error.message : "Failed to trigger warm-up",
+    return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
+      error: extractErrorMessage(error, "Failed to trigger warm-up"),
     });
   }
 }
-
-export { lambdaHandler as handler };

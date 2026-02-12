@@ -4,6 +4,7 @@
 import { publishToQueue, publishWarmMessage } from "../src/sqs";
 
 import { MockSQSClient } from "./mocks";
+import { TEST_QUEUE_URL } from "./setup";
 
 describe("SQS Message Publishing", () => {
   let mockSQS: MockSQSClient;
@@ -13,14 +14,13 @@ describe("SQS Message Publishing", () => {
   });
 
   it("should send SQS message with correct payload", async () => {
-    const queueUrl = "https://sqs.us-east-1.amazonaws.com/123456789/test-queue";
     const text = "tere";
     const hash = "abc123";
 
-    await publishToQueue(mockSQS, queueUrl, text, hash);
+    await publishToQueue(mockSQS, TEST_QUEUE_URL, text, hash);
 
     expect(mockSQS.messages).toHaveLength(1);
-    expect(mockSQS.messages[0]?.QueueUrl).toBe(queueUrl);
+    expect(mockSQS.messages[0]?.QueueUrl).toBe(TEST_QUEUE_URL);
 
     const messageBody = JSON.parse(mockSQS.messages[0]?.MessageBody ?? "{}");
     expect(messageBody.text).toBe(text);
@@ -28,11 +28,10 @@ describe("SQS Message Publishing", () => {
   });
 
   it("should include all required fields in message", async () => {
-    const queueUrl = "https://sqs.us-east-1.amazonaws.com/123456789/test-queue";
     const text = "tere";
     const hash = "abc123";
 
-    await publishToQueue(mockSQS, queueUrl, text, hash);
+    await publishToQueue(mockSQS, TEST_QUEUE_URL, text, hash);
 
     const messageBody = JSON.parse(mockSQS.messages[0]?.MessageBody ?? "{}");
     expect(messageBody.text).toBeDefined();
@@ -57,12 +56,11 @@ describe("SQS Message Publishing", () => {
 describe("SQS Warm Message", () => {
   it("should send warm message with correct payload", async () => {
     const mockSQS = new MockSQSClient();
-    const queueUrl = "https://sqs.us-east-1.amazonaws.com/123456789/test-queue";
 
-    await publishWarmMessage(mockSQS, queueUrl);
+    await publishWarmMessage(mockSQS, TEST_QUEUE_URL);
 
     expect(mockSQS.messages).toHaveLength(1);
-    expect(mockSQS.messages[0]?.QueueUrl).toBe(queueUrl);
+    expect(mockSQS.messages[0]?.QueueUrl).toBe(TEST_QUEUE_URL);
 
     const body = JSON.parse(mockSQS.messages[0]?.MessageBody ?? "{}");
     expect(body.type).toBe("warm");

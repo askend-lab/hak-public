@@ -5,36 +5,25 @@ import type { S3ClientLike } from "./s3";
 import type { SQSClientLike } from "./sqs";
 import { TEXT_LIMITS, calculateHashSync as calculateHash } from "@hak/shared";
 
-import { checkFileExists } from "./s3";
+import { checkFileExists, buildS3Url } from "./s3";
 import { publishToQueue } from "./sqs";
-
-const HTTP_STATUS = {
-  OK: 200,
-  BAD_REQUEST: 400,
-} as const;
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  extractErrorMessage,
+  type LambdaResponse,
+} from "./response";
+import { getAwsRegion, getRequiredEnvVars } from "./env";
 
 interface RequestBody {
   text?: unknown;
 }
 
-interface ApiResponse {
-  statusCode: number;
-  body: string;
+export function buildCacheKey(hash: string): string {
+  return `cache/${hash}.mp3`;
 }
 
-function createResponse(statusCode: number, body: unknown): ApiResponse {
-  return { statusCode, body: JSON.stringify(body) };
-}
-
-function createErrorResponse(error: string): ApiResponse {
-  return createResponse(HTTP_STATUS.BAD_REQUEST, { error });
-}
-
-function createSuccessResponse(body: unknown): ApiResponse {
-  return createResponse(HTTP_STATUS.OK, body);
-}
-
-function validateText(
+export function validateText(
   text: unknown,
 ): { valid: true; text: string } | { valid: false; error: string } {
   if (typeof text !== "string" || text === "") {
@@ -49,22 +38,11 @@ function validateText(
   return { valid: true, text };
 }
 
-function getRequiredEnvVars(): { bucketName: string; queueUrl: string } {
-  const bucketName = process.env.BUCKET_NAME ?? "";
-  const queueUrl = process.env.QUEUE_URL ?? "";
-  if (bucketName === "" || queueUrl === "") {
-    throw new Error(
-      "BUCKET_NAME and QUEUE_URL environment variables are required",
-    );
-  }
-  return { bucketName, queueUrl };
-}
-
 export async function handler(
   event: { body: string },
   s3Client: S3ClientLike,
   sqsClient: SQSClientLike,
-): Promise<{ statusCode: number; body: string }> {
+): Promise<LambdaResponse> {
   try {
     const { bucketName, queueUrl } = getRequiredEnvVars();
 
@@ -75,30 +53,28 @@ export async function handler(
       return createErrorResponse(validation.error);
     }
 
-    const text = validation.text;
-
-    const hash = calculateHash(text);
-    const key = `cache/${hash}.mp3`;
+    const hash = calculateHash(validation.text);
+    const key = buildCacheKey(hash);
 
     const exists = await checkFileExists(s3Client, bucketName, key);
 
     if (exists) {
       return createSuccessResponse({
         status: "ready",
-        url: `https://${bucketName}.s3.${process.env.AWS_REGION ?? "eu-west-1"}.amazonaws.com/${key}`,
+        url: buildS3Url(bucketName, getAwsRegion(), key),
         hash,
       });
     }
 
-    await publishToQueue(sqsClient, queueUrl, text, hash);
+    await publishToQueue(sqsClient, queueUrl, validation.text, hash);
 
     return createSuccessResponse({
       status: "processing",
       hash,
     });
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-    return createErrorResponse(errorMessage);
+    return createErrorResponse(
+      extractErrorMessage(error, "Unknown error occurred"),
+    );
   }
 }
