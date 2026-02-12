@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { CONTENT_TYPE_JSON } from "./analyzeApi";
+import { getVoiceModel } from "@/types/synthesis";
 
 const POLL_INTERVAL_MS = 1000;
 const MAX_POLL_ATTEMPTS = 30;
@@ -36,6 +37,14 @@ async function pollForAudio(cacheKey: string): Promise<string> {
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
   }
   throw new Error("Synthesis timed out");
+}
+
+/**
+ * Synthesize with automatic voice model selection.
+ * Combines synthesizeWithPolling + getVoiceModel to avoid repeated pattern.
+ */
+export async function synthesizeAuto(text: string): Promise<string> {
+  return synthesizeWithPolling(text, getVoiceModel(text));
 }
 
 export async function synthesizeWithPolling(
