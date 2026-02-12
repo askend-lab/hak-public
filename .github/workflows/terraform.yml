@@ -60,7 +60,11 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
+        run: |
+          terraform init \
+            -backend-config="bucket=askend-lab-terraform-state" \
+            -backend-config="dynamodb_table=askend-lab-terraform-locks" \
+            -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
       - name: Terraform Validate
         id: validate
@@ -139,7 +143,11 @@ jobs:
           terraform_version: 1.6.0
 
       - name: Terraform Init
-        run: terraform init -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
+        run: |
+          terraform init \
+            -backend-config="bucket=askend-lab-terraform-state" \
+            -backend-config="dynamodb_table=askend-lab-terraform-locks" \
+            -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
       - name: Import DynamoDB table (one-time)
         run: |

@@ -43,7 +43,10 @@ jobs:
       - name: Terraform Init
         working-directory: infra/merlin
         run: |
-          terraform init -backend-config="key=merlin/${{ github.event.inputs.environment || 'dev' }}/terraform.tfstate"
+          terraform init \
+            -backend-config="bucket=askend-lab-terraform-state" \
+            -backend-config="dynamodb_table=askend-lab-terraform-locks" \
+            -backend-config="key=merlin/${{ github.event.inputs.environment || 'dev' }}/terraform.tfstate"
 
       - name: Import ECR repository (one-time)
         working-directory: infra/merlin
