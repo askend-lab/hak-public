@@ -45,15 +45,14 @@ const server = http.createServer(
     const url = new URL(req.url || "/", `http://localhost:${PORT}`);
     const path = url.pathname;
 
-    console.log(`[REQUEST] ${req.method} ${path} (raw: ${req.url})`);
+    const method = req.method || "GET";
+    console.log(`[REQUEST] ${method} ${path} (raw: ${req.url})`);
 
-    if (req.method === "OPTIONS") {
+    if (method === "OPTIONS") {
       res.writeHead(200);
       res.end();
       return;
     }
-
-    const method = req.method || "GET";
     let body = "";
     req.on("data", (chunk: Buffer) => {
       body += chunk.toString();

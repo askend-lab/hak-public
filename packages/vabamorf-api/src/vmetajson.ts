@@ -15,6 +15,8 @@ interface QueuedRequest {
 const VMETAJSON_PARAMS = ["--stem", "--addphonetics"] as const;
 const TIMEOUT_ERROR = "vmetajson timeout";
 const NOT_INITIALIZED_ERROR = "vmetajson process not initialized";
+const PARSE_ERROR_PREFIX = "Failed to parse vmetajson response: ";
+const EXIT_ERROR_PREFIX = "vmetajson exited with code ";
 
 // Stryker disable next-line all: env default is equivalent
 const TIMEOUT_MS = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
@@ -85,9 +87,7 @@ export function initVmetajson(
           completeCurrentRequest(response);
         } catch {
           failCurrentRequest(
-            new Error(
-              `Failed to parse vmetajson response: ${line}`,
-            ),
+            new Error(`${PARSE_ERROR_PREFIX}${line}`),
           );
         }
       }
@@ -102,7 +102,7 @@ export function initVmetajson(
 
   vmetajsonProcess.on("exit", (code: number | null) => {
     failCurrentRequest(
-      new Error(`vmetajson exited with code ${code ?? "unknown"}`),
+      new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`),
     );
     vmetajsonProcess = null;
   });

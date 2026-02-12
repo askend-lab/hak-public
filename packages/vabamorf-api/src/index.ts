@@ -5,6 +5,7 @@ export { analyzeHandler, variantsHandler, healthHandler } from "./handler";
 export { createResponse, parseJsonBody, getFieldError, validateField, RESPONSE_HEADERS } from "./validation";
 export { formatPhoneticText } from "./parser-helpers";
 export { buildDescription } from "./description-builder";
+export { closeVmetajson, isInitialized } from "./vmetajson";
 export type {
   AnalyzeRequest,
   AnalyzeResponse,
@@ -12,5 +13,9 @@ export type {
   VariantsResponse,
   Variant,
   MorphologyInfo,
+  VmetajsonMrf,
+  VmetajsonToken,
+  VmetajsonResponse,
+  VmetajsonInput,
   LambdaResponse,
 } from "./types";
