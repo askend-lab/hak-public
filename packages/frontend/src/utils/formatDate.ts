@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+export const LOCALE_ET = "et-EE";
+
+const toDateObj = (date: string | Date): Date =>
+  typeof date === "string" ? new Date(date) : date;
+
 /**
  * Format a date to Estonian locale format (dd.mm.yyyy)
  * Accepts Date objects or ISO date strings
  */
 export const formatDate = (date: string | Date): string => {
-  const dateObj = typeof date === "string" ? new Date(date) : date;
-  return dateObj.toLocaleDateString("et-EE", {
+  return toDateObj(date).toLocaleDateString(LOCALE_ET, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -19,8 +23,7 @@ export const formatDate = (date: string | Date): string => {
  * Accepts Date objects or ISO date strings
  */
 export const formatDateTime = (date: string | Date): string => {
-  const dateObj = typeof date === "string" ? new Date(date) : date;
-  return dateObj.toLocaleDateString("et-EE", {
+  return toDateObj(date).toLocaleDateString(LOCALE_ET, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
