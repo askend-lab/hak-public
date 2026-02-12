@@ -4,91 +4,77 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220.svg)](https://pnpm.io/)
 
-A serverless language learning platform where teachers create interactive
-Estonian lessons and students complete them. Built with React, TypeScript,
-and AWS Lambda.
+An open-source language learning platform where teachers create interactive
+Estonian lessons with text-to-speech audio, and students complete them.
+Built with React and TypeScript.
 
 ## Quick Start
 
 ```bash
 pnpm install
-pnpm test          # Run all tests
-pnpm run dx        # Full quality check: tests + hooks
 pnpm start         # Start dev server (http://localhost:5180)
 ```
 
 **Prerequisites:** Node.js 20+, pnpm 9+
 
-## Architecture
-
-**Monorepo** (`pnpm` workspaces) with serverless backend on AWS.
+## Project Structure
 
 | Package | Description |
 |---------|-------------|
 | `packages/frontend` | React SPA — Vite, SCSS/BEM, React Router |
-| `packages/simplestore` | REST API — Lambda + DynamoDB |
-| `packages/audio-api` | Audio processing — Lambda + S3 |
-| `packages/merlin-api` | Estonian TTS gateway — Lambda |
-| `packages/merlin-worker` | TTS synthesis engine — SQS + Docker |
-| `packages/vabamorf-api` | Morphological analysis — Lambda + native binary |
 | `packages/shared` | Shared types and utilities |
-| `packages/specifications` | Gherkin specs (BDD) |
-| `packages/tara-auth` | Estonian eID (TARA) authentication |
-| `packages/gherkin-parser` | Gherkin → test mapping |
+| `packages/specifications` | Gherkin BDD specifications |
+| `packages/gherkin-parser` | Gherkin-to-test mapping |
+
+## Features
+
+- **Interactive lessons** — Teachers create text-based lessons with audio
+- **Text-to-speech** — Estonian speech synthesis for lesson content
+- **Morphological analysis** — Word stress and pronunciation variants
+- **Responsive design** — Works on desktop and mobile
+- **Accessibility** — WCAG-compliant UI components
 
 ## Development
 
 ### Code Quality
 
-Quality is enforced automatically via pre-commit hooks:
+Quality is enforced via pre-commit hooks:
 
 - **TypeScript** — strict mode, zero `any` types
 - **ESLint** — zero warnings policy
 - **Tests** — TDD enforced, coverage thresholds per module
 - **Security** — dependency audit, secret detection
-- **Architecture** — file size limits, no copy-paste, import order
-
-Run all checks manually:
-
-```bash
-pnpm run dx        # Full DevBox quality check
-pnpm lint          # ESLint
-pnpm -r exec tsc --noEmit   # TypeScript check
-```
 
 ### Testing
 
 ```bash
-pnpm test              # All tests
-pnpm test -- --full    # Full suite with coverage
+cd packages/frontend
+npx vitest              # Run frontend tests
+npx vitest --coverage   # With coverage
 ```
 
-Tests use **Jest** (backend packages) and **Vitest** (frontend).
 BDD specifications in Gherkin live in `packages/specifications/`.
 
-## Infrastructure
+## API Contract
 
-Serverless on AWS, managed with Terraform.
+The frontend communicates with a backend API. The expected endpoints are
+documented in the [API specification](docs/API.md) and the
+[Gherkin specifications](packages/specifications/).
 
-- **Frontend** — S3 + CloudFront
-- **APIs** — Lambda behind API Gateway
-- **Database** — DynamoDB
-- **Audio** — S3 + Lambda processing
-- **TTS** — ECS/Docker (Merlin synthesis engine)
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture and [`docs/`](docs/) for more documentation.
+Any backend implementation that conforms to these contracts will work with
+the frontend.
 
 ## Contributing
 
 We welcome contributions! Please read:
 
 1. [Contributing Guide](CONTRIBUTING.md)
-2. [Code of Conduct](CODE_OF_CONDUCT.md)
+2. [Security Policy](SECURITY.md)
 
 ```bash
 # Fork, clone, then:
 pnpm install
-pnpm test          # Make sure everything passes
+cd packages/frontend && npx vitest   # Make sure everything passes
 # Create a branch, make changes, open a PR
 ```
 

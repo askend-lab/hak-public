@@ -1,6 +1,6 @@
 # Contributing to HAK
 
-Thank you for your interest in contributing to HAK - the Estonian language learning platform!
+Thank you for your interest in contributing to HAK — the Estonian language learning platform!
 
 ## Getting Started
 
@@ -8,7 +8,6 @@ Thank you for your interest in contributing to HAK - the Estonian language learn
 
 - Node.js 20+
 - pnpm 9+
-- AWS CLI (for deployment)
 
 ### Setup
 
@@ -48,43 +47,37 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 1. Create a branch from `main`
 2. Make your changes
-3. Run tests: `pnpm test`
-4. Run linting: `pnpm lint`
-5. Open a PR with a clear description
+3. Run tests: `cd packages/frontend && npx vitest`
+4. Open a PR with a clear description
 
 ## Project Structure
 
 ```
 packages/
-  frontend/     - React frontend application
-  simplestore/  - Key-value store Lambda
-  audio-api/    - Text-to-speech API
-  vabamorf-api/ - Estonian morphological analysis
-  merlin-api/   - TTS synthesis with Merlin
-  shared/       - Shared utilities and types
-  tara-auth/      - Estonian eID (TARA) authentication
+  frontend/       - React frontend application
+  shared/         - Shared utilities and types
   gherkin-parser/ - Gherkin specification parser
   specifications/ - BDD specifications
 
-infra/          - Terraform infrastructure
-docs/           - Documentation
+docs/             - Documentation
 ```
 
 ## Code Style
 
 - TypeScript strict mode
-- ESLint
+- ESLint with zero warnings policy
 - No `any` types without justification
-- Tests for new functionality
+- Tests required for new functionality (TDD)
 
 ## Testing
 
 ```bash
-# Run all tests
-pnpm test
+# Run frontend tests
+cd packages/frontend
+npx vitest
 
-# Run tests for a specific package
-pnpm --filter @hak/frontend test
+# Run with coverage
+npx vitest --coverage
 ```
 
 ## Questions?
