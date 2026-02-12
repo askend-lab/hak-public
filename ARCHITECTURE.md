@@ -5,7 +5,7 @@
 ```mermaid
 graph TB
     subgraph Client
-        FE[React SPA<br/>Vite + TailwindCSS]
+        FE[React SPA<br/>Vite + SCSS/BEM]
     end
 
     subgraph AWS Cloud
@@ -18,12 +18,14 @@ graph TB
             AA[audio-api<br/>Audio Processing]
             MA[merlin-api<br/>TTS Gateway]
             VA[vabamorf-api<br/>Morphology]
+            TA[tara-auth<br/>Authentication]
         end
 
         DDB[(DynamoDB)]
         S3_A[S3 Audio Bucket]
         SQS[SQS Queue]
         MW[merlin-worker<br/>Docker / ECS]
+        COG[Cognito]
     end
 
     FE --> CF --> S3_WEB
@@ -32,10 +34,12 @@ graph TB
     APIGW --> AA
     APIGW --> MA
     APIGW --> VA
+    APIGW --> TA
     SS --> DDB
     AA --> S3_A
     MA --> SQS --> MW
     MW --> S3_A
+    TA --> COG
 ```
 
 ## Monorepo Structure
@@ -49,14 +53,16 @@ graph LR
         MA[merlin-api]
         MW[merlin-worker]
         VA[vabamorf-api]
+        TA[tara-auth]
         SH[shared]
         SP[specifications]
         GP[gherkin-parser]
     end
 
     FE --> SH
-    SS --> SH
+    FE --> SP
     AA --> SH
+    MW --> SH
     SP --> GP
 ```
 
@@ -64,12 +70,13 @@ graph LR
 
 | Package | Tech | Runtime | Purpose |
 |---------|------|---------|---------|
-| `frontend` | React, Vite, TailwindCSS, Vitest | S3 + CloudFront | Teacher/student UI |
-| `simplestore` | Express, DynamoDB SDK | Lambda | Lessons, users, progress CRUD |
-| `audio-api` | Express, S3 SDK | Lambda | Audio upload, playback, storage |
-| `merlin-api` | Express, SQS SDK | Lambda | TTS request gateway |
-| `merlin-worker` | Python, Conda, Merlin | Docker (ECS) | Estonian speech synthesis |
-| `vabamorf-api` | Express, native binary | Lambda (Docker) | Estonian morphological analysis |
+| `frontend` | React, Vite, SCSS/BEM, Vitest | S3 + CloudFront | Teacher/student UI |
+| `simplestore` | TypeScript, DynamoDB SDK | Lambda | Lessons, users, progress CRUD |
+| `audio-api` | TypeScript, S3 SDK, SQS SDK | Lambda | Audio upload, playback, storage |
+| `merlin-api` | TypeScript, ECS SDK, S3 SDK, SQS SDK | Lambda | TTS request gateway |
+| `merlin-worker` | Python + TypeScript, Conda, Merlin | Docker (ECS) | Estonian speech synthesis |
+| `vabamorf-api` | TypeScript, native binary (vmetajson) | Lambda (Docker) | Estonian morphological analysis |
+| `tara-auth` | TypeScript, Cognito SDK, JOSE | Lambda | Estonian eID (TARA) authentication |
 | `shared` | TypeScript | — | Shared types, utilities, constants |
 | `specifications` | Gherkin | — | BDD feature specifications |
 | `gherkin-parser` | TypeScript | — | Gherkin-to-test mapping |
@@ -129,6 +136,9 @@ sequenceDiagram
 infra/
   main.tf              # Provider, backend config
   variables.tf         # Input variables
+  locals.tf            # Local values
+  outputs.tf           # Output values
+  terraform-state.tf   # Remote state backend
   terraform.tfvars     # Environment values (not in git)
   api-gateway.tf       # API Gateway routes
   dynamodb.tf          # DynamoDB tables
@@ -139,6 +149,7 @@ infra/
   route53.tf           # DNS records
   cloudwatch-*.tf      # Monitoring, alarms, dashboard
   slack-notifications.tf  # Alert notifications
+  merlin/              # Merlin-specific infra (ECS)
 ```
 
 ## Quality System
@@ -149,18 +160,25 @@ Pre-commit hooks enforce quality on every commit:
 commit → DevBox hooks (pre-commit stage)
   ├── TypeScript strict (run-typecheck)
   ├── ESLint zero warnings (run-lint)
+  ├── Build check (run-build)
   ├── All tests pass (run-tests)
+  ├── Test coverage (test-coverage)
   ├── TDD enforcement (test-required)
+  ├── Metrics required (metrics-required)
   ├── No any types (no-any)
   ├── No floating promises (no-floating-promises)
   ├── Import order (import-order)
   ├── No console.log (no-console)
   ├── Copy-paste detection (jscpd)
+  ├── Dead code detection (dead-code)
   ├── File size limits (source-size, markdown-size)
   ├── Language check (language-check)
   ├── Broken links (broken-links)
   ├── Dependency audit (security-audit)
   ├── Secret detection (secret-detection)
   ├── License check (license-check)
-  └── Unused deps (dependency-check)
+  ├── Unused deps (dependency-check)
+  ├── Docker lint (docker-lint)
+  ├── IaC security (iac-security)
+  └── Plan validation (plan-validation)
 ```
