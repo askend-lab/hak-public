@@ -1,17 +1,26 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import type { S3Client } from "@aws-sdk/client-s3";
+import { uploadAudio, buildCacheKey } from "../src/s3";
+import { createMockS3Client } from "./setup";
 
-import { uploadAudio } from "../src/s3";
-
-const mockS3Client = {
-  send: jest.fn(),
-} as unknown as S3Client & { send: jest.Mock };
+const mockS3Client = createMockS3Client();
 
 describe("S3 Operations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe("buildCacheKey", () => {
+    it("should return cache path with .mp3 extension", () => {
+      expect(buildCacheKey("abc123")).toBe("cache/abc123.mp3");
+    });
+
+    it("should include hash in path", () => {
+      const key = buildCacheKey("test-hash");
+      expect(key).toContain("test-hash");
+      expect(key).toMatch(/^cache\/.+\.mp3$/);
+    });
   });
 
   describe("uploadAudio", () => {

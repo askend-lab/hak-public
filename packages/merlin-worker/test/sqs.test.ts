@@ -1,13 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import type { SQSClient } from "@aws-sdk/client-sqs";
+import { receiveMessage, deleteMessage, parseMessage, isWarmMessage } from "../src/sqs";
+import { createMockSqsClient } from "./setup";
 
-import { receiveMessage, deleteMessage, parseMessage } from "../src/sqs";
-
-const mockSqsClient = {
-  send: jest.fn(),
-} as unknown as SQSClient & { send: jest.Mock };
+const mockSqsClient = createMockSqsClient();
 
 describe("SQS Operations", () => {
   beforeEach(() => {
@@ -129,6 +126,16 @@ describe("SQS Operations", () => {
       await deleteMessage(mockSqsClient, "https://queue-url", "receipt-123");
 
       expect(mockSqsClient.send).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("isWarmMessage", () => {
+    it("should return true for warm message", () => {
+      expect(isWarmMessage({ type: "warm" })).toBe(true);
+    });
+
+    it("should return false for audio message", () => {
+      expect(isWarmMessage({ text: "hello", hash: "abc" })).toBe(false);
     });
   });
 });
