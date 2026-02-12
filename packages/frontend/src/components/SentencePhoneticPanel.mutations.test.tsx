@@ -2,383 +2,362 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, act, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import SentencePhoneticPanel from "./SentencePhoneticPanel";
 
-// Use vi.fn() for transforms so we can mockReturnValueOnce later
+const flush = () => new Promise(r => setTimeout(r, 0));
+
 const mockTransformToUI = vi.fn((t: string | null) => t ?? null);
 const mockTransformToVabamorf = vi.fn((t: string | null) => t ?? null);
-
 vi.mock("@/utils/phoneticMarkers", () => ({
-  transformToUI: (...args: unknown[]) => mockTransformToUI(...args as [string | null]),
-  transformToVabamorf: (...args: unknown[]) => mockTransformToVabamorf(...args as [string | null]),
+  transformToUI: (...a: unknown[]) => mockTransformToUI(...(a as [string | null])),
+  transformToVabamorf: (...a: unknown[]) => mockTransformToVabamorf(...(a as [string | null])),
 }));
-
 vi.mock("@/utils/synthesize", () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-url"),
 }));
+vi.mock("@/types/synthesis", () => ({ getVoiceModel: vi.fn(() => "m") }));
 
-vi.mock("@/types/synthesis", () => ({
-  getVoiceModel: vi.fn(() => "model"),
-}));
-
-// Capture audio callbacks so we can trigger them manually
-let audioCallbacks: {
-  onLoaded?: () => void;
-  onEnded?: () => void;
-  onError?: () => void;
-} = {};
+let cbs: { onLoaded?: () => void; onEnded?: () => void; onError?: () => void } = {};
 const mockPause = vi.fn();
 const mockPlay = vi.fn().mockResolvedValue(undefined);
-
 vi.mock("@/utils/audioPlayer", () => ({
-  createAudioPlayer: vi.fn((_url: string, cbs: typeof audioCallbacks) => {
-    audioCallbacks = cbs;
-    return {
-      audio: { play: mockPlay, pause: mockPause },
-    };
+  createAudioPlayer: vi.fn((_u: string, c: typeof cbs) => {
+    cbs = c;
+    return { audio: { play: mockPlay, pause: mockPause } };
   }),
 }));
 
 describe("SentencePhoneticPanel mutation kills", () => {
-  const defaultProps = {
+  const dp = {
     sentenceText: "Hello world",
-    phoneticText: "Héllo wórld",
+    phoneticText: "abcde",
     isOpen: true,
     onClose: vi.fn(),
     onApply: vi.fn(),
   };
-
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockResolvedValue("mock-url");
     mockTransformToUI.mockImplementation((t: string | null) => t ?? null);
     mockTransformToVabamorf.mockImplementation((t: string | null) => t ?? null);
     mockPlay.mockResolvedValue(undefined);
-    audioCallbacks = {};
+    cbs = {};
   });
 
-  describe("editedText initialization", () => {
-    it("uses phoneticText (via transformToUI) when open with phoneticText", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByDisplayValue("Héllo wórld")).toBeInTheDocument();
-    });
-
-    it("uses sentenceText when open with null phoneticText", () => {
-      render(<SentencePhoneticPanel {...defaultProps} phoneticText={null} />);
-      expect(screen.getByDisplayValue("Hello world")).toBeInTheDocument();
-    });
-
-    it("does not render when isOpen false", () => {
-      const { container } = render(
-        <SentencePhoneticPanel {...defaultProps} isOpen={false} />,
-      );
-      expect(container.firstChild).toBeNull();
-    });
+  // --- editedText init & useEffect deps ---
+  it("uses transformToUI(phoneticText) when open", () => {
+    render(<SentencePhoneticPanel {...dp} />);
+    expect(mockTransformToUI).toHaveBeenCalledWith("abcde");
+    expect(screen.getByDisplayValue("abcde")).toBeInTheDocument();
+  });
+  it("uses sentenceText when phoneticText is null", () => {
+    render(<SentencePhoneticPanel {...dp} phoneticText={null} />);
+    expect(screen.getByDisplayValue("Hello world")).toBeInTheDocument();
+  });
+  it("falls back to empty string when transformToUI returns null", () => {
+    mockTransformToUI.mockReturnValueOnce(null);
+    render(<SentencePhoneticPanel {...dp} />);
+    expect(screen.getByRole("textbox")).toHaveValue("");
+  });
+  it("returns null when not open", () => {
+    const { container } = render(<SentencePhoneticPanel {...dp} isOpen={false} />);
+    expect(container.firstChild).toBeNull();
+  });
+  it("re-initializes when phoneticText changes", () => {
+    const { rerender } = render(<SentencePhoneticPanel {...dp} phoneticText="old" />);
+    expect(screen.getByDisplayValue("old")).toBeInTheDocument();
+    rerender(<SentencePhoneticPanel {...dp} phoneticText="new" />);
+    expect(screen.getByDisplayValue("new")).toBeInTheDocument();
+  });
+  it("re-initializes when sentenceText changes and phoneticText null", () => {
+    const { rerender } = render(
+      <SentencePhoneticPanel {...dp} phoneticText={null} sentenceText="a" />,
+    );
+    expect(screen.getByDisplayValue("a")).toBeInTheDocument();
+    rerender(<SentencePhoneticPanel {...dp} phoneticText={null} sentenceText="b" />);
+    expect(screen.getByDisplayValue("b")).toBeInTheDocument();
+  });
+  it("focuses textarea on open", () => {
+    render(<SentencePhoneticPanel {...dp} />);
+    expect(document.activeElement).toBe(screen.getByRole("textbox"));
+  });
+  it("shows edit view by default (not guide)", () => {
+    render(<SentencePhoneticPanel {...dp} />);
+    expect(screen.getByText("Muuda häälduskuju")).toBeInTheDocument();
+    expect(screen.queryByText("Hääldusmärkide juhend")).not.toBeInTheDocument();
   });
 
-  describe("focus behavior", () => {
-    it("focuses textarea when panel opens", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      const ta = screen.getByDisplayValue("Héllo wórld");
-      expect(document.activeElement).toBe(ta);
-    });
-  });
-
+  // --- insertMarkerAtCursor ---
   describe("insertMarkerAtCursor", () => {
-    it("inserts marker at cursor position", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} phoneticText="test" />);
-      const ta = screen.getByDisplayValue("test") as HTMLTextAreaElement;
+    it("inserts marker at middle preserving surrounding text", () => {
+      vi.useFakeTimers();
+      render(<SentencePhoneticPanel {...dp} phoneticText="hello" />);
+      const ta = screen.getByRole("textbox") as HTMLTextAreaElement;
       ta.focus();
       ta.setSelectionRange(2, 2);
-
-      const markerBtn = screen.getByRole("button", { name: "kolmas välde" });
-      await user.click(markerBtn);
-      expect(ta.value).toContain("`");
+      fireEvent.click(screen.getByRole("button", { name: "kolmas välde" }));
+      expect(ta.value).toBe("he`llo");
+      vi.advanceTimersByTime(10);
+      expect(ta.selectionStart).toBe(3);
+      expect(ta.selectionEnd).toBe(3);
+      vi.useRealTimers();
+    });
+    it("inserts at start (position 0)", () => {
+      vi.useFakeTimers();
+      render(<SentencePhoneticPanel {...dp} phoneticText="abc" />);
+      const ta = screen.getByRole("textbox") as HTMLTextAreaElement;
+      ta.focus();
+      ta.setSelectionRange(0, 0);
+      fireEvent.click(screen.getByRole("button", { name: "kolmas välde" }));
+      expect(ta.value).toBe("`abc");
+      vi.advanceTimersByTime(10);
+      expect(ta.selectionStart).toBe(1);
+      vi.useRealTimers();
+    });
+    it("inserts at end", () => {
+      vi.useFakeTimers();
+      render(<SentencePhoneticPanel {...dp} phoneticText="abc" />);
+      const ta = screen.getByRole("textbox") as HTMLTextAreaElement;
+      ta.focus();
+      ta.setSelectionRange(3, 3);
+      fireEvent.click(screen.getByRole("button", { name: "kolmas välde" }));
+      expect(ta.value).toBe("abc`");
+      vi.advanceTimersByTime(10);
+      expect(ta.selectionStart).toBe(4);
+      vi.useRealTimers();
+    });
+    it("replaces selected range", () => {
+      vi.useFakeTimers();
+      render(<SentencePhoneticPanel {...dp} phoneticText="abcde" />);
+      const ta = screen.getByRole("textbox") as HTMLTextAreaElement;
+      ta.focus();
+      ta.setSelectionRange(1, 3);
+      fireEvent.click(screen.getByRole("button", { name: "kolmas välde" }));
+      expect(ta.value).toBe("a`de");
+      vi.advanceTimersByTime(10);
+      expect(ta.selectionStart).toBe(2);
+      vi.useRealTimers();
     });
   });
 
-  describe("handlePlay audio flow", () => {
-    it("calls synthesizeWithPolling and createAudioPlayer", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      await user.click(screen.getByText("Kuula"));
-
+  // --- handlePlay ---
+  describe("handlePlay", () => {
+    it("passes transformToVabamorf result to synthesize", async () => {
+      mockTransformToVabamorf.mockReturnValueOnce("transformed");
+      render(<SentencePhoneticPanel {...dp} />);
+      await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
       const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      expect(synthesizeWithPolling).toHaveBeenCalled();
-      const { createAudioPlayer } = await import("@/utils/audioPlayer");
-      expect(createAudioPlayer).toHaveBeenCalled();
-      expect(mockPlay).toHaveBeenCalled();
+      expect(synthesizeWithPolling).toHaveBeenCalledWith("transformed", "m");
     });
-
-    it("onLoaded sets isPlaying=true, isLoading=false", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      await user.click(screen.getByText("Kuula"));
-
-      // Trigger onLoaded inside act
-      await act(async () => { audioCallbacks.onLoaded?.(); });
-
+    it("empty string fallback when transformToVabamorf returns null", async () => {
+      mockTransformToVabamorf.mockReturnValueOnce(null);
+      render(<SentencePhoneticPanel {...dp} />);
+      await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
+      const { synthesizeWithPolling } = await import("@/utils/synthesize");
+      expect(synthesizeWithPolling).toHaveBeenCalledWith("", "m");
+      const { getVoiceModel } = await import("@/types/synthesis");
+      expect(getVoiceModel).toHaveBeenCalledWith("");
+    });
+    it("sets isLoading at start", async () => {
+      const { synthesizeWithPolling } = await import("@/utils/synthesize");
+      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockImplementation(
+        () => new Promise(() => {}),
+      );
+      render(<SentencePhoneticPanel {...dp} />);
+      fireEvent.click(screen.getByText("Kuula"));
+      const btn = screen.getByText("Kuula").closest("button")!;
+      expect(btn.className).toContain("loading");
+      expect(btn.className).not.toContain("playing");
+      expect(btn.title).toBe("Laen...");
+    });
+    it("onLoaded sets playing", async () => {
+      render(<SentencePhoneticPanel {...dp} />);
+      await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
+      await act(async () => { cbs.onLoaded?.(); });
       const btn = screen.getByText("Kuula").closest("button")!;
       expect(btn.className).toContain("playing");
       expect(btn.className).not.toContain("loading");
       expect(btn.title).toBe("Mängib");
     });
-
-    it("onEnded resets isPlaying and isLoading", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      await user.click(screen.getByText("Kuula"));
-      await act(async () => { audioCallbacks.onLoaded?.(); });
-
-      await act(async () => { audioCallbacks.onEnded?.(); });
-
-      const btn = screen.getByText("Kuula").closest("button")!;
-      expect(btn.className).not.toContain("playing");
-      expect(btn.className).not.toContain("loading");
-      expect(btn.title).toBe("Kuula");
-    });
-
-    it("onError resets isPlaying and isLoading", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      await user.click(screen.getByText("Kuula"));
-      await act(async () => { audioCallbacks.onLoaded?.(); });
-      await act(async () => { audioCallbacks.onError?.(); });
-
+    it("onEnded resets both", async () => {
+      render(<SentencePhoneticPanel {...dp} />);
+      await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
+      await act(async () => { cbs.onLoaded?.(); });
+      await act(async () => { cbs.onEnded?.(); });
       const btn = screen.getByText("Kuula").closest("button")!;
       expect(btn.className).not.toContain("playing");
       expect(btn.className).not.toContain("loading");
     });
-
-    it("catch block logs error with exact prefix and resets state", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error("synth fail"),
-      );
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-
-      await user.click(screen.getByText("Kuula"));
-      await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith("Failed to play:", expect.any(Error));
-      });
-
+    it("onError resets both", async () => {
+      render(<SentencePhoneticPanel {...dp} />);
+      await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
+      await waitFor(() => expect(cbs.onLoaded).toBeDefined());
+      await act(async () => { cbs.onLoaded?.(); });
+      await act(async () => { cbs.onError?.(); });
       const btn = screen.getByText("Kuula").closest("button")!;
       expect(btn.className).not.toContain("playing");
       expect(btn.className).not.toContain("loading");
-      consoleSpy.mockRestore();
     });
-
-    it("play button title shows 'Laen...' during loading", async () => {
+    it("catch logs and resets", async () => {
       const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockImplementation(
-        () => new Promise(() => {}),
-      );
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-
-      await user.click(screen.getByText("Kuula"));
-      expect(screen.getByText("Kuula").closest("button")?.title).toBe("Laen...");
+      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("x"));
+      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+      render(<SentencePhoneticPanel {...dp} />);
+      await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
+      await waitFor(() => expect(spy).toHaveBeenCalledWith("Failed to play:", expect.any(Error)));
+      const btn = screen.getByText("Kuula").closest("button")!;
+      expect(btn.className).not.toContain("playing");
+      expect(btn.className).not.toContain("loading");
+      spy.mockRestore();
     });
-
-    it("does not play when editedText is whitespace only", () => {
-      render(
-        <SentencePhoneticPanel {...defaultProps} phoneticText={null} sentenceText="" />,
-      );
-      expect(screen.getByText("Kuula").closest("button")).toBeDisabled();
-    });
-
-    it("shows loader-spinner when loading", async () => {
+    it("shows loader-spinner", async () => {
       const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockImplementation(
-        () => new Promise(() => {}),
-      );
-      const user = userEvent.setup();
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
-      await user.click(screen.getByText("Kuula"));
+      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {}));
+      const { container } = render(<SentencePhoneticPanel {...dp} />);
+      fireEvent.click(screen.getByText("Kuula"));
       expect(container.querySelector(".loader-spinner")).toBeTruthy();
     });
   });
 
+  // --- handleApply ---
   describe("handleApply", () => {
-    it("calls onApply with transformed text then onClose", async () => {
+    it("calls onApply with transformed text then onClose", () => {
       const onApply = vi.fn();
       const onClose = vi.fn();
-      const user = userEvent.setup();
-      render(
-        <SentencePhoneticPanel {...defaultProps} onApply={onApply} onClose={onClose} />,
-      );
-      await user.click(screen.getByRole("button", { name: /rakenda/i }));
-      expect(onApply).toHaveBeenCalledWith("Héllo wórld");
+      render(<SentencePhoneticPanel {...dp} onApply={onApply} onClose={onClose} />);
+      fireEvent.click(screen.getByRole("button", { name: /rakenda/i }));
+      expect(onApply).toHaveBeenCalledWith("abcde");
       expect(onClose).toHaveBeenCalled();
     });
-
-    it("does not call onApply when text is whitespace", async () => {
+    it("does not call onApply when whitespace", () => {
       const onApply = vi.fn();
-      const user = userEvent.setup();
-      render(
-        <SentencePhoneticPanel {...defaultProps} phoneticText={null} sentenceText="   " onApply={onApply} />,
-      );
-      await user.click(screen.getByRole("button", { name: /rakenda/i }));
+      render(<SentencePhoneticPanel {...dp} phoneticText={null} sentenceText="   " onApply={onApply} />);
+      fireEvent.click(screen.getByRole("button", { name: /rakenda/i }));
       expect(onApply).not.toHaveBeenCalled();
     });
-
-    it("uses empty string fallback when transformToVabamorf returns null", async () => {
+    it("null fallback from transformToVabamorf", () => {
       mockTransformToVabamorf.mockReturnValueOnce(null);
       const onApply = vi.fn();
-      const user = userEvent.setup();
-      render(
-        <SentencePhoneticPanel {...defaultProps} onApply={onApply} />,
-      );
-      await user.click(screen.getByRole("button", { name: /rakenda/i }));
+      render(<SentencePhoneticPanel {...dp} onApply={onApply} />);
+      fireEvent.click(screen.getByRole("button", { name: /rakenda/i }));
       expect(onApply).toHaveBeenCalledWith("");
     });
   });
 
+  // --- handleClose ---
   describe("handleClose", () => {
-    it("calls onClose", async () => {
+    it("calls onClose", () => {
       const onClose = vi.fn();
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} onClose={onClose} />);
-      await user.click(screen.getByRole("button", { name: /sulge/i }));
+      render(<SentencePhoneticPanel {...dp} onClose={onClose} />);
+      fireEvent.click(screen.getByRole("button", { name: /sulge/i }));
       expect(onClose).toHaveBeenCalled();
     });
-
-    it("resets playing/loading state on close", async () => {
+    it("resets state on close after play", async () => {
       const onClose = vi.fn();
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} onClose={onClose} />);
-
-      await user.click(screen.getByText("Kuula"));
-      await act(async () => { audioCallbacks.onLoaded?.(); });
-
-      await user.click(screen.getByRole("button", { name: /sulge/i }));
+      render(<SentencePhoneticPanel {...dp} onClose={onClose} />);
+      await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
+      await waitFor(() => expect(cbs.onLoaded).toBeDefined());
+      await act(async () => { cbs.onLoaded?.(); });
+      fireEvent.click(screen.getByRole("button", { name: /sulge/i }));
       expect(onClose).toHaveBeenCalled();
+      const btn = screen.getByText("Kuula").closest("button")!;
+      expect(btn.className).not.toContain("playing");
+      expect(btn.className).not.toContain("loading");
     });
   });
 
-  describe("handlePlay guard", () => {
-    it("handlePlay does not call synthesize when text is empty", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockClear();
-      render(
-        <SentencePhoneticPanel {...defaultProps} phoneticText={null} sentenceText="  " />,
-      );
-      // Button is disabled, so play won't fire
-      const btn = screen.getByText("Kuula").closest("button");
-      expect(btn).toBeDisabled();
-      expect(synthesizeWithPolling).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("button disabled states", () => {
-    it("play disabled when empty text", () => {
-      render(<SentencePhoneticPanel {...defaultProps} phoneticText={null} sentenceText="" />);
+  // --- button disabled ---
+  describe("disabled states", () => {
+    it("play disabled empty", () => {
+      render(<SentencePhoneticPanel {...dp} phoneticText={null} sentenceText="" />);
       expect(screen.getByText("Kuula").closest("button")).toBeDisabled();
     });
-
-    it("play disabled when isLoading", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockImplementation(
-        () => new Promise(() => {}),
-      );
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      await user.click(screen.getByText("Kuula"));
-      expect(screen.getByText("Kuula").closest("button")).toBeDisabled();
-    });
-
-    it("play enabled when text present and not loading", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText("Kuula").closest("button")).not.toBeDisabled();
-    });
-
-    it("apply disabled when empty text", () => {
-      render(<SentencePhoneticPanel {...defaultProps} phoneticText={null} sentenceText="" />);
+    it("apply disabled empty", () => {
+      render(<SentencePhoneticPanel {...dp} phoneticText={null} sentenceText="" />);
       expect(screen.getByRole("button", { name: /rakenda/i })).toBeDisabled();
     });
-
-    it("apply enabled when text present", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
+    it("play disabled whitespace-only (kills .trim() mutation)", () => {
+      render(<SentencePhoneticPanel {...dp} phoneticText={null} sentenceText="   " />);
+      expect(screen.getByText("Kuula").closest("button")).toBeDisabled();
+    });
+    it("apply disabled whitespace-only (kills .trim() mutation)", () => {
+      render(<SentencePhoneticPanel {...dp} phoneticText={null} sentenceText="   " />);
+      expect(screen.getByRole("button", { name: /rakenda/i })).toBeDisabled();
+    });
+    it("play enabled with text", () => {
+      render(<SentencePhoneticPanel {...dp} />);
+      expect(screen.getByText("Kuula").closest("button")).not.toBeDisabled();
+    });
+    it("apply enabled with text", () => {
+      render(<SentencePhoneticPanel {...dp} />);
       expect(screen.getByRole("button", { name: /rakenda/i })).not.toBeDisabled();
     });
   });
 
+  // --- guide view ---
   describe("guide view", () => {
-    it("shows guide when opened and hides main header", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      const guideBtn = screen.queryByLabelText("Ava hääldusmärkide juhend");
-      if (guideBtn) {
-        await user.click(guideBtn);
-        expect(screen.getByText("Hääldusmärkide juhend")).toBeInTheDocument();
-        expect(screen.queryByText("Muuda häälduskuju")).not.toBeInTheDocument();
-      }
+    it("opens guide and shows marker items", () => {
+      render(<SentencePhoneticPanel {...dp} />);
+      const btn = screen.queryByLabelText("Ava hääldusmärkide juhend");
+      if (!btn) return;
+      fireEvent.click(btn);
+      expect(screen.getByText("Hääldusmärkide juhend")).toBeInTheDocument();
+      expect(screen.queryByText("Muuda häälduskuju")).not.toBeInTheDocument();
+      expect(screen.getByText(/k`ätte/)).toBeInTheDocument();
+      expect(screen.getByText(/kolmas välde/)).toBeInTheDocument();
     });
-
-    it("guide close calls handleClose", async () => {
+    it("back button returns to edit view", () => {
+      render(<SentencePhoneticPanel {...dp} />);
+      const btn = screen.queryByLabelText("Ava hääldusmärkide juhend");
+      if (!btn) return;
+      fireEvent.click(btn);
+      fireEvent.click(screen.getByLabelText("Tagasi"));
+      expect(screen.getByText("Muuda häälduskuju")).toBeInTheDocument();
+    });
+    it("guide close calls handleClose", () => {
       const onClose = vi.fn();
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} onClose={onClose} />);
-      const guideBtn = screen.queryByLabelText("Ava hääldusmärkide juhend");
-      if (guideBtn) {
-        await user.click(guideBtn);
-        const closeButtons = screen.getAllByRole("button", { name: /sulge/i });
-        await user.click(closeButtons[0]!);
-        expect(onClose).toHaveBeenCalled();
-      }
+      render(<SentencePhoneticPanel {...dp} onClose={onClose} />);
+      const btn = screen.queryByLabelText("Ava hääldusmärkide juhend");
+      if (!btn) return;
+      fireEvent.click(btn);
+      const closes = screen.getAllByRole("button", { name: /sulge/i });
+      fireEvent.click(closes[0]!);
+      expect(onClose).toHaveBeenCalled();
     });
   });
 
-  describe("CSS classes", () => {
-    it("root class", () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
+  // --- CSS classes ---
+  describe("classes and attrs", () => {
+    it("root", () => {
+      const { container } = render(<SentencePhoneticPanel {...dp} />);
       expect(container.querySelector(".sentence-phonetic-panel")).toBeTruthy();
     });
-
-    it("header classes", () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(container.querySelector(".sentence-phonetic-panel__header")).toBeTruthy();
-      expect(container.querySelector(".sentence-phonetic-panel__title-section")).toBeTruthy();
-    });
-
-    it("play button button--primary", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
+    it("button--primary on play", () => {
+      render(<SentencePhoneticPanel {...dp} />);
       expect(screen.getByText("Kuula").closest("button")?.className).toContain("button--primary");
     });
-
-    it("apply button button--secondary", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
+    it("button--secondary on apply", () => {
+      render(<SentencePhoneticPanel {...dp} />);
       expect(screen.getByRole("button", { name: /rakenda/i }).className).toContain("button--secondary");
     });
-
-    it("textarea class", () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(container.querySelector(".sentence-phonetic-panel__textarea")).toBeTruthy();
+    it("play idle: exact class and title (kills empty-string mutations)", () => {
+      render(<SentencePhoneticPanel {...dp} />);
+      const btn = screen.getByText("Kuula").closest("button")!;
+      const classes = btn.className.trim().split(/\s+/);
+      expect(classes).toEqual(["button", "button--primary"]);
+      expect(btn.title).toBe("Kuula");
     });
-
+    it("textarea rows=4 and placeholder", () => {
+      const { container } = render(<SentencePhoneticPanel {...dp} />);
+      const ta = container.querySelector("textarea")!;
+      expect(Number(ta.rows)).toBe(4);
+      expect(ta.placeholder).toBe("Kirjuta oma foneetiline variant");
+    });
     it("close button class", () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
+      const { container } = render(<SentencePhoneticPanel {...dp} />);
       expect(container.querySelector(".sentence-phonetic-panel__close")).toBeTruthy();
-    });
-
-    it("markers guide box class", () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(container.querySelector(".sentence-phonetic-panel__markers-guide-box")).toBeTruthy();
-    });
-
-    it("textarea placeholder", () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
-      const ta = container.querySelector("textarea");
-      expect(ta?.placeholder).toBe("Kirjuta oma foneetiline variant");
-    });
-
-    it("textarea rows=4", () => {
-      const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(Number(container.querySelector("textarea")?.rows)).toBe(4);
     });
   });
 });

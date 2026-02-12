@@ -181,7 +181,7 @@ describe("BaseModal mutation kills", () => {
     expect(container.querySelector(".base-modal__header")).toBeTruthy();
   });
 
-  it("shiftKey+Tab on non-first element does not wrap", () => {
+  it("Shift+Tab on middle does NOT wrap to last (kills L101 || mutant)", () => {
     render(
       <BaseModal isOpen={true} onClose={vi.fn()} title="T">
         <button>First</button>
@@ -191,8 +191,54 @@ describe("BaseModal mutation kills", () => {
     );
     const middleBtn = screen.getByText("Middle");
     middleBtn.focus();
-    // Shift+Tab on middle shouldn't wrap (it's not the first element)
     fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
-    // Focus should stay or move naturally, not wrap to last
+    const lastBtn = screen.getByText("Last");
+    expect(document.activeElement).not.toBe(lastBtn);
+  });
+
+  it("Tab on middle does NOT wrap to first (kills L104 || mutant)", () => {
+    render(
+      <BaseModal isOpen={true} onClose={vi.fn()} title="T">
+        <button>First</button>
+        <button>Middle</button>
+        <button>Last</button>
+      </BaseModal>,
+    );
+    const middleBtn = screen.getByText("Middle");
+    middleBtn.focus();
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: false });
+    const closeBtn = screen.getByRole("button", { name: /sulge/i });
+    expect(document.activeElement).not.toBe(closeBtn);
+  });
+
+  it("preventBackdropClose prevents close on backdrop click", () => {
+    const onClose = vi.fn();
+    const { container } = render(
+      <BaseModal isOpen={true} onClose={onClose} preventBackdropClose={true}>
+        <p>C</p>
+      </BaseModal>,
+    );
+    fireEvent.click(container.querySelector(".base-modal__backdrop")!);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("initial focus moves to first focusable element via rAF", () => {
+    render(
+      <BaseModal isOpen={true} onClose={vi.fn()} title="T">
+        <button>MyBtn</button>
+      </BaseModal>,
+    );
+    const closeBtn = screen.getByRole("button", { name: /sulge/i });
+    expect(document.activeElement).toBe(closeBtn);
+  });
+
+  it("header renders when title is provided (kills L152 false)", () => {
+    const { container } = render(
+      <BaseModal isOpen={true} onClose={vi.fn()} title="Hello">
+        <p>C</p>
+      </BaseModal>,
+    );
+    expect(container.querySelector(".base-modal__header")).toBeTruthy();
+    expect(screen.getByText("Hello")).toBeInTheDocument();
   });
 });

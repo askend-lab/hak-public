@@ -154,4 +154,28 @@ describe("LoginModal mutation kills", () => {
     );
     expect(container.querySelector(".login-modal")).toBeTruthy();
   });
+
+  it("returns null when isOpen is false (kills L102 false mutant)", () => {
+    const { container } = render(
+      <LoginModal isOpen={false} onClose={vi.fn()} />,
+    );
+    expect(container.querySelector(".login-modal")).toBeNull();
+  });
+
+  it("hr elements have borderTop style (kills L139/L154 empty string)", () => {
+    render(<LoginModal isOpen={true} onClose={vi.fn()} />);
+    const divider = document.querySelector(".login-modal__divider");
+    const hrs = divider?.querySelectorAll("hr");
+    expect(hrs?.length).toBe(2);
+    hrs?.forEach((hr) => {
+      expect(hr.style.borderTop).toBeTruthy();
+    });
+  });
+
+  it("divider container has expected children", () => {
+    render(<LoginModal isOpen={true} onClose={vi.fn()} />);
+    const divider = document.querySelector(".login-modal__divider");
+    expect(divider?.childElementCount).toBe(3);
+    expect(divider?.querySelector("span")?.textContent).toBe("või");
+  });
 });
