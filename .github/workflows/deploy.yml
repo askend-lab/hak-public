@@ -43,19 +43,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTIFACTS_BUCKET: askend-lab-artifacts
   ARTIFACTS_PREFIX: hak/builds
   DEPLOYMENTS_PREFIX: hak/deployments
-  # CloudFront distribution IDs per environment
-  CF_DIST_DEV: E232G8TMX7360Y
-  CF_DIST_PROD: E2D4DEJKUQ1SXC
-  # Cognito for SimpleStore authorizer
-  COGNITO_USER_POOL_ARN: arn:aws:cognito-idp:eu-west-1:465168436856:userpool/eu-west-1_wlRtuLkG2
-  # Domain for serverless-domain-manager
-  DOMAIN_NAME: askend-lab.com
-  AWS_ACCOUNT_ID: "465168436856"
-  HOSTED_ZONE_ID: Z0251725SXN1AR149FEI
-  CERTIFICATE_ARN: arn:aws:acm:eu-west-1:465168436856:certificate/f91069e3-9ca9-4651-b912-765c9f49fc0d
 
 jobs:
   deploy:
@@ -89,8 +78,18 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::465168436856:role/GitHubActionsRole
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
+
+      - name: Load config from SSM
+        run: |
+          echo "ARTIFACTS_BUCKET=$(aws ssm get-parameter --name /hak/shared/artifacts-bucket --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "CF_DIST_DEV=$(aws ssm get-parameter --name /hak/shared/cloudfront-dist-dev --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "CF_DIST_PROD=$(aws ssm get-parameter --name /hak/shared/cloudfront-dist-prod --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "COGNITO_USER_POOL_ARN=$(aws ssm get-parameter --name /hak/shared/cognito-user-pool-arn --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "DOMAIN_NAME=$(aws ssm get-parameter --name /hak/shared/domain-name --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "HOSTED_ZONE_ID=$(aws ssm get-parameter --name /hak/shared/hosted-zone-id --query Parameter.Value --output text)" >> $GITHUB_ENV
+          echo "CERTIFICATE_ARN=$(aws ssm get-parameter --name /hak/shared/certificate-arn --query Parameter.Value --output text)" >> $GITHUB_ENV
 
       - name: Get build manifest and current state
         id: state
