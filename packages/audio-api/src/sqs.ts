@@ -23,7 +23,20 @@ async function withRetry<T>(
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
+  /* istanbul ignore next -- unreachable: loop always returns or throws */
   throw new Error("Retry failed");
+}
+
+async function sendSqsMessage(
+  sqsClient: SQSClientLike,
+  queueUrl: string,
+  body: Record<string, unknown>,
+): Promise<void> {
+  const command = new SendMessageCommand({
+    QueueUrl: queueUrl,
+    MessageBody: JSON.stringify({ ...body, timestamp: Date.now() }),
+  });
+  await withRetry(() => sqsClient.send(command));
 }
 
 export async function publishToQueue(
@@ -32,20 +45,12 @@ export async function publishToQueue(
   text: string,
   hash: string,
 ): Promise<void> {
-  const command = new SendMessageCommand({
-    QueueUrl: queueUrl,
-    MessageBody: JSON.stringify({ text, hash, timestamp: Date.now() }),
-  });
-  await withRetry(() => sqsClient.send(command));
+  await sendSqsMessage(sqsClient, queueUrl, { text, hash });
 }
 
 export async function publishWarmMessage(
   sqsClient: SQSClientLike,
   queueUrl: string,
 ): Promise<void> {
-  const command = new SendMessageCommand({
-    QueueUrl: queueUrl,
-    MessageBody: JSON.stringify({ type: "warm", timestamp: Date.now() }),
-  });
-  await withRetry(() => sqsClient.send(command));
+  await sendSqsMessage(sqsClient, queueUrl, { type: "warm" });
 }

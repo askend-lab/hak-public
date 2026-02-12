@@ -2,12 +2,13 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { handler } from "../src/handler";
+import { buildS3Url } from "../src/s3";
 
 import {
   TestContext,
   createTestContext,
   setupTestEnv,
-  setupCacheHit,
+  setupCache,
   createRequestEvent,
   TEST_BUCKET,
 } from "./setup";
@@ -22,7 +23,7 @@ describe("Lambda Handler - Cache Hit", () => {
 
   it("should return URL when file exists in S3", async () => {
     const event = createRequestEvent("tere");
-    const hash = setupCacheHit(ctx.mockS3, "tere");
+    const hash = setupCache(ctx.mockS3, "tere", true);
 
     const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
@@ -36,21 +37,21 @@ describe("Lambda Handler - Cache Hit", () => {
 
   it("should have correct URL format with status ready", async () => {
     const event = createRequestEvent("hello");
-    const hash = setupCacheHit(ctx.mockS3, "hello");
+    const hash = setupCache(ctx.mockS3, "hello", true);
 
     const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     const body = JSON.parse(response.body);
     expect(body.status).toBe("ready");
     expect(body.url).toBe(
-      `https://${TEST_BUCKET}.s3.${process.env.AWS_REGION ?? "eu-west-1"}.amazonaws.com/cache/${hash}.mp3`,
+      buildS3Url(TEST_BUCKET, process.env.AWS_REGION ?? "eu-west-1", `cache/${hash}.mp3`),
     );
     expect(body.hash).toBe(hash);
   });
 
   it("should NOT send SQS message on cache hit", async () => {
     const event = createRequestEvent("tere");
-    setupCacheHit(ctx.mockS3, "tere");
+    setupCache(ctx.mockS3, "tere", true);
 
     await handler(event, ctx.mockS3, ctx.mockSQS);
 

@@ -39,15 +39,13 @@ export function setupTestEnv(): void {
   process.env.QUEUE_URL = TEST_QUEUE_URL;
 }
 
-export function setupCacheHit(mockS3: MockS3Client, text: string): string {
+export function setupCache(
+  mockS3: MockS3Client,
+  text: string,
+  exists: boolean,
+): string {
   const hash = calculateHashSync(text);
-  mockS3.setFileExists(`cache/${hash}.mp3`, true);
-  return hash;
-}
-
-export function setupCacheMiss(mockS3: MockS3Client, text: string): string {
-  const hash = calculateHashSync(text);
-  mockS3.setFileExists(`cache/${hash}.mp3`, false);
+  mockS3.setFileExists(`cache/${hash}.mp3`, exists);
   return hash;
 }
 

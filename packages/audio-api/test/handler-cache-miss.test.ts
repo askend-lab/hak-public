@@ -7,7 +7,7 @@ import {
   TestContext,
   createTestContext,
   setupTestEnv,
-  setupCacheMiss,
+  setupCache,
   createRequestEvent,
 } from "./setup";
 
@@ -21,7 +21,7 @@ describe("Lambda Handler - Cache Miss", () => {
 
   it("should send SQS message when file not in S3", async () => {
     const event = createRequestEvent("new-phrase");
-    const hash = setupCacheMiss(ctx.mockS3, "new-phrase");
+    const hash = setupCache(ctx.mockS3, "new-phrase", false);
 
     await handler(event, ctx.mockS3, ctx.mockSQS);
 
@@ -33,7 +33,7 @@ describe("Lambda Handler - Cache Miss", () => {
 
   it("should return status processing with hash", async () => {
     const event = createRequestEvent("new-phrase");
-    const hash = setupCacheMiss(ctx.mockS3, "new-phrase");
+    const hash = setupCache(ctx.mockS3, "new-phrase", false);
 
     const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
@@ -45,7 +45,7 @@ describe("Lambda Handler - Cache Miss", () => {
 
   it("should return hash for frontend polling", async () => {
     const event = createRequestEvent("test");
-    const hash = setupCacheMiss(ctx.mockS3, "test");
+    const hash = setupCache(ctx.mockS3, "test", false);
 
     const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 

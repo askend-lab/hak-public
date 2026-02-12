@@ -3,18 +3,16 @@
 
 import { lambdaHandler, healthHandler, warmHandler } from "../src/index";
 
-jest.mock("../src/handler", () => ({
-  handler: jest.fn().mockResolvedValue({
-    statusCode: 200,
-    body: JSON.stringify({ success: true }),
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-    },
-  }),
-}));
+jest.mock("../src/handler", () => {
+  const { CORS_HEADERS } = require("../src/response");
+  return {
+    handler: jest.fn().mockResolvedValue({
+      statusCode: 200,
+      body: JSON.stringify({ success: true }),
+      headers: { ...CORS_HEADERS },
+    }),
+  };
+});
 
 jest.mock("../src/sqs", () => ({
   publishWarmMessage: jest.fn().mockResolvedValue(undefined),

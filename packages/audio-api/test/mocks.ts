@@ -16,30 +16,18 @@ export class MockS3Client implements S3ClientLike {
   }
 
   send(
-    command: HeadObjectCommand | SendMessageCommand,
-  ): Promise<
-    { $metadata: { httpStatusCode: number } } | { MessageId: string }
-  > {
+    command: HeadObjectCommand,
+  ): Promise<{ $metadata: { httpStatusCode: number } }> {
     if (this.shouldThrow) {
       throw new Error("Mock S3 error");
     }
-    if (command instanceof HeadObjectCommand) {
-      const params = command.input;
-      const exists = this.files.get(params.Key ?? "");
-      if (exists === true) {
-        return Promise.resolve({ $metadata: { httpStatusCode: 200 } });
-      }
-      const error = new Error("Not Found") as Error & { name: string };
-      error.name = "NotFound";
-      throw error;
+    const exists = this.files.get(command.input.Key ?? "");
+    if (exists === true) {
+      return Promise.resolve({ $metadata: { httpStatusCode: 200 } });
     }
-    throw new Error(
-      `Unknown command: ${command.constructor.name}`,
-    );
-  }
-
-  reset(): void {
-    this.files.clear();
+    const error = new Error("Not Found") as Error & { name: string };
+    error.name = "NotFound";
+    throw error;
   }
 }
 
@@ -47,14 +35,7 @@ export class MockSQSClient implements SQSClientLike {
   public messages: SendMessageCommand["input"][] = [];
 
   send(command: SendMessageCommand): Promise<{ MessageId: string }> {
-    if (command instanceof SendMessageCommand) {
-      this.messages.push(command.input);
-      return Promise.resolve({ MessageId: "mock-message-id" });
-    }
-    throw new Error("Unknown command");
-  }
-
-  reset(): void {
-    this.messages = [];
+    this.messages.push(command.input);
+    return Promise.resolve({ MessageId: "mock-message-id" });
   }
 }
