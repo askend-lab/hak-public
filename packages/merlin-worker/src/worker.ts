@@ -17,11 +17,13 @@ import type { Message } from "@aws-sdk/client-sqs";
 
 const logger = createLogger("info");
 
-function getReceiptHandle(message: Message): string {
+const TEXT_PREVIEW_LENGTH = 50;
+
+export function getReceiptHandle(message: Message): string {
   return message.ReceiptHandle ?? "";
 }
 
-function getMessageId(message: Message): string {
+export function getMessageId(message: Message): string {
   return message.MessageId ?? "unknown";
 }
 
@@ -56,7 +58,7 @@ export async function processMessage(
     }
 
     const { text, hash } = parsed;
-    logger.info(`Processing: hash=${hash}, text="${text.substring(0, 50)}..."`);
+    logger.info(`Processing: hash=${hash}, text="${text.substring(0, TEXT_PREVIEW_LENGTH)}..."`);
 
     const audioBuffer = await synthesize(text, config.merlinUrl);
     logger.info(`Synthesized: ${String(audioBuffer.length)} bytes`);
@@ -81,7 +83,7 @@ export async function processMessage(
   }
 }
 
-const ERROR_RETRY_DELAY_MS = 5000;
+export const ERROR_RETRY_DELAY_MS = 5000;
 
 /* istanbul ignore next */
 export async function runWorker(
