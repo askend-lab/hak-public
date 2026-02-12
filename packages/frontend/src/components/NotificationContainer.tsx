@@ -47,7 +47,7 @@ const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
       color?: NotificationColor,
       action?: NotificationAction,
     ) => {
-      const id = `notification-${Date.now()}-${Math.random()}`;
+      const id = `notification-${crypto.randomUUID()}`;
       const notification: NotificationData = {
         id,
         type,

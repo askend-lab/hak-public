@@ -63,7 +63,7 @@ const transformEntryToSentence = (entry: RawEntry): SentenceState => {
     ? convertTextToTags(entry.stressedText)
     : [];
   return ensureSentenceState({
-    id: entry.id || `entry_${Date.now()}_${Math.random()}`,
+    id: entry.id || `entry_${crypto.randomUUID()}`,
     text: entry.text,
     tags: words,
     isPlaying: false,
@@ -84,7 +84,7 @@ const restoreFromStorage = (
 ): SentenceState[] => {
   return stored.map((s) =>
     ensureSentenceState({
-      id: s.id || `entry_${Date.now()}_${Math.random()}`,
+      id: s.id || `entry_${crypto.randomUUID()}`,
       text: s.text || "",
       tags: s.tags || [],
       isPlaying: false,
