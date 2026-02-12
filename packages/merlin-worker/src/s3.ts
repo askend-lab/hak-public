@@ -3,7 +3,7 @@
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const AUDIO_CONTENT_TYPE = "audio/mpeg";
+export const AUDIO_CONTENT_TYPE = "audio/mpeg";
 
 export function buildCacheKey(hash: string): string {
   return `cache/${hash}.mp3`;

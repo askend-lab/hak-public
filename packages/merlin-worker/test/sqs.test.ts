@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { receiveMessage, deleteMessage, parseMessage, isWarmMessage, MAX_MESSAGES, WAIT_TIME_SECONDS } from "../src/sqs";
+import { receiveMessage, deleteMessage, parseMessage, isWarmMessage, isAudioMessage, MAX_MESSAGES, WAIT_TIME_SECONDS } from "../src/sqs";
 import { createMockSqsClient } from "./setup";
 
 const mockSqsClient = createMockSqsClient();
@@ -158,6 +158,16 @@ describe("SQS Operations", () => {
     it("should throw for numeric hash", () => {
       const message = { Body: JSON.stringify({ text: "hello", hash: 123 }) };
       expect(() => parseMessage(message as { Body: string })).toThrow("Missing hash field");
+    });
+  });
+
+  describe("isAudioMessage", () => {
+    it("should return true for audio message", () => {
+      expect(isAudioMessage({ text: "hello", hash: "abc" })).toBe(true);
+    });
+
+    it("should return false for warm message", () => {
+      expect(isAudioMessage({ type: "warm" })).toBe(false);
     });
   });
 

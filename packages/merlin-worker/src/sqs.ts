@@ -23,6 +23,10 @@ export function isWarmMessage(msg: ParsedMessage): msg is WarmMessage {
   return "type" in msg && msg.type === "warm";
 }
 
+export function isAudioMessage(msg: ParsedMessage): msg is AudioMessage {
+  return !isWarmMessage(msg);
+}
+
 export const MAX_MESSAGES = 1;
 export const WAIT_TIME_SECONDS = 20;
 

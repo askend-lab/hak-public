@@ -17,7 +17,7 @@ import type { Message } from "@aws-sdk/client-sqs";
 
 const logger = createLogger("info");
 
-const TEXT_PREVIEW_LENGTH = 50;
+export const TEXT_PREVIEW_LENGTH = 50;
 
 export function getReceiptHandle(message: Message): string {
   return message.ReceiptHandle ?? "";
