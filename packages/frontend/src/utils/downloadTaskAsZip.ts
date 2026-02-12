@@ -4,8 +4,7 @@
 import JSZip from "jszip";
 import { Task, TaskEntry, hasAudioSource } from "@/types/task";
 import { formatDateTime } from "@/utils/formatDate";
-import { synthesizeWithPolling } from "@/utils/synthesize";
-import { getVoiceModel } from "@/types/synthesis";
+import { synthesizeAuto } from "@/utils/synthesize";
 
 function sanitizeFilename(text: string): string {
   return text
@@ -24,10 +23,7 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
   // Synthesize audio if not available
   if (!audioUrl) {
     try {
-      audioUrl = await synthesizeWithPolling(
-        entry.stressedText || entry.text,
-        getVoiceModel(entry.text),
-      );
+      audioUrl = await synthesizeAuto(entry.stressedText || entry.text);
     } catch {
       return null;
     }

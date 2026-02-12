@@ -2,9 +2,9 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu, convertTextToTags, getVoiceModel, CACHE_INVALIDATION } from "@/types/synthesis";
+import { EditingTag, OpenTagMenu, convertTextToTags, CACHE_INVALIDATION } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
-import { synthesizeWithPolling } from "@/utils/synthesize";
+import { synthesizeAuto } from "@/utils/synthesize";
 import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
 import { useTagEditor } from "./synthesis/useTagEditor";
 import { usePlaylistControl } from "./synthesis/usePlaylistControl";
@@ -100,10 +100,7 @@ export function useSynthesis() {
 
       if (!audioUrl) {
         try {
-          audioUrl = await synthesizeWithPolling(
-            sentence.text,
-            getVoiceModel(sentence.text),
-          );
+          audioUrl = await synthesizeAuto(sentence.text);
           updateSentence(id, { audioUrl });
         } catch (error) {
           console.error("Failed to generate audio:", error);

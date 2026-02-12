@@ -20,6 +20,7 @@ vi.mock("jszip", () => {
 
 vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
+  synthesizeAuto: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
 }));
 
 vi.mock("@/types/synthesis", () => ({
@@ -146,8 +147,6 @@ describe("downloadTaskAsZip", () => {
   });
 
   it("synthesizes audio when entry has no audioUrl or audioBlob", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
-
     vi.spyOn(document.body, "appendChild").mockImplementation(() => null as unknown as Node);
     vi.spyOn(document.body, "removeChild").mockImplementation(() => null as unknown as Node);
     vi.spyOn(document, "createElement").mockReturnValue({
@@ -174,7 +173,8 @@ describe("downloadTaskAsZip", () => {
 
     await downloadTaskAsZip(taskWithNoAudio);
 
-    expect(synthesizeWithPolling).toHaveBeenCalledWith("Tere", "efm_s");
+    const { synthesizeAuto } = await import("@/utils/synthesize");
+    expect(synthesizeAuto).toHaveBeenCalledWith("Tere");
     // fetch called once to download the synthesized audio URL
     expect(global.fetch).toHaveBeenCalledWith("https://example.com/synthesized.wav");
   });

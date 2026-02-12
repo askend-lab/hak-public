@@ -20,6 +20,7 @@ vi.mock("jszip", () => {
 
 vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
+  synthesizeAuto: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
 }));
 
 vi.mock("@/types/synthesis", () => ({
@@ -173,30 +174,30 @@ describe("downloadTaskAsZip mutations", () => {
   });
 
   it("prefers stressedText for synthesis", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeAuto } = await import("@/utils/synthesize");
     setupDomMocks();
     const task = { ...mockTask, entries: [
       { id: "e1", taskId: "t1", text: "plain", stressedText: "stressed",
         audioUrl: null, audioBlob: null, order: 0, createdAt: new Date() },
     ] };
     await downloadTaskAsZip(task);
-    expect(synthesizeWithPolling).toHaveBeenCalledWith("stressed", expect.any(String));
+    expect(synthesizeAuto).toHaveBeenCalledWith("stressed");
   });
 
   it("falls back to text when stressedText is empty", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeAuto } = await import("@/utils/synthesize");
     setupDomMocks();
     const task = { ...mockTask, entries: [
       { id: "e1", taskId: "t1", text: "fallback", stressedText: "",
         audioUrl: null, audioBlob: null, order: 0, createdAt: new Date() },
     ] };
     await downloadTaskAsZip(task);
-    expect(synthesizeWithPolling).toHaveBeenCalledWith("fallback", expect.any(String));
+    expect(synthesizeAuto).toHaveBeenCalledWith("fallback");
   });
 
   it("skips audio on synthesis failure", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
-    (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("fail"));
+    const { synthesizeAuto } = await import("@/utils/synthesize");
+    (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("fail"));
     setupDomMocks();
     const task = { ...mockTask, entries: [
       { id: "e1", taskId: "t1", text: "X", stressedText: "",
