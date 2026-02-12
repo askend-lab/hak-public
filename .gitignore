@@ -56,6 +56,29 @@ packages/merlin-worker/tools/**/Makefile
 # Generated TypeScript from Gherkin specs
 *.generated.ts
 
+# Misplaced backend services in frontend
+packages/frontend/src/services/merlin/
+packages/frontend/src/services/vabamorf/
+
+# Temp lab files
+packages/merlin-worker/tools/genlab/lab/
+
+# WORLD build artifacts, Visual Studio project, test data
+packages/merlin-worker/tools/WORLD/build/
+packages/merlin-worker/tools/WORLD/visualstudio/
+packages/merlin-worker/tools/WORLD/test/
+packages/merlin-worker/tools/WORLD/wav_test/
+
+# Native binaries
+packages/vabamorf-api/vmetajson
+packages/frontend/src/services/vabamorf/vmetajson
+
+# Visual Studio files
+*.suo
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
 # Internal DevBox tooling
 devbox
 devbox.yaml
