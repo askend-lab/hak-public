@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import JSZip from "jszip";
-import { Task, TaskEntry } from "@/types/task";
+import { Task, TaskEntry, hasAudioSource } from "@/types/task";
 import { formatDateTime } from "@/utils/formatDate";
 import { synthesizeWithPolling } from "@/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
@@ -19,7 +19,7 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
     return entry.audioBlob;
   }
 
-  let audioUrl = entry.audioUrl;
+  let audioUrl = hasAudioSource(entry) ? entry.audioUrl : null;
 
   // Synthesize audio if not available
   if (!audioUrl) {

@@ -2,10 +2,9 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu, convertTextToTags } from "@/types/synthesis";
+import { EditingTag, OpenTagMenu, convertTextToTags, getVoiceModel } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
 import { synthesizeWithPolling } from "@/utils/synthesize";
-import { getVoiceModel } from "@/types/synthesis";
 import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
 import { useTagEditor } from "./synthesis/useTagEditor";
 import { usePlaylistControl } from "./synthesis/usePlaylistControl";
