@@ -22,3 +22,22 @@ test-results
 playwright-report
 .lhci
 .stryker-tmp
+
+# Generated test/mutation reports
+**/reports/mutation/
+**/.nyc_output/
+
+# macOS
+.DS_Store
+
+# Build logs
+*.log
+
+# IDE project files
+**/nbproject/
+
+# Internal DevBox tooling
+devbox
+devbox.yaml
+defaults.yaml
+.githooks/
