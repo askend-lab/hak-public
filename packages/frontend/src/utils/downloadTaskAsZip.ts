@@ -4,6 +4,8 @@
 import JSZip from "jszip";
 import { Task, TaskEntry } from "@/types/task";
 import { formatDateTime } from "@/utils/formatDate";
+import { synthesizeWithPolling } from "@/utils/synthesize";
+import { getVoiceModel } from "@/types/synthesis";
 
 function sanitizeFilename(text: string): string {
   return text
@@ -16,9 +18,25 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
   if (entry.audioBlob && entry.audioBlob.size > 0) {
     return entry.audioBlob;
   }
-  if (!entry.audioUrl) return null;
+
+  let audioUrl = entry.audioUrl;
+
+  // Synthesize audio if not available
+  if (!audioUrl) {
+    try {
+      audioUrl = await synthesizeWithPolling(
+        entry.stressedText || entry.text,
+        getVoiceModel(entry.text),
+      );
+    } catch {
+      return null;
+    }
+  }
+
+  if (!audioUrl) return null;
+
   try {
-    const response = await fetch(entry.audioUrl);
+    const response = await fetch(audioUrl);
     if (!response.ok) return null;
     return await response.blob();
   } catch {

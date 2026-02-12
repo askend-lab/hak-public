@@ -18,6 +18,14 @@ vi.mock("jszip", () => {
   };
 });
 
+vi.mock("@/utils/synthesize", () => ({
+  synthesizeWithPolling: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
+}));
+
+vi.mock("@/types/synthesis", () => ({
+  getVoiceModel: vi.fn().mockReturnValue("efm_s"),
+}));
+
 describe("downloadTaskAsZip", () => {
   let mockTask: Task;
 
@@ -135,5 +143,39 @@ describe("downloadTaskAsZip", () => {
     await downloadTaskAsZip(emptyTask);
 
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("synthesizes audio when entry has no audioUrl or audioBlob", async () => {
+    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+
+    vi.spyOn(document.body, "appendChild").mockImplementation(() => null as unknown as Node);
+    vi.spyOn(document.body, "removeChild").mockImplementation(() => null as unknown as Node);
+    vi.spyOn(document, "createElement").mockReturnValue({
+      href: "",
+      download: "",
+      click: vi.fn(),
+    } as unknown as HTMLAnchorElement);
+
+    const taskWithNoAudio = {
+      ...mockTask,
+      entries: [
+        {
+          id: "entry-3",
+          taskId: "task-1",
+          text: "Tere",
+          stressedText: "Tere",
+          audioUrl: null,
+          audioBlob: null,
+          order: 0,
+          createdAt: new Date(),
+        },
+      ],
+    };
+
+    await downloadTaskAsZip(taskWithNoAudio);
+
+    expect(synthesizeWithPolling).toHaveBeenCalledWith("Tere", "efm_s");
+    // fetch called once to download the synthesized audio URL
+    expect(global.fetch).toHaveBeenCalledWith("https://example.com/synthesized.wav");
   });
 });
