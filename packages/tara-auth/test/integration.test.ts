@@ -6,11 +6,13 @@ const mockExchangeCodeForTokens = jest.fn();
 const mockVerifyIdToken = jest.fn();
 
 jest.mock('../src/tara-client', () => ({
-  createTaraClient: jest.fn().mockResolvedValue({
-    buildAuthorizationUrl: mockBuildAuthorizationUrl,
-    exchangeCodeForTokens: mockExchangeCodeForTokens,
-    verifyIdToken: mockVerifyIdToken,
-  }),
+  createTaraClient: jest.fn().mockImplementation(() =>
+    Promise.resolve({
+      buildAuthorizationUrl: mockBuildAuthorizationUrl,
+      exchangeCodeForTokens: mockExchangeCodeForTokens,
+      verifyIdToken: mockVerifyIdToken,
+    })
+  ),
 }));
 
 // Mock Cognito client
@@ -18,10 +20,10 @@ const mockFindOrCreateUser = jest.fn();
 const mockGenerateTokens = jest.fn();
 
 jest.mock('../src/cognito-client', () => ({
-  createCognitoClient: jest.fn().mockReturnValue({
+  createCognitoClient: jest.fn().mockImplementation(() => ({
     findOrCreateUser: mockFindOrCreateUser,
     generateTokens: mockGenerateTokens,
-  }),
+  })),
 }));
 
 // Import handlers after mocks are set up
