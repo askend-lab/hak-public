@@ -51,6 +51,7 @@ function isValidLogLevel(level: string): level is LogLevel {
 }
 
 function isNodeEnv(): boolean {
+  // eslint-disable-next-line no-restricted-globals
   return typeof process !== "undefined";
 }
 
