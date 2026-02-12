@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
-import { S3Client, HeadObjectCommand } from "@aws-sdk/client-s3";
 import {
   ECSClient,
   UpdateServiceCommand,
@@ -10,12 +8,17 @@ import {
 } from "@aws-sdk/client-ecs";
 import { createHash } from "crypto";
 
-const sqsClient = new SQSClient({ region: process.env.AWS_REGION_NAME });
-const s3Client = new S3Client({ region: process.env.AWS_REGION_NAME });
-const ecsClient = new ECSClient({ region: process.env.AWS_REGION_NAME });
+import {
+  createResponse,
+  createInternalError,
+  HTTP_STATUS,
+  type LambdaResponse,
+} from "./response";
+import { getAwsRegion, VOICE_DEFAULTS } from "./env";
+import { checkS3Cache, buildAudioUrl } from "./s3";
+import { sendToQueue } from "./sqs";
 
-const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL ?? "";
-const S3_BUCKET = process.env.S3_BUCKET ?? "";
+const ecsClient = new ECSClient({ region: getAwsRegion() });
 
 interface SynthesizeRequest {
   text: string;
@@ -24,7 +27,7 @@ interface SynthesizeRequest {
   pitch?: number;
 }
 
-function generateCacheKey(
+export function generateCacheKey(
   text: string,
   voice: string,
   speed: number,
@@ -34,49 +37,19 @@ function generateCacheKey(
   return createHash("sha256").update(input).digest("hex");
 }
 
-async function checkS3Cache(cacheKey: string): Promise<boolean> {
-  try {
-    await s3Client.send(
-      new HeadObjectCommand({
-        Bucket: S3_BUCKET,
-        Key: `cache/${cacheKey}.wav`,
-      }),
-    );
-    return true;
-  } catch {
-    return false;
+const WARMUP_COOLDOWN_MS = 60_000;
+let lastWarmupTime = 0;
+
+function checkRateLimit(): LambdaResponse | null {
+  const now = Date.now();
+  if (now - lastWarmupTime < WARMUP_COOLDOWN_MS) {
+    return createResponse(HTTP_STATUS.TOO_MANY_REQUESTS, {
+      error: "Rate limited. Try again later.",
+      retryAfterMs: WARMUP_COOLDOWN_MS - (now - lastWarmupTime),
+    });
   }
-}
-
-async function sendToQueue(message: object): Promise<string> {
-  const result = await sqsClient.send(
-    new SendMessageCommand({
-      QueueUrl: SQS_QUEUE_URL,
-      MessageBody: JSON.stringify(message),
-    }),
-  );
-  return result.MessageId ?? "";
-}
-
-interface LambdaResponse {
-  statusCode: number;
-  headers: Record<string, string>;
-  body: string;
-}
-
-const CORS_HEADERS = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization",
-  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-} as const;
-
-function createResponse(statusCode: number, body: object): LambdaResponse {
-  return {
-    statusCode,
-    headers: { ...CORS_HEADERS },
-    body: JSON.stringify(body),
-  };
+  lastWarmupTime = now;
+  return null;
 }
 
 export async function synthesize(event: {
@@ -85,26 +58,26 @@ export async function synthesize(event: {
   try {
     const body: SynthesizeRequest = JSON.parse(event.body ?? "{}");
 
-    if (!body.text) {
-      return createResponse(400, { error: "Missing text field" });
-    }
-
-    const voice = body.voice ?? "efm_l";
-    const speed = body.speed ?? 1.0;
-    const pitch = body.pitch ?? 0;
-    const cacheKey = generateCacheKey(body.text, voice, speed, pitch);
-
-    // Check if already cached
-    const cached = await checkS3Cache(cacheKey);
-    if (cached) {
-      return createResponse(200, {
-        status: "ready",
-        cacheKey,
-        audioUrl: `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? "eu-west-1"}.amazonaws.com/cache/${cacheKey}.wav`,
+    if (typeof body.text !== "string" || body.text === "") {
+      return createResponse(HTTP_STATUS.BAD_REQUEST, {
+        error: "Missing text field",
       });
     }
 
-    // Send to SQS for processing
+    const voice = body.voice ?? VOICE_DEFAULTS.voice;
+    const speed = body.speed ?? VOICE_DEFAULTS.speed;
+    const pitch = body.pitch ?? VOICE_DEFAULTS.pitch;
+    const cacheKey = generateCacheKey(body.text, voice, speed, pitch);
+
+    const cached = await checkS3Cache(cacheKey);
+    if (cached) {
+      return createResponse(HTTP_STATUS.OK, {
+        status: "ready",
+        cacheKey,
+        audioUrl: buildAudioUrl(cacheKey),
+      });
+    }
+
     await sendToQueue({
       text: body.text,
       voice,
@@ -113,14 +86,13 @@ export async function synthesize(event: {
       cacheKey,
     });
 
-    return createResponse(202, {
+    return createResponse(HTTP_STATUS.ACCEPTED, {
       status: "processing",
       cacheKey,
-      audioUrl: `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? "eu-west-1"}.amazonaws.com/cache/${cacheKey}.wav`,
+      audioUrl: buildAudioUrl(cacheKey),
     });
   } catch (error) {
-    console.error("Synthesize error:", error);
-    return createResponse(500, { error: "Internal server error" });
+    return createInternalError("Synthesize error", error);
   }
 }
 
@@ -131,50 +103,41 @@ export async function status(event: {
     const cacheKey = event.pathParameters?.cacheKey;
 
     if (!cacheKey) {
-      return createResponse(400, { error: "Missing cacheKey" });
+      return createResponse(HTTP_STATUS.BAD_REQUEST, {
+        error: "Missing cacheKey",
+      });
     }
 
     const ready = await checkS3Cache(cacheKey);
 
-    return createResponse(200, {
+    return createResponse(HTTP_STATUS.OK, {
       status: ready ? "ready" : "processing",
       cacheKey,
-      audioUrl: ready
-        ? `https://${S3_BUCKET}.s3.${process.env.AWS_REGION_NAME ?? "eu-west-1"}.amazonaws.com/cache/${cacheKey}.wav`
-        : null,
+      audioUrl: ready ? buildAudioUrl(cacheKey) : null,
     });
   } catch (error) {
-    console.error("Status error:", error);
-    return createResponse(500, { error: "Internal server error" });
+    return createInternalError("Status error", error);
   }
 }
 
 export async function health(): Promise<LambdaResponse> {
-  return createResponse(200, { status: "ok", version: "1.0.0" });
+  return createResponse(HTTP_STATUS.OK, { status: "ok", version: "1.0.0" });
 }
 
-const WARMUP_COOLDOWN_MS = 60_000;
-let lastWarmupTime = 0;
-
 export async function warmup(): Promise<LambdaResponse> {
-  const now = Date.now();
-  if (now - lastWarmupTime < WARMUP_COOLDOWN_MS) {
-    return createResponse(429, {
-      error: "Rate limited. Try again later.",
-      retryAfterMs: WARMUP_COOLDOWN_MS - (now - lastWarmupTime),
-    });
-  }
-  lastWarmupTime = now;
+  const rateLimited = checkRateLimit();
+  if (rateLimited) return rateLimited;
 
   const cluster = process.env.ECS_CLUSTER ?? "";
   const service = process.env.ECS_SERVICE ?? "";
 
   if (!cluster || !service) {
-    return createResponse(500, { error: "Missing ECS config" });
+    return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
+      error: "Missing ECS config",
+    });
   }
 
   try {
-    // Check current state
     const describe = await ecsClient.send(
       new DescribeServicesCommand({
         cluster,
@@ -186,14 +149,13 @@ export async function warmup(): Promise<LambdaResponse> {
     const running = describe.services?.[0]?.runningCount ?? 0;
 
     if (currentDesired >= 1) {
-      return createResponse(200, {
+      return createResponse(HTTP_STATUS.OK, {
         status: "already_warm",
         running,
         desired: currentDesired,
       });
     }
 
-    // Scale up to 1
     await ecsClient.send(
       new UpdateServiceCommand({
         cluster,
@@ -202,9 +164,12 @@ export async function warmup(): Promise<LambdaResponse> {
       }),
     );
 
-    return createResponse(200, { status: "warming", running: 0, desired: 1 });
+    return createResponse(HTTP_STATUS.OK, {
+      status: "warming",
+      running: 0,
+      desired: 1,
+    });
   } catch (error) {
-    console.error("Warmup error:", error);
-    return createResponse(500, { error: "Failed to warmup" });
+    return createInternalError("Warmup error", error);
   }
 }
