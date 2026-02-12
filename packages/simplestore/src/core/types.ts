@@ -67,6 +67,20 @@ export interface StoreConfig {
   readonly keyDelimiter: string;
 }
 
+/** Single source of truth for valid data types */
+export const VALID_DATA_TYPES: readonly DataType[] = [
+  "private",
+  "unlisted",
+  "public",
+  "shared",
+] as const;
+
+/** Shared default configuration — used by store and validation */
+export const DEFAULT_CONFIG: StoreConfig = {
+  maxTtlSeconds: 31536000,
+  keyDelimiter: "#",
+};
+
 /**
  * Storage adapter interface - dependency injection point
  */

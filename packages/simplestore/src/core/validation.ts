@@ -5,7 +5,7 @@
  * Validation logic - pure functions, no external dependencies
  */
 
-import { DataType, StoreRequest, StoreConfig } from "./types";
+import { DataType, StoreRequest, StoreConfig, VALID_DATA_TYPES, DEFAULT_CONFIG } from "./types";
 
 /**
  * Validation result with collected errors
@@ -15,19 +15,7 @@ export interface ValidationResult {
   readonly errors: string[];
 }
 
-const VALID_TYPES: readonly DataType[] = [
-  "private",
-  "unlisted",
-  "public",
-  "shared",
-] as const;
-
 const MAX_KEY_LENGTH = 1024;
-
-const DEFAULT_CONFIG: StoreConfig = {
-  maxTtlSeconds: 31536000, // 1 year
-  keyDelimiter: "#",
-};
 
 /**
  * Creates a validation result
@@ -58,8 +46,8 @@ function validateRequiredString(
  * Validates data type field
  */
 function validateType(type: unknown, errors: string[]): void {
-  if (!VALID_TYPES.includes(type as DataType)) {
-    errors.push(`type must be one of: ${VALID_TYPES.join(", ")}`);
+  if (!VALID_DATA_TYPES.includes(type as DataType)) {
+    errors.push(`type must be one of: ${VALID_DATA_TYPES.join(", ")}`);
   }
 }
 
@@ -144,15 +132,6 @@ export function validateGetRequest(
 }
 
 /**
- * Validates prefix string (allows empty string for query all)
- */
-function validatePrefix(value: unknown, name: string, errors: string[]): void {
-  if (value !== undefined && typeof value !== "string") {
-    errors.push(`${name} must be a string`);
-  }
-}
-
-/**
  * Validates query request parameters
  */
 export function validateQueryRequest(
@@ -161,7 +140,11 @@ export function validateQueryRequest(
 ): ValidationResult {
   const errors: string[] = [];
 
-  validatePrefix(pkPrefix, "prefix", errors);
+  if (pkPrefix === undefined || pkPrefix === null) {
+    errors.push("prefix is required");
+  } else if (typeof pkPrefix !== "string") {
+    errors.push("prefix must be a string");
+  }
   validateType(type, errors);
 
   return result(errors);
@@ -187,12 +170,12 @@ export function validateServerContext(
  * Check if type is valid
  */
 export function isValidType(type: unknown): type is DataType {
-  return VALID_TYPES.includes(type as DataType);
+  return VALID_DATA_TYPES.includes(type as DataType);
 }
 
 /**
  * Get valid types list
  */
 export function getValidTypes(): readonly DataType[] {
-  return VALID_TYPES;
+  return VALID_DATA_TYPES;
 }

@@ -66,12 +66,8 @@ function getUserId(event: APIGatewayProxyEvent): string | null {
   return null;
 }
 
-/**
- * Get required env variable or default
- */
 function getEnv(name: string, defaultValue: string): string {
-  const value = process.env[name];
-  return value && value.trim() !== "" ? value : defaultValue;
+  return process.env[name]?.trim() || defaultValue;
 }
 
 /**
@@ -111,20 +107,18 @@ const routes: Route[] = [
   { method: "GET", path: "/query", handler: handleQuery },
 ];
 
+// #6 Set for O(1) lookup instead of triple OR
+const PUBLIC_READABLE_TYPES = new Set(["shared", "unlisted", "public"]);
+
 /**
  * Check if request is for publicly readable data (read-only access allowed without auth)
- * - shared: everyone can read and modify
- * - unlisted: everyone can read, only owner can modify
- * - public: everyone can read, only owner can modify
  */
 function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
   if (event.httpMethod !== "GET") return false;
-
-  // /get-public endpoint always allows anonymous access (type validation done in handler)
   if (event.resource === "/get-public") return true;
 
   const type = event.queryStringParameters?.type;
-  return type === "shared" || type === "unlisted" || type === "public";
+  return type !== undefined && PUBLIC_READABLE_TYPES.has(type);
 }
 
 /**

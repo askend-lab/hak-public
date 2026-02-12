@@ -13,6 +13,7 @@ import {
   DataType,
   StorageAdapter,
   StoreConfig,
+  DEFAULT_CONFIG,
 } from "./types";
 import { parseTtl } from "./validation";
 
@@ -21,11 +22,6 @@ export const ERRORS = {
   NOT_FOUND: "Item not found",
   ACCESS_DENIED: "Access denied: not owner",
 } as const;
-
-const DEFAULT_CONFIG: StoreConfig = {
-  maxTtlSeconds: 31536000,
-  keyDelimiter: "#",
-};
 
 /**
  * Builds partition key for context-based grouping
@@ -104,7 +100,7 @@ export class Store {
     try {
       // Check if item exists to preserve createdAt
       const existing = await this.adapter.get(keys.pk, keys.sk);
-      const item = this.createItem(request, existing?.createdAt);
+      const item = this.createItem(keys, request, existing?.createdAt);
 
       await this.adapter.put(item);
       return this.success(item);
@@ -186,16 +182,10 @@ export class Store {
   }
 
   private createItem(
+    keys: { pk: string; sk: string },
     request: StoreRequest,
     existingCreatedAt?: string,
   ): StoreItem {
-    const keys = buildKeys(
-      this.context,
-      request.type,
-      request.pk,
-      request.sk,
-      this.config.keyDelimiter,
-    );
     const now = new Date().toISOString();
 
     return {

@@ -14,6 +14,7 @@ import {
   validateStoreRequest,
   validateGetRequest,
   validateQueryRequest,
+  ValidationResult,
   ERRORS,
 } from "../core";
 
@@ -62,6 +63,23 @@ function createErrorResponse(
   return createResponse(status, { error });
 }
 
+// #5 Extracted query param helper — eliminates 4x `?? {}` pattern
+function getQueryParams(event: APIGatewayProxyEvent): Record<string, string> {
+  return (event.queryStringParameters ?? {}) as Record<string, string>;
+}
+
+// #3 Extracted validation gate — eliminates repeated validate+error pattern
+function validateOrError(
+  validation: ValidationResult,
+): APIGatewayProxyResult | null {
+  if (!validation.valid) {
+    return createResponse(HTTP_STATUS.BAD_REQUEST, {
+      errors: validation.errors,
+    });
+  }
+  return null;
+}
+
 function parseBody(
   event: APIGatewayProxyEvent,
 ): Record<string, unknown> | null {
@@ -84,12 +102,10 @@ export async function handleSave(
     });
   }
 
-  const validation = validateStoreRequest(body as Partial<StoreRequest>);
-  if (!validation.valid) {
-    return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      errors: validation.errors,
-    });
-  }
+  const validationError = validateOrError(
+    validateStoreRequest(body as Partial<StoreRequest>),
+  );
+  if (validationError) return validationError;
 
   const request: StoreRequest = {
     pk: body.pk as string,
@@ -107,48 +123,46 @@ export async function handleSave(
     : createErrorResponse(result.error, HTTP_STATUS.BAD_REQUEST);
 }
 
-export async function handleGet(
+// #2 Extracted common get logic — shared by handleGet and handleGetPublic
+async function executeGet(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
-  const { pk, sk, type } = event.queryStringParameters ?? {};
+  const { pk, sk, type } = getQueryParams(event);
 
-  const validation = validateGetRequest(pk, sk, type);
-  if (!validation.valid) {
-    return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      errors: validation.errors,
-    });
-  }
+  const validationError = validateOrError(validateGetRequest(pk, sk, type));
+  if (validationError) return validationError;
 
   const result = await store.get(pk as string, sk as string, type as DataType);
 
-  // Always return 200 - null item means not found
-  // This prevents CloudFront from transforming 404 to SPA fallback HTML
   if (result.success) {
     return createResponse(HTTP_STATUS.OK, { item: result.item });
   }
 
   // Not found is a valid result - return 200 with null item
+  // This prevents CloudFront from transforming 404 to SPA fallback HTML
   if (result.error === ERRORS.NOT_FOUND) {
     return createResponse(HTTP_STATUS.OK, { item: null });
   }
 
-  // Other errors (access denied, etc.) still return appropriate status
   return createErrorResponse(result.error, HTTP_STATUS.FORBIDDEN);
+}
+
+export async function handleGet(
+  event: APIGatewayProxyEvent,
+  store: Store,
+): Promise<APIGatewayProxyResult> {
+  return executeGet(event, store);
 }
 
 export async function handleDelete(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
-  const { pk, sk, type } = event.queryStringParameters ?? {};
+  const { pk, sk, type } = getQueryParams(event);
 
-  const validation = validateGetRequest(pk, sk, type);
-  if (!validation.valid) {
-    return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      errors: validation.errors,
-    });
-  }
+  const validationError = validateOrError(validateGetRequest(pk, sk, type));
+  if (validationError) return validationError;
 
   const result = await store.delete(
     pk as string,
@@ -164,22 +178,12 @@ export async function handleQuery(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
-  const { prefix, type } = event.queryStringParameters ?? {};
+  const { prefix, type } = getQueryParams(event);
 
-  const validation = validateQueryRequest(prefix, type);
-  if (!validation.valid) {
-    return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      errors: validation.errors,
-    });
-  }
+  const validationError = validateOrError(validateQueryRequest(prefix, type));
+  if (validationError) return validationError;
 
-  if (prefix === undefined) {
-    return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      error: "Missing prefix parameter",
-    });
-  }
-
-  const result = await store.query(prefix, type as DataType);
+  const result = await store.query(prefix as string, type as DataType);
   return result.success
     ? createResponse(HTTP_STATUS.OK, { items: result.items })
     : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_ERROR);
@@ -197,14 +201,7 @@ export async function handleGetPublic(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
-  const { pk, sk, type } = event.queryStringParameters ?? {};
-
-  const validation = validateGetRequest(pk, sk, type);
-  if (!validation.valid) {
-    return createResponse(HTTP_STATUS.BAD_REQUEST, {
-      errors: validation.errors,
-    });
-  }
+  const { type } = getQueryParams(event);
 
   // Reject private type - this endpoint is only for public-readable data
   if (type === "private") {
@@ -213,15 +210,5 @@ export async function handleGetPublic(
     });
   }
 
-  const result = await store.get(pk as string, sk as string, type as DataType);
-
-  if (result.success) {
-    return createResponse(HTTP_STATUS.OK, { item: result.item });
-  }
-
-  if (result.error === ERRORS.NOT_FOUND) {
-    return createResponse(HTTP_STATUS.OK, { item: null });
-  }
-
-  return createErrorResponse(result.error, HTTP_STATUS.FORBIDDEN);
+  return executeGet(event, store);
 }
