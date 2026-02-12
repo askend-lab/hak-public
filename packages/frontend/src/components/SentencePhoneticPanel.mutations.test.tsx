@@ -83,6 +83,11 @@ describe("SentencePhoneticPanel mutation kills", () => {
     render(<SentencePhoneticPanel {...dp} />);
     expect(document.activeElement).toBe(screen.getByRole("textbox"));
   });
+  it("focuses textarea when isOpen changes from false to true (kills L109 dep)", () => {
+    const { rerender } = render(<SentencePhoneticPanel {...dp} isOpen={false} />);
+    rerender(<SentencePhoneticPanel {...dp} isOpen={true} />);
+    expect(document.activeElement).toBe(screen.getByRole("textbox"));
+  });
   it("shows edit view by default (not guide)", () => {
     render(<SentencePhoneticPanel {...dp} />);
     expect(screen.getByText("Muuda häälduskuju")).toBeInTheDocument();
