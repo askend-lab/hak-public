@@ -19,9 +19,9 @@ export {
   validateServerContext,
   parseTtl,
   isValidType,
-  getValidTypes,
 } from "./validation";
 export type { ValidationResult, TtlResult } from "./validation";
+export { VALID_DATA_TYPES, DEFAULT_CONFIG } from "./types";
 export type {
   DataType,
   ServerContext,

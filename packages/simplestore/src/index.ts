@@ -14,6 +14,8 @@
 export {
   Store,
   ERRORS,
+  VALID_DATA_TYPES,
+  DEFAULT_CONFIG,
   buildKeys,
   buildPartitionKey,
   buildSortKey,
@@ -23,7 +25,6 @@ export {
   validateServerContext,
   parseTtl,
   isValidType,
-  getValidTypes,
 } from "./core";
 
 export type {
@@ -47,12 +48,11 @@ export {
   setAdapter,
   handleSave,
   handleGet,
+  handleGetPublic,
   handleDelete,
   handleQuery,
+  handleDebugError,
   createResponse,
   HTTP_STATUS,
   HTTP_ERRORS,
 } from "./lambda";
-
-// Legacy exports for backward compatibility (deprecated)
-export { Store as default } from "./core";

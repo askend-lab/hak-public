@@ -5,7 +5,7 @@
  * In-memory storage adapter for testing
  */
 
-import { StorageAdapter, StoreItem } from "../core/types";
+import { StorageAdapter, StoreItem, DEFAULT_CONFIG } from "../core/types";
 
 /**
  * In-memory store implementing StorageAdapter interface
@@ -13,9 +13,14 @@ import { StorageAdapter, StoreItem } from "../core/types";
  */
 export class InMemoryAdapter implements StorageAdapter {
   private readonly data: Map<string, StoreItem> = new Map();
+  private readonly delimiter: string;
+
+  constructor(delimiter: string = DEFAULT_CONFIG.keyDelimiter) {
+    this.delimiter = delimiter;
+  }
 
   private buildKey(pk: string, sk: string): string {
-    return `${pk}#${sk}`;
+    return `${pk}${this.delimiter}${sk}`;
   }
 
   async put(item: StoreItem): Promise<void> {
@@ -40,7 +45,7 @@ export class InMemoryAdapter implements StorageAdapter {
   ): Promise<StoreItem[]> {
     const results: StoreItem[] = [];
 
-    for (const [_key, item] of this.data) {
+    for (const item of this.data.values()) {
       if (item.PK === pk && item.SK.startsWith(skPrefix)) {
         results.push({ ...item });
       }
