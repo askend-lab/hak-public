@@ -14,7 +14,9 @@ const mockFeature = (
   name,
   description: "",
   tags,
-  scenarios: scenarios.map((s) => ({ name: s, steps: [], tags: [] })),
+  scenarios: scenarios.map((s) => ({ name: s, steps: [], tags: [], examples: [] })),
+  rules: [],
+  errors: [],
 });
 
 const mockTestSuites = [

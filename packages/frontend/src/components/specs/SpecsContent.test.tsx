@@ -5,16 +5,20 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import SpecsContent from "./SpecsContent";
 
+import type { StepKeyword } from "@hak/specifications";
+
 const mockFeature = (
   name: string,
-  scenarios: { name: string; steps: string[] }[],
+  scenarios: { name: string; steps: { keyword: StepKeyword; text: string }[] }[],
   tags: string[] = [],
   desc = "",
 ) => ({
   name,
   description: desc,
   tags,
-  scenarios: scenarios.map((s) => ({ ...s, tags: [] })),
+  scenarios: scenarios.map((s) => ({ ...s, tags: [], examples: [] })),
+  rules: [],
+  errors: [],
 });
 
 const mockSuites = [
@@ -91,7 +95,11 @@ describe("SpecsContent steps", () => {
     const feature = mockFeature("Feature", [
       {
         name: "Scenario",
-        steps: ["Given something", "When action", "Then result"],
+        steps: [
+          { keyword: "Given", text: "something" },
+          { keyword: "When", text: "action" },
+          { keyword: "Then", text: "result" },
+        ],
       },
     ]);
     render(<SpecsContent feature={feature} testSuites={[]} />);
@@ -102,16 +110,22 @@ describe("SpecsContent steps", () => {
 
   it("renders And/But keywords", () => {
     const feature = mockFeature("Feature", [
-      { name: "Scenario", steps: ["And more", "But not this"] },
+      {
+        name: "Scenario",
+        steps: [
+          { keyword: "And", text: "more" },
+          { keyword: "But", text: "not this" },
+        ],
+      },
     ]);
     render(<SpecsContent feature={feature} testSuites={[]} />);
     expect(screen.getByText("And")).toBeInTheDocument();
     expect(screen.getByText("But")).toBeInTheDocument();
   });
 
-  it("handles steps without keyword", () => {
+  it("handles steps with keyword and text", () => {
     const feature = mockFeature("Feature", [
-      { name: "Scenario", steps: ["plain step text"] },
+      { name: "Scenario", steps: [{ keyword: "Given", text: "plain step text" }] },
     ]);
     render(<SpecsContent feature={feature} testSuites={[]} />);
     expect(screen.getByText("plain step text")).toBeInTheDocument();
