@@ -72,7 +72,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       "/api/vabamorf": {
-        target: process.env.VITE_VABAMORF_URL ?? "http://localhost:8080",
+        target: process.env.VITE_VABAMORF_URL ?? "https://vabamorf-dev.askend-lab.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/vabamorf/, ""),
         configure: (proxy) => {
@@ -83,7 +83,7 @@ export default defineConfig({
         },
       },
       "/api/merlin": {
-        target: process.env.VITE_MERLIN_URL ?? "http://localhost:8081",
+        target: process.env.VITE_MERLIN_URL ?? "https://merlin-prod.askend-lab.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/merlin/, ""),
         configure: (proxy) => {
@@ -94,7 +94,7 @@ export default defineConfig({
         },
       },
       "/api/audio": {
-        target: process.env.VITE_AUDIO_API_URL ?? "http://localhost:4001",
+        target: process.env.VITE_AUDIO_API_URL ?? "https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/audio/, "/dev"),
         configure: (proxy) => {
@@ -105,7 +105,7 @@ export default defineConfig({
         },
       },
       "/api/analyze": {
-        target: process.env.VITE_VABAMORF_URL ?? "http://localhost:8080",
+        target: process.env.VITE_VABAMORF_URL ?? "https://vabamorf-dev.askend-lab.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
         configure: (proxy) => {
@@ -116,7 +116,7 @@ export default defineConfig({
         },
       },
       "/api/variants": {
-        target: process.env.VITE_VABAMORF_URL ?? "http://localhost:8080",
+        target: process.env.VITE_VABAMORF_URL ?? "https://vabamorf-dev.askend-lab.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
         configure: (proxy) => {
@@ -127,7 +127,7 @@ export default defineConfig({
         },
       },
       "/api/synthesize": {
-        target: process.env.VITE_MERLIN_URL ?? "http://localhost:8081",
+        target: process.env.VITE_MERLIN_URL ?? "https://merlin-prod.askend-lab.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
         configure: (proxy) => {
@@ -138,7 +138,7 @@ export default defineConfig({
         },
       },
       "/api/status": {
-        target: process.env.VITE_MERLIN_URL ?? "http://localhost:8081",
+        target: process.env.VITE_MERLIN_URL ?? "https://merlin-prod.askend-lab.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
         configure: (proxy) => {
