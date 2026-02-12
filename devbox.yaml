@@ -20,7 +20,6 @@ test_modules:
   - name: merlin-api
     path: packages/merlin-api
     type: jest
-    min_coverage_lines: 85
   - name: vabamorf-api
     path: packages/vabamorf-api
     type: jest
@@ -30,16 +29,14 @@ test_modules:
   - name: tara-auth
     path: packages/tara-auth
     type: jest
-    min_coverage_lines: 60
-    min_coverage_branches: 30
+    min_coverage_branches: 90
   - name: shared
     path: packages/shared
     type: jest
   - name: frontend
     path: packages/frontend
     type: vitest
-    min_coverage_lines: 94
-    min_coverage_branches: 75
+    min_coverage_branches: 85
     command: "pnpm test"
     command_full: "pnpm test:coverage"
     results_file: "jest-results.json"
@@ -51,7 +48,7 @@ test_modules:
 
 # Global coverage settings
 coverage:
-  min_total: 45
+  min_total: 95
 
 # Task Channel - Slack-based agent communication
 task_channel:
