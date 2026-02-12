@@ -10,8 +10,11 @@ import {
   isWarmMessage,
 } from "../src/sqs";
 import { processMessage } from "../src/worker";
-import type { SQSClient } from "@aws-sdk/client-sqs";
-import type { S3Client } from "@aws-sdk/client-s3";
+import {
+  createMockSqsClient,
+  createMockS3Client,
+  TEST_CONFIG,
+} from "./setup";
 
 jest.mock("../src/sqs", () => ({
   receiveMessage: jest.fn(),
@@ -28,13 +31,9 @@ jest.mock("../src/s3", () => ({
   uploadAudio: jest.fn(),
 }));
 
-const mockSqsClient = { send: jest.fn() } as unknown as SQSClient;
-const mockS3Client = { send: jest.fn() } as unknown as S3Client;
-const config = {
-  queueUrl: "https://queue-url",
-  bucketName: "test-bucket",
-  merlinUrl: "https://merlin-url/synthesize",
-};
+const mockSqsClient = createMockSqsClient();
+const mockS3Client = createMockS3Client();
+const config = TEST_CONFIG;
 
 describe("Worker", () => {
   beforeEach(() => {

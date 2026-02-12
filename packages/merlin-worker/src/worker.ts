@@ -13,8 +13,17 @@ import {
   deleteMessage,
   isWarmMessage,
 } from "./sqs";
+import type { Message } from "@aws-sdk/client-sqs";
 
 const logger = createLogger("info");
+
+function getReceiptHandle(message: Message): string {
+  return message.ReceiptHandle ?? "";
+}
+
+function getMessageId(message: Message): string {
+  return message.MessageId ?? "unknown";
+}
 
 export interface WorkerConfig {
   queueUrl: string;
@@ -41,7 +50,7 @@ export async function processMessage(
       await deleteMessage(
         sqsClient,
         config.queueUrl,
-        message.ReceiptHandle ?? "",
+        getReceiptHandle(message),
       );
       return true;
     }
@@ -58,14 +67,14 @@ export async function processMessage(
     await deleteMessage(
       sqsClient,
       config.queueUrl,
-      message.ReceiptHandle ?? "",
+      getReceiptHandle(message),
     );
-    logger.info(`Deleted message: ${message.MessageId ?? "unknown"}`);
+    logger.info(`Deleted message: ${getMessageId(message)}`);
 
     return true;
   } catch (error) {
     logger.error(
-      `Error processing message ${message.MessageId ?? "unknown"}:`,
+      `Error processing message ${getMessageId(message)}:`,
       error,
     );
     throw error;
