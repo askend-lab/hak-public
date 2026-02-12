@@ -63,4 +63,25 @@ describe("ShareTaskModal mutation kills", () => {
     render(<ShareTaskModal isOpen={true} shareToken="abc" taskName="T" onClose={mockOnClose} />);
     expect(screen.getByText("Jaga ülesanne")).toBeInTheDocument();
   });
+
+  it("isCopying resets to false after successful copy", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, writable: true, configurable: true });
+    const user = userEvent.setup();
+    render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} />);
+    await user.click(screen.getByRole("button", { name: "Kopeeri" }));
+    // After copy completes, button should show "Kopeeri" (not "Kopeeritud!")
+    expect(screen.getByRole("button", { name: "Kopeeri" })).not.toBeDisabled();
+  });
+
+  it("isCopying resets to false after failed copy", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, writable: true, configurable: true });
+    const user = userEvent.setup();
+    render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} />);
+    await user.click(screen.getByRole("button", { name: "Kopeeri" }));
+    expect(screen.getByRole("button", { name: "Kopeeri" })).not.toBeDisabled();
+    spy.mockRestore();
+  });
 });

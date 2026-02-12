@@ -10,3 +10,4 @@ playwright-report/
 
 # Stryker mutation testing
 .stryker-tmp/
+reports/stryker-incremental.json

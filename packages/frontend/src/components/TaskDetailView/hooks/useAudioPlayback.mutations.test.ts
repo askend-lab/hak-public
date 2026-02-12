@@ -252,4 +252,16 @@ describe("useAudioPlayback mutation kills", () => {
       expect(result.current.isPlayingAll).toBe(false);
     });
   });
+
+  describe("playSingleEntry synthesis path", () => {
+    it("synthesis failure in playAll clears loading and returns false", async () => {
+      const { synthesizeWithPolling } = await import("@/utils/synthesize");
+      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("fail"));
+      const entries = [makeEntry("e1")];
+      const { result } = renderHook(() => useAudioPlayback(entries));
+      await act(async () => { await result.current.handlePlayAll(); });
+      expect(result.current.currentLoadingId).toBeNull();
+      expect(result.current.isPlayingAll).toBe(false);
+    });
+  });
 });
