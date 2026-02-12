@@ -13,12 +13,14 @@ import {
 import { analyze } from "./vmetajson";
 
 // Docker: both files in /var/task/, Dev: package.json is one level up from src/
-let version = "0.0.0";
-try {
-  version = require("./package.json").version;
-} catch {
-  version = require("../package.json").version;
+function loadVersion(): string {
+  try {
+    return require("./package.json").version;
+  } catch {
+    return require("../package.json").version;
+  }
 }
+const version = loadVersion();
 
 // Kept in sync with @hak/shared TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH
 const MAX_TEXT_LENGTH = 10_000;
@@ -27,6 +29,12 @@ const HTTP_STATUS = {
   OK: 200,
   BAD_REQUEST: 400,
   INTERNAL_ERROR: 500,
+} as const;
+
+const ERRORS = {
+  MISSING_BODY: "Missing request body",
+  INVALID_JSON: "Invalid JSON",
+  NO_VARIANTS: "No phonetic variants found for the word",
 } as const;
 
 interface ParsedInput<T> {
@@ -40,6 +48,10 @@ interface ParseError {
 }
 type ParseResult<T> = ParsedInput<T> | ParseError;
 
+function badRequest(error: string): ParseError {
+  return { success: false, response: createResponse(HTTP_STATUS.BAD_REQUEST, { error }) };
+}
+
 function parseAndValidate<T>(
   event: APIGatewayProxyEvent,
   fieldName: string,
@@ -47,36 +59,17 @@ function parseAndValidate<T>(
 ): ParseResult<T> {
   ensureInitialized();
 
-  if (event.body === null)
-    return {
-      success: false,
-      response: createResponse(HTTP_STATUS.BAD_REQUEST, {
-        error: "Missing request body",
-      }),
-    };
+  if (event.body === null) return badRequest(ERRORS.MISSING_BODY);
 
   const body = parseJsonBody(event.body);
-
-  if (body === null)
-    return {
-      success: false,
-      response: createResponse(HTTP_STATUS.BAD_REQUEST, {
-        error: "Invalid JSON",
-      }),
-    };
+  if (body === null) return badRequest(ERRORS.INVALID_JSON);
 
   const fieldResult = validateField(
     body as Record<string, unknown>,
     fieldName,
     maxLength,
   );
-  if ("error" in fieldResult)
-    return {
-      success: false,
-      response: createResponse(HTTP_STATUS.BAD_REQUEST, {
-        error: fieldResult.error,
-      }),
-    };
+  if ("error" in fieldResult) return badRequest(fieldResult.error);
 
   return { success: true, body: body as T, value: fieldResult.value };
 }
@@ -121,7 +114,7 @@ export async function variantsHandler(
 
     if (variants.length === 0)
       return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
-        error: "No phonetic variants found for the word",
+        error: ERRORS.NO_VARIANTS,
       });
 
     return createResponse(HTTP_STATUS.OK, { word: parsed.value, variants });

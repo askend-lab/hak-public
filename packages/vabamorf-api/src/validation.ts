@@ -10,6 +10,13 @@ const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
 // Stryker disable next-line all: env defaults are equivalent
 const DICT_PATH = process.env.DICT_PATH ?? ".";
 
+const RESPONSE_HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+} as const;
+
 export function createResponse(
   statusCode: number,
   body: object,
@@ -17,12 +24,7 @@ export function createResponse(
   return {
     statusCode,
     body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type,Authorization",
-      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    },
+    headers: RESPONSE_HEADERS,
   };
 }
 
@@ -51,7 +53,7 @@ export function getFieldError(
   if (!fieldValue.trim()) return `'${fieldName}' must be a non-empty string`;
 
   if (maxLength != null && fieldValue.length > maxLength)
-    return `Text is too long (max ${String(maxLength)} characters)`;
+    return `Text is too long (max ${maxLength} characters)`;
   return null;
 }
 

@@ -4,8 +4,6 @@
 import { buildDescription } from "./description-builder";
 import { Variant, MorphologyInfo } from "./types";
 
-export { buildDescription };
-
 export function formatPhoneticText(stem: string, ending: string): string {
   return ending && ending !== "0" ? `${stem}+${ending}` : stem;
 }

@@ -12,6 +12,11 @@ interface QueuedRequest {
   timeoutId: ReturnType<typeof setTimeout>;
 }
 
+const VMETAJSON_PARAMS = ["--stem", "--addphonetics"] as const;
+
+// Stryker disable next-line all: env default is equivalent
+const TIMEOUT_MS = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
+
 let vmetajsonProcess: ChildProcess | null = null;
 const requestQueue: QueuedRequest[] = [];
 let currentRequest: QueuedRequest | null = null;
@@ -29,22 +34,21 @@ function processNextRequest(): void {
   vmetajsonProcess.stdin.write(`${JSON.stringify(currentRequest.input)}\n`);
 }
 
-function completeCurrentRequest(response: VmetajsonResponse): void {
+function finishCurrentRequest(action: (req: QueuedRequest) => void): void {
   if (currentRequest) {
     clearTimeout(currentRequest.timeoutId);
-    currentRequest.resolve(response);
+    action(currentRequest);
     currentRequest = null;
     processNextRequest();
   }
 }
 
+function completeCurrentRequest(response: VmetajsonResponse): void {
+  finishCurrentRequest((req) => req.resolve(response));
+}
+
 function failCurrentRequest(error: Error): void {
-  if (currentRequest) {
-    clearTimeout(currentRequest.timeoutId);
-    currentRequest.reject(error);
-    currentRequest = null;
-    processNextRequest();
-  }
+  finishCurrentRequest((req) => req.reject(error));
 }
 
 export function initVmetajson(
@@ -109,14 +113,12 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
 
   const input: VmetajsonInput = {
     params: {
-      vmetajson: ["--stem", "--addphonetics"],
+      vmetajson: [...VMETAJSON_PARAMS],
     },
     content: text,
   };
 
   return new Promise((resolve, reject) => {
-    // Stryker disable next-line all: env default is equivalent
-    const timeoutMs = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
     const timeoutId = setTimeout(() => {
       const index = requestQueue.findIndex((r) => r.timeoutId === timeoutId);
       // Stryker disable next-line all: boundary condition is equivalent
@@ -129,7 +131,7 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
         reject(new Error("vmetajson timeout"));
         processNextRequest();
       }
-    }, timeoutMs);
+    }, TIMEOUT_MS);
 
     requestQueue.push({ resolve, reject, input, timeoutId });
     processNextRequest();
