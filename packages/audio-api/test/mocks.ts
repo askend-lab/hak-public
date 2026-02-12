@@ -4,7 +4,10 @@
 import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { SendMessageCommand } from "@aws-sdk/client-sqs";
 
-export class MockS3Client {
+import type { S3ClientLike } from "../src/s3";
+import type { SQSClientLike } from "../src/sqs";
+
+export class MockS3Client implements S3ClientLike {
   private readonly files = new Map<string, boolean>();
   public shouldThrow = false;
 
@@ -40,7 +43,7 @@ export class MockS3Client {
   }
 }
 
-export class MockSQSClient {
+export class MockSQSClient implements SQSClientLike {
   public messages: SendMessageCommand["input"][] = [];
 
   send(command: SendMessageCommand): Promise<{ MessageId: string }> {

@@ -24,6 +24,14 @@ function isS3Error(error: unknown): error is S3Error {
   );
 }
 
+export function buildS3Url(
+  bucketName: string,
+  region: string,
+  key: string,
+): string {
+  return `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
+}
+
 export async function checkFileExists(
   s3Client: S3ClientLike,
   bucket: string,

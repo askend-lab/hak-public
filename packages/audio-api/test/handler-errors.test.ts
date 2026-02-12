@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import type { S3Client } from "@aws-sdk/client-s3";
-import type { SQSClient } from "@aws-sdk/client-sqs";
-
 import { handler } from "../src/handler";
 
 import {
@@ -13,9 +10,6 @@ import {
   TEST_BUCKET,
   TEST_QUEUE_URL,
 } from "./setup";
-
-type S3Send = Pick<S3Client, "send">;
-type SQSSend = Pick<SQSClient, "send">;
 
 describe("Lambda Handler - Error Cases", () => {
   let ctx: TestContext;
@@ -35,11 +29,7 @@ describe("Lambda Handler - Error Cases", () => {
     delete process.env.BUCKET_NAME;
     const event = createRequestEvent("test");
 
-    const response = await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);
@@ -50,11 +40,7 @@ describe("Lambda Handler - Error Cases", () => {
     delete process.env.QUEUE_URL;
     const event = createRequestEvent("test");
 
-    const response = await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);
@@ -66,11 +52,7 @@ describe("Lambda Handler - Error Cases", () => {
     delete process.env.QUEUE_URL;
     const event = createRequestEvent("test");
 
-    const response = await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     expect(response.statusCode).toBe(400);
     expect(JSON.parse(response.body).error).toBeDefined();
@@ -79,11 +61,7 @@ describe("Lambda Handler - Error Cases", () => {
   it("should handle invalid JSON in request body", async () => {
     const event = { body: "not valid json" };
 
-    const response = await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     expect(response.statusCode).toBe(400);
   });
@@ -92,11 +70,7 @@ describe("Lambda Handler - Error Cases", () => {
     const event = createRequestEvent("test");
     ctx.mockS3.shouldThrow = true;
 
-    const response = await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);

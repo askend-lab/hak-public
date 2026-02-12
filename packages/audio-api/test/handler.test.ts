@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import type { S3Client } from "@aws-sdk/client-s3";
-import type { SQSClient } from "@aws-sdk/client-sqs";
-
 import { handler } from "../src/handler";
 
 import {
@@ -14,9 +11,6 @@ import {
   createRequestEvent,
   TEST_BUCKET,
 } from "./setup";
-
-type S3Send = Pick<S3Client, "send">;
-type SQSSend = Pick<SQSClient, "send">;
 
 describe("Lambda Handler - Cache Hit", () => {
   let ctx: TestContext;
@@ -30,11 +24,7 @@ describe("Lambda Handler - Cache Hit", () => {
     const event = createRequestEvent("tere");
     const hash = setupCacheHit(ctx.mockS3, "tere");
 
-    const response = await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
@@ -48,11 +38,7 @@ describe("Lambda Handler - Cache Hit", () => {
     const event = createRequestEvent("hello");
     const hash = setupCacheHit(ctx.mockS3, "hello");
 
-    const response = await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    const response = await handler(event, ctx.mockS3, ctx.mockSQS);
 
     const body = JSON.parse(response.body);
     expect(body.status).toBe("ready");
@@ -66,11 +52,7 @@ describe("Lambda Handler - Cache Hit", () => {
     const event = createRequestEvent("tere");
     setupCacheHit(ctx.mockS3, "tere");
 
-    await handler(
-      event,
-      ctx.mockS3 as unknown as S3Send,
-      ctx.mockSQS as unknown as SQSSend,
-    );
+    await handler(event, ctx.mockS3, ctx.mockSQS);
 
     expect(ctx.mockSQS.messages).toHaveLength(0);
   });
