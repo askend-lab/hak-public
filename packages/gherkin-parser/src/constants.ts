@@ -19,7 +19,10 @@ function namePattern(keyword: string): RegExp {
   return new RegExp(`^${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*`);
 }
 
-export const SCENARIO_NAME_PATTERN = /^Scenario(?: Outline)?:\s*/;
+// #5 Scenario pattern derived from both SCENARIO and SCENARIO_OUTLINE keywords
+export const SCENARIO_NAME_PATTERN = new RegExp(
+  `^(?:${[KEYWORDS.SCENARIO_OUTLINE, KEYWORDS.SCENARIO].map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\s*`,
+);
 export const FEATURE_NAME_PATTERN = namePattern(KEYWORDS.FEATURE);
 export const RULE_NAME_PATTERN = namePattern(KEYWORDS.RULE);
 export const TABLE_ROW_PATTERN = /^\|.*\|$/;
