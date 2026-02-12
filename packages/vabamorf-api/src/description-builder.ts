@@ -1,3 +1,5 @@
+const DEFAULT_DESCRIPTION = "tavaline";
+
 const POS_MAP: Record<string, string> = {
   S: "nimisõna",
   V: "tegusõna",
@@ -32,5 +34,5 @@ export function buildDescription(
   addLemmaPart(parts, lemma, word);
   addPosPart(parts, pos);
   if (fs) parts.push(fs);
-  return parts.length > 0 ? parts.join(", ") : "tavaline";
+  return parts.length > 0 ? parts.join(", ") : DEFAULT_DESCRIPTION;
 }

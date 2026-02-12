@@ -35,6 +35,7 @@ const ERRORS = {
   MISSING_BODY: "Missing request body",
   INVALID_JSON: "Invalid JSON",
   NO_VARIANTS: "No phonetic variants found for the word",
+  UNKNOWN: "Unknown error",
 } as const;
 
 interface ParsedInput<T> {
@@ -75,7 +76,7 @@ function parseAndValidate<T>(
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
-  const message = error instanceof Error ? error.message : "Unknown error";
+  const message = error instanceof Error ? error.message : ERRORS.UNKNOWN;
   return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
     error: `Processing error: ${message}`,
   });

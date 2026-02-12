@@ -35,7 +35,7 @@ export interface VariantsResponse {
 
 export interface VmetajsonInput {
   params: {
-    vmetajson: string[];
+    vmetajson: readonly string[];
   };
   content: string;
 }

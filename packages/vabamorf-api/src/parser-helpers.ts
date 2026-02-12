@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { buildDescription } from "./description-builder";
-import { Variant, MorphologyInfo } from "./types";
+import { Variant } from "./types";
 
 export function formatPhoneticText(stem: string, ending: string): string {
   return ending && ending !== "0" ? `${stem}+${ending}` : stem;
@@ -45,7 +45,7 @@ export function createVariantFromMrf(
   return {
     text,
     description,
-    morphology: { lemma, pos, fs, stem, ending } as MorphologyInfo,
+    morphology: { lemma, pos, fs, stem, ending },
   };
 }
 

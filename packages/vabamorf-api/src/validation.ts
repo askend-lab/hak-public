@@ -47,7 +47,7 @@ export function getFieldError(
   fieldName: string,
   maxLength?: number,
 ): string | null {
-  if (fieldValue === null || typeof fieldValue !== "string")
+  if (typeof fieldValue !== "string")
     return `Missing '${fieldName}' field in request body`;
 
   if (!fieldValue.trim()) return `'${fieldName}' must be a non-empty string`;

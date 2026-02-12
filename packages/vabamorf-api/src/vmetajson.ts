@@ -13,6 +13,7 @@ interface QueuedRequest {
 }
 
 const VMETAJSON_PARAMS = ["--stem", "--addphonetics"] as const;
+const TIMEOUT_ERROR = "vmetajson timeout";
 
 // Stryker disable next-line all: env default is equivalent
 const TIMEOUT_MS = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
@@ -84,7 +85,7 @@ export function initVmetajson(
         } catch {
           failCurrentRequest(
             new Error(
-              `Failed to parse vmetajson response: ${line ?? "unknown"}`,
+              `Failed to parse vmetajson response: ${line}`,
             ),
           );
         }
@@ -100,7 +101,7 @@ export function initVmetajson(
 
   vmetajsonProcess.on("exit", (code: number | null) => {
     failCurrentRequest(
-      new Error(`vmetajson exited with code ${String(code ?? "unknown")}`),
+      new Error(`vmetajson exited with code ${code ?? "unknown"}`),
     );
     vmetajsonProcess = null;
   });
@@ -113,7 +114,7 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
 
   const input: VmetajsonInput = {
     params: {
-      vmetajson: [...VMETAJSON_PARAMS],
+      vmetajson: VMETAJSON_PARAMS,
     },
     content: text,
   };
@@ -124,11 +125,11 @@ export async function analyze(text: string): Promise<VmetajsonResponse> {
       // Stryker disable next-line all: boundary condition is equivalent
       if (index !== -1) {
         requestQueue.splice(index, 1);
-        reject(new Error("vmetajson timeout"));
+        reject(new Error(TIMEOUT_ERROR));
         // Stryker disable next-line all: optional chaining is equivalent
       } else if (currentRequest?.timeoutId === timeoutId) {
         currentRequest = null;
-        reject(new Error("vmetajson timeout"));
+        reject(new Error(TIMEOUT_ERROR));
         processNextRequest();
       }
     }, TIMEOUT_MS);

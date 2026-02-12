@@ -6,14 +6,18 @@ import {
   createVariantFromMrf,
   isDuplicateVariant,
 } from "./parser-helpers";
-import { VmetajsonResponse, Variant } from "./types";
+import { VmetajsonResponse, VmetajsonToken, Variant } from "./types";
+
+function getTokens(response: VmetajsonResponse): VmetajsonToken[] {
+  // Stryker disable next-line all: optional chaining is equivalent
+  return response.annotations?.tokens ?? [];
+}
 
 export function extractStressedText(
   response: VmetajsonResponse,
   originalText: string,
 ): string {
-  // Stryker disable next-line all: optional chaining is equivalent
-  const tokens = response.annotations?.tokens ?? [];
+  const tokens = getTokens(response);
   const stressedTokens = tokens
     .map(extractTokenText)
     .filter((t): t is string => t !== null);
@@ -25,8 +29,7 @@ export function extractVariants(
   response: VmetajsonResponse,
   word: string,
 ): Variant[] {
-  // Stryker disable next-line all: optional chaining is equivalent
-  const tokens = response.annotations?.tokens ?? [];
+  const tokens = getTokens(response);
   const variants: Variant[] = [];
 
   for (const tokenData of tokens) {
