@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { SentenceState } from "@/types/synthesis";
+import { SentenceState, CACHE_INVALIDATION } from "@/types/synthesis";
 
 type SentenceSetter = React.Dispatch<React.SetStateAction<SentenceState[]>>;
 type TagTransformer = (sentence: SentenceState) => Partial<SentenceState>;
@@ -55,8 +55,7 @@ export function useTagUpdater(setSentences: SentenceSetter): {
           tags: newTags,
           text: newTags.join(" "),
           stressedTags: newStressedTags,
-          phoneticText: undefined,
-          audioUrl: undefined,
+          ...CACHE_INVALIDATION,
         };
       });
     },
@@ -85,8 +84,7 @@ export function useTagUpdater(setSentences: SentenceSetter): {
           tags: newTags,
           text: newTags.join(" "),
           stressedTags: newStressedTags,
-          phoneticText: undefined,
-          audioUrl: undefined,
+          ...CACHE_INVALIDATION,
         };
       });
     },

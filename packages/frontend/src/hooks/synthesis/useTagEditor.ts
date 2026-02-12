@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { SentenceState, convertTextToTags } from "@/types/synthesis";
+import { SentenceState, convertTextToTags, CACHE_INVALIDATION } from "@/types/synthesis";
 
 export function useTagEditor(
   getSentence: (id: string) => SentenceState | undefined,
@@ -35,8 +35,7 @@ export function useTagEditor(
         tags: allTags,
         currentInput: "",
         text: newText,
-        phoneticText: undefined,
-        audioUrl: undefined,
+        ...CACHE_INVALIDATION,
       });
     },
     [getSentence, updateSentence],
@@ -81,8 +80,7 @@ export function useTagEditor(
         tags: newTags,
         currentInput: removedTag,
         text: newTags.join(" "),
-        phoneticText: undefined,
-        audioUrl: undefined,
+        ...CACHE_INVALIDATION,
       });
     },
     [getSentence, updateSentence],

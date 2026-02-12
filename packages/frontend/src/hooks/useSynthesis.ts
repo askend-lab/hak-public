@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu, convertTextToTags, getVoiceModel } from "@/types/synthesis";
+import { EditingTag, OpenTagMenu, convertTextToTags, getVoiceModel, CACHE_INVALIDATION } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
 import { synthesizeWithPolling } from "@/utils/synthesize";
 import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
@@ -82,8 +82,7 @@ export function useSynthesis() {
           tags: allTags,
           currentInput: "",
           text: fullText,
-          phoneticText: undefined,
-          audioUrl: undefined,
+          ...CACHE_INVALIDATION,
         });
         synthesizeWithText(id, fullText);
       } else if (sentence.tags.length > 0) {
