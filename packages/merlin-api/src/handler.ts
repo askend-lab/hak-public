@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import {
-  ECSClient,
-  UpdateServiceCommand,
-  DescribeServicesCommand,
-} from "@aws-sdk/client-ecs";
 import { createHash } from "crypto";
 
 import {
@@ -14,13 +9,14 @@ import {
   HTTP_STATUS,
   type LambdaResponse,
 } from "./response";
-import { getAwsRegion, VOICE_DEFAULTS } from "./env";
+import { VOICE_DEFAULTS, getEcsCluster, getEcsService } from "./env";
 import { checkS3Cache, buildAudioUrl } from "./s3";
 import { sendToQueue } from "./sqs";
+import { describeService, scaleService } from "./ecs";
 
-const ecsClient = new ECSClient({ region: getAwsRegion() });
+const VERSION = "1.0.0";
 
-interface SynthesizeRequest {
+export interface SynthesizeRequest {
   text: string;
   voice?: string;
   speed?: number;
@@ -37,8 +33,16 @@ export function generateCacheKey(
   return createHash("sha256").update(input).digest("hex");
 }
 
+function createBadRequest(error: string): LambdaResponse {
+  return createResponse(HTTP_STATUS.BAD_REQUEST, { error });
+}
+
 const WARMUP_COOLDOWN_MS = 60_000;
 let lastWarmupTime = 0;
+
+export function resetRateLimit(): void {
+  lastWarmupTime = 0;
+}
 
 function checkRateLimit(): LambdaResponse | null {
   const now = Date.now();
@@ -59,9 +63,7 @@ export async function synthesize(event: {
     const body: SynthesizeRequest = JSON.parse(event.body ?? "{}");
 
     if (typeof body.text !== "string" || body.text === "") {
-      return createResponse(HTTP_STATUS.BAD_REQUEST, {
-        error: "Missing text field",
-      });
+      return createBadRequest("Missing text field");
     }
 
     const voice = body.voice ?? VOICE_DEFAULTS.voice;
@@ -103,9 +105,7 @@ export async function status(event: {
     const cacheKey = event.pathParameters?.cacheKey;
 
     if (!cacheKey) {
-      return createResponse(HTTP_STATUS.BAD_REQUEST, {
-        error: "Missing cacheKey",
-      });
+      return createBadRequest("Missing cacheKey");
     }
 
     const ready = await checkS3Cache(cacheKey);
@@ -121,32 +121,21 @@ export async function status(event: {
 }
 
 export async function health(): Promise<LambdaResponse> {
-  return createResponse(HTTP_STATUS.OK, { status: "ok", version: "1.0.0" });
+  return createResponse(HTTP_STATUS.OK, { status: "ok", version: VERSION });
 }
 
 export async function warmup(): Promise<LambdaResponse> {
   const rateLimited = checkRateLimit();
   if (rateLimited) return rateLimited;
 
-  const cluster = process.env.ECS_CLUSTER ?? "";
-  const service = process.env.ECS_SERVICE ?? "";
-
-  if (!cluster || !service) {
+  if (!getEcsCluster() || !getEcsService()) {
     return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
       error: "Missing ECS config",
     });
   }
 
   try {
-    const describe = await ecsClient.send(
-      new DescribeServicesCommand({
-        cluster,
-        services: [service],
-      }),
-    );
-
-    const currentDesired = describe.services?.[0]?.desiredCount ?? 0;
-    const running = describe.services?.[0]?.runningCount ?? 0;
+    const { desired: currentDesired, running } = await describeService();
 
     if (currentDesired >= 1) {
       return createResponse(HTTP_STATUS.OK, {
@@ -156,13 +145,7 @@ export async function warmup(): Promise<LambdaResponse> {
       });
     }
 
-    await ecsClient.send(
-      new UpdateServiceCommand({
-        cluster,
-        service,
-        desiredCount: 1,
-      }),
-    );
+    await scaleService(1);
 
     return createResponse(HTTP_STATUS.OK, {
       status: "warming",

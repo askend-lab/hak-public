@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { generateCacheKey } from "../src/handler";
+import { generateCacheKey, resetRateLimit } from "../src/handler";
+import type { SynthesizeRequest } from "../src/handler";
 import { createResponse, createInternalError, HTTP_STATUS, CORS_HEADERS } from "../src/response";
-import { buildAudioUrl } from "../src/s3";
+import { buildAudioUrl, buildCacheKey } from "../src/s3";
 import { VOICE_DEFAULTS } from "../src/env";
+
+process.env.AWS_REGION_NAME = "eu-west-1";
+process.env.S3_BUCKET = "test-bucket";
+process.env.SQS_QUEUE_URL = "https://sqs.eu-west-1.amazonaws.com/123456789/test-queue";
 
 describe("generateCacheKey", () => {
   it("should return consistent hash for same input", () => {
@@ -81,6 +86,43 @@ describe("buildAudioUrl", () => {
     expect(url).toContain("abc123.wav");
     expect(url).toContain(".s3.");
     expect(url).toContain(".amazonaws.com/cache/");
+  });
+});
+
+describe("buildCacheKey", () => {
+  it("should return cache path with .wav extension", () => {
+    expect(buildCacheKey("abc123")).toBe("cache/abc123.wav");
+  });
+
+  it("should include the cacheKey in the path", () => {
+    const key = buildCacheKey("test-key");
+    expect(key).toContain("test-key");
+    expect(key).toMatch(/^cache\/.+\.wav$/);
+  });
+});
+
+describe("resetRateLimit", () => {
+  it("should be callable without error", () => {
+    expect(() => resetRateLimit()).not.toThrow();
+  });
+});
+
+describe("SynthesizeRequest", () => {
+  it("should allow minimal request with just text", () => {
+    const req: SynthesizeRequest = { text: "hello" };
+    expect(req.text).toBe("hello");
+    expect(req.voice).toBeUndefined();
+  });
+
+  it("should allow full request with all fields", () => {
+    const req: SynthesizeRequest = {
+      text: "hello",
+      voice: "efm_l",
+      speed: 1.5,
+      pitch: 2,
+    };
+    expect(req.voice).toBe("efm_l");
+    expect(req.speed).toBe(1.5);
   });
 });
 

@@ -13,6 +13,14 @@ export function getS3Bucket(): string {
   return process.env.S3_BUCKET ?? "";
 }
 
+export function getEcsCluster(): string {
+  return process.env.ECS_CLUSTER ?? "";
+}
+
+export function getEcsService(): string {
+  return process.env.ECS_SERVICE ?? "";
+}
+
 export const VOICE_DEFAULTS = {
   voice: "efm_l",
   speed: 1.0,
