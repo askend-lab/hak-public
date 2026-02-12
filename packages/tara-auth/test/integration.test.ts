@@ -1,33 +1,26 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
-// Mock TARA client
-const mockBuildAuthorizationUrl = jest.fn();
-const mockExchangeCodeForTokens = jest.fn();
-const mockVerifyIdToken = jest.fn();
-
+// Mock TARA client - factory avoids loading real module (no TDZ references)
 jest.mock('../src/tara-client', () => ({
-  createTaraClient: jest.fn().mockImplementation(() =>
-    Promise.resolve({
-      buildAuthorizationUrl: mockBuildAuthorizationUrl,
-      exchangeCodeForTokens: mockExchangeCodeForTokens,
-      verifyIdToken: mockVerifyIdToken,
-    })
-  ),
+  createTaraClient: jest.fn(),
 }));
 
 // Mock Cognito client
-const mockFindOrCreateUser = jest.fn();
-const mockGenerateTokens = jest.fn();
-
 jest.mock('../src/cognito-client', () => ({
-  createCognitoClient: jest.fn().mockImplementation(() => ({
-    findOrCreateUser: mockFindOrCreateUser,
-    generateTokens: mockGenerateTokens,
-  })),
+  createCognitoClient: jest.fn(),
 }));
 
 // Import handlers after mocks are set up
 import { callbackHandler, startHandler } from '../src/handler';
+import { createTaraClient } from '../src/tara-client';
+import { createCognitoClient } from '../src/cognito-client';
+
+const mockBuildAuthorizationUrl = jest.fn();
+const mockExchangeCodeForTokens = jest.fn();
+const mockVerifyIdToken = jest.fn();
+
+const mockFindOrCreateUser = jest.fn();
+const mockGenerateTokens = jest.fn();
 
 describe('TARA Custom Auth Integration Tests', () => {
   const TARA_ISSUER = 'https://tara-test.ria.ee';
@@ -39,6 +32,19 @@ describe('TARA Custom Auth Integration Tests', () => {
     process.env.TARA_ISSUER = TARA_ISSUER;
     process.env.FRONTEND_URL_DEV = FRONTEND_URL;
     process.env.STAGE = 'dev';
+
+    // Configure TARA client mock
+    (createTaraClient as jest.Mock).mockResolvedValue({
+      buildAuthorizationUrl: mockBuildAuthorizationUrl,
+      exchangeCodeForTokens: mockExchangeCodeForTokens,
+      verifyIdToken: mockVerifyIdToken,
+    });
+
+    // Configure Cognito client mock
+    (createCognitoClient as jest.Mock).mockReturnValue({
+      findOrCreateUser: mockFindOrCreateUser,
+      generateTokens: mockGenerateTokens,
+    });
 
     // Default mock implementations
     mockBuildAuthorizationUrl.mockReturnValue(
