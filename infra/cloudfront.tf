@@ -25,6 +25,7 @@ resource "aws_cloudfront_origin_access_control" "website" {
 }
 
 # CloudFront distribution
+#tfsec:ignore:AVD-AWS-0011 WAF not required for educational platform; cost consideration for OSS project
 resource "aws_cloudfront_distribution" "website" {
   enabled             = true
   is_ipv6_enabled     = true
