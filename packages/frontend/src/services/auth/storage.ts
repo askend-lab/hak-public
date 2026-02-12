@@ -10,6 +10,8 @@ const STORAGE_KEYS = {
   REFRESH_TOKEN: "hak_refresh_token",
 };
 
+const COGNITO_PROVIDER_PREFIX = "CognitoIdentityServiceProvider";
+
 export const AuthStorage = {
   getUser(): User | null {
     const stored = localStorage.getItem(STORAGE_KEYS.USER);
@@ -53,7 +55,7 @@ export const AuthStorage = {
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith("CognitoIdentityServiceProvider")) {
+      if (key && key.startsWith(COGNITO_PROVIDER_PREFIX)) {
         keysToRemove.push(key);
       }
     }

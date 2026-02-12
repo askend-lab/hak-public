@@ -7,10 +7,21 @@ import { useState, useEffect } from "react";
 import { transformToVabamorf } from "@/utils/phoneticMarkers";
 import { synthesizeWithPolling } from "@/utils/synthesize";
 import { createAudioPlayer } from "@/utils/audioPlayer";
+import { CONTENT_TYPE_JSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
+import { getVoiceModel } from "@/types/synthesis";
 import { CloseIcon } from "../ui/Icons";
 import PhoneticGuide from "./PhoneticGuide";
 import { VariantItem } from "./VariantItem";
 import { CustomVariantForm } from "./CustomVariantForm";
+
+function deduplicateByText(variants: Variant[]): Variant[] {
+  const seen = new Set<string>();
+  return variants.filter((v) => {
+    if (seen.has(v.text)) return false;
+    seen.add(v.text);
+    return true;
+  });
+}
 
 interface Variant {
   text: string;
@@ -56,22 +67,14 @@ export default function PronunciationVariants({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/variants", {
+      const response = await fetch(VARIANTS_API_PATH, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": CONTENT_TYPE_JSON },
         body: JSON.stringify({ word: selectedWord }),
       });
       if (!response.ok) throw new Error("Failed to fetch variants");
       const data = await response.json();
-      const uniqueVariants: Variant[] = [];
-      const seenTexts = new Set<string>();
-      for (const variant of data.variants || []) {
-        if (!seenTexts.has(variant.text)) {
-          seenTexts.add(variant.text);
-          uniqueVariants.push(variant);
-        }
-      }
-      setVariants(uniqueVariants);
+      setVariants(deduplicateByText(data.variants || []));
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -83,7 +86,7 @@ export default function PronunciationVariants({
     setLoadingVariant(variant.text);
     setPlayingVariant(null);
     try {
-      const audioUrl = await synthesizeWithPolling(variant.text, "efm_s");
+      const audioUrl = await synthesizeWithPolling(variant.text, getVoiceModel(variant.text));
       const { audio } = createAudioPlayer(audioUrl, {
         onLoaded: () => {
           setLoadingVariant(null);
@@ -116,7 +119,7 @@ export default function PronunciationVariants({
     setIsCustomPlaying(false);
     try {
       const vabamorfText = transformToVabamorf(customVariant);
-      const audioUrl = await synthesizeWithPolling(vabamorfText || "", "efm_s");
+      const audioUrl = await synthesizeWithPolling(vabamorfText || "", getVoiceModel(vabamorfText || ""));
       const { audio } = createAudioPlayer(audioUrl, {
         onLoaded: () => {
           setIsCustomLoading(false);

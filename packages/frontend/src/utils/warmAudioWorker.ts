@@ -2,10 +2,13 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { logger } from "@hak/shared";
+import { CONTENT_TYPE_JSON } from "./analyzeApi";
 
 let warmed = false;
 let lastActivity = 0;
 const ACTIVITY_THROTTLE = 60000; // 1 min between pings
+const AUDIO_WARM_API_PATH = "/api/audio/warm";
+const WARMUP_API_PATH = "/api/warmup";
 
 export async function warmAudioWorker(): Promise<void> {
   if (warmed) return;
@@ -14,13 +17,13 @@ export async function warmAudioWorker(): Promise<void> {
   try {
     // Warm up both Audio and Merlin workers
     await Promise.all([
-      fetch("/api/audio/warm", {
+      fetch(AUDIO_WARM_API_PATH, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": CONTENT_TYPE_JSON },
       }),
-      fetch("/api/warmup", {
+      fetch(WARMUP_API_PATH, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": CONTENT_TYPE_JSON },
       }),
     ]);
     warmed = true;
@@ -38,7 +41,7 @@ export function pingMerlinOnActivity(): void {
   if (now - lastActivity < ACTIVITY_THROTTLE) return;
   lastActivity = now;
 
-  fetch("/api/warmup", { method: "POST" }).catch(() => {});
+  fetch(WARMUP_API_PATH, { method: "POST" }).catch(() => {});
 }
 
 // Auto-ping on user activity (mouse, keyboard, touch)

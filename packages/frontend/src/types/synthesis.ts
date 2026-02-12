@@ -24,12 +24,12 @@ export type OpenTagMenu = {
   tagIndex: number;
 } | null;
 
-export function getVoiceModel(text: string): "efm_s" | "efm_l" {
-  const words = text
-    .trim()
-    .split(/\s+/)
-    .filter((word) => word.length > 0);
-  return words.length === 1 ? "efm_s" : "efm_l";
+export const VOICE_SINGLE = "efm_s";
+export const VOICE_MULTI = "efm_l";
+
+export function getVoiceModel(text: string): typeof VOICE_SINGLE | typeof VOICE_MULTI {
+  const words = convertTextToTags(text);
+  return words.length === 1 ? VOICE_SINGLE : VOICE_MULTI;
 }
 
 export function convertTextToTags(text: string): string[] {

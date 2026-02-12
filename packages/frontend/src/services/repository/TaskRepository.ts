@@ -99,7 +99,7 @@ export class TaskRepository {
       speechSequences: taskData.speechSequences ?? [],
       entries:
         taskData.speechEntries?.map((entry, index) => ({
-          id: `entry_${Date.now()}_${index}`,
+          id: generateId("entry"),
           taskId,
           text: entry.text,
           stressedText: entry.stressedText,
@@ -109,7 +109,7 @@ export class TaskRepository {
           createdAt: new Date(),
         })) ??
         taskData.speechSequences?.map((text, index) => ({
-          id: `entry_${Date.now()}_${index}`,
+          id: generateId("entry"),
           taskId,
           text,
           stressedText: text,
