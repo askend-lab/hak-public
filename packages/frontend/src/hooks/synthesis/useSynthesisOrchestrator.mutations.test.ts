@@ -6,13 +6,7 @@ import { renderHook, act } from "@testing-library/react";
 import { useSynthesisOrchestrator } from "./useSynthesisOrchestrator";
 import type { Mock } from "vitest";
 
-interface AudioHandlers {
-  onLoadStart?: () => void;
-  onLoadComplete?: () => void;
-  onEnded?: () => void;
-  onError?: (err?: unknown) => void;
-  onStart?: () => void;
-}
+interface AudioHandlers { onLoadStart?: () => void; onLoadComplete?: () => void; onEnded?: () => void; onError?: (err?: unknown) => void; onStart?: () => void; }
 
 vi.mock("./useSentenceState");
 vi.mock("./useAudioPlayer");
@@ -283,14 +277,118 @@ describe("useSynthesisOrchestrator mutation kills", () => {
     expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isLoading: true, isPlaying: false });
   });
 
-  // --- synthesizeWithText L225: error handling ---
-  it("synthesizeWithText handles synthesis error gracefully", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    mockSynthesisAPI.synthesizeText.mockRejectedValue(new Error("fail"));
-    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "Hi", tags: [] });
+  it("synthesizeAndPlay cached onError clears audioUrl/phoneticText", async () => {
+    vi.useFakeTimers();
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onError?.(); return false; });
+    mockSentenceState.sentences = [{ id: "s1", text: "Hi", audioUrl: "http://c.mp3", phoneticText: "Hí", tags: ["Hi"] }];
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeAndPlay("s1"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isLoading: false, isPlaying: false, audioUrl: undefined, phoneticText: undefined });
+    vi.useRealTimers();
+  });
+
+  it("synthesizeAndPlay catch on playAudio clears cache", async () => {
+    mockAudioPlayer.playAudio.mockRejectedValueOnce(new Error("play failed"));
+    mockSentenceState.sentences = [{ id: "s1", text: "Hi", audioUrl: "http://c.mp3", phoneticText: "Hí", tags: ["Hi"] }];
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeAndPlay("s1"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { audioUrl: undefined, phoneticText: undefined });
+  });
+
+  it("synthesizeAndPlay new synthesis fires all callbacks correctly", async () => {
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onLoadComplete?.(); cb.onEnded?.(); return true; });
+    mockSentenceState.sentences = [{ id: "s1", text: "Hi", tags: ["Hi"] }];
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeAndPlay("s1"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", expect.objectContaining({ isLoading: false, isPlaying: true }));
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isPlaying: false });
+  });
+
+  it("synthesizeAndPlay new synthesis onError sets loading/playing false", async () => {
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onError?.(); return false; });
+    mockSentenceState.sentences = [{ id: "s1", text: "Hi", tags: ["Hi"] }];
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeAndPlay("s1"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isLoading: false, isPlaying: false });
+  });
+
+  it("synthesizeWithText cached path fires onLoadStart/onLoadComplete/onEnded", async () => {
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onLoadStart?.(); cb.onLoadComplete?.(); cb.onEnded?.(); return true; });
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "Hi", audioUrl: "http://c.mp3", phoneticText: "Hí", tags: [] });
     const { result } = renderHook(() => useSynthesisOrchestrator());
     await act(async () => { await result.current.synthesizeWithText("s1", "Hi"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isPlaying: false });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isLoading: false, isPlaying: true });
+  });
+
+  it("synthesizeWithText cached onError clears cache", async () => {
+    vi.useFakeTimers();
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onError?.(); return false; });
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "Hi", audioUrl: "http://c.mp3", phoneticText: "Hí", tags: [] });
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeWithText("s1", "Hi"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isLoading: false, isPlaying: false, audioUrl: undefined, phoneticText: undefined });
+    vi.useRealTimers();
+  });
+
+  it("synthesizeWithText new synthesis fires all callbacks", async () => {
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onLoadComplete?.(); cb.onEnded?.(); return true; });
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "New", tags: [] });
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeWithText("s1", "New"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isLoading: false, isPlaying: true, phoneticText: "Héllo wórld", audioUrl: "http://audio.mp3" });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isPlaying: false });
+  });
+
+  it("synthesizeWithText new synthesis onError resets state", async () => {
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onError?.(); return false; });
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "New", tags: [] });
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeWithText("s1", "New"); });
     expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isLoading: false, isPlaying: false });
+  });
+
+  it("synthesizeWithText skips cache when phoneticText missing", async () => {
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "Hi", audioUrl: "http://c.mp3", phoneticText: null, tags: [] });
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeWithText("s1", "Hi"); });
+    expect(mockSynthesisAPI.synthesizeText).toHaveBeenCalled();
+  });
+
+  it("synthesizeWithText skips cache when audioUrl missing", async () => {
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "Hi", audioUrl: null, phoneticText: "Hí", tags: [] });
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeWithText("s1", "Hi"); });
+    expect(mockSynthesisAPI.synthesizeText).toHaveBeenCalled();
+  });
+
+  it("playSingleSentence logs error with correct prefix", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const err = new Error("fail");
+    mockSynthesisAPI.synthesizeWithCache.mockRejectedValue(err);
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "hi", audioUrl: null, tags: [] });
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.playSingleSentence("s1"); });
+    expect(spy).toHaveBeenCalledWith("Failed to synthesize audio:", err);
     spy.mockRestore();
+  });
+
+  it("synthesizeAndPlay logs error with correct prefix", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const err = new Error("fail");
+    mockSynthesisAPI.synthesizeText.mockRejectedValue(err);
+    mockSentenceState.sentences = [{ id: "s1", text: "Hi", tags: ["Hi"] }];
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeAndPlay("s1"); });
+    expect(spy).toHaveBeenCalledWith("Failed to synthesize:", err);
+    spy.mockRestore();
+  });
+
+  it("playSingleSentence playAudio fires onLoadStart", async () => {
+    mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "hi", audioUrl: "http://a.mp3", tags: [] });
+    mockAudioPlayer.playAudio.mockImplementation(async (_u: string, cb: AudioHandlers) => { cb.onLoadStart?.(); cb.onEnded?.(); return true; });
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.playSingleSentence("s1"); });
+    expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("s1", { isPlaying: true });
   });
 });
