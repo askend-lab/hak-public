@@ -248,6 +248,7 @@ hooks:
       - "askend-lab.com"
     checkAwsAccountId: true
     excludePaths:
+      - ".github/workflows/**"
       - "**/node_modules/**"
       - "**/*.test.*"
       - "**/*.spec.*"

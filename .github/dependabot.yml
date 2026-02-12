@@ -24,3 +24,13 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/packages/vabamorf-api"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/packages/merlin-worker"
+    schedule:
+      interval: "weekly"
