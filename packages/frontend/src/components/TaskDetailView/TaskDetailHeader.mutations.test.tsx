@@ -21,6 +21,7 @@ const baseProps = {
   task: baseTask, entriesCount: 5, isLoadingPlayAll: false, isPlayingAll: false,
   isHeaderMenuOpen: false, setIsHeaderMenuOpen: vi.fn(),
   onShare: vi.fn(), onPlayAll: vi.fn(), onEditTask: vi.fn(), onDeleteTask: vi.fn(),
+  onDownloadZip: vi.fn(), isDownloading: false,
 };
 
 describe("TaskDetailHeader mutation kills", () => {

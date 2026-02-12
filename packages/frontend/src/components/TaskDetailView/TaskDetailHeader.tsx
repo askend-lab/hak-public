@@ -15,6 +15,8 @@ interface TaskDetailHeaderProps {
   setIsHeaderMenuOpen: (open: boolean) => void;
   onShare: () => void;
   onPlayAll: () => void;
+  onDownloadZip: () => void;
+  isDownloading: boolean;
   onEditTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
 }
@@ -28,6 +30,8 @@ export function TaskDetailHeader({
   setIsHeaderMenuOpen,
   onShare,
   onPlayAll,
+  onDownloadZip,
+  isDownloading,
   onEditTask,
   onDeleteTask,
 }: TaskDetailHeaderProps) {
@@ -44,6 +48,13 @@ export function TaskDetailHeader({
       <div className="page-header__actions">
         <button onClick={onShare} className="button button--secondary">
           <span>Jaga</span>
+        </button>
+        <button
+          onClick={onDownloadZip}
+          className="button button--secondary"
+          disabled={isDownloading}
+        >
+          <span>{isDownloading ? "Laadin..." : "Laadi alla"}</span>
         </button>
         <PlayAllButton
           isPlaying={isPlayingAll}

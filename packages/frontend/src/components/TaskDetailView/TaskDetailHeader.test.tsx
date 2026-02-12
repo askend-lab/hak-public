@@ -27,6 +27,8 @@ const defaultProps = {
   setIsHeaderMenuOpen: vi.fn(),
   onShare: vi.fn(),
   onPlayAll: vi.fn(),
+  onDownloadZip: vi.fn(),
+  isDownloading: false,
   onEditTask: vi.fn(),
   onDeleteTask: vi.fn(),
 };
@@ -79,6 +81,26 @@ describe("TaskDetailHeader actions", () => {
   it("shows pause state", () => {
     render(<TaskDetailHeader {...defaultProps} isPlayingAll={true} />);
     expect(screen.getByText("Peata")).toBeInTheDocument();
+  });
+});
+
+describe("TaskDetailHeader download", () => {
+  it("calls onDownloadZip when clicked", async () => {
+    const onDownloadZip = vi.fn();
+    render(<TaskDetailHeader {...defaultProps} onDownloadZip={onDownloadZip} />);
+    await userEvent.click(screen.getByText("Laadi alla"));
+    expect(onDownloadZip).toHaveBeenCalled();
+  });
+
+  it("shows loading text when downloading", () => {
+    render(<TaskDetailHeader {...defaultProps} isDownloading={true} />);
+    expect(screen.getByText("Laadin...")).toBeInTheDocument();
+  });
+
+  it("disables button when downloading", () => {
+    render(<TaskDetailHeader {...defaultProps} isDownloading={true} />);
+    const btn = screen.getByText("Laadin...").closest("button");
+    expect(btn).toBeDisabled();
   });
 });
 

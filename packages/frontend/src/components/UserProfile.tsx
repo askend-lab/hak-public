@@ -35,23 +35,6 @@ export default function UserProfile({ user }: UserProfileProps) {
     setIsDropdownOpen(false);
   };
 
-  const handleClearLocalStorage = () => {
-    if (
-      window.confirm(
-        "Kas oled kindel, et soovid kõik kohaliku salvestuse andmed kustutada? See taastab rakenduse algsesse olekusse mock-andmetega.",
-      )
-    ) {
-      // Clear all localStorage data
-      localStorage.clear();
-
-      // Close dropdown
-      setIsDropdownOpen(false);
-
-      // Refresh the page to reset application state
-      window.location.reload();
-    }
-  };
-
   return (
     <div className="user-profile">
       <button
@@ -90,16 +73,6 @@ export default function UserProfile({ user }: UserProfileProps) {
             </div>
 
             <div className="user-profile__actions">
-              <button
-                onClick={handleClearLocalStorage}
-                className="user-profile__action-button"
-                title="Taasta rakendus algsesse olekusse"
-              >
-                <div className="user-profile__action-button-content">
-                  Kustuta kohalikud andmed
-                </div>
-              </button>
-
               <button
                 onClick={handleLogout}
                 className="user-profile__action-button user-profile__action-button--danger"
