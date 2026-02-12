@@ -62,17 +62,14 @@ export default function SpecsContent({
                 {result && ` ${result.duration.toFixed(0)}ms`}
               </span>
             </div>
-            {scenario.steps.map((step, stepIdx) => {
-              const match = step.match(/^(Given|When|Then|And|But)\s+(.*)$/);
-              return (
-                <div key={stepIdx} className="specs-step">
-                  <span className="specs-step__keyword">
-                    {match?.[1] ?? ""}
-                  </span>
-                  {match?.[2] ?? step}
-                </div>
-              );
-            })}
+            {scenario.steps.map((step, stepIdx) => (
+              <div key={stepIdx} className="specs-step">
+                <span className="specs-step__keyword">
+                  {step.keyword}
+                </span>
+                {step.text}
+              </div>
+            ))}
           </div>
         );
       })}
