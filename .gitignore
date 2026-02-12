@@ -66,7 +66,9 @@ packages/merlin-worker/tools/genlab/lab/
 # WORLD build artifacts, Visual Studio project, test data
 packages/merlin-worker/tools/WORLD/build/
 packages/merlin-worker/tools/WORLD/visualstudio/
-packages/merlin-worker/tools/WORLD/test/
+packages/merlin-worker/tools/WORLD/test/test.cpp
+packages/merlin-worker/tools/WORLD/test/ctest.c
+packages/merlin-worker/tools/WORLD/test/*.wav
 packages/merlin-worker/tools/WORLD/wav_test/
 
 # Native binaries
