@@ -40,6 +40,8 @@ const RESPONSE_HEADERS = {
   "Access-Control-Allow-Origin": "*",
 } as const;
 
+const DEBUG_ERROR_MESSAGE = "Intentional test error for monitoring";
+
 const ERROR_STATUS_MAP: Record<string, number> = {
   [ERRORS.NOT_FOUND]: HTTP_STATUS.NOT_FOUND,
   [ERRORS.ACCESS_DENIED]: HTTP_STATUS.FORBIDDEN,
@@ -58,11 +60,11 @@ export function createResponse(
 
 function createErrorResponse(
   error: string | undefined,
-  defaultStatus: number,
+  fallbackStatus: number,
 ): APIGatewayProxyResult {
   const status = error
-    ? (ERROR_STATUS_MAP[error] ?? defaultStatus)
-    : defaultStatus;
+    ? (ERROR_STATUS_MAP[error] ?? fallbackStatus)
+    : fallbackStatus;
   return createResponse(status, { error });
 }
 
@@ -181,8 +183,6 @@ export async function handleQuery(
     ? createResponse(HTTP_STATUS.OK, { items: result.items })
     : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_ERROR);
 }
-
-const DEBUG_ERROR_MESSAGE = "Intentional test error for monitoring";
 
 export function handleDebugError(): APIGatewayProxyResult {
   console.error("[DEBUG] Intentional 500 error triggered for monitoring test");

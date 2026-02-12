@@ -75,9 +75,12 @@ export interface StoreConfig {
   readonly keyDelimiter: string;
 }
 
+/** One year in seconds — default max TTL */
+export const MAX_TTL_SECONDS = 31_536_000;
+
 /** Shared default configuration — used by store and validation */
 export const DEFAULT_CONFIG: StoreConfig = {
-  maxTtlSeconds: 31536000,
+  maxTtlSeconds: MAX_TTL_SECONDS,
   keyDelimiter: "#",
 };
 
