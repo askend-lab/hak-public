@@ -286,4 +286,99 @@ describe("useSentenceState mutation kills", () => {
     expect(s?.audioUrl).toBeNull();
     expect(s?.stressedTags).toBeNull();
   });
+
+  // --- Legacy migration L128-136: precise split/filter/trim ---
+  it("legacy migration trims, splits on whitespace, and filters empty", () => {
+    localStorage.setItem("eki_playlist_entries", JSON.stringify([{ id: "p1", text: "  a\t\tb  c  " }]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.tags).toStrictEqual(["a", "b", "c"]);
+    expect(result.current.sentences[0]?.tags.every((t: string) => t.length > 0)).toBe(true);
+  });
+
+  it("legacy migration stressedText split/filter also trims", () => {
+    localStorage.setItem("eki_playlist_entries", JSON.stringify([
+      { id: "p1", text: "a b", stressedText: "  á   b́  " },
+    ]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.stressedTags).toStrictEqual(["á", "b́"]);
+  });
+
+  it("legacy migration sets isPlaying/isLoading false and currentInput empty", () => {
+    localStorage.setItem("eki_playlist_entries", JSON.stringify([{ id: "p1", text: "hi" }]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.isPlaying).toBe(false);
+    expect(result.current.sentences[0]?.isLoading).toBe(false);
+    expect(result.current.sentences[0]?.currentInput).toBe("");
+  });
+
+  // --- Copied entries L177-192: precise split/filter/trim ---
+  it("copied entries trims, splits on whitespace, and filters empty", () => {
+    sessionStorage.setItem("copiedEntries", JSON.stringify([{ id: "c1", text: "  x\t\ty  z  " }]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.tags).toStrictEqual(["x", "y", "z"]);
+    expect(result.current.sentences[0]?.tags.every((t: string) => t.length > 0)).toBe(true);
+  });
+
+  it("copied entries stressedText split/filter also trims", () => {
+    sessionStorage.setItem("copiedEntries", JSON.stringify([
+      { id: "c1", text: "a b", stressedText: "  á   b́  " },
+    ]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.stressedTags).toStrictEqual(["á", "b́"]);
+  });
+
+  it("copied entries sets isPlaying/isLoading false and currentInput empty", () => {
+    sessionStorage.setItem("copiedEntries", JSON.stringify([{ id: "c1", text: "hi" }]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.isPlaying).toBe(false);
+    expect(result.current.sentences[0]?.isLoading).toBe(false);
+    expect(result.current.sentences[0]?.currentInput).toBe("");
+  });
+
+  it("copied entries stressedTags null when word count mismatch", () => {
+    sessionStorage.setItem("copiedEntries", JSON.stringify([
+      { id: "c1", text: "a b c", stressedText: "á b́" },
+    ]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.stressedTags).toBeNull();
+  });
+
+  // --- loadInitialState L73: null stored value ---
+  it("loadInitialState returns default when stored is empty array", () => {
+    localStorage.setItem("eki_synthesis_state", JSON.stringify([]));
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.id).toBe("1");
+  });
+
+  it("loadInitialState catches corrupted JSON", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    localStorage.setItem("eki_synthesis_state", "not-json");
+    const { result } = renderHook(() => useSentenceState());
+    expect(result.current.sentences[0]?.id).toBe("1");
+    expect(spy).toHaveBeenCalledWith("Failed to load synthesis state from localStorage:", expect.any(Error));
+    spy.mockRestore();
+  });
+
+  // --- handleRemoveSentence L285: revokeUrl with audioUrl ---
+  it("handleRemoveSentence revokes audioUrl when revokeUrl is true", () => {
+    global.URL.revokeObjectURL = vi.fn();
+    const { result } = renderHook(() => useSentenceState());
+    act(() => { result.current.setDemoSentences(); });
+    const id = result.current.sentences[0]?.id ?? "";
+    act(() => { result.current.updateSentence(id, { audioUrl: "blob:x" }); });
+    act(() => { result.current.handleRemoveSentence(id, true); });
+    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:x");
+  });
+
+  // --- persist error message L110 ---
+  it("persist error message includes correct prefix", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const origSetItem = localStorage.setItem.bind(localStorage);
+    const { result } = renderHook(() => useSentenceState());
+    localStorage.setItem = (): void => { throw new Error("quota"); };
+    act(() => { result.current.handleAddSentence(); });
+    expect(spy).toHaveBeenCalledWith("Failed to save synthesis state to localStorage:", expect.any(Error));
+    localStorage.setItem = origSetItem;
+    spy.mockRestore();
+  });
 });
