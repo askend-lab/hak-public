@@ -41,6 +41,8 @@ export const TARA_VERIFIED = 'TARA_VERIFIED';
 export const CUSTOM_CHALLENGE = 'CUSTOM_CHALLENGE';
 export const TARA_AUTH_METADATA = 'TARA_AUTH';
 export const FALLBACK_EMAIL_DOMAIN = 'tara.ee';
+export const PERSONAL_CODE_ATTR = 'custom:personal_code';
+export const DEFAULT_EXPIRES_IN = 3600;
 
 export function buildFallbackEmail(personalCode: string): string {
   return `${personalCode}@${FALLBACK_EMAIL_DOMAIN}`;

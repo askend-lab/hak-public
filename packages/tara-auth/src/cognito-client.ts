@@ -7,7 +7,7 @@ import {
   ListUsersCommand,
   UsernameExistsException,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLENGE, buildFallbackEmail } from './types';
+import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLENGE, PERSONAL_CODE_ATTR, DEFAULT_EXPIRES_IN, buildFallbackEmail } from './types';
 
 export const DEFAULT_REGION = 'eu-west-1';
 
@@ -47,7 +47,7 @@ export class CognitoClient {
     try {
       const command = new ListUsersCommand({
         UserPoolId: this.config.userPoolId,
-        Filter: `"custom:personal_code" = "${personalCode}"`,
+        Filter: `"${PERSONAL_CODE_ATTR}" = "${personalCode}"`,
         Limit: 1,
       });
       const response = await this.client.send(command);
@@ -76,7 +76,7 @@ export class CognitoClient {
       UserPoolId: this.config.userPoolId,
       Username: username,
       UserAttributes: [
-        { Name: 'custom:personal_code', Value: personalCode },
+        { Name: PERSONAL_CODE_ATTR, Value: personalCode },
       ],
     });
     await this.client.send(command);
@@ -88,7 +88,7 @@ export class CognitoClient {
     const attributes: Array<{ Name: string; Value: string }> = [
       { Name: 'email', Value: email },
       { Name: 'email_verified', Value: 'true' },
-      { Name: 'custom:personal_code', Value: taraIdToken.sub },
+      { Name: PERSONAL_CODE_ATTR, Value: taraIdToken.sub },
     ];
 
     // Add optional attributes only if they have values
@@ -169,7 +169,7 @@ export class CognitoClient {
         accessToken: authResponse.AuthenticationResult.AccessToken || '',
         idToken: authResponse.AuthenticationResult.IdToken || '',
         refreshToken: authResponse.AuthenticationResult.RefreshToken || '',
-        expiresIn: authResponse.AuthenticationResult.ExpiresIn || 3600,
+        expiresIn: authResponse.AuthenticationResult.ExpiresIn || DEFAULT_EXPIRES_IN,
       };
     } catch (error) {
       throw new Error(`Token generation failed: ${error}`);

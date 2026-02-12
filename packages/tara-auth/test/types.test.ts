@@ -3,8 +3,11 @@ import {
   CUSTOM_CHALLENGE,
   TARA_AUTH_METADATA,
   FALLBACK_EMAIL_DOMAIN,
+  PERSONAL_CODE_ATTR,
+  DEFAULT_EXPIRES_IN,
   buildFallbackEmail,
 } from '../src/types';
+import { DEFAULT_REGION } from '../src/cognito-client';
 
 describe('types constants and helpers', () => {
   describe('TARA_VERIFIED', () => {
@@ -28,6 +31,24 @@ describe('types constants and helpers', () => {
   describe('FALLBACK_EMAIL_DOMAIN', () => {
     it('should be tara.ee', () => {
       expect(FALLBACK_EMAIL_DOMAIN).toBe('tara.ee');
+    });
+  });
+
+  describe('PERSONAL_CODE_ATTR', () => {
+    it('should be custom:personal_code', () => {
+      expect(PERSONAL_CODE_ATTR).toBe('custom:personal_code');
+    });
+  });
+
+  describe('DEFAULT_EXPIRES_IN', () => {
+    it('should be 3600', () => {
+      expect(DEFAULT_EXPIRES_IN).toBe(3600);
+    });
+  });
+
+  describe('DEFAULT_REGION', () => {
+    it('should be eu-west-1', () => {
+      expect(DEFAULT_REGION).toBe('eu-west-1');
     });
   });
 

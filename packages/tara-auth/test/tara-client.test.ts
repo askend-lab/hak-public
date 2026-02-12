@@ -1,4 +1,4 @@
-import { createTaraClient } from '../src/tara-client';
+import { createTaraClient, DEFAULT_TARA_ISSUER, DEFAULT_CALLBACK_URL } from '../src/tara-client';
 import * as jose from 'jose';
 
 // Mock jose
@@ -25,7 +25,7 @@ describe('createTaraClient', () => {
     process.env.TARA_CALLBACK_URL = 'https://auth.example.com/callback';
   });
 
-  afterAll(() => {
+  afterEach(() => {
     process.env = originalEnv;
   });
 
@@ -183,6 +183,16 @@ describe('createTaraClient', () => {
         issuer: 'https://custom-issuer.ee',
         audience: 'my-aud',
       });
+    });
+  });
+
+  describe('constants', () => {
+    it('DEFAULT_TARA_ISSUER should be tara-test URL', () => {
+      expect(DEFAULT_TARA_ISSUER).toBe('https://tara-test.ria.ee');
+    });
+
+    it('DEFAULT_CALLBACK_URL should be askend-lab callback', () => {
+      expect(DEFAULT_CALLBACK_URL).toContain('auth.askend-lab.com');
     });
   });
 });

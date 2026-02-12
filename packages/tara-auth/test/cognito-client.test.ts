@@ -27,6 +27,10 @@ describe('CognitoClient', () => {
     mockSend.mockReset();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   const baseTaraToken = {
     iss: 'https://tara-test.ria.ee',
     aud: 'test-client',
@@ -354,15 +358,13 @@ describe('CognitoClient', () => {
 
   describe('createCognitoClient', () => {
     const originalEnv = process.env;
-
     beforeEach(() => {
       process.env = { ...originalEnv };
     });
 
-    afterAll(() => {
+    afterEach(() => {
       process.env = originalEnv;
     });
-
     it('should create client when env vars are set', () => {
       process.env.COGNITO_USER_POOL_ID = 'pool-id';
       process.env.COGNITO_CLIENT_ID = 'client-id';
@@ -371,7 +373,6 @@ describe('CognitoClient', () => {
       const client = createCognitoClient();
       expect(client).toBeInstanceOf(CognitoClient);
     });
-
     it('should throw when COGNITO_USER_POOL_ID is missing', () => {
       process.env.COGNITO_USER_POOL_ID = '';
       process.env.COGNITO_CLIENT_ID = 'client-id';
