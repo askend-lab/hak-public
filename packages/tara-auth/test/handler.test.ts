@@ -65,7 +65,7 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
       state: 'test-state',
     },
     headers: {
-      Cookie: `tara_auth_state=${encodedState}`,
+      Cookie: `${STATE_COOKIE_NAME}=${encodedState}`,
     },
     body: null,
     isBase64Encoded: false,
