@@ -1,19 +1,14 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-export interface LambdaResponse {
-  statusCode: number;
-  headers: Record<string, string>;
-  body: string;
-}
+import {
+  HTTP_STATUS,
+  createLambdaResponse,
+  type LambdaResponse,
+} from "@hak/shared";
 
-export const HTTP_STATUS = {
-  OK: 200,
-  ACCEPTED: 202,
-  BAD_REQUEST: 400,
-  TOO_MANY_REQUESTS: 429,
-  INTERNAL_SERVER_ERROR: 500,
-} as const;
+export type { LambdaResponse } from "@hak/shared";
+export { HTTP_STATUS } from "@hak/shared";
 
 export const CORS_HEADERS = {
   "Content-Type": "application/json",
@@ -26,11 +21,7 @@ export function createResponse(
   statusCode: number,
   body: object,
 ): LambdaResponse {
-  return {
-    statusCode,
-    headers: { ...CORS_HEADERS },
-    body: JSON.stringify(body),
-  };
+  return createLambdaResponse(statusCode, body, { ...CORS_HEADERS });
 }
 
 export function createBadRequest(error: string): LambdaResponse {
