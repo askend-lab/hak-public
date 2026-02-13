@@ -48,8 +48,8 @@ describe("Index Lambda Handlers", () => {
       const event = createRequestEvent("test");
       const response = await lambdaHandler(event);
 
-      expect(response.headers["Access-Control-Allow-Headers"]).toBe("Content-Type");
-      expect(response.headers["Access-Control-Allow-Methods"]).toBe("POST, OPTIONS");
+      expect(response.headers["Access-Control-Allow-Headers"]).toBe("Content-Type,Authorization");
+      expect(response.headers["Access-Control-Allow-Methods"]).toBe("GET,POST,OPTIONS");
     });
   });
 

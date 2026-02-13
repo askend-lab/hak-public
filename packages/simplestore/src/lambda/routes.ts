@@ -6,7 +6,7 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { HTTP_STATUS } from "@hak/shared";
+import { CORS_HEADERS, HTTP_STATUS } from "@hak/shared";
 
 import {
   Store,
@@ -29,11 +29,6 @@ export const HTTP_ERRORS = {
   PRIVATE_NOT_ALLOWED: "private type not allowed on /get-public endpoint",
 } as const;
 
-const RESPONSE_HEADERS = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-} as const;
-
 const DEBUG_ERROR_MESSAGE = "Intentional test error for monitoring";
 
 const ERROR_STATUS_MAP: Record<string, number> = {
@@ -47,7 +42,7 @@ export function createResponse(
 ): APIGatewayProxyResult {
   return {
     statusCode,
-    headers: RESPONSE_HEADERS,
+    headers: { ...CORS_HEADERS },
     body: JSON.stringify(body),
   };
 }

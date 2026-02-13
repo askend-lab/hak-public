@@ -12,6 +12,17 @@ export interface LambdaResponse {
   body: string;
 }
 
+/**
+ * Shared CORS headers for all Lambda API responses.
+ * Single source of truth — eliminates inconsistencies across packages.
+ */
+export const CORS_HEADERS: Record<string, string> = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+};
+
 export const HTTP_STATUS = {
   OK: 200,
   ACCEPTED: 202,
