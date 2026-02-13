@@ -31,4 +31,7 @@ export const VARIANTS_STRINGS = {
 
 export const SYNTHESIS_STRINGS = {
   ADD_SENTENCE: "Lisa lause",
+  TAG_MENU_VARIANTS: "Vali sõna häälduskuju",
+  TAG_MENU_EDIT: "Muuda sõna kirjakuju",
+  TAG_MENU_DELETE: "Kustuta sõna",
 } as const;
