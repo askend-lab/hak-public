@@ -12,7 +12,7 @@ RUN chmod +x ./vmetajson
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy compiled TypeScript
 COPY dist/ ./
