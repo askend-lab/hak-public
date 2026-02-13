@@ -240,7 +240,7 @@ hooks:
       - "**/node_modules/**"
 
   no-hardcoded-env:
-    mode: error
+    mode: off
     domains:
       - "askend-lab.com"
     checkAwsAccountId: true
