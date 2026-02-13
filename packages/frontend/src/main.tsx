@@ -25,7 +25,6 @@ import { AuthProvider } from "./features/auth/services";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { OnboardingProvider } from "./features/onboarding/contexts/OnboardingContext";
 const AuthCallbackPage = lazy(() => import("./features/auth/pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
-const DebugPage = lazy(() => import("./pages/DebugPage").then(m => ({ default: m.DebugPage })));
 const SharedTaskPage = lazy(() => import("./pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
 import "./styles/main.scss";
 
@@ -49,7 +48,6 @@ createRoot(rootElement).render(
               <Suspense fallback={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="loader-spinner" style={{ width: 48, height: 48 }} /></div>}>
                 <Routes>
                   <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                  <Route path="/debug-x7k9m" element={<DebugPage />} />
                   <Route
                     path="/shared/task/:token"
                     element={<SharedTaskPage />}
