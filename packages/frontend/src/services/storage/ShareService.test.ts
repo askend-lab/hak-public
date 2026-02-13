@@ -8,16 +8,6 @@ vi.mock("@hak/shared", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
-const mockBaselineTasks: Record<string, unknown>[] = [];
-vi.mock("./MockDataLoader", () => {
-  return {
-    MockDataLoader: class {
-      loadBaselineTasks(): Promise<Record<string, unknown>[]> { return Promise.resolve([...mockBaselineTasks]); }
-      findTaskByShareToken(): Promise<null> { return Promise.resolve(null); }
-    },
-  };
-});
-
 const mockStorage = {
   saveTaskAsUnlisted: vi.fn().mockResolvedValue(undefined),
   getTaskByShareToken: vi.fn().mockResolvedValue(null),
