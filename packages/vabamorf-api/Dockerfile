@@ -1,6 +1,6 @@
 # Use Debian-based Node.js with Lambda Web Adapter
 # @hak/shared bundled from compiled tsc output, ECR image reused in deploy
-FROM node:18-slim@sha256:f9ab18e354e6855ae56ef2b290dd225c1e51a564f87584b9bd21dd651838830e
+FROM node:20-slim
 
 # Install Lambda Web Adapter and libjsoncpp
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter

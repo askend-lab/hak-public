@@ -1,10 +1,11 @@
 service: vabamorf-api
 
+# TODO: migrate to Serverless v4 (v3 is in maintenance mode since 2024)
 frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
 
