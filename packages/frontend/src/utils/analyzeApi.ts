@@ -13,6 +13,23 @@ export const CONTENT_TYPE_JSON = "application/json";
 export const ANALYZE_API_PATH = "/api/analyze";
 export const VARIANTS_API_PATH = "/api/variants";
 
+/**
+ * Sends a POST request with a JSON body.
+ * Reduces repeated fetch + Content-Type + JSON.stringify boilerplate.
+ */
+export function postJSON(
+  url: string,
+  body: Record<string, unknown>,
+  options?: RequestInit,
+): Promise<Response> {
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": CONTENT_TYPE_JSON },
+    body: JSON.stringify(body),
+    ...options,
+  });
+}
+
 export interface AnalyzeResponse {
   stressedText: string;
 }
@@ -24,11 +41,7 @@ export interface AnalyzeResponse {
  */
 export async function analyzeText(text: string): Promise<string | null> {
   try {
-    const response = await fetch(ANALYZE_API_PATH, {
-      method: "POST",
-      headers: { "Content-Type": CONTENT_TYPE_JSON },
-      body: JSON.stringify({ text }),
-    });
+    const response = await postJSON(ANALYZE_API_PATH, { text });
 
     if (!response.ok) {
       return null;
@@ -47,11 +60,7 @@ export async function analyzeText(text: string): Promise<string | null> {
  * Use when you need to handle the error explicitly.
  */
 export async function analyzeTextOrThrow(text: string): Promise<string> {
-  const response = await fetch(ANALYZE_API_PATH, {
-    method: "POST",
-    headers: { "Content-Type": CONTENT_TYPE_JSON },
-    body: JSON.stringify({ text }),
-  });
+  const response = await postJSON(ANALYZE_API_PATH, { text });
 
   if (!response.ok) {
     throw new Error("Analysis failed");

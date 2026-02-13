@@ -176,7 +176,6 @@ describe("App (Home)", () => {
         </MemoryRouter>,
       );
       expect(container.querySelector(".page-loading-state")).toBeInTheDocument();
-      expect(container.querySelector(".page-loading-state__spinner")).toBeInTheDocument();
     });
   });
 

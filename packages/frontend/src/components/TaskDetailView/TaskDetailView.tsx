@@ -5,6 +5,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
+import { getErrorMessage } from "@/utils/getErrorMessage";
+import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { convertTextToTags } from "@/types/synthesis";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
@@ -117,7 +119,7 @@ export default function TaskDetailView({
       })
       .catch((err) =>
         setError(
-          err instanceof Error ? err.message : "Viga ülesande laadimisel",
+          getErrorMessage(err, "Viga ülesande laadimisel"),
         ),
       )
       .finally(() => setIsLoading(false));
@@ -127,19 +129,7 @@ export default function TaskDetailView({
     const entry = entries.find((e) => e.id === id);
     if (!entry || !entry.text.trim()) return;
 
-    try {
-      await navigator.clipboard.writeText(entry.text);
-      showNotification(
-        "success",
-        "Tekst kopeeritud!",
-        undefined,
-        undefined,
-        "success",
-      );
-    } catch (error) {
-      console.error("Failed to copy text:", error);
-      showNotification("error", "Viga teksti kopeerimisel");
-    }
+    await copyTextToClipboard(entry.text, showNotification);
   };
 
   const handleDeleteEntry = async (id: string) => {

@@ -69,6 +69,7 @@ export function RowMenu({
             className={`sentence-synthesis-item__dropdown-menu${menuStyle ? " sentence-synthesis-item__dropdown-menu--fixed" : ""}`}
             style={menuStyle}
             role="menu"
+            tabIndex={-1}
             aria-label="Lausungi valikud"
             onKeyDown={handleKeyDown}
           >

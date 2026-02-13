@@ -5,6 +5,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { SentenceState, convertTextToTags } from "@/types/synthesis";
 
 const STORAGE_KEY = "eki_synthesis_state";
+const LEGACY_PLAYLIST_KEY = "eki_playlist_entries";
+export const COPIED_ENTRIES_KEY = "copiedEntries";
 
 const ensureSentenceState = (
   sentence: Partial<SentenceState> &
@@ -146,17 +148,17 @@ export function useSentenceState(): {
   // Legacy migration from eki_playlist_entries
   useEffect(() => {
     try {
-      const storedPlaylist = localStorage.getItem("eki_playlist_entries");
+      const storedPlaylist = localStorage.getItem(LEGACY_PLAYLIST_KEY);
       if (storedPlaylist) {
         const entries = JSON.parse(storedPlaylist);
         if (Array.isArray(entries) && entries.length > 0) {
           setSentences(entries.map(transformEntryToSentence));
-          localStorage.removeItem("eki_playlist_entries");
+          localStorage.removeItem(LEGACY_PLAYLIST_KEY);
         }
       }
     } catch (error) {
       console.error("Failed to load playlist from localStorage:", error);
-      localStorage.removeItem("eki_playlist_entries");
+      localStorage.removeItem(LEGACY_PLAYLIST_KEY);
     }
   }, []);
 
@@ -166,7 +168,7 @@ export function useSentenceState(): {
     if (processedCopiedEntries.current) return;
     
     try {
-      const copied = sessionStorage.getItem("copiedEntries");
+      const copied = sessionStorage.getItem(COPIED_ENTRIES_KEY);
       if (copied) {
         const entries = JSON.parse(copied);
         if (Array.isArray(entries) && entries.length > 0) {
@@ -178,7 +180,7 @@ export function useSentenceState(): {
             
             return hasOnlyEmptySentence ? transformedEntries : [...prev, ...transformedEntries];
           });
-          sessionStorage.removeItem("copiedEntries");
+          sessionStorage.removeItem(COPIED_ENTRIES_KEY);
         }
       }
     } catch (error) {
@@ -186,7 +188,7 @@ export function useSentenceState(): {
         "Failed to load copied entries from sessionStorage:",
         error,
       );
-      sessionStorage.removeItem("copiedEntries");
+      sessionStorage.removeItem(COPIED_ENTRIES_KEY);
     }
     // Run on every render to detect when copiedEntries appear (e.g., after navigation)
   });
@@ -235,7 +237,7 @@ export function useSentenceState(): {
   const handleAddSentence = useCallback(() => {
     setSentences((prev) => [
       ...prev,
-      createEmptySentence(Date.now().toString()),
+      createEmptySentence(crypto.randomUUID()),
     ]);
   }, []);
 

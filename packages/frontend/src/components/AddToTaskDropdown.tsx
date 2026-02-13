@@ -167,7 +167,7 @@ export default function AddToTaskDropdown({
   if (!isOpen) return null;
   return (
     <>
-      <div className="add-to-task-backdrop" onClick={onClose} />
+      <div className="add-to-task-backdrop" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }} role="presentation" />
       <div className="add-to-task-dropdown" ref={dropdownRef}>
         {selectedTask ? (
           <ConfirmPanel

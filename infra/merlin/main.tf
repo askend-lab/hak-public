@@ -69,6 +69,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "merlin_audio" {
     id     = "expire-old-audio"
     status = "Enabled"
 
+    filter {
+      prefix = "cache/"
+    }
+
     expiration {
       days = 30
     }

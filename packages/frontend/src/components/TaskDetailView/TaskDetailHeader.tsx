@@ -106,6 +106,8 @@ export function TaskDetailHeader({
               <div
                 className="task-detail__menu-backdrop"
                 onClick={() => setIsHeaderMenuOpen(false)}
+                onKeyDown={(e) => { if (e.key === "Escape") setIsHeaderMenuOpen(false); }}
+                role="presentation"
               />
               <div
                 ref={menuRef}

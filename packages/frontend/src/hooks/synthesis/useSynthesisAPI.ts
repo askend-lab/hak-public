@@ -2,9 +2,9 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { getVoiceModel, convertTextToTags } from "@/types/synthesis";
-import { synthesizeWithPolling } from "@/utils/synthesize";
-import { CONTENT_TYPE_JSON, ANALYZE_API_PATH } from "@/utils/analyzeApi";
+import { convertTextToTags } from "@/types/synthesis";
+import { synthesizeAuto } from "@/utils/synthesize";
+import { postJSON, ANALYZE_API_PATH } from "@/utils/analyzeApi";
 
 export interface SynthesisResult {
   audioUrl: string;
@@ -26,11 +26,7 @@ export function useSynthesisAPI(): {
 } {
   const analyzeText = useCallback(
     async (text: string): Promise<{ stressedText: string }> => {
-      const response = await fetch(ANALYZE_API_PATH, {
-        method: "POST",
-        headers: { "Content-Type": CONTENT_TYPE_JSON },
-        body: JSON.stringify({ text }),
-      });
+      const response = await postJSON(ANALYZE_API_PATH, { text });
 
       if (!response.ok) {
         throw new Error("Analysis failed");
@@ -56,10 +52,7 @@ export function useSynthesisAPI(): {
         }
       }
 
-      const audioUrl = await synthesizeWithPolling(
-        actualPhoneticText,
-        getVoiceModel(actualPhoneticText),
-      );
+      const audioUrl = await synthesizeAuto(actualPhoneticText);
 
       return {
         audioUrl,

@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback, useRef } from "react";
-import { convertTextToTags } from "@/types/synthesis";
+import { convertTextToTags, CACHE_INVALIDATION } from "@/types/synthesis";
 import { useSentenceState } from "./useSentenceState";
 import { useAudioPlayer } from "./useAudioPlayer";
 import { useSynthesisAPI } from "./useSynthesisAPI";
@@ -67,10 +67,7 @@ export function useSynthesisOrchestrator(): ReturnType<
           onError: () => {
             updateSentence(id, { isPlaying: false });
             if (retryCount === 0 && sentence.audioUrl) {
-              updateSentence(id, {
-                audioUrl: undefined,
-                phoneticText: undefined,
-              });
+              updateSentence(id, CACHE_INVALIDATION);
               setTimeout(async () => {
                 await playSingleSentence(id, abortSignal, 1);
               }, 100);
@@ -85,10 +82,7 @@ export function useSynthesisOrchestrator(): ReturnType<
         onError: () => {
           updateSentence(id, { isPlaying: false });
           if (retryCount === 0 && sentence.audioUrl) {
-            updateSentence(id, {
-              audioUrl: undefined,
-              phoneticText: undefined,
-            });
+            updateSentence(id, CACHE_INVALIDATION);
             setTimeout(async () => {
               await playSingleSentence(id, abortSignal, 1);
             }, 100);
@@ -118,15 +112,14 @@ export function useSynthesisOrchestrator(): ReturnType<
               updateSentence(id, {
                 isLoading: false,
                 isPlaying: false,
-                audioUrl: undefined,
-                phoneticText: undefined,
+                ...CACHE_INVALIDATION,
               });
               setTimeout(() => synthesizeAndPlay(id), 100);
             },
           });
           return;
         } catch {
-          updateSentence(id, { audioUrl: undefined, phoneticText: undefined });
+          updateSentence(id, CACHE_INVALIDATION);
         }
       }
 
@@ -188,15 +181,14 @@ export function useSynthesisOrchestrator(): ReturnType<
               updateSentence(id, {
                 isLoading: false,
                 isPlaying: false,
-                audioUrl: undefined,
-                phoneticText: undefined,
+                ...CACHE_INVALIDATION,
               });
               setTimeout(() => synthesizeWithText(id, text), 100);
             },
           });
           return;
         } catch {
-          updateSentence(id, { audioUrl: undefined, phoneticText: undefined });
+          updateSentence(id, CACHE_INVALIDATION);
         }
       }
 

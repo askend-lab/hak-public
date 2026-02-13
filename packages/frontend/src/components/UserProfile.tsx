@@ -59,6 +59,8 @@ export default function UserProfile({ user }: UserProfileProps) {
           <div
             className="user-profile__backdrop"
             onClick={() => setIsDropdownOpen(false)}
+            onKeyDown={(e) => { if (e.key === "Escape") setIsDropdownOpen(false); }}
+            role="presentation"
           />
           <div className="user-profile__dropdown">
             <div className="user-profile__header">

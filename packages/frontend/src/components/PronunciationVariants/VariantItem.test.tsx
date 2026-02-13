@@ -44,10 +44,9 @@ describe("VariantItem", () => {
     expect(screen.getByText("kolmas välde")).toBeInTheDocument();
   });
 
-  it("renders explanation when available", () => {
-    render(<VariantItem {...defaultProps} />);
-    expect(screen.getByText("Kolmandas vältes")).toBeInTheDocument();
-    expect(screen.getByTestId("volume-icon")).toBeInTheDocument();
+  it("renders variant without explanation section", () => {
+    const { container } = render(<VariantItem {...defaultProps} />);
+    expect(container.querySelector(".pronunciation-variants__item-explanation")).toBeNull();
   });
 
   it("hides explanation when empty", () => {

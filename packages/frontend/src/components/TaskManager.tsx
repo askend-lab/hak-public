@@ -112,6 +112,8 @@ function TaskRow({
               <div
                 className="task-manager__menu-backdrop"
                 onClick={onMenuClose}
+                onKeyDown={(e) => { if (e.key === "Escape") onMenuClose(); }}
+                role="presentation"
               />
               <div
                 ref={menuRef}

@@ -75,8 +75,10 @@ export function normalizeTags(tags: string[]): string[] {
   }
 
   // Pass 2: right-attach if the first token is still punctuation-only
-  if (result.length > 1 && !isWordToken(result[0])) {
-    result[1] = result[0] + result[1];
+  const first = result[0];
+  const second = result[1];
+  if (result.length > 1 && first !== undefined && second !== undefined && !isWordToken(first)) {
+    result[1] = first + second;
     result.shift();
   }
 
@@ -112,3 +114,12 @@ export function filterNonEmptySentences<T extends { text: string }>(
 ): T[] {
   return sentences.filter((s) => s.text.trim());
 }
+
+/**
+ * Standard updates to invalidate cached synthesis results.
+ * Used when text/tags change and audio needs re-synthesis.
+ */
+export const CACHE_INVALIDATION: Pick<SentenceState, "phoneticText" | "audioUrl"> = {
+  phoneticText: undefined,
+  audioUrl: undefined,
+};

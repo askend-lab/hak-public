@@ -77,6 +77,7 @@ describe("SentencePhoneticPanel", () => {
   it("plays audio on play button click", async () => {
     vi.mock("@/utils/synthesize", () => ({
       synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+      synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
     }));
     class MockAudio {
       src = "";
@@ -104,6 +105,7 @@ describe("SentencePhoneticPanel", () => {
   it("handles audio onerror callback", async () => {
     vi.mock("@/utils/synthesize", () => ({
       synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+      synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
     }));
     class ErrorAudio {
       src = "";
@@ -130,6 +132,7 @@ describe("SentencePhoneticPanel", () => {
   it("handles play error", async () => {
     vi.mock("@/utils/synthesize", () => ({
       synthesizeWithPolling: vi.fn().mockRejectedValue(new Error("synth fail")),
+      synthesizeAuto: vi.fn().mockRejectedValue(new Error("synth fail")),
     }));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
@@ -155,6 +158,7 @@ describe("SentencePhoneticPanel", () => {
     // First trigger play to set audioRef
     vi.mock("@/utils/synthesize", () => ({
       synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+      synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
     }));
     const pauseFn = vi.fn();
     class MockAudioClose {
@@ -188,8 +192,8 @@ describe("SentencePhoneticPanel", () => {
   });
 
   it("handles play error gracefully", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
-    (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+    const { synthesizeAuto } = await import("@/utils/synthesize");
+    (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("synth fail"),
     );
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});

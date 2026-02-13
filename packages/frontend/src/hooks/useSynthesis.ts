@@ -2,9 +2,10 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu, convertTextToTags, normalizeTags, getVoiceModel } from "@/types/synthesis";
+import { EditingTag, OpenTagMenu, convertTextToTags, normalizeTags, CACHE_INVALIDATION } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
-import { synthesizeWithPolling } from "@/utils/synthesize";
+import { synthesizeAuto } from "@/utils/synthesize";
+import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
 import { useTagEditor } from "./synthesis/useTagEditor";
 import { usePlaylistControl } from "./synthesis/usePlaylistControl";
@@ -98,8 +99,7 @@ export function useSynthesis() {
           tags: allTags,
           currentInput: "",
           text: fullText,
-          phoneticText: undefined,
-          audioUrl: undefined,
+          ...CACHE_INVALIDATION,
         });
         synthesizeWithText(id, fullText);
       } else if (sentence.tags.length > 0) {
@@ -117,10 +117,7 @@ export function useSynthesis() {
 
       if (!audioUrl) {
         try {
-          audioUrl = await synthesizeWithPolling(
-            sentence.text,
-            getVoiceModel(sentence.text),
-          );
+          audioUrl = await synthesizeAuto(sentence.text);
           updateSentence(id, { audioUrl });
         } catch (error) {
           console.error("Failed to generate audio:", error);
@@ -153,19 +150,7 @@ export function useSynthesis() {
       const sentence = getSentence(id);
       if (!sentence || !sentence.text.trim()) return;
 
-      try {
-        await navigator.clipboard.writeText(sentence.text);
-        showNotification(
-          "success",
-          "Tekst kopeeritud!",
-          undefined,
-          undefined,
-          "success",
-        );
-      } catch (error) {
-        console.error("Failed to copy text:", error);
-        showNotification("error", "Viga teksti kopeerimisel");
-      }
+      await copyTextToClipboard(sentence.text, showNotification);
     },
     [getSentence, showNotification],
   );

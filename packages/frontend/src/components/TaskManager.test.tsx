@@ -57,7 +57,7 @@ describe("TaskManager", () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
 
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
 
     await waitFor(() => {
@@ -71,7 +71,7 @@ describe("TaskManager", () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
 
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
 
     await waitFor(() => {
@@ -86,7 +86,7 @@ describe("TaskManager", () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
 
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
 
     await waitFor(() => {
@@ -101,7 +101,7 @@ describe("TaskManager", () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
 
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
 
     await waitFor(() => {
@@ -116,7 +116,7 @@ describe("TaskManager", () => {
     const user = userEvent.setup();
     const { container } = render(<TaskManager {...defaultProps} />);
 
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
 
     await waitFor(() => {
@@ -195,7 +195,7 @@ describe("TaskManager", () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
 
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
 
     // Menu should be open, onViewTask should NOT be called
@@ -225,7 +225,7 @@ describe("TaskManager", () => {
   it("delete button has danger class", async () => {
     const user = userEvent.setup();
     const { container } = render(<TaskManager {...defaultProps} />);
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
     await waitFor(() => expect(screen.getByText("Kustuta")).toBeInTheDocument());
     expect(container.querySelector(".task-manager__menu-item--danger")).toBeTruthy();
@@ -234,7 +234,7 @@ describe("TaskManager", () => {
   it("closes menu when clicking same more button again", async () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
     await waitFor(() => expect(screen.getByText("Muuda")).toBeInTheDocument());
     await user.click(moreButtons[0]!);
@@ -244,7 +244,7 @@ describe("TaskManager", () => {
   it("menu closes after edit action", async () => {
     const user = userEvent.setup();
     render(<TaskManager {...defaultProps} />);
-    const moreButtons = screen.getAllByLabelText("More options");
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(moreButtons[0]!);
     await waitFor(() => expect(screen.getByText("Muuda")).toBeInTheDocument());
     await user.click(screen.getByText("Muuda"));

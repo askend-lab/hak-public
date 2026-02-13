@@ -127,13 +127,13 @@ describe("SentenceSynthesisItem", () => {
   describe("drag and drop", () => {
     it("shows drag handle when draggable", () => {
       render(<SentenceSynthesisItem {...defaultProps} draggable={true} />);
-      expect(screen.getByLabelText("Drag to reorder")).toBeInTheDocument();
+      expect(screen.getByLabelText("Lohista järjestamiseks")).toBeInTheDocument();
     });
 
     it("does not show drag handle when not draggable", () => {
       render(<SentenceSynthesisItem {...defaultProps} draggable={false} />);
       expect(
-        screen.queryByLabelText("Drag to reorder"),
+        screen.queryByLabelText("Lohista järjestamiseks"),
       ).not.toBeInTheDocument();
     });
 
@@ -146,7 +146,7 @@ describe("SentenceSynthesisItem", () => {
         />,
       );
       expect(
-        screen.queryByLabelText("Drag to reorder"),
+        screen.queryByLabelText("Lohista järjestamiseks"),
       ).not.toBeInTheDocument();
     });
 
@@ -248,7 +248,7 @@ describe("SentenceSynthesisItem", () => {
           currentInput="test"
         />,
       );
-      expect(screen.getByLabelText("Clear all")).toBeInTheDocument();
+      expect(screen.getByLabelText("Tühjenda kõik")).toBeInTheDocument();
     });
 
     it("calls onClear when clear button clicked", async () => {
@@ -264,7 +264,7 @@ describe("SentenceSynthesisItem", () => {
         />,
       );
 
-      await user.click(screen.getByLabelText("Clear all"));
+      await user.click(screen.getByLabelText("Tühjenda kõik"));
       expect(onClear).toHaveBeenCalledWith("test-sentence");
     });
 
@@ -349,7 +349,7 @@ describe("SentenceSynthesisItem", () => {
           menuContent={<div>Menu Content</div>}
         />,
       );
-      expect(screen.getByLabelText("More options")).toBeInTheDocument();
+      expect(screen.getByLabelText("Rohkem valikuid")).toBeInTheDocument();
     });
 
     it("renders menu content", () => {
@@ -382,7 +382,7 @@ describe("SentenceSynthesisItem", () => {
           mode="input"
         />,
       );
-      expect(screen.getByLabelText("Drag to reorder")).toBeInTheDocument();
+      expect(screen.getByLabelText("Lohista järjestamiseks")).toBeInTheDocument();
     });
 
     it("does not render drag handle in readonly mode", () => {
@@ -394,7 +394,7 @@ describe("SentenceSynthesisItem", () => {
         />,
       );
       expect(
-        screen.queryByLabelText("Drag to reorder"),
+        screen.queryByLabelText("Lohista järjestamiseks"),
       ).not.toBeInTheDocument();
     });
   });
@@ -485,7 +485,7 @@ describe("SentenceSynthesisItem", () => {
           onDragStart={onDragStart}
         />,
       );
-      const handle = screen.getByLabelText("Drag to reorder");
+      const handle = screen.getByLabelText("Lohista järjestamiseks");
       const mockDataTransfer = { setDragImage: vi.fn() };
       fireEvent.dragStart(handle, { dataTransfer: mockDataTransfer });
       expect(onDragStart).toHaveBeenCalledWith(
@@ -503,7 +503,7 @@ describe("SentenceSynthesisItem", () => {
           onDragEnd={onDragEnd}
         />,
       );
-      const handle = screen.getByLabelText("Drag to reorder");
+      const handle = screen.getByLabelText("Lohista järjestamiseks");
       fireEvent.dragEnd(handle);
       expect(onDragEnd).toHaveBeenCalled();
     });
@@ -552,7 +552,7 @@ describe("SentenceSynthesisItem", () => {
           onMenuOpenLegacy={onMenuOpenLegacy}
         />,
       );
-      await user.click(screen.getByLabelText("More options"));
+      await user.click(screen.getByLabelText("Rohkem valikuid"));
       expect(onMenuOpenLegacy).toHaveBeenCalledWith(
         expect.anything(),
         "test-sentence",

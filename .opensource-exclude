@@ -1,0 +1,53 @@
+# Files and directories excluded from the open-source repository.
+# Used by scripts/sync-to-public.sh
+# One path per line. Supports directories (trailing /) and files.
+# Lines starting with # are comments.
+
+# --- Internal tooling (DevBox) ---
+devbox
+devbox.yaml
+defaults.yaml
+.githooks/
+.agent-channel
+
+# --- Infrastructure (AWS-specific) ---
+infra/
+docker-compose.yml
+.env.example
+
+# --- Internal packages (not open-sourced) ---
+packages/tara-auth/
+packages/task-channel/
+
+# --- E2E tests (depend on internal AWS infrastructure) ---
+packages/frontend/e2e/
+
+# --- CI/CD workflows and automation (not for public repo) ---
+.github/workflows/codeql.yml
+.github/dependabot.yml
+.github/workflows/build.yml
+.github/workflows/deploy.yml
+.github/workflows/deploy-merlin-infra.yml
+.github/workflows/build-merlin-worker.yml
+.github/workflows/terraform.yml
+.github/workflows/release.yml
+.github/workflows/auto-approve-prs.yml
+.github/workflows/auto-merge-prs.yml
+.github/workflows/auto-update-prs.yml
+.github/workflows/sync-to-public.yml
+
+# --- Config files referencing internal packages ---
+babel.config.js
+jest.config.js
+jest.setup.ts
+knip.json
+.npmrc
+.gitleaks.toml
+
+# --- Internal documentation ---
+internal/
+
+# --- Internal docs (replaced by *.public.md versions) ---
+README.md
+CONTRIBUTING.md
+docs/DEPLOYMENT.md

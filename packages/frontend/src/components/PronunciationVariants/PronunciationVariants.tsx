@@ -5,10 +5,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { transformToVabamorf } from "@/utils/phoneticMarkers";
-import { synthesizeWithPolling } from "@/utils/synthesize";
+import { synthesizeAuto } from "@/utils/synthesize";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 import { createAudioPlayer } from "@/utils/audioPlayer";
-import { CONTENT_TYPE_JSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
-import { getVoiceModel } from "@/types/synthesis";
+import { postJSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
 import { CloseIcon } from "../ui/Icons";
 import PhoneticGuide from "./PhoneticGuide";
 import { VariantItem } from "./VariantItem";
@@ -68,16 +68,12 @@ export default function PronunciationVariants({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(VARIANTS_API_PATH, {
-        method: "POST",
-        headers: { "Content-Type": CONTENT_TYPE_JSON },
-        body: JSON.stringify({ word: selectedWord }),
-      });
+      const response = await postJSON(VARIANTS_API_PATH, { word: selectedWord });
       if (!response.ok) throw new Error("Failed to fetch variants");
       const data = await response.json();
       setVariants(deduplicateByText(data.variants || []));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(getErrorMessage(err, "An error occurred"));
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +102,7 @@ export default function PronunciationVariants({
     setLoadingVariant(variant.text);
     setPlayingVariant(null);
     try {
-      const audioUrl = await synthesizeWithPolling(variant.text, getVoiceModel(variant.text));
+      const audioUrl = await synthesizeAuto(variant.text);
       const { audio } = createAudioPlayer(audioUrl, {
         onLoaded: () => {
           setLoadingVariant(null);
@@ -155,7 +151,7 @@ export default function PronunciationVariants({
     setIsCustomPlaying(false);
     try {
       const vabamorfText = transformToVabamorf(customVariant);
-      const audioUrl = await synthesizeWithPolling(vabamorfText || "", getVoiceModel(vabamorfText || ""));
+      const audioUrl = await synthesizeAuto(vabamorfText || "");
       const { audio } = createAudioPlayer(audioUrl, {
         onLoaded: () => {
           setIsCustomLoading(false);

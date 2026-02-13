@@ -158,10 +158,13 @@ export function TagsInput({
                   <div
                     className="sentence-synthesis-item__tag-menu-backdrop"
                     onClick={() => onTagMenuClose && onTagMenuClose()}
+                    onKeyDown={(e) => { if (e.key === "Escape") onTagMenuClose?.(); }}
+                    role="presentation"
                   />
                   <div
                     className="sentence-synthesis-item__tag-dropdown"
                     role="menu"
+                    tabIndex={-1}
                     aria-label="Sõna valikud"
                     ref={(el) => {
                       if (el) {

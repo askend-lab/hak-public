@@ -15,6 +15,7 @@ vi.mock("@/utils/phoneticMarkers", () => ({
 
 vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("audio-url"),
+  synthesizeAuto: vi.fn().mockResolvedValue("audio-url"),
 }));
 
 describe("PronunciationVariants Full", () => {
@@ -98,7 +99,7 @@ describe("PronunciationVariants Full", () => {
       "Kirjuta oma hääldusmärkidega variant",
     );
     await user.type(input, "custom");
-    await user.click(screen.getByLabelText("Clear input"));
+    await user.click(screen.getByLabelText("Tühjenda sisend"));
     expect(input).toHaveValue("");
   });
 

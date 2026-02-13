@@ -15,6 +15,7 @@ vi.mock("@/utils/phoneticMarkers", () => ({
 }));
 vi.mock("@/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-url"),
+  synthesizeAuto: vi.fn().mockResolvedValue("mock-url"),
 }));
 vi.mock("@/types/synthesis", () => ({ getVoiceModel: vi.fn(() => "m") }));
 
@@ -38,8 +39,8 @@ describe("SentencePhoneticPanel mutation kills", () => {
   };
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
-    (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockResolvedValue("mock-url");
+    const { synthesizeAuto } = await import("@/utils/synthesize");
+    (synthesizeAuto as ReturnType<typeof vi.fn>).mockResolvedValue("mock-url");
     mockTransformToUI.mockImplementation((t: string | null) => t ?? null);
     mockTransformToVabamorf.mockImplementation((t: string | null) => t ?? null);
     mockPlay.mockResolvedValue(undefined);
@@ -153,21 +154,19 @@ describe("SentencePhoneticPanel mutation kills", () => {
       mockTransformToVabamorf.mockReturnValueOnce("transformed");
       render(<SentencePhoneticPanel {...dp} />);
       await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      expect(synthesizeWithPolling).toHaveBeenCalledWith("transformed", "m");
+      const { synthesizeAuto } = await import("@/utils/synthesize");
+      expect(synthesizeAuto).toHaveBeenCalledWith("transformed");
     });
     it("empty string fallback when transformToVabamorf returns null", async () => {
       mockTransformToVabamorf.mockReturnValueOnce(null);
       render(<SentencePhoneticPanel {...dp} />);
       await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      expect(synthesizeWithPolling).toHaveBeenCalledWith("", "m");
-      const { getVoiceModel } = await import("@/types/synthesis");
-      expect(getVoiceModel).toHaveBeenCalledWith("");
+      const { synthesizeAuto } = await import("@/utils/synthesize");
+      expect(synthesizeAuto).toHaveBeenCalledWith("");
     });
     it("sets isLoading at start", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockImplementation(
+      const { synthesizeAuto } = await import("@/utils/synthesize");
+      (synthesizeAuto as ReturnType<typeof vi.fn>).mockImplementation(
         () => new Promise(() => {}),
       );
       render(<SentencePhoneticPanel {...dp} />);
@@ -206,8 +205,8 @@ describe("SentencePhoneticPanel mutation kills", () => {
       expect(btn.className).not.toContain("loading");
     });
     it("catch logs and resets", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("x"));
+      const { synthesizeAuto } = await import("@/utils/synthesize");
+      (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("x"));
       const spy = vi.spyOn(console, "error").mockImplementation(() => {});
       render(<SentencePhoneticPanel {...dp} />);
       await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
@@ -218,8 +217,8 @@ describe("SentencePhoneticPanel mutation kills", () => {
       spy.mockRestore();
     });
     it("shows loader-spinner", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
-      (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {}));
+      const { synthesizeAuto } = await import("@/utils/synthesize");
+      (synthesizeAuto as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {}));
       const { container } = render(<SentencePhoneticPanel {...dp} />);
       fireEvent.click(screen.getByText("Kuula"));
       expect(container.querySelector(".loader-spinner")).toBeTruthy();

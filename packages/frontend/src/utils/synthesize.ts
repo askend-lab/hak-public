@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { CONTENT_TYPE_JSON } from "./analyzeApi";
+import { postJSON } from "./analyzeApi";
+import { getVoiceModel } from "@/types/synthesis";
 
 const POLL_INTERVAL_MS = 1000;
 const MAX_POLL_ATTEMPTS = 30;
@@ -38,15 +39,19 @@ async function pollForAudio(cacheKey: string): Promise<string> {
   throw new Error("Synthesis timed out");
 }
 
+/**
+ * Synthesize with automatic voice model selection.
+ * Combines synthesizeWithPolling + getVoiceModel to avoid repeated pattern.
+ */
+export async function synthesizeAuto(text: string): Promise<string> {
+  return synthesizeWithPolling(text, getVoiceModel(text));
+}
+
 export async function synthesizeWithPolling(
   text: string,
   voice: string,
 ): Promise<string> {
-  const response = await fetch(SYNTHESIZE_API_PATH, {
-    method: "POST",
-    headers: { "Content-Type": CONTENT_TYPE_JSON },
-    body: JSON.stringify({ text, voice }),
-  });
+  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice });
   if (!response.ok) throw new Error("Synthesis request failed");
 
   const data: SynthesizeResponse = await response.json();

@@ -17,11 +17,11 @@ describe("cognitoConfig", () => {
     expect(typeof cognitoConfig.domain).toBe("string");
   });
 
-  it("should have hardcoded defaults for local development", () => {
+  it("should have empty defaults requiring env var configuration", () => {
     expect(cognitoConfig.region).toBe("eu-west-1");
-    expect(cognitoConfig.userPoolId).toBe("eu-west-1_wlRtuLkG2");
-    expect(cognitoConfig.clientId).toBe("64tf6nf61n6sgftqif6q975hka");
-    expect(cognitoConfig.domain).toBe("askend-lab-auth.auth.eu-west-1.amazoncognito.com");
+    expect(cognitoConfig.userPoolId).toBe("");
+    expect(cognitoConfig.clientId).toBe("");
+    expect(cognitoConfig.domain).toBe("");
   });
 
   it("should have exact OAuth scopes", () => {
@@ -119,10 +119,10 @@ describe("getLogoutUrl", () => {
 });
 
 describe("getTaraLoginUrl", () => {
-  it("should return direct URL to hak-api-dev for TARA auth", async () => {
+  it("should return TARA login URL from env var (empty default)", async () => {
     const { getTaraLoginUrl } = await import("./config");
     const url = getTaraLoginUrl();
-    expect(url).toBe("https://hak-api-dev.askend-lab.com/auth/tara/start");
+    expect(url).toBe("");
   });
 });
 

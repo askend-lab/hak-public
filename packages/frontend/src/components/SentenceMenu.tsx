@@ -195,6 +195,7 @@ export default function SentenceMenu({
         ref={menuRef}
         className={menuClassName}
         role="menu"
+        tabIndex={-1}
         aria-label="Lausungi valikud"
         onKeyDown={handleKeyDown}
         style={menuStyle}

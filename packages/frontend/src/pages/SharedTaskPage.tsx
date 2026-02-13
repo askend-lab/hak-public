@@ -8,6 +8,7 @@ import { Task } from "@/types/task";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useSharedTaskAudio } from "@/hooks/useSharedTaskAudio";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { COPIED_ENTRIES_KEY } from "@/hooks/synthesis/useSentenceState";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import SentenceSynthesisItem from "@/components/SentenceSynthesisItem";
@@ -77,7 +78,7 @@ export function SharedTaskPage() {
   const handleCopyToPlaylist = (): void => {
     if (!task?.entries) return;
 
-    sessionStorage.setItem("copiedEntries", JSON.stringify(task.entries));
+    sessionStorage.setItem(COPIED_ENTRIES_KEY, JSON.stringify(task.entries));
     showNotification("success", "Laused kopeeritud!");
     navigate("/synthesis");
   };

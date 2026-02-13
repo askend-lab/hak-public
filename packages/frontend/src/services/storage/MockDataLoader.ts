@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { Task, TaskEntry } from "@/types/task";
-import mockTasksData from "../../../public/data/mock-tasks.json";
+import mockTasksData from "@/data/mock-tasks.json";
 import { generateShareToken } from "./shareTokenUtils";
 
 export class MockDataLoader {
