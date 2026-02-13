@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddEntryModal from "./AddEntryModal";
 
@@ -274,7 +274,37 @@ describe("AddEntryModal", () => {
         screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
         "Test",
       );
-      // Simulate BaseModal close - would trigger handleClose
+      mockOnClose.mockClear();
+      // Click close button to trigger handleClose (use fireEvent to avoid isolation issues)
+      const closeBtn = screen.getByRole("button", { name: "Sulge" });
+      fireEvent.click(closeBtn);
+      expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    it("shows validation error for empty title", async () => {
+      const user = userEvent.setup();
+      render(
+        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
+      );
+
+      // Type whitespace-only title to enable the button, then clear it
+      await user.type(
+        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
+        "a",
+      );
+      await user.clear(screen.getByPlaceholderText("Pealkiri (Kohustuslik)"));
+      await user.type(
+        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
+        " ",
+      );
+      // Button should be disabled for whitespace-only, so we submit via form
+      const form = document.querySelector("form")!;
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(screen.getByText("Pealkiri on kohustuslik")).toBeInTheDocument();
+      });
+      expect(mockOnAdd).not.toHaveBeenCalled();
     });
 
     // Covered by TaskEditModal.mutations.test.tsx ("handleClose does not call onClose while submitting").
