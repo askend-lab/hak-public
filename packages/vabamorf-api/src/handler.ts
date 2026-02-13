@@ -22,7 +22,11 @@ function loadVersion(): string {
   try {
     return require("./package.json").version;
   } catch {
-    return require("../package.json").version;
+    try {
+      return require("../package.json").version;
+    } catch {
+      return "0.0.0";
+    }
   }
 }
 const version = loadVersion();
