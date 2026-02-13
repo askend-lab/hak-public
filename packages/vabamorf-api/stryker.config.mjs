@@ -16,9 +16,9 @@ export default {
     "!src/index.ts"
   ],
   thresholds: {
-    high: 80,
-    low: 60,
-    break: 50
+    high: 90,
+    low: 70,
+    break: 60
   },
   timeoutMS: 30000
 };
