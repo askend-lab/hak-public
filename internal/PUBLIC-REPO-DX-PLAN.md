@@ -69,9 +69,10 @@ Larger changes that improve the developer experience and code quality. Not block
   - Add `React.lazy()` for route-level components (SpecsPage, Dashboard, TasksView)
   - Target: main chunk < 500KB
 
-- [ ] **2.2 Add pre-commit hooks for external contributors**
-  - `.githooks/` excluded (DevBox-dependent). External devs have no commit-time checks.
-  - Options: Husky + lint-staged, or rely on CI (Phase 1.4)
+- [x] **2.2 Add pre-commit hooks for external contributors** ✅ DONE
+  - Implemented: Husky + lint-staged (`.husky/pre-commit` → `pnpm lint-staged` → ESLint on staged files)
+  - Sync script adds `"prepare": "husky"` and keeps `lint-staged` config in public package.json
+  - Private repo unaffected (core.hooksPath=.githooks overrides husky)
 
 - [ ] **2.3 E2E tests without AWS dependencies**
   - Currently excluded (depend on Secrets Manager, Cognito test users)

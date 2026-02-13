@@ -37,6 +37,7 @@ packages/frontend/e2e/
 .github/workflows/sync-to-public.yml
 
 # --- Config files referencing internal packages ---
+.gherkin-lintrc
 babel.config.js
 jest.config.js
 jest.setup.ts
