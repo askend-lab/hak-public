@@ -259,8 +259,14 @@ if [[ -f ARCHITECTURE.md ]]; then
     content = content.replace(/## Infrastructure\n[\s\S]*?(?=\n## |\n*$)/, '');
     // Replace DevBox reference in Quality System section
     content = content.replace('Pre-commit hooks (DevBox) enforce', 'Pre-commit hooks enforce');
+    // Remove tara-auth references (package excluded from public repo)
+    content = content.replace(/^- \*\*tara-auth\*\* —.*\n/gm, '');
+    // Fix backend count (Five → Four, since tara-auth is excluded)
+    content = content.replace('Five Lambda functions', 'Four Lambda functions');
+    // Remove Infrastructure line from Quality System (no infra in public repo)
+    content = content.replace(/^- \*\*Infrastructure\*\* —.*\n/gm, '');
     fs.writeFileSync('ARCHITECTURE.md', content);
-    console.log('  Removed infra/ section and DevBox reference');
+    console.log('  Removed infra/ section, DevBox ref, tara-auth refs, Infrastructure quality line');
   "
 fi
 
@@ -275,6 +281,31 @@ fi
 if [[ -f docs/adr/README.md ]]; then
   sed -i 's/TDD with DevBox hooks/TDD with pre-commit hooks/' docs/adr/README.md
   echo "  Cleaned DevBox reference in ADR README"
+fi
+
+# --- Clean up frontend package.json (remove scripts referencing excluded e2e/) ---
+echo ">>> Cleaning frontend scripts..."
+if [[ -f packages/frontend/package.json ]] && command -v node &>/dev/null; then
+  node -e "
+    const fs = require('fs');
+    const pkg = JSON.parse(fs.readFileSync('packages/frontend/package.json', 'utf8'));
+    // Remove scripts that reference excluded e2e/ directory
+    delete pkg.scripts['test:a11y'];
+    delete pkg.scripts['test:a11y:report'];
+    fs.writeFileSync('packages/frontend/package.json', JSON.stringify(pkg, null, 2) + '\n');
+    console.log('  Removed test:a11y scripts (e2e/ excluded)');
+  "
+fi
+
+# --- Rename ADR 003 file (remove devbox from filename) ---
+echo ">>> Renaming ADR 003..."
+if [[ -f docs/adr/003-tdd-devbox.md ]]; then
+  mv docs/adr/003-tdd-devbox.md docs/adr/003-tdd-hooks.md
+  # Update the link in README
+  if [[ -f docs/adr/README.md ]]; then
+    sed -i 's/003-tdd-devbox\.md/003-tdd-hooks.md/' docs/adr/README.md
+  fi
+  echo "  Renamed 003-tdd-devbox.md → 003-tdd-hooks.md"
 fi
 
 # --- Clean up merlin-api package.json (remove deploy scripts) ---
