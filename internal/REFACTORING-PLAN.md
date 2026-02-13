@@ -48,7 +48,7 @@ Deep analysis of the entire HAK project identified 10 major refactoring candidat
 - **File:** `packages/frontend/src/App.tsx:155-222`
 - **Problem:** App.tsx manually wires ~76 props from 6 hooks (synthesis, taskHandlers, dragDrop, variants, menu, auth) into `SynthesisView`. Extreme prop drilling.
 - **Fix:** Create `SynthesisContext` so child components subscribe directly to needed state.
-- **Status:** [ ] Deferred — largest refactoring, needs separate PR
+- **Status:** [x] Done — PR #433
 
 #### 7. CI Build Pipeline Runs Jest Instead of Vitest — Frontend Tests Skipped
 - **File:** `.github/workflows/build.yml:116`
