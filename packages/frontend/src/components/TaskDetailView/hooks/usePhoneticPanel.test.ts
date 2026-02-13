@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePhoneticPanel } from "./usePhoneticPanel";
 import type { TaskEntry, Task } from "@/types/task";
+import { logger } from "@hak/shared";
 
 const mockUpdateTaskEntry = vi.fn();
 vi.mock("@/services/dataService", () => ({
@@ -105,7 +106,7 @@ describe("usePhoneticPanel", () => {
   });
 
   it("handleExplorePhonetic handles fetch error", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const entryNoStressed = { ...mockEntry, stressedText: "" };
     (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("fail"),
@@ -183,7 +184,7 @@ describe("usePhoneticPanel", () => {
   });
 
   it("handlePhoneticApply handles save error", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     window.alert = vi.fn();
     mockUpdateTaskEntry.mockRejectedValueOnce(new Error("save fail"));
     const setEntries = vi.fn();

@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSentenceState } from "./useSentenceState";
 
@@ -31,7 +32,7 @@ describe("useSentenceState", () => {
   });
 
   it("handles corrupted localStorage gracefully", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     localStorage.setItem("eki_synthesis_state", "not-json");
     const { result } = renderHook(() => useSentenceState());
     expect(result.current.sentences).toHaveLength(1);
@@ -170,7 +171,7 @@ describe("useSentenceState", () => {
   });
 
   it("handles corrupted sessionStorage gracefully", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     sessionStorage.setItem("copiedEntries", "bad-json");
     renderHook(() => useSentenceState());
     expect(spy).toHaveBeenCalled();

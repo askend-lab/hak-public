@@ -12,6 +12,9 @@ export {
   CORS_HEADERS,
   HTTP_STATUS,
   createLambdaResponse,
+  createApiResponse,
+  createBadRequestResponse,
+  createInternalErrorResponse,
   extractErrorMessage,
 } from "./lambda";
 export type { LambdaResponse, HttpStatusCode } from "./lambda";

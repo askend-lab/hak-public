@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesisOrchestrator } from "./useSynthesisOrchestrator";
 import type { Mock } from "vitest";
@@ -208,7 +209,7 @@ describe("useSynthesisOrchestrator", () => {
       });
 
       const consoleSpy = vi
-        .spyOn(console, "error")
+        .spyOn(logger, "error")
         .mockImplementation(() => {});
       const { result } = renderHook(() => useSynthesisOrchestrator());
 
@@ -304,7 +305,7 @@ describe("useSynthesisOrchestrator", () => {
       mockSentenceState.sentences = [{ id: "test-1", text: "Hello", tags: [] }];
 
       const consoleSpy = vi
-        .spyOn(console, "error")
+        .spyOn(logger, "error")
         .mockImplementation(() => {});
       const { result } = renderHook(() => useSynthesisOrchestrator());
 
@@ -371,7 +372,7 @@ describe("useSynthesisOrchestrator", () => {
       });
 
       const consoleSpy = vi
-        .spyOn(console, "error")
+        .spyOn(logger, "error")
         .mockImplementation(() => {});
       const { result } = renderHook(() => useSynthesisOrchestrator());
 
@@ -462,7 +463,7 @@ describe("useSynthesisOrchestrator", () => {
       });
 
       const consoleSpy = vi
-        .spyOn(console, "error")
+        .spyOn(logger, "error")
         .mockImplementation(() => {});
       const { result } = renderHook(() => useSynthesisOrchestrator());
 

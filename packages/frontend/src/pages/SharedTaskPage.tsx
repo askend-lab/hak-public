@@ -9,6 +9,7 @@ import { useNotification } from "@/contexts/NotificationContext";
 import { useSharedTaskAudio } from "@/hooks/useSharedTaskAudio";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { COPIED_ENTRIES_KEY } from "@/hooks/synthesis/useSentenceState";
+import { logger } from "@hak/shared";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import SentenceSynthesisItem from "@/components/SentenceSynthesisItem";
@@ -52,7 +53,7 @@ export function SharedTaskPage() {
           setError("Ülesannet ei leitud");
         }
       } catch (err) {
-        console.error("Failed to load shared task:", err);
+        logger.error("Failed to load shared task:", err);
         setError("Viga ülesande laadimisel");
       } finally {
         setIsLoading(false);

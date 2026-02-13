@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { Component, ErrorInfo, ReactNode } from "react";
+import { logger } from "@hak/shared";
 
 interface Props {
   children: ReactNode;
@@ -24,7 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error("[ErrorBoundary] Uncaught error:", error, errorInfo);
+    logger.error("[ErrorBoundary] Uncaught error:", error, errorInfo);
   }
 
   override render(): ReactNode {

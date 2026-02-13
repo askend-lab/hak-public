@@ -52,6 +52,38 @@ export function createLambdaResponse(
 }
 
 /**
+ * Creates an API response with CORS headers (most common pattern).
+ * Replaces per-package createResponse() wrappers.
+ */
+export function createApiResponse(
+  statusCode: number,
+  body: unknown,
+): LambdaResponse {
+  return createLambdaResponse(statusCode, body, { ...CORS_HEADERS });
+}
+
+/**
+ * Creates a 400 Bad Request response with CORS headers.
+ */
+export function createBadRequestResponse(error: string): LambdaResponse {
+  return createApiResponse(HTTP_STATUS.BAD_REQUEST, { error });
+}
+
+/**
+ * Creates a 500 Internal Server Error response with CORS headers.
+ * Logs the error context for debugging.
+ */
+export function createInternalErrorResponse(
+  context: string,
+  error: unknown,
+): LambdaResponse {
+  console.error(`${context}:`, error);
+  return createApiResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
+    error: "Internal server error",
+  });
+}
+
+/**
  * Extracts error message from unknown error type.
  */
 export function extractErrorMessage(

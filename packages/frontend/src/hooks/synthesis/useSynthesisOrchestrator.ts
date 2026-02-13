@@ -6,6 +6,7 @@ import { convertTextToTags, CACHE_INVALIDATION } from "@/types/synthesis";
 import { useSentenceState } from "./useSentenceState";
 import { useAudioPlayer } from "./useAudioPlayer";
 import { useSynthesisAPI } from "./useSynthesisAPI";
+import { logger } from "@hak/shared";
 
 const MAX_RETRY_COUNT = 1;
 const RETRY_DELAY_MS = 100;
@@ -56,7 +57,7 @@ export function useSynthesisOrchestrator(): ReturnType<
           if (abortSignal?.aborted) return false;
           updateSentence(id, { audioUrl: result.audioUrl });
         } catch (error) {
-          console.error("Failed to synthesize audio:", error);
+          logger.error("Failed to synthesize audio:", error);
           return false;
         }
       }
@@ -159,7 +160,7 @@ export function useSynthesisOrchestrator(): ReturnType<
             updateSentence(id, { isLoading: false, isPlaying: false }),
         });
       } catch (error) {
-        console.error("Failed to synthesize:", error);
+        logger.error("Failed to synthesize:", error);
         updateSentence(id, { isLoading: false, isPlaying: false });
       }
     },
@@ -221,7 +222,7 @@ export function useSynthesisOrchestrator(): ReturnType<
             updateSentence(id, { isLoading: false, isPlaying: false }),
         });
       } catch (error) {
-        console.error("Failed to synthesize:", error);
+        logger.error("Failed to synthesize:", error);
         updateSentence(id, { isLoading: false, isPlaying: false });
       }
     },

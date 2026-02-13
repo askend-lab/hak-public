@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesisOrchestrator } from "./useSynthesisOrchestrator";
 import type { Mock } from "vitest";
@@ -109,7 +110,7 @@ describe("useSynthesisOrchestrator mutation kills", () => {
 
   // --- playSingleSentence L56: synthesis error returns false ---
   it("playSingleSentence returns false on synthesis error", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockSynthesisAPI.synthesizeWithCache.mockRejectedValue(new Error("fail"));
     mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "hi", audioUrl: null, tags: [] });
     const { result } = renderHook(() => useSynthesisOrchestrator());
@@ -363,7 +364,7 @@ describe("useSynthesisOrchestrator mutation kills", () => {
   });
 
   it("playSingleSentence logs error with correct prefix", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const err = new Error("fail");
     mockSynthesisAPI.synthesizeWithCache.mockRejectedValue(err);
     mockSentenceState.getSentence.mockReturnValue({ id: "s1", text: "hi", audioUrl: null, tags: [] });
@@ -374,7 +375,7 @@ describe("useSynthesisOrchestrator mutation kills", () => {
   });
 
   it("synthesizeAndPlay logs error with correct prefix", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const err = new Error("fail");
     mockSynthesisAPI.synthesizeText.mockRejectedValue(err);
     mockSentenceState.sentences = [{ id: "s1", text: "Hi", tags: ["Hi"] }];

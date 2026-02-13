@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import type { NotificationType, NotificationColor } from "@/components/Notification";
+import { logger } from "@hak/shared";
 
 /**
  * Copies text to clipboard and reports success/failure via a notification callback.
@@ -27,7 +28,7 @@ export async function copyTextToClipboard(
       "success",
     );
   } catch (error) {
-    console.error("Failed to copy text:", error);
+    logger.error("Failed to copy text:", error);
     showNotification("error", "Viga teksti kopeerimisel");
   }
 }

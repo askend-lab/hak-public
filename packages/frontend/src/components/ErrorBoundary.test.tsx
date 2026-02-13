@@ -4,6 +4,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { logger } from "@hak/shared";
 
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   if (shouldThrow) {
@@ -80,16 +81,18 @@ describe("ErrorBoundary", () => {
   });
 
   it("logs error to console with error info", () => {
+    const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
-    expect(console.error).toHaveBeenCalledWith(
+    expect(logSpy).toHaveBeenCalledWith(
       "[ErrorBoundary] Uncaught error:",
       expect.any(Error),
       expect.objectContaining({ componentStack: expect.any(String) }),
     );
+    logSpy.mockRestore();
   });
 
   it("does not render fallback or error UI when no error", () => {

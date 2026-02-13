@@ -8,6 +8,7 @@ import { PageLoadingState } from "./ui/PageLoadingState";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 import { useUserTasks } from "@/hooks";
+import { logger } from "@hak/shared";
 
 interface Task {
   id: string;
@@ -53,7 +54,7 @@ export default function TasksView({
         onEditTask(taskData);
       }
     } catch (error) {
-      console.error("Failed to fetch task for editing:", error);
+      logger.error("Failed to fetch task for editing:", error);
     }
   };
 
@@ -69,7 +70,7 @@ export default function TasksView({
         onShareTask(taskData);
       }
     } catch (error) {
-      console.error("Failed to fetch task for sharing:", error);
+      logger.error("Failed to fetch task for sharing:", error);
     }
   };
 

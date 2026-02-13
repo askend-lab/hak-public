@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { TaskSummary } from "@/types/task";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
+import { logger } from "@hak/shared";
 import { SearchIcon, AddIcon, BackIcon } from "./ui/Icons";
 
 export type AddToTaskMode = "append" | "replace";
@@ -128,7 +129,7 @@ export default function AddToTaskDropdown({
     DataService.getInstance()
       .getUserTasks(user.id)
       .then(setTasks)
-      .catch((e) => console.error("Failed to load tasks:", e))
+      .catch((e) => logger.error("Failed to load tasks:", e))
       .finally(() => setIsLoading(false));
   }, [isOpen, user]);
   useEffect(() => {

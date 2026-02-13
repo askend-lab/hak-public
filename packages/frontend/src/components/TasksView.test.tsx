@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TasksView from "./TasksView";
@@ -192,7 +193,7 @@ describe("TasksView - Edit Task Bug", () => {
   });
 
   it("should handle edit task error gracefully", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockGetTask.mockRejectedValueOnce(new Error("fetch fail"));
 
     const user = userEvent.setup();
@@ -283,7 +284,7 @@ describe("TasksView - Edit Task Bug", () => {
       isEmpty: false,
       refresh: vi.fn(),
     });
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockGetTask.mockRejectedValueOnce(new Error("fetch fail"));
 
     const user = userEvent.setup();

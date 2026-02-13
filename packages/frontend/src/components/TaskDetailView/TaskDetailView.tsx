@@ -11,6 +11,7 @@ import { convertTextToTags } from "@/types/synthesis";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 import { useNotification } from "@/contexts/NotificationContext";
+import { logger } from "@hak/shared";
 import SentenceSynthesisItem from "../SentenceSynthesisItem";
 import ShareTaskModal from "../ShareTaskModal";
 import PronunciationVariants from "../PronunciationVariants";
@@ -83,7 +84,7 @@ export default function TaskDetailView({
       await downloadTaskAsZip({ ...task, entries });
       showNotification("success", "ZIP-fail allalaaditud!", undefined, undefined, "success");
     } catch (err) {
-      console.error("ZIP download failed:", err);
+      logger.error("ZIP download failed:", err);
       showNotification("error", "Viga ZIP-faili loomisel");
     } finally {
       setIsDownloading(false);

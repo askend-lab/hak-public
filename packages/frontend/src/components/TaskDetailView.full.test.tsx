@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import TaskDetailView from "./TaskDetailView";
 
@@ -149,7 +150,7 @@ describe("TaskDetailView Full", () => {
 
   it("handles API error gracefully", async () => {
     mockGetTask.mockRejectedValue(new Error("API Error"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     render(<TaskDetailView {...props} />);
     // Component handles error gracefully
     expect(screen.getByText(/laen/i)).toBeInTheDocument();

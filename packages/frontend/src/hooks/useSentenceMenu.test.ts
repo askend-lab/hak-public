@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useSentenceMenu } from "./useSentenceMenu";
 
@@ -96,7 +97,7 @@ describe("useSentenceMenu", () => {
   });
 
   it("should handle getUserTasks error in handleMenuOpen", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const { DataService } = await import("@/services/dataService");
     (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       getUserTasks: vi.fn().mockRejectedValue(new Error("load failed")),

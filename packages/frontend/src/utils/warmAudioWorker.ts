@@ -30,7 +30,7 @@ export async function warmAudioWorker(): Promise<void> {
     lastActivity = Date.now();
     logger.info("[Audio] Workers warm-up triggered");
   } catch (error) {
-    console.warn("[Audio] Failed to warm up workers:", error);
+    logger.warn("[Audio] Failed to warm up workers:", error);
   }
 }
 

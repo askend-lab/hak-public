@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { vi } from "vitest";
+import { logger } from "@hak/shared";
 import {
   cognitoConfig,
   getLoginUrl,
@@ -165,7 +166,7 @@ describe("exchangeCodeForTokens", () => {
 
   it("should return null on token exchange failure", async () => {
     sessionStorage.setItem("pkce_code_verifier", "test-verifier");
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
@@ -217,7 +218,7 @@ describe("exchangeCodeForTokens", () => {
   it("should return null on network error", async () => {
     sessionStorage.setItem("pkce_code_verifier", "test-verifier");
     global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     const result = await exchangeCodeForTokens("auth-code");
     expect(result).toBeNull();
@@ -229,7 +230,7 @@ describe("exchangeCodeForTokens", () => {
   });
 
   it("should log missing PKCE verifier error", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     await exchangeCodeForTokens("code");
     expect(consoleSpy).toHaveBeenCalledWith("[Auth] Missing PKCE code verifier");
     consoleSpy.mockRestore();

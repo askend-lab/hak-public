@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import SentencePhoneticPanel from "./SentencePhoneticPanel";
 
@@ -207,7 +208,7 @@ describe("SentencePhoneticPanel mutation kills", () => {
     it("catch logs and resets", async () => {
       const { synthesizeAuto } = await import("@/utils/synthesize");
       (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("x"));
-      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
       render(<SentencePhoneticPanel {...dp} />);
       await act(async () => { fireEvent.click(screen.getByText("Kuula")); await flush(); });
       await waitFor(() => expect(spy).toHaveBeenCalledWith("Failed to play:", expect.any(Error)));

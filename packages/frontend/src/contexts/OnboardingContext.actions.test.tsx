@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, act } from "@testing-library/react";
 import { OnboardingProvider, useOnboarding } from "./OnboardingContext";
 import { STORAGE_KEY } from "@/config/onboardingConfig";
@@ -93,7 +94,7 @@ describe("OnboardingContext actions", () => {
 
   describe("useOnboarding hook", () => {
     it("throws when used outside provider", () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
       expect(() => { render(<TestConsumer />); }).toThrow("useOnboarding must be used within an OnboardingProvider");
       consoleSpy.mockRestore();
     });

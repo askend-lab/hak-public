@@ -6,6 +6,7 @@ import { extractStressedText, extractVariants } from "./parser";
 import { LambdaResponse } from "./types";
 import { createResponse, parseJsonBody, validateField } from "./validation";
 import { analyze, isInitialized, initVmetajson } from "./vmetajson";
+import { HTTP_STATUS, TEXT_LIMITS } from "@hak/shared";
 
 // Stryker disable next-line all: env defaults are equivalent
 const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
@@ -26,14 +27,7 @@ function loadVersion(): string {
 }
 const version = loadVersion();
 
-// Kept in sync with @hak/shared TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH
-const MAX_TEXT_LENGTH = 10_000;
-
-const HTTP_STATUS = {
-  OK: 200,
-  BAD_REQUEST: 400,
-  INTERNAL_ERROR: 500,
-} as const;
+const MAX_TEXT_LENGTH = TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH;
 
 const ERRORS = {
   MISSING_BODY: "Missing request body",
@@ -82,7 +76,7 @@ function parseAndValidate(
 
 function handleError(error: unknown): APIGatewayProxyResult {
   const message = error instanceof Error ? error.message : ERRORS.UNKNOWN;
-  return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
+  return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: `${PROCESSING_ERROR_PREFIX}${message}`,
   });
 }
@@ -119,7 +113,7 @@ export async function variantsHandler(
     const variants = extractVariants(response, parsed.value);
 
     if (variants.length === 0)
-      return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
+      return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
         error: ERRORS.NO_VARIANTS,
       });
 

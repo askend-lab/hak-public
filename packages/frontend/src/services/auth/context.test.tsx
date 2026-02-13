@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { vi } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, waitFor, act } from "@testing-library/react";
 import { AuthProvider } from "./context";
 import { AuthStorage } from "./storage";
@@ -132,7 +133,7 @@ describe("AuthProvider", () => {
 
 describe("useAuth", () => {
   it("should throw error when used outside AuthProvider", () => {
-    const consoleError = vi.spyOn(console, "error").mockImplementation(vi.fn());
+    const consoleError = vi.spyOn(logger, "error").mockImplementation(vi.fn());
 
     expect(() => render(<TestComponent />)).toThrow(
       "useAuth must be used within AuthProvider",

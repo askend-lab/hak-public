@@ -125,10 +125,10 @@ resource "aws_s3_bucket_policy" "merlin_audio_public_read" {
 
 resource "aws_ecr_repository" "merlin_worker" {
   name                 = "merlin-worker"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
-    scan_on_push = false
+    scan_on_push = true
   }
 
   tags = local.tags

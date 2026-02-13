@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import {
-  CORS_HEADERS,
-  createLambdaResponse,
-  type LambdaResponse,
-} from "@hak/shared";
+import { createApiResponse, type LambdaResponse } from "@hak/shared";
 
 export function createResponse(
   statusCode: number,
   body: object,
 ): LambdaResponse {
-  return createLambdaResponse(statusCode, body, { ...CORS_HEADERS });
+  return createApiResponse(statusCode, body);
 }
 
 export function parseJsonBody(eventBody: string | null): unknown {
