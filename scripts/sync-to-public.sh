@@ -122,17 +122,22 @@ if command -v node &>/dev/null; then
     const fs = require('fs');
     const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
-    // Remove internal scripts
+    // Remove internal scripts (devbox-dependent)
     const internalScripts = [
-      'dx', 'dx:cli', 'test', 'test:full', 'test:coverage',
+      'dx', 'dx:cli',
       'postinstall', 'kill-ports', 'start:backend'
     ];
     for (const s of internalScripts) {
       delete pkg.scripts[s];
     }
 
-    // Update start script to just run frontend
+    // Replace devbox-dependent scripts with standalone equivalents
+    pkg.scripts.test = 'pnpm -r --filter=@hak/frontend run test:full && pnpm -r --filter=@hak/shared run test:full';
+    pkg.scripts['test:full'] = pkg.scripts.test;
+    pkg.scripts['test:coverage'] = 'pnpm -r --filter=@hak/frontend run test:coverage';
     pkg.scripts.start = 'pnpm --filter @hak/frontend dev';
+    pkg.scripts.build = 'pnpm --filter @hak/frontend build';
+    pkg.scripts.typecheck = 'pnpm -r exec tsc --noEmit';
 
     // Remove .npmrc reference (private registry)
     // (file already deleted above)
