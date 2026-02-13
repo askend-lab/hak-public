@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { StrictMode } from "react";
+import { StrictMode, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import * as Sentry from "@sentry/react";
@@ -24,9 +24,9 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthProvider } from "./services/auth";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
-import { AuthCallbackPage } from "./pages/AuthCallbackPage";
-import { DebugPage } from "./pages/DebugPage";
-import { SharedTaskPage } from "./pages/SharedTaskPage";
+const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
+const DebugPage = lazy(() => import("./pages/DebugPage").then(m => ({ default: m.DebugPage })));
+const SharedTaskPage = lazy(() => import("./pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
 import "./styles/main.scss";
 
 // Enable accessibility checking in development mode
@@ -46,15 +46,17 @@ createRoot(rootElement).render(
         <NotificationProvider>
           <OnboardingProvider>
             <BrowserRouter>
-              <Routes>
-                <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                <Route path="/debug-x7k9m" element={<DebugPage />} />
-                <Route
-                  path="/shared/task/:token"
-                  element={<SharedTaskPage />}
-                />
-                <Route path="*" element={<App />} />
-              </Routes>
+              <Suspense fallback={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="loader-spinner" style={{ width: 48, height: 48 }} /></div>}>
+                <Routes>
+                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                  <Route path="/debug-x7k9m" element={<DebugPage />} />
+                  <Route
+                    path="/shared/task/:token"
+                    element={<SharedTaskPage />}
+                  />
+                  <Route path="*" element={<App />} />
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </OnboardingProvider>
         </NotificationProvider>
