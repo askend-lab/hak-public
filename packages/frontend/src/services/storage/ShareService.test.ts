@@ -63,10 +63,9 @@ describe("ShareService", () => {
 
   describe("getSharedTask", () => {
     it("returns baseline task when found", async () => {
-      mockBaselineTasks.push(mockTask);
+      mockLoader.loadBaselineTasks.mockResolvedValueOnce([mockTask]);
       const result = await service.getSharedTask("task-1");
       expect(result).toEqual(mockTask);
-      mockBaselineTasks.length = 0;
     });
 
     it("returns null when no baseline task found", async () => {

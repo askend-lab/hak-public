@@ -60,11 +60,9 @@ describe("ShareService sharing flow", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    // getSharedTask creates its own MockDataLoader internally, so we need to mock the module
-    const { MockDataLoader: ML } = await import("./MockDataLoader");
-    vi.spyOn(ML.prototype, "loadBaselineTasks").mockResolvedValue([
-      baselineTask,
-    ]);
+    (
+      mockLoader.loadBaselineTasks as ReturnType<typeof vi.fn>
+    ).mockResolvedValueOnce([baselineTask]);
 
     const result = await shareService.getSharedTask("baseline-1");
     expect(result).toEqual(baselineTask);
