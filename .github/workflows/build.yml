@@ -85,15 +85,20 @@ jobs:
             BASE_SHA="${{ github.event.before }}"
           fi
 
-          if [ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]; then
-            echo "Initial commit - building all"
+          # Determine changed files; fall back to building all if diff is unavailable
+          CHANGED=""
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            CHANGED=$(git diff --name-only "$BASE_SHA" HEAD 2>/dev/null || true)
+          fi
+
+          if [ -z "$CHANGED" ]; then
+            echo "No diff available (initial commit, workflow_dispatch, or same SHA) - building all"
             echo "frontend=true" >> $GITHUB_OUTPUT
             echo "simplestore=true" >> $GITHUB_OUTPUT
             echo "audio-api=true" >> $GITHUB_OUTPUT
             echo "merlin-api=true" >> $GITHUB_OUTPUT
             echo "vabamorf-api=true" >> $GITHUB_OUTPUT
           else
-            CHANGED=$(git diff --name-only $BASE_SHA HEAD)
             echo "Changed files: $CHANGED"
 
             # Check if @hak/shared changed — if so, rebuild all dependent packages
