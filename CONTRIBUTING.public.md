@@ -6,21 +6,19 @@ Thank you for your interest in contributing to HAK — the Estonian language lea
 
 ### Prerequisites
 
-- Node.js 20+
-- pnpm 9+
+- [Node.js](https://nodejs.org/) 20+ (see `.nvmrc`)
+- [pnpm](https://pnpm.io/) 10+
+- [Git](https://git-scm.com/)
+
+No Docker, AWS CLI, or environment variables required. The dev server proxies API calls to deployed services.
 
 ### Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/askend-lab/hak.git
 cd hak
-
-# Install dependencies
 pnpm install
-
-# Start the development server
-pnpm start
+pnpm start              # Dev server at http://localhost:5181
 ```
 
 ## Development Workflow
@@ -47,7 +45,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 1. Create a branch from `main`
 2. Make your changes
-3. Run tests: `cd packages/frontend && npx vitest`
+3. Run checks: `pnpm check`
 4. Open a PR with a clear description
 
 ## Project Structure
@@ -74,16 +72,15 @@ docs/             - Documentation and API reference
 - No `any` types without justification
 - Tests required for new functionality (TDD)
 
-## Testing
+## Available Commands
 
-```bash
-# Run frontend tests
-cd packages/frontend
-npx vitest
-
-# Run with coverage
-npx vitest --coverage
-```
+| Command | Description |
+|---------|-------------|
+| `pnpm start` | Start frontend dev server (port 5181) |
+| `pnpm check` | Run all checks: lint + typecheck + tests |
+| `pnpm lint` | ESLint + Gherkin lint |
+| `pnpm typecheck` | TypeScript type checking across all packages |
+| `pnpm test:all` | Run all tests across all packages |
 
 ## Questions?
 
