@@ -23,14 +23,28 @@ pnpm start         # Start dev server (http://localhost:5180)
 |---------|-------------|
 | `packages/frontend` | React SPA — Vite, SCSS/BEM, React Router |
 | `packages/shared` | Shared types and utilities |
+| `packages/simplestore` | REST API for lessons, users, progress (DynamoDB) |
+| `packages/merlin-api` | TTS gateway — synthesis requests, caching (Lambda) |
+| `packages/merlin-worker` | Estonian speech synthesis engine — Merlin TTS (Docker/ECS) |
+| `packages/vabamorf-api` | Estonian morphological analysis — stress, variants (Lambda) |
+| `packages/audio-api` | Audio file storage and playback (S3) |
 | `packages/specifications` | Gherkin BDD specifications |
 | `packages/gherkin-parser` | Gherkin-to-test mapping |
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for a system overview.
+
+**Frontend** → React SPA served via CDN.
+**Backend** → Serverless Lambda functions + Docker-based TTS engine.
+**Storage** → DynamoDB for data, S3 for audio files.
 
 ## Features
 
 - **Interactive lessons** — Teachers create text-based lessons with audio
-- **Text-to-speech** — Estonian speech synthesis for lesson content
-- **Morphological analysis** — Word stress and pronunciation variants
+- **Text-to-speech** — Estonian speech synthesis (Merlin TTS engine)
+- **Morphological analysis** — Word stress and pronunciation variants (Vabamorf)
+- **Audio pipeline** — Synthesis queue, caching, playback
 - **Responsive design** — Works on desktop and mobile
 - **Accessibility** — WCAG-compliant UI components
 
@@ -55,14 +69,12 @@ npx vitest --coverage   # With coverage
 
 BDD specifications in Gherkin live in `packages/specifications/`.
 
-## API Contract
+## API Documentation
 
-The frontend communicates with a backend API. The expected endpoints are
-documented in the [API specification](docs/API.md) and the
-[Gherkin specifications](packages/specifications/).
-
-Any backend implementation that conforms to these contracts will work with
-the frontend.
+- [API Reference](docs/API.md) — endpoint overview
+- [Vabamorf API](docs/API-Vabamorf.md) — morphological analysis endpoints
+- [Merlin TTS API](docs/API-Merlin.md) — speech synthesis endpoints
+- [Architecture Decisions](docs/adr/) — ADRs
 
 ## Contributing
 

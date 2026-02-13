@@ -56,10 +56,15 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 packages/
   frontend/       - React frontend application
   shared/         - Shared utilities and types
+  simplestore/    - REST API for lessons, users, progress
+  merlin-api/     - TTS gateway (synthesis requests, caching)
+  merlin-worker/  - Estonian speech synthesis engine (Docker)
+  vabamorf-api/   - Estonian morphological analysis
+  audio-api/      - Audio file storage and playback
   gherkin-parser/ - Gherkin specification parser
   specifications/ - BDD specifications
 
-docs/             - Documentation
+docs/             - Documentation and API reference
 ```
 
 ## Code Style
