@@ -140,6 +140,9 @@ jobs:
             echo "$module: BUILD=$BUILD_SHA CURRENT=$CURRENT_SHA -> $( [ "$SHOULD_DEPLOY" == "true" ] && echo DEPLOY || echo skip )"
           done
 
+          # Output vabamorf SHA for ECR image URI construction
+          echo "vabamorf_sha=$(get_module "vabamorf-api" /tmp/build-manifest.json)" >> $GITHUB_OUTPUT
+
       - name: Download build artifacts
         run: |
           BUILD_ID="${{ inputs.build_id }}"
@@ -150,7 +153,6 @@ jobs:
           [ "${{ steps.state.outputs.deploy_simplestore }}" == "true" ] && aws s3 sync ${S3_BUILD}/simplestore/ artifacts/simplestore/
           [ "${{ steps.state.outputs.deploy_audio_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/audio-api/ artifacts/audio-api/
           [ "${{ steps.state.outputs.deploy_merlin_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/merlin-api/ artifacts/merlin-api/
-          [ "${{ steps.state.outputs.deploy_vabamorf_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/vabamorf-api/ artifacts/vabamorf-api/
 
           echo "✅ Downloaded artifacts"
 
@@ -221,13 +223,16 @@ jobs:
 
       - name: Login to ECR
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
       - name: Deploy Vabamorf API
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         working-directory: packages/vabamorf-api
+        env:
+          VABAMORF_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ steps.state.outputs.vabamorf_sha }}
         run: |
-          mkdir -p dist && cp -r ../../artifacts/vabamorf-api/* dist/ 2>/dev/null || true
+          echo "Using ECR image: $VABAMORF_IMAGE_URI"
           cd /tmp && npm init -y && npm install serverless-domain-manager serverless@3 --save
           cd /home/runner/work/hak/hak/packages/vabamorf-api
           /tmp/node_modules/.bin/serverless create_domain --stage ${{ inputs.environment }} || true
