@@ -13,8 +13,8 @@ Built with React and TypeScript.
 **Prerequisites:** [Node.js](https://nodejs.org/) 20+, [pnpm](https://pnpm.io/) 10+, [Git](https://git-scm.com/)
 
 ```bash
-git clone https://github.com/askend-lab/hak.git
-cd hak
+git clone https://github.com/askend-lab/hak-public.git
+cd hak-public
 pnpm install
 pnpm start              # Dev server at http://localhost:5181
 ```
