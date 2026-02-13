@@ -25,7 +25,6 @@ export default {
     "!src/utils/a11y-dev.ts",
     "!src/utils/warmAudioWorker.ts",
     "!src/services/storage/MockDataLoader.ts",
-    "!src/pages/DebugPage.tsx",
     "!src/services/auth/index.ts",
     "!src/services/auth/types.ts",
     "!src/**/*.generated.ts",
