@@ -17,7 +17,7 @@ import {
   mockSentenceMenu,
 } from "./test/mocks/appMocks";
 
-vi.mock("./services/auth", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
+vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => mockNotificationContext()),
 }));
@@ -56,7 +56,7 @@ vi.mock("./components/TaskDetailView", () => ({
 vi.mock("./components/TaskEditModal", () => ({ default: () => null }));
 vi.mock("./components/AddEntryModal", () => ({ default: () => null }));
 vi.mock("./components/ShareTaskModal", () => ({ default: () => null }));
-vi.mock("./components/LoginModal", () => ({
+vi.mock("@/features/auth/components/LoginModal", () => ({
   default: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="login-modal">LoginModal</div> : null,
 }));
@@ -211,7 +211,7 @@ describe("App (Home)", () => {
 
   describe("authenticated user", () => {
     it("shows user profile when authenticated", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -249,7 +249,7 @@ describe("App (Home)", () => {
 
     it("clicking tasks link when not authenticated shows login modal", async () => {
       const setShowLoginModal = vi.fn();
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: null,
         isAuthenticated: false,
@@ -391,7 +391,7 @@ describe("App (Home)", () => {
   describe("login button", () => {
     it("calls setShowLoginModal when clicked", async () => {
       const setShowLoginModal = vi.fn();
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: null,
         isAuthenticated: false,
@@ -421,7 +421,7 @@ describe("App (Home)", () => {
 
   describe("tasks view", () => {
     it("shows tasks view when authenticated and tasks selected", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,

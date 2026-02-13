@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import TaskDetailView from "./TaskDetailView";
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     user: { id: "user-1", name: "Test User" },
     isAuthenticated: true,

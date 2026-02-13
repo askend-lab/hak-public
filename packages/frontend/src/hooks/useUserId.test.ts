@@ -4,9 +4,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useUserId } from "./useUserId";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 
-vi.mock("@/services/auth");
+vi.mock("@/features/auth/services");
 
 const mockUseAuth = useAuth as ReturnType<typeof vi.fn>;
 

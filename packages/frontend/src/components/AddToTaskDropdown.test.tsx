@@ -11,7 +11,7 @@ const stableUser = {
   name: "Test User",
   email: "test@test.ee",
 };
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     user: stableUser,
   })),

@@ -4,7 +4,7 @@
 import TaskEditModal from "./TaskEditModal";
 import AddEntryModal from "./AddEntryModal";
 import ShareTaskModal from "./ShareTaskModal";
-import LoginModal from "./LoginModal";
+import LoginModal from "@/features/auth/components/LoginModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { OnboardingWizard } from "./onboarding";
 import { MODAL_STRINGS } from "@/constants/ui-strings";

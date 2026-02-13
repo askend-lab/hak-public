@@ -19,7 +19,7 @@ vi.mock("@/services/dataService", () => ({
   },
 }));
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     user: { id: "user-1", name: "Test User" },
     isAuthenticated: true,

@@ -3,7 +3,7 @@
 
 import { useCallback } from "react";
 import { DataService } from "@/services/dataService";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
 import { TASK_STRINGS } from "@/constants/ui-strings";

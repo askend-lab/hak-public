@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { Task, TaskEntry } from "@/types/task";
-import { AuthStorage } from "../auth/storage";
+import { AuthStorage } from "@/features/auth/services/storage";
 import { CONTENT_TYPE_JSON } from "@/utils/analyzeApi";
 import { logger } from "@hak/shared";
 

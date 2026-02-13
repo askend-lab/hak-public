@@ -14,7 +14,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import AppModals from "./components/AppModals";
 import SynthesisModals from "./components/SynthesisModals";
 import { RoleSelectionContent } from "./components/onboarding";
-import { useAuth } from "./services/auth";
+import { useAuth } from "./features/auth/services";
 import { COPIED_ENTRIES_KEY } from "./hooks/synthesis/useSentenceState";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./contexts/OnboardingContext";

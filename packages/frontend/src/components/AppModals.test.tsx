@@ -29,7 +29,7 @@ vi.mock("./ShareTaskModal", () => ({
       </div>
     ) : null,
 }));
-vi.mock("./LoginModal", () => ({
+vi.mock("@/features/auth/components/LoginModal", () => ({
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? (
       <div data-testid="login-modal">

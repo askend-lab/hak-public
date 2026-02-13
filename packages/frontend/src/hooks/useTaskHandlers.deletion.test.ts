@@ -10,7 +10,7 @@ import { SentenceState } from "@/types/synthesis";
 const mockShowNotification = vi.fn();
 const mockSetShowLoginModal = vi.fn();
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     user: { id: "user-1", name: "Test User" },
     isAuthenticated: true,

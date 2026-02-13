@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 import { SentenceState } from "@/types/synthesis";
 import { TASK_STRINGS } from "@/constants/ui-strings";
 import { useTaskModals } from "./useTaskModals";

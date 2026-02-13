@@ -6,7 +6,7 @@ import { logger } from "@hak/shared";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import TaskDetailView from "./TaskDetailView";
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     user: { id: "user-1", name: "Test" },
     isAuthenticated: true,

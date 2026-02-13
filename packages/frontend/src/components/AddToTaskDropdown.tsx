@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef } from "react";
 import { TaskSummary } from "@/types/task";
 import { DataService } from "@/services/dataService";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 import { logger } from "@hak/shared";
 import { SearchIcon, AddIcon, BackIcon } from "./ui/Icons";
 

@@ -6,14 +6,14 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LoginModal from "./LoginModal";
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     login: vi.fn().mockResolvedValue(undefined),
     loginWithTara: vi.fn(),
   })),
 }));
 
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 
 /**
  * Mutation-killing tests for LoginModal

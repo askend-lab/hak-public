@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import UserProfile from "./UserProfile";
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({ logout: vi.fn() })),
 }));
 
@@ -30,7 +30,7 @@ describe("UserProfile Full", () => {
   });
 
   it("calls logout when logout clicked", async () => {
-    const { useAuth } = await import("@/services/auth");
+    const { useAuth } = await import("@/features/auth/services");
     const logout = vi.fn();
     vi.mocked(useAuth).mockReturnValue({
       logout,

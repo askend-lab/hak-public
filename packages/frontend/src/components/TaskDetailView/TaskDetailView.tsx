@@ -9,7 +9,7 @@ import { getErrorMessage } from "@/utils/getErrorMessage";
 import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { convertTextToTags } from "@/types/synthesis";
 import { DataService } from "@/services/dataService";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
 import { logger } from "@hak/shared";
 import SentenceSynthesisItem from "../SentenceSynthesisItem";
