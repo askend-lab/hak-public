@@ -231,6 +231,7 @@ jobs:
         working-directory: packages/vabamorf-api
         env:
           VABAMORF_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ steps.state.outputs.vabamorf_sha }}
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
         run: |
           echo "Using ECR image: $VABAMORF_IMAGE_URI"
           cd /tmp && npm init -y && npm install serverless-domain-manager serverless@3 --save
