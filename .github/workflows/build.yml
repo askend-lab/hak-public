@@ -99,11 +99,11 @@ jobs:
             # Check if @hak/shared changed — if so, rebuild all dependent packages
             SHARED_CHANGED=$(echo "$CHANGED" | grep -q "^packages/shared/" && echo true || echo false)
 
-            echo "frontend=$(echo "$CHANGED" | grep -q "^packages/frontend/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "simplestore=$(echo "$CHANGED" | grep -q "^packages/simplestore/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "audio-api=$(echo "$CHANGED" | grep -q "^packages/audio-api/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "merlin-api=$(echo "$CHANGED" | grep -q "^packages/merlin-api/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "vabamorf-api=$(echo "$CHANGED" | grep -q "^packages/vabamorf-api/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "frontend=$( (echo "$CHANGED" | grep -q "^packages/frontend/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "simplestore=$( (echo "$CHANGED" | grep -q "^packages/simplestore/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "audio-api=$( (echo "$CHANGED" | grep -q "^packages/audio-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "merlin-api=$( (echo "$CHANGED" | grep -q "^packages/merlin-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "vabamorf-api=$( (echo "$CHANGED" | grep -q "^packages/vabamorf-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
 
             if echo "$CHANGED" | grep -qE "^(package\.json|pnpm-lock\.yaml|tsconfig\.json)$"; then
               echo "Root config changed - building all"
@@ -149,14 +149,6 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
-      - name: Prepare shared package for Vabamorf Docker build
-        if: steps.detect.outputs.vabamorf-api == 'true'
-        run: |
-          cd packages/shared && npx tsc
-          mkdir -p ../vabamorf-api/_shared/dist
-          cp dist/*.js ../vabamorf-api/_shared/dist/
-          echo '{"name":"@hak/shared","version":"0.1.0","main":"dist/index.js"}' > ../vabamorf-api/_shared/package.json
-
       - name: Build Vabamorf Docker image
         if: steps.detect.outputs.vabamorf-api == 'true'
         working-directory: packages/vabamorf-api
@@ -164,7 +156,6 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} .
-          rm -rf _shared
 
       - name: Scan Docker image with Trivy
         if: steps.detect.outputs.vabamorf-api == 'true'
