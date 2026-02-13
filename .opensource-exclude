@@ -19,6 +19,9 @@ docker-compose.yml
 packages/tara-auth/
 packages/task-channel/
 
+# --- E2E tests (depend on internal AWS infrastructure) ---
+packages/frontend/e2e/
+
 # --- CI/CD workflows and automation (not for public repo) ---
 .github/workflows/codeql.yml
 .github/dependabot.yml

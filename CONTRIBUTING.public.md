@@ -13,8 +13,8 @@ Thank you for your interest in contributing to HAK — the Estonian language lea
 
 ```bash
 # Clone the repository
-git clone https://github.com/askend-lab/hak.git
-cd hak
+git clone https://github.com/askend-lab/hak-public.git
+cd hak-public
 
 # Install dependencies
 pnpm install

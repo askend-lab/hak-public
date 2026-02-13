@@ -10,7 +10,11 @@ import { TestComponent } from "./context.test-utils";
 vi.mock("./storage");
 vi.mock("./config", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./config")>();
-  return { ...actual, exchangeCodeForTokens: vi.fn().mockResolvedValue(null) };
+  return {
+    ...actual,
+    getTaraLoginUrl: () => "https://example.com/auth/tara/start",
+    exchangeCodeForTokens: vi.fn().mockResolvedValue(null),
+  };
 });
 
 const mockAuthStorage = vi.mocked(AuthStorage);
