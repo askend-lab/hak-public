@@ -8,7 +8,7 @@ e2e/.auth/
 test-results/
 playwright-report/
 
-# Generated files (sync-features.js output)
+# Generated files (sync-features.js output, regenerated in CI)
 *.generated.ts
 
 # Stryker mutation testing
