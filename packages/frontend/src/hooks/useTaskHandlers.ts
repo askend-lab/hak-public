@@ -6,6 +6,7 @@ import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 import { useNotification } from "@/contexts/NotificationContext";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
+import { TASK_STRINGS } from "@/constants/ui-strings";
 
 export function useTaskHandlers(
   sentences: SentenceState[],
@@ -27,7 +28,7 @@ export function useTaskHandlers(
   // Navigation action for notifications - navigates to task view
   const viewTaskAction = useCallback(
     (taskId: string): { label: string; onClick: () => void } => ({
-      label: "Vaata ülesannet",
+      label: TASK_STRINGS.VIEW_TASK,
       onClick: (): void => {
         setSelectedTaskId(taskId);
         setCurrentView("tasks");
@@ -83,15 +84,15 @@ export function useTaskHandlers(
         const count = entries.length;
         showNotification(
           "success",
-          "Lisatud ülesandesse",
-          `${count} ${count === 1 ? "lause" : "lauset"} lisatud ülesandesse ${taskName}!`,
+          TASK_STRINGS.ADDED_TO_TASK,
+          TASK_STRINGS.ADDED_ENTRIES(count, taskName),
           undefined,
           undefined,
           viewTaskAction(taskId),
         );
       } catch (error) {
         console.error("Failed to add entries:", error);
-        showNotification("error", "Lausete lisamine ebaõnnestus");
+        showNotification("error", TASK_STRINGS.ADD_ENTRIES_FAILED);
       }
     },
     [user, sentences, showNotification, setSelectedTaskId, setCurrentView],
@@ -118,15 +119,15 @@ export function useTaskHandlers(
         setTaskRefreshTrigger((prev) => prev + 1);
         showNotification(
           "success",
-          "Lisatud ülesandesse",
-          `Lause lisatud ülesandesse ${taskName}!`,
+          TASK_STRINGS.ADDED_TO_TASK,
+          TASK_STRINGS.ADDED_ENTRY(taskName),
           undefined,
           undefined,
           viewTaskAction(taskId),
         );
       } catch (error) {
         console.error("Failed to add entry:", error);
-        showNotification("error", "Lausete lisamine ebaõnnestus");
+        showNotification("error", TASK_STRINGS.ADD_ENTRIES_FAILED);
       }
     },
     [user, sentences, showNotification, setSelectedTaskId, setCurrentView],
@@ -180,8 +181,8 @@ export function useTaskHandlers(
         if (playlistEntries.length > 0) {
           showNotification(
             "success",
-            "Ülesanne loodud",
-            `${title} loodud!`,
+            TASK_STRINGS.TASK_CREATED,
+            TASK_STRINGS.TASK_CREATED_DETAIL(title),
             undefined,
             undefined,
             viewTaskAction(newTask.id),
@@ -246,14 +247,14 @@ export function useTaskHandlers(
         setTaskRefreshTrigger((prev) => prev + 1);
         showNotification(
           "success",
-          `Ülesanne "${updatedTask.name}" uuendatud!`,
+          TASK_STRINGS.TASK_UPDATED(updatedTask.name),
           undefined,
           undefined,
           "success",
         );
       } catch (error) {
         console.error("Failed to update task:", error);
-        showNotification("error", "Ülesande uuendamine ebaõnnestus");
+        showNotification("error", TASK_STRINGS.TASK_UPDATE_FAILED);
       }
     },
     [user, showNotification],
@@ -286,7 +287,7 @@ export function useTaskHandlers(
       setTaskRefreshTrigger((prev) => prev + 1);
       showNotification(
         "success",
-        `Ülesanne "${taskName}" kustutatud!`,
+        TASK_STRINGS.TASK_DELETED(taskName),
         undefined,
         undefined,
         "success",
@@ -295,7 +296,7 @@ export function useTaskHandlers(
       setCurrentView("tasks");
     } catch (error) {
       console.error("Failed to delete task:", error);
-      showNotification("error", "Ülesande kustutamine ebaõnnestus");
+      showNotification("error", TASK_STRINGS.TASK_DELETE_FAILED);
     } finally {
       setShowDeleteConfirmation(false);
       setTaskToDelete(null);
