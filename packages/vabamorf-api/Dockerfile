@@ -1,14 +1,11 @@
 # Use Debian-based Node.js with Lambda Web Adapter
-# @hak/shared bundled from compiled tsc output, ECR image reused in deploy
 FROM node:20-slim
 
 # Install Lambda Web Adapter and libjsoncpp
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y libjsoncpp-dev && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/task
 
@@ -17,12 +14,12 @@ COPY vmetajson /var/task/vmetajson.bin
 COPY et.dct /var/task/
 RUN chmod +x /var/task/vmetajson.bin
 
-# Set up @hak/shared from compiled output (workspace package, zero npm deps)
-COPY dist/shared/src/ /var/task/node_modules/@hak/shared/
-RUN echo '{"name":"@hak/shared","version":"0.1.0","main":"index.js"}' > /var/task/node_modules/@hak/shared/package.json
+# Copy package files and install dependencies
+COPY package*.json /var/task/
+RUN npm install --omit=dev
 
-# Copy compiled TypeScript
-COPY dist/vabamorf-api/src/ /var/task/
+# Copy compiled TypeScript (from dist/src/ to root)
+COPY dist/src/ /var/task/
 
 # Set environment variables
 ENV VMETAJSON_PATH=/var/task/vmetajson.bin
