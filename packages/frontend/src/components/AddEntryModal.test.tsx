@@ -245,9 +245,10 @@ describe("AddEntryModal", () => {
 
     it("does not close on error", async () => {
       mockOnAdd.mockRejectedValue(new Error("Failed"));
+      const localOnClose = vi.fn();
       const user = userEvent.setup();
       render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
+        <AddEntryModal isOpen={true} onClose={localOnClose} onAdd={mockOnAdd} />,
       );
 
       await user.type(
@@ -259,7 +260,7 @@ describe("AddEntryModal", () => {
       await waitFor(() => {
         expect(screen.getByText("Failed")).toBeInTheDocument();
       });
-      expect(mockOnClose).not.toHaveBeenCalled();
+      expect(localOnClose).not.toHaveBeenCalled();
     });
   });
 

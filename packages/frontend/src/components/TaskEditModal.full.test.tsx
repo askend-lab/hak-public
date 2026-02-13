@@ -336,12 +336,13 @@ describe("TaskEditModal", () => {
 
     it("does not close on error", async () => {
       mockOnSave.mockRejectedValue(new Error("Failed"));
+      const localOnClose = vi.fn();
       const user = userEvent.setup();
       render(
         <TaskEditModal
           isOpen={true}
           task={mockTask}
-          onClose={mockOnClose}
+          onClose={localOnClose}
           onSave={mockOnSave}
           setTaskToEdit={mockSetTaskToEdit}
         />,
@@ -352,7 +353,7 @@ describe("TaskEditModal", () => {
       await waitFor(() => {
         expect(screen.getByText("Failed")).toBeInTheDocument();
       });
-      expect(mockOnClose).not.toHaveBeenCalled();
+      expect(localOnClose).not.toHaveBeenCalled();
     });
   });
 });
