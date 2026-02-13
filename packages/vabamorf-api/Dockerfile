@@ -1,4 +1,5 @@
 # Use Debian-based Node.js with Lambda Web Adapter
+# Rebuilt: @hak/shared bundled from compiled tsc output
 FROM node:18-slim@sha256:f9ab18e354e6855ae56ef2b290dd225c1e51a564f87584b9bd21dd651838830e
 
 # Install Lambda Web Adapter and libjsoncpp
