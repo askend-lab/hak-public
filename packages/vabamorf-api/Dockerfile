@@ -15,8 +15,11 @@ COPY et.dct /var/task/
 RUN chmod +x /var/task/vmetajson.bin
 
 # Copy package files and install dependencies
+# Strip @hak/shared workspace dep (npm can't resolve pnpm workspace:* protocol)
 COPY package*.json /var/task/
-RUN npm install --omit=dev
+COPY _shared/ /var/task/node_modules/@hak/shared/
+RUN node -e "var p=JSON.parse(require('fs').readFileSync('package.json'));delete p.dependencies['@hak/shared'];require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" \
+    && npm install --omit=dev
 
 # Copy compiled TypeScript (from dist/src/ to root)
 COPY dist/src/ /var/task/

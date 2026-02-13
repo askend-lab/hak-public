@@ -223,6 +223,14 @@ jobs:
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
+      - name: Prepare shared package for Vabamorf Docker build
+        if: steps.state.outputs.deploy_vabamorf_api == 'true'
+        run: |
+          cd packages/shared && npx tsc
+          mkdir -p ../vabamorf-api/_shared/dist
+          cp dist/*.js ../vabamorf-api/_shared/dist/
+          echo '{"name":"@hak/shared","version":"0.1.0","main":"dist/index.js"}' > ../vabamorf-api/_shared/package.json
+
       - name: Deploy Vabamorf API
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         working-directory: packages/vabamorf-api
@@ -232,6 +240,7 @@ jobs:
           cd /home/runner/work/hak/hak/packages/vabamorf-api
           /tmp/node_modules/.bin/serverless create_domain --stage ${{ inputs.environment }} || true
           /tmp/node_modules/.bin/serverless deploy --stage ${{ inputs.environment }}
+          rm -rf _shared
           echo "✅ Vabamorf API deployed"
 
       - name: Update deployment state
