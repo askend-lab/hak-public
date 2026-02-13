@@ -17,7 +17,7 @@ provider:
   ecr:
     images:
       vabamorf:
-        path: ./
+        uri: ${env:VABAMORF_IMAGE_URI}
 
 functions:
   api:
