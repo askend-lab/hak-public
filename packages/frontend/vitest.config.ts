@@ -51,7 +51,7 @@ export default defineConfig({
         "src/components/onboarding/index.ts",
         "**/*.generated.ts",
         "**/testspecs/**/index.ts",
-        "src/utils/warmAudioWorker.ts",
+        "src/features/synthesis/utils/warmAudioWorker.ts",
         "src/services/storage/MockDataLoader.ts",
         "src/pages/DebugPage.tsx",
         "src/services/auth/index.ts",
