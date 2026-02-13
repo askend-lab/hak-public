@@ -4,7 +4,9 @@ extends: "./defaults.yaml"
 project:
   name: "HAK"
 
-# Incremental testing - only runs affected tests (requires module-level opt-in)
+# Global excludes (merged with defaults)
+global_excludes:
+  - '**/.venv/**'
 
 # Test modules with coverage requirements
 test_modules:
@@ -17,7 +19,9 @@ test_modules:
   - name: merlin-worker
     path: packages/merlin-worker
     type: pytest
-    command: "echo 'Python package — tests run via pytest'"
+    command: ".venv/bin/pytest tests/ -v --json-report --json-report-file=pytest-results.json"
+    command_full: ".venv/bin/pytest tests/ -v --json-report --json-report-file=pytest-results.json --cov=worker --cov-report=json:coverage/coverage.json"
+    results_file: "pytest-results.json"
   - name: merlin-api
     path: packages/merlin-api
     type: jest
