@@ -146,6 +146,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
+      - name: Prepare shared package for Vabamorf Docker build
+        if: steps.detect.outputs.vabamorf-api == 'true'
+        run: |
+          cd packages/shared && npx tsc
+          mkdir -p ../vabamorf-api/_shared/dist
+          cp dist/*.js ../vabamorf-api/_shared/dist/
+          echo '{"name":"@hak/shared","version":"0.1.0","main":"dist/index.js"}' > ../vabamorf-api/_shared/package.json
+
       - name: Build Vabamorf Docker image
         if: steps.detect.outputs.vabamorf-api == 'true'
         working-directory: packages/vabamorf-api
@@ -153,6 +161,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} .
+          rm -rf _shared
 
       - name: Scan Docker image with Trivy
         if: steps.detect.outputs.vabamorf-api == 'true'
