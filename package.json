@@ -25,7 +25,7 @@
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
     "kill-ports": "lsof -ti:5181 | xargs -r kill -9 2>/dev/null; sleep 0.5; true",
     "start:frontend": "pnpm --filter @hak/frontend dev",
-    "start:backend": "pnpm exec tsc --noEmit && pnpm --filter simplestore dev",
+    "start:backend": "pnpm exec tsc --noEmit && pnpm --filter @hak/simplestore dev",
     "start": "pnpm run kill-ports && pnpm run start:frontend"
   },
   "engines": {

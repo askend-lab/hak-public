@@ -138,19 +138,19 @@ jobs:
 
       - name: Build SimpleStore
         if: steps.detect.outputs.simplestore == 'true'
-        run: pnpm --filter simplestore build
+        run: pnpm --filter @hak/simplestore build
 
       - name: Build Audio API
         if: steps.detect.outputs.audio-api == 'true'
-        run: pnpm --filter audio-api build
+        run: pnpm --filter @hak/audio-api build
 
       - name: Build Merlin API
         if: steps.detect.outputs.merlin-api == 'true'
-        run: pnpm --filter merlin-api build
+        run: pnpm --filter @hak/merlin-api build
 
       - name: Build Vabamorf API
         if: steps.detect.outputs.vabamorf-api == 'true'
-        run: pnpm --filter vabamorf-api build
+        run: pnpm --filter @hak/vabamorf-api build
 
       - name: Login to ECR
         if: steps.detect.outputs.vabamorf-api == 'true'
