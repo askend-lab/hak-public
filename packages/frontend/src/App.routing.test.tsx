@@ -20,7 +20,7 @@ vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContex
 vi.mock("./contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => mockNotificationContext()),
 }));
-vi.mock("./contexts/OnboardingContext", () => ({
+vi.mock("./features/onboarding/contexts/OnboardingContext", () => ({
   useOnboarding: vi.fn(() => mockOnboardingContext()),
 }));
 vi.mock("./hooks", async (importOriginal) => {
@@ -75,7 +75,7 @@ vi.mock("./components/Dashboard", () => ({
   default: () => <div data-testid="dashboard">Dashboard</div>,
 }));
 vi.mock("./components/AppModals", () => ({ default: () => null }));
-vi.mock("./components/onboarding", () => ({
+vi.mock("./features/onboarding/components", () => ({
   RoleSelectionContent: () => (
     <div data-testid="role-selection">RoleSelection</div>
   ),
@@ -303,7 +303,7 @@ describe("App Routing", () => {
 
   describe("authentication-based routing", () => {
     it("shows role selection when onboarding not completed", async () => {
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: false,

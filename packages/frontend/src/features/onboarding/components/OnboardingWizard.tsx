@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
 import WizardTooltip from "./WizardTooltip";
 
 /**

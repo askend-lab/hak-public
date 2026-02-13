@@ -7,13 +7,13 @@ import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import RoleSelectionContent from "./RoleSelectionPage";
 
-vi.mock("@/contexts/OnboardingContext", () => ({
+vi.mock("@/features/onboarding/contexts/OnboardingContext", () => ({
   useOnboarding: vi.fn(() => ({
     selectRole: vi.fn(),
   })),
 }));
 
-import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
 
 describe("RoleSelectionContent", () => {
   const mockSelectRole = vi.fn();

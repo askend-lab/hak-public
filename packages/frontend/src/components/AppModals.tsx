@@ -6,7 +6,7 @@ import AddEntryModal from "./AddEntryModal";
 import ShareTaskModal from "./ShareTaskModal";
 import LoginModal from "@/features/auth/components/LoginModal";
 import ConfirmationModal from "./ConfirmationModal";
-import { OnboardingWizard } from "./onboarding";
+import { OnboardingWizard } from "@/features/onboarding/components";
 import { MODAL_STRINGS } from "@/constants/ui-strings";
 
 interface Task {

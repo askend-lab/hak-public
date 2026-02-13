@@ -23,7 +23,7 @@ import App from "./App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthProvider } from "./features/auth/services";
 import { NotificationProvider } from "./contexts/NotificationContext";
-import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { OnboardingProvider } from "./features/onboarding/contexts/OnboardingContext";
 const AuthCallbackPage = lazy(() => import("./features/auth/pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
 const DebugPage = lazy(() => import("./pages/DebugPage").then(m => ({ default: m.DebugPage })));
 const SharedTaskPage = lazy(() => import("./pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));

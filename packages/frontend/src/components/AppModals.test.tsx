@@ -54,7 +54,7 @@ vi.mock("./ConfirmationModal", () => ({
       </div>
     ) : null,
 }));
-vi.mock("./onboarding", () => ({
+vi.mock("@/features/onboarding/components", () => ({
   OnboardingWizard: () => <div data-testid="wizard">Wizard</div>,
 }));
 
