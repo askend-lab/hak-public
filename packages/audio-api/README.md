@@ -94,14 +94,13 @@ The Lambda does NOT provide status check endpoint. Frontend handles polling itse
 - Fargate Spot instances for generation
 
 **Authentication:**
-- AWS Cognito authorization
-- Lambda gets user ID from `event.requestContext.authorizer.claims.sub`
+- No authorizer configured in `serverless.yml` — endpoints are currently open
 - Rate limiting can be added per user if needed
 
 ## Technical Details
 
 **Lambda Configuration:**
-- Runtime: Node.js (18+)
+- Runtime: Node.js 20 (`nodejs20.x`)
 - Memory: 256-512 MB (minimal)
 - Timeout: 5-10 seconds
 - Environment: Uses computed names for service discovery

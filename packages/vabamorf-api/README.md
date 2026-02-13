@@ -29,8 +29,8 @@ Returns pronunciation variants for a word.
 ## Configuration
 
 Environment variables:
-- `VMETAJSON_PATH` - Path to vmetajson binary
-- `DICTIONARY_PATH` - Path to Estonian dictionary
+- `VMETAJSON_PATH` — Path to vmetajson binary (default: `./vmetajson`)
+- `DICT_PATH` — Path to Estonian dictionary directory (default: `.`)
 
 ## Usage
 
@@ -38,8 +38,8 @@ Environment variables:
 # Run tests
 pnpm test
 
-# Deploy
-pnpm run deploy
+# Deploy (via Serverless Framework)
+serverless deploy --stage dev
 ```
 
 ## Dependencies
