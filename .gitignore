@@ -56,13 +56,6 @@ packages/merlin-worker/tools/SPTK-3.9/**/Makefile
 !packages/merlin-worker/tools/**/Makefile.mak
 !packages/merlin-worker/tools/WORLD/makefile
 
-# Generated TypeScript from Gherkin specs — committed to git for reliability
-# Regenerate with: pnpm --filter @hak/frontend sync-features
-
-# Misplaced backend services in frontend
-packages/frontend/src/services/merlin/
-packages/frontend/src/services/vabamorf/
-
 # Temp lab files
 packages/merlin-worker/tools/genlab/lab/
 
@@ -73,13 +66,3 @@ packages/merlin-worker/tools/WORLD/test/test.cpp
 packages/merlin-worker/tools/WORLD/test/ctest.c
 packages/merlin-worker/tools/WORLD/test/*.wav
 packages/merlin-worker/tools/WORLD/wav_test/
-
-# Native binaries (keep vabamorf-api/vmetajson — needed for Docker build)
-packages/frontend/src/services/vabamorf/vmetajson
-
-# Visual Studio files
-*.suo
-*.sln
-*.vcxproj
-*.vcxproj.filters
-

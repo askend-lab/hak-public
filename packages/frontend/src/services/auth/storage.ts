@@ -16,6 +16,11 @@ const COGNITO_PROVIDER_PREFIX = "CognitoIdentityServiceProvider";
 // In-memory token storage — not persisted to localStorage.
 // Prevents XSS from stealing access/id tokens via localStorage.
 // Tokens are re-obtained on page load via refresh_token flow.
+//
+// Note: refresh_token is stored in localStorage (not in-memory) so that
+// silent token refresh works across page reloads. This is standard practice
+// for SPA + Cognito — AWS Amplify does the same. Moving to httpOnly cookies
+// would require a backend proxy for the Cognito token endpoint.
 let memoryAccessToken: string | null = null;
 let memoryIdToken: string | null = null;
 
