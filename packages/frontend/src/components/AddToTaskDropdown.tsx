@@ -8,13 +8,20 @@ import { TaskSummary } from "@/types/task";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 import { logger } from "@hak/shared";
-import { SearchIcon, AddIcon } from "./ui/Icons";
+import { SearchIcon, AddIcon, BackIcon } from "./ui/Icons";
+
+export type AddToTaskMode = "append" | "replace";
 
 interface AddToTaskDropdownProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectTask: (taskId: string, taskName: string) => void;
+  onSelectTask: (
+    taskId: string,
+    taskName: string,
+    mode: AddToTaskMode,
+  ) => void;
   onCreateNew: () => void;
+  sentenceCount: number;
   anchorRef?: React.RefObject<HTMLElement>;
 }
 
@@ -27,7 +34,7 @@ const TaskList = ({
   isLoading: boolean;
   filteredTasks: TaskSummary[];
   searchQuery: string;
-  onSelect: (id: string, name: string) => void;
+  onSelect: (task: TaskSummary) => void;
 }) => {
   if (isLoading)
     return (
@@ -43,7 +50,7 @@ const TaskList = ({
         <button
           key={task.id}
           className="add-to-task-item"
-          onClick={() => onSelect(task.id, task.name)}
+          onClick={() => onSelect(task)}
         >
           <span className="add-to-task-item-name">{task.name}</span>
         </button>
@@ -52,17 +59,68 @@ const TaskList = ({
   );
 };
 
+const ConfirmPanel = ({
+  task,
+  sentenceCount,
+  onBack,
+  onConfirm,
+}: {
+  task: TaskSummary;
+  sentenceCount: number;
+  onBack: () => void;
+  onConfirm: (mode: AddToTaskMode) => void;
+}) => (
+  <>
+    <div className="add-to-task-confirm-header">
+      <button
+        onClick={onBack}
+        className="add-to-task-confirm-back"
+        aria-label="Tagasi"
+        type="button"
+      >
+        <BackIcon size="lg" />
+      </button>
+      <h4 className="add-to-task-confirm-title">{task.name}</h4>
+    </div>
+    <div className="add-to-task-confirm-body">
+      <p className="add-to-task-confirm-info">
+        Ülesandes on {task.entryCount}{" "}
+        {task.entryCount === 1 ? "lause" : "lauset"}.
+        <br />
+        Lisad {sentenceCount}{" "}
+        {sentenceCount === 1 ? "uue lause" : "uut lauset"}.
+      </p>
+      <div className="add-to-task-confirm-actions">
+        <button
+          className="button button--primary button--small"
+          onClick={() => onConfirm("append")}
+        >
+          Lisa juurde
+        </button>
+        <button
+          className="button button--secondary button--small"
+          onClick={() => onConfirm("replace")}
+        >
+          Asenda olemasolevad
+        </button>
+      </div>
+    </div>
+  </>
+);
+
 export default function AddToTaskDropdown({
   isOpen,
   onClose,
   onSelectTask,
   onCreateNew,
+  sentenceCount,
   anchorRef: _anchorRef,
 }: AddToTaskDropdownProps) {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [tasks, setTasks] = useState<TaskSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskSummary | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -75,18 +133,33 @@ export default function AddToTaskDropdown({
       .finally(() => setIsLoading(false));
   }, [isOpen, user]);
   useEffect(() => {
-    if (isOpen && searchInputRef.current)
+    if (isOpen && !selectedTask && searchInputRef.current)
       setTimeout(() => searchInputRef.current?.focus(), 100);
-  }, [isOpen]);
+  }, [isOpen, selectedTask]);
   useEffect(() => {
-    if (!isOpen) setSearchQuery("");
+    if (!isOpen) {
+      setSearchQuery("");
+      setSelectedTask(null);
+    }
   }, [isOpen]);
   const filteredTasks = tasks.filter((t) =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  const handleSelect = (id: string, name: string) => {
-    onSelectTask(id, name);
+  const handleTaskClick = (task: TaskSummary) => {
+    if (task.entryCount > 0) {
+      setSelectedTask(task);
+    } else {
+      onSelectTask(task.id, task.name, "append");
+      onClose();
+    }
+  };
+  const handleConfirm = (mode: AddToTaskMode) => {
+    if (!selectedTask) return;
+    onSelectTask(selectedTask.id, selectedTask.name, mode);
     onClose();
+  };
+  const handleBack = () => {
+    setSelectedTask(null);
   };
   const handleCreate = () => {
     onCreateNew();
@@ -95,35 +168,52 @@ export default function AddToTaskDropdown({
   if (!isOpen) return null;
   return (
     <>
-      <div className="add-to-task-backdrop" onClick={onClose} />
+      <div className="add-to-task-backdrop" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }} role="presentation" />
       <div className="add-to-task-dropdown" ref={dropdownRef}>
-        <div className="add-to-task-search">
-          <input
-            ref={searchInputRef}
-            type="text"
-            className="add-to-task-search-input"
-            placeholder="Otsi"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+        {selectedTask ? (
+          <ConfirmPanel
+            task={selectedTask}
+            sentenceCount={sentenceCount}
+            onBack={handleBack}
+            onConfirm={handleConfirm}
           />
-          <SearchIcon size="2xl" className="add-to-task-search-icon" />
-        </div>
-        <div className="add-to-task-list">
-          <TaskList
-            isLoading={isLoading}
-            filteredTasks={filteredTasks}
-            searchQuery={searchQuery}
-            onSelect={handleSelect}
-          />
-        </div>
-        <div className="add-to-task-create">
-          <button className="add-to-task-create-button" onClick={handleCreate}>
-            <span className="add-to-task-create-icon">
-              <AddIcon size="sm" />
-            </span>
-            <span className="add-to-task-create-text">Loo uus ülesanne</span>
-          </button>
-        </div>
+        ) : (
+          <>
+            <div className="add-to-task-search">
+              <input
+                ref={searchInputRef}
+                type="text"
+                className="add-to-task-search-input"
+                placeholder="Otsi"
+                aria-label="Otsi ülesannet"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <SearchIcon size="2xl" className="add-to-task-search-icon" />
+            </div>
+            <div className="add-to-task-list">
+              <TaskList
+                isLoading={isLoading}
+                filteredTasks={filteredTasks}
+                searchQuery={searchQuery}
+                onSelect={handleTaskClick}
+              />
+            </div>
+            <div className="add-to-task-create">
+              <button
+                className="add-to-task-create-button"
+                onClick={handleCreate}
+              >
+                <span className="add-to-task-create-icon">
+                  <AddIcon size="sm" />
+                </span>
+                <span className="add-to-task-create-text">
+                  Loo uus ülesanne
+                </span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

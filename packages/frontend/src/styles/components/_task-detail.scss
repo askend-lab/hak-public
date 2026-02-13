@@ -99,6 +99,12 @@
   @include paper-sm;
   display: flex;
   flex-direction: column;
+
+  &--fixed {
+    position: fixed;
+    top: auto;
+    right: auto;
+  }
 }
 
 .task-detail__menu-item {
@@ -281,15 +287,6 @@
 
 .task-detail__error p {
   color: $color-soft-danger;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 // Entries section

@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+// Content pages: accessibility statement, privacy policy, terms, etc.
+
+.content-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-lg;
+    color: $color-text-primary;
+  }
+
+  &__section {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__section-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-sm;
+    color: $color-text-primary;
+  }
+
+  &__text {
+    font-size: $font-size-md;
+    line-height: 1.6;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-md;
+  }
+
+  &__link {
+    color: $color-primary;
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

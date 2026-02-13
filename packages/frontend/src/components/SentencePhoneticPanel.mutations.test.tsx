@@ -358,7 +358,7 @@ describe("SentencePhoneticPanel mutation kills", () => {
       const { container } = render(<SentencePhoneticPanel {...dp} />);
       const ta = container.querySelector("textarea")!;
       expect(Number(ta.rows)).toBe(4);
-      expect(ta.placeholder).toBe("Kirjuta oma foneetiline variant");
+      expect(ta.placeholder).toBe("Kirjuta oma hääldusvariant");
     });
     it("close button class", () => {
       const { container } = render(<SentencePhoneticPanel {...dp} />);

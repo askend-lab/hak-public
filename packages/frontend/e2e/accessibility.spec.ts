@@ -6,6 +6,8 @@
  *
  * Full-page accessibility audits using Playwright and axe-core
  * for WCAG 2.1 AA compliance.
+ *
+ * Tests all major pages, modals, panels, and interactive states.
  */
 
 import { test, expect } from "@playwright/test";
@@ -49,26 +51,40 @@ function expectNoSeriousViolations(
   }
 }
 
+/**
+ * Log all violations for review (including minor ones)
+ */
+function logViolations(
+  results: Awaited<ReturnType<typeof runAccessibilityAudit>>,
+  context: string,
+) {
+  if (results.violations.length > 0) {
+    console.log(
+      `[${context}] ${results.violations.length} accessibility issues:`,
+    );
+    results.violations.forEach((v) => {
+      console.log(
+        `  [${v.impact?.toUpperCase()}] ${v.id}: ${v.description} (${v.nodes.length} elements)`,
+      );
+    });
+  }
+}
+
+// =========================================================================
+// Page-Level Audits
+// =========================================================================
+
 test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
   test.describe("Synthesis Page (Main View)", () => {
     test("should have no critical accessibility violations on synthesis page", async ({
       page,
     }) => {
       await page.goto("/");
-
-      // Wait for page to fully load
       await page.waitForLoadState("networkidle");
 
       const results = await runAccessibilityAudit(page);
+      logViolations(results, "Synthesis Page");
       expectNoSeriousViolations(results);
-
-      // Log all violations for review (including minor ones)
-      if (results.violations.length > 0) {
-        console.log(
-          "Accessibility issues found:",
-          JSON.stringify(results.violations, null, 2),
-        );
-      }
     });
 
     test("should maintain accessibility during user interactions", async ({
@@ -86,6 +102,7 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
       }
 
       const results = await runAccessibilityAudit(page);
+      logViolations(results, "Synthesis Page - After Input");
       expectNoSeriousViolations(results);
     });
   });
@@ -98,16 +115,59 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
       await page.waitForLoadState("networkidle");
 
       const results = await runAccessibilityAudit(page);
+      logViolations(results, "Tasks Page");
       expectNoSeriousViolations(results);
     });
   });
+
+  test.describe("Specs Page", () => {
+    test("should have no critical accessibility violations on specs page", async ({
+      page,
+    }) => {
+      await page.goto("/specs");
+      await page.waitForLoadState("networkidle");
+
+      const results = await runAccessibilityAudit(page);
+      logViolations(results, "Specs Page");
+      expectNoSeriousViolations(results);
+    });
+  });
+
+  test.describe("Dashboard Page", () => {
+    test("should have no critical accessibility violations on dashboard", async ({
+      page,
+    }) => {
+      await page.goto("/dashboard");
+      await page.waitForLoadState("networkidle");
+
+      const results = await runAccessibilityAudit(page);
+      logViolations(results, "Dashboard");
+      expectNoSeriousViolations(results);
+    });
+  });
+
+  test.describe("Role Selection Page", () => {
+    test("should have no critical accessibility violations on role selection", async ({
+      page,
+    }) => {
+      await page.goto("/role-selection");
+      await page.waitForLoadState("networkidle");
+
+      const results = await runAccessibilityAudit(page);
+      logViolations(results, "Role Selection");
+      expectNoSeriousViolations(results);
+    });
+  });
+
+  // =========================================================================
+  // Modal Audits
+  // =========================================================================
 
   test.describe("Modal Accessibility", () => {
     test("login modal should be accessible", async ({ page }) => {
       await page.goto("/");
       await page.waitForLoadState("networkidle");
 
-      // Try to trigger login modal
       const loginButton = page.getByRole("button", {
         name: /logi sisse|login/i,
       });
@@ -116,10 +176,37 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
         await page.waitForTimeout(300);
 
         const results = await runAccessibilityAudit(page);
+        logViolations(results, "Login Modal");
         expectNoSeriousViolations(results);
       }
     });
+
+    test("confirmation modal should be accessible", async ({ page }) => {
+      await page.goto("/tasks");
+      await page.waitForLoadState("networkidle");
+
+      // Try to trigger a delete confirmation
+      const menuButton = page.locator('[aria-label="Rohkem valikuid"]').first();
+      if (await menuButton.isVisible()) {
+        await menuButton.click();
+        await page.waitForTimeout(200);
+
+        const deleteButton = page.getByRole("button", { name: /kustuta/i });
+        if (await deleteButton.isVisible()) {
+          await deleteButton.click();
+          await page.waitForTimeout(300);
+
+          const results = await runAccessibilityAudit(page);
+          logViolations(results, "Confirmation Modal");
+          expectNoSeriousViolations(results);
+        }
+      }
+    });
   });
+
+  // =========================================================================
+  // Keyboard Navigation
+  // =========================================================================
 
   test.describe("Keyboard Navigation", () => {
     test("should be navigable with keyboard only", async ({ page }) => {
@@ -130,7 +217,6 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
       for (let i = 0; i < 10; i++) {
         await page.keyboard.press("Tab");
 
-        // Check that focus is visible
         const focusedElement = await page.evaluate(() => {
           const el = document.activeElement;
           if (!el || el === document.body) return null;
@@ -146,7 +232,6 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
         });
 
         if (focusedElement && focusedElement.tagName !== "BODY") {
-          // Log focus state for debugging
           console.log(
             `Focus on ${focusedElement.tagName}:`,
             focusedElement.hasOutline,
@@ -155,11 +240,25 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
       }
     });
 
+    test("skip link should be first focusable element", async ({ page }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+
+      // First Tab should focus the skip link
+      await page.keyboard.press("Tab");
+
+      const skipLink = await page.evaluate(() => {
+        const el = document.activeElement;
+        return el?.classList.contains("skip-link") || el?.textContent?.includes("Liigu põhisisu juurde");
+      });
+
+      expect(skipLink).toBeTruthy();
+    });
+
     test("Escape key should close modals", async ({ page }) => {
       await page.goto("/");
       await page.waitForLoadState("networkidle");
 
-      // Try to open and close login modal
       const loginButton = page.getByRole("button", {
         name: /logi sisse|login/i,
       });
@@ -167,16 +266,18 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
         await loginButton.click();
         await page.waitForTimeout(300);
 
-        // Press Escape to close
         await page.keyboard.press("Escape");
         await page.waitForTimeout(300);
 
-        // Modal should be closed
         const modal = page.locator(".base-modal");
         await expect(modal).not.toBeVisible();
       }
     });
   });
+
+  // =========================================================================
+  // Focus Management
+  // =========================================================================
 
   test.describe("Focus Management", () => {
     test("focus should be visible on interactive elements", async ({
@@ -185,7 +286,6 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
       await page.goto("/");
       await page.waitForLoadState("networkidle");
 
-      // Get all focusable elements
       const focusableElements = await page
         .locator(
           'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
@@ -195,13 +295,11 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
       for (const element of focusableElements.slice(0, 5)) {
         await element.focus();
 
-        // Check for visible focus indicator
         const hasFocusIndicator = await element.evaluate((el) => {
           const styles = window.getComputedStyle(el);
           const outline = styles.outline;
           const boxShadow = styles.boxShadow;
 
-          // Check if there's a visible focus indicator
           const hasOutline =
             outline && !outline.includes("none") && !outline.includes("0px");
           const hasBoxShadow = boxShadow && boxShadow !== "none";
@@ -209,7 +307,6 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
           return hasOutline || hasBoxShadow;
         });
 
-        // This is informational - we'll fix issues in remediation phase
         if (!hasFocusIndicator) {
           const tagName = await element.evaluate((el) => el.tagName);
           const className = await element.evaluate((el) => el.className);
@@ -220,4 +317,5 @@ test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
       }
     });
   });
+
 });

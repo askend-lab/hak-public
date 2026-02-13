@@ -82,10 +82,8 @@ vi.mock("./TaskDetailHeader", () => ({
   ),
 }));
 vi.mock("./TaskDetailStates", () => ({
-  TaskDetailLoading: ({ onBack }: { onBack: () => void }) => (
-    <div data-testid="loading">
-      <button onClick={onBack}>Back</button>
-    </div>
+  TaskDetailLoading: () => (
+    <div data-testid="loading">Loading...</div>
   ),
   TaskDetailError: ({
     error,

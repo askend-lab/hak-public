@@ -38,6 +38,7 @@ interface SentenceSynthesisItemProps {
   onTagClick?: (id: string, tagIndex: number, word: string) => void;
   selectedTagIndex?: number | null;
   isPronunciationPanelOpen?: boolean;
+  allTagsSelected?: boolean;
 
   // Tag menu (for input mode - synthesis page)
   onTagMenuOpen?: (sentenceId: string, tagIndex: number) => void;
@@ -106,6 +107,7 @@ export default function SentenceSynthesisItem({
   onTagClick,
   selectedTagIndex,
   isPronunciationPanelOpen,
+  allTagsSelected,
   onTagMenuOpen,
   openTagMenu,
   onTagMenuClose,
@@ -180,6 +182,7 @@ export default function SentenceSynthesisItem({
             sentenceIndex={sentenceIndex}
             selectedTagIndex={selectedTagIndex}
             isPronunciationPanelOpen={isPronunciationPanelOpen}
+            allTagsSelected={allTagsSelected}
             openTagMenu={openTagMenu}
             tagMenuItems={tagMenuItems}
             loadingTagIndex={loadingTagIndex}
@@ -203,6 +206,7 @@ export default function SentenceSynthesisItem({
             tags={tags}
             selectedTagIndex={selectedTagIndex}
             isPronunciationPanelOpen={isPronunciationPanelOpen}
+            allTagsSelected={allTagsSelected}
             onTagClick={onTagClick}
           />
         );
@@ -230,7 +234,7 @@ export default function SentenceSynthesisItem({
           draggable
           onDragStart={handleDragStartInternal}
           onDragEnd={handleDragEndInternal}
-          aria-label="Drag to reorder"
+          aria-label="Lohista järjestamiseks"
         >
           <DragHandleIcon size="2xl" />
         </div>
@@ -264,7 +268,7 @@ export default function SentenceSynthesisItem({
         <div className="sentence-synthesis-item__menu-container">
           <button
             className="sentence-synthesis-item__menu-button"
-            aria-label="More options"
+            aria-label="Rohkem valikuid"
             onClick={(e) => onMenuOpenLegacy(e, id)}
             data-onboarding-target={`sentence-${sentenceIndex}-menu`}
           >

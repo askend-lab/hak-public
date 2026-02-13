@@ -25,6 +25,8 @@
 // 3. Base Styles
 // -------------------------------------------------------------------------
 @import "base/reset";
+@import "base/animations";
+@import "base/reduced-motion";
 
 // -------------------------------------------------------------------------
 // 4. Components (following storybook BEM conventions)
@@ -88,6 +90,9 @@
 
 // Dashboard Components
 @import "components/dashboard";
+
+// Content Pages (accessibility statement, terms, etc.)
+@import "components/content-page";
 
 // Build Info
 @import "components/build-info";

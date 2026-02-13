@@ -48,15 +48,16 @@ describe("SentenceMenu authenticated", () => {
     { id: "t2", name: "Task 2" },
   ];
 
-  it("shows search and tasks when authenticated", () => {
+  it("shows search and tasks when authenticated", async () => {
     render(
       <SentenceMenu {...defaultProps} isAuthenticated={true} tasks={tasks} />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     expect(screen.getByPlaceholderText("Otsi")).toBeInTheDocument();
     expect(screen.getByText("Task 1")).toBeInTheDocument();
   });
 
-  it("filters tasks by search query", () => {
+  it("filters tasks by search query", async () => {
     render(
       <SentenceMenu
         {...defaultProps}
@@ -65,11 +66,12 @@ describe("SentenceMenu authenticated", () => {
         menuSearchQuery="Task 1"
       />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     expect(screen.getByText("Task 1")).toBeInTheDocument();
     expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
   });
 
-  it("shows loading state", () => {
+  it("shows loading state", async () => {
     render(
       <SentenceMenu
         {...defaultProps}
@@ -77,6 +79,7 @@ describe("SentenceMenu authenticated", () => {
         isLoadingTasks={true}
       />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     expect(screen.getByText("Laen...")).toBeInTheDocument();
   });
 
@@ -92,6 +95,7 @@ describe("SentenceMenu authenticated", () => {
         onClose={onClose}
       />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     await userEvent.click(screen.getByText("Task 1"));
     expect(onAddToTask).toHaveBeenCalledWith("s1", "t1", "Task 1");
   });
@@ -105,6 +109,7 @@ describe("SentenceMenu authenticated", () => {
         onCreateNewTask={onCreateNewTask}
       />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     await userEvent.click(screen.getByText("Loo uus ülesanne"));
     expect(onCreateNewTask).toHaveBeenCalledWith("s1");
   });
@@ -193,6 +198,7 @@ describe("SentenceMenu keyboard and positioning", () => {
         tasks={[{ id: "t1", name: "T1" }]}
       />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     const input = screen.getByPlaceholderText("Otsi");
     const event = new MouseEvent("click", { bubbles: true });
     const stopProp = vi.spyOn(event, "stopPropagation");
@@ -228,29 +234,33 @@ describe("SentenceMenu structure and classes", () => {
     expect(divider?.className).toContain("synthesis__menu-divider");
   });
 
-  it("loading state has aria-busy=true", () => {
+  it("loading state has aria-busy=true", async () => {
     const { container } = render(
       <SentenceMenu {...defaultProps} isAuthenticated={true} isLoadingTasks={true} />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     const loading = container.querySelector('[aria-busy="true"]');
     expect(loading).toBeTruthy();
   });
 
-  it("task list has role=group and aria-label", () => {
+  it("task list has role=group and aria-label", async () => {
     const { container } = render(
       <SentenceMenu {...defaultProps} isAuthenticated={true} />,
     );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     const group = container.querySelector('[role="group"]');
     expect(group?.getAttribute("aria-label")).toBe("Ülesanded");
   });
 
-  it("search input has visually-hidden label", () => {
+  it("search input has visually-hidden label", async () => {
     render(<SentenceMenu {...defaultProps} isAuthenticated={true} />);
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     expect(screen.getByLabelText("Otsi ülesandeid")).toBeInTheDocument();
   });
 
-  it("create button icon has aria-hidden=true", () => {
+  it("create button icon has aria-hidden=true", async () => {
     const { container } = render(<SentenceMenu {...defaultProps} isAuthenticated={true} />);
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     const icon = container.querySelector(".synthesis__menu-item-create-icon");
     expect(icon?.getAttribute("aria-hidden")).toBe("true");
   });
@@ -265,6 +275,7 @@ describe("SentenceMenu structure and classes", () => {
     const onClose = vi.fn();
     const tasks = [{ id: "t1", name: "T1" }];
     render(<SentenceMenu {...defaultProps} isAuthenticated={true} tasks={tasks} onClose={onClose} />);
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     await userEvent.click(screen.getByText("T1"));
     expect(onClose).toHaveBeenCalled();
   });
@@ -272,6 +283,7 @@ describe("SentenceMenu structure and classes", () => {
   it("onClose called when create new task clicked", async () => {
     const onClose = vi.fn();
     render(<SentenceMenu {...defaultProps} isAuthenticated={true} onClose={onClose} />);
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
     await userEvent.click(screen.getByText("Loo uus ülesanne"));
     expect(onClose).toHaveBeenCalled();
   });

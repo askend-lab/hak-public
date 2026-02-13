@@ -5,11 +5,8 @@
 
 import React from "react";
 import { transformToUI } from "@/utils/phoneticMarkers";
-import { PlayIcon, PauseIcon, VolumeIcon } from "../ui/Icons";
-import {
-  parsePhoneticMarkers,
-  generatePronunciationExplanation,
-} from "./phoneticHelpers";
+import { PlayIcon, PauseIcon } from "../ui/Icons";
+import { parsePhoneticMarkers } from "./phoneticHelpers";
 
 interface Variant {
   text: string;
@@ -36,7 +33,6 @@ export function VariantItem({
   onUse,
 }: VariantItemProps): React.ReactElement {
   const displayText = transformToUI(variant.text ?? "");
-  const explanation = generatePronunciationExplanation(displayText ?? "");
   const markers = parsePhoneticMarkers(variant.text ?? "");
 
   return (
@@ -77,15 +73,6 @@ export function VariantItem({
           </button>
         </div>
       </div>
-      {explanation && (
-        <div className="pronunciation-variants__item-explanation">
-          <VolumeIcon
-            size="md"
-            className="pronunciation-variants__explanation-icon"
-          />
-          <span>{explanation}</span>
-        </div>
-      )}
     </div>
   );
 }

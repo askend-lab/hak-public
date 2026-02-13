@@ -36,7 +36,7 @@ describe("PhoneticGuide", () => {
   it("calls onClose when close button clicked", () => {
     const onClose = vi.fn();
     render(<PhoneticGuide {...defaultProps} onClose={onClose} />);
-    fireEvent.click(screen.getByLabelText("Close"));
+    fireEvent.click(screen.getByLabelText("Sulge"));
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -74,7 +74,7 @@ describe("PhoneticGuide", () => {
   it("buttons have type=button", () => {
     render(<PhoneticGuide {...defaultProps} />);
     const backBtn = screen.getByLabelText("Tagasi variantide juurde");
-    const closeBtn = screen.getByLabelText("Close");
+    const closeBtn = screen.getByLabelText("Sulge");
     expect(backBtn.getAttribute("type")).toBe("button");
     expect(closeBtn.getAttribute("type")).toBe("button");
   });

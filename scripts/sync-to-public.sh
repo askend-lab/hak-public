@@ -259,8 +259,19 @@ if [[ -f ARCHITECTURE.md ]]; then
     content = content.replace(/## Infrastructure\n[\s\S]*?(?=\n## |\n*$)/, '');
     // Replace DevBox reference in Quality System section
     content = content.replace('Pre-commit hooks (DevBox) enforce', 'Pre-commit hooks enforce');
+    // Remove tara-auth references (package excluded from public repo)
+    content = content.replace(/^- \*\*tara-auth\*\* —.*\n/gm, '');
+    // Fix backend count (Five → Four, since tara-auth is excluded)
+    content = content.replace('Five Lambda functions', 'Four Lambda functions');
+    // Remove Infrastructure line from Quality System (no infra in public repo)
+    content = content.replace(/^- \*\*Infrastructure\*\* —.*\n/gm, '');
+    // Rewrite Quality System intro (no pre-commit hooks in public repo)
+    content = content.replace(
+      'Pre-commit hooks enforce quality on every commit. The commit is rejected if any check fails.',
+      'Quality checks run in CI on every pull request. The PR is blocked if any check fails.'
+    );
     fs.writeFileSync('ARCHITECTURE.md', content);
-    console.log('  Removed infra/ section and DevBox reference');
+    console.log('  Removed infra/ section, DevBox ref, tara-auth refs, Infrastructure quality line, hooks claim');
   "
 fi
 
@@ -274,39 +285,58 @@ if [[ -f docs/adr/003-tdd-devbox.md ]]; then
 fi
 if [[ -f docs/adr/README.md ]]; then
   sed -i 's/TDD with DevBox hooks/TDD with pre-commit hooks/' docs/adr/README.md
-  echo "  Cleaned DevBox reference in ADR README"
+fi
+# Rename ADR 003 file and update link
+if [[ -f docs/adr/003-tdd-devbox.md ]]; then
+  mv docs/adr/003-tdd-devbox.md docs/adr/003-tdd-hooks.md
+  [[ -f docs/adr/README.md ]] && sed -i 's/003-tdd-devbox\.md/003-tdd-hooks.md/' docs/adr/README.md
+  echo "  Renamed 003-tdd-devbox.md → 003-tdd-hooks.md"
 fi
 
-# --- Clean up merlin-api package.json (remove deploy scripts) ---
-echo ">>> Cleaning merlin-api package.json..."
-if [[ -f packages/merlin-api/package.json ]] && command -v node &>/dev/null; then
+# --- Clean up package.json scripts (frontend: e2e refs, merlin-api: deploy scripts) ---
+echo ">>> Cleaning package scripts..."
+if command -v node &>/dev/null; then
   node -e "
     const fs = require('fs');
-    const pkg = JSON.parse(fs.readFileSync('packages/merlin-api/package.json', 'utf8'));
-    delete pkg.scripts['deploy'];
-    delete pkg.scripts['deploy:dev'];
-    delete pkg.scripts['deploy:prod'];
-    if (!pkg.scripts['test:full']) pkg.scripts['test:full'] = pkg.scripts['test'] || 'jest';
-    fs.writeFileSync('packages/merlin-api/package.json', JSON.stringify(pkg, null, 2) + '\n');
-    console.log('  Removed deploy scripts, added test:full');
+    // Frontend: remove test:a11y scripts (e2e/ excluded)
+    if (fs.existsSync('packages/frontend/package.json')) {
+      const fp = JSON.parse(fs.readFileSync('packages/frontend/package.json', 'utf8'));
+      delete fp.scripts['test:a11y']; delete fp.scripts['test:a11y:report'];
+      fs.writeFileSync('packages/frontend/package.json', JSON.stringify(fp, null, 2) + '\n');
+    }
+    // merlin-api: remove deploy scripts, add test:full
+    if (fs.existsSync('packages/merlin-api/package.json')) {
+      const mp = JSON.parse(fs.readFileSync('packages/merlin-api/package.json', 'utf8'));
+      delete mp.scripts['deploy']; delete mp.scripts['deploy:dev']; delete mp.scripts['deploy:prod'];
+      if (!mp.scripts['test:full']) mp.scripts['test:full'] = mp.scripts['test'] || 'jest';
+      fs.writeFileSync('packages/merlin-api/package.json', JSON.stringify(mp, null, 2) + '\n');
+    }
+    console.log('  Cleaned frontend and merlin-api scripts');
   "
 fi
 
 # --- Clean up main.tsx (remove Build timestamp comment) ---
-echo ">>> Cleaning main.tsx..."
 if [[ -f packages/frontend/src/main.tsx ]]; then
   sed -i '/^\/\/ Build [0-9]\{14\}$/d' packages/frontend/src/main.tsx
-  echo "  Removed Build timestamp"
 fi
 
-# --- Clean up .gitignore (remove references to internal paths) ---
+# --- Remove SPTK prebuilt binaries (Docker rebuilds from source via compile_tools.sh) ---
+echo ">>> Removing SPTK build artifacts..."
+rm -rf packages/merlin-worker/tools/SPTK-3.9/build 2>/dev/null
+rm -f packages/merlin-worker/tools/SPTK-3.9/lib/libSPTK.a 2>/dev/null
+echo "  Removed SPTK-3.9/build/ and duplicate libSPTK.a"
+
+# --- Clean up .gitignore (remove internal/unused patterns) ---
 echo ">>> Cleaning .gitignore..."
 if [[ -f .gitignore ]]; then
-  # Remove lines referencing internal packages/paths that no longer exist
-  sed -i '/packages\/frontend\/src\/services\/merlin\//d' .gitignore
-  sed -i '/packages\/frontend\/src\/services\/vabamorf\//d' .gitignore
-  sed -i '/packages\/frontend\/cucumber-results/d' .gitignore
-  sed -i '/\.agent-channel/d' .gitignore
+  sed -i -e '/packages\/frontend\/src\/services\/merlin\//d' \
+    -e '/packages\/frontend\/src\/services\/vabamorf\//d' \
+    -e '/packages\/frontend\/cucumber-results/d' \
+    -e '/\.agent-channel/d' \
+    -e '/^\.terraform/d' -e '/^\*\.tfstate/d' -e '/^\*\.tfplan/d' -e '/^tfplan-/d' \
+    -e '/^\.vs$/d' -e '/^\*\.suo$/d' -e '/^\*\.sln$/d' -e '/^\*\.vcxproj/d' \
+    -e '/^\.lhci$/d' -e '/^\.stryker-tmp$/d' \
+    -e '/^$/N;/^\n$/d' .gitignore
   echo "  Cleaned .gitignore"
 fi
 

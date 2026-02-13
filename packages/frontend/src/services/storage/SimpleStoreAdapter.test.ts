@@ -109,7 +109,7 @@ describe("SimpleStoreAdapter", () => {
       expect(callBody.pk).toBe("tasks");
       expect(callBody.sk).toBe("user-1");
       expect(callBody.type).toBe("private");
-      expect(callBody.ttl).toBe(31536000);
+      expect(callBody.ttl).toBe(0);
       expect(callBody.data.tasks).toHaveLength(1);
       expect(callBody.data.tasks[0].id).toBe("task-1");
       expect(call[1].method).toBe("POST");

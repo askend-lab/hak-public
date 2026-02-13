@@ -31,6 +31,7 @@ const defaultProps = {
   isDownloading: false,
   onEditTask: vi.fn(),
   onDeleteTask: vi.fn(),
+  onCopyToSynthesis: vi.fn(),
 };
 
 describe("TaskDetailHeader rendering", () => {
@@ -87,18 +88,19 @@ describe("TaskDetailHeader actions", () => {
 describe("TaskDetailHeader download", () => {
   it("calls onDownloadZip when clicked", async () => {
     const onDownloadZip = vi.fn();
-    render(<TaskDetailHeader {...defaultProps} onDownloadZip={onDownloadZip} />);
-    await userEvent.click(screen.getByText("Laadi alla"));
+    const setMenu = vi.fn();
+    render(<TaskDetailHeader {...defaultProps} onDownloadZip={onDownloadZip} isHeaderMenuOpen={true} setIsHeaderMenuOpen={setMenu} />);
+    await userEvent.click(screen.getByText(/Lae alla/));
     expect(onDownloadZip).toHaveBeenCalled();
   });
 
-  it("shows loading text when downloading", () => {
-    render(<TaskDetailHeader {...defaultProps} isDownloading={true} />);
+  it("shows loading text when downloading", async () => {
+    render(<TaskDetailHeader {...defaultProps} isHeaderMenuOpen={true} isDownloading={true} />);
     expect(screen.getByText("Laadin...")).toBeInTheDocument();
   });
 
   it("disables button when downloading", () => {
-    render(<TaskDetailHeader {...defaultProps} isDownloading={true} />);
+    render(<TaskDetailHeader {...defaultProps} isHeaderMenuOpen={true} isDownloading={true} />);
     const btn = screen.getByText("Laadin...").closest("button");
     expect(btn).toBeDisabled();
   });
@@ -116,7 +118,7 @@ describe("TaskDetailHeader menu open", () => {
 
   it("shows menu items when open", () => {
     render(<TaskDetailHeader {...defaultProps} isHeaderMenuOpen={true} />);
-    expect(screen.getByText("Muuda")).toBeInTheDocument();
+    expect(screen.getByText(/Muuda ülesande kirjeldust/)).toBeInTheDocument();
   });
 });
 
@@ -130,7 +132,7 @@ describe("TaskDetailHeader menu actions", () => {
         onEditTask={onEdit}
       />,
     );
-    await userEvent.click(screen.getByText("Muuda"));
+    await userEvent.click(screen.getByText(/Muuda ülesande kirjeldust/));
     expect(onEdit).toHaveBeenCalledWith("task-1");
   });
 
@@ -143,7 +145,7 @@ describe("TaskDetailHeader menu actions", () => {
         onDeleteTask={onDelete}
       />,
     );
-    await userEvent.click(screen.getByText("Kustuta"));
+    await userEvent.click(screen.getByText(/Kustuta ülesanne/));
     expect(onDelete).toHaveBeenCalledWith("task-1");
   });
 

@@ -10,6 +10,7 @@ interface TagsListProps {
   tags: string[];
   selectedTagIndex?: number | null | undefined;
   isPronunciationPanelOpen?: boolean | undefined;
+  allTagsSelected?: boolean | undefined;
   onTagClick?:
     | ((id: string, tagIndex: number, word: string) => void)
     | undefined;
@@ -20,6 +21,7 @@ export function TagsList({
   tags,
   selectedTagIndex,
   isPronunciationPanelOpen,
+  allTagsSelected,
   onTagClick,
 }: TagsListProps): React.ReactElement {
   return (
@@ -27,7 +29,8 @@ export function TagsList({
       <div className="sentence-synthesis-item__tags-group">
         {tags.map((tag, index) => {
           const isSelected =
-            isPronunciationPanelOpen && selectedTagIndex === index;
+            (isPronunciationPanelOpen && selectedTagIndex === index) ||
+            (isPronunciationPanelOpen && allTagsSelected);
           return (
             <div
               key={index}

@@ -85,6 +85,9 @@ export default function SpecsNav({
             <div
               className={`specs-group__header ${isGroupExpanded ? "specs-group__header--expanded" : ""}`}
               onClick={() => onToggleGroup(group.name)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onToggleGroup(group.name); }}
+              role="button"
+              tabIndex={0}
             >
               <span>
                 {isGroupExpanded ? "📂" : "📁"} {group.name}
@@ -112,6 +115,9 @@ export default function SpecsNav({
                         onToggleFeature(feature.name);
                         onSelectFeature(feature.name);
                       }}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { onToggleFeature(feature.name); onSelectFeature(feature.name); } }}
+                      role="button"
+                      tabIndex={0}
                     >
                       <span className="specs-feature__name">
                         {isFeatureExpanded ? "▼" : "▶"}{" "}
@@ -143,6 +149,9 @@ export default function SpecsNav({
                             key={scenario.name}
                             className="specs-scenario__item"
                             onClick={() => onSelectFeature(feature.name)}
+                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelectFeature(feature.name); }}
+                            role="button"
+                            tabIndex={0}
                           >
                             <span className={getBadgeClass(status)}>
                               {status === "passed" ? "✓" : "○"}

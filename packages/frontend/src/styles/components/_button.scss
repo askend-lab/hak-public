@@ -2,6 +2,7 @@
 @import "../tokens/borders";
 @import "../tokens/opacity";
 @import "../tokens/typography";
+@import "../tokens/spacing";
 
 // =========================================================================
 // Button Component
@@ -281,13 +282,3 @@
 // =========================================================================
 // Aliases for pages that use btn-primary/btn-secondary class names
 // =========================================================================
-
-// Loader animation
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}

@@ -12,7 +12,7 @@ export default defineConfig({
   reporter: "html",
   globalSetup: "./e2e/global-setup.ts",
   use: {
-    baseURL: "http://localhost:5180",
+    baseURL: "http://localhost:5181",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     storageState: "e2e/.auth/user.json",
@@ -25,7 +25,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "pnpm dev",
-    url: "http://localhost:5180",
+    url: "http://localhost:5181",
     reuseExistingServer: !process.env.CI,
   },
 });

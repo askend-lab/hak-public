@@ -18,11 +18,11 @@ describe("cognitoConfig", () => {
     expect(typeof cognitoConfig.domain).toBe("string");
   });
 
-  it("should have empty defaults requiring env var configuration", () => {
+  it("should have hardcoded public OAuth defaults", () => {
     expect(cognitoConfig.region).toBe("eu-west-1");
-    expect(cognitoConfig.userPoolId).toBe("");
-    expect(cognitoConfig.clientId).toBe("");
-    expect(cognitoConfig.domain).toBe("");
+    expect(cognitoConfig.userPoolId).toBe("eu-west-1_wlRtuLkG2");
+    expect(cognitoConfig.clientId).toBe("64tf6nf61n6sgftqif6q975hka");
+    expect(cognitoConfig.domain).toBe("askend-lab-auth.auth.eu-west-1.amazoncognito.com");
   });
 
   it("should have exact OAuth scopes", () => {

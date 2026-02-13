@@ -101,8 +101,8 @@ describe("AuthCallbackPage", () => {
     render(<AuthCallbackPage />);
 
     expect(screen.getByText("Sisenen...")).toBeInTheDocument();
-    const spinner = document.querySelector(".loader-spinner");
-    expect(spinner).toBeTruthy();
+    const loadingState = document.querySelector(".page-loading-state");
+    expect(loadingState).toBeTruthy();
   });
 
   it("redirects to home when TARA tokens succeed", async () => {
@@ -172,24 +172,22 @@ describe("AuthCallbackPage", () => {
     });
   });
 
-  it("loading spinner has correct dimensions", () => {
+  it("loading state uses PageLoadingState component", () => {
     window.location.search = "?code=c";
     mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
     render(<AuthCallbackPage />);
-    const spinner = document.querySelector(".loader-spinner") as HTMLElement;
-    expect(spinner?.style.width).toBe("48px");
-    expect(spinner?.style.height).toBe("48px");
+    const loadingState = document.querySelector(".page-loading-state");
+    expect(loadingState).toBeTruthy();
   });
 
   it("loading view has flex centered layout", () => {
     window.location.search = "?code=c";
     mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
     render(<AuthCallbackPage />);
-    const container = screen.getByText("Sisenen...").parentElement;
+    const container = document.querySelector(".page-loading-state") as HTMLElement;
     expect(container?.style.display).toBe("flex");
     expect(container?.style.justifyContent).toBe("center");
     expect(container?.style.alignItems).toBe("center");
-    expect(container?.style.height).toBe("100vh");
   });
 
   it("error text includes 'Sisselogimine ebaõnnestus' prefix with error detail", async () => {

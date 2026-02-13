@@ -57,18 +57,18 @@ describe("CustomVariantForm", () => {
 
   it("shows clear button when value is non-empty", () => {
     render(<CustomVariantForm {...defaultProps} value="hello" />);
-    expect(screen.getByLabelText("Clear input")).toBeInTheDocument();
+    expect(screen.getByLabelText("Tühjenda sisend")).toBeInTheDocument();
   });
 
   it("hides clear button when value is empty", () => {
     render(<CustomVariantForm {...defaultProps} value="" />);
-    expect(screen.queryByLabelText("Clear input")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Tühjenda sisend")).not.toBeInTheDocument();
   });
 
   it("calls onChange with empty string when clear clicked", () => {
     const onChange = vi.fn();
     render(<CustomVariantForm {...defaultProps} onChange={onChange} />);
-    fireEvent.click(screen.getByLabelText("Clear input"));
+    fireEvent.click(screen.getByLabelText("Tühjenda sisend"));
     expect(onChange).toHaveBeenCalledWith("");
   });
 

@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../services/auth";
 import { logger } from "@hak/shared";
+import { PageLoadingState } from "../components/ui/PageLoadingState";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export function AuthCallbackPage() {
 
   if (error) {
     return (
-      <div
+      <main
         style={{
           display: "flex",
           flexDirection: "column",
@@ -87,12 +88,12 @@ export function AuthCallbackPage() {
         >
           Tagasi avalehele
         </button>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div
+    <main
       style={{
         display: "flex",
         justifyContent: "center",
@@ -100,8 +101,7 @@ export function AuthCallbackPage() {
         height: "100vh",
       }}
     >
-      <div className="loader-spinner" style={{ width: 48, height: 48 }}></div>
-      <p style={{ marginLeft: "1rem" }}>Sisenen...</p>
-    </div>
+      <PageLoadingState message="Sisenen..." />
+    </main>
   );
 }

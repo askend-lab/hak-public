@@ -115,13 +115,14 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1");
+      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
     });
 
     expect(mockAddTextEntriesToTask).toHaveBeenCalledWith(
       "user-1",
       "task-1",
       expect.any(Array),
+      "append",
     );
     expect(mockShowNotification).toHaveBeenCalledWith(
       "success",
@@ -274,7 +275,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1");
+      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
     });
 
     expect(mockShowNotification).toHaveBeenCalledWith(
@@ -304,7 +305,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1");
+      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
     });
 
     expect(mockAddTextEntriesToTask).not.toHaveBeenCalled();

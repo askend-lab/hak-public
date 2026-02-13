@@ -34,6 +34,7 @@ interface TagsInputProps {
   // Tag selection
   selectedTagIndex?: number | null | undefined;
   isPronunciationPanelOpen?: boolean | undefined;
+  allTagsSelected?: boolean | undefined;
 
   // Tag menu
   openTagMenu?: OpenTagMenu | null | undefined;
@@ -63,6 +64,7 @@ export function TagsInput({
   sentenceIndex,
   selectedTagIndex,
   isPronunciationPanelOpen,
+  allTagsSelected,
   openTagMenu,
   tagMenuItems,
   loadingTagIndex,
@@ -86,7 +88,8 @@ export function TagsInput({
       >
         {tags.map((tag, index) => {
           const isSelected =
-            isPronunciationPanelOpen && selectedTagIndex === index;
+            (isPronunciationPanelOpen && selectedTagIndex === index) ||
+            (isPronunciationPanelOpen && allTagsSelected);
           const isMenuOpen =
             openTagMenu?.sentenceId === id && openTagMenu?.tagIndex === index;
           const isEditing =
@@ -103,6 +106,7 @@ export function TagsInput({
                 key={index}
                 type="text"
                 className="sentence-synthesis-item__tag-edit-input"
+                aria-label="Muuda silti"
                 value={editingTag.value}
                 onChange={(e) => onEditTagChange(e.target.value)}
                 onKeyDown={onEditTagKeyDown}
@@ -121,10 +125,16 @@ export function TagsInput({
               onClick={() => onTagMenuOpen && onTagMenuOpen(id, index)}
               role="button"
               tabIndex={0}
+              aria-haspopup="menu"
+              aria-expanded={isMenuOpen}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   onTagMenuOpen && onTagMenuOpen(id, index);
+                } else if (e.key === "Escape" && isMenuOpen) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onTagMenuClose && onTagMenuClose();
                 }
               }}
               data-onboarding-target={`sentence-${sentenceIndex}-tag-${index}`}
@@ -148,15 +158,58 @@ export function TagsInput({
                   <div
                     className="sentence-synthesis-item__tag-menu-backdrop"
                     onClick={() => onTagMenuClose && onTagMenuClose()}
+                    onKeyDown={(e) => { if (e.key === "Escape") onTagMenuClose?.(); }}
+                    role="presentation"
                   />
                   <div
                     className="sentence-synthesis-item__tag-dropdown"
+                    role="menu"
+                    tabIndex={-1}
+                    aria-label="Sõna valikud"
+                    ref={(el) => {
+                      if (el) {
+                        const firstItem =
+                          el.querySelector<HTMLElement>('[role="menuitem"]');
+                        firstItem?.focus();
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onTagMenuClose && onTagMenuClose();
+                        const tagEl = e.currentTarget.closest(
+                          ".sentence-synthesis-item__tag",
+                        );
+                        if (tagEl instanceof HTMLElement) {
+                          tagEl.focus();
+                        }
+                      } else if (
+                        e.key === "ArrowDown" ||
+                        e.key === "ArrowUp"
+                      ) {
+                        e.preventDefault();
+                        const items =
+                          e.currentTarget.querySelectorAll<HTMLElement>(
+                            '[role="menuitem"]',
+                          );
+                        const currentIndex = Array.from(items).indexOf(
+                          document.activeElement as HTMLElement,
+                        );
+                        const nextIndex =
+                          e.key === "ArrowDown"
+                            ? (currentIndex + 1) % items.length
+                            : (currentIndex - 1 + items.length) % items.length;
+                        items[nextIndex]?.focus();
+                      }
+                    }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     {tagMenuItems.map((item, itemIndex) => (
                       <button
                         key={itemIndex}
                         className={`sentence-synthesis-item__tag-menu-item ${item.danger ? "sentence-synthesis-item__tag-menu-item--danger" : ""}`}
+                        role="menuitem"
                         onClick={() => {
                           item.onClick(id, index, tag);
                           onTagMenuClose && onTagMenuClose();
@@ -177,6 +230,7 @@ export function TagsInput({
           <input
             type="text"
             className="sentence-synthesis-item__input"
+            aria-label="Sisesta lause"
             placeholder={
               tags.length === 0
                 ? placeholder || "Kirjuta sõna või lause ja vajuta Enter"
@@ -193,7 +247,7 @@ export function TagsInput({
           <button
             onClick={() => onClear(id)}
             className="sentence-synthesis-item__clear-button"
-            aria-label="Clear all"
+            aria-label="Tühjenda kõik"
           >
             <CloseIcon size="sm" />
           </button>

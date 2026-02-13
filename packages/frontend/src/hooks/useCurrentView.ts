@@ -8,7 +8,9 @@ export type ViewType =
   | "tasks"
   | "specs"
   | "dashboard"
-  | "role-selection";
+  | "role-selection"
+  | "accessibility"
+  | "privacy";
 
 interface CurrentViewResult {
   currentView: ViewType;
@@ -32,7 +34,11 @@ export function useCurrentView(): CurrentViewResult {
         ? "dashboard"
         : pathname.startsWith("/role-selection")
           ? "role-selection"
-          : "synthesis";
+          : pathname.startsWith("/accessibility")
+            ? "accessibility"
+            : pathname.startsWith("/privacy")
+              ? "privacy"
+            : "synthesis";
 
   const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
   const selectedTaskId: string | null = taskIdMatch?.[1] || null;

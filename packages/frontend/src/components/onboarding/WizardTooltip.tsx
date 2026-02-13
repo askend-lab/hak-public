@@ -171,7 +171,7 @@ export default function WizardTooltip({
   return (
     <>
       {/* Overlay that dims the rest of the page */}
-      <div className="wizard__overlay" onClick={onSkip} />
+      <div className="wizard__overlay" onClick={onSkip} onKeyDown={(e) => { if (e.key === "Escape") onSkip(); }} role="presentation" />
 
       {/* Tooltip */}
       <div

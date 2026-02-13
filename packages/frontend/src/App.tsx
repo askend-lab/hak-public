@@ -9,6 +9,8 @@ import SynthesisView from "./components/SynthesisView";
 import TasksView from "./components/TasksView";
 import SpecsPage from "./components/SpecsPage";
 import Dashboard from "./components/Dashboard";
+import AccessibilityPage from "./pages/AccessibilityPage";
+import PrivacyPage from "./pages/PrivacyPage";
 import AppModals from "./components/AppModals";
 import SynthesisModals from "./components/SynthesisModals";
 import { RoleSelectionContent } from "./components/onboarding";
@@ -16,11 +18,13 @@ import { useAuth } from "./services/auth";
 import { COPIED_ENTRIES_KEY } from "./hooks/synthesis/useSentenceState";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./contexts/OnboardingContext";
+import { PageLoadingState } from "./components/ui/PageLoadingState";
 import { SynthesisPageProvider } from "./contexts/SynthesisPageContext";
 import {
   useSynthesis,
   useTaskHandlers,
   useCurrentView,
+  useDocumentTitle,
 } from "./hooks";
 
 export default function Home() {
@@ -34,6 +38,7 @@ export default function Home() {
   } = useOnboarding();
   const navigate = useNavigate();
   const { currentView, selectedTaskId } = useCurrentView();
+  useDocumentTitle();
 
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
 
@@ -110,7 +115,7 @@ export default function Home() {
           minHeight: "100vh",
         }}
       >
-        <div className="loader-spinner" style={{ width: 48, height: 48 }}></div>
+        <PageLoadingState />
       </div>
     );
   }
@@ -119,6 +124,9 @@ export default function Home() {
 
   return (
     <div className="page-layout">
+      <a href="#main-content" className="skip-link">
+        Liigu põhisisu juurde
+      </a>
       <AppHeader
         isAuthenticated={isAuthenticated}
         user={user}
@@ -128,6 +136,8 @@ export default function Home() {
       />
 
       <main
+        id="main-content"
+        tabIndex={-1}
         className={`page-layout__main ${showRoleSelection ? "role-selection-main" : ""}`}
       >
         {showRoleSelection ? (
@@ -165,6 +175,8 @@ export default function Home() {
               <SpecsPage onBack={() => navigate("/synthesis")} />
             )}
             {currentView === "dashboard" && <Dashboard />}
+            {currentView === "accessibility" && <AccessibilityPage />}
+            {currentView === "privacy" && <PrivacyPage />}
           </>
         )}
       </main>

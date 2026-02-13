@@ -51,7 +51,7 @@ describe("TaskManager mutation kills", () => {
   it("opens menu and calls onEditTask", async () => {
     const user = userEvent.setup();
     render(<TaskManager tasks={makeTasks()} {...handlers} />);
-    const menuBtns = screen.getAllByLabelText("More options");
+    const menuBtns = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(menuBtns[0]!);
     expect(screen.getByText("Muuda")).toBeInTheDocument();
     await user.click(screen.getByText("Muuda"));
@@ -61,7 +61,7 @@ describe("TaskManager mutation kills", () => {
   it("opens menu and calls onShareTask", async () => {
     const user = userEvent.setup();
     render(<TaskManager tasks={makeTasks()} {...handlers} />);
-    const menuBtns = screen.getAllByLabelText("More options");
+    const menuBtns = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(menuBtns[0]!);
     await user.click(screen.getByText("Jaga"));
     expect(handlers.onShareTask).toHaveBeenCalledWith("t1");
@@ -70,7 +70,7 @@ describe("TaskManager mutation kills", () => {
   it("opens menu and calls onDeleteTask", async () => {
     const user = userEvent.setup();
     render(<TaskManager tasks={makeTasks()} {...handlers} />);
-    const menuBtns = screen.getAllByLabelText("More options");
+    const menuBtns = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(menuBtns[0]!);
     await user.click(screen.getByText("Kustuta"));
     expect(handlers.onDeleteTask).toHaveBeenCalledWith("t1");
@@ -79,7 +79,7 @@ describe("TaskManager mutation kills", () => {
   it("toggles menu open/close on same button", async () => {
     const user = userEvent.setup();
     render(<TaskManager tasks={makeTasks()} {...handlers} />);
-    const menuBtns = screen.getAllByLabelText("More options");
+    const menuBtns = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(menuBtns[0]!);
     expect(screen.getByText("Muuda")).toBeInTheDocument();
     await user.click(menuBtns[0]!);
@@ -89,7 +89,7 @@ describe("TaskManager mutation kills", () => {
   it("closes menu via backdrop", async () => {
     const user = userEvent.setup();
     render(<TaskManager tasks={makeTasks()} {...handlers} />);
-    const menuBtns = screen.getAllByLabelText("More options");
+    const menuBtns = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(menuBtns[0]!);
     expect(screen.getByText("Muuda")).toBeInTheDocument();
     const backdrop = document.querySelector(".task-manager__menu-backdrop");
@@ -125,7 +125,7 @@ describe("TaskManager mutation kills", () => {
   it("menu closes after action", async () => {
     const user = userEvent.setup();
     render(<TaskManager tasks={makeTasks()} {...handlers} />);
-    const menuBtns = screen.getAllByLabelText("More options");
+    const menuBtns = screen.getAllByLabelText("Rohkem valikuid");
     await user.click(menuBtns[0]!);
     await user.click(screen.getByText("Muuda"));
     expect(screen.queryByText("Kustuta")).not.toBeInTheDocument();

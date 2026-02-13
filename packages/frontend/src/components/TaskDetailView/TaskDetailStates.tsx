@@ -3,6 +3,8 @@
 
 "use client";
 
+import { PageLoadingState } from "../ui/PageLoadingState";
+
 interface BackButtonProps {
   onBack: () => void;
 }
@@ -25,20 +27,8 @@ function BackButton({ onBack }: BackButtonProps) {
   );
 }
 
-export function TaskDetailLoading({ onBack }: BackButtonProps) {
-  return (
-    <div className="task-detail-view">
-      <div className="task-detail-hero">
-        <div className="task-detail-hero-header">
-          <BackButton onBack={onBack} />
-        </div>
-      </div>
-      <div className="task-detail-loading">
-        <div className="loading-spinner"></div>
-        <p>Laen ülesannet...</p>
-      </div>
-    </div>
-  );
+export function TaskDetailLoading() {
+  return <PageLoadingState message="Laen ülesannet..." />;
 }
 
 interface TaskDetailErrorProps {

@@ -4,6 +4,7 @@
 import TaskManager from "./TaskManager";
 import TaskDetailView from "./TaskDetailView";
 import { AddIcon } from "./ui/Icons";
+import { PageLoadingState } from "./ui/PageLoadingState";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 import { useUserTasks } from "@/hooks";
@@ -92,13 +93,7 @@ export default function TasksView({
   if (isLoading) {
     return (
       <div className="page-content page-content--empty">
-        <div className="empty-state">
-          <div
-            className="loader-spinner"
-            style={{ width: 48, height: 48 }}
-          ></div>
-          <p className="empty-state__description">Laen ülesandeid...</p>
-        </div>
+        <PageLoadingState message="Laen ülesandeid..." />
       </div>
     );
   }
