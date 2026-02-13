@@ -18,3 +18,10 @@ export {
   extractErrorMessage,
 } from "./lambda";
 export type { LambdaResponse, HttpStatusCode } from "./lambda";
+export { getAwsRegion } from "./env";
+export {
+  isNotFoundError,
+  buildS3Url,
+  checkFileExists,
+} from "./s3";
+export type { S3ClientLike } from "./s3";
