@@ -23,7 +23,6 @@ provider:
   environment:
     SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID}/hak-merlin-${self:provider.stage}-queue
     S3_BUCKET: hak-merlin-${self:provider.stage}-audio
-    AWS_REGION: eu-west-1
 
   iam:
     role:
