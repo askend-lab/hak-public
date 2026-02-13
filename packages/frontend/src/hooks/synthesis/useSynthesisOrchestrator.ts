@@ -7,6 +7,9 @@ import { useSentenceState } from "./useSentenceState";
 import { useAudioPlayer } from "./useAudioPlayer";
 import { useSynthesisAPI } from "./useSynthesisAPI";
 
+const MAX_RETRY_COUNT = 1;
+const RETRY_DELAY_MS = 100;
+
 export function useSynthesisOrchestrator(): ReturnType<
   typeof useSentenceState
 > & {
@@ -94,7 +97,7 @@ export function useSynthesisOrchestrator(): ReturnType<
   );
 
   const synthesizeAndPlay = useCallback(
-    async (id: string) => {
+    async (id: string, retryCount = 0) => {
       const sentence = sentencesRef.current.find((s) => s.id === id);
       if (!sentence?.text.trim()) return;
 
@@ -114,7 +117,9 @@ export function useSynthesisOrchestrator(): ReturnType<
                 isPlaying: false,
                 ...CACHE_INVALIDATION,
               });
-              setTimeout(() => synthesizeAndPlay(id), 100);
+              if (retryCount < MAX_RETRY_COUNT) {
+                setTimeout(() => synthesizeAndPlay(id, retryCount + 1), RETRY_DELAY_MS);
+              }
             },
           });
           return;
@@ -162,7 +167,7 @@ export function useSynthesisOrchestrator(): ReturnType<
   );
 
   const synthesizeWithText = useCallback(
-    async (id: string, text: string) => {
+    async (id: string, text: string, retryCount = 0) => {
       const sentence = getSentence(id);
       stopCurrentAudio();
 
@@ -183,7 +188,9 @@ export function useSynthesisOrchestrator(): ReturnType<
                 isPlaying: false,
                 ...CACHE_INVALIDATION,
               });
-              setTimeout(() => synthesizeWithText(id, text), 100);
+              if (retryCount < MAX_RETRY_COUNT) {
+                setTimeout(() => synthesizeWithText(id, text, retryCount + 1), RETRY_DELAY_MS);
+              }
             },
           });
           return;
