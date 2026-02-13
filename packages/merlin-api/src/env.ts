@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 export function getAwsRegion(): string {
-  return process.env.AWS_REGION_NAME ?? "eu-west-1";
+  return process.env.AWS_REGION ?? "eu-west-1";
 }
 
 export function getSqsQueueUrl(): string {

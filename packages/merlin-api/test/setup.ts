@@ -13,7 +13,7 @@ export const DEFAULT_SPEED = 1.0;
 export const DEFAULT_PITCH = 0;
 
 export function setupTestEnv(): void {
-  process.env.AWS_REGION_NAME = TEST_REGION;
+  process.env.AWS_REGION = TEST_REGION;
   process.env.S3_BUCKET = TEST_BUCKET;
   process.env.SQS_QUEUE_URL = TEST_QUEUE_URL;
   delete process.env.ECS_CLUSTER;
