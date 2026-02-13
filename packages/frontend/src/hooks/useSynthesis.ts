@@ -8,6 +8,7 @@ import { synthesizeAuto } from "@/utils/synthesize";
 import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
 import { useTagEditor } from "./synthesis/useTagEditor";
+import { logger } from "@hak/shared";
 import { usePlaylistControl } from "./synthesis/usePlaylistControl";
 import { useTagUpdater } from "./synthesis/useTagUpdater";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -104,7 +105,7 @@ export function useSynthesis() {
           audioUrl = await synthesizeAuto(sentence.text);
           updateSentence(id, { audioUrl });
         } catch (error) {
-          console.error("Failed to generate audio:", error);
+          logger.error("Failed to generate audio:", error);
           return;
         }
       }
@@ -123,7 +124,7 @@ export function useSynthesis() {
         document.body.removeChild(a);
         URL.revokeObjectURL(blobUrl);
       } catch (error) {
-        console.error("Failed to download audio:", error);
+        logger.error("Failed to download audio:", error);
       }
     },
     [getSentence, updateSentence],

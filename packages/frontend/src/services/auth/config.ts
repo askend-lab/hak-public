@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { generateCodeVerifier, generateCodeChallenge } from "./pkce";
+import { logger } from "@hak/shared";
 
 const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
@@ -96,7 +97,7 @@ export async function exchangeCodeForTokens(code: string): Promise<{
 } | null> {
   const codeVerifier = sessionStorage.getItem(PKCE_STORAGE_KEY);
   if (!codeVerifier) {
-    console.error("[Auth] Missing PKCE code verifier");
+    logger.error("[Auth] Missing PKCE code verifier");
     return null;
   }
 
@@ -120,7 +121,7 @@ export async function exchangeCodeForTokens(code: string): Promise<{
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error(
+      logger.error(
         "[Auth] Token exchange failed:",
         response.status,
         errorData,
@@ -138,7 +139,7 @@ export async function exchangeCodeForTokens(code: string): Promise<{
       expiresIn: data.expires_in,
     };
   } catch (error) {
-    console.error("[Auth] Token exchange error:", error);
+    logger.error("[Auth] Token exchange error:", error);
     return null;
   }
 }

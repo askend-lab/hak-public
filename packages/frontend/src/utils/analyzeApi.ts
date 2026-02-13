@@ -8,6 +8,7 @@
  * - useSynthesis.ts (2 calls)
  * - usePhoneticPanel.ts (1 call)
  */
+import { logger } from "@hak/shared";
 
 export const CONTENT_TYPE_JSON = "application/json";
 export const ANALYZE_API_PATH = "/api/analyze";
@@ -50,7 +51,7 @@ export async function analyzeText(text: string): Promise<string | null> {
     const data: AnalyzeResponse = await response.json();
     return data.stressedText || null;
   } catch (error) {
-    console.error("Failed to analyze text:", error);
+    logger.error("Failed to analyze text:", error);
     return null;
   }
 }

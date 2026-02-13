@@ -17,6 +17,7 @@ import {
   StoredOnboardingState,
 } from "@/types/onboarding";
 import { ROLE_CONFIGS, STORAGE_KEY } from "@/config/onboardingConfig";
+import { logger } from "@hak/shared";
 
 interface OnboardingContextType {
   state: OnboardingState;
@@ -62,7 +63,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error) {
-      console.error("Failed to load onboarding state:", error);
+      logger.error("Failed to load onboarding state:", error);
       localStorage.removeItem(STORAGE_KEY);
     } finally {
       setIsLoading(false);
@@ -80,7 +81,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(storageState));
       } catch (error) {
-        console.error("Failed to save onboarding state:", error);
+        logger.error("Failed to save onboarding state:", error);
       }
     },
     [],

@@ -4,6 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../services/auth";
+import { logger } from "@hak/shared";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export function AuthCallbackPage() {
       const errorParam = queryParams.get("error");
       const errorDescription = queryParams.get("error_description");
       if (errorParam) {
-        console.error("Auth callback error:", errorParam, errorDescription);
+        logger.error("Auth callback error:", errorParam, errorDescription);
         setError(errorDescription || errorParam);
         return;
       }

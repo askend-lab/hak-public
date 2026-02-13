@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SimpleStoreAdapter } from "./SimpleStoreAdapter";
 import { Task } from "@/types/task";
+import { logger } from "@hak/shared";
 
 vi.mock("../auth/storage", () => ({
   AuthStorage: { getIdToken: vi.fn(() => "test-token") },
@@ -64,21 +65,21 @@ describe("SimpleStoreAdapter shared/unlisted/misc", () => {
     });
 
     it("throws on save error and logs to console", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
       mockFetch.mockResolvedValueOnce({ ok: false, text: async () => "Error" });
       await expect(adapter.saveSharedTasks([])).rejects.toThrow();
-      expect(consoleSpy).toHaveBeenCalledWith("Failed to save shared tasks:", expect.any(Error));
-      consoleSpy.mockRestore();
+      expect(logSpy).toHaveBeenCalledWith("Failed to save shared tasks:", expect.any(Error));
+      logSpy.mockRestore();
     });
   });
 
   describe("get error handling", () => {
     it("throws on non-404 error response", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
       mockFetch.mockResolvedValueOnce({ ok: false, status: 500, text: async () => "Internal server error" });
       await expect(adapter.loadUserTasks("user-1")).rejects.toThrow("Failed to get");
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
+      expect(logSpy).toHaveBeenCalled();
+      logSpy.mockRestore();
     });
   });
 
@@ -103,10 +104,10 @@ describe("SimpleStoreAdapter shared/unlisted/misc", () => {
 
     it("returns null on error", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
       expect(await adapter.getTaskByShareToken("bad-token")).toBeNull();
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
+      expect(logSpy).toHaveBeenCalled();
+      logSpy.mockRestore();
     });
   });
 

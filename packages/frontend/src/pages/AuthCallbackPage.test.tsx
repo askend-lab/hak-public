@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { vi, describe, it, expect, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 
 const mockNavigate = vi.fn();
@@ -54,7 +55,7 @@ describe("AuthCallbackPage", () => {
   });
 
   it("shows error_description from query params", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     window.location.search =
       "?error=access_denied&error_description=User%20denied";
 
@@ -72,7 +73,7 @@ describe("AuthCallbackPage", () => {
   });
 
   it("falls back to error param when no description", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     window.location.search = "?error=server_error";
 
     render(<AuthCallbackPage />);

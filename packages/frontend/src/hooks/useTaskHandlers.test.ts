@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useTaskHandlers } from "./useTaskHandlers";
 import { SentenceState } from "@/types/synthesis";
@@ -267,7 +268,7 @@ describe("useTaskHandlers", () => {
 
   it("should handle error when adding entries to task", async () => {
     mockAddTextEntriesToTask.mockRejectedValueOnce(new Error("Failed"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
     );
@@ -311,7 +312,7 @@ describe("useTaskHandlers", () => {
 
   it("should handle error when updating task", async () => {
     mockUpdateTask.mockRejectedValueOnce(new Error("Failed"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
     );
@@ -441,7 +442,7 @@ describe("useTaskHandlers edge cases", () => {
 
   it("handles error when adding single sentence", async () => {
     mockAddTextEntriesToTask.mockRejectedValueOnce(new Error("Failed"));
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(logger, "error").mockImplementation(() => {});
     const { result } = renderHook(() =>
       useTaskHandlers(sentences, setView, setTaskId),
     );

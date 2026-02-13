@@ -96,11 +96,14 @@ jobs:
             CHANGED=$(git diff --name-only $BASE_SHA HEAD)
             echo "Changed files: $CHANGED"
 
-            echo "frontend=$(echo "$CHANGED" | grep -q "^packages/frontend/" && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "simplestore=$(echo "$CHANGED" | grep -q "^packages/simplestore/" && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "audio-api=$(echo "$CHANGED" | grep -q "^packages/audio-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "merlin-api=$(echo "$CHANGED" | grep -q "^packages/merlin-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "vabamorf-api=$(echo "$CHANGED" | grep -q "^packages/vabamorf-api/" && echo true || echo false)" >> $GITHUB_OUTPUT
+            # Check if @hak/shared changed — if so, rebuild all dependent packages
+            SHARED_CHANGED=$(echo "$CHANGED" | grep -q "^packages/shared/" && echo true || echo false)
+
+            echo "frontend=$(echo "$CHANGED" | grep -q "^packages/frontend/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "simplestore=$(echo "$CHANGED" | grep -q "^packages/simplestore/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "audio-api=$(echo "$CHANGED" | grep -q "^packages/audio-api/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "merlin-api=$(echo "$CHANGED" | grep -q "^packages/merlin-api/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
+            echo "vabamorf-api=$(echo "$CHANGED" | grep -q "^packages/vabamorf-api/" && echo true || [ "$SHARED_CHANGED" == "true" ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
             if echo "$CHANGED" | grep -qE "^(package\.json|pnpm-lock\.yaml|tsconfig\.json)$"; then
               echo "Root config changed - building all"
@@ -109,7 +112,7 @@ jobs:
               echo "audio-api=true" >> $GITHUB_OUTPUT
               echo "merlin-api=true" >> $GITHUB_OUTPUT
               echo "vabamorf-api=true" >> $GITHUB_OUTPUT
-              fi
+            fi
           fi
 
       - name: Run tests

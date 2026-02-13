@@ -4,6 +4,7 @@
 import { Task, TaskEntry } from "@/types/task";
 import { AuthStorage } from "../auth/storage";
 import { CONTENT_TYPE_JSON } from "@/utils/analyzeApi";
+import { logger } from "@hak/shared";
 
 interface SimpleStoreResponse {
   success: boolean;
@@ -45,7 +46,7 @@ export class SimpleStoreAdapter {
 
     if (!response.ok) {
       const error = await response.text();
-      console.error("SimpleStore save failed:", error);
+      logger.error("SimpleStore save failed:", error);
       throw new Error(`Failed to save: ${error}`);
     }
   }
@@ -65,7 +66,7 @@ export class SimpleStoreAdapter {
     if (!response.ok) {
       if (response.status === 404) return null;
       const error = await response.text();
-      console.error("SimpleStore get failed:", error);
+      logger.error("SimpleStore get failed:", error);
       throw new Error(`Failed to get: ${error}`);
     }
 
@@ -105,7 +106,7 @@ export class SimpleStoreAdapter {
     try {
       await this.save("shared", "tasks", "shared", { tasks });
     } catch (error) {
-      console.error("Failed to save shared tasks:", error);
+      logger.error("Failed to save shared tasks:", error);
       throw error;
     }
   }
@@ -115,7 +116,7 @@ export class SimpleStoreAdapter {
       const data = await this.get("tasks", shareToken, "unlisted");
       return data ? (data as unknown as Task) : null;
     } catch (error) {
-      console.error("Failed to get task by share token:", error);
+      logger.error("Failed to get task by share token:", error);
       return null;
     }
   }

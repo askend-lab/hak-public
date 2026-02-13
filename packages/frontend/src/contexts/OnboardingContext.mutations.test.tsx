@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, act } from "@testing-library/react";
 import { OnboardingProvider, useOnboarding } from "./OnboardingContext";
 import { STORAGE_KEY } from "@/config/onboardingConfig";
@@ -41,7 +42,7 @@ describe("OnboardingContext precise mutation kills", () => {
   });
 
   it("no stored value: localStorage.removeItem NOT called, no console.error", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const removeSpy = vi.spyOn(Storage.prototype, "removeItem");
 
     render(
@@ -65,7 +66,7 @@ describe("OnboardingContext precise mutation kills", () => {
 
   it("error handler logs exact message prefix", async () => {
     localStorage.setItem(STORAGE_KEY, "{{invalid");
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     render(
       <OnboardingProvider>
         <TestConsumer />
@@ -104,7 +105,7 @@ describe("OnboardingContext precise mutation kills", () => {
   });
 
   it("saveToStorage catch block logs error on localStorage failure", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     render(
       <OnboardingProvider>
         <TestConsumer />

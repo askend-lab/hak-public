@@ -6,6 +6,7 @@ import { Task, TaskEntry } from "@/types/task";
 import { DataService } from "@/services/dataService";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
 import { analyzeText } from "@/utils/analyzeApi";
+import { logger } from "@hak/shared";
 
 interface UsePhoneticPanelReturn {
   showPhoneticPanel: boolean;
@@ -93,7 +94,7 @@ export function usePhoneticPanel(
           },
         );
       } catch (error) {
-        console.error("Failed to update entry:", error);
+        logger.error("Failed to update entry:", error);
         alert("Viga: foneetilise kuju salvestamine ebaõnnestus");
       }
     },

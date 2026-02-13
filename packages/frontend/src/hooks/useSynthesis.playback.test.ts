@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesis } from "./useSynthesis";
 
@@ -212,7 +213,7 @@ describe("useSynthesis playback", () => {
 
   it("handles synthesis error gracefully", async () => {
     mockSynthesize.mockRejectedValueOnce(new Error("Synthesis failed"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     const { result } = renderHook(() => useSynthesis());
     act(() => {

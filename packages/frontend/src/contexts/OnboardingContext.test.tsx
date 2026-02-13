@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, act } from "@testing-library/react";
 import { OnboardingProvider, useOnboarding } from "./OnboardingContext";
 import { STORAGE_KEY } from "@/config/onboardingConfig";
@@ -134,7 +135,7 @@ describe("OnboardingContext mutation tests", () => {
 
   it("error handler removes malformed storage key", async () => {
     localStorage.setItem(STORAGE_KEY, "not-json");
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(logger, "error").mockImplementation(() => {});
     render(
       <OnboardingProvider>
         <TestConsumer />

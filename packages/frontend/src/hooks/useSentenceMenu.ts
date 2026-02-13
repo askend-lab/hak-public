@@ -4,6 +4,7 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@/services/auth";
 import { DataService } from "@/services/dataService";
+import { logger } from "@hak/shared";
 
 export function useSentenceMenu(): {
   openMenuId: string | null;
@@ -41,7 +42,7 @@ export function useSentenceMenu(): {
           const tasks = await dataService.getUserTasks(user.id);
           setMenuTasks(tasks.map((t) => ({ id: t.id, name: t.name })));
         } catch (error) {
-          console.error("Failed to load tasks for menu:", error);
+          logger.error("Failed to load tasks for menu:", error);
           setMenuTasks([]);
         } finally {
           setIsLoadingMenuTasks(false);

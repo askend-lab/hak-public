@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { useNotification } from "@/contexts/NotificationContext";
+import { logger } from "@hak/shared";
 import BaseModal from "./BaseModal";
 
 interface ShareTaskModalProps {
@@ -36,7 +37,7 @@ export default function ShareTaskModal({
         "success",
       );
     } catch (e) {
-      console.error("Failed to copy share link:", e);
+      logger.error("Failed to copy share link:", e);
       showNotification("error", "Viga lingi kopeerimisel");
     } finally {
       setIsCopying(false);

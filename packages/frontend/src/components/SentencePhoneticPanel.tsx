@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { transformToUI, transformToVabamorf } from "@/utils/phoneticMarkers";
 import { synthesizeAuto } from "@/utils/synthesize";
 import { createAudioPlayer } from "@/utils/audioPlayer";
+import { logger } from "@hak/shared";
 import { BackIcon, PlayIcon, PauseIcon, CloseIcon } from "./ui/Icons";
 import MarkersGuideBox from "./ui/MarkersGuideBox";
 import { markers } from "@/data/markerData";
@@ -160,7 +161,7 @@ export default function SentencePhoneticPanel({
       audioRef.current = audio;
       await audio.play();
     } catch (e) {
-      console.error("Failed to play:", e);
+      logger.error("Failed to play:", e);
       setIsPlaying(false);
       setIsLoading(false);
     }

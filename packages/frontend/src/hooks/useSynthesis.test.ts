@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesis } from "./useSynthesis";
 import { synthesizeWithPolling } from "@/utils/synthesize";
@@ -448,7 +449,7 @@ describe("useSynthesis", () => {
   });
 
   it("should handle download synthesis error", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     vi.mocked(synthesizeWithPolling).mockRejectedValueOnce(
       new Error("synth fail"),
     );
@@ -467,7 +468,7 @@ describe("useSynthesis", () => {
   });
 
   it("should handle download fetch error", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     vi.mocked(synthesizeWithPolling).mockResolvedValueOnce("mock-audio-url");
     global.fetch = vi.fn().mockRejectedValueOnce(new Error("fetch fail"));
 
@@ -532,7 +533,7 @@ describe("useSynthesis", () => {
   });
 
   it("should handle clipboard error in handleCopyText", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const writeText = vi.fn().mockRejectedValue(new Error("clipboard fail"));
     Object.defineProperty(navigator, "clipboard", {
       value: { writeText },

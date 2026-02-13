@@ -8,6 +8,7 @@ import { transformToVabamorf } from "@/utils/phoneticMarkers";
 import { synthesizeAuto } from "@/utils/synthesize";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { createAudioPlayer } from "@/utils/audioPlayer";
+import { logger } from "@hak/shared";
 import { postJSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
 import { CloseIcon } from "../ui/Icons";
 import PhoneticGuide from "./PhoneticGuide";
@@ -99,7 +100,7 @@ export default function PronunciationVariants({
       });
       await audio.play();
     } catch (error) {
-      console.error("Failed to play variant:", error);
+      logger.error("Failed to play variant:", error);
       setPlayingVariant(null);
       setLoadingVariant(null);
     }
@@ -132,7 +133,7 @@ export default function PronunciationVariants({
       });
       await audio.play();
     } catch (error) {
-      console.error("Failed to play custom variant:", error);
+      logger.error("Failed to play custom variant:", error);
       setIsCustomPlaying(false);
       setIsCustomLoading(false);
     }

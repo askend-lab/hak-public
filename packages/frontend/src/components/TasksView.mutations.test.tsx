@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TasksView from "./TasksView";
@@ -173,7 +174,7 @@ describe("TasksView mutation kills", () => {
   });
 
   it("handleEditTask logs error on failure", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockGetTask.mockRejectedValueOnce(new Error("fail"));
     const user = userEvent.setup();
     render(<TasksView {...props} />);
@@ -224,7 +225,7 @@ describe("TasksView mutation kills", () => {
   });
 
   it("handleShareTask logs error on failure", async () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockGetTask.mockRejectedValueOnce(new Error("fail"));
     const user = userEvent.setup();
     render(<TasksView {...props} />);

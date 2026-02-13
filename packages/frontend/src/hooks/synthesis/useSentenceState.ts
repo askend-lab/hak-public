@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { SentenceState, convertTextToTags } from "@/types/synthesis";
+import { logger } from "@hak/shared";
 
 const STORAGE_KEY = "eki_synthesis_state";
 const LEGACY_PLAYLIST_KEY = "eki_playlist_entries";
@@ -110,7 +111,7 @@ const loadInitialState = (): SentenceState[] => {
       }
     }
   } catch (error) {
-    console.error("Failed to load synthesis state from localStorage:", error);
+    logger.error("Failed to load synthesis state from localStorage:", error);
   }
   return [INITIAL_SENTENCE];
 };
@@ -140,7 +141,7 @@ export function useSentenceState(): {
       const toStore = sanitizeForStorage(sentences);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
     } catch (error) {
-      console.error("Failed to save synthesis state to localStorage:", error);
+      logger.error("Failed to save synthesis state to localStorage:", error);
     }
   }, [sentences]);
 
@@ -156,7 +157,7 @@ export function useSentenceState(): {
         }
       }
     } catch (error) {
-      console.error("Failed to load playlist from localStorage:", error);
+      logger.error("Failed to load playlist from localStorage:", error);
       localStorage.removeItem(LEGACY_PLAYLIST_KEY);
     }
   }, []);
@@ -173,7 +174,7 @@ export function useSentenceState(): {
         }
       }
     } catch (error) {
-      console.error(
+      logger.error(
         "Failed to load copied entries from sessionStorage:",
         error,
       );

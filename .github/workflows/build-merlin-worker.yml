@@ -47,16 +47,15 @@ jobs:
             --secret id=aws_access_key_id,src=/tmp/aws_access_key_id \
             --secret id=aws_secret_access_key,src=/tmp/aws_secret_access_key \
             --secret id=aws_session_token,src=/tmp/aws_session_token \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 
           # Clean up credential files
           rm -f /tmp/aws_access_key_id /tmp/aws_secret_access_key /tmp/aws_session_token
 
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      - name: Update ECS service (dev)
+      - name: Deploy to dev
+        if: github.event_name == 'push'
         run: |
           aws ecs update-service \
             --cluster hak-merlin-dev \
@@ -64,7 +63,8 @@ jobs:
             --force-new-deployment \
             --region eu-west-1
 
-      - name: Update ECS service (prod)
+      - name: Deploy to prod
+        if: github.event_name == 'workflow_dispatch'
         run: |
           aws ecs update-service \
             --cluster hak-merlin-prod \

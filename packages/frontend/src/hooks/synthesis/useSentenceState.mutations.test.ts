@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSentenceState } from "./useSentenceState";
 
@@ -96,7 +97,7 @@ describe("useSentenceState mutation kills", () => {
   });
 
   it("handles localStorage.setItem error gracefully", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const origSetItem = localStorage.setItem.bind(localStorage);
     const { result } = renderHook(() => useSentenceState());
     localStorage.setItem = (): void => { throw new Error("quota exceeded"); };
@@ -148,7 +149,7 @@ describe("useSentenceState mutation kills", () => {
   });
 
   it("legacy migration handles corrupted data and removes key", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     localStorage.setItem("eki_playlist_entries", "bad-json");
     renderHook(() => useSentenceState());
     expect(spy).toHaveBeenCalled();
@@ -197,7 +198,7 @@ describe("useSentenceState mutation kills", () => {
   });
 
   it("copied entries handles error and removes key", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     sessionStorage.setItem("copiedEntries", "not-json");
     renderHook(() => useSentenceState());
     expect(sessionStorage.getItem("copiedEntries")).toBeNull();
@@ -351,7 +352,7 @@ describe("useSentenceState mutation kills", () => {
   });
 
   it("loadInitialState catches corrupted JSON", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     localStorage.setItem("eki_synthesis_state", "not-json");
     const { result } = renderHook(() => useSentenceState());
     expect(result.current.sentences[0]?.id).toBe("1");
@@ -372,7 +373,7 @@ describe("useSentenceState mutation kills", () => {
 
   // --- persist error message L110 ---
   it("persist error message includes correct prefix", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const origSetItem = localStorage.setItem.bind(localStorage);
     const { result } = renderHook(() => useSentenceState());
     localStorage.setItem = (): void => { throw new Error("quota"); };

@@ -74,260 +74,40 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-  # /api/analyze -> Vabamorf API
-  ordered_cache_behavior {
-    path_pattern     = "/api/analyze"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "vabamorf-api"
+  # API route cache behaviors — generated from local.api_routes map
+  dynamic "ordered_cache_behavior" {
+    for_each = local.api_routes
+    content {
+      path_pattern     = ordered_cache_behavior.value.path
+      allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = ordered_cache_behavior.value.origin
 
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
-      cookies {
-        forward = "none"
+      forwarded_values {
+        query_string = ordered_cache_behavior.value.query_string
+        headers = ordered_cache_behavior.value.auth ? [
+          "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization"
+        ] : [
+          "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"
+        ]
+        cookies {
+          forward = "none"
+        }
       }
-    }
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/variants -> Vabamorf API
-  ordered_cache_behavior {
-    path_pattern     = "/api/variants"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "vabamorf-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
-      cookies {
-        forward = "none"
+      dynamic "function_association" {
+        for_each = ordered_cache_behavior.value.rewrite ? [1] : []
+        content {
+          event_type   = "viewer-request"
+          function_arn = aws_cloudfront_function.api_rewrite.arn
+        }
       }
+
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = 0
+      default_ttl            = 0
+      max_ttl                = 0
     }
-
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/synthesize -> Merlin API
-  ordered_cache_behavior {
-    path_pattern     = "/api/synthesize"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "merlin-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/status/* -> Merlin API (for polling)
-  ordered_cache_behavior {
-    path_pattern     = "/api/status/*"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "merlin-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/warmup -> Merlin API (for worker warm-up)
-  ordered_cache_behavior {
-    path_pattern     = "/api/warmup"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "merlin-api"
-
-    forwarded_values {
-      query_string = false
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.api_rewrite.arn
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/save -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
-  ordered_cache_behavior {
-    path_pattern     = "/api/save"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "simplestore-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/get -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
-  ordered_cache_behavior {
-    path_pattern     = "/api/get"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "simplestore-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/delete -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
-  ordered_cache_behavior {
-    path_pattern     = "/api/delete"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "simplestore-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/query -> SimpleStore API (no rewrite - SimpleStore expects /api/* paths)
-  ordered_cache_behavior {
-    path_pattern     = "/api/query"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "simplestore-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/get-shared -> SimpleStore API (no rewrite - for unauthenticated shared task access)
-  ordered_cache_behavior {
-    path_pattern     = "/api/get-shared"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "simplestore-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-  }
-
-  # /api/get-public -> SimpleStore API (for unauthenticated access to unlisted/shared/public data)
-  ordered_cache_behavior {
-    path_pattern     = "/api/get-public"
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "simplestore-api"
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
   }
 
   default_cache_behavior {

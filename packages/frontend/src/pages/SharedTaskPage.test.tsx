@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
@@ -200,7 +201,7 @@ describe("SharedTaskPage", () => {
 
   it("handles error during task loading", async () => {
     mockGetTaskByShareToken.mockRejectedValue(new Error("Network error"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     renderWithRouter("abc123");
 
@@ -294,7 +295,7 @@ describe("SharedTaskPage", () => {
   });
 
   it("shows error when fetch fails", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(logger, "error").mockImplementation(() => {});
     mockGetTaskByShareToken.mockRejectedValue(new Error("Network fail"));
 
     renderWithRouter("abc123");

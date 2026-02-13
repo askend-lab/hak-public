@@ -4,6 +4,7 @@
 import { Task, TaskEntry } from "@/types/task";
 import mockTasksData from "@/data/mock-tasks.json";
 import { generateShareToken } from "./shareTokenUtils";
+import { logger } from "@hak/shared";
 
 export class MockDataLoader {
   private normalizeTaskEntry(
@@ -46,7 +47,7 @@ export class MockDataLoader {
         this.normalizeTask(task as Record<string, unknown>),
       );
     } catch (error) {
-      console.error("Failed to load baseline tasks:", error);
+      logger.error("Failed to load baseline tasks:", error);
       return [];
     }
   }
@@ -62,7 +63,7 @@ export class MockDataLoader {
         ? this.normalizeTask(taskData as Record<string, unknown>)
         : null;
     } catch (error) {
-      console.error("Failed to find task by share token:", error);
+      logger.error("Failed to find task by share token:", error);
       return null;
     }
   }

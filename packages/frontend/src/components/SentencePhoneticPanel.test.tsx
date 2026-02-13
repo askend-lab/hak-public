@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SentencePhoneticPanel from "./SentencePhoneticPanel";
@@ -134,7 +135,7 @@ describe("SentencePhoneticPanel", () => {
       synthesizeWithPolling: vi.fn().mockRejectedValue(new Error("synth fail")),
       synthesizeAuto: vi.fn().mockRejectedValue(new Error("synth fail")),
     }));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     const user = userEvent.setup();
     render(<SentencePhoneticPanel {...defaultProps} />);
@@ -196,7 +197,7 @@ describe("SentencePhoneticPanel", () => {
     (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("synth fail"),
     );
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const user = userEvent.setup();
     render(<SentencePhoneticPanel {...defaultProps} />);
     await user.click(screen.getByText("Kuula"));

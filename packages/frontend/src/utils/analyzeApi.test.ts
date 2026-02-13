@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@hak/shared";
 import { analyzeText, analyzeTextOrThrow } from "./analyzeApi";
 
 describe("analyzeApi", () => {
@@ -46,7 +47,7 @@ describe("analyzeApi", () => {
         new Error("Network error"),
       );
       const consoleSpy = vi
-        .spyOn(console, "error")
+        .spyOn(logger, "error")
         .mockImplementation(() => {});
 
       const result = await analyzeText("test");

@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import PronunciationVariants from "./PronunciationVariants";
@@ -190,7 +191,7 @@ describe("PronunciationVariants", () => {
     (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("synth fail"),
     );
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     const user = userEvent.setup();
     render(<PronunciationVariants {...defaultProps} />);
