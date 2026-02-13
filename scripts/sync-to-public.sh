@@ -112,6 +112,21 @@ for pub_file in *.public.md; do
   mv "$pub_file" "$target"
 done
 
+# --- Copy public CI workflow (build.public.yml → .github/workflows/build.yml) ---
+echo ">>> Setting up public CI workflow..."
+if [[ -f .github/workflows/build.public.yml ]]; then
+  mkdir -p .github/workflows
+  mv .github/workflows/build.public.yml .github/workflows/build.yml
+  echo "  build.public.yml → .github/workflows/build.yml"
+fi
+
+# --- Copy public .env.example ---
+echo ">>> Setting up .env.example..."
+if [[ -f .env.example.public ]]; then
+  mv .env.example.public .env.example
+  echo "  .env.example.public → .env.example"
+fi
+
 # --- Clean up pnpm-workspace.yaml (still points to packages/*) ---
 # No change needed — pnpm ignores missing directories silently.
 
@@ -138,7 +153,7 @@ if command -v node &>/dev/null; then
     pkg.scripts['test:coverage'] = 'pnpm -r --filter=@hak/frontend run test:coverage';
     pkg.scripts.start = 'pnpm --filter @hak/frontend dev';
     pkg.scripts.build = 'pnpm --filter @hak/frontend build';
-    pkg.scripts.typecheck = 'pnpm -r exec tsc --noEmit';
+    pkg.scripts.typecheck = 'pnpm --filter @hak/frontend --filter @hak/shared exec tsc --noEmit';
 
     // Rewrite repository URLs from private to public repo
     if (pkg.repository?.url) {
@@ -211,6 +226,108 @@ echo ">>> Cleaning eslint.config.mjs..."
 if [[ -f eslint.config.mjs ]]; then
   sed -i 's/from DevBox with/with/' eslint.config.mjs
   echo "  Removed DevBox reference"
+fi
+
+# --- Clean up tsconfig.json (jest.setup.ts is excluded, remove from include) ---
+echo ">>> Cleaning tsconfig.json..."
+if [[ -f tsconfig.json ]]; then
+  node -e "
+    const fs = require('fs');
+    const tsconfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
+    tsconfig.include = tsconfig.include?.filter(p => p !== 'jest.setup.ts') ?? [];
+    if (tsconfig.include.length === 0) delete tsconfig.include;
+    fs.writeFileSync('tsconfig.json', JSON.stringify(tsconfig, null, 2) + '\n');
+    console.log('  Removed jest.setup.ts from include');
+  "
+fi
+
+# --- Clean up PR template (fix typecheck command) ---
+echo ">>> Cleaning pull_request_template.md..."
+if [[ -f .github/pull_request_template.md ]]; then
+  sed -i 's/pnpm -r exec tsc --noEmit/pnpm typecheck/' .github/pull_request_template.md
+  echo "  Fixed typecheck command"
+fi
+
+# --- Clean up ARCHITECTURE.md (remove infra/ section and DevBox references) ---
+echo ">>> Cleaning ARCHITECTURE.md..."
+if [[ -f ARCHITECTURE.md ]]; then
+  # Remove the Infrastructure section that references infra/ (which is excluded)
+  node -e "
+    const fs = require('fs');
+    let content = fs.readFileSync('ARCHITECTURE.md', 'utf8');
+    // Remove ## Infrastructure section (everything from '## Infrastructure' to next '##' or end)
+    content = content.replace(/## Infrastructure\n[\s\S]*?(?=\n## |\n*$)/, '');
+    // Replace DevBox reference in Quality System section
+    content = content.replace('Pre-commit hooks (DevBox) enforce', 'Pre-commit hooks enforce');
+    // Remove tara-auth references (package excluded from public repo)
+    content = content.replace(/^- \*\*tara-auth\*\* —.*\n/gm, '');
+    // Fix backend count (Five → Four, since tara-auth is excluded)
+    content = content.replace('Five Lambda functions', 'Four Lambda functions');
+    // Remove Infrastructure line from Quality System (no infra in public repo)
+    content = content.replace(/^- \*\*Infrastructure\*\* —.*\n/gm, '');
+    fs.writeFileSync('ARCHITECTURE.md', content);
+    console.log('  Removed infra/ section, DevBox ref, tara-auth refs, Infrastructure quality line');
+  "
+fi
+
+# --- Clean up ADR 003 (replace DevBox with standard hooks) ---
+echo ">>> Cleaning ADR docs..."
+if [[ -f docs/adr/003-tdd-devbox.md ]]; then
+  sed -i 's/DevBox pre-commit hooks/pre-commit hooks/g' docs/adr/003-tdd-devbox.md
+  sed -i 's/DevBox Hooks/Pre-commit Hooks/g' docs/adr/003-tdd-devbox.md
+  sed -i 's/DevBox is a custom tool — needs replacement with husky for OSS/Custom internal tool replaced with standard hooks/' docs/adr/003-tdd-devbox.md
+  echo "  Cleaned DevBox references in ADR 003"
+fi
+if [[ -f docs/adr/README.md ]]; then
+  sed -i 's/TDD with DevBox hooks/TDD with pre-commit hooks/' docs/adr/README.md
+  echo "  Cleaned DevBox reference in ADR README"
+fi
+
+# --- Clean up frontend package.json (remove scripts referencing excluded e2e/) ---
+echo ">>> Cleaning frontend scripts..."
+if [[ -f packages/frontend/package.json ]] && command -v node &>/dev/null; then
+  node -e "
+    const fs = require('fs');
+    const pkg = JSON.parse(fs.readFileSync('packages/frontend/package.json', 'utf8'));
+    // Remove scripts that reference excluded e2e/ directory
+    delete pkg.scripts['test:a11y'];
+    delete pkg.scripts['test:a11y:report'];
+    fs.writeFileSync('packages/frontend/package.json', JSON.stringify(pkg, null, 2) + '\n');
+    console.log('  Removed test:a11y scripts (e2e/ excluded)');
+  "
+fi
+
+# --- Rename ADR 003 file (remove devbox from filename) ---
+echo ">>> Renaming ADR 003..."
+if [[ -f docs/adr/003-tdd-devbox.md ]]; then
+  mv docs/adr/003-tdd-devbox.md docs/adr/003-tdd-hooks.md
+  # Update the link in README
+  if [[ -f docs/adr/README.md ]]; then
+    sed -i 's/003-tdd-devbox\.md/003-tdd-hooks.md/' docs/adr/README.md
+  fi
+  echo "  Renamed 003-tdd-devbox.md → 003-tdd-hooks.md"
+fi
+
+# --- Clean up merlin-api package.json (remove deploy scripts) ---
+echo ">>> Cleaning merlin-api package.json..."
+if [[ -f packages/merlin-api/package.json ]] && command -v node &>/dev/null; then
+  node -e "
+    const fs = require('fs');
+    const pkg = JSON.parse(fs.readFileSync('packages/merlin-api/package.json', 'utf8'));
+    delete pkg.scripts['deploy'];
+    delete pkg.scripts['deploy:dev'];
+    delete pkg.scripts['deploy:prod'];
+    if (!pkg.scripts['test:full']) pkg.scripts['test:full'] = pkg.scripts['test'] || 'jest';
+    fs.writeFileSync('packages/merlin-api/package.json', JSON.stringify(pkg, null, 2) + '\n');
+    console.log('  Removed deploy scripts, added test:full');
+  "
+fi
+
+# --- Clean up main.tsx (remove Build timestamp comment) ---
+echo ">>> Cleaning main.tsx..."
+if [[ -f packages/frontend/src/main.tsx ]]; then
+  sed -i '/^\/\/ Build [0-9]\{14\}$/d' packages/frontend/src/main.tsx
+  echo "  Removed Build timestamp"
 fi
 
 # --- Clean up .gitignore (remove references to internal paths) ---

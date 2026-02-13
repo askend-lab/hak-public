@@ -98,12 +98,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async function initAuth() {
       const storedUser = AuthStorage.getUser();
       const accessToken = AuthStorage.getAccessToken();
+      const hasRefreshToken = AuthStorage.getRefreshToken() !== null;
 
       if (storedUser && accessToken) {
+        // Same session — tokens are in memory, check expiry
         const needsRefresh = isTokenExpired(accessToken);
         const canContinue = !needsRefresh || await refreshTokens();
 
         if (canContinue) {
+          setState({
+            user: storedUser,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+        } else {
+          AuthStorage.clear();
+          setState({ ...initialState, isLoading: false });
+        }
+      } else if (storedUser && hasRefreshToken) {
+        // Page refresh — access/id tokens are gone (in-memory only),
+        // but we have a refresh token to re-obtain them
+        const refreshed = await refreshTokens();
+
+        if (refreshed) {
           setState({
             user: storedUser,
             isAuthenticated: true,

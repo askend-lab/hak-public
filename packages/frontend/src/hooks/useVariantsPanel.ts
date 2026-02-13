@@ -5,6 +5,7 @@ import { useState, useCallback } from "react";
 import { SentenceState, convertTextToTags, stripPunctuationForLookup } from "@/types/synthesis";
 import { NotificationType } from "@/components/Notification";
 import { analyzeText, postJSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
+import { VARIANTS_STRINGS } from "@/constants/ui-strings";
 
 const VARIANTS_API_TIMEOUT_MS = 10000;
 const MIN_SPINNER_DISPLAY_MS = 500;
@@ -134,8 +135,8 @@ export function useVariantsPanel(
         if (!data.variants?.length) {
           showNotification?.(
             "warning",
-            "Variante ei leitud",
-            "Sõna ei leidu eesti keeles või on valesti kirjutatud.",
+            VARIANTS_STRINGS.NOT_FOUND,
+            VARIANTS_STRINGS.NOT_FOUND_DESC,
           );
           return;
         }
@@ -148,14 +149,14 @@ export function useVariantsPanel(
         if (error instanceof Error && error.name === "AbortError") {
           showNotification?.(
             "error",
-            "Päring aegus",
-            "Variantide laadimine võttis liiga kaua.",
+            VARIANTS_STRINGS.TIMEOUT,
+            VARIANTS_STRINGS.TIMEOUT_DESC,
           );
         } else {
           showNotification?.(
             "error",
-            "Variantide laadimine ebaõnnestus",
-            "Sõna ei leidu eesti keeles või on valesti kirjutatud.",
+            VARIANTS_STRINGS.LOAD_FAILED,
+            VARIANTS_STRINGS.NOT_FOUND_DESC,
           );
         }
       } finally {

@@ -161,7 +161,7 @@ export async function handler(
     const effectiveUserId = userId || ANONYMOUS_USER;
     return await route.handler(event, createStore(effectiveUserId));
   } catch {
-    return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
+    return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
       error: HTTP_ERRORS.INTERNAL,
     });
   }

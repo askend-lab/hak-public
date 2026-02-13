@@ -19,31 +19,32 @@ export class MockDataLoader {
     };
   }
 
+  private normalizeTask(taskData: Record<string, unknown>): Task {
+    const taskId = taskData.id as string;
+    const createdAt = new Date(taskData.createdAt as string);
+    const entries = (taskData.entries as TaskEntry[] | undefined) || [];
+
+    return {
+      ...taskData,
+      shareToken:
+        (taskData.shareToken as string) || generateShareToken(),
+      speechSequences:
+        (taskData.speechSequences as string[]) ||
+        entries.map((e: TaskEntry) => e.text) ||
+        [],
+      entries: entries.map((entry: TaskEntry) =>
+        this.normalizeTaskEntry(entry, taskId, createdAt),
+      ),
+      createdAt,
+      updatedAt: new Date(taskData.updatedAt as string),
+    } as Task;
+  }
+
   async loadBaselineTasks(): Promise<Task[]> {
     try {
-      const data = mockTasksData;
-
-      return (data.tasks as unknown[]).map((task: unknown) => {
-        const taskData = task as Record<string, unknown>;
-        const taskId = taskData.id as string;
-        const createdAt = new Date(taskData.createdAt as string);
-        const entries = (taskData.entries as TaskEntry[] | undefined) || [];
-
-        return {
-          ...taskData,
-          shareToken:
-            (taskData.shareToken as string) || generateShareToken(),
-          speechSequences:
-            (taskData.speechSequences as string[]) ||
-            entries.map((e: TaskEntry) => e.text) ||
-            [],
-          entries: entries.map((entry: TaskEntry) =>
-            this.normalizeTaskEntry(entry, taskId, createdAt),
-          ),
-          createdAt,
-          updatedAt: new Date(taskData.updatedAt as string),
-        } as Task;
-      });
+      return (mockTasksData.tasks as unknown[]).map((task: unknown) =>
+        this.normalizeTask(task as Record<string, unknown>),
+      );
     } catch (error) {
       console.error("Failed to load baseline tasks:", error);
       return [];
@@ -52,33 +53,14 @@ export class MockDataLoader {
 
   async findTaskByShareToken(shareToken: string): Promise<Task | null> {
     try {
-      const data = mockTasksData;
-      const taskData = (data.tasks as unknown[]).find((task: unknown) => {
-        const t = task as Record<string, unknown>;
-        return t.shareToken === shareToken;
-      });
+      const taskData = (mockTasksData.tasks as unknown[]).find(
+        (task: unknown) =>
+          (task as Record<string, unknown>).shareToken === shareToken,
+      );
 
-      if (!taskData) {
-        return null;
-      }
-
-      const task = taskData as Record<string, unknown>;
-      const taskId = task.id as string;
-      const createdAt = new Date(task.createdAt as string);
-      const entries = (task.entries as TaskEntry[] | undefined) || [];
-
-      return {
-        ...task,
-        speechSequences:
-          (task.speechSequences as string[]) ||
-          entries.map((e: TaskEntry) => e.text) ||
-          [],
-        entries: entries.map((entry: TaskEntry) =>
-          this.normalizeTaskEntry(entry, taskId, createdAt),
-        ),
-        createdAt,
-        updatedAt: new Date(task.updatedAt as string),
-      } as Task;
+      return taskData
+        ? this.normalizeTask(taskData as Record<string, unknown>)
+        : null;
     } catch (error) {
       console.error("Failed to find task by share token:", error);
       return null;

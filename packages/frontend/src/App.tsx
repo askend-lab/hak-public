@@ -12,18 +12,17 @@ import Dashboard from "./components/Dashboard";
 import AccessibilityPage from "./pages/AccessibilityPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AppModals from "./components/AppModals";
+import SynthesisModals from "./components/SynthesisModals";
 import { RoleSelectionContent } from "./components/onboarding";
 import { useAuth } from "./services/auth";
 import { COPIED_ENTRIES_KEY } from "./hooks/synthesis/useSentenceState";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./contexts/OnboardingContext";
 import { PageLoadingState } from "./components/ui/PageLoadingState";
+import { SynthesisPageProvider } from "./contexts/SynthesisPageContext";
 import {
   useSynthesis,
   useTaskHandlers,
-  useDragAndDrop,
-  useVariantsPanel,
-  useSentenceMenu,
   useCurrentView,
   useDocumentTitle,
 } from "./hooks";
@@ -49,13 +48,6 @@ export default function Home() {
     () => navigate("/tasks"),
     () => {},
   );
-  const dragDrop = useDragAndDrop(synthesis.setSentences);
-  const variants = useVariantsPanel(
-    synthesis.sentences,
-    synthesis.setSentences,
-    showNotification,
-  );
-  const menu = useSentenceMenu();
   const hasCheckedInitialRedirect = useRef(false);
   // Capture copiedEntries presence synchronously during render (before effects clear it)
   const hadCopiedEntries = useRef(
@@ -105,15 +97,6 @@ export default function Home() {
     navigate,
   ]);
 
-  const handleUseVariant = (variantText: string) => {
-    synthesis.handleUseVariant(
-      variantText,
-      variants.selectedSentenceId,
-      variants.selectedTagIndex,
-    );
-    variants.setVariantsCustomPhonetic(variantText);
-  };
-
   const handleTasksClick = () => {
     if (!isAuthenticated) {
       setPendingTasksViewAccess(true);
@@ -162,74 +145,18 @@ export default function Home() {
         ) : (
           <>
             {currentView === "synthesis" && (
-              <SynthesisView
+              <SynthesisPageProvider
                 sentences={synthesis.sentences}
-                isPlayingAll={synthesis.isPlayingAll}
-                isLoadingPlayAll={synthesis.isLoadingPlayAll}
-                openTagMenu={synthesis.openTagMenu}
-                editingTag={synthesis.editingTag}
-                draggedId={dragDrop.draggedId}
-                dragOverId={dragDrop.dragOverId}
+                setSentences={synthesis.setSentences}
+                synthesis={synthesis}
+                taskHandlers={taskHandlers}
+                showNotification={showNotification}
                 isAuthenticated={isAuthenticated}
-                menuOpenId={menu.openMenuId}
-                menuAnchorEl={menu.menuAnchorEl}
-                menuSearchQuery={menu.menuSearchQuery}
-                isLoadingMenuTasks={menu.isLoadingMenuTasks}
-                menuTasks={menu.menuTasks}
-                showAddToTaskDropdown={taskHandlers.showAddToTaskDropdown}
-                variantsSelectedSentenceId={variants.selectedSentenceId}
-                variantsSelectedTagIndex={variants.selectedTagIndex}
-                sentencePhoneticId={variants.sentencePhoneticId}
-                isVariantsPanelOpen={variants.isVariantsPanelOpen}
-                showSentencePhoneticPanel={variants.showSentencePhoneticPanel}
-                loadingVariantsTag={variants.loadingVariantsTag}
-                onAddAllClick={taskHandlers.handleAddAllSentencesToTask}
-                onPlayAllClick={synthesis.handlePlayAll}
-                onDropdownClose={() =>
-                  taskHandlers.setShowAddToTaskDropdown(false)
-                }
-                onSelectTask={taskHandlers.handleSelectTaskFromDropdown}
-                onCreateNew={taskHandlers.handleCreateNewFromDropdown}
-                onPlay={synthesis.handlePlay}
-                onDragStart={dragDrop.handleDragStart}
-                onDragEnd={dragDrop.handleDragEnd}
-                onDragOver={dragDrop.handleDragOver}
-                onDragLeave={dragDrop.handleDragLeave}
-                onDrop={dragDrop.handleDrop}
-                onTagMenuOpen={(id, idx) => {
-                  const isOpen =
-                    synthesis.openTagMenu?.sentenceId === id &&
-                    synthesis.openTagMenu?.tagIndex === idx;
-                  synthesis.setOpenTagMenu(
-                    isOpen ? null : { sentenceId: id, tagIndex: idx },
-                  );
-                }}
-                onTagMenuClose={() => synthesis.setOpenTagMenu(null)}
-                onOpenVariantsFromMenu={variants.handleOpenVariantsFromMenu}
-                onEditTag={synthesis.handleEditTag}
-                onDeleteTag={synthesis.handleDeleteTag}
-                onEditTagChange={synthesis.handleEditTagChange}
-                onEditTagKeyDown={synthesis.handleEditTagKeyDown}
-                onEditTagCommit={synthesis.handleEditTagCommit}
-                onInputChange={synthesis.handleTextChange}
-                onInputKeyDown={synthesis.handleKeyDown}
-                onInputBlur={synthesis.handleInputBlur}
-                onClearSentence={synthesis.handleClearSentence}
-                onMenuOpen={(
-                  event: React.MouseEvent<Element, MouseEvent>,
-                  id: string,
-                ) => menu.handleMenuOpen(event, id)}
-                onMenuClose={menu.handleMenuClose}
-                onMenuSearchChange={menu.setMenuSearchQuery}
-                onAddToTask={taskHandlers.handleAddSentenceToExistingTask}
-                onCreateNewTask={taskHandlers.handleCreateNewTaskFromMenu}
-                onExplorePhonetic={variants.handleExplorePhonetic}
-                onDownload={synthesis.handleDownload}
-                onCopyText={synthesis.handleCopyText}
-                onRemoveSentence={synthesis.handleRemoveSentence}
                 onLogin={() => setShowLoginModal(true)}
-                onAddSentence={synthesis.handleAddSentence}
-              />
+              >
+                <SynthesisView />
+                <SynthesisModals showNotification={showNotification} />
+              </SynthesisPageProvider>
             )}
             {currentView === "tasks" && (
               <TasksView
@@ -260,12 +187,8 @@ export default function Home() {
       <AppModals
         showLoginModal={showLoginModal}
         setShowLoginModal={setShowLoginModal}
-        showNotification={showNotification}
         isWizardActive={isWizardActive}
-        variants={variants}
-        synthesis={synthesis}
         taskHandlers={taskHandlers}
-        onUseVariant={handleUseVariant}
       />
     </div>
   );

@@ -17,12 +17,45 @@ export class TaskRepository {
     private shareService: ShareService,
   ) {}
 
-  async getUserTasks(userId: string): Promise<TaskSummary[]> {
+  private async loadAllData(userId: string): Promise<{
+    baselineTasks: Task[];
+    userTasks: Task[];
+    baselineAdditions: Record<string, TaskEntry[]>;
+  }> {
     const [baselineTasks, userTasks, baselineAdditions] = await Promise.all([
       this.mockLoader.loadBaselineTasks(),
       this.storage.loadUserTasks(userId),
       this.storage.loadBaselineTaskAdditions(userId),
     ]);
+    return { baselineTasks, userTasks, baselineAdditions };
+  }
+
+  private findTask(
+    taskId: string,
+    data: { baselineTasks: Task[]; userTasks: Task[]; baselineAdditions: Record<string, TaskEntry[]> },
+  ): { task: Task; isUserTask: boolean } | null {
+    const userTask = data.userTasks.find((t) => t.id === taskId);
+    if (userTask) return { task: userTask, isUserTask: true };
+
+    const baselineTask = data.baselineTasks.find((t) => t.id === taskId);
+    if (baselineTask) {
+      return {
+        task: {
+          ...baselineTask,
+          entries: [
+            ...(baselineTask.entries ?? []),
+            ...(data.baselineAdditions[taskId] ?? []),
+          ],
+        },
+        isUserTask: false,
+      };
+    }
+    return null;
+  }
+
+  async getUserTasks(userId: string): Promise<TaskSummary[]> {
+    const { baselineTasks, userTasks, baselineAdditions } =
+      await this.loadAllData(userId);
 
     const userBaselineTasks = baselineTasks
       .filter((task) => task.userId === userId)
@@ -64,29 +97,9 @@ export class TaskRepository {
   }
 
   async getTask(taskId: string, userId: string): Promise<Task | null> {
-    const [baselineTasks, userTasks, baselineAdditions] = await Promise.all([
-      this.mockLoader.loadBaselineTasks(),
-      this.storage.loadUserTasks(userId),
-      this.storage.loadBaselineTaskAdditions(userId),
-    ]);
-
-    const userTask = userTasks.find((task) => task.id === taskId);
-    if (userTask) {
-      return userTask;
-    }
-
-    const baselineTask = baselineTasks.find((task) => task.id === taskId);
-    if (baselineTask) {
-      return {
-        ...baselineTask,
-        entries: [
-          ...(baselineTask.entries ?? []),
-          ...(baselineAdditions[taskId] ?? []),
-        ],
-      };
-    }
-
-    return null;
+    const data = await this.loadAllData(userId);
+    const found = this.findTask(taskId, data);
+    return found?.task ?? null;
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
@@ -224,13 +237,12 @@ export class TaskRepository {
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
     mode: "append" | "replace" = "append",
   ): Promise<TaskEntry[]> {
-    const task = await this.getTask(taskId, userId);
-    if (!task) {
+    const data = await this.loadAllData(userId);
+    const found = this.findTask(taskId, data);
+    if (!found) {
       throw new Error("Task not found");
     }
-
-    const userTasks = await this.storage.loadUserTasks(userId);
-    const isUserTask = userTasks.some((t) => t.id === taskId);
+    const { task, isUserTask } = found;
 
     const isReplace = mode === "replace";
     const currentEntries = task.entries ?? [];
@@ -288,10 +300,12 @@ export class TaskRepository {
     entryId: string,
     updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>,
   ): Promise<TaskEntry | null> {
-    const task = await this.getTask(taskId, userId);
-    if (!task) {
+    const data = await this.loadAllData(userId);
+    const found = this.findTask(taskId, data);
+    if (!found) {
       throw new Error("Task not found");
     }
+    const { task, isUserTask } = found;
 
     const entryIndex = task.entries?.findIndex((entry) => entry.id === entryId);
     if (entryIndex === undefined || entryIndex === -1) {
@@ -308,14 +322,10 @@ export class TaskRepository {
     const updatedEntries = [...(task.entries ?? [])];
     updatedEntries[entryIndex] = updatedEntry;
 
-    const userTasks = await this.storage.loadUserTasks(userId);
-    const isUserTask = userTasks.some((t) => t.id === taskId);
-
     if (isUserTask) {
       await this.updateTask(userId, taskId, { entries: updatedEntries });
     } else {
-      const baselineTasks = await this.mockLoader.loadBaselineTasks();
-      const baselineTask = baselineTasks.find((task) => task.id === taskId);
+      const baselineTask = data.baselineTasks.find((t) => t.id === taskId);
 
       if (baselineTask) {
         const baselineAdditions =

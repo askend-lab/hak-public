@@ -44,6 +44,22 @@ export default defineConfig({
     }),
   },
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      onwarn(warning, defaultHandler) {
+        if (warning.message.includes("sourcemap for reporting an error")) return;
+        defaultHandler(warning);
+      },
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+          query: ["@tanstack/react-query"],
+          vendor: ["zod", "zustand", "jszip", "@dnd-kit/core", "@dnd-kit/sortable", "@dnd-kit/utilities"],
+          sentry: ["@sentry/react"],
+        },
+      },
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: {

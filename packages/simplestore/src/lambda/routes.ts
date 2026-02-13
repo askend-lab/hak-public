@@ -6,6 +6,7 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { CORS_HEADERS, HTTP_STATUS } from "@hak/shared";
 
 import {
   Store,
@@ -18,14 +19,7 @@ import {
   ERRORS,
 } from "../core";
 
-export const HTTP_STATUS = {
-  OK: 200,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  INTERNAL_ERROR: 500,
-} as const;
+export { HTTP_STATUS };
 
 export const HTTP_ERRORS = {
   UNAUTHORIZED: "Authentication required. Provide a valid token or use a public-readable endpoint.",
@@ -33,11 +27,6 @@ export const HTTP_ERRORS = {
   INTERNAL: "Internal server error",
   INVALID_JSON: "Invalid JSON body",
   PRIVATE_NOT_ALLOWED: "private type not allowed on /get-public endpoint",
-} as const;
-
-const RESPONSE_HEADERS = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
 } as const;
 
 const DEBUG_ERROR_MESSAGE = "Intentional test error for monitoring";
@@ -53,7 +42,7 @@ export function createResponse(
 ): APIGatewayProxyResult {
   return {
     statusCode,
-    headers: RESPONSE_HEADERS,
+    headers: { ...CORS_HEADERS },
     body: JSON.stringify(body),
   };
 }
@@ -181,12 +170,12 @@ export async function handleQuery(
   const result = await store.query(prefix as string, type as DataType);
   return result.success
     ? createResponse(HTTP_STATUS.OK, { items: result.items })
-    : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_ERROR);
+    : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
 }
 
 export function handleDebugError(): APIGatewayProxyResult {
   console.error("[DEBUG] Intentional 500 error triggered for monitoring test");
-  return createResponse(HTTP_STATUS.INTERNAL_ERROR, {
+  return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: DEBUG_ERROR_MESSAGE,
     timestamp: new Date().toISOString(),
   });

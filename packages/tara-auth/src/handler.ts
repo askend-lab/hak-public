@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse } from '@hak/shared';
 import { createTaraClient } from './tara-client';
 import { createCognitoClient } from './cognito-client';
 import { AuthState } from './types';
@@ -79,11 +80,11 @@ export async function startHandler(
     };
   } catch (error) {
     console.error('TARA start error:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Failed to start TARA authentication' }),
-    };
+    return createLambdaResponse(
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      { error: 'Failed to start TARA authentication' },
+      { ...CORS_HEADERS },
+    );
   }
 }
 

@@ -61,8 +61,4 @@ export interface VmetajsonResponse {
   };
 }
 
-export interface LambdaResponse {
-  statusCode: number;
-  body: string;
-  headers: Record<string, string>;
-}
+export type { LambdaResponse } from "@hak/shared";

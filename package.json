@@ -29,9 +29,19 @@
     "start": "pnpm run kill-ports && pnpm run start:frontend"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "aws-sdk",
+      "core-js",
+      "esbuild",
+      "es5-ext",
+      "protobufjs",
+      "serverless",
+      "unrs-resolver"
+    ],
     "overrides": {
       "braces": ">=3.0.3",
       "tar": ">=7.5.7",

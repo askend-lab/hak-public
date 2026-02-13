@@ -8,7 +8,7 @@ import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 
 const WCAG_AA_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
-const BASE_URL = process.env.BASE_URL || "http://localhost:5180";
+const BASE_URL = process.env.BASE_URL || "http://localhost:5181";
 
 async function runAudit() {
   const browser = await chromium.launch();

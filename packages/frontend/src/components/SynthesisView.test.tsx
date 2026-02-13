@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SynthesisView from "./SynthesisView";
 import { SentenceState } from "@/types/synthesis";
+import type { SynthesisPageContextValue } from "@/contexts/SynthesisPageContext";
 
 interface MockHeaderProps { onPlayAllClick: () => void }
 interface MockItemProps {
@@ -18,6 +19,12 @@ interface MockItemProps {
   tagMenuItems?: { label: string; onClick: (id: string, idx: number, word: string) => void }[];
 }
 interface MockMenuProps { sentenceId: string; onClose: () => void }
+
+let mockContextValue: SynthesisPageContextValue;
+
+vi.mock("@/contexts/SynthesisPageContext", () => ({
+  useSynthesisPage: () => mockContextValue,
+}));
 
 vi.mock("./SynthesisPageHeader", () => ({
   default: ({ onPlayAllClick }: MockHeaderProps) => (
@@ -80,170 +87,173 @@ const makeSentence = (id: string, text: string): SentenceState => ({
   stressedTags: null,
 });
 
-const baseProps = {
-  sentences: [makeSentence("s1", "hello world"), makeSentence("s2", "foo bar")],
-  isPlayingAll: false,
-  isLoadingPlayAll: false,
-  openTagMenu: null,
-  editingTag: null,
-  draggedId: null,
-  dragOverId: null,
-  isAuthenticated: true,
-  menuOpenId: null,
-  menuAnchorEl: {} as Record<string, HTMLElement | null>,
-  menuSearchQuery: "",
-  isLoadingMenuTasks: false,
-  menuTasks: [],
-  showAddToTaskDropdown: false,
-  variantsSelectedSentenceId: null,
-  variantsSelectedTagIndex: null,
-  sentencePhoneticId: null,
-  isVariantsPanelOpen: false,
-  showSentencePhoneticPanel: false,
-  loadingVariantsTag: null,
-  onAddAllClick: vi.fn(),
-  onPlayAllClick: vi.fn(),
-  onDropdownClose: vi.fn(),
-  onSelectTask: vi.fn(),
-  onCreateNew: vi.fn(),
-  onPlay: vi.fn(),
-  onDragStart: vi.fn(),
-  onDragEnd: vi.fn(),
-  onDragOver: vi.fn(),
-  onDragLeave: vi.fn(),
-  onDrop: vi.fn(),
-  onTagMenuOpen: vi.fn(),
-  onTagMenuClose: vi.fn(),
-  onOpenVariantsFromMenu: vi.fn(),
-  onEditTag: vi.fn(),
-  onDeleteTag: vi.fn(),
-  onEditTagChange: vi.fn(),
-  onEditTagKeyDown: vi.fn(),
-  onEditTagCommit: vi.fn(),
-  onInputChange: vi.fn(),
-  onInputKeyDown: vi.fn(),
-  onInputBlur: vi.fn(),
-  onClearSentence: vi.fn(),
-  onMenuOpen: vi.fn(),
-  onMenuClose: vi.fn(),
-  onMenuSearchChange: vi.fn(),
-  onAddToTask: vi.fn(),
-  onCreateNewTask: vi.fn(),
-  onExplorePhonetic: vi.fn(),
-  onDownload: vi.fn(),
-  onCopyText: vi.fn(),
-  onRemoveSentence: vi.fn(),
-  onLogin: vi.fn(),
-  onAddSentence: vi.fn(),
-};
+function createMockContext(
+  overrides?: Partial<SynthesisPageContextValue>,
+): SynthesisPageContextValue {
+  return {
+    synthesis: {
+      sentences: [makeSentence("s1", "hello world"), makeSentence("s2", "foo bar")],
+      isPlayingAll: false,
+      isLoadingPlayAll: false,
+      openTagMenu: null,
+      editingTag: null,
+      setSentences: vi.fn(),
+      setOpenTagMenu: vi.fn(),
+      handlePlay: vi.fn(),
+      handlePlayAll: vi.fn(),
+      handleTextChange: vi.fn(),
+      handleKeyDown: vi.fn(),
+      handleInputBlur: vi.fn(),
+      handleClearSentence: vi.fn(),
+      handleAddSentence: vi.fn(),
+      handleRemoveSentence: vi.fn(),
+      handleDownload: vi.fn(),
+      handleCopyText: vi.fn(),
+      handleUseVariant: vi.fn(),
+      handleEditTag: vi.fn(),
+      handleDeleteTag: vi.fn(),
+      handleEditTagChange: vi.fn(),
+      handleEditTagKeyDown: vi.fn(),
+      handleEditTagCommit: vi.fn(),
+      handleSentencePhoneticApply: vi.fn(),
+      setDemoSentences: vi.fn(),
+    } as unknown as SynthesisPageContextValue["synthesis"],
+    taskHandlers: {
+      showAddToTaskDropdown: false,
+      setShowAddToTaskDropdown: vi.fn(),
+      handleAddAllSentencesToTask: vi.fn(),
+      handleSelectTaskFromDropdown: vi.fn(),
+      handleCreateNewFromDropdown: vi.fn(),
+      handleAddSentenceToExistingTask: vi.fn(),
+      handleCreateNewTaskFromMenu: vi.fn(),
+    } as unknown as SynthesisPageContextValue["taskHandlers"],
+    dragDrop: {
+      draggedId: null,
+      dragOverId: null,
+      handleDragStart: vi.fn(),
+      handleDragEnd: vi.fn(),
+      handleDragOver: vi.fn(),
+      handleDragLeave: vi.fn(),
+      handleDrop: vi.fn(),
+    } as unknown as SynthesisPageContextValue["dragDrop"],
+    variants: {
+      selectedSentenceId: null,
+      selectedTagIndex: null,
+      sentencePhoneticId: null,
+      isVariantsPanelOpen: false,
+      showSentencePhoneticPanel: false,
+      loadingVariantsTag: null,
+      handleOpenVariantsFromMenu: vi.fn(),
+      handleExplorePhonetic: vi.fn(),
+    } as unknown as SynthesisPageContextValue["variants"],
+    menu: {
+      openMenuId: null,
+      menuAnchorEl: {} as Record<string, HTMLElement | null>,
+      menuSearchQuery: "",
+      isLoadingMenuTasks: false,
+      menuTasks: [],
+      handleMenuOpen: vi.fn(),
+      handleMenuClose: vi.fn(),
+      setMenuSearchQuery: vi.fn(),
+    } as unknown as SynthesisPageContextValue["menu"],
+    isAuthenticated: true,
+    onLogin: vi.fn(),
+    handleUseVariant: vi.fn(),
+    handleTagMenuOpen: vi.fn(),
+    handleTagMenuClose: vi.fn(),
+    ...overrides,
+  };
+}
 
 describe("SynthesisView", () => {
+  beforeEach(() => {
+    mockContextValue = createMockContext();
+  });
+
   it("renders header and sentence items", () => {
-    render(<SynthesisView {...baseProps} />);
+    render(<SynthesisView />);
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(screen.getByTestId("item-s1")).toBeInTheDocument();
     expect(screen.getByTestId("item-s2")).toBeInTheDocument();
   });
 
   it("renders add sentence button", () => {
-    render(<SynthesisView {...baseProps} />);
+    render(<SynthesisView />);
     expect(screen.getByText("Lisa lause")).toBeInTheDocument();
   });
 
-  it("calls onAddSentence when add button clicked", () => {
-    const onAddSentence = vi.fn();
-    render(<SynthesisView {...baseProps} onAddSentence={onAddSentence} />);
+  it("calls handleAddSentence when add button clicked", () => {
+    render(<SynthesisView />);
     fireEvent.click(screen.getByText("Lisa lause"));
-    expect(onAddSentence).toHaveBeenCalled();
+    expect(mockContextValue.synthesis.handleAddSentence).toHaveBeenCalled();
   });
 
-  it("calls onPlay when play button clicked", () => {
-    const onPlay = vi.fn();
-    render(<SynthesisView {...baseProps} onPlay={onPlay} />);
+  it("calls handlePlay when play button clicked", () => {
+    render(<SynthesisView />);
     fireEvent.click(screen.getByText("Play s1"));
-    expect(onPlay).toHaveBeenCalledWith("s1");
+    expect(mockContextValue.synthesis.handlePlay).toHaveBeenCalledWith("s1");
   });
 
-  it("calls onClearSentence when clear clicked", () => {
-    const onClearSentence = vi.fn();
-    render(<SynthesisView {...baseProps} onClearSentence={onClearSentence} />);
+  it("calls handleClearSentence when clear clicked", () => {
+    render(<SynthesisView />);
     fireEvent.click(screen.getByText("Clear s1"));
-    expect(onClearSentence).toHaveBeenCalledWith("s1");
+    expect(mockContextValue.synthesis.handleClearSentence).toHaveBeenCalledWith("s1");
   });
 
-  it("renders menu content when menuOpenId matches and anchorEl exists", () => {
+  it("renders menu content when openMenuId matches and anchorEl exists", () => {
     const el = document.createElement("div");
-    render(
-      <SynthesisView
-        {...baseProps}
-        menuOpenId="s1"
-        menuAnchorEl={{ s1: el }}
-      />,
-    );
+    mockContextValue = createMockContext({
+      menu: {
+        ...createMockContext().menu,
+        openMenuId: "s1",
+        menuAnchorEl: { s1: el },
+      } as SynthesisPageContextValue["menu"],
+    });
+    render(<SynthesisView />);
     expect(screen.getByTestId("menu-s1")).toBeInTheDocument();
   });
 
-  it("does not render menu when menuOpenId does not match", () => {
-    render(<SynthesisView {...baseProps} menuOpenId="s3" />);
+  it("does not render menu when openMenuId does not match", () => {
+    mockContextValue = createMockContext({
+      menu: {
+        ...createMockContext().menu,
+        openMenuId: "s3",
+      } as SynthesisPageContextValue["menu"],
+    });
+    render(<SynthesisView />);
     expect(screen.queryByTestId("menu-s1")).not.toBeInTheDocument();
   });
 
-  it("renders tag menu items with correct callbacks", () => {
-    const onOpenVariantsFromMenu = vi.fn();
-    const onEditTag = vi.fn();
-    const onDeleteTag = vi.fn();
-    // We need to render with openTagMenu set to trigger tag menu rendering
-    render(
-      <SynthesisView
-        {...baseProps}
-        onOpenVariantsFromMenu={onOpenVariantsFromMenu}
-        onEditTag={onEditTag}
-        onDeleteTag={onDeleteTag}
-      />,
-    );
-    // The tag menu items are passed to SentenceSynthesisItem as props
-    // They get exercised when the component renders
+  it("renders tag menu items", () => {
+    render(<SynthesisView />);
     expect(screen.getByTestId("item-s1")).toBeInTheDocument();
   });
 
-  it("calls onPlayAllClick from header", () => {
-    const onPlayAllClick = vi.fn();
-    render(<SynthesisView {...baseProps} onPlayAllClick={onPlayAllClick} />);
+  it("calls handlePlayAll from header", () => {
+    render(<SynthesisView />);
     fireEvent.click(screen.getByText("Play All"));
-    expect(onPlayAllClick).toHaveBeenCalled();
+    expect(mockContextValue.synthesis.handlePlayAll).toHaveBeenCalled();
   });
 
-  it("calls onInputKeyDown wrapper with sentence id", () => {
-    const onInputKeyDown = vi.fn();
-    render(<SynthesisView {...baseProps} onInputKeyDown={onInputKeyDown} />);
+  it("calls handleKeyDown wrapper with sentence id", () => {
+    render(<SynthesisView />);
     fireEvent.click(screen.getByText("KeyDown s1"));
-    expect(onInputKeyDown).toHaveBeenCalledWith({ key: "Enter" }, "s1");
+    expect(mockContextValue.synthesis.handleKeyDown).toHaveBeenCalledWith({ key: "Enter" }, "s1");
   });
 
-  it("calls onInputBlur wrapper with sentence id", () => {
-    const onInputBlur = vi.fn();
-    render(<SynthesisView {...baseProps} onInputBlur={onInputBlur} />);
+  it("calls handleInputBlur wrapper with sentence id", () => {
+    render(<SynthesisView />);
     fireEvent.click(screen.getByText("Blur s1"));
-    expect(onInputBlur).toHaveBeenCalledWith("s1");
+    expect(mockContextValue.synthesis.handleInputBlur).toHaveBeenCalledWith("s1");
   });
 
   it("tag menu items invoke correct callbacks", () => {
-    const onOpenVariantsFromMenu = vi.fn();
-    const onEditTag = vi.fn();
-    const onDeleteTag = vi.fn();
-    render(
-      <SynthesisView
-        {...baseProps}
-        onOpenVariantsFromMenu={onOpenVariantsFromMenu}
-        onEditTag={onEditTag}
-        onDeleteTag={onDeleteTag}
-      />,
-    );
+    render(<SynthesisView />);
     fireEvent.click(screen.getAllByText("TagMenu-Vali sõna häälduskuju")[0]!);
-    expect(onOpenVariantsFromMenu).toHaveBeenCalledWith("s1", 0, "word");
+    expect(mockContextValue.variants.handleOpenVariantsFromMenu).toHaveBeenCalledWith("s1", 0, "word");
     fireEvent.click(screen.getAllByText("TagMenu-Muuda sõna kirjakuju")[0]!);
-    expect(onEditTag).toHaveBeenCalledWith("s1", 0);
+    expect(mockContextValue.synthesis.handleEditTag).toHaveBeenCalledWith("s1", 0);
     fireEvent.click(screen.getAllByText("TagMenu-Kustuta sõna")[0]!);
-    expect(onDeleteTag).toHaveBeenCalledWith("s1", 0);
+    expect(mockContextValue.synthesis.handleDeleteTag).toHaveBeenCalledWith("s1", 0);
   });
 });
