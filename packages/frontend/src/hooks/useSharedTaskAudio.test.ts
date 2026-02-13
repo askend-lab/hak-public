@@ -6,7 +6,7 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { useSharedTaskAudio } from "./useSharedTaskAudio";
 import { TaskEntry } from "@/types/task";
 
-vi.mock("@/utils/synthesize", () => ({
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 

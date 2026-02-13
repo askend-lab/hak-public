@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAudioPlayback } from "./useAudioPlayback";
 
-vi.mock("@/utils/synthesize", () => ({
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("blob:audio-url"),
 }));
 
@@ -100,7 +100,7 @@ describe("getVoiceModel logic", () => {
     await act(async () => {
       result.current.handlePlayEntry("1");
     });
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
     expect(synthesizeWithPolling).toHaveBeenCalledWith("word", "efm_s");
   });
 
@@ -110,7 +110,7 @@ describe("getVoiceModel logic", () => {
     await act(async () => {
       result.current.handlePlayEntry("1");
     });
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
     expect(synthesizeWithPolling).toHaveBeenCalledWith("hello world", "efm_l");
   });
 });
@@ -160,7 +160,7 @@ describe("useAudioPlayback with existing audio", () => {
     await act(async () => {
       result.current.handlePlayEntry("1");
     });
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
     expect(synthesizeWithPolling).toHaveBeenCalledWith("test", "efm_s");
   });
 
@@ -202,7 +202,7 @@ describe("useAudioPlayback with existing audio", () => {
   });
 
   it("handlePlayAll with synthesis failure in playSingleEntry", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
     (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValue(
       new Error("synth error"),
     );
@@ -216,7 +216,7 @@ describe("useAudioPlayback with existing audio", () => {
   });
 
   it("synthesizeAndPlay handles synthesis error", async () => {
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
     (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("fail"),
     );
@@ -235,7 +235,7 @@ describe("useAudioPlayback with existing audio", () => {
     await act(async () => {
       result.current.handlePlayEntry("1");
     });
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
     expect(synthesizeWithPolling).toHaveBeenCalled();
   });
 
@@ -316,7 +316,7 @@ describe("useAudioPlayback with existing audio", () => {
     const entries = [mockEntry("1", "test", "")];
     const { result } = renderHook(() => useAudioPlayback(entries));
     await act(async () => { result.current.handlePlayEntry("1"); });
-    const { synthesizeWithPolling } = await import("@/utils/synthesize");
+    const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
     expect(synthesizeWithPolling).toHaveBeenCalled();
   });
 });

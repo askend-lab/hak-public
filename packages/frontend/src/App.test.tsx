@@ -46,7 +46,7 @@ vi.mock("./hooks", async (importOriginal) => {
 vi.mock("./components/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
 }));
-vi.mock("./components/PronunciationVariants", () => ({ default: () => null }));
+vi.mock("./features/synthesis/components/PronunciationVariants", () => ({ default: () => null }));
 vi.mock("./features/tasks/components/TaskManager", () => ({
   default: () => <div data-testid="task-manager">TaskManager</div>,
 }));
@@ -67,8 +67,8 @@ vi.mock("./components/UserProfile", () => ({
 }));
 vi.mock("./components/ConfirmationModal", () => ({ default: () => null }));
 vi.mock("./features/tasks/components/AddToTaskDropdown", () => ({ default: () => null }));
-vi.mock("./components/SentencePhoneticPanel", () => ({ default: () => null }));
-vi.mock("./components/SentenceSynthesisItem", () => ({
+vi.mock("./features/synthesis/components/SentencePhoneticPanel", () => ({ default: () => null }));
+vi.mock("./features/synthesis/components/SentenceSynthesisItem", () => ({
   default: ({ id }: { id: string }) => (
     <div data-testid={`sentence-item-${id}`}>SentenceItem</div>
   ),

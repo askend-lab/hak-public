@@ -5,21 +5,21 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import AppHeader from "./components/AppHeader";
-import SynthesisView from "./components/SynthesisView";
+import SynthesisView from "./features/synthesis/components/SynthesisView";
 import TasksView from "./features/tasks/components/TasksView";
 import SpecsPage from "./components/SpecsPage";
 import Dashboard from "./components/Dashboard";
 import AccessibilityPage from "./pages/AccessibilityPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AppModals from "./components/AppModals";
-import SynthesisModals from "./components/SynthesisModals";
+import SynthesisModals from "./features/synthesis/components/SynthesisModals";
 import { RoleSelectionContent } from "./features/onboarding/components";
 import { useAuth } from "./features/auth/services";
-import { COPIED_ENTRIES_KEY } from "./hooks/synthesis/useSentenceState";
+import { COPIED_ENTRIES_KEY } from "./features/synthesis/hooks/synthesis/useSentenceState";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./features/onboarding/contexts/OnboardingContext";
 import { PageLoadingState } from "./components/ui/PageLoadingState";
-import { SynthesisPageProvider } from "./contexts/SynthesisPageContext";
+import { SynthesisPageProvider } from "./features/synthesis/contexts/SynthesisPageContext";
 import {
   useSynthesis,
   useTaskHandlers,

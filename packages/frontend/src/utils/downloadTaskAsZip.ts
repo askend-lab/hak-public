@@ -4,7 +4,7 @@
 import JSZip from "jszip";
 import { Task, TaskEntry, hasAudioSource } from "@/types/task";
 import { formatDateTime } from "@/utils/formatDate";
-import { synthesizeAuto } from "@/utils/synthesize";
+import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
 
 function sanitizeFilename(text: string): string {
   return text

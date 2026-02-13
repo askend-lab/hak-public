@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { TaskEntry, hasAudioSource, getEntryPlayUrl } from "@/types/task";
-import { synthesizeWithPolling } from "@/utils/synthesize";
+import { synthesizeWithPolling } from "@/features/synthesis/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
 
 interface UseAudioPlaybackReturn {

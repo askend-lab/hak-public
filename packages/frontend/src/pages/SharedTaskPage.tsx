@@ -8,11 +8,11 @@ import { Task } from "@/types/task";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useSharedTaskAudio } from "@/hooks/useSharedTaskAudio";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { COPIED_ENTRIES_KEY } from "@/hooks/synthesis/useSentenceState";
+import { COPIED_ENTRIES_KEY } from "@/features/synthesis/hooks/synthesis/useSentenceState";
 import { logger } from "@hak/shared";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
-import SentenceSynthesisItem from "@/components/SentenceSynthesisItem";
+import SentenceSynthesisItem from "@/features/synthesis/components/SentenceSynthesisItem";
 import { PlayAllButton } from "@/components/ui/PlayAllButton";
 import { PageLoadingState } from "@/components/ui/PageLoadingState";
 

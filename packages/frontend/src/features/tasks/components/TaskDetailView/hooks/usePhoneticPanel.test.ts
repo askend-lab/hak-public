@@ -17,7 +17,7 @@ vi.mock("@/services/dataService", () => ({
   },
 }));
 
-vi.mock("@/utils/phoneticMarkers", () => ({
+vi.mock("@/features/synthesis/utils/phoneticMarkers", () => ({
   stripPhoneticMarkers: (text: string): string => text.replace(/[`~^]/g, ""),
 }));
 
