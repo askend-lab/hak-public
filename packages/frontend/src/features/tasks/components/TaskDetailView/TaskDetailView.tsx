@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { getErrorMessage } from "@/utils/getErrorMessage";
@@ -82,10 +80,10 @@ export default function TaskDetailView({
     setIsDownloading(true);
     try {
       await downloadTaskAsZip({ ...task, entries });
-      showNotification("success", "ZIP-fail allalaaditud!", undefined, undefined, "success");
+      showNotification({ type: "success", message: "ZIP-fail allalaaditud!", color: "success" });
     } catch (err) {
       logger.error("ZIP download failed:", err);
-      showNotification("error", "Viga ZIP-faili loomisel");
+      showNotification({ type: "error", message: "Viga ZIP-faili loomisel" });
     } finally {
       setIsDownloading(false);
     }
@@ -95,7 +93,7 @@ export default function TaskDetailView({
     if (!entries || entries.length === 0) return;
 
     sessionStorage.setItem("copiedEntries", JSON.stringify(entries));
-    showNotification("success", "Laused kopeeritud!");
+    showNotification({ type: "success", message: "Laused kopeeritud!" });
     onNavigateToSynthesis();
   }, [entries, showNotification, onNavigateToSynthesis]);
 
@@ -148,18 +146,16 @@ export default function TaskDetailView({
         entries: updatedEntries,
       });
       if (entryToDelete) {
-        showNotification(
-          "success",
-          "Lause kustutatud",
-          undefined,
-          undefined,
-          "success",
-        );
+        showNotification({
+          type: "success",
+          message: "Lause kustutatud",
+          color: "success",
+        });
       }
     } catch (_err) {
       // Revert on error
       setEntries(entries);
-      showNotification("error", "Viga lause kustutamisel");
+      showNotification({ type: "error", message: "Viga lause kustutamisel" });
     }
   };
 

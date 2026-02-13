@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { SentenceState, convertTextToTags, stripPunctuationForLookup } from "@/types/synthesis";
-import { NotificationType } from "@/components/Notification";
+import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 import { analyzeText, postJSON, VARIANTS_API_PATH } from "@/features/synthesis/utils/analyzeApi";
 import { VARIANTS_STRINGS } from "@/constants/ui-strings";
 
@@ -30,11 +30,7 @@ interface UseVariantsPanelReturn {
 export function useVariantsPanel(
   sentences: SentenceState[],
   setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>,
-  showNotification?: (
-    type: NotificationType,
-    message: string,
-    description?: string,
-  ) => void,
+  showNotification?: (options: ShowNotificationOptions) => void,
 ): UseVariantsPanelReturn {
   const [variantsWord, setVariantsWord] = useState<string | null>(null);
   const [variantsCustomPhonetic, setVariantsCustomPhonetic] = useState<
@@ -133,11 +129,11 @@ export function useVariantsPanel(
         const data = await response.json();
 
         if (!data.variants?.length) {
-          showNotification?.(
-            "warning",
-            VARIANTS_STRINGS.NOT_FOUND,
-            VARIANTS_STRINGS.NOT_FOUND_DESC,
-          );
+          showNotification?.({
+            type: "warning",
+            message: VARIANTS_STRINGS.NOT_FOUND,
+            description: VARIANTS_STRINGS.NOT_FOUND_DESC,
+          });
           return;
         }
 
@@ -147,17 +143,17 @@ export function useVariantsPanel(
         // Ensure minimum display time even on error
         await minDisplayTime;
         if (error instanceof Error && error.name === "AbortError") {
-          showNotification?.(
-            "error",
-            VARIANTS_STRINGS.TIMEOUT,
-            VARIANTS_STRINGS.TIMEOUT_DESC,
-          );
+          showNotification?.({
+            type: "error",
+            message: VARIANTS_STRINGS.TIMEOUT,
+            description: VARIANTS_STRINGS.TIMEOUT_DESC,
+          });
         } else {
-          showNotification?.(
-            "error",
-            VARIANTS_STRINGS.LOAD_FAILED,
-            VARIANTS_STRINGS.NOT_FOUND_DESC,
-          );
+          showNotification?.({
+            type: "error",
+            message: VARIANTS_STRINGS.LOAD_FAILED,
+            description: VARIANTS_STRINGS.NOT_FOUND_DESC,
+          });
         }
       } finally {
         setLoadingVariantsTag(null);

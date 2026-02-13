@@ -239,13 +239,11 @@ describe("TaskDetailView", () => {
 
     await user.click(screen.getAllByText("Kustuta")[0]!);
     await waitFor(() => expect(mockUpdateTask).toHaveBeenCalled());
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "success",
-      expect.any(String),
-      undefined,
-      undefined,
-      "success",
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "success",
+      message: expect.any(String),
+      color: "success",
+    });
   });
 
   it("handleDeleteEntry reverts on error", async () => {
@@ -258,10 +256,10 @@ describe("TaskDetailView", () => {
 
     await user.click(screen.getAllByText("Kustuta")[0]!);
     await waitFor(() =>
-      expect(mockShowNotification).toHaveBeenCalledWith(
-        "error",
-        expect.any(String),
-      ),
+      expect(mockShowNotification).toHaveBeenCalledWith({
+        type: "error",
+        message: expect.any(String),
+      }),
     );
   });
 

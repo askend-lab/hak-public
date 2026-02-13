@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import type { NotificationType, NotificationColor } from "@/components/Notification";
+import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 import { logger } from "@hak/shared";
 
 /**
@@ -10,25 +10,17 @@ import { logger } from "@hak/shared";
  */
 export async function copyTextToClipboard(
   text: string,
-  showNotification: (
-    type: NotificationType,
-    message: string,
-    description?: string,
-    duration?: number,
-    color?: NotificationColor,
-  ) => void,
+  showNotification: (options: ShowNotificationOptions) => void,
 ): Promise<void> {
   try {
     await navigator.clipboard.writeText(text);
-    showNotification(
-      "success",
-      "Tekst kopeeritud!",
-      undefined,
-      undefined,
-      "success",
-    );
+    showNotification({
+      type: "success",
+      message: "Tekst kopeeritud!",
+      color: "success",
+    });
   } catch (error) {
     logger.error("Failed to copy text:", error);
-    showNotification("error", "Viga teksti kopeerimisel");
+    showNotification({ type: "error", message: "Viga teksti kopeerimisel" });
   }
 }

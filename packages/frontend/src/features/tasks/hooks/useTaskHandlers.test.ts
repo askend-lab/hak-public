@@ -124,14 +124,12 @@ describe("useTaskHandlers", () => {
       expect.any(Array),
       "append",
     );
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "success",
-      expect.any(String),
-      expect.any(String),
-      undefined,
-      undefined,
-      expect.any(Object),
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "success",
+      message: expect.any(String),
+      description: expect.any(String),
+      action: expect.any(Object),
+    });
   });
 
   it("should open add task modal from dropdown", () => {
@@ -278,10 +276,10 @@ describe("useTaskHandlers", () => {
       await result.current.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
     });
 
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "error",
-      expect.any(String),
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "error",
+      message: expect.any(String),
+    });
     consoleSpy.mockRestore();
   });
 
@@ -333,10 +331,10 @@ describe("useTaskHandlers", () => {
     await act(async () => {
       await result.current.handleTaskUpdated(updatedTask);
     });
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "error",
-      expect.any(String),
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "error",
+      message: expect.any(String),
+    });
     consoleSpy.mockRestore();
   });
 
@@ -454,10 +452,10 @@ describe("useTaskHandlers edge cases", () => {
         "Task 1",
       );
     });
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "error",
-      expect.any(String),
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "error",
+      message: expect.any(String),
+    });
   });
 
   // Bug #2: Creating task from Tasks view (handleCreateTask) should NOT include synthesis sentences
