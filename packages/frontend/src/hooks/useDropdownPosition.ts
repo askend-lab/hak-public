@@ -1,79 +1,134 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 
-interface UseDropdownPositionOptions {
-  isOpen: boolean;
-  anchorEl?: HTMLElement | null;
-  contentDeps?: unknown[];
+const MENU_GAP = 4; // px gap between anchor and menu
+const VIEWPORT_PADDING = 8; // px minimum distance from viewport edges
+
+interface DropdownPosition {
+  top: number;
+  left: number;
 }
 
-interface UseDropdownPositionResult {
-  anchorRef: React.RefObject<HTMLButtonElement | null>;
-  menuRef: React.RefObject<HTMLDivElement | null>;
-  menuStyle: React.CSSProperties;
+interface UseDropdownPositionOptions {
+  /** Whether the dropdown is currently open */
+  isOpen: boolean;
+  /** Alignment of the dropdown relative to the anchor. Default: 'right' */
+  alignment?: "right" | "left";
+  /** Dependencies that may change the menu size (e.g. loading state, item count) */
+  contentDeps?: unknown[];
+  /** External anchor element (alternative to using the returned anchorRef) */
+  anchorEl?: HTMLElement | null;
 }
 
 /**
- * Positions a dropdown menu relative to its anchor element,
- * ensuring it stays within the viewport.
+ * Hook for viewport-aware dropdown positioning.
+ * Returns refs for anchor and menu elements, plus calculated position.
+ *
+ * The dropdown is positioned with `position: fixed` relative to the viewport.
+ * It prefers opening below the anchor, but flips above when there isn't enough
+ * room below. Left/right edges are also clamped to stay within the viewport.
+ *
+ * Listens to scroll and resize events to keep position updated.
  */
 export function useDropdownPosition({
   isOpen,
+  alignment = "right",
+  contentDeps = [],
   anchorEl,
-}: UseDropdownPositionOptions): UseDropdownPositionResult {
-  const anchorRef = useRef<HTMLButtonElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
+}: UseDropdownPositionOptions) {
+  const anchorRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<DropdownPosition | null>(null);
 
-  const updatePosition = useCallback(() => {
-    const anchor = anchorEl ?? anchorRef.current;
-    const menu = menuRef.current;
-    if (!anchor || !menu || !isOpen) {
-      setMenuStyle({});
-      return;
-    }
+  // Use external anchorEl if provided, otherwise use the ref
+  const getAnchorElement = useCallback(
+    () => anchorEl ?? anchorRef.current,
+    [anchorEl],
+  );
 
+  const recalcPosition = useCallback(() => {
+    const anchor = getAnchorElement();
+    if (!anchor || !menuRef.current) return;
     const anchorRect = anchor.getBoundingClientRect();
-    const menuRect = menu.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
+    const menuRect = menuRef.current.getBoundingClientRect();
+    const menuHeight = menuRect.height;
+    const menuWidth = menuRect.width;
+    const vh = window.innerHeight;
+    const vw = window.innerWidth;
 
-    let top = anchorRect.bottom;
-    let left = anchorRect.left;
+    // Preferred: below the anchor
+    let top = anchorRect.bottom + MENU_GAP;
 
-    // Flip up if overflowing bottom
-    if (top + menuRect.height > viewportHeight) {
-      top = anchorRect.top - menuRect.height;
+    // Horizontal alignment
+    let left =
+      alignment === "right"
+        ? anchorRect.right - menuWidth // align right edges
+        : anchorRect.left; // align left edges
+
+    // If menu overflows bottom, flip above the anchor
+    if (top + menuHeight > vh - VIEWPORT_PADDING) {
+      const aboveTop = anchorRect.top - MENU_GAP - menuHeight;
+      if (aboveTop >= VIEWPORT_PADDING) {
+        top = aboveTop;
+      } else {
+        // Not enough room above either - clamp to viewport bottom
+        top = Math.max(VIEWPORT_PADDING, vh - menuHeight - VIEWPORT_PADDING);
+      }
     }
 
-    // Shift left if overflowing right
-    if (left + menuRect.width > viewportWidth) {
-      left = viewportWidth - menuRect.width - 8;
+    // Ensure left/right stay within viewport
+    left = Math.max(VIEWPORT_PADDING, left);
+    if (left + menuWidth > vw - VIEWPORT_PADDING) {
+      left = vw - menuWidth - VIEWPORT_PADDING;
     }
 
-    // Clamp
-    top = Math.max(4, top);
-    left = Math.max(4, left);
+    setPosition({ top, left });
+  }, [alignment, getAnchorElement]);
 
-    setMenuStyle({
-      position: "fixed",
-      top: `${top}px`,
-      left: `${left}px`,
-    });
-  }, [isOpen, anchorEl]);
+  // Set initial position from anchor (before menu is measured)
+  useLayoutEffect(() => {
+    const anchor = getAnchorElement();
+    if (isOpen && anchor) {
+      const rect = anchor.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + MENU_GAP,
+        left:
+          alignment === "right"
+            ? Math.max(VIEWPORT_PADDING, rect.right - 250)
+            : Math.max(VIEWPORT_PADDING, rect.left),
+      });
+    } else if (!isOpen) {
+      setPosition(null);
+    }
+  }, [isOpen, alignment, getAnchorElement]);
 
+  // Adjust position after menu renders and when content changes
   useEffect(() => {
     if (!isOpen) return;
-    updatePosition();
-    window.addEventListener("scroll", updatePosition, true);
-    window.addEventListener("resize", updatePosition);
-    return () => {
-      window.removeEventListener("scroll", updatePosition, true);
-      window.removeEventListener("resize", updatePosition);
-    };
-  }, [isOpen, updatePosition]);
+    recalcPosition();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, recalcPosition, ...contentDeps]);
 
-  return { anchorRef, menuRef, menuStyle };
+  // Keep position updated on scroll/resize
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleUpdate = (): void => recalcPosition();
+    window.addEventListener("scroll", handleUpdate, true);
+    window.addEventListener("resize", handleUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", handleUpdate, true);
+      window.removeEventListener("resize", handleUpdate);
+    };
+  }, [isOpen, recalcPosition]);
+
+  return {
+    anchorRef,
+    menuRef,
+    position,
+    menuStyle: position ? { top: position.top, left: position.left } : undefined,
+  };
 }

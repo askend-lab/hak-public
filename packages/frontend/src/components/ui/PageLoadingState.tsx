@@ -1,33 +1,29 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+/**
+ * PageLoadingState - Standardized full-page loading indicator
+ * 
+ * Usage:
+ *   <PageLoadingState message="Loading..." />
+ *   <PageLoadingState /> // Uses default message
+ */
+
 interface PageLoadingStateProps {
   message?: string;
-  role?: string;
-  "aria-live"?: "polite" | "assertive" | "off";
 }
 
-/**
- * Full-page loading indicator shown while async data is being fetched.
- */
-export function PageLoadingState({
-  message = "Laadimine…",
-  role = "status",
-  "aria-live": ariaLive = "polite",
+export function PageLoadingState({ 
+  message = "Laadimine..." 
 }: PageLoadingStateProps) {
   return (
-    <main
-      className="page-loading-state"
-      role={role}
-      aria-live={ariaLive}
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "60vh",
-      }}
+    <div 
+      className="page-loading-state" 
+      role="status" 
+      aria-live="polite"
     >
-      <p>{message}</p>
-    </main>
+      <div className="page-loading-state__spinner" aria-hidden="true" />
+      <p className="page-loading-state__message">{message}</p>
+    </div>
   );
 }
