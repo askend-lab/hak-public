@@ -272,6 +272,10 @@ if [[ -f docs/adr/003-tdd-devbox.md ]]; then
   sed -i 's/DevBox is a custom tool — needs replacement with husky for OSS/Custom internal tool replaced with standard hooks/' docs/adr/003-tdd-devbox.md
   echo "  Cleaned DevBox references in ADR 003"
 fi
+if [[ -f docs/adr/README.md ]]; then
+  sed -i 's/TDD with DevBox hooks/TDD with pre-commit hooks/' docs/adr/README.md
+  echo "  Cleaned DevBox reference in ADR README"
+fi
 
 # --- Clean up merlin-api package.json (remove deploy scripts) ---
 echo ">>> Cleaning merlin-api package.json..."
