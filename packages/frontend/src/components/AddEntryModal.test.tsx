@@ -243,7 +243,7 @@ describe("AddEntryModal", () => {
       });
     });
 
-    it.skip("does not close on error", async () => {
+    it("does not close on error", async () => {
       mockOnAdd.mockRejectedValue(new Error("Failed"));
       const user = userEvent.setup();
       render(
@@ -277,6 +277,9 @@ describe("AddEntryModal", () => {
       // Simulate BaseModal close - would trigger handleClose
     });
 
+    // Covered by TaskEditModal.mutations.test.tsx ("handleClose does not call onClose while submitting").
+    // AddEntryModal uses the same handleClose guard; the test here has a timing issue with
+    // userEvent.type triggering stale closure in BaseModal's onClose ref.
     it.skip("prevents close during submission", async () => {
       mockOnAdd.mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 1000)),

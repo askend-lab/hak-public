@@ -123,7 +123,6 @@ export default function MarkerTooltip({
   const tooltipClassName = `marker-tooltip marker-tooltip--align-${align}`;
 
   return (
-    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
     <div
       ref={wrapperRef}
       className="marker-tooltip-wrapper"
@@ -131,17 +130,19 @@ export default function MarkerTooltip({
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
       onKeyDown={handleKeyDown}
-      role="group"
+      role="toolbar"
+      tabIndex={0}
     >
       {children}
       {isVisible && (
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <div
           className={tooltipClassName}
           role="tooltip"
-          onMouseEnter={handleTooltipMouseEnter}
-          onMouseLeave={handleTooltipMouseLeave}
         >
+          <div
+            onMouseEnter={handleTooltipMouseEnter}
+            onMouseLeave={handleTooltipMouseLeave}
+          >
           <div className="marker-tooltip__arrow" />
           <div className="marker-tooltip__content">
             <div className="marker-tooltip__header">
@@ -156,6 +157,7 @@ export default function MarkerTooltip({
                 </span>
               ))}
             </div>
+          </div>
           </div>
         </div>
       )}
