@@ -1,21 +1,14 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import AppHeader from "./components/AppHeader";
-import SynthesisView from "./features/synthesis/components/SynthesisView";
-import TasksView from "./features/tasks/components/TasksView";
-import SpecsPage from "./components/SpecsPage";
-import Dashboard from "./components/Dashboard";
-import AccessibilityPage from "./pages/AccessibilityPage";
-import PrivacyPage from "./pages/PrivacyPage";
 import AppModals from "./components/AppModals";
 import SynthesisModals from "./features/synthesis/components/SynthesisModals";
 import { RoleSelectionContent } from "./features/onboarding/components";
 import { useAuth } from "./features/auth/services";
-import { COPIED_ENTRIES_KEY } from "./features/synthesis/hooks/synthesis/useSentenceState";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./features/onboarding/contexts/OnboardingContext";
 import { PageLoadingState } from "./components/ui/PageLoadingState";
@@ -25,7 +18,15 @@ import {
   useTaskHandlers,
   useCurrentView,
   useDocumentTitle,
+  useAppRedirects,
 } from "./hooks";
+
+const SynthesisView = lazy(() => import("./features/synthesis/components/SynthesisView"));
+const TasksView = lazy(() => import("./features/tasks/components/TasksView"));
+const SpecsPage = lazy(() => import("./components/SpecsPage"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const AccessibilityPage = lazy(() => import("./pages/AccessibilityPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
 
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } =
@@ -40,27 +41,12 @@ export default function Home() {
   const { currentView, selectedTaskId } = useCurrentView();
   useDocumentTitle();
 
-  const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
-
   const synthesis = useSynthesis();
   const taskHandlers = useTaskHandlers(
     synthesis.sentences,
     () => navigate("/tasks"),
-    () => {},
   );
-  const hasCheckedInitialRedirect = useRef(false);
-  // Capture copiedEntries presence synchronously during render (before effects clear it)
-  const hadCopiedEntries = useRef(
-    sessionStorage.getItem(COPIED_ENTRIES_KEY) !== null,
-  );
-
-  // Handle post-login redirect
-  useEffect(() => {
-    if (isAuthenticated && pendingTasksViewAccess) {
-      navigate("/tasks");
-      setPendingTasksViewAccess(false);
-    }
-  }, [isAuthenticated, pendingTasksViewAccess, navigate]);
+  const { handleTasksClick } = useAppRedirects(currentView);
 
   useEffect(() => {
     if (isWizardActive && onboardingState.selectedRole)
@@ -71,50 +57,9 @@ export default function Home() {
     synthesis.setDemoSentences,
   ]);
 
-  // Redirect first-time users to role selection on initial app load only
-  useEffect(() => {
-    if (isOnboardingLoading) return;
-
-    // Only check on initial app load, not on subsequent navigation
-    if (!hasCheckedInitialRedirect.current) {
-      hasCheckedInitialRedirect.current = true;
-      // Skip role selection if user has copied entries from shared task
-      // Use ref captured during render since useSentenceState clears sessionStorage in its effect
-      if (
-        !hadCopiedEntries.current &&
-        !onboardingState.completed &&
-        !onboardingState.selectedRole &&
-        currentView === "synthesis"
-      ) {
-        navigate("/role-selection", { replace: true });
-      }
-    }
-  }, [
-    isOnboardingLoading,
-    onboardingState.completed,
-    onboardingState.selectedRole,
-    currentView,
-    navigate,
-  ]);
-
-  const handleTasksClick = () => {
-    if (!isAuthenticated) {
-      setPendingTasksViewAccess(true);
-      setShowLoginModal(true);
-    }
-  };
-
   if (isOnboardingLoading) {
     return (
-      <div
-        className="page-layout"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
+      <div className="page-layout page-layout--centered">
         <PageLoadingState />
       </div>
     );
@@ -143,7 +88,7 @@ export default function Home() {
         {showRoleSelection ? (
           <RoleSelectionContent />
         ) : (
-          <>
+          <Suspense fallback={<PageLoadingState />}>
             {currentView === "synthesis" && (
               <SynthesisPageProvider
                 sentences={synthesis.sentences}
@@ -177,7 +122,7 @@ export default function Home() {
             {currentView === "dashboard" && <Dashboard />}
             {currentView === "accessibility" && <AccessibilityPage />}
             {currentView === "privacy" && <PrivacyPage />}
-          </>
+          </Suspense>
         )}
       </main>
 

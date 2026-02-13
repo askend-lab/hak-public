@@ -21,6 +21,11 @@
   background-color: $color-secondary;
 }
 
+.page-layout--centered {
+  align-items: center;
+  justify-content: center;
+}
+
 // =============================================================================
 // STICKY HEADER (Shared across all pages)
 // =============================================================================
