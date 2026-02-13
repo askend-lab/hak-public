@@ -120,6 +120,9 @@ jobs:
             fi
           fi
 
+      - name: Generate feature specs
+        run: pnpm --filter @hak/frontend sync-features
+
       - name: Run tests
         run: pnpm test:all
 
