@@ -71,9 +71,7 @@ BDD specifications in Gherkin live in `packages/specifications/`.
 
 ## API Documentation
 
-- [API Reference](docs/API.md) — endpoint overview
-- [Vabamorf API](docs/API-Vabamorf.md) — morphological analysis endpoints
-- [Merlin TTS API](docs/API-Merlin.md) — speech synthesis endpoints
+- [API Reference](docs/API.md) — all endpoint documentation
 - [Architecture Decisions](docs/adr/) — ADRs
 
 ## Contributing
