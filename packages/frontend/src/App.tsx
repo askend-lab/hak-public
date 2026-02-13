@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import AppHeader from "./components/AppHeader";
 import SynthesisView from "./components/SynthesisView";
-import TasksView from "./components/TasksView";
+import TasksView from "./features/tasks/components/TasksView";
 import SpecsPage from "./components/SpecsPage";
 import Dashboard from "./components/Dashboard";
 import AccessibilityPage from "./pages/AccessibilityPage";

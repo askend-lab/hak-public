@@ -2,11 +2,11 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 export { useSynthesis } from "./useSynthesis";
-export { useTaskHandlers } from "./useTaskHandlers";
+export { useTaskHandlers } from "@/features/tasks/hooks/useTaskHandlers";
 export { useDragAndDrop } from "./useDragAndDrop";
 export { useVariantsPanel } from "./useVariantsPanel";
 export { useSentenceMenu } from "./useSentenceMenu";
-export { useUserTasks } from "./useUserTasks";
+export { useUserTasks } from "@/features/tasks/hooks/useUserTasks";
 export { useUserId } from "./useUserId";
 export { useCurrentView } from "./useCurrentView";
 export { useDocumentTitle } from "./useDocumentTitle";

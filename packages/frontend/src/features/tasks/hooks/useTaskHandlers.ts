@@ -8,7 +8,7 @@ import { TASK_STRINGS } from "@/constants/ui-strings";
 import { useTaskModals } from "./useTaskModals";
 import { useTaskCRUD } from "./useTaskCRUD";
 import { useTaskEntries } from "./useTaskEntries";
-import { useTaskSharing } from "./useTaskSharing";
+import { useTaskSharing } from "@/hooks/useTaskSharing";
 
 export function useTaskHandlers(
   sentences: SentenceState[],

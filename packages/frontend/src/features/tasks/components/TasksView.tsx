@@ -3,8 +3,8 @@
 
 import TaskManager from "./TaskManager";
 import TaskDetailView from "./TaskDetailView";
-import { AddIcon } from "./ui/Icons";
-import { PageLoadingState } from "./ui/PageLoadingState";
+import { AddIcon } from "@/components/ui/Icons";
+import { PageLoadingState } from "@/components/ui/PageLoadingState";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/features/auth/services";
 import { useUserTasks } from "@/hooks";

@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import AppModals from "./AppModals";
 
-vi.mock("./TaskEditModal", () => ({
+vi.mock("@/features/tasks/components/TaskEditModal", () => ({
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? (
       <div data-testid="edit-modal">
@@ -13,7 +13,7 @@ vi.mock("./TaskEditModal", () => ({
       </div>
     ) : null,
 }));
-vi.mock("./AddEntryModal", () => ({
+vi.mock("@/features/tasks/components/AddEntryModal", () => ({
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? (
       <div data-testid="add-modal">

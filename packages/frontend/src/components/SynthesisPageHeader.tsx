@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import AddToTaskDropdown, { type AddToTaskMode } from "./AddToTaskDropdown";
+import AddToTaskDropdown, { type AddToTaskMode } from "@/features/tasks/components/AddToTaskDropdown";
 import { PlayAllButton } from "./ui/PlayAllButton";
 
 interface SynthesisPageHeaderProps {

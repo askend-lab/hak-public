@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SynthesisPageHeader from "./SynthesisPageHeader";
 
-vi.mock("./AddToTaskDropdown", () => ({
+vi.mock("@/features/tasks/components/AddToTaskDropdown", () => ({
   default: ({ isOpen, onClose, onSelectTask, onCreateNew }: { isOpen: boolean; onClose: () => void; onSelectTask: (id: string, name: string, mode: string) => void; onCreateNew: () => void }) =>
     isOpen ? (
       <div data-testid="dropdown">

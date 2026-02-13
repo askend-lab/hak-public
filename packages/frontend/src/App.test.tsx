@@ -47,14 +47,14 @@ vi.mock("./components/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
 }));
 vi.mock("./components/PronunciationVariants", () => ({ default: () => null }));
-vi.mock("./components/TaskManager", () => ({
+vi.mock("./features/tasks/components/TaskManager", () => ({
   default: () => <div data-testid="task-manager">TaskManager</div>,
 }));
-vi.mock("./components/TaskDetailView", () => ({
+vi.mock("./features/tasks/components/TaskDetailView", () => ({
   default: () => <div data-testid="task-detail-view">TaskDetailView</div>,
 }));
-vi.mock("./components/TaskEditModal", () => ({ default: () => null }));
-vi.mock("./components/AddEntryModal", () => ({ default: () => null }));
+vi.mock("./features/tasks/components/TaskEditModal", () => ({ default: () => null }));
+vi.mock("./features/tasks/components/AddEntryModal", () => ({ default: () => null }));
 vi.mock("./components/ShareTaskModal", () => ({ default: () => null }));
 vi.mock("@/features/auth/components/LoginModal", () => ({
   default: ({ isOpen }: { isOpen: boolean }) =>
@@ -66,7 +66,7 @@ vi.mock("./components/UserProfile", () => ({
   ),
 }));
 vi.mock("./components/ConfirmationModal", () => ({ default: () => null }));
-vi.mock("./components/AddToTaskDropdown", () => ({ default: () => null }));
+vi.mock("./features/tasks/components/AddToTaskDropdown", () => ({ default: () => null }));
 vi.mock("./components/SentencePhoneticPanel", () => ({ default: () => null }));
 vi.mock("./components/SentenceSynthesisItem", () => ({
   default: ({ id }: { id: string }) => (

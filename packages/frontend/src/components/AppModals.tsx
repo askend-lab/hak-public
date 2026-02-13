@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import TaskEditModal from "./TaskEditModal";
-import AddEntryModal from "./AddEntryModal";
+import TaskEditModal from "@/features/tasks/components/TaskEditModal";
+import AddEntryModal from "@/features/tasks/components/AddEntryModal";
 import ShareTaskModal from "./ShareTaskModal";
 import LoginModal from "@/features/auth/components/LoginModal";
 import ConfirmationModal from "./ConfirmationModal";
