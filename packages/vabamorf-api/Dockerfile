@@ -14,10 +14,6 @@ COPY vmetajson /var/task/vmetajson.bin
 COPY et.dct /var/task/
 RUN chmod +x /var/task/vmetajson.bin
 
-# Copy package files and install dependencies
-COPY package*.json /var/task/
-RUN npm install --omit=dev
-
 # Copy compiled TypeScript (from dist/src/ to root)
 COPY dist/src/ /var/task/
 
