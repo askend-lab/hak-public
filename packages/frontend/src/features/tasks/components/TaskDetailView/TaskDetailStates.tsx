@@ -3,7 +3,7 @@
 
 "use client";
 
-import { PageLoadingState } from "../ui/PageLoadingState";
+import { PageLoadingState } from "@/components/ui/PageLoadingState";
 
 interface BackButtonProps {
   onBack: () => void;

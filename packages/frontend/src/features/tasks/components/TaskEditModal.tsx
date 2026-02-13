@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-import BaseModal from "./BaseModal";
+import BaseModal from "@/components/BaseModal";
 
 interface TaskEditModalProps {
   isOpen: boolean;

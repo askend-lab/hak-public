@@ -4,7 +4,7 @@
 "use client";
 
 import { Task } from "@/types/task";
-import { PlayAllButton } from "../ui/PlayAllButton";
+import { PlayAllButton } from "@/components/ui/PlayAllButton";
 import { useDropdownPosition } from "@/hooks/useDropdownPosition";
 
 interface TaskDetailHeaderProps {

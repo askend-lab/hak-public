@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { TaskSummary } from "@/types/task";
-import { MoreIcon } from "./ui/Icons";
+import { MoreIcon } from "@/components/ui/Icons";
 import { formatDate } from "@/utils/formatDate";
 import { useDropdownPosition } from "@/hooks/useDropdownPosition";
 

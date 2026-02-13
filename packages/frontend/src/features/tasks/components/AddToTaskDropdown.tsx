@@ -8,7 +8,7 @@ import { TaskSummary } from "@/types/task";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/features/auth/services";
 import { logger } from "@hak/shared";
-import { SearchIcon, AddIcon, BackIcon } from "./ui/Icons";
+import { SearchIcon, AddIcon, BackIcon } from "@/components/ui/Icons";
 
 export type AddToTaskMode = "append" | "replace";
 

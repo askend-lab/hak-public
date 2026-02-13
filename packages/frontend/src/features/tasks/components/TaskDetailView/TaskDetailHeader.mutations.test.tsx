@@ -6,7 +6,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TaskDetailHeader } from "./TaskDetailHeader";
 
-vi.mock("../ui/PlayAllButton", () => ({
+vi.mock("@/components/ui/PlayAllButton", () => ({
   PlayAllButton: ({ isPlaying, isLoading, disabled, onClick }: {
     isPlaying: boolean; isLoading: boolean; disabled: boolean; onClick: () => void;
   }) => (

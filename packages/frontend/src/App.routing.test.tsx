@@ -61,7 +61,7 @@ vi.mock("./components/Footer", () => ({
 vi.mock("./components/SynthesisView", () => ({
   default: () => <div data-testid="synthesis-view">SynthesisView</div>,
 }));
-vi.mock("./components/TasksView", () => ({
+vi.mock("./features/tasks/components/TasksView", () => ({
   default: ({ selectedTaskId }: { selectedTaskId: string | null }) => (
     <div data-testid="tasks-view" data-task-id={selectedTaskId}>
       TasksView
