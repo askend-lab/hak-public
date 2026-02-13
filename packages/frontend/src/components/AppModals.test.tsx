@@ -5,10 +5,6 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import AppModals from "./AppModals";
 
-vi.mock("./PronunciationVariants", () => ({
-  default: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="variants-panel">Variants</div> : null,
-}));
 vi.mock("./TaskEditModal", () => ({
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? (
@@ -58,20 +54,6 @@ vi.mock("./ConfirmationModal", () => ({
       </div>
     ) : null,
 }));
-vi.mock("./SentencePhoneticPanel", () => ({
-  default: ({
-    isOpen,
-    onApply,
-  }: {
-    isOpen: boolean;
-    onApply: (t: string) => void;
-  }) =>
-    isOpen ? (
-      <div data-testid="phonetic-panel">
-        <button onClick={() => onApply("te`re")}>Apply</button>
-      </div>
-    ) : null,
-}));
 vi.mock("./onboarding", () => ({
   OnboardingWizard: () => <div data-testid="wizard">Wizard</div>,
 }));
@@ -79,34 +61,7 @@ vi.mock("./onboarding", () => ({
 const baseProps = {
   showLoginModal: false,
   setShowLoginModal: vi.fn(),
-  showNotification: vi.fn(),
   isWizardActive: false,
-  variants: {
-    variantsWord: null,
-    isVariantsPanelOpen: false,
-    handleCloseVariants: vi.fn(),
-    variantsCustomPhonetic: null,
-    setVariantsCustomPhonetic: vi.fn(),
-    sentencePhoneticId: null,
-    showSentencePhoneticPanel: false,
-    handleCloseSentencePhonetic: vi.fn(),
-  },
-  synthesis: {
-    sentences: [
-      {
-        id: "s1",
-        text: "tere",
-        tags: ["tere"],
-        isPlaying: false,
-        isLoading: false,
-        currentInput: "",
-        phoneticText: "te`re",
-        audioUrl: null,
-        stressedTags: null,
-      },
-    ],
-    handleSentencePhoneticApply: vi.fn(),
-  },
   taskHandlers: {
     showAddTaskModal: false,
     setShowAddTaskModal: vi.fn(),
@@ -125,7 +80,6 @@ const baseProps = {
     handleConfirmDelete: vi.fn(),
     handleCancelDelete: vi.fn(),
   },
-  onUseVariant: vi.fn(),
 };
 
 describe("AppModals", () => {
@@ -259,40 +213,5 @@ describe("AppModals", () => {
   it("renders wizard when isWizardActive", () => {
     render(<AppModals {...baseProps} isWizardActive={true} />);
     expect(screen.getByTestId("wizard")).toBeInTheDocument();
-  });
-
-  it("renders variants panel when open", () => {
-    const props = {
-      ...baseProps,
-      variants: {
-        ...baseProps.variants,
-        isVariantsPanelOpen: true,
-        variantsWord: "tere",
-      },
-    };
-    render(<AppModals {...props} />);
-    expect(screen.getByTestId("variants-panel")).toBeInTheDocument();
-  });
-
-  it("renders phonetic panel and applies changes", () => {
-    const handleSentencePhoneticApply = vi.fn();
-    const showNotification = vi.fn();
-    const props = {
-      ...baseProps,
-      showNotification,
-      variants: {
-        ...baseProps.variants,
-        sentencePhoneticId: "s1",
-        showSentencePhoneticPanel: true,
-      },
-      synthesis: { ...baseProps.synthesis, handleSentencePhoneticApply },
-    };
-    render(<AppModals {...props} />);
-    fireEvent.click(screen.getByText("Apply"));
-    expect(handleSentencePhoneticApply).toHaveBeenCalledWith("s1", "te`re");
-    expect(showNotification).toHaveBeenCalledWith(
-      "success",
-      "Lause uus häälduskuju rakendatud",
-    );
   });
 });
