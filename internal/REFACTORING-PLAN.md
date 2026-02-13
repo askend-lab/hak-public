@@ -42,25 +42,25 @@ Deep analysis of the entire HAK project identified 10 major refactoring candidat
 - **File:** `packages/tara-auth/src/handler.ts`
 - **Problem:** Manually constructs response objects `{statusCode, headers, body}` without `@hak/shared`. Has hardcoded default frontend URLs. Not connected to the monorepo shared package.
 - **Fix:** Add `@hak/shared` dependency, use shared response utilities, extract hardcoded URLs to env vars.
-- **Status:** [ ] Not started
+- **Status:** [x] Done — PR #429
 
 #### 6. App.tsx God Component — ~76 Props Drilled into SynthesisView
 - **File:** `packages/frontend/src/App.tsx:155-222`
 - **Problem:** App.tsx manually wires ~76 props from 6 hooks (synthesis, taskHandlers, dragDrop, variants, menu, auth) into `SynthesisView`. Extreme prop drilling.
 - **Fix:** Create `SynthesisContext` so child components subscribe directly to needed state.
-- **Status:** [ ] Not started
+- **Status:** [ ] Deferred — largest refactoring, needs separate PR
 
 #### 7. CI Build Pipeline Runs Jest Instead of Vitest — Frontend Tests Skipped
 - **File:** `.github/workflows/build.yml:116`
 - **Problem:** `pnpm exec jest --passWithNoTests` — but frontend uses Vitest. Jest only covers backend packages. Frontend tests (the bulk of all tests) are NOT running in CI.
 - **Fix:** Replace with `pnpm test:all` or `pnpm -r run test:full`.
-- **Status:** [ ] Not started
+- **Status:** [x] Done — commit 9b7f899
 
 #### 8. Docker Security Scan (Trivy) Never Blocks Build
 - **File:** `.github/workflows/build.yml:157-167`
 - **Problem:** Trivy scan has `exit-code: '0'` and `continue-on-error: true`. Even CRITICAL/HIGH vulnerabilities never prevent pushing to ECR.
 - **Fix:** Set `exit-code: '1'` and remove `continue-on-error`.
-- **Status:** [ ] Not started
+- **Status:** [x] Done — commit 9b7f899
 
 ### 🟢 CLEANUP
 
@@ -68,7 +68,7 @@ Deep analysis of the entire HAK project identified 10 major refactoring candidat
 - **File:** `packages/frontend/src/services/storage/SimpleStoreAdapter.ts:113-122`
 - **Problem:** `findAllUserTaskKeys()` and `loadTasksByKey()` always return empty arrays. Legacy from previous architecture.
 - **Fix:** Remove methods and update related test stubs.
-- **Status:** [ ] Not started
+- **Status:** [x] Done — commit 9b7f899
 
 #### 10. Remaining Hardcoded Estonian Strings in AppModals.tsx
 - **File:** `packages/frontend/src/components/AppModals.tsx:107,144,148-153`
@@ -77,7 +77,7 @@ Deep analysis of the entire HAK project identified 10 major refactoring candidat
   - `"Sisene, et luua ja hallata ülesandeid"` (line 144)
   - `"Kustuta ülesanne"`, `"Kas oled kindel..."`, `"Kustuta"`, `"Tühista"` (lines 148-153)
 - **Fix:** Add to `constants/ui-strings.ts` and replace in `AppModals.tsx`.
-- **Status:** [ ] Not started
+- **Status:** [x] Done — commit 9b7f899
 
 ## Priority Order
 
