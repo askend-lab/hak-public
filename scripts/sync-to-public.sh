@@ -112,6 +112,21 @@ for pub_file in *.public.md; do
   mv "$pub_file" "$target"
 done
 
+# --- Copy public CI workflow (build.public.yml → .github/workflows/build.yml) ---
+echo ">>> Setting up public CI workflow..."
+if [[ -f .github/workflows/build.public.yml ]]; then
+  mkdir -p .github/workflows
+  mv .github/workflows/build.public.yml .github/workflows/build.yml
+  echo "  build.public.yml → .github/workflows/build.yml"
+fi
+
+# --- Copy public .env.example ---
+echo ">>> Setting up .env.example..."
+if [[ -f .env.example.public ]]; then
+  mv .env.example.public .env.example
+  echo "  .env.example.public → .env.example"
+fi
+
 # --- Clean up pnpm-workspace.yaml (still points to packages/*) ---
 # No change needed — pnpm ignores missing directories silently.
 
@@ -138,7 +153,7 @@ if command -v node &>/dev/null; then
     pkg.scripts['test:coverage'] = 'pnpm -r --filter=@hak/frontend run test:coverage';
     pkg.scripts.start = 'pnpm --filter @hak/frontend dev';
     pkg.scripts.build = 'pnpm --filter @hak/frontend build';
-    pkg.scripts.typecheck = 'pnpm -r exec tsc --noEmit';
+    pkg.scripts.typecheck = 'pnpm --filter @hak/frontend --filter @hak/shared exec tsc --noEmit';
 
     // Rewrite repository URLs from private to public repo
     if (pkg.repository?.url) {
@@ -211,6 +226,19 @@ echo ">>> Cleaning eslint.config.mjs..."
 if [[ -f eslint.config.mjs ]]; then
   sed -i 's/from DevBox with/with/' eslint.config.mjs
   echo "  Removed DevBox reference"
+fi
+
+# --- Clean up tsconfig.json (jest.setup.ts is excluded, remove from include) ---
+echo ">>> Cleaning tsconfig.json..."
+if [[ -f tsconfig.json ]]; then
+  node -e "
+    const fs = require('fs');
+    const tsconfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
+    tsconfig.include = tsconfig.include?.filter(p => p !== 'jest.setup.ts') ?? [];
+    if (tsconfig.include.length === 0) delete tsconfig.include;
+    fs.writeFileSync('tsconfig.json', JSON.stringify(tsconfig, null, 2) + '\n');
+    console.log('  Removed jest.setup.ts from include');
+  "
 fi
 
 # --- Clean up .gitignore (remove references to internal paths) ---
