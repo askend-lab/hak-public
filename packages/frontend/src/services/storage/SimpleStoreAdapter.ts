@@ -110,17 +110,6 @@ export class SimpleStoreAdapter {
     }
   }
 
-  async findAllUserTaskKeys(): Promise<string[]> {
-    // In SimpleStore, we don't enumerate all users - this method is only used for share token lookup
-    // which we'll handle differently
-    return [];
-  }
-
-  async loadTasksByKey(_key: string): Promise<Task[]> {
-    // Not needed with SimpleStore - share tokens handled via dedicated query
-    return [];
-  }
-
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {
     try {
       const data = await this.get("tasks", shareToken, "unlisted");

@@ -72,18 +72,6 @@ describe("SimpleStoreAdapter shared/unlisted/misc", () => {
     });
   });
 
-  describe("findAllUserTaskKeys", () => {
-    it("returns empty array", async () => {
-      expect(await adapter.findAllUserTaskKeys()).toEqual([]);
-    });
-  });
-
-  describe("loadTasksByKey", () => {
-    it("returns empty array", async () => {
-      expect(await adapter.loadTasksByKey("some-key")).toEqual([]);
-    });
-  });
-
   describe("get error handling", () => {
     it("throws on non-404 error response", async () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});

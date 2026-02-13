@@ -35,3 +35,13 @@ export const SYNTHESIS_STRINGS = {
   TAG_MENU_EDIT: "Muuda sõna kirjakuju",
   TAG_MENU_DELETE: "Kustuta sõna",
 } as const;
+
+export const MODAL_STRINGS = {
+  PHONETIC_APPLIED: "Lause uus häälduskuju rakendatud",
+  LOGIN_MESSAGE: "Sisene, et luua ja hallata ülesandeid",
+  DELETE_TASK_TITLE: "Kustuta ülesanne",
+  DELETE_TASK_CONFIRM: (name: string) =>
+    `Kas oled kindel, et soovid ülesande "${name}" kustutada?`,
+  DELETE_TASK_BUTTON: "Kustuta",
+  DELETE_TASK_CANCEL: "Tühista",
+} as const;

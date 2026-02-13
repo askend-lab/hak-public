@@ -10,6 +10,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import SentencePhoneticPanel from "./SentencePhoneticPanel";
 import { OnboardingWizard } from "./onboarding";
 import { SentenceState } from "@/types/synthesis";
+import { MODAL_STRINGS } from "@/constants/ui-strings";
 
 interface Task {
   id: string;
@@ -104,7 +105,7 @@ export default function AppModals({
               variants.sentencePhoneticId!,
               newPhoneticText,
             );
-            showNotification("success", "Lause uus häälduskuju rakendatud");
+            showNotification("success", MODAL_STRINGS.PHONETIC_APPLIED);
           }}
         />
       )}
@@ -141,14 +142,14 @@ export default function AppModals({
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
-        message="Sisene, et luua ja hallata ülesandeid"
+        message={MODAL_STRINGS.LOGIN_MESSAGE}
       />
       <ConfirmationModal
         isOpen={taskHandlers.showDeleteConfirmation}
-        title="Kustuta ülesanne"
-        message={`Kas oled kindel, et soovid ülesande "${taskHandlers.taskToDelete?.name}" kustutada?`}
-        confirmText="Kustuta"
-        cancelText="Tühista"
+        title={MODAL_STRINGS.DELETE_TASK_TITLE}
+        message={MODAL_STRINGS.DELETE_TASK_CONFIRM(taskHandlers.taskToDelete?.name ?? "")}
+        confirmText={MODAL_STRINGS.DELETE_TASK_BUTTON}
+        cancelText={MODAL_STRINGS.DELETE_TASK_CANCEL}
         onConfirm={taskHandlers.handleConfirmDelete}
         onCancel={taskHandlers.handleCancelDelete}
         variant="danger"
