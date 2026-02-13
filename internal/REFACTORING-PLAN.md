@@ -30,13 +30,13 @@ Deep analysis of the entire HAK project identified 10 major refactoring candidat
   - `vabamorf-api`: `Allow-Headers: "Content-Type,Authorization"`, `Methods: "GET,POST,OPTIONS"`
   - `simplestore`: only `Content-Type` + `Allow-Origin` (no Methods/Headers at all)
 - **Fix:** Centralize CORS configuration in `@hak/shared` with variants (public/authenticated).
-- **Status:** [ ] Not started
+- **Status:** [x] Done — commit 542d536
 
 #### 4. vabamorf-api Not Using @hak/shared Lambda Utilities
 - **File:** `packages/vabamorf-api/src/validation.ts:6-22`
 - **Problem:** Despite `@hak/shared` being a dependency, `validation.ts` still defines its own `createResponse()` and `RESPONSE_HEADERS` locally. Missed in Refactor Round 1.
 - **Fix:** Replace with `createLambdaResponse` from `@hak/shared`.
-- **Status:** [ ] Not started
+- **Status:** [x] Done — commit 542d536 (combined with #3)
 
 #### 5. tara-auth Completely Isolated from Shared Infrastructure
 - **File:** `packages/tara-auth/src/handler.ts`
