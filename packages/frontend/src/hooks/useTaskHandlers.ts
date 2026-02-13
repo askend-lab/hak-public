@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/services/auth";
 import { useNotification } from "@/contexts/NotificationContext";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
 import { TASK_STRINGS } from "@/constants/ui-strings";
+import { useTaskModals } from "./useTaskModals";
 
 export function useTaskHandlers(
   sentences: SentenceState[],
@@ -15,6 +16,24 @@ export function useTaskHandlers(
 ) {
   const { user, isAuthenticated, setShowLoginModal } = useAuth();
   const { showNotification } = useNotification();
+
+  const modals = useTaskModals();
+  const {
+    setShowAddTaskModal,
+    setShowAddToTaskDropdown,
+    setShowTaskEditModal,
+    setShowShareTaskModal,
+    setTaskToEdit,
+    setTaskToShare,
+    setTaskRefreshTrigger,
+    setShowDeleteConfirmation,
+    setTaskToDelete,
+    setPendingSentenceId,
+    isTaskCreationFromTasksView,
+    setIsTaskCreationFromTasksView,
+    pendingSentenceId,
+    taskToDelete,
+  } = modals;
 
   // Auth guard helper - returns true if NOT authenticated (to trigger early return)
   const requireAuth = useCallback((): boolean => {
@@ -36,32 +55,6 @@ export function useTaskHandlers(
     }),
     [setSelectedTaskId, setCurrentView],
   );
-
-  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
-  const [showAddToTaskDropdown, setShowAddToTaskDropdown] = useState(false);
-  const [showTaskEditModal, setShowTaskEditModal] = useState(false);
-  const [showShareTaskModal, setShowShareTaskModal] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<{
-    id: string;
-    name: string;
-    description?: string | null;
-  } | null>(null);
-  const [taskToShare, setTaskToShare] = useState<{
-    id: string;
-    shareToken?: string;
-    name: string;
-  } | null>(null);
-  const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [taskToDelete, setTaskToDelete] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-  const [pendingSentenceId, setPendingSentenceId] = useState<string | null>(
-    null,
-  );
-  const [isTaskCreationFromTasksView, setIsTaskCreationFromTasksView] =
-    useState(false);
 
   const handleAddAllSentencesToTask = useCallback(() => {
     if (requireAuth()) return;
@@ -332,21 +325,7 @@ export function useTaskHandlers(
   );
 
   return {
-    showAddTaskModal,
-    setShowAddTaskModal,
-    showAddToTaskDropdown,
-    setShowAddToTaskDropdown,
-    showTaskEditModal,
-    setShowTaskEditModal,
-    showShareTaskModal,
-    setShowShareTaskModal,
-    taskToEdit,
-    setTaskToEdit,
-    taskToShare,
-    setTaskToShare,
-    taskRefreshTrigger,
-    showDeleteConfirmation,
-    taskToDelete,
+    ...modals,
     handleAddAllSentencesToTask,
     handleSelectTaskFromDropdown,
     handleCreateNewFromDropdown,
