@@ -10,12 +10,16 @@ Built with React and TypeScript.
 
 ## Quick Start
 
+**Prerequisites:** [Node.js](https://nodejs.org/) 20+, [pnpm](https://pnpm.io/) 10+, [Git](https://git-scm.com/)
+
 ```bash
+git clone https://github.com/askend-lab/hak.git
+cd hak
 pnpm install
-pnpm start         # Start dev server (http://localhost:5180)
+pnpm start              # Dev server at http://localhost:5181
 ```
 
-**Prerequisites:** Node.js 20+, pnpm 9+
+No Docker, AWS CLI, or environment variables needed — the dev server proxies API calls to deployed services.
 
 ## Project Structure
 
@@ -50,22 +54,21 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for a system overview.
 
 ## Development
 
-### Code Quality
+### Available Commands
 
-Quality is enforced via pre-commit hooks:
+| Command | Description |
+|---------|-------------|
+| `pnpm start` | Start frontend dev server (port 5181) |
+| `pnpm check` | Run all checks: lint + typecheck + tests |
+| `pnpm lint` | ESLint + Gherkin lint |
+| `pnpm typecheck` | TypeScript type checking across all packages |
+| `pnpm test:all` | Run all tests across all packages |
+
+### Code Quality
 
 - **TypeScript** — strict mode, zero `any` types
 - **ESLint** — zero warnings policy
 - **Tests** — TDD enforced, coverage thresholds per module
-- **Security** — dependency audit, secret detection
-
-### Testing
-
-```bash
-cd packages/frontend
-npx vitest              # Run frontend tests
-npx vitest --coverage   # With coverage
-```
 
 BDD specifications in Gherkin live in `packages/specifications/`.
 
@@ -82,9 +85,8 @@ We welcome contributions! Please read:
 2. [Security Policy](SECURITY.md)
 
 ```bash
-# Fork, clone, then:
 pnpm install
-cd packages/frontend && npx vitest   # Make sure everything passes
+pnpm check          # Make sure everything passes
 # Create a branch, make changes, open a PR
 ```
 
