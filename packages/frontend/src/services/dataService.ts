@@ -14,7 +14,7 @@ export interface DataServiceDeps {
 }
 
 export class DataService {
-  private static instance: DataService;
+  private static instance: DataService | null = null;
   private storage: SimpleStoreAdapter;
   private mockLoader: MockDataLoader;
   private shareService: ShareService;
@@ -32,14 +32,15 @@ export class DataService {
   }
 
   static getInstance(): DataService {
-    if (!DataService.instance) {
-      DataService.instance = new DataService();
-    }
-    return DataService.instance;
+    const existing = DataService.instance;
+    if (existing) return existing;
+    const created = new DataService();
+    DataService.instance = created;
+    return created;
   }
 
   static resetInstance(): void {
-    DataService.instance = undefined as unknown as DataService;
+    DataService.instance = null;
   }
 
   async getUserTasks(userId: string): Promise<TaskSummary[]> {
@@ -93,24 +94,16 @@ export class DataService {
     taskId: string,
     entryData: Omit<TaskEntry, "id" | "taskId" | "createdAt">,
   ): Promise<TaskEntry> {
-    const task = await this.repository.getTask(taskId, userId);
-    if (!task) {
-      throw new Error("Task not found");
-    }
-
-    const newEntry: TaskEntry = {
-      id: `entry_${crypto.randomUUID()}`,
+    const entries = await this.repository.addTextEntriesToTask(
+      userId,
       taskId,
-      ...entryData,
-      createdAt: new Date(),
-    };
-
-    const updatedEntries = [...(task.entries || []), newEntry];
-    await this.repository.updateTask(userId, taskId, {
-      entries: updatedEntries,
-    });
-
-    return newEntry;
+      [{ text: entryData.text, stressedText: entryData.stressedText }],
+    );
+    const entry = entries[0];
+    if (!entry) {
+      throw new Error("Failed to create entry");
+    }
+    return entry;
   }
 
   async addTextEntriesToTask(
