@@ -1,44 +1,211 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-// Content pages: accessibility statement, privacy policy, terms, etc.
+// =========================================================================
+// Content Page Layout
+// =========================================================================
+// Reusable layout for text-heavy informational pages (e.g., accessibility
+// statement, privacy policy). Follows Sõnaveeb-like content page design.
+// =========================================================================
+
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+
+// =============================================================================
+// BASE WRAPPER
+// =============================================================================
 
 .content-page {
-  max-width: 800px;
+  background-color: $color-white;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// =============================================================================
+// BANNER
+// =============================================================================
+
+.content-page__banner {
+  width: 100%;
+  background-color: $color-secondary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: $color-primary;
+
+  // Mobile
+  padding: $spacing-8 $spacing-4;
+  min-height: 140px;
+
+  // Tablet+
+  @include tablet {
+    padding: $spacing-8 $spacing-6;
+    min-height: 180px;
+  }
+
+  // Desktop+
+  @include desktop {
+    min-height: 220px;
+  }
+}
+
+.content-page__banner-title {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-none;
+  letter-spacing: $letter-spacing-content-title;
+  color: $color-primary;
+  margin: 0;
+
+  // Mobile
+  font-size: $font-size-2xl; // 24px
+
+  // Tablet+
+  @include tablet {
+    font-size: $font-size-content-title; // 34px
+  }
+}
+
+// =============================================================================
+// BODY
+// =============================================================================
+
+.content-page__body {
+  width: 100%;
+  max-width: 750px;
   margin: 0 auto;
-  padding: $spacing-xl $spacing-md;
+  box-sizing: border-box;
 
-  &__title {
-    font-size: $font-size-xl;
-    font-weight: $font-weight-bold;
-    margin-bottom: $spacing-lg;
-    color: $color-text-primary;
+  // Mobile
+  padding: 0 $spacing-4;
+
+  // Mobile landscape
+  @include mobile-landscape {
+    padding: 0 $spacing-5;
   }
 
-  &__section {
-    margin-bottom: $spacing-lg;
+  // Tablet+
+  @include tablet {
+    padding: 0 $spacing-6;
   }
 
-  &__section-title {
-    font-size: $font-size-lg;
-    font-weight: $font-weight-semibold;
-    margin-bottom: $spacing-sm;
-    color: $color-text-primary;
+  // When max-width reached, remove padding
+  @include respond-above(750px + 48px) {
+    padding: 0;
   }
+}
 
-  &__text {
-    font-size: $font-size-md;
-    line-height: 1.6;
-    color: $color-text-secondary;
-    margin-bottom: $spacing-md;
-  }
+// =============================================================================
+// FOOTER BAND
+// =============================================================================
 
-  &__link {
-    color: $color-primary;
-    text-decoration: underline;
+.content-page__footer-band {
+  background-color: $color-secondary;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  justify-content: center;
 
-    &:hover {
-      text-decoration: none;
+  .content-page__section {
+    border-bottom-color: rgba($color-black, 0.1);
+
+    &:last-child {
+      border-bottom: none;
     }
   }
 }
+
+// =============================================================================
+// SECTION
+// =============================================================================
+
+.content-page__section {
+  padding: $spacing-8 0; // 32px vertical
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2; // 8px
+  border-bottom: $border-width-thin solid $color-border-light;
+
+  @include tablet {
+    padding: 36px 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+// =============================================================================
+// TYPOGRAPHY
+// =============================================================================
+
+.content-page__section h4 {
+  font-family: $font-body;
+  font-size: $font-size-xl; // 20px
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal; // 140%
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  margin: 0 0 $spacing-2 0;
+}
+
+.content-page__section h3 {
+  font-family: $font-body;
+  font-size: $font-size-md; // 16px
+  font-weight: $font-weight-medium;
+  line-height: $line-height-tight;
+  letter-spacing: $letter-spacing-content-body;
+  color: $color-primary;
+  margin: 0 0 $spacing-2 0;
+}
+
+.content-page__section p {
+  font-family: $font-body;
+  font-size: $font-size-md; // 16px
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal; // 140%
+  letter-spacing: $letter-spacing-content-body;
+  color: $color-primary;
+  margin: 0;
+}
+
+.content-page__section ul {
+  font-family: $font-body;
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-content-body;
+  color: $color-primary;
+  margin: 0;
+  padding-left: $spacing-6; // 24px indent
+  list-style-type: disc;
+
+  li {
+    margin-bottom: $spacing-2;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul {
+    margin-top: $spacing-2;
+    padding-left: $spacing-6;
+    list-style-type: disc;
+  }
+}
+
+.content-page__section a {
+  color: $color-soft-primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+

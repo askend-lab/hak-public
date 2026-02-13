@@ -2,19 +2,53 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
-const DEFAULT_TITLE = "HAK — Eesti keele õppeplatvorm";
+const APP_NAME = "Hääldusabiline";
+
+const ROUTE_TITLES: Record<string, string> = {
+  "/": `${APP_NAME} – Tekst kõneks`,
+  "/synthesis": `${APP_NAME} – Tekst kõneks`,
+  "/tasks": `${APP_NAME} – Ülesanded`,
+  "/specs": `${APP_NAME} – Testid`,
+  "/dashboard": `${APP_NAME} – Töölaud`,
+  "/role-selection": `${APP_NAME} – Vali roll`,
+  "/accessibility": `${APP_NAME} – Ligipääsetavuse teatis`,
+  "/privacy": `${APP_NAME} – Privaatsuspoliitika`,
+  "/auth/callback": `${APP_NAME} – Sisselogimine`,
+};
 
 /**
- * Sets the document title, restoring the default on unmount.
- * Pass `undefined` to keep the default title.
+ * Updates document.title based on the current route.
+ * Accepts an optional custom title for dynamic pages (e.g. task detail).
  */
-export function useDocumentTitle(title?: string): void {
+export function useDocumentTitle(customTitle?: string): void {
+  const { pathname } = useLocation();
+
   useEffect(() => {
-    const previous = document.title;
-    document.title = title ?? DEFAULT_TITLE;
-    return () => {
-      document.title = previous;
-    };
-  }, [title]);
+    if (customTitle) {
+      document.title = `${APP_NAME} – ${customTitle}`;
+      return;
+    }
+
+    // Exact match first
+    if (ROUTE_TITLES[pathname]) {
+      document.title = ROUTE_TITLES[pathname];
+      return;
+    }
+
+    // Prefix match for nested routes (e.g. /tasks/:id)
+    if (pathname.startsWith("/tasks/")) {
+      document.title = `${APP_NAME} – Ülesanne`;
+      return;
+    }
+
+    if (pathname.startsWith("/shared/task/")) {
+      document.title = `${APP_NAME} – Jagatud ülesanne`;
+      return;
+    }
+
+    // Fallback
+    document.title = APP_NAME;
+  }, [pathname, customTitle]);
 }
