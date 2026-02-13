@@ -235,7 +235,7 @@ jobs:
         if: steps.state.outputs.deploy_vabamorf_api == 'true'
         working-directory: packages/vabamorf-api
         run: |
-          mkdir -p dist/src && cp -r ../../artifacts/vabamorf-api/* dist/src/ 2>/dev/null || true
+          mkdir -p dist && cp -r ../../artifacts/vabamorf-api/* dist/ 2>/dev/null || true
           cd /tmp && npm init -y && npm install serverless-domain-manager serverless@3 --save
           cd /home/runner/work/hak/hak/packages/vabamorf-api
           /tmp/node_modules/.bin/serverless create_domain --stage ${{ inputs.environment }} || true

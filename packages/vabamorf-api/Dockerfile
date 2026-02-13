@@ -14,15 +14,12 @@ COPY vmetajson /var/task/vmetajson.bin
 COPY et.dct /var/task/
 RUN chmod +x /var/task/vmetajson.bin
 
-# Copy package files and install dependencies
-# Strip @hak/shared workspace dep (npm can't resolve pnpm workspace:* protocol)
-COPY package*.json /var/task/
-COPY _shared/ /var/task/node_modules/@hak/shared/
-RUN node -e "var p=JSON.parse(require('fs').readFileSync('package.json'));delete p.dependencies['@hak/shared'];require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" \
-    && npm install --omit=dev
+# Set up @hak/shared from compiled output (workspace package, zero npm deps)
+COPY dist/shared/src/ /var/task/node_modules/@hak/shared/
+RUN echo '{"name":"@hak/shared","version":"0.1.0","main":"index.js"}' > /var/task/node_modules/@hak/shared/package.json
 
-# Copy compiled TypeScript (from dist/src/ to root)
-COPY dist/src/ /var/task/
+# Copy compiled TypeScript
+COPY dist/vabamorf-api/src/ /var/task/
 
 # Set environment variables
 ENV VMETAJSON_PATH=/var/task/vmetajson.bin

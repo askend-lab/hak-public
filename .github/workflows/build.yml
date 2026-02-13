@@ -221,7 +221,7 @@ jobs:
           upload_module "simplestore" "packages/simplestore/dist" "$SIMPLESTORE_CHANGED"
           upload_module "audio-api" "packages/audio-api/dist" "$AUDIO_API_CHANGED"
           upload_module "merlin-api" "packages/merlin-api/dist" "$MERLIN_API_CHANGED"
-          upload_module "vabamorf-api" "packages/vabamorf-api/dist/src" "$VABAMORF_API_CHANGED"
+          upload_module "vabamorf-api" "packages/vabamorf-api/dist" "$VABAMORF_API_CHANGED"
 
           # Build manifest using jq
           jq -n \
