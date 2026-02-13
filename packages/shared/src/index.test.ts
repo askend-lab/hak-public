@@ -11,6 +11,10 @@ import {
   sleep,
   isNonEmpty,
   isEmpty,
+  getAwsRegion,
+  isNotFoundError,
+  buildS3Url,
+  checkFileExists,
 } from "./index";
 
 describe("Index exports", () => {
@@ -51,5 +55,21 @@ describe("Index exports", () => {
 
   it("should export isEmpty", () => {
     expect(typeof isEmpty).toBe("function");
+  });
+
+  it("should export getAwsRegion", () => {
+    expect(typeof getAwsRegion).toBe("function");
+  });
+
+  it("should export isNotFoundError", () => {
+    expect(typeof isNotFoundError).toBe("function");
+  });
+
+  it("should export buildS3Url", () => {
+    expect(typeof buildS3Url).toBe("function");
+  });
+
+  it("should export checkFileExists", () => {
+    expect(typeof checkFileExists).toBe("function");
   });
 });

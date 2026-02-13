@@ -41,7 +41,8 @@ export {
   VOICE_DEFAULTS,
 } from "./env";
 
-export { buildAudioUrl, buildCacheKey, checkS3Cache, isNotFoundError } from "./s3";
+export { buildAudioUrl, buildCacheKey, checkS3Cache } from "./s3";
+export { isNotFoundError } from "@hak/shared";
 export { sendToQueue } from "./sqs";
 export { describeService, scaleService, isEcsConfigured } from "./ecs";
 export type { EcsServiceState } from "./ecs";

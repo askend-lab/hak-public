@@ -89,7 +89,8 @@ describe("ecs", () => {
 });
 
 describe("s3", () => {
-  const { checkS3Cache, buildCacheKey, buildAudioUrl, isNotFoundError } = require("../src/s3");
+  const { checkS3Cache, buildCacheKey, buildAudioUrl } = require("../src/s3");
+  const { isNotFoundError } = require("@hak/shared");
 
   describe("buildCacheKey", () => {
     it("should build cache key with .wav extension", () => {
@@ -135,9 +136,9 @@ describe("s3", () => {
     });
 
     it("should rethrow non-NotFound errors", async () => {
-      mockSend.mockRejectedValue(new Error("S3 down"));
+      mockSend.mockRejectedValue({ name: "AccessDenied", message: "forbidden", $metadata: { httpStatusCode: 403 } });
 
-      await expect(checkS3Cache("abc123")).rejects.toThrow("S3 down");
+      await expect(checkS3Cache("abc123")).rejects.toThrow("S3 error");
     });
   });
 

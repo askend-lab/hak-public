@@ -11,6 +11,10 @@
     "test:full": "jest --coverage --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
   },
+
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.985.0"
+  },
   "devDependencies": {
     "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",

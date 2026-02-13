@@ -404,6 +404,10 @@ importers:
   packages/merlin-worker: {}
 
   packages/shared:
+    dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.985.0
+        version: 3.985.0
     devDependencies:
       '@types/jest':
         specifier: ^29.0.0
