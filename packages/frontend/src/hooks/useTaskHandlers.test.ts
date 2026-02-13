@@ -121,6 +121,7 @@ describe("useTaskHandlers", () => {
       "user-1",
       "task-1",
       expect.any(Array),
+      "append",
     );
     expect(mockShowNotification).toHaveBeenCalledWith(
       "success",

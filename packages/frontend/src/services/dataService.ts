@@ -108,8 +108,9 @@ export class DataService {
     userId: string,
     taskId: string,
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
+    mode: "append" | "replace" = "append",
   ): Promise<TaskEntry[]> {
-    return this.repository.addTextEntriesToTask(userId, taskId, textEntries);
+    return this.repository.addTextEntriesToTask(userId, taskId, textEntries, mode);
   }
 
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {

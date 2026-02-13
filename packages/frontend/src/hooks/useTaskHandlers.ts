@@ -82,8 +82,7 @@ export function useTaskHandlers(
 
       try {
         const dataService = DataService.getInstance();
-        // TODO: when replace API is available, use _mode to choose behavior
-        await dataService.addTextEntriesToTask(user.id, taskId, entries);
+        await dataService.addTextEntriesToTask(user.id, taskId, entries, _mode);
         setTaskRefreshTrigger((prev) => prev + 1);
         const count = entries.length;
         showNotification(
