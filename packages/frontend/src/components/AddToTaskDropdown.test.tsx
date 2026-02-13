@@ -45,6 +45,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
       expect(container.firstChild).toBeNull();
@@ -57,6 +58,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -72,6 +74,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -87,6 +90,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -102,6 +106,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -121,6 +126,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -135,7 +141,7 @@ describe("AddToTaskDropdown", () => {
       }
     });
 
-    it("calls onSelectTask when task clicked", async () => {
+    it("calls onSelectTask with append mode when empty task clicked", async () => {
       const user = userEvent.setup();
       render(
         <AddToTaskDropdown
@@ -143,6 +149,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -151,7 +158,7 @@ describe("AddToTaskDropdown", () => {
       });
 
       await user.click(screen.getByText("Task One"));
-      expect(mockOnSelectTask).toHaveBeenCalledWith("task-1", "Task One");
+      expect(mockOnSelectTask).toHaveBeenCalledWith("task-1", "Task One", "append");
       expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -163,6 +170,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -185,6 +193,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 
@@ -217,6 +226,7 @@ describe("AddToTaskDropdown", () => {
           onClose={mockOnClose}
           onSelectTask={mockOnSelectTask}
           onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
         />,
       );
 

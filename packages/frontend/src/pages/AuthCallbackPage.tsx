@@ -4,6 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../services/auth";
+import { PageLoadingState } from "../components/ui/PageLoadingState";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -99,8 +100,7 @@ export function AuthCallbackPage() {
         height: "100vh",
       }}
     >
-      <div className="loader-spinner" style={{ width: 48, height: 48 }}></div>
-      <p style={{ marginLeft: "1rem" }}>Sisenen...</p>
+      <PageLoadingState message="Sisenen..." />
     </main>
   );
 }

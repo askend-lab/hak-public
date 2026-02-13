@@ -2,6 +2,7 @@
 @import "../tokens/typography";
 @import "../tokens/spacing";
 @import "../tokens/borders";
+@import "../tokens/breakpoints";
 @import "../abstracts/mixins";
 
 // =========================================================================
@@ -22,7 +23,8 @@
 // Panel header - uses panel header mixin with specific width
 .sentence-phonetic-panel__header {
   @include panel-header;
-  width: 518px;
+  width: 100%;
+  max-width: 518px;
 }
 
 // Title section - component-specific (multi-line with subtitle)
@@ -60,8 +62,10 @@
 
 .sentence-phonetic-panel__description {
   margin: 0;
-  width: 518px;
-  height: 44px;
+  width: 100%;
+  max-width: 518px;
+  height: auto;
+  min-height: 44px;
   font-family: $font-body;
   font-size: $font-size-md;
   font-weight: 400;
@@ -93,7 +97,8 @@
 }
 
 .sentence-phonetic-panel__textarea {
-  width: 518px;
+  width: 100%;
+  max-width: 518px;
   height: 84px;
   padding: $spacing-3;
   border: 1px solid $color-primary;
@@ -133,8 +138,8 @@
 }
 
 .sentence-phonetic-panel__marker-button {
-  min-width: $spacing-touch-target;
-  min-height: $spacing-touch-target;
+  width: 28px;
+  height: 36px;
   padding: 0;
   background: $color-white;
   border: 1px solid $color-outlined-neutral;
@@ -378,12 +383,39 @@
   flex-shrink: 0;
 }
 
-// Spin animation for loading spinners
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+// ---------------------------------------------------------------------------
+// Responsive Styles
+// ---------------------------------------------------------------------------
+
+@include respond-below($breakpoint-md) {
+  .sentence-phonetic-panel {
+    width: 100vw;
+    max-width: none;
+    padding: $spacing-4 $spacing-3;
   }
-  100% {
-    transform: rotate(360deg);
+
+  .sentence-phonetic-panel__header,
+  .sentence-phonetic-panel__content {
+    width: 100%;
+    max-width: none;
+  }
+
+  .sentence-phonetic-panel__description,
+  .sentence-phonetic-panel__textarea {
+    max-width: none;
+  }
+
+  .sentence-phonetic-panel__title {
+    font-size: $font-size-md;
+  }
+}
+
+@include respond-below($breakpoint-sm) {
+  .sentence-phonetic-panel {
+    padding: $spacing-3 $spacing-2;
+  }
+
+  .sentence-phonetic-panel__actions {
+    padding: 0;
   }
 }

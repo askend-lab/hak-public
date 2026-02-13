@@ -107,8 +107,8 @@
 }
 
 @mixin panel-close {
-  min-width: $spacing-touch-target;
-  min-height: $spacing-touch-target;
+  width: 36px;
+  height: 36px;
   border-radius: $border-radius-full;
   border: none;
   background: transparent;
@@ -122,6 +122,31 @@
 
   &:hover {
     background: $color-menu-hover;
+  }
+}
+
+// Compact variant for dense contexts (dropdowns, menus)
+@mixin panel-close-sm {
+  width: 24px;
+  height: 24px;
+  border-radius: $border-radius-full;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: $color-menu-hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
   }
 }
 

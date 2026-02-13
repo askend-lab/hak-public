@@ -1,6 +1,7 @@
 # WCAG 2.1 AA Compliance Audit Report
 
-**Audit Date:** January 17, 2026  
+**Initial Audit Date:** January 17, 2026  
+**Re-Audit Date:** February 12, 2026  
 **Auditor:** Automated Assessment with Manual Review  
 **Scope:** Frontend UI (`packages/frontend`) - ~88 TSX components  
 **Standard:** WCAG 2.1 Level AA
@@ -9,26 +10,28 @@
 
 ## Executive Summary
 
-This audit assesses the frontend application for WCAG 2.1 Level AA compliance. The assessment included automated testing infrastructure setup, component-by-component review, and implementation of critical fixes.
+This audit assesses the frontend application for WCAG 2.1 Level AA compliance. The February 2026 re-audit built on the January 2026 initial fixes with comprehensive screen reader readiness improvements, expanded automated testing, and color contrast fixes.
 
-### Compliance Status: IMPROVED (Previously: Non-Compliant)
+### Compliance Status: SUBSTANTIALLY COMPLIANT
 
-| Category        | Before | After | Status       |
-| --------------- | ------ | ----- | ------------ |
-| Critical Issues | 5      | 0     | ✅ Fixed     |
-| High Priority   | 8      | 0     | ✅ Fixed     |
-| Medium Priority | 12     | 3     | ⚠️ Remaining |
-| Low Priority    | 6      | 6     | 📋 Backlog   |
+| Category        | Jan 2026 | Feb 2026 | Status            |
+| --------------- | -------- | -------- | ----------------- |
+| Critical Issues | 0        | 0        | All fixed         |
+| High Priority   | 0        | 0        | All fixed         |
+| Medium Priority | 3        | 0        | All fixed         |
+| Low Priority    | 6        | 3        | 3 items deferred  |
 
-### Key Improvements Made
+### Key Improvements (February 2026)
 
-1. **Focus Indicators** - Fixed critical WCAG 2.4.7 violation
-2. **Modal Accessibility** - Added role, aria-modal, focus trap
-3. **Form Labels** - Added missing labels to all form inputs
-4. **Error Announcements** - Added role="alert" to error messages
-5. **Menu Accessibility** - Added ARIA roles and keyboard support
-6. **Language Declaration** - Changed html lang from "en" to "et"
-7. **Testing Infrastructure** - Installed axe-core, jest-axe, Playwright a11y
+1. **Screen Reader Readiness** - aria-labels on all icon-only buttons, form inputs, dropdown triggers
+2. **Document Title** - Dynamic title updates per route via `useDocumentTitle` hook
+3. **Color Contrast** - Fixed `$color-text-disabled` and `$color-text-placeholder` to meet 4.5:1 ratio
+4. **Live Regions** - Loading states announce to assistive technology
+5. **Accessible Modals** - BuildInfo modal now has dialog role and aria-labelledby
+6. **Decorative Content** - SVGs hidden from assistive technology where appropriate
+7. **Keyboard Access** - Clickable task rows now accessible via keyboard
+8. **Estonian Labels** - All aria-labels translated from English to Estonian
+9. **Testing** - Expanded E2E suite, enabled jsx-a11y ESLint rules
 
 ---
 
@@ -36,260 +39,232 @@ This audit assesses the frontend application for WCAG 2.1 Level AA compliance. T
 
 ### 1. Perceivable (WCAG 1.x)
 
-#### 1.1.1 Non-text Content ✅ PASS
+#### 1.1.1 Non-text Content — PASS
 
-- **Finding:** Icon component correctly uses `aria-hidden="true"` for decorative icons
-- **Logo:** Has proper `alt="EKI Logo"` attribute
+- Icons use `aria-hidden="true"` for decorative purposes
+- Logo has proper `alt` text
+- **Feb 2026:** Added `aria-hidden` to Google/TARA SVG icons in LoginModal and inline SVG in TaskDetailHeader
 
-#### 1.3.1 Info and Relationships ✅ FIXED
+#### 1.3.1 Info and Relationships — PASS
 
-- **Before:** Several form inputs used placeholders without labels
-- **After:** Added proper `<label htmlFor="...">` associations to:
-  - `AddEntryModal.tsx`
-  - `TaskEditModal.tsx`
-  - `SentenceMenu.tsx` (search input)
+- Forms have proper labels (explicit or aria-label)
+- Landmark structure: `<header>`, `<nav>`, `<main>`, `<footer>`
+- Heading hierarchy verified (h1 > h2 > h3)
+- **Feb 2026:** Added `aria-label` to all unlabeled form inputs (search, tag edit, sentence input, phonetic textarea)
 
-#### 1.4.1 Use of Color ✅ PASS
+#### 1.4.3 Contrast (Minimum) — PASS
 
-- **Finding:** Error states use both color AND text/icons
-- Notifications include error text, not just red color
+- **Feb 2026 Fix:** `$color-text-disabled` changed from #999999 (2.85:1) to #767676 (4.54:1)
+- **Feb 2026 Fix:** `$color-text-placeholder` changed from #747676 (4.63:1) to #636B74 (5.24:1)
+- All other text/background combinations meet 4.5:1 minimum
 
-#### 1.4.3 Contrast (Minimum) ⚠️ NEEDS VERIFICATION
+#### 1.4.4 Resize Text — PASS
 
-- **Finding:** Color tokens are defined with good contrast values
-- **Recommendation:** Run automated contrast checking on all color combinations
-- **Colors to verify:**
-  - `$color-text-placeholder` (#747676) on white backgrounds
-  - `$color-text-disabled` (#999999) on light backgrounds
-
-#### 1.4.4 Resize Text ✅ PASS
-
-- **Finding:** Typography uses `rem` units throughout
+- Typography uses `rem` units
 - Responsive breakpoints properly handled
 
 ---
 
 ### 2. Operable (WCAG 2.x)
 
-#### 2.1.1 Keyboard ✅ FIXED
+#### 2.1.1 Keyboard — PASS (one deferral)
 
-- **Before:** Some custom controls were mouse-only
-- **After:** All interactive elements are keyboard accessible
-- Menus support Escape key to close
+- All interactive elements are keyboard accessible
+- **Feb 2026:** Made task row clickable divs keyboard-accessible with `role="button"`, `tabIndex`, `onKeyDown`
+- **Deferred (A-016):** Drag-and-drop keyboard alternative for sentence reordering
 
-#### 2.1.2 No Keyboard Trap ✅ FIXED
+#### 2.1.2 No Keyboard Trap — PASS
 
-- **Before:** Modals did not trap focus
-- **After:** `BaseModal.tsx` implements focus trap
-- Focus returns to trigger element on close
+- Modal focus trap works correctly
+- Escape key closes all modals and dropdowns
 
-#### 2.4.3 Focus Order ✅ PASS
+#### 2.4.1 Bypass Blocks — PASS
 
-- **Finding:** DOM order matches visual order
-- Tab sequence is logical throughout the application
+- Skip-to-main-content link present on all main pages
+- Main content has `id="main-content"` with `tabIndex={-1}`
 
-#### 2.4.7 Focus Visible ✅ FIXED (Critical)
+#### 2.4.2 Page Titled — PASS
 
-- **Before:** `_reset.scss` contained `button { outline: none; }` (CRITICAL VIOLATION)
-- **After:** Replaced with proper `:focus-visible` styles:
-  ```scss
-  button:focus-visible,
-  a:focus-visible,
-  input:focus-visible {
-    outline: 2px solid var(--color-input-border-focus);
-    outline-offset: 2px;
-  }
-  ```
-- Added focus mixins: `@mixin focus-visible`, `@mixin focus-visible-ring`
+- **Feb 2026:** Created `useDocumentTitle` hook
+- Title updates dynamically per route (e.g., "Hääldusabiline – Ülesanded")
+- Shared task pages show task name in title
+
+#### 2.4.3 Focus Order — PASS
+
+- DOM order matches visual order
+- Logical tab sequence
+
+#### 2.4.7 Focus Visible — PASS
+
+- `:focus-visible` styles applied to all interactive elements
+
+#### 2.5.5 Target Size — OPEN (deferred)
+
+- **Feb 2026:** Touch target enforcement (44x44px via `$spacing-touch-target`) was implemented but reverted — changes caused unintended visual regressions (oversized buttons and icons).
+- **Status:** Deferred (A-017). Needs design review before re-implementation to ensure visual consistency.
 
 ---
 
 ### 3. Understandable (WCAG 3.x)
 
-#### 3.1.1 Language of Page ✅ FIXED
+#### 3.1.1 Language of Page — PASS
 
-- **Before:** `<html lang="en">` (incorrect for Estonian content)
-- **After:** `<html lang="et">`
+- `<html lang="et">` set correctly
+- **Feb 2026:** All aria-labels in Estonian (previously some were in English)
 
-#### 3.2.1 On Focus ✅ PASS
+#### 3.2.1 On Focus — PASS
 
-- **Finding:** No unexpected context changes on focus
+- No unexpected context changes on focus
 
-#### 3.3.1 Error Identification ✅ FIXED
+#### 3.3.1 Error Identification — PASS
 
-- **Before:** Error messages lacked ARIA attributes
-- **After:** All error messages now have `role="alert"`:
-  - `TaskCreationModal.tsx`
-  - `AddEntryModal.tsx`
-  - `TaskEditModal.tsx`
-  - `LoginModal.tsx`
-  - `PronunciationVariants.tsx`
+- Error messages have `role="alert"`
 
-#### 3.3.2 Labels or Instructions ✅ FIXED
+#### 3.3.2 Labels or Instructions — PASS
 
-- **Finding:** All form fields now have proper labels
-- Required fields marked with `aria-required="true"`
+- All form fields have proper labels or aria-label
 
 ---
 
 ### 4. Robust (WCAG 4.x)
 
-#### 4.1.1 Parsing ✅ PASS
+#### 4.1.1 Parsing — PASS
 
-- **Finding:** Valid HTML structure, no duplicate IDs
+- Valid HTML structure, no duplicate IDs
 
-#### 4.1.2 Name, Role, Value ✅ FIXED
+#### 4.1.2 Name, Role, Value — PASS
 
-- **Before:** Modals missing `role="dialog"` and `aria-modal`
-- **After:** `BaseModal.tsx` now includes:
-  - `role="dialog"`
-  - `aria-modal="true"`
-  - `aria-labelledby` linked to modal title
-- **Menus:** Now include:
-  - `role="menu"` on dropdown container
-  - `role="menuitem"` on menu items
-  - `aria-haspopup="menu"` on trigger buttons
-  - `aria-expanded` state
+- All modals have `role="dialog"`, `aria-modal="true"`, `aria-labelledby`
+- **Feb 2026:** BuildInfo modal added dialog ARIA attributes
+- All dropdown triggers have `aria-expanded`
+- All icon-only buttons have `aria-label`
 
----
+#### 4.1.3 Status Messages — PASS
 
-## Files Modified
-
-| File                                                             | Changes                                            |
-| ---------------------------------------------------------------- | -------------------------------------------------- |
-| `package.json`                                                   | Added a11y testing dependencies, test:a11y scripts |
-| `index.html`                                                     | Changed lang="en" to lang="et"                     |
-| `src/styles/base/_reset.scss`                                    | Fixed focus indicators, added .visually-hidden     |
-| `src/styles/abstracts/_mixins.scss`                              | Added focus-visible mixins                         |
-| `src/components/BaseModal.tsx`                                   | Added ARIA, focus trap, focus management           |
-| `src/components/AddEntryModal.tsx`                               | Added labels, role="alert"                         |
-| `src/components/TaskEditModal.tsx`                               | Added labels, role="alert"                         |
-| `src/components/TaskCreationModal.tsx`                           | Added role="alert"                                 |
-| `src/components/LoginModal.tsx`                                  | Added role="alert"                                 |
-| `src/components/SentenceMenu.tsx`                                | Added ARIA roles, keyboard support                 |
-| `src/components/SentenceSynthesis/RowMenu.tsx`                   | Added ARIA roles, keyboard support                 |
-| `src/components/PronunciationVariants/PronunciationVariants.tsx` | Added role="alert"                                 |
-| `src/main.tsx`                                                   | Added dev-mode axe-core integration                |
-| `src/test/setup.ts`                                              | Added jest-axe matchers                            |
-| `src/test/a11y-helpers.ts`                                       | New - accessibility test utilities                 |
-| `src/utils/a11y-dev.ts`                                          | New - dev-mode accessibility checker               |
-| `e2e/accessibility.spec.ts`                                      | New - Playwright a11y tests                        |
-| `docs/02-DESIGN-SYSTEM/07-Quality-Standards.md`                  | Added accessibility section                        |
+- Notification container has `aria-live="polite"`, `aria-atomic="true"`
+- **Feb 2026:** Loading states have `role="status"`, `aria-live="polite"`
 
 ---
 
-## Testing Infrastructure Added
+## Files Modified (February 2026)
+
+### Phase B: Screen Reader Readiness
+
+| File | Changes |
+| --- | --- |
+| `src/components/BuildInfo.tsx` | aria-label on buttons, dialog ARIA on modal |
+| `src/components/PronunciationVariants/CustomVariantForm.tsx` | aria-label on play button, input, clear button |
+| `src/components/PronunciationVariants/VariantItem.tsx` | aria-label on play button |
+| `src/components/PronunciationVariants/PronunciationVariants.tsx` | Estonian aria-label on close |
+| `src/components/PronunciationVariants/PhoneticGuide.tsx` | Estonian aria-label on close |
+| `src/components/SentenceSynthesisItem.tsx` | Estonian aria-labels (drag, menu) |
+| `src/components/SentenceSynthesis/TagsInput.tsx` | aria-labels on inputs, clear button |
+| `src/components/SentencePhoneticPanel.tsx` | aria-label on textarea |
+| `src/components/AddToTaskDropdown.tsx` | aria-label on search input |
+| `src/components/TaskDetailView/TaskDetailHeader.tsx` | aria-expanded, aria-hidden on SVG |
+| `src/components/UserProfile.tsx` | aria-expanded, aria-label |
+| `src/components/TaskManager.tsx` | aria-expanded, keyboard access on task rows, Estonian labels |
+| `src/components/LoginModal.tsx` | aria-hidden on decorative SVGs |
+| `src/pages/SharedTaskPage.tsx` | useDocumentTitle, live region on loading |
+| `src/pages/AuthCallbackPage.tsx` | live region on loading |
+| `src/hooks/useDocumentTitle.ts` | New - route-based title updates |
+| `src/hooks/index.ts` | Export useDocumentTitle |
+| `src/App.tsx` | useDocumentTitle integration |
+
+### Phase C: Touch Target Sizes — REVERTED
+
+Touch target enforcement was implemented across 13 SCSS files but reverted due to visual regressions (oversized buttons/icons). This work is deferred as A-017 pending design review.
+
+### Phase A: Testing & Linting
+
+| File | Changes |
+| --- | --- |
+| `e2e/accessibility.spec.ts` | Comprehensive E2E accessibility test suite |
+| `eslint.base.config.mjs` | 18 jsx-a11y rules enabled |
+
+### Phase D: Color Contrast
+
+| File | Changes |
+| --- | --- |
+| `src/styles/tokens/_colors.scss` | Fixed $color-text-disabled, $color-text-placeholder |
+
+---
+
+## Testing Infrastructure
 
 ### 1. Development Mode (axe-core)
-
 - Automatically logs accessibility violations to console
-- Enable via: runs automatically in `npm run dev`
 - Manual audit: Call `window.runA11yAudit()` in browser console
 
 ### 2. Unit Tests (jest-axe)
-
 - Import helpers from `@/test/a11y-helpers`
 - Use `expectNoA11yViolations(container)` in tests
-- Matchers extend `expect` automatically
 
 ### 3. E2E Tests (Playwright + axe-core)
-
 - Run: `npm run test:a11y`
-- Tests all major pages and user flows
-- Reports critical/serious violations as test failures
+- Tests: page-level audits, modals, keyboard navigation, touch targets, screen reader readiness, focus management
+
+### 4. ESLint (jsx-a11y)
+- 18 rules enabled for TSX/JSX files
+- Catches accessibility issues at development time
 
 ---
 
-## Remaining Work (Backlog)
+## Remaining Work (Deferred)
 
-### Medium Priority
-
-| Issue                       | Location       | Recommendation                         |
-| --------------------------- | -------------- | -------------------------------------- |
-| Color contrast verification | All components | Run automated contrast checker         |
-| Skip link                   | App layout     | Add skip-to-main-content link          |
-| Live regions                | Notifications  | Consider aria-live for dynamic content |
-
-### Low Priority
-
-| Issue              | Location            | Recommendation                     |
-| ------------------ | ------------------- | ---------------------------------- |
-| Landmarks          | Page layout         | Add main, nav, footer landmarks    |
-| Heading hierarchy  | Some pages          | Verify h1-h6 sequence              |
-| Drag-and-drop      | Sentence reordering | Add keyboard alternative           |
-| Touch target size  | Mobile              | Verify 44x44px minimum             |
-| Reduced motion     | Animations          | Add prefers-reduced-motion support |
-| High contrast mode | Theming             | Test with Windows High Contrast    |
-
----
-
-## Verification Commands
-
-```bash
-# Run automated accessibility tests
-npm run test:a11y
-
-# Run all tests including accessibility
-npm run test:full
-
-# Check design system validation
-npm run validate:design
-
-# Development mode with live a11y checking
-npm run dev
-# Check browser console for axe-core warnings
-```
+| ID    | Issue                              | WCAG Criterion     | Priority |
+| ----- | ---------------------------------- | ------------------ | -------- |
+| A-016 | Drag-and-drop keyboard alternative | 2.1.1 Keyboard     | Low      |
+| A-017 | Touch target size (44x44px)        | 2.5.5 Target Size  | Low      |
+| A-019 | High contrast mode (forced-colors) | 1.4.1 Use of Color | Low      |
 
 ---
 
 ## Compliance Checklist
 
 ```
-WCAG 2.1 AA Checklist:
+WCAG 2.1 AA Checklist (February 2026):
 
 Perceivable:
-✅ 1.1.1 Non-text Content - Icons use aria-hidden, images have alt
-✅ 1.3.1 Info and Relationships - Forms have labels
-⚠️ 1.4.3 Contrast - Needs verification
-✅ 1.4.4 Resize Text - Uses rem units
+  1.1.1 Non-text Content       — PASS (aria-hidden on decorative elements)
+  1.3.1 Info and Relationships  — PASS (landmarks, labels, heading hierarchy)
+  1.4.1 Use of Color           — PASS (errors use text+icon, not just color)
+  1.4.3 Contrast (Minimum)     — PASS (all tokens verified ≥4.5:1)
+  1.4.4 Resize Text            — PASS (rem units throughout)
 
 Operable:
-✅ 2.1.1 Keyboard - All elements keyboard accessible
-✅ 2.1.2 No Keyboard Trap - Focus trap in modals works correctly
-✅ 2.4.3 Focus Order - Logical tab order
-✅ 2.4.7 Focus Visible - Focus indicators implemented
+  2.1.1 Keyboard               — PASS* (drag-and-drop deferred)
+  2.1.2 No Keyboard Trap       — PASS
+  2.4.1 Bypass Blocks          — PASS (skip link implemented)
+  2.4.2 Page Titled            — PASS (dynamic titles per route)
+  2.4.3 Focus Order            — PASS
+  2.4.7 Focus Visible          — PASS
+  2.5.5 Target Size            — OPEN (deferred — needs design review)
 
 Understandable:
-✅ 3.1.1 Language of Page - lang="et" set
-✅ 3.3.1 Error Identification - role="alert" on errors
-✅ 3.3.2 Labels or Instructions - All inputs labeled
+  3.1.1 Language of Page        — PASS (lang="et", Estonian labels)
+  3.2.1 On Focus               — PASS
+  3.3.1 Error Identification   — PASS
+  3.3.2 Labels or Instructions — PASS
 
 Robust:
-✅ 4.1.1 Parsing - Valid HTML
-✅ 4.1.2 Name, Role, Value - ARIA implemented
+  4.1.1 Parsing                — PASS
+  4.1.2 Name, Role, Value      — PASS (all ARIA attributes present)
+  4.1.3 Status Messages        — PASS (live regions for notifications & loading)
 ```
 
 ---
 
-## Recommendations for Ongoing Compliance
+## Recommendations
 
-1. **Add accessibility to Definition of Done**
-   - Run `npm run test:a11y` before each PR
-   - Check console for axe-core warnings during development
-
-2. **Screen Reader Testing**
-   - Test with VoiceOver (macOS) monthly
-   - Test with NVDA (Windows) before major releases
-
-3. **Automated CI Integration**
-   - Add accessibility tests to CI pipeline
-   - Fail builds on critical accessibility violations
-
-4. **Training**
-   - Review WCAG 2.1 AA guidelines with team
-   - Reference the accessibility checklist in 07-Quality-Standards.md
+1. **Complete A-016** — Add keyboard alternative for drag-and-drop sentence reordering
+2. **Complete A-017** — Enforce 44x44px touch targets with design-approved approach (avoid visual regressions)
+3. **Complete A-019** — Test and support `forced-colors` (Windows High Contrast Mode)
+3. **Screen Reader Testing** — Conduct manual testing with VoiceOver and NVDA
+4. **CI Integration** — Add `npm run test:a11y` to CI pipeline
+5. **Regular Re-audit** — Quarterly WCAG 2.1 AA audit
 
 ---
 
-**Report Generated:** January 17, 2026  
+**Report Generated:** February 12, 2026  
 **Next Review:** Quarterly or before major releases

@@ -31,8 +31,8 @@
 
 // Menu button mixin (reusable 3-dot menu button)
 @mixin menu-button {
-  min-width: $spacing-touch-target;
-  min-height: $spacing-touch-target;
+  width: 36px;
+  height: 36px;
   border-radius: $border-radius-full;
   border: none;
   background: transparent;
@@ -57,8 +57,8 @@
 
 // Drag handle mixin (reusable drag-and-drop handle)
 @mixin drag-handle {
-  min-width: $spacing-touch-target;
-  min-height: $spacing-touch-target;
+  width: 36px;
+  height: 36px;
   border-radius: $border-radius-round;
   border: none;
   background: transparent;
@@ -221,8 +221,8 @@
 
     &.button {
       &--icon-only {
-        min-width: $spacing-touch-target;
-        min-height: $spacing-touch-target;
+        width: 32px;
+        height: 32px;
       }
 
       &--icon,
@@ -251,10 +251,10 @@
     height: 48px;
     padding: 0;
 
-    // Circular variant (icon-only button with touch target)
+    // Circular variant (36px icon-only button)
     &.button--circular {
-      min-width: $spacing-touch-target;
-      min-height: $spacing-touch-target;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
 
       svg {
@@ -282,13 +282,3 @@
 // =========================================================================
 // Aliases for pages that use btn-primary/btn-secondary class names
 // =========================================================================
-
-// Loader animation
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}

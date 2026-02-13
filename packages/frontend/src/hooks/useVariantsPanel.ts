@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback } from "react";
-import { SentenceState, convertTextToTags } from "@/types/synthesis";
+import { SentenceState, convertTextToTags, stripPunctuationForLookup } from "@/types/synthesis";
 import { NotificationType } from "@/components/Notification";
 import { analyzeText, CONTENT_TYPE_JSON, VARIANTS_API_PATH } from "@/utils/analyzeApi";
 
@@ -82,7 +82,7 @@ export function useVariantsPanel(
               : null;
           setSelectedSentenceId(sentenceId);
           setSelectedTagIndex(tagIndex);
-          setVariantsWord(word);
+          setVariantsWord(stripPunctuationForLookup(word));
           setVariantsCustomPhonetic(customPhoneticForm || null);
           setIsVariantsPanelOpen(true);
           return;
@@ -92,7 +92,7 @@ export function useVariantsPanel(
       const customPhoneticForm = sentence?.stressedTags?.[tagIndex];
       setSelectedSentenceId(sentenceId);
       setSelectedTagIndex(tagIndex);
-      setVariantsWord(word);
+      setVariantsWord(stripPunctuationForLookup(word));
       setVariantsCustomPhonetic(customPhoneticForm || null);
       setIsVariantsPanelOpen(true);
     },
@@ -117,12 +117,15 @@ export function useVariantsPanel(
       // Minimum spinner display time for better UX
       const minDisplayTime = new Promise((resolve) => setTimeout(resolve, MIN_SPINNER_DISPLAY_MS));
 
+      // Strip punctuation for API lookup (preserve dashes for compound words)
+      const lookupWord = stripPunctuationForLookup(word);
+
       try {
         const [response] = await Promise.all([
           fetch(VARIANTS_API_PATH, {
             method: "POST",
             headers: { "Content-Type": CONTENT_TYPE_JSON },
-            body: JSON.stringify({ word }),
+            body: JSON.stringify({ word: lookupWord }),
             signal: controller.signal,
           }),
           minDisplayTime,

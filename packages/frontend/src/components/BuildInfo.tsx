@@ -105,10 +105,10 @@ const BuildInfoModal = ({
   onClose: () => void;
 }) => (
   <div className="build-info-overlay" onClick={onClose}>
-    <div className="build-info-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="build-info-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="build-info-title">
       <div className="build-info-modal__header">
-        <h3>Build Info</h3>
-        <button className="build-info-modal__close" onClick={onClose}>
+        <h3 id="build-info-title">Build Info</h3>
+        <button className="build-info-modal__close" onClick={onClose} aria-label="Sulge">
           ×
         </button>
       </div>
@@ -148,6 +148,7 @@ export default function BuildInfo() {
         className="build-info-button"
         onClick={() => setIsOpen(true)}
         title="Build info"
+        aria-label="Ehituse teave"
       >
         <span className="build-info-hash">{info.commitHash}</span>
       </button>

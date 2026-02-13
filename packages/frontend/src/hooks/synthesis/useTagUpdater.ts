@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { SentenceState } from "@/types/synthesis";
+import { SentenceState, normalizeTags } from "@/types/synthesis";
 
 type SentenceSetter = React.Dispatch<React.SetStateAction<SentenceState[]>>;
 type TagTransformer = (sentence: SentenceState) => Partial<SentenceState>;
@@ -47,10 +47,10 @@ export function useTagUpdater(setSentences: SentenceSetter): {
   const deleteTag = useCallback(
     (sentenceId: string, tagIndex: number) => {
       updateSentenceTags(sentenceId, (s) => {
-        const newTags = s.tags.filter((_, i) => i !== tagIndex);
-        const newStressedTags = s.stressedTags?.filter(
-          (_, i) => i !== tagIndex,
-        );
+        const newTags = normalizeTags(s.tags.filter((_, i) => i !== tagIndex));
+        const newStressedTags = s.stressedTags
+          ? normalizeTags(s.stressedTags.filter((_, i) => i !== tagIndex))
+          : undefined;
         return {
           tags: newTags,
           text: newTags.join(" "),
@@ -69,17 +69,19 @@ export function useTagUpdater(setSentences: SentenceSetter): {
   const replaceTag = useCallback(
     (sentenceId: string, tagIndex: number, newWords: string[]) => {
       updateSentenceTags(sentenceId, (s) => {
-        const newTags = [
+        const newTags = normalizeTags([
           ...s.tags.slice(0, tagIndex),
           ...newWords,
           ...s.tags.slice(tagIndex + 1),
-        ];
+        ]);
         const newStressedTags = s.stressedTags
-          ? [
-              ...s.stressedTags.slice(0, tagIndex),
-              ...newWords.map(() => undefined as unknown as string),
-              ...s.stressedTags.slice(tagIndex + 1),
-            ].filter((t) => t !== undefined)
+          ? normalizeTags(
+              [
+                ...s.stressedTags.slice(0, tagIndex),
+                ...newWords.map(() => undefined as unknown as string),
+                ...s.stressedTags.slice(tagIndex + 1),
+              ].filter((t) => t !== undefined),
+            )
           : undefined;
         return {
           tags: newTags,

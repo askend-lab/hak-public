@@ -68,7 +68,11 @@ export function useTaskHandlers(
   }, [requireAuth]);
 
   const handleSelectTaskFromDropdown = useCallback(
-    async (taskId: string, taskName: string) => {
+    async (
+      taskId: string,
+      taskName: string,
+      _mode: "append" | "replace",
+    ) => {
       if (!user) return;
       const entries = filterNonEmptySentences(sentences).map((s) => ({
         text: s.text,
@@ -78,6 +82,7 @@ export function useTaskHandlers(
 
       try {
         const dataService = DataService.getInstance();
+        // TODO: when replace API is available, use _mode to choose behavior
         await dataService.addTextEntriesToTask(user.id, taskId, entries);
         setTaskRefreshTrigger((prev) => prev + 1);
         const count = entries.length;

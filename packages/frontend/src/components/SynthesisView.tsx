@@ -36,7 +36,11 @@ interface SynthesisViewProps {
   onAddAllClick: () => void;
   onPlayAllClick: () => void;
   onDropdownClose: () => void;
-  onSelectTask: (taskId: string, taskName: string) => void;
+  onSelectTask: (
+    taskId: string,
+    taskName: string,
+    mode: "append" | "replace",
+  ) => void;
   onCreateNew: () => void;
   onPlay: (id: string) => void;
   onDragStart: (e: React.DragEvent, id: string) => void;
@@ -111,6 +115,8 @@ const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
     (p.isVariantsPanelOpen || p.showSentencePhoneticPanel) &&
     (p.variantsSelectedSentenceId === sentence.id ||
       p.sentencePhoneticId === sentence.id);
+  const isSentencePhoneticOpen = 
+    p.showSentencePhoneticPanel && p.sentencePhoneticId === sentence.id;
   return (
     <SentenceSynthesisItem
       key={sentence.id}
@@ -142,6 +148,7 @@ const SentenceItem = ({ sentence, sentenceIndex, p }: SentenceItemProps) => {
       isPronunciationPanelOpen={
         p.isVariantsPanelOpen || p.showSentencePhoneticPanel
       }
+      allTagsSelected={isSentencePhoneticOpen}
       editingTag={p.editingTag}
       onEditTagChange={p.onEditTagChange}
       onEditTagKeyDown={p.onEditTagKeyDown}

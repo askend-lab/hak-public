@@ -9,11 +9,14 @@ import SynthesisView from "./components/SynthesisView";
 import TasksView from "./components/TasksView";
 import SpecsPage from "./components/SpecsPage";
 import Dashboard from "./components/Dashboard";
+import AccessibilityPage from "./pages/AccessibilityPage";
+import PrivacyPage from "./pages/PrivacyPage";
 import AppModals from "./components/AppModals";
 import { RoleSelectionContent } from "./components/onboarding";
 import { useAuth } from "./services/auth";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./contexts/OnboardingContext";
+import { PageLoadingState } from "./components/ui/PageLoadingState";
 import {
   useSynthesis,
   useTaskHandlers,
@@ -21,6 +24,7 @@ import {
   useVariantsPanel,
   useSentenceMenu,
   useCurrentView,
+  useDocumentTitle,
 } from "./hooks";
 
 export default function Home() {
@@ -34,6 +38,7 @@ export default function Home() {
   } = useOnboarding();
   const navigate = useNavigate();
   const { currentView, selectedTaskId } = useCurrentView();
+  useDocumentTitle();
 
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
 
@@ -126,7 +131,7 @@ export default function Home() {
           minHeight: "100vh",
         }}
       >
-        <div className="loader-spinner" style={{ width: 48, height: 48 }}></div>
+        <PageLoadingState />
       </div>
     );
   }
@@ -242,6 +247,8 @@ export default function Home() {
               <SpecsPage onBack={() => navigate("/synthesis")} />
             )}
             {currentView === "dashboard" && <Dashboard />}
+            {currentView === "accessibility" && <AccessibilityPage />}
+            {currentView === "privacy" && <PrivacyPage />}
           </>
         )}
       </main>

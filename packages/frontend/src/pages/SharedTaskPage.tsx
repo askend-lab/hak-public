@@ -7,10 +7,12 @@ import { DataService } from "@/services/dataService";
 import { Task } from "@/types/task";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useSharedTaskAudio } from "@/hooks/useSharedTaskAudio";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import SentenceSynthesisItem from "@/components/SentenceSynthesisItem";
 import { PlayAllButton } from "@/components/ui/PlayAllButton";
+import { PageLoadingState } from "@/components/ui/PageLoadingState";
 
 export function SharedTaskPage() {
   const { token } = useParams<{ token: string }>();
@@ -28,6 +30,8 @@ export function SharedTaskPage() {
     handlePlayEntry,
     handlePlayAll,
   } = useSharedTaskAudio();
+
+  useDocumentTitle(task?.name ? `Jagatud: ${task.name}` : undefined);
 
   useEffect(() => {
     async function loadTask(): Promise<void> {
@@ -80,12 +84,7 @@ export function SharedTaskPage() {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="shared-task-loading">
-        <div className="loading-spinner" />
-        <p>Laadimine...</p>
-      </div>
-    );
+    return <PageLoadingState />;
   }
 
   // Error state

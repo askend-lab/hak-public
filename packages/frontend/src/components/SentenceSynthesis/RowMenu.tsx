@@ -5,8 +5,8 @@
 
 import React from "react";
 
-import { useRef, useEffect, useState } from "react";
 import { MoreIcon } from "../ui/Icons";
+import { useDropdownPosition } from "@/hooks/useDropdownPosition";
 
 interface RowMenuItem {
   label: string;
@@ -32,51 +32,22 @@ export function RowMenu({
   onClose,
   "data-onboarding-target": onboardingTarget,
 }: RowMenuProps): React.ReactElement {
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<{
-    top: number;
-    right: number;
-  } | null>(null);
-
-  useEffect(() => {
-    if (isOpen && menuButtonRef.current) {
-      const updatePosition = (): void => {
-        if (menuButtonRef.current) {
-          const rect = menuButtonRef.current.getBoundingClientRect();
-          setDropdownPosition({
-            top: rect.bottom + 4,
-            right: window.innerWidth - rect.right,
-          });
-        }
-      };
-
-      updatePosition();
-
-      window.addEventListener("scroll", updatePosition, true);
-      window.addEventListener("resize", updatePosition);
-
-      return (): void => {
-        window.removeEventListener("scroll", updatePosition, true);
-        window.removeEventListener("resize", updatePosition);
-      };
-    } else {
-      setDropdownPosition(null);
-    }
-    return undefined;
-  }, [isOpen]);
+  const { anchorRef, menuRef, menuStyle } = useDropdownPosition({
+    isOpen,
+  });
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === "Escape") {
       onClose();
-      menuButtonRef.current?.focus();
+      anchorRef.current?.focus();
     }
   };
 
   return (
     <div className="sentence-synthesis-item__menu-container">
       <button
-        ref={menuButtonRef}
+        ref={anchorRef}
         className="sentence-synthesis-item__menu-button"
         aria-label="Rohkem valikuid"
         aria-haspopup="menu"
@@ -86,7 +57,7 @@ export function RowMenu({
       >
         <MoreIcon size="2xl" />
       </button>
-      {isOpen && dropdownPosition && (
+      {isOpen && (
         <>
           <div
             className="sentence-synthesis-item__menu-backdrop"
@@ -94,11 +65,9 @@ export function RowMenu({
             aria-hidden="true"
           />
           <div
-            className="sentence-synthesis-item__dropdown-menu sentence-synthesis-item__dropdown-menu--fixed"
-            style={{
-              top: `${dropdownPosition.top}px`,
-              right: `${dropdownPosition.right}px`,
-            }}
+            ref={menuRef}
+            className={`sentence-synthesis-item__dropdown-menu${menuStyle ? " sentence-synthesis-item__dropdown-menu--fixed" : ""}`}
+            style={menuStyle}
             role="menu"
             aria-label="Lausungi valikud"
             onKeyDown={handleKeyDown}

@@ -32,7 +32,10 @@ const FooterLinks = () => (
         <a href="#">Versiooniajalugu</a>
       </li>
       <li>
-        <a href="#">Kasutus- ja privaatsustingimused</a>
+        <a href="/privacy">Kasutus- ja privaatsustingimused</a>
+      </li>
+      <li>
+        <a href="/accessibility">Ligipääsetavuse teatis</a>
       </li>
     </ul>
   </div>

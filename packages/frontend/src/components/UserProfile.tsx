@@ -40,6 +40,8 @@ export default function UserProfile({ user }: UserProfileProps) {
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="user-profile__button"
+        aria-expanded={isDropdownOpen}
+        aria-label="Kasutaja profiil"
       >
         <div className="user-profile__avatar">{getInitials(user)}</div>
         <div className="user-profile__info">

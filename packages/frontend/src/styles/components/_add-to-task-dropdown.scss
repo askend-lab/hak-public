@@ -6,6 +6,7 @@
 @import "../tokens/spacing";
 @import "../tokens/borders";
 @import "input";
+@import "panel";
 
 // Backdrop - uses Paper mixin
 .add-to-task-backdrop {
@@ -124,6 +125,50 @@
   line-height: 150%; // From spec
   letter-spacing: 0.15px; // From spec
   color: $color-primary;
+}
+
+// Confirmation panel header (matches synthesis__menu-panel-header pattern)
+.add-to-task-confirm-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: 6px $spacing-4;
+}
+
+.add-to-task-confirm-back {
+  @include panel-close-sm;
+  color: $color-primary;
+}
+
+.add-to-task-confirm-title {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Confirmation panel body
+.add-to-task-confirm-body {
+  padding: $spacing-2 $spacing-4 $spacing-4;
+}
+
+.add-to-task-confirm-info {
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 150%;
+  margin: 0 0 $spacing-3;
+}
+
+.add-to-task-confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
 }
 
 // Container for button + dropdown positioning
