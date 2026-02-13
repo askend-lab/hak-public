@@ -241,6 +241,60 @@ if [[ -f tsconfig.json ]]; then
   "
 fi
 
+# --- Clean up PR template (fix typecheck command) ---
+echo ">>> Cleaning pull_request_template.md..."
+if [[ -f .github/pull_request_template.md ]]; then
+  sed -i 's/pnpm -r exec tsc --noEmit/pnpm typecheck/' .github/pull_request_template.md
+  echo "  Fixed typecheck command"
+fi
+
+# --- Clean up ARCHITECTURE.md (remove infra/ section and DevBox references) ---
+echo ">>> Cleaning ARCHITECTURE.md..."
+if [[ -f ARCHITECTURE.md ]]; then
+  # Remove the Infrastructure section that references infra/ (which is excluded)
+  node -e "
+    const fs = require('fs');
+    let content = fs.readFileSync('ARCHITECTURE.md', 'utf8');
+    // Remove ## Infrastructure section (everything from '## Infrastructure' to next '##' or end)
+    content = content.replace(/## Infrastructure\n[\s\S]*?(?=\n## |\n*$)/, '');
+    // Replace DevBox reference in Quality System section
+    content = content.replace('Pre-commit hooks (DevBox) enforce', 'Pre-commit hooks enforce');
+    fs.writeFileSync('ARCHITECTURE.md', content);
+    console.log('  Removed infra/ section and DevBox reference');
+  "
+fi
+
+# --- Clean up ADR 003 (replace DevBox with standard hooks) ---
+echo ">>> Cleaning ADR docs..."
+if [[ -f docs/adr/003-tdd-devbox.md ]]; then
+  sed -i 's/DevBox pre-commit hooks/pre-commit hooks/g' docs/adr/003-tdd-devbox.md
+  sed -i 's/DevBox Hooks/Pre-commit Hooks/g' docs/adr/003-tdd-devbox.md
+  sed -i 's/DevBox is a custom tool — needs replacement with husky for OSS/Custom internal tool replaced with standard hooks/' docs/adr/003-tdd-devbox.md
+  echo "  Cleaned DevBox references in ADR 003"
+fi
+
+# --- Clean up merlin-api package.json (remove deploy scripts) ---
+echo ">>> Cleaning merlin-api package.json..."
+if [[ -f packages/merlin-api/package.json ]] && command -v node &>/dev/null; then
+  node -e "
+    const fs = require('fs');
+    const pkg = JSON.parse(fs.readFileSync('packages/merlin-api/package.json', 'utf8'));
+    delete pkg.scripts['deploy'];
+    delete pkg.scripts['deploy:dev'];
+    delete pkg.scripts['deploy:prod'];
+    if (!pkg.scripts['test:full']) pkg.scripts['test:full'] = pkg.scripts['test'] || 'jest';
+    fs.writeFileSync('packages/merlin-api/package.json', JSON.stringify(pkg, null, 2) + '\n');
+    console.log('  Removed deploy scripts, added test:full');
+  "
+fi
+
+# --- Clean up main.tsx (remove Build timestamp comment) ---
+echo ">>> Cleaning main.tsx..."
+if [[ -f packages/frontend/src/main.tsx ]]; then
+  sed -i '/^\/\/ Build [0-9]\{14\}$/d' packages/frontend/src/main.tsx
+  echo "  Removed Build timestamp"
+fi
+
 # --- Clean up .gitignore (remove references to internal paths) ---
 echo ">>> Cleaning .gitignore..."
 if [[ -f .gitignore ]]; then

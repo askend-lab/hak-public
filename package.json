@@ -34,8 +34,12 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
+      "aws-sdk",
+      "core-js",
       "esbuild",
+      "es5-ext",
       "protobufjs",
+      "serverless",
       "unrs-resolver"
     ],
     "overrides": {
