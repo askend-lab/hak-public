@@ -5,12 +5,19 @@ import type { User } from "./types";
 
 const STORAGE_KEYS = {
   USER: "hak_user",
-  ACCESS_TOKEN: "hak_access_token",
-  ID_TOKEN: "hak_id_token",
   REFRESH_TOKEN: "hak_refresh_token",
 };
 
+// Legacy keys — removed from localStorage on clear() for migration
+const LEGACY_KEYS = ["hak_access_token", "hak_id_token"];
+
 const COGNITO_PROVIDER_PREFIX = "CognitoIdentityServiceProvider";
+
+// In-memory token storage — not persisted to localStorage.
+// Prevents XSS from stealing access/id tokens via localStorage.
+// Tokens are re-obtained on page load via refresh_token flow.
+let memoryAccessToken: string | null = null;
+let memoryIdToken: string | null = null;
 
 export const AuthStorage = {
   getUser(): User | null {
@@ -23,19 +30,19 @@ export const AuthStorage = {
   },
 
   getAccessToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    return memoryAccessToken;
   },
 
   setAccessToken(token: string): void {
-    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+    memoryAccessToken = token;
   },
 
   getIdToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.ID_TOKEN);
+    return memoryIdToken;
   },
 
   setIdToken(token: string): void {
-    localStorage.setItem(STORAGE_KEYS.ID_TOKEN, token);
+    memoryIdToken = token;
   },
 
   getRefreshToken(): string | null {
@@ -47,10 +54,13 @@ export const AuthStorage = {
   },
 
   clear(): void {
+    memoryAccessToken = null;
+    memoryIdToken = null;
     localStorage.removeItem(STORAGE_KEYS.USER);
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.ID_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+
+    // Clean up legacy keys from previous localStorage-based storage
+    LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
 
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {

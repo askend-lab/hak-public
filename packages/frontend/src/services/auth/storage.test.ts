@@ -6,6 +6,7 @@ import { AuthStorage } from "./storage";
 describe("AuthStorage", () => {
   beforeEach(() => {
     localStorage.clear();
+    AuthStorage.clear();
   });
 
   describe("User storage", () => {
@@ -30,14 +31,16 @@ describe("AuthStorage", () => {
   });
 
   describe("Token key verification", () => {
-    it("stores access token under correct key", () => {
+    it("stores access token in memory only (not localStorage)", () => {
       AuthStorage.setAccessToken("tok");
-      expect(localStorage.getItem("hak_access_token")).toBe("tok");
+      expect(AuthStorage.getAccessToken()).toBe("tok");
+      expect(localStorage.getItem("hak_access_token")).toBeNull();
     });
 
-    it("stores id token under correct key", () => {
+    it("stores id token in memory only (not localStorage)", () => {
       AuthStorage.setIdToken("tok");
-      expect(localStorage.getItem("hak_id_token")).toBe("tok");
+      expect(AuthStorage.getIdToken()).toBe("tok");
+      expect(localStorage.getItem("hak_id_token")).toBeNull();
     });
 
     it("stores refresh token under correct key", () => {
