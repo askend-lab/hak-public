@@ -184,15 +184,20 @@ export class Store {
   ): StoreItem {
     const now = new Date().toISOString();
 
-    return {
+    const item: StoreItem = {
       PK: keys.pk,
       SK: keys.sk,
       data: request.data ?? {},
       owner: this.context.userId,
       createdAt: existingCreatedAt ?? now,
       updatedAt: now,
-      ttl: this.calculateTtl(request.ttl),
     };
+
+    if (request.ttl > 0) {
+      return { ...item, ttl: this.calculateTtl(request.ttl) };
+    }
+
+    return item;
   }
 
   private calculateTtl(ttlSeconds: number): number {

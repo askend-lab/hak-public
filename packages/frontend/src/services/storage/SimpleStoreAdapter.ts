@@ -13,7 +13,7 @@ interface SimpleStoreResponse {
 }
 
 const SIMPLE_STORE_BASE_URL = "/api";
-const SIMPLE_STORE_TTL_SECONDS = 31536000; // 1 year in seconds
+const SIMPLE_STORE_TTL_SECONDS = 0; // 0 = no expiration
 
 export class SimpleStoreAdapter {
   private readonly baseUrl = SIMPLE_STORE_BASE_URL;
