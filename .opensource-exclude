@@ -15,12 +15,7 @@ infra/
 docker-compose.yml
 .env.example
 
-# --- Backend packages (hosted by us, not open-sourced) ---
-packages/merlin-worker/
-packages/merlin-api/
-packages/vabamorf-api/
-packages/audio-api/
-packages/simplestore/
+# --- Internal packages (not open-sourced) ---
 packages/tara-auth/
 packages/task-channel/
 
@@ -44,13 +39,7 @@ knip.json
 .npmrc
 .gitleaks.toml
 
-# --- Docs with infrastructure details ---
-ARCHITECTURE.md
+# --- Internal docs (replaced by *.public.md versions) ---
 README.md
 CONTRIBUTING.md
 docs/DEPLOYMENT.md
-docs/API.md
-docs/API-Merlin.md
-docs/API-Vabamorf.md
-docs/adr/002-serverless-aws.md
-docs/adr/003-tdd-devbox.md
