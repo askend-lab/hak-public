@@ -7,7 +7,7 @@ import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import AppHeader from "./AppHeader";
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     user: { id: "123", name: "Test User", email: "test@test.com" },
     isAuthenticated: true,

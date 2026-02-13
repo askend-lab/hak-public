@@ -16,11 +16,11 @@ import {
   mockSentenceMenu,
 } from "./test/mocks/appMocks";
 
-vi.mock("./services/auth", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
+vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => mockNotificationContext()),
 }));
-vi.mock("./contexts/OnboardingContext", () => ({
+vi.mock("./features/onboarding/contexts/OnboardingContext", () => ({
   useOnboarding: vi.fn(() => mockOnboardingContext()),
 }));
 vi.mock("./hooks", async (importOriginal) => {
@@ -75,7 +75,7 @@ vi.mock("./components/Dashboard", () => ({
   default: () => <div data-testid="dashboard">Dashboard</div>,
 }));
 vi.mock("./components/AppModals", () => ({ default: () => null }));
-vi.mock("./components/onboarding", () => ({
+vi.mock("./features/onboarding/components", () => ({
   RoleSelectionContent: () => (
     <div data-testid="role-selection">RoleSelection</div>
   ),
@@ -100,7 +100,7 @@ describe("App Routing", () => {
     });
 
     it("renders tasks view for /tasks route", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -127,7 +127,7 @@ describe("App Routing", () => {
     });
 
     it("renders task detail for /tasks/:id route", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -189,7 +189,7 @@ describe("App Routing", () => {
 
   describe("pathname parsing", () => {
     it("extracts task ID from /tasks/:id URL", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -216,7 +216,7 @@ describe("App Routing", () => {
     });
 
     it("sets task ID to null for /tasks without ID", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -255,7 +255,7 @@ describe("App Routing", () => {
     });
 
     it("detects tasks view from /tasks pathname", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -303,7 +303,7 @@ describe("App Routing", () => {
 
   describe("authentication-based routing", () => {
     it("shows role selection when onboarding not completed", async () => {
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: false,

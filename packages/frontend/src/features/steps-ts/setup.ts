@@ -24,9 +24,9 @@ import {
 import { createElement } from "react";
 import { MemoryRouter } from "react-router-dom";
 import App from "../../App";
-import { AuthProvider } from "../../services/auth";
+import { AuthProvider } from "../auth/services";
 import { NotificationProvider } from "../../contexts/NotificationContext";
-import { OnboardingProvider } from "../../contexts/OnboardingContext";
+import { OnboardingProvider } from "../onboarding/contexts/OnboardingContext";
 
 // Setup jsdom
 (global as unknown as Record<string, unknown>).import = {

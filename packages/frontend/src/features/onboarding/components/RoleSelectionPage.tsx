@@ -4,7 +4,7 @@
 "use client";
 
 import { useNavigate } from "react-router-dom";
-import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
 import { ROLE_CONFIGS } from "@/config/onboardingConfig";
 import { UserRole } from "@/types/onboarding";
 

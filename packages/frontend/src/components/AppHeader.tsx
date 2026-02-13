@@ -4,7 +4,7 @@
 import { NavLink, Link } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import { HelpIcon } from "./ui/Icons";
-import type { User } from "@/services/auth";
+import type { User } from "@/features/auth/services";
 
 interface AppHeaderProps {
   isAuthenticated: boolean;

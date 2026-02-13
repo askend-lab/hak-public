@@ -5,7 +5,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Dashboard from "./Dashboard";
 
-vi.mock("../services/auth/context", () => ({
+vi.mock("../features/auth/services/context", () => ({
   useAuth: vi.fn(() => ({
     user: null,
     isAuthenticated: false,
@@ -28,7 +28,7 @@ vi.mock("../services/dataService", () => ({
   },
 }));
 
-import { useAuth } from "../services/auth/context";
+import { useAuth } from "../features/auth/services/context";
 
 describe("Dashboard", () => {
   beforeEach(() => {

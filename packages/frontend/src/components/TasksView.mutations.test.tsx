@@ -16,7 +16,7 @@ vi.mock("@/services/dataService", () => ({
 }));
 
 const mockUseAuth = vi.fn();
-vi.mock("@/services/auth", () => ({ useAuth: (...args: unknown[]) => mockUseAuth(...args) }));
+vi.mock("@/features/auth/services", () => ({ useAuth: (...args: unknown[]) => mockUseAuth(...args) }));
 
 const mockUseUserTasks = vi.fn();
 vi.mock("@/hooks", () => ({ useUserTasks: (...args: unknown[]) => mockUseUserTasks(...args) }));

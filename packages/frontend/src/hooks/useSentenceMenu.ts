@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback } from "react";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 import { DataService } from "@/services/dataService";
 import { logger } from "@hak/shared";
 

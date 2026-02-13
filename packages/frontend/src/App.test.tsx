@@ -17,11 +17,11 @@ import {
   mockSentenceMenu,
 } from "./test/mocks/appMocks";
 
-vi.mock("./services/auth", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
+vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => mockNotificationContext()),
 }));
-vi.mock("./contexts/OnboardingContext", () => ({
+vi.mock("./features/onboarding/contexts/OnboardingContext", () => ({
   useOnboarding: vi.fn(() => mockOnboardingContext()),
 }));
 vi.mock("./hooks", async (importOriginal) => {
@@ -56,7 +56,7 @@ vi.mock("./components/TaskDetailView", () => ({
 vi.mock("./components/TaskEditModal", () => ({ default: () => null }));
 vi.mock("./components/AddEntryModal", () => ({ default: () => null }));
 vi.mock("./components/ShareTaskModal", () => ({ default: () => null }));
-vi.mock("./components/LoginModal", () => ({
+vi.mock("@/features/auth/components/LoginModal", () => ({
   default: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="login-modal">LoginModal</div> : null,
 }));
@@ -73,7 +73,7 @@ vi.mock("./components/SentenceSynthesisItem", () => ({
     <div data-testid={`sentence-item-${id}`}>SentenceItem</div>
   ),
 }));
-vi.mock("./components/onboarding", () => ({
+vi.mock("./features/onboarding/components", () => ({
   RoleSelectionContent: () => (
     <div data-testid="role-selection">RoleSelection</div>
   ),
@@ -151,7 +151,7 @@ describe("App (Home)", () => {
 
   describe("loading state", () => {
     it("shows loading spinner when onboarding is loading", async () => {
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: false,
@@ -181,7 +181,7 @@ describe("App (Home)", () => {
 
   describe("role selection", () => {
     it("shows role selection when onboarding not completed", async () => {
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: false,
@@ -211,7 +211,7 @@ describe("App (Home)", () => {
 
   describe("authenticated user", () => {
     it("shows user profile when authenticated", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -249,7 +249,7 @@ describe("App (Home)", () => {
 
     it("clicking tasks link when not authenticated shows login modal", async () => {
       const setShowLoginModal = vi.fn();
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: null,
         isAuthenticated: false,
@@ -280,7 +280,7 @@ describe("App (Home)", () => {
   describe("synthesis view", () => {
     beforeEach(async () => {
       // Ensure onboarding is completed so synthesis view is shown
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: true,
@@ -330,7 +330,7 @@ describe("App (Home)", () => {
 
   describe("help button", () => {
     it("renders help button", async () => {
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: true,
@@ -360,7 +360,7 @@ describe("App (Home)", () => {
 
   describe("onboarding wizard", () => {
     it("shows wizard when active", async () => {
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: true,
@@ -391,7 +391,7 @@ describe("App (Home)", () => {
   describe("login button", () => {
     it("calls setShowLoginModal when clicked", async () => {
       const setShowLoginModal = vi.fn();
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: null,
         isAuthenticated: false,
@@ -421,7 +421,7 @@ describe("App (Home)", () => {
 
   describe("tasks view", () => {
     it("shows tasks view when authenticated and tasks selected", async () => {
-      const { useAuth } = await import("./services/auth");
+      const { useAuth } = await import("./features/auth/services");
       vi.mocked(useAuth).mockReturnValue({
         user: { id: "123", name: "Test User", email: "test@test.com" },
         isAuthenticated: true,
@@ -437,7 +437,7 @@ describe("App (Home)", () => {
         handleTaraTokens: vi.fn(),
       });
 
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: true,
@@ -510,7 +510,7 @@ describe("App (Home)", () => {
         synthesizeAndPlay: vi.fn(),
       });
 
-      const { useOnboarding } = await import("./contexts/OnboardingContext");
+      const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
           completed: true,

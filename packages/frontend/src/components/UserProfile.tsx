@@ -4,7 +4,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth, type User } from "@/services/auth";
+import { useAuth, type User } from "@/features/auth/services";
 import { ChevronDownIcon } from "./ui/Icons";
 
 interface UserProfileProps {

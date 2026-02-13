@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 
 /**
  * Get the current user ID or fallback to test user

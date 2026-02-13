@@ -13,11 +13,11 @@ import AccessibilityPage from "./pages/AccessibilityPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AppModals from "./components/AppModals";
 import SynthesisModals from "./components/SynthesisModals";
-import { RoleSelectionContent } from "./components/onboarding";
-import { useAuth } from "./services/auth";
+import { RoleSelectionContent } from "./features/onboarding/components";
+import { useAuth } from "./features/auth/services";
 import { COPIED_ENTRIES_KEY } from "./hooks/synthesis/useSentenceState";
 import { useNotification } from "./contexts/NotificationContext";
-import { useOnboarding } from "./contexts/OnboardingContext";
+import { useOnboarding } from "./features/onboarding/contexts/OnboardingContext";
 import { PageLoadingState } from "./components/ui/PageLoadingState";
 import { SynthesisPageProvider } from "./contexts/SynthesisPageContext";
 import {

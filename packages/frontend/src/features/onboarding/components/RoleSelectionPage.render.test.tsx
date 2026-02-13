@@ -4,7 +4,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { OnboardingProvider } from "../../contexts/OnboardingContext";
+import { OnboardingProvider } from "../contexts/OnboardingContext";
 import RoleSelectionPage from "./RoleSelectionPage";
 
 describe("RoleSelectionPage render", () => {

@@ -3,7 +3,7 @@
 
 import { useCallback } from "react";
 import { DataService } from "@/services/dataService";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 import { logger } from "@hak/shared";
 
 interface UseTaskSharingDeps {

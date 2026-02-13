@@ -4,10 +4,10 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-import BaseModal from "./BaseModal";
-import { ErrorIcon } from "./ui/Icons";
+import BaseModal from "@/components/BaseModal";
+import { ErrorIcon } from "@/components/ui/Icons";
 
 interface LoginModalProps {
   isOpen: boolean;

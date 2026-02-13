@@ -13,13 +13,13 @@ vi.mock("react-router-dom", async (importOriginal) => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-vi.mock("@/contexts/OnboardingContext", () => ({
+vi.mock("@/features/onboarding/contexts/OnboardingContext", () => ({
   useOnboarding: vi.fn(() => ({
     selectRole: vi.fn(),
   })),
 }));
 
-import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
 
 /**
  * Mutation-killing tests for RoleSelectionPage

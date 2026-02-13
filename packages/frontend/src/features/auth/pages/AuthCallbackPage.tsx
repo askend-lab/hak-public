@@ -3,9 +3,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../services/auth";
+import { useAuth } from "../services";
 import { logger } from "@hak/shared";
-import { PageLoadingState } from "../components/ui/PageLoadingState";
+import { PageLoadingState } from "@/components/ui/PageLoadingState";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();

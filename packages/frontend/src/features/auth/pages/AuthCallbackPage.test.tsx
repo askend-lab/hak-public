@@ -10,7 +10,7 @@ vi.mock("react-router-dom", () => ({ useNavigate: () => mockNavigate }));
 
 const mockHandleCodeCallback = vi.fn();
 const mockHandleTaraTokens = vi.fn();
-vi.mock("../services/auth", () => ({
+vi.mock("../services", () => ({
   useAuth: () => ({
     handleCodeCallback: mockHandleCodeCallback,
     handleTaraTokens: mockHandleTaraTokens,

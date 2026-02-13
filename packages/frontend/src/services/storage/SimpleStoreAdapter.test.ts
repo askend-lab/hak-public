@@ -6,7 +6,7 @@ import { SimpleStoreAdapter } from "./SimpleStoreAdapter";
 import { Task, TaskEntry } from "@/types/task";
 import { logger } from "@hak/shared";
 
-vi.mock("../auth/storage", () => ({
+vi.mock("@/features/auth/services/storage", () => ({
   AuthStorage: {
     getIdToken: vi.fn(() => "test-token"),
   },
@@ -193,7 +193,7 @@ describe("SimpleStoreAdapter", () => {
 });
 
 // --- Merged from SimpleStoreAdapter.mutations.test.ts ---
-vi.mock("../auth/storage", () => ({
+vi.mock("@/features/auth/services/storage", () => ({
   AuthStorage: { getIdToken: vi.fn(() => "test-token") },
 }));
 

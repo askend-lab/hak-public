@@ -6,7 +6,7 @@ import { SimpleStoreAdapter } from "./SimpleStoreAdapter";
 import { Task } from "@/types/task";
 import { logger } from "@hak/shared";
 
-vi.mock("../auth/storage", () => ({
+vi.mock("@/features/auth/services/storage", () => ({
   AuthStorage: { getIdToken: vi.fn(() => "test-token") },
 }));
 
@@ -138,7 +138,7 @@ describe("SimpleStoreAdapter shared/unlisted/misc", () => {
 
   describe("auth headers", () => {
     it("omits Authorization header when no token", async () => {
-      const { AuthStorage } = await import("../auth/storage");
+      const { AuthStorage } = await import("@/features/auth/services/storage");
       (AuthStorage.getIdToken as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       mockFetch.mockResolvedValueOnce({
         ok: true, json: async () => ({ success: true, item: { data: { tasks: [] } } }),

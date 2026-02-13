@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { TaskSummary } from "@/types/task";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { DataService } from "@/services/dataService";
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 
 interface UseUserTasksResult {
   tasks: TaskSummary[];

@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import OnboardingWizard from "./OnboardingWizard";
 
-vi.mock("@/contexts/OnboardingContext", () => ({
+vi.mock("@/features/onboarding/contexts/OnboardingContext", () => ({
   useOnboarding: vi.fn(() => ({
     state: { selectedRole: "learner", currentStep: 0, completed: false },
     currentSteps: [
@@ -39,7 +39,7 @@ vi.mock("./WizardTooltip", () => ({
   ),
 }));
 
-import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
 
 /**
  * Mutation-killing tests for OnboardingWizard

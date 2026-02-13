@@ -6,13 +6,13 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import UserProfile from "./UserProfile";
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     logout: vi.fn(),
   })),
 }));
 
-import { useAuth } from "@/services/auth";
+import { useAuth } from "@/features/auth/services";
 
 describe("UserProfile", () => {
   const mockUser = {

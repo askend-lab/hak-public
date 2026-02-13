@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { WizardStep } from "@/types/onboarding";
-import { CloseIcon, BackIcon, ArrowForwardIcon } from "../ui/Icons";
+import { CloseIcon, BackIcon, ArrowForwardIcon } from "@/components/ui/Icons";
 
 interface WizardTooltipProps {
   step: WizardStep;

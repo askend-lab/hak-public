@@ -20,7 +20,7 @@ vi.mock("@/services/dataService", () => ({
   },
 }));
 
-vi.mock("@/services/auth", () => ({
+vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({ user: { id: "u1", email: "test@test.com" } })),
 }));
 
@@ -183,7 +183,7 @@ describe("TaskDetailView", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { useAuth } = await import("@/services/auth");
+    const { useAuth } = await import("@/features/auth/services");
     (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({
       user: { id: "u1", email: "test@test.com" },
     });
@@ -301,7 +301,7 @@ describe("TaskDetailView", () => {
   });
 
   it("shows error when no user", async () => {
-    const { useAuth } = await import("@/services/auth");
+    const { useAuth } = await import("@/features/auth/services");
     (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({ user: null });
     render(<TaskDetailView {...defaultProps} />);
     await waitFor(() =>
