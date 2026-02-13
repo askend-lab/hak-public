@@ -229,9 +229,6 @@ else
   echo "  Warning: pnpm not available, pnpm-lock.yaml removed but not regenerated"
 fi
 
-# --- Clean up docs/adr/README.md (remove broken ADR links if any excluded) ---
-# Currently all ADRs are included in public repo, no cleanup needed
-
 # --- Clean up eslint.config.mjs (remove DevBox reference) ---
 echo ">>> Cleaning eslint.config.mjs..."
 if [[ -f eslint.config.mjs ]]; then
