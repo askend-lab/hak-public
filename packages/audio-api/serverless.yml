@@ -1,5 +1,6 @@
 service: audio-api
 
+# TODO: migrate to Serverless v4 (v3 is in maintenance mode since 2024)
 frameworkVersion: "3"
 
 plugins:
@@ -11,12 +12,12 @@ custom:
     minify: false
     sourcemap: true
     platform: "node"
-    target: "node18"
+    target: "node20"
     packager: "pnpm"
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
   memorySize: 256

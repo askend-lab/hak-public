@@ -54,28 +54,11 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## Project Structure
 
-```
-packages/
-  frontend/     - React frontend application
-  simplestore/  - Key-value store Lambda
-  audio-api/    - Text-to-speech API
-  vabamorf-api/ - Estonian morphological analysis
-  merlin-api/   - TTS synthesis with Merlin
-  shared/       - Shared utilities and types
-  tara-auth/      - Estonian eID (TARA) authentication
-  gherkin-parser/ - Gherkin specification parser
-  specifications/ - BDD specifications
-
-infra/          - Terraform infrastructure
-docs/           - Documentation
-```
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full monorepo structure, package dependencies, and data flows.
 
 ## Code Style
 
-- TypeScript strict mode
-- ESLint
-- No `any` types without justification
-- Tests for new functionality
+See the Quality System section in [ARCHITECTURE.md](ARCHITECTURE.md) for the full list of enforced checks.
 
 ## Testing
 
