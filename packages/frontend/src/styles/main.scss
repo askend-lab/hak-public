@@ -105,3 +105,15 @@ body {
   color: $color-text-secondary;
   background-color: $color-surface-bg;
 }
+
+.app-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+
+  &__spinner {
+    width: 48px;
+    height: 48px;
+  }
+}
