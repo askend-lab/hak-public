@@ -18,7 +18,7 @@ vi.mock("jszip", () => {
   };
 });
 
-vi.mock("@/utils/synthesize", () => ({
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
   synthesizeAuto: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
 }));
@@ -173,7 +173,7 @@ describe("downloadTaskAsZip", () => {
 
     await downloadTaskAsZip(taskWithNoAudio);
 
-    const { synthesizeAuto } = await import("@/utils/synthesize");
+    const { synthesizeAuto } = await import("@/features/synthesis/utils/synthesize");
     expect(synthesizeAuto).toHaveBeenCalledWith("Tere");
     // fetch called once to download the synthesized audio URL
     expect(global.fetch).toHaveBeenCalledWith("https://example.com/synthesized.wav");

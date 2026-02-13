@@ -25,7 +25,7 @@ vi.mock("@/contexts/NotificationContext", () => ({
   })),
 }));
 
-vi.mock("@/utils/synthesize", () => ({
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 
@@ -64,7 +64,7 @@ vi.mock("@/components/ui/PlayAllButton", () => ({
   ),
 }));
 
-vi.mock("@/components/SentenceSynthesisItem", () => ({
+vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
   default: ({
     id,
     text,

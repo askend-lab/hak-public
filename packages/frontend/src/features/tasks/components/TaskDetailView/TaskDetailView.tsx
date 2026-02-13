@@ -12,10 +12,10 @@ import { DataService } from "@/services/dataService";
 import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
 import { logger } from "@hak/shared";
-import SentenceSynthesisItem from "@/components/SentenceSynthesisItem";
+import SentenceSynthesisItem from "@/features/synthesis/components/SentenceSynthesisItem";
 import ShareTaskModal from "@/components/ShareTaskModal";
-import PronunciationVariants from "@/components/PronunciationVariants";
-import SentencePhoneticPanel from "@/components/SentencePhoneticPanel";
+import PronunciationVariants from "@/features/synthesis/components/PronunciationVariants";
+import SentencePhoneticPanel from "@/features/synthesis/components/SentencePhoneticPanel";
 
 import { TaskDetailHeader } from "./TaskDetailHeader";
 import { TaskDetailLoading, TaskDetailError } from "./TaskDetailStates";

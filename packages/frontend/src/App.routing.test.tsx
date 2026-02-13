@@ -58,7 +58,7 @@ vi.mock("./utils/warmAudioWorker", () => ({ warmAudioWorker: vi.fn() }));
 vi.mock("./components/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
 }));
-vi.mock("./components/SynthesisView", () => ({
+vi.mock("./features/synthesis/components/SynthesisView", () => ({
   default: () => <div data-testid="synthesis-view">SynthesisView</div>,
 }));
 vi.mock("./features/tasks/components/TasksView", () => ({

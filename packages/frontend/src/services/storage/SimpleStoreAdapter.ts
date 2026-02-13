@@ -3,7 +3,7 @@
 
 import { Task, TaskEntry } from "@/types/task";
 import { AuthStorage } from "@/features/auth/services/storage";
-import { CONTENT_TYPE_JSON } from "@/utils/analyzeApi";
+import { CONTENT_TYPE_JSON } from "@/features/synthesis/utils/analyzeApi";
 import { logger } from "@hak/shared";
 
 interface SimpleStoreResponse {

@@ -9,7 +9,7 @@ import {
   getAudioInstances, audioAt, lastAudio, makeEntry, makeBlob,
 } from "@/test/audioMockHelpers";
 
-vi.mock("@/utils/synthesize", () => ({
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("blob:synth-url"),
 }));
 vi.mock("@/types/synthesis", () => ({ getVoiceModel: vi.fn(() => "voice") }));
@@ -68,7 +68,7 @@ describe("useSharedTaskAudio mutation kills", () => {
     });
 
     it("synthesize failure resets both ids", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
+      const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
       (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("fail"));
       const { result } = renderHook(() => useSharedTaskAudio());
       await act(async () => result.current.handlePlayEntry("e1", [makeEntry("e1")]));
@@ -164,7 +164,7 @@ describe("useSharedTaskAudio mutation kills", () => {
     it("null audio triggers synthesize", async () => {
       const { result } = renderHook(() => useSharedTaskAudio());
       await act(async () => result.current.handlePlayEntry("e1", [makeEntry("e1")]));
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
+      const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
       expect(synthesizeWithPolling).toHaveBeenCalledWith("stressed-e1", "voice");
     });
   });
@@ -195,7 +195,7 @@ describe("useSharedTaskAudio mutation kills", () => {
     });
 
     it("breaks loop when entry fails", async () => {
-      const { synthesizeWithPolling } = await import("@/utils/synthesize");
+      const { synthesizeWithPolling } = await import("@/features/synthesis/utils/synthesize");
       (synthesizeWithPolling as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("fail"));
       const { result } = renderHook(() => useSharedTaskAudio());
       await act(async () => { await result.current.handlePlayAll([makeEntry("e1"), makeEntry("e2", { audioUrl: "http://b.mp3" })]); });

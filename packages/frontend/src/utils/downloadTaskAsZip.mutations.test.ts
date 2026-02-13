@@ -18,7 +18,7 @@ vi.mock("jszip", () => {
   };
 });
 
-vi.mock("@/utils/synthesize", () => ({
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
   synthesizeAuto: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
 }));
@@ -174,7 +174,7 @@ describe("downloadTaskAsZip mutations", () => {
   });
 
   it("prefers stressedText for synthesis", async () => {
-    const { synthesizeAuto } = await import("@/utils/synthesize");
+    const { synthesizeAuto } = await import("@/features/synthesis/utils/synthesize");
     setupDomMocks();
     const task = { ...mockTask, entries: [
       { id: "e1", taskId: "t1", text: "plain", stressedText: "stressed",
@@ -185,7 +185,7 @@ describe("downloadTaskAsZip mutations", () => {
   });
 
   it("falls back to text when stressedText is empty", async () => {
-    const { synthesizeAuto } = await import("@/utils/synthesize");
+    const { synthesizeAuto } = await import("@/features/synthesis/utils/synthesize");
     setupDomMocks();
     const task = { ...mockTask, entries: [
       { id: "e1", taskId: "t1", text: "fallback", stressedText: "",
@@ -196,7 +196,7 @@ describe("downloadTaskAsZip mutations", () => {
   });
 
   it("skips audio on synthesis failure", async () => {
-    const { synthesizeAuto } = await import("@/utils/synthesize");
+    const { synthesizeAuto } = await import("@/features/synthesis/utils/synthesize");
     (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("fail"));
     setupDomMocks();
     const task = { ...mockTask, entries: [

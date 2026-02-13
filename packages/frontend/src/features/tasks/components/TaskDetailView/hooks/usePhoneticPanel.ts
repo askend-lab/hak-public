@@ -4,8 +4,8 @@
 import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { DataService } from "@/services/dataService";
-import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
-import { analyzeText } from "@/utils/analyzeApi";
+import { stripPhoneticMarkers } from "@/features/synthesis/utils/phoneticMarkers";
+import { analyzeText } from "@/features/synthesis/utils/analyzeApi";
 import { logger } from "@hak/shared";
 
 interface UsePhoneticPanelReturn {

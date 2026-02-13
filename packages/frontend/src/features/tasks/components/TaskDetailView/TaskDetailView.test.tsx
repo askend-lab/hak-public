@@ -28,7 +28,7 @@ vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({ showNotification: mockShowNotification })),
 }));
 
-vi.mock("@/components/SentenceSynthesisItem", () => ({
+vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
   default: ({
     id,
     rowMenuItems,
@@ -62,8 +62,8 @@ vi.mock("@/components/ShareTaskModal", () => ({
     ) : null,
 }));
 
-vi.mock("@/components/PronunciationVariants", () => ({ default: () => null }));
-vi.mock("@/components/SentencePhoneticPanel", () => ({ default: () => null }));
+vi.mock("@/features/synthesis/components/PronunciationVariants", () => ({ default: () => null }));
+vi.mock("@/features/synthesis/components/SentencePhoneticPanel", () => ({ default: () => null }));
 vi.mock("./TaskDetailHeader", () => ({
   TaskDetailHeader: ({
     onShare,

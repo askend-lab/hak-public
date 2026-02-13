@@ -17,7 +17,7 @@ vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({ showNotification: vi.fn() })),
 }));
 
-vi.mock("@/utils/synthesize", () => ({
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
 }));
 
