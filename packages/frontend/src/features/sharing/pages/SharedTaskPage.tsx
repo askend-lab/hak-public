@@ -6,7 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DataService } from "@/services/dataService";
 import { Task } from "@/types/task";
 import { useNotification } from "@/contexts/NotificationContext";
-import { useSharedTaskAudio } from "@/hooks/useSharedTaskAudio";
+import { useSharedTaskAudio } from "@/features/sharing/hooks/useSharedTaskAudio";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { COPIED_ENTRIES_KEY } from "@/features/synthesis/hooks/synthesis/useSentenceState";
 import { logger } from "@hak/shared";

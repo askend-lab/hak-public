@@ -3,9 +3,9 @@
 
 import { Task } from "@/types/task";
 import { logger } from "@hak/shared";
-import { SimpleStoreAdapter } from "./SimpleStoreAdapter";
-import { MockDataLoader } from "./MockDataLoader";
-import { generateShareToken } from "./shareTokenUtils";
+import { SimpleStoreAdapter } from "@/services/storage/SimpleStoreAdapter";
+import { MockDataLoader } from "@/services/storage/MockDataLoader";
+import { generateShareToken } from "@/services/storage/shareTokenUtils";
 
 export class ShareService {
   constructor(

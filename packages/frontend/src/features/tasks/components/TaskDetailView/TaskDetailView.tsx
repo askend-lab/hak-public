@@ -13,7 +13,7 @@ import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
 import { logger } from "@hak/shared";
 import SentenceSynthesisItem from "@/features/synthesis/components/SentenceSynthesisItem";
-import ShareTaskModal from "@/components/ShareTaskModal";
+import ShareTaskModal from "@/features/sharing/components/ShareTaskModal";
 import PronunciationVariants from "@/features/synthesis/components/PronunciationVariants";
 import SentencePhoneticPanel from "@/features/synthesis/components/SentencePhoneticPanel";
 

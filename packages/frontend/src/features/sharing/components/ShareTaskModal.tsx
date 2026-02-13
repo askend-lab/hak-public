@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { useNotification } from "@/contexts/NotificationContext";
 import { logger } from "@hak/shared";
-import BaseModal from "./BaseModal";
+import BaseModal from "@/components/BaseModal";
 
 interface ShareTaskModalProps {
   isOpen: boolean;

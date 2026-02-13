@@ -53,7 +53,7 @@ vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
   ),
 }));
 
-vi.mock("@/components/ShareTaskModal", () => ({
+vi.mock("@/features/sharing/components/ShareTaskModal", () => ({
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? (
       <div data-testid="share-modal">

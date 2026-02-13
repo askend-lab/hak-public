@@ -3,7 +3,7 @@
 
 import TaskEditModal from "@/features/tasks/components/TaskEditModal";
 import AddEntryModal from "@/features/tasks/components/AddEntryModal";
-import ShareTaskModal from "./ShareTaskModal";
+import ShareTaskModal from "@/features/sharing/components/ShareTaskModal";
 import LoginModal from "@/features/auth/components/LoginModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { OnboardingWizard } from "@/features/onboarding/components";

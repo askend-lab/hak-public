@@ -55,7 +55,7 @@ vi.mock("./features/tasks/components/TaskDetailView", () => ({
 }));
 vi.mock("./features/tasks/components/TaskEditModal", () => ({ default: () => null }));
 vi.mock("./features/tasks/components/AddEntryModal", () => ({ default: () => null }));
-vi.mock("./components/ShareTaskModal", () => ({ default: () => null }));
+vi.mock("./features/sharing/components/ShareTaskModal", () => ({ default: () => null }));
 vi.mock("@/features/auth/components/LoginModal", () => ({
   default: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="login-modal">LoginModal</div> : null,
