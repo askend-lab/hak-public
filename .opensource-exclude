@@ -19,7 +19,9 @@ docker-compose.yml
 packages/tara-auth/
 packages/task-channel/
 
-# --- CI/CD workflows (AWS deploy, internal automation) ---
+# --- CI/CD workflows and automation (not for public repo) ---
+.github/workflows/codeql.yml
+.github/dependabot.yml
 .github/workflows/build.yml
 .github/workflows/deploy.yml
 .github/workflows/deploy-merlin-infra.yml
