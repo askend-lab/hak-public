@@ -62,7 +62,11 @@ export function useTaskHandlers(
   }, [requireAuth]);
 
   const handleSelectTaskFromDropdown = useCallback(
-    async (taskId: string, taskName: string) => {
+    async (
+      taskId: string,
+      taskName: string,
+      _mode: "append" | "replace",
+    ) => {
       if (!user) return;
       const entries = filterNonEmptySentences(sentences).map((s) => ({
         text: s.text,
@@ -72,7 +76,7 @@ export function useTaskHandlers(
 
       try {
         const dataService = DataService.getInstance();
-        await dataService.addTextEntriesToTask(user.id, taskId, entries);
+        await dataService.addTextEntriesToTask(user.id, taskId, entries, _mode);
         setTaskRefreshTrigger((prev) => prev + 1);
         const count = entries.length;
         showNotification(

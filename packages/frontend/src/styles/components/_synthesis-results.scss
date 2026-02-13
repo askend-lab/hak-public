@@ -4,6 +4,7 @@
 @import "../tokens/typography";
 @import "../tokens/borders";
 @import "../tokens/breakpoints";
+@import "./panel";
 
 // Unified Synthesis Results Section
 .eki-synthesis-results {
@@ -1321,4 +1322,47 @@
 
 .synthesis__menu-divider {
   @include paper-divider;
+}
+
+// ===========================================================================
+// Drill-down Menu (Nested Panel Support)
+// ===========================================================================
+
+// Menu item with submenu indicator (chevron on right)
+.synthesis__menu-item--submenu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Chevron icon for submenu items
+.synthesis__menu-item-chevron {
+  flex-shrink: 0;
+  color: $color-primary;
+  opacity: 0.6;
+  margin-left: $spacing-2;
+}
+
+// Sub-panel header (back button + title)
+.synthesis__menu-panel-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: 6px $spacing-4;
+}
+
+// Back button in sub-panel header
+.synthesis__menu-back-button {
+  @include panel-close-sm;
+  color: $color-primary;
+}
+
+// Sub-panel title
+.synthesis__menu-panel-title {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  margin: 0;
+  flex: 1;
 }

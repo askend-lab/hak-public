@@ -23,7 +23,7 @@ const FooterLogo = () => (
 );
 const FooterLinks = () => (
   <div className="footer-section">
-    <h3 className="footer-heading">Hääldusabiline</h3>
+    <h2 className="footer-heading">Hääldusabiline</h2>
     <ul className="footer-links">
       <li>
         <a href="#">Portaalist</a>
@@ -32,14 +32,17 @@ const FooterLinks = () => (
         <a href="#">Versiooniajalugu</a>
       </li>
       <li>
-        <a href="#">Kasutus- ja privaatsustingimused</a>
+        <a href="/privacy">Kasutus- ja privaatsustingimused</a>
+      </li>
+      <li>
+        <a href="/accessibility">Ligipääsetavuse teatis</a>
       </li>
     </ul>
   </div>
 );
 const SocialLinks = () => (
   <div className="footer-section">
-    <h3 className="footer-heading">Sotsiaalmeedia</h3>
+    <h2 className="footer-heading">Sotsiaalmeedia</h2>
     <p className="footer-description">Hoia pilk peal.</p>
     <ul className="footer-social">
       <li>
@@ -77,7 +80,7 @@ const SocialLinks = () => (
 );
 const FeedbackSection = () => (
   <div className="footer-section">
-    <h3 className="footer-heading">Tagasiside</h3>
+    <h2 className="footer-heading">Tagasiside</h2>
     <div className="footer-feedback-content">
       <p className="footer-description">
         Iga arvamus loeb ja aitab Hääldusabilist paremaks teha! Saada meile oma

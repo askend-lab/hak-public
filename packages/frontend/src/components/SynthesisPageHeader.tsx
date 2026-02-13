@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import AddToTaskDropdown from "./AddToTaskDropdown";
+import AddToTaskDropdown, { type AddToTaskMode } from "./AddToTaskDropdown";
 import { PlayAllButton } from "./ui/PlayAllButton";
 
 interface SynthesisPageHeaderProps {
@@ -12,7 +12,11 @@ interface SynthesisPageHeaderProps {
   onPlayAllClick: () => void;
   showDropdown: boolean;
   onDropdownClose: () => void;
-  onSelectTask: (taskId: string, taskName: string) => void;
+  onSelectTask: (
+    taskId: string,
+    taskName: string,
+    mode: AddToTaskMode,
+  ) => void;
   onCreateNew: () => void;
 }
 
@@ -50,6 +54,7 @@ export default function SynthesisPageHeader({
               onClose={onDropdownClose}
               onSelectTask={onSelectTask}
               onCreateNew={onCreateNew}
+              sentenceCount={sentenceCount}
             />
           </div>
         )}

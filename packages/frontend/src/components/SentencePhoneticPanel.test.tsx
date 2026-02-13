@@ -229,7 +229,7 @@ describe("SentencePhoneticPanel", () => {
     const { container } = render(<SentencePhoneticPanel {...defaultProps} />);
     const ta = container.querySelector(".sentence-phonetic-panel__textarea");
     expect(ta).toBeTruthy();
-    expect(ta?.getAttribute("placeholder")).toBe("Kirjuta oma foneetiline variant");
+    expect(ta?.getAttribute("placeholder")).toBe("Kirjuta oma hääldusvariant");
   });
 
   it("apply button has button--secondary class", () => {

@@ -17,6 +17,9 @@ describe("TaskRepository", () => {
     saveBaselineTaskAdditions: ReturnType<typeof vi.fn>;
     loadSharedTasks: ReturnType<typeof vi.fn>;
     saveSharedTasks: ReturnType<typeof vi.fn>;
+    findAllUserTaskKeys: ReturnType<typeof vi.fn>;
+    loadTasksByKey: ReturnType<typeof vi.fn>;
+    saveTaskAsUnlisted: ReturnType<typeof vi.fn>;
   };
   let mockLoader: MockDataLoader;
   let shareService: ShareService;
@@ -54,6 +57,9 @@ describe("TaskRepository", () => {
       saveBaselineTaskAdditions: vi.fn().mockResolvedValue(undefined),
       loadSharedTasks: vi.fn().mockResolvedValue([]),
       saveSharedTasks: vi.fn().mockResolvedValue(undefined),
+      findAllUserTaskKeys: vi.fn().mockResolvedValue([]),
+      loadTasksByKey: vi.fn().mockResolvedValue([]),
+      saveTaskAsUnlisted: vi.fn().mockResolvedValue(undefined),
     };
     mockLoader = new MockDataLoader();
     shareService = new ShareService(

@@ -68,7 +68,7 @@ describe("SentenceSynthesisItem mutation kills", () => {
     });
     it("draggable defaults to false", () => {
       render(<SentenceSynthesisItem {...bp} />);
-      expect(screen.queryByLabelText("Drag to reorder")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Lohista järjestamiseks")).not.toBeInTheDocument();
     });
   });
 
@@ -77,7 +77,7 @@ describe("SentenceSynthesisItem mutation kills", () => {
     it("handleDragStartInternal calls setDragImage with offsetHeight/2", () => {
       vi.useFakeTimers();
       render(<SentenceSynthesisItem {...bp} draggable={true} onDragStart={vi.fn()} />);
-      const handle = screen.getByLabelText("Drag to reorder");
+      const handle = screen.getByLabelText("Lohista järjestamiseks");
       // The container div is the parent with ref
       const container = handle.closest(".sentence-synthesis-item") as HTMLDivElement;
       Object.defineProperty(container, "offsetHeight", { value: 40, configurable: true });
@@ -96,7 +96,7 @@ describe("SentenceSynthesisItem mutation kills", () => {
       render(
         <SentenceSynthesisItem {...bp} draggable={true} onDragEnd={vi.fn()} />,
       );
-      const handle = screen.getByLabelText("Drag to reorder");
+      const handle = screen.getByLabelText("Lohista järjestamiseks");
       const container = handle.closest(".sentence-synthesis-item") as HTMLDivElement;
       container.style.opacity = "0.5";
       fireEvent.dragEnd(handle);
@@ -106,7 +106,7 @@ describe("SentenceSynthesisItem mutation kills", () => {
     it("calls onDragStart with id", () => {
       const onDragStart = vi.fn();
       render(<SentenceSynthesisItem {...bp} draggable={true} onDragStart={onDragStart} />);
-      fireEvent.dragStart(screen.getByLabelText("Drag to reorder"), {
+      fireEvent.dragStart(screen.getByLabelText("Lohista järjestamiseks"), {
         dataTransfer: { setDragImage: vi.fn() },
       });
       expect(onDragStart).toHaveBeenCalledWith(expect.anything(), "s1");
@@ -115,7 +115,7 @@ describe("SentenceSynthesisItem mutation kills", () => {
     it("calls onDragEnd", () => {
       const onDragEnd = vi.fn();
       render(<SentenceSynthesisItem {...bp} draggable={true} onDragEnd={onDragEnd} />);
-      fireEvent.dragEnd(screen.getByLabelText("Drag to reorder"));
+      fireEvent.dragEnd(screen.getByLabelText("Lohista järjestamiseks"));
       expect(onDragEnd).toHaveBeenCalled();
     });
 
@@ -135,18 +135,18 @@ describe("SentenceSynthesisItem mutation kills", () => {
 
     it("no drag handle in readonly mode even with draggable", () => {
       render(<SentenceSynthesisItem {...bp} mode="readonly" draggable={true} />);
-      expect(screen.queryByLabelText("Drag to reorder")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Lohista järjestamiseks")).not.toBeInTheDocument();
     });
     it("dragStart works without onDragStart (kills L148 true)", () => {
       render(<SentenceSynthesisItem {...bp} draggable={true} />);
-      const handle = screen.getByLabelText("Drag to reorder");
+      const handle = screen.getByLabelText("Lohista järjestamiseks");
       const cont = handle.closest(".sentence-synthesis-item") as HTMLDivElement;
       Object.defineProperty(cont, "offsetHeight", { value: 40, configurable: true });
       fireEvent.dragStart(handle, { dataTransfer: { setDragImage: vi.fn() } });
     });
     it("dragEnd works without onDragEnd (kills L157 true)", () => {
       render(<SentenceSynthesisItem {...bp} draggable={true} />);
-      fireEvent.dragEnd(screen.getByLabelText("Drag to reorder"));
+      fireEvent.dragEnd(screen.getByLabelText("Lohista järjestamiseks"));
     });
   });
 
@@ -223,7 +223,7 @@ describe("SentenceSynthesisItem mutation kills", () => {
     it("legacy menu button target", () => {
       render(<SentenceSynthesisItem {...bp} onMenuOpenLegacy={vi.fn()} sentenceIndex={3} />);
       expect(
-        screen.getByLabelText("More options").getAttribute("data-onboarding-target"),
+        screen.getByLabelText("Rohkem valikuid").getAttribute("data-onboarding-target"),
       ).toBe("sentence-3-menu");
     });
   });
@@ -269,11 +269,11 @@ describe("SentenceSynthesisItem mutation kills", () => {
   describe("legacy menu", () => {
     it("renders when onMenuOpenLegacy provided", () => {
       render(<SentenceSynthesisItem {...bp} onMenuOpenLegacy={vi.fn()} />);
-      expect(screen.getByLabelText("More options")).toBeInTheDocument();
+      expect(screen.getByLabelText("Rohkem valikuid")).toBeInTheDocument();
     });
     it("not rendered without onMenuOpenLegacy", () => {
       render(<SentenceSynthesisItem {...bp} />);
-      expect(screen.queryByLabelText("More options")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Rohkem valikuid")).not.toBeInTheDocument();
     });
   });
 

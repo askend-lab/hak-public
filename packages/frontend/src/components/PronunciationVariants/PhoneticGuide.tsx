@@ -54,7 +54,7 @@ export default function PhoneticGuide({ onBack, onClose }: PhoneticGuideProps) {
         <button
           onClick={onClose}
           className="pronunciation-variants__close"
-          aria-label="Close"
+          aria-label="Sulge"
           type="button"
         >
           <CloseIcon size="2xl" />

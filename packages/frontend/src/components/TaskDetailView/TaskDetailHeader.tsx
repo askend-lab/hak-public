@@ -5,6 +5,7 @@
 
 import { Task } from "@/types/task";
 import { PlayAllButton } from "../ui/PlayAllButton";
+import { useDropdownPosition } from "@/hooks/useDropdownPosition";
 
 interface TaskDetailHeaderProps {
   task: Task;
@@ -17,6 +18,7 @@ interface TaskDetailHeaderProps {
   onPlayAll: () => void;
   onDownloadZip: () => void;
   isDownloading: boolean;
+  onCopyToSynthesis: () => void;
   onEditTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
 }
@@ -32,9 +34,14 @@ export function TaskDetailHeader({
   onPlayAll,
   onDownloadZip,
   isDownloading,
+  onCopyToSynthesis,
   onEditTask,
   onDeleteTask,
 }: TaskDetailHeaderProps) {
+  const { anchorRef, menuRef, menuStyle } = useDropdownPosition({
+    isOpen: isHeaderMenuOpen,
+  });
+
   if (entriesCount === 0) return null;
 
   return (
@@ -49,13 +56,6 @@ export function TaskDetailHeader({
         <button onClick={onShare} className="button button--secondary">
           <span>Jaga</span>
         </button>
-        <button
-          onClick={onDownloadZip}
-          className="button button--secondary"
-          disabled={isDownloading}
-        >
-          <span>{isDownloading ? "Laadin..." : "Laadi alla"}</span>
-        </button>
         <PlayAllButton
           isPlaying={isPlayingAll}
           isLoading={isLoadingPlayAll}
@@ -64,8 +64,10 @@ export function TaskDetailHeader({
         />
         <div className="task-detail__menu-container">
           <button
+            ref={anchorRef}
             className="task-detail__menu-button"
             aria-label="Rohkem valikuid"
+            aria-expanded={isHeaderMenuOpen}
             onClick={() => setIsHeaderMenuOpen(!isHeaderMenuOpen)}
           >
             <svg
@@ -74,6 +76,7 @@ export function TaskDetailHeader({
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
               <path
                 d="M17 12C17 12.5523 17.4477 13 18 13C18.5523 13 19 12.5523 19 12C19 11.4477 18.5523 11 18 11C17.4477 11 17 11.4477 17 12Z"
@@ -103,8 +106,35 @@ export function TaskDetailHeader({
               <div
                 className="task-detail__menu-backdrop"
                 onClick={() => setIsHeaderMenuOpen(false)}
+                onKeyDown={(e) => { if (e.key === "Escape") setIsHeaderMenuOpen(false); }}
+                role="presentation"
               />
-              <div className="task-detail__dropdown-menu">
+              <div
+                ref={menuRef}
+                className={`task-detail__dropdown-menu${menuStyle ? " task-detail__dropdown-menu--fixed" : ""}`}
+                style={menuStyle}
+              >
+                <button
+                  className="task-detail__menu-item"
+                  onClick={() => {
+                    onDownloadZip();
+                    setIsHeaderMenuOpen(false);
+                  }}
+                  disabled={isDownloading}
+                >
+                  <div className="task-detail__menu-item-content">
+                    {isDownloading ? "Laadin..." : "Lae alla ülesande sisu"}
+                  </div>
+                </button>
+                <button
+                  className="task-detail__menu-item"
+                  onClick={() => {
+                    onCopyToSynthesis();
+                    setIsHeaderMenuOpen(false);
+                  }}
+                >
+                  <div className="task-detail__menu-item-content">Muuda ülesande lauseid</div>
+                </button>
                 <button
                   className="task-detail__menu-item"
                   onClick={() => {
@@ -112,7 +142,7 @@ export function TaskDetailHeader({
                     setIsHeaderMenuOpen(false);
                   }}
                 >
-                  <div className="task-detail__menu-item-content">Muuda</div>
+                  <div className="task-detail__menu-item-content">Muuda ülesande kirjeldust</div>
                 </button>
                 <button
                   className="task-detail__menu-item task-detail__menu-item--danger"
@@ -121,7 +151,7 @@ export function TaskDetailHeader({
                     setIsHeaderMenuOpen(false);
                   }}
                 >
-                  <div className="task-detail__menu-item-content">Kustuta</div>
+                  <div className="task-detail__menu-item-content">Kustuta ülesanne</div>
                 </button>
               </div>
             </>

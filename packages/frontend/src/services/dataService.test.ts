@@ -136,7 +136,7 @@ describe("DataService", () => {
 
   it("addTextEntriesToTask delegates", async () => {
     await service.addTextEntriesToTask("u1", "t1", ["hi"]);
-    expect(mockRepo.addTextEntriesToTask).toHaveBeenCalledWith("u1", "t1", ["hi"]);
+    expect(mockRepo.addTextEntriesToTask).toHaveBeenCalledWith("u1", "t1", ["hi"], "append");
   });
 
   it("getTaskByShareToken delegates", async () => {

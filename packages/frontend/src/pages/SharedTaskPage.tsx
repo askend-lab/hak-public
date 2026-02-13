@@ -7,11 +7,13 @@ import { DataService } from "@/services/dataService";
 import { Task } from "@/types/task";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useSharedTaskAudio } from "@/hooks/useSharedTaskAudio";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { COPIED_ENTRIES_KEY } from "@/hooks/synthesis/useSentenceState";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import SentenceSynthesisItem from "@/components/SentenceSynthesisItem";
 import { PlayAllButton } from "@/components/ui/PlayAllButton";
+import { PageLoadingState } from "@/components/ui/PageLoadingState";
 
 export function SharedTaskPage() {
   const { token } = useParams<{ token: string }>();
@@ -29,6 +31,8 @@ export function SharedTaskPage() {
     handlePlayEntry,
     handlePlayAll,
   } = useSharedTaskAudio();
+
+  useDocumentTitle(task?.name ? `Jagatud: ${task.name}` : undefined);
 
   useEffect(() => {
     async function loadTask(): Promise<void> {
@@ -81,26 +85,24 @@ export function SharedTaskPage() {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="shared-task-loading">
-        <div className="loading-spinner" />
-        <p>Laadimine...</p>
-      </div>
-    );
+    return <PageLoadingState />;
   }
 
   // Error state
   if (error || !task) {
     return (
-      <div className="shared-task-error">
-        <h2>{error || "Ülesannet ei leitud"}</h2>
+      <main className="shared-task-error">
+        <h1>{error || "Ülesannet ei leitud"}</h1>
         <p>Kontrolli, kas jagamislink on õige.</p>
-      </div>
+      </main>
     );
   }
 
   return (
     <div className="page-layout">
+      <a href="#main-content" className="skip-link">
+        Liigu põhisisu juurde
+      </a>
       <AppHeader
         isAuthenticated={false}
         user={null}
@@ -111,7 +113,7 @@ export function SharedTaskPage() {
         }}
       />
 
-      <main className="page-layout__main">
+      <main id="main-content" tabIndex={-1} className="page-layout__main">
         <div className="page-header page-header--full">
           <div className="page-header__content">
             <h1 className="page-header__title">

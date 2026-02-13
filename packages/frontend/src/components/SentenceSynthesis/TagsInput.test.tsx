@@ -38,7 +38,7 @@ describe("TagsInput", () => {
   it("renders clear button when tags exist and onClear provided", () => {
     const onClear = vi.fn();
     render(<TagsInput {...baseProps} onClear={onClear} />);
-    fireEvent.click(screen.getByLabelText("Clear all"));
+    fireEvent.click(screen.getByLabelText("Tühjenda kõik"));
     expect(onClear).toHaveBeenCalledWith("s1");
   });
 
@@ -199,7 +199,7 @@ describe("TagsInput", () => {
   it("renders clear button when currentInput has value", () => {
     const onClear = vi.fn();
     render(<TagsInput {...baseProps} tags={[]} currentInput="text" onClear={onClear} />);
-    expect(screen.getByLabelText("Clear all")).toBeInTheDocument();
+    expect(screen.getByLabelText("Tühjenda kõik")).toBeInTheDocument();
   });
 
   it("empty placeholder when tags exist", () => {

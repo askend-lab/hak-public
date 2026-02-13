@@ -72,7 +72,7 @@ const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
   );
 
   return (
-    <div className="notification-container">
+    <div className="notification-container" aria-live="polite" aria-atomic="true">
       {notifications.map((notification) => (
         <Notification
           key={notification.id}

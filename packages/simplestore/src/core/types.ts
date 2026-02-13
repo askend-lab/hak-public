@@ -54,7 +54,7 @@ export interface StoreItem {
   readonly owner: string;
   readonly createdAt: string;
   readonly updatedAt: string;
-  readonly ttl: number;
+  readonly ttl?: number;
 }
 
 /**

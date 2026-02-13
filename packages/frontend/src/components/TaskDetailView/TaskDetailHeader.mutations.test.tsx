@@ -21,7 +21,7 @@ const baseProps = {
   task: baseTask, entriesCount: 5, isLoadingPlayAll: false, isPlayingAll: false,
   isHeaderMenuOpen: false, setIsHeaderMenuOpen: vi.fn(),
   onShare: vi.fn(), onPlayAll: vi.fn(), onEditTask: vi.fn(), onDeleteTask: vi.fn(),
-  onDownloadZip: vi.fn(), isDownloading: false,
+  onDownloadZip: vi.fn(), isDownloading: false, onCopyToSynthesis: vi.fn(),
 };
 
 describe("TaskDetailHeader mutation kills", () => {
@@ -55,8 +55,8 @@ describe("TaskDetailHeader mutation kills", () => {
   it("opens menu and shows edit/delete options", async () => {
     const setMenu = vi.fn();
     render(<TaskDetailHeader {...baseProps} isHeaderMenuOpen={true} setIsHeaderMenuOpen={setMenu} />);
-    expect(screen.getByText("Muuda")).toBeInTheDocument();
-    expect(screen.getByText("Kustuta")).toBeInTheDocument();
+    expect(screen.getByText(/Muuda ülesande kirjeldust/)).toBeInTheDocument();
+    expect(screen.getByText(/Kustuta ülesanne/)).toBeInTheDocument();
   });
 
   it("edit button calls onEditTask with task id and closes menu", async () => {
@@ -64,7 +64,7 @@ describe("TaskDetailHeader mutation kills", () => {
     const onEdit = vi.fn();
     const user = userEvent.setup();
     render(<TaskDetailHeader {...baseProps} isHeaderMenuOpen={true} setIsHeaderMenuOpen={setMenu} onEditTask={onEdit} />);
-    await user.click(screen.getByText("Muuda"));
+    await user.click(screen.getByText(/Muuda ülesande kirjeldust/));
     expect(onEdit).toHaveBeenCalledWith("t1");
     expect(setMenu).toHaveBeenCalledWith(false);
   });
@@ -74,7 +74,7 @@ describe("TaskDetailHeader mutation kills", () => {
     const onDelete = vi.fn();
     const user = userEvent.setup();
     render(<TaskDetailHeader {...baseProps} isHeaderMenuOpen={true} setIsHeaderMenuOpen={setMenu} onDeleteTask={onDelete} />);
-    await user.click(screen.getByText("Kustuta"));
+    await user.click(screen.getByText(/Kustuta ülesanne/));
     expect(onDelete).toHaveBeenCalledWith("t1");
     expect(setMenu).toHaveBeenCalledWith(false);
   });

@@ -151,9 +151,10 @@ describe("Notification", () => {
         onClose={vi.fn()}
       />,
     );
-    const p = container.querySelector("p");
-    expect(p?.textContent).toContain("Some desc");
-    expect(p?.textContent).toContain("Act");
+    const paragraphs = container.querySelectorAll("p");
+    const descP = paragraphs[1];
+    expect(descP?.textContent).toContain("Some desc");
+    expect(descP?.textContent).toContain("Act");
   });
 
   it("has close button with aria-label", () => {
@@ -189,7 +190,8 @@ describe("Notification", () => {
     const { container } = render(
       <Notification type="info" message="msg" onClose={vi.fn()} />,
     );
-    expect(container.querySelector("p")).toBeNull();
+    const paragraphs = container.querySelectorAll("p");
+    expect(paragraphs.length).toBe(1);
   });
 
   it("action button has notification-action-link class", () => {
@@ -210,8 +212,8 @@ describe("Notification", () => {
     render(
       <Notification type="info" message="My message" onClose={vi.fn()} />,
     );
-    const h2 = screen.getByText("My message");
-    expect(h2.tagName).toBe("H2");
+    const el = screen.getByText("My message");
+    expect(el.tagName).toBe("P");
   });
 
   it("returns undefined cleanup when duration is 0", () => {

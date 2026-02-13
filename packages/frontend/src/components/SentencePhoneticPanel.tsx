@@ -132,6 +132,18 @@ export default function SentencePhoneticPanel({
 
   const handlePlay = async () => {
     if (!editedText.trim()) return;
+
+    // If already playing, pause it
+    if (isPlaying) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+      setIsPlaying(false);
+      return;
+    }
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -218,7 +230,8 @@ export default function SentencePhoneticPanel({
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
                 className="sentence-phonetic-panel__textarea"
-                placeholder="Kirjuta oma foneetiline variant"
+                aria-label="Häälduskuju"
+                placeholder="Kirjuta oma hääldusvariant"
                 rows={4}
               />
             </div>

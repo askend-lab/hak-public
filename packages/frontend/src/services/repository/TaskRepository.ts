@@ -235,6 +235,7 @@ export class TaskRepository {
     userId: string,
     taskId: string,
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
+    mode: "append" | "replace" = "append",
   ): Promise<TaskEntry[]> {
     const data = await this.loadAllData(userId);
     const found = this.findTask(taskId, data);
@@ -243,9 +244,11 @@ export class TaskRepository {
     }
     const { task, isUserTask } = found;
 
+    const isReplace = mode === "replace";
     const currentEntries = task.entries ?? [];
-    const maxOrder =
-      currentEntries.length > 0
+    const startOrder = isReplace
+      ? 0
+      : currentEntries.length > 0
         ? Math.max(...currentEntries.map((e) => e.order))
         : 0;
 
@@ -258,26 +261,32 @@ export class TaskRepository {
         stressedText: isStringEntry ? entry : entry.stressedText,
         audioUrl: null,
         audioBlob: null,
-        order: maxOrder + index + 1,
+        order: startOrder + index + 1,
         createdAt: new Date(),
       };
     });
 
+    const newTexts = textEntries.map((entry) =>
+      typeof entry === "string" ? entry : entry.text,
+    );
+
     if (isUserTask) {
-      const updatedEntries = [...currentEntries, ...newEntries];
+      const updatedEntries = isReplace
+        ? newEntries
+        : [...currentEntries, ...newEntries];
+      const updatedSequences = isReplace
+        ? newTexts
+        : [...(task.speechSequences ?? []), ...newTexts];
       await this.updateTask(userId, taskId, {
         entries: updatedEntries,
-        speechSequences: [
-          ...(task.speechSequences ?? []),
-          ...textEntries.map((entry) =>
-            typeof entry === "string" ? entry : entry.text,
-          ),
-        ],
+        speechSequences: updatedSequences,
       });
     } else {
       const baselineAdditions =
         await this.storage.loadBaselineTaskAdditions(userId);
-      const existingAdditions = baselineAdditions[taskId] ?? [];
+      const existingAdditions = isReplace
+        ? []
+        : (baselineAdditions[taskId] ?? []);
       baselineAdditions[taskId] = [...existingAdditions, ...newEntries];
       await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
     }

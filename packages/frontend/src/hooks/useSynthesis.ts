@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu, convertTextToTags, CACHE_INVALIDATION } from "@/types/synthesis";
+import { EditingTag, OpenTagMenu, convertTextToTags, normalizeTags, CACHE_INVALIDATION } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/utils/phoneticMarkers";
 import { synthesizeAuto } from "@/utils/synthesize";
 import { copyTextToClipboard } from "@/utils/clipboardUtils";
@@ -75,9 +75,25 @@ export function useSynthesis() {
     (id: string): void => {
       const sentence = getSentence(id);
       if (!sentence) return;
+      // If sentence is already playing, stop it (pause behavior)
+      if (sentence.isPlaying) {
+        if (playlist.isPlayingAll || playlist.isLoadingPlayAll) {
+          // Stop the entire play-all sequence
+          playlist.handlePlayAll();
+        } else {
+          // Stop individual playback
+          if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.src = "";
+          }
+          updateSentence(id, { isPlaying: false });
+        }
+        return;
+      }
+
       if (sentence.currentInput.trim()) {
         const inputWords = convertTextToTags(sentence.currentInput);
-        const allTags = [...sentence.tags, ...inputWords];
+        const allTags = normalizeTags([...sentence.tags, ...inputWords]);
         const fullText = allTags.join(" ");
         updateSentence(id, {
           tags: allTags,
@@ -90,7 +106,7 @@ export function useSynthesis() {
         synthesizeAndPlay(id);
       }
     },
-    [getSentence, updateSentence, synthesizeAndPlay, synthesizeWithText],
+    [getSentence, updateSentence, synthesizeAndPlay, synthesizeWithText, currentAudio, playlist],
   );
 
   const handleDownload = useCallback(
@@ -199,11 +215,11 @@ export function useSynthesis() {
               newText = newTags.join(" ");
             } else {
               const newWords = convertTextToTags(trimmedValue);
-              const newTags = [
+              const newTags = normalizeTags([
                 ...sentence.tags.slice(0, tagIndex),
                 ...newWords,
                 ...sentence.tags.slice(tagIndex + 1),
-              ];
+              ]);
               newText = newTags.join(" ");
             }
           }

@@ -73,7 +73,7 @@ describe("PronunciationVariants", () => {
       });
 
       render(<PronunciationVariants {...defaultProps} />);
-      expect(screen.getByLabelText("Close")).toBeInTheDocument();
+      expect(screen.getByLabelText("Sulge")).toBeInTheDocument();
     });
   });
 
@@ -170,7 +170,7 @@ describe("PronunciationVariants", () => {
 
       render(<PronunciationVariants {...defaultProps} />);
 
-      await user.click(screen.getByLabelText("Close"));
+      await user.click(screen.getByLabelText("Sulge"));
       expect(defaultProps.onClose).toHaveBeenCalled();
     });
 
@@ -317,7 +317,7 @@ describe("PronunciationVariants", () => {
       );
       await user.type(input, "custom");
 
-      expect(screen.getByLabelText("Clear input")).toBeInTheDocument();
+      expect(screen.getByLabelText("Tühjenda sisend")).toBeInTheDocument();
     });
 
     it("closes custom form when toggle clicked again", async () => {

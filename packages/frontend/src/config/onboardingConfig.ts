@@ -144,9 +144,9 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
       },
       {
         id: "phonetic-form",
-        title: "Uuri foneetilist kuju",
+        title: "Uuri häälduskuju",
         description:
-          'Ava menüüst "Uuri foneetilist kuju", et näha ja muuta lause foneetilist esitust.',
+          'Ava menüüst "Uuri häälduskuju", et näha ja muuta lause häälduskuju.',
         targetSelector: '[data-onboarding-target="sentence-0-menu"]',
         position: "left",
       },

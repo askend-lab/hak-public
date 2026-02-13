@@ -169,8 +169,8 @@ describe("onboardingConfig", () => {
       const phoneticStep = config.steps.find((s) => s.id === "phonetic-form");
       expect(phoneticStep).toBeDefined();
       expect(phoneticStep?.targetSelector).toBe('[data-onboarding-target="sentence-0-menu"]');
-      expect(phoneticStep?.title).toBe("Uuri foneetilist kuju");
-      expect(phoneticStep?.description).toContain("foneetilist esitust");
+      expect(phoneticStep?.title).toBe("Uuri häälduskuju");
+      expect(phoneticStep?.description).toContain("häälduskuju");
     });
 
     it("has exact specialist step titles", () => {

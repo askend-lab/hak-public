@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { TaskSummary } from "@/types/task";
 import { MoreIcon } from "./ui/Icons";
 import { formatDate } from "@/utils/formatDate";
+import { useDropdownPosition } from "@/hooks/useDropdownPosition";
 
 interface TaskRowProps {
   task: TaskSummary;
@@ -35,6 +36,10 @@ function TaskRow({
 }: TaskRowProps) {
   const descriptionRef = useRef<HTMLSpanElement>(null);
   const [needsExpansion, setNeedsExpansion] = useState(false);
+  const isMenuOpen = openMenuId === task.id;
+  const { anchorRef, menuRef, menuStyle } = useDropdownPosition({
+    isOpen: isMenuOpen,
+  });
 
   useEffect(() => {
     // Check if the description is truncated
@@ -47,7 +52,18 @@ function TaskRow({
 
   return (
     <div className={`task-row-simple ${isExpanded ? "expanded" : ""}`}>
-      <div className="task-row-content" onClick={() => onViewTask(task.id)}>
+      <div
+        className="task-row-content"
+        onClick={() => onViewTask(task.id)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onViewTask(task.id);
+          }
+        }}
+      >
         <div className="task-row-info">
           <span className={`task-row-name ${isExpanded ? "expanded" : ""}`}>
             {task.name}
@@ -82,20 +98,28 @@ function TaskRow({
       <div className="task-row-actions">
         <div className="task-manager__menu-container">
           <button
+            ref={anchorRef}
             className="task-manager__menu-button"
-            aria-label="More options"
+            aria-label="Rohkem valikuid"
+            aria-expanded={isMenuOpen}
             onClick={() => onMenuOpen(task.id)}
           >
             <MoreIcon size="2xl" />
           </button>
 
-          {openMenuId === task.id && (
+          {isMenuOpen && (
             <>
               <div
                 className="task-manager__menu-backdrop"
                 onClick={onMenuClose}
+                onKeyDown={(e) => { if (e.key === "Escape") onMenuClose(); }}
+                role="presentation"
               />
-              <div className="task-manager__dropdown-menu">
+              <div
+                ref={menuRef}
+                className={`task-manager__dropdown-menu${menuStyle ? " task-manager__dropdown-menu--fixed" : ""}`}
+                style={menuStyle}
+              >
                 <button
                   className="task-manager__menu-item"
                   onClick={() => {

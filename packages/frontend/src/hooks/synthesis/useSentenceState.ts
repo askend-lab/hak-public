@@ -129,6 +129,7 @@ export function useSentenceState(): {
 } {
   const [sentences, setSentences] = useState<SentenceState[]>(loadInitialState);
   const isInitialMount = useRef(true);
+  const processedCopiedEntries = useRef(false);
 
   // Persist sentences to localStorage whenever they change (skip initial mount)
   useEffect(() => {
@@ -161,14 +162,24 @@ export function useSentenceState(): {
     }
   }, []);
 
-  // Load copied entries from shared task
+  // Load copied entries from shared task - check on every render
   useEffect(() => {
+    // Skip if we already processed copiedEntries in this session
+    if (processedCopiedEntries.current) return;
+    
     try {
       const copied = sessionStorage.getItem(COPIED_ENTRIES_KEY);
       if (copied) {
         const entries = JSON.parse(copied);
         if (Array.isArray(entries) && entries.length > 0) {
-          setSentences(entries.map(transformEntryToSentence));
+          processedCopiedEntries.current = true;
+          setSentences((prev) => {
+            // If prev only has one empty sentence, replace it; otherwise append
+            const hasOnlyEmptySentence = prev.length === 1 && prev[0]?.text === "" && prev[0]?.tags.length === 0;
+            const transformedEntries = entries.map(transformEntryToSentence);
+            
+            return hasOnlyEmptySentence ? transformedEntries : [...prev, ...transformedEntries];
+          });
           sessionStorage.removeItem(COPIED_ENTRIES_KEY);
         }
       }
@@ -179,7 +190,8 @@ export function useSentenceState(): {
       );
       sessionStorage.removeItem(COPIED_ENTRIES_KEY);
     }
-  }, []);
+    // Run on every render to detect when copiedEntries appear (e.g., after navigation)
+  });
 
   const setDemoSentences = useCallback(() => {
     setSentences([

@@ -90,6 +90,14 @@ export default function TaskDetailView({
     }
   }, [task, entries, isDownloading, showNotification]);
 
+  const handleCopyToSynthesis = useCallback(() => {
+    if (!entries || entries.length === 0) return;
+
+    sessionStorage.setItem("copiedEntries", JSON.stringify(entries));
+    showNotification("success", "Laused kopeeritud!");
+    onNavigateToSynthesis();
+  }, [entries, showNotification, onNavigateToSynthesis]);
+
   // Load task data (skip if initialTask provided)
   useEffect(() => {
     if (initialTask || !user) {
@@ -154,7 +162,7 @@ export default function TaskDetailView({
     }
   };
 
-  if (isLoading) return <TaskDetailLoading onBack={onBack} />;
+  if (isLoading) return <TaskDetailLoading />;
   if (error) return <TaskDetailError onBack={onBack} error={error} />;
   if (!task) return null;
 
@@ -171,6 +179,7 @@ export default function TaskDetailView({
         onPlayAll={audio.handlePlayAll}
         onDownloadZip={handleDownloadZip}
         isDownloading={isDownloading}
+        onCopyToSynthesis={handleCopyToSynthesis}
         onEditTask={onEditTask}
         onDeleteTask={onDeleteTask}
       />
@@ -207,7 +216,10 @@ export default function TaskDetailView({
                     ? variants.selectedTagIndex
                     : null
                 }
-                isPronunciationPanelOpen={variants.isVariantsPanelOpen}
+                isPronunciationPanelOpen={
+                  variants.isVariantsPanelOpen || phonetic.showPhoneticPanel
+                }
+                allTagsSelected={phonetic.phoneticPanelEntryId === entry.id}
                 openMenuId={openMenuId}
                 onMenuOpen={setOpenMenuId}
                 onMenuClose={handleMenuClose}

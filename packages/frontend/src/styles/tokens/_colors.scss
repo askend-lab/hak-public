@@ -88,8 +88,8 @@
   --color-input-border-focus: #4a90e2; // Input focus border
 
   // Text colors - Extended
-  --color-text-placeholder: #747676; // Placeholder text
-  --color-text-disabled: #999999; // Disabled text
+  --color-text-placeholder: #636b74; // Placeholder text (WCAG AA ≥4.5:1 on white)
+  --color-text-disabled: #767676; // Disabled text (WCAG AA ≥4.54:1 on white)
   --color-text-dark: #000000; // Pure black text (87% opacity typically applied)
 
   // Menu & Dropdown colors

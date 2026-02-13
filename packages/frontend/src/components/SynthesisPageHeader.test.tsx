@@ -6,11 +6,11 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import SynthesisPageHeader from "./SynthesisPageHeader";
 
 vi.mock("./AddToTaskDropdown", () => ({
-  default: ({ isOpen, onClose, onSelectTask, onCreateNew }: { isOpen: boolean; onClose: () => void; onSelectTask: (id: string, name: string) => void; onCreateNew: () => void }) =>
+  default: ({ isOpen, onClose, onSelectTask, onCreateNew }: { isOpen: boolean; onClose: () => void; onSelectTask: (id: string, name: string, mode: string) => void; onCreateNew: () => void }) =>
     isOpen ? (
       <div data-testid="dropdown">
         <button onClick={onClose}>Close</button>
-        <button onClick={() => onSelectTask("t1", "Task 1")}>Select</button>
+        <button onClick={() => onSelectTask("t1", "Task 1", "append")}>Select</button>
         <button onClick={onCreateNew}>Create</button>
       </div>
     ) : null,

@@ -40,11 +40,16 @@
   --line-height-relaxed: 1.55; // 155%
   --line-height-loose: 1.75; // 175%
 
+  // Font sizes (content pages)
+  --font-size-content-title: 2.125rem; // 34px - content page heading
+
   // Letter spacing
   --letter-spacing-tight: -0.025em;
   --letter-spacing-normal: 0;
   --letter-spacing-subtle: 0.15px; // 0.15px - for body text per design spec
   --letter-spacing-wide: 0.025em;
+  --letter-spacing-content-title: 0.0025em; // 0.25% - content page heading
+  --letter-spacing-content-body: 0.005em; // 0.5% - content page body text
 
   // Semantic heading tokens (compose existing tokens)
   // Page Title (H1 level)
@@ -79,6 +84,7 @@ $font-size-2xl: var(--font-size-2xl);
 $font-size-3xl: var(--font-size-3xl);
 $font-size-4xl: var(--font-size-4xl);
 $font-size-5xl: var(--font-size-5xl);
+$font-size-content-title: var(--font-size-content-title);
 
 // Font weights
 $font-weight-regular: var(--font-weight-regular);
@@ -99,6 +105,8 @@ $letter-spacing-tight: var(--letter-spacing-tight);
 $letter-spacing-normal: var(--letter-spacing-normal);
 $letter-spacing-subtle: var(--letter-spacing-subtle);
 $letter-spacing-wide: var(--letter-spacing-wide);
+$letter-spacing-content-title: var(--letter-spacing-content-title);
+$letter-spacing-content-body: var(--letter-spacing-content-body);
 
 // Semantic heading tokens
 $heading-page-title-size: var(--heading-page-title-size);

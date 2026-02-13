@@ -28,7 +28,7 @@ export default function MarkersGuideBox({
   return (
     <div className={`markers-guide-box ${className}`.trim()}>
       <div className="markers-guide-box__header">
-        <h5 className="markers-guide-box__title">Hääldusmärgid</h5>
+        <h3 className="markers-guide-box__title">Hääldusmärgid</h3>
         <button
           type="button"
           className="markers-guide-box__info-button"

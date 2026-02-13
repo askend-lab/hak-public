@@ -95,7 +95,7 @@ describe("TasksView mutation kills", () => {
     mockUseUserTasks.mockReturnValue({ tasks: [], isLoading: true, error: null, isEmpty: false });
     render(<TasksView {...props} />);
     expect(screen.getByText("Laen ülesandeid...")).toBeInTheDocument();
-    expect(document.querySelector(".loader-spinner")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
   it("shows empty state with create button", async () => {

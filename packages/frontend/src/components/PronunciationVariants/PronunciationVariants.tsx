@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { transformToVabamorf } from "@/utils/phoneticMarkers";
 import { synthesizeAuto } from "@/utils/synthesize";
 import { getErrorMessage } from "@/utils/getErrorMessage";
@@ -55,6 +55,7 @@ export default function PronunciationVariants({
   const [isCustomLoading, setIsCustomLoading] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [showCustomForm, setShowCustomForm] = useState(false);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (word && isOpen) {
@@ -78,7 +79,26 @@ export default function PronunciationVariants({
     }
   };
 
+  const stopCurrentAudio = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.src = "";
+      currentAudioRef.current = null;
+    }
+  };
+
   const handlePlayVariant = async (variant: Variant) => {
+    // If this variant is already playing, pause it
+    if (playingVariant === variant.text) {
+      stopCurrentAudio();
+      setPlayingVariant(null);
+      return;
+    }
+
+    // Stop any currently playing audio (variant or custom)
+    stopCurrentAudio();
+    setIsCustomPlaying(false);
+
     setLoadingVariant(variant.text);
     setPlayingVariant(null);
     try {
@@ -89,17 +109,21 @@ export default function PronunciationVariants({
           setPlayingVariant(variant.text);
         },
         onEnded: () => {
+          currentAudioRef.current = null;
           setPlayingVariant(null);
           setLoadingVariant(null);
         },
         onError: () => {
+          currentAudioRef.current = null;
           setPlayingVariant(null);
           setLoadingVariant(null);
         },
       });
+      currentAudioRef.current = audio;
       await audio.play();
     } catch (error) {
       console.error("Failed to play variant:", error);
+      currentAudioRef.current = null;
       setPlayingVariant(null);
       setLoadingVariant(null);
     }
@@ -111,6 +135,18 @@ export default function PronunciationVariants({
 
   const handlePlayCustomVariant = async () => {
     if (!customVariant.trim()) return;
+
+    // If custom variant is already playing, pause it
+    if (isCustomPlaying) {
+      stopCurrentAudio();
+      setIsCustomPlaying(false);
+      return;
+    }
+
+    // Stop any currently playing audio (variant or custom)
+    stopCurrentAudio();
+    setPlayingVariant(null);
+
     setIsCustomLoading(true);
     setIsCustomPlaying(false);
     try {
@@ -122,17 +158,21 @@ export default function PronunciationVariants({
           setIsCustomPlaying(true);
         },
         onEnded: () => {
+          currentAudioRef.current = null;
           setIsCustomPlaying(false);
           setIsCustomLoading(false);
         },
         onError: () => {
+          currentAudioRef.current = null;
           setIsCustomPlaying(false);
           setIsCustomLoading(false);
         },
       });
+      currentAudioRef.current = audio;
       await audio.play();
     } catch (error) {
       console.error("Failed to play custom variant:", error);
+      currentAudioRef.current = null;
       setIsCustomPlaying(false);
       setIsCustomLoading(false);
     }
@@ -161,7 +201,7 @@ export default function PronunciationVariants({
               <button
                 onClick={onClose}
                 className="pronunciation-variants__close"
-                aria-label="Close"
+                aria-label="Sulge"
               >
                 <CloseIcon size="2xl" />
               </button>

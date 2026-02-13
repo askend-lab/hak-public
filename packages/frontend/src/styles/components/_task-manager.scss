@@ -84,15 +84,6 @@
   font-size: $font-size-sm;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .task-manager__error {
   padding: $spacing-4;
   background: $color-soft-danger-bg;
@@ -127,6 +118,12 @@
   @include paper-base;
   @include paper-dropdown;
   @include paper-sm;
+
+  &--fixed {
+    position: fixed;
+    top: auto;
+    right: auto;
+  }
 }
 
 .task-manager__menu-item {

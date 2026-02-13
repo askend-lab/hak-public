@@ -86,6 +86,10 @@ function SentenceItem({ sentence, sentenceIndex }: SentenceItemProps) {
       isPronunciationPanelOpen={
         variants.isVariantsPanelOpen || variants.showSentencePhoneticPanel
       }
+      allTagsSelected={
+        variants.showSentencePhoneticPanel &&
+        variants.sentencePhoneticId === sentence.id
+      }
       editingTag={synthesis.editingTag}
       onEditTagChange={synthesis.handleEditTagChange}
       onEditTagKeyDown={synthesis.handleEditTagKeyDown}
