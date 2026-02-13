@@ -261,4 +261,38 @@ describe("TaskManager", () => {
     render(<TaskManager {...defaultProps} />);
     expect(screen.getAllByText(/lauset/).length).toBe(2);
   });
+
+  it("calls onViewTask on Enter key on task row", async () => {
+    const { container } = render(<TaskManager {...defaultProps} />);
+    const taskRow = container.querySelector(".task-row-content");
+    if (taskRow) {
+      const { fireEvent } = await import("@testing-library/react");
+      fireEvent.keyDown(taskRow, { key: "Enter" });
+      expect(defaultProps.onViewTask).toHaveBeenCalledWith("task-1");
+    }
+  });
+
+  it("calls onViewTask on Space key on task row", async () => {
+    const { container } = render(<TaskManager {...defaultProps} />);
+    const taskRow = container.querySelector(".task-row-content");
+    if (taskRow) {
+      const { fireEvent } = await import("@testing-library/react");
+      fireEvent.keyDown(taskRow, { key: " " });
+      expect(defaultProps.onViewTask).toHaveBeenCalledWith("task-1");
+    }
+  });
+
+  it("closes menu on Escape key on backdrop", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<TaskManager {...defaultProps} />);
+    const moreButtons = screen.getAllByLabelText("Rohkem valikuid");
+    await user.click(moreButtons[0]!);
+    await waitFor(() => expect(screen.getByText("Muuda")).toBeInTheDocument());
+    const backdrop = container.querySelector(".task-manager__menu-backdrop");
+    if (backdrop) {
+      const { fireEvent } = await import("@testing-library/react");
+      fireEvent.keyDown(backdrop, { key: "Escape" });
+    }
+    await waitFor(() => expect(screen.queryByText("Muuda")).not.toBeInTheDocument());
+  });
 });

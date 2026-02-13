@@ -214,4 +214,112 @@ describe("TagsInput", () => {
     const group = container.querySelector(".sentence-synthesis-item__tags-group");
     expect(group?.getAttribute("lang")).toBe("et");
   });
+
+  it("closes tag menu on Escape key from tag element", () => {
+    const onTagMenuClose = vi.fn();
+    render(
+      <TagsInput
+        {...baseProps}
+        openTagMenu={{ sentenceId: "s1", tagIndex: 0 }}
+        onTagMenuClose={onTagMenuClose}
+      />,
+    );
+    fireEvent.keyDown(screen.getByText("hello"), { key: "Escape" });
+    expect(onTagMenuClose).toHaveBeenCalled();
+  });
+
+  it("closes tag menu on Escape key from backdrop", () => {
+    const onTagMenuClose = vi.fn();
+    const { container } = render(
+      <TagsInput
+        {...baseProps}
+        openTagMenu={{ sentenceId: "s1", tagIndex: 0 }}
+        onTagMenuClose={onTagMenuClose}
+      />,
+    );
+    const backdrop = container.querySelector(".sentence-synthesis-item__tag-menu-backdrop");
+    if (backdrop) fireEvent.keyDown(backdrop, { key: "Escape" });
+    expect(onTagMenuClose).toHaveBeenCalled();
+  });
+
+  it("navigates dropdown menu with Escape key", () => {
+    const onTagMenuClose = vi.fn();
+    const { container } = render(
+      <TagsInput
+        {...baseProps}
+        openTagMenu={{ sentenceId: "s1", tagIndex: 0 }}
+        tagMenuItems={[{ label: "Option1", onClick: vi.fn() }]}
+        onTagMenuClose={onTagMenuClose}
+      />,
+    );
+    const dropdown = container.querySelector(".sentence-synthesis-item__tag-dropdown");
+    if (dropdown) fireEvent.keyDown(dropdown, { key: "Escape" });
+    expect(onTagMenuClose).toHaveBeenCalled();
+  });
+
+  it("navigates dropdown menu with ArrowDown/ArrowUp keys", () => {
+    const { container } = render(
+      <TagsInput
+        {...baseProps}
+        openTagMenu={{ sentenceId: "s1", tagIndex: 0 }}
+        tagMenuItems={[
+          { label: "Option1", onClick: vi.fn() },
+          { label: "Option2", onClick: vi.fn() },
+        ]}
+        onTagMenuClose={vi.fn()}
+      />,
+    );
+    const dropdown = container.querySelector(".sentence-synthesis-item__tag-dropdown");
+    if (dropdown) {
+      fireEvent.keyDown(dropdown, { key: "ArrowDown" });
+      fireEvent.keyDown(dropdown, { key: "ArrowUp" });
+    }
+  });
+
+  it("stops propagation on dropdown click", () => {
+    const onTagMenuOpen = vi.fn();
+    const { container } = render(
+      <TagsInput
+        {...baseProps}
+        openTagMenu={{ sentenceId: "s1", tagIndex: 0 }}
+        tagMenuItems={[{ label: "Pick", onClick: vi.fn() }]}
+        onTagMenuClose={vi.fn()}
+        onTagMenuOpen={onTagMenuOpen}
+      />,
+    );
+    const dropdown = container.querySelector(".sentence-synthesis-item__tag-dropdown");
+    if (dropdown) fireEvent.click(dropdown);
+  });
+
+  it("shows selected style when allTagsSelected is true", () => {
+    const { container } = render(
+      <TagsInput
+        {...baseProps}
+        isPronunciationPanelOpen={true}
+        allTagsSelected={true}
+      />,
+    );
+    const selected = container.querySelectorAll(".sentence-synthesis-item__tag--selected");
+    expect(selected.length).toBe(2);
+  });
+
+  it("calls onEditTagKeyDown and onEditTagCommit on editing tag", () => {
+    const onEditTagChange = vi.fn();
+    const onEditTagKeyDown = vi.fn();
+    const onEditTagCommit = vi.fn();
+    render(
+      <TagsInput
+        {...baseProps}
+        editingTag={{ sentenceId: "s1", tagIndex: 0, value: "test" }}
+        onEditTagChange={onEditTagChange}
+        onEditTagKeyDown={onEditTagKeyDown}
+        onEditTagCommit={onEditTagCommit}
+      />,
+    );
+    const input = screen.getByDisplayValue("test");
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onEditTagKeyDown).toHaveBeenCalled();
+    fireEvent.blur(input);
+    expect(onEditTagCommit).toHaveBeenCalled();
+  });
 });

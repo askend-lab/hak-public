@@ -85,6 +85,19 @@ describe("UserProfile", () => {
 
       expect(screen.queryByText("Logi välja")).not.toBeInTheDocument();
     });
+
+    it("closes dropdown on Escape key on backdrop", async () => {
+      const user = userEvent.setup();
+      const { container } = render(<UserProfile user={mockUser} />);
+      await user.click(screen.getByRole("button"));
+      expect(screen.getByText("Logi välja")).toBeInTheDocument();
+      const backdrop = container.querySelector(".user-profile__backdrop");
+      if (backdrop) {
+        const { fireEvent } = await import("@testing-library/react");
+        fireEvent.keyDown(backdrop, { key: "Escape" });
+      }
+      expect(screen.queryByText("Logi välja")).not.toBeInTheDocument();
+    });
   });
 
   describe("logout", () => {
