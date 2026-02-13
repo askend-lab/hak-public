@@ -181,9 +181,8 @@ export default function WizardTooltip({
           top: position.top,
           left: position.left,
           opacity: position.top === 0 && position.left === 0 ? 0 : 1,
-          // @ts-ignore - CSS custom property
           "--arrow-offset": `${position.arrowOffset || 50}%`,
-        }}
+        } as React.CSSProperties}
         role="dialog"
         aria-labelledby="wizard-title"
         aria-describedby="wizard-description"

@@ -334,7 +334,7 @@ describe("TaskEditModal", () => {
       });
     });
 
-    it.skip("does not close on error", async () => {
+    it("does not close on error", async () => {
       mockOnSave.mockRejectedValue(new Error("Failed"));
       const user = userEvent.setup();
       render(
