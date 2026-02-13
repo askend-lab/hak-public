@@ -30,26 +30,29 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
-      - name: Get AWS credentials for Docker build
-        id: aws-creds
-        run: |
-          echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> $GITHUB_OUTPUT
-          echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_OUTPUT
-          echo "aws_session_token=$AWS_SESSION_TOKEN" >> $GITHUB_OUTPUT
-
       - name: Build and push Docker image
         working-directory: packages/merlin-worker
         env:
+          DOCKER_BUILDKIT: "1"
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: merlin-worker
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          # Write credentials to temp files for BuildKit secrets (not baked into image layers)
+          echo -n "$AWS_ACCESS_KEY_ID" > /tmp/aws_access_key_id
+          echo -n "$AWS_SECRET_ACCESS_KEY" > /tmp/aws_secret_access_key
+          echo -n "$AWS_SESSION_TOKEN" > /tmp/aws_session_token
+
           docker build \
-            --build-arg AWS_ACCESS_KEY_ID=${{ steps.aws-creds.outputs.aws_access_key_id }} \
-            --build-arg AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws_secret_access_key }} \
-            --build-arg AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws_session_token }} \
+            --secret id=aws_access_key_id,src=/tmp/aws_access_key_id \
+            --secret id=aws_secret_access_key,src=/tmp/aws_secret_access_key \
+            --secret id=aws_session_token,src=/tmp/aws_session_token \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+
+          # Clean up credential files
+          rm -f /tmp/aws_access_key_id /tmp/aws_secret_access_key /tmp/aws_session_token
+
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
