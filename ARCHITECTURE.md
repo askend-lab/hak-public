@@ -23,12 +23,12 @@ HAK is an Estonian language learning platform. Teachers create lessons with text
 
 pnpm workspaces monorepo. Packages and their dependencies:
 
-- **frontend** — depends on `shared`, `specifications`
-- **simplestore** — standalone
+- **frontend** — depends on `shared`, `specifications`, `simplestore` (dev)
+- **simplestore** — depends on `shared`
 - **audio-api** — depends on `shared`
-- **merlin-api** — standalone
+- **merlin-api** — depends on `shared`
 - **merlin-worker** — depends on `shared`
-- **vabamorf-api** — standalone
+- **vabamorf-api** — depends on `shared`
 - **tara-auth** — standalone
 - **shared** — shared types, utilities, constants (no dependencies)
 - **specifications** — Gherkin BDD feature specs, depends on `gherkin-parser`
@@ -88,10 +88,9 @@ All infrastructure is managed with Terraform in `infra/`.
 
 Pre-commit hooks (DevBox) enforce quality on every commit. The commit is rejected if any check fails.
 
-- **TypeScript strict** — no `any` types, no floating promises
+- **TypeScript strict** — no `any` types, explicit return types
 - **ESLint** — zero warnings policy
-- **Build check** — code must compile
-- **Tests** — all tests must pass, coverage thresholds enforced, TDD required for new code
-- **Code quality** — no console.log, import order, copy-paste detection, dead code detection, file size limits
-- **Security** — dependency audit, secret detection, license check
+- **Build check** — frontend and shared must compile (`tsc --noEmit`)
+- **Tests** — all tests must pass, coverage thresholds configured per package
+- **Code quality** — no console.log (use `logger`), import-first, duplicate detection (sonarjs), file size limits
 - **Infrastructure** — Docker lint, IaC security scan, plan validation
