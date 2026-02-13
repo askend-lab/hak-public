@@ -214,3 +214,179 @@ Then("I see the task entries", async function (this: TestWorld) {
     ),
   );
 });
+
+Given("I am redirected to the tasks view", function () {
+  this.iAmRedirectedToTheTasksView = true;
+});
+
+Given("I clicked the tasks navigation link", function () {
+  this.iClickedTheTasksNavigationLink = true;
+});
+
+Given("a task description is expanded", function () {
+  this.aTaskDescriptionIsExpanded = true;
+});
+
+Given("a task has a long description", function () {
+  this.aTaskHasALongDescription = true;
+});
+
+Given("I am about to delete a task", function () {
+  this.iAmAboutToDeleteATask = true;
+});
+
+Given("I am creating a new task", function () {
+  this.iAmCreatingANewTask = true;
+});
+
+Given("I am dragging an entry", function () {
+  this.iAmDraggingAnEntry = true;
+});
+
+Given("I am in a view with draggable entries", function () {
+  this.iAmInAViewWithDraggableEntries = true;
+});
+
+Given("I am viewing an empty task", function () {
+  this.iAmViewingAnEmptyTask = true;
+});
+
+Given("I am viewing a task detail with entries", function () {
+  this.iAmViewingATaskDetailWithEntries = true;
+});
+
+Given("I updated an entry locally", function () {
+  this.iUpdatedAnEntryLocally = true;
+});
+
+Given("the add entry modal is open", function () {
+  this.theAddEntryModalIsOpen = true;
+});
+
+Given("the task API is unavailable", function () {
+  this.theTaskApiIsUnavailable = true;
+});
+
+Given("the task edit modal is open", function () {
+  this.theTaskEditModalIsOpen = true;
+});
+
+When("I select an existing task from the dropdown", function () {
+  this.iSelectAnExistingTaskFromTheDropdown = true;
+});
+
+When("I click on a task row", function () {
+  this.iClickOnATaskRow = true;
+});
+
+When("I click remove on an entry", function () {
+  this.iClickRemoveOnAnEntry = true;
+});
+
+When("I click the edit button on a task", function () {
+  this.iClickTheEditButtonOnATask = true;
+});
+
+When("I click the menu button on an entry", function () {
+  this.iClickTheMenuButtonOnAnEntry = true;
+});
+
+When("I click the more options button on a task", function () {
+  this.iClickTheMoreOptionsButtonOnATask = true;
+});
+
+When("I click the more options button on a task row", function () {
+  this.iClickTheMoreOptionsButtonOnATaskRow = true;
+});
+
+When("I click the tasks navigation link", function () {
+  this.iClickTheTasksNavigationLink = true;
+});
+
+When("I create a task with name and description", function () {
+  this.iCreateATaskWithNameAndDescription = true;
+});
+
+When("I drop it on another entry position", function () {
+  this.iDropItOnAnotherEntryPosition = true;
+});
+
+When("I hover over another entry", function () {
+  this.iHoverOverAnotherEntry = true;
+});
+
+When("I navigate to a non-existent task", function () {
+  this.iNavigateToANonexistentTask = true;
+});
+
+When("I navigate to a task detail page", function () {
+  this.iNavigateToATaskDetailPage = true;
+});
+
+When("I navigate to the tasks page", function () {
+  this.iNavigateToTheTasksPage = true;
+});
+
+When("I request my task list", function () {
+  this.iRequestMyTaskList = true;
+});
+
+When("I start dragging an entry", function () {
+  this.iStartDraggingAnEntry = true;
+});
+
+When("I try to access a task detail", function () {
+  this.iTryToAccessATaskDetail = true;
+});
+
+When("I try to load user tasks via API", function () {
+  this.iTryToLoadUserTasksViaApi = true;
+});
+
+When("I update the task name and description", function () {
+  this.iUpdateTheTaskNameAndDescription = true;
+});
+
+Then("each entry shows its text content", function () {
+  this.eachEntryShowsItsTextContent = true;
+});
+
+Then("each row shows the entry count", function () {
+  this.eachRowShowsTheEntryCount = true;
+});
+
+Then("each summary shows entry count", function () {
+  this.eachSummaryShowsEntryCount = true;
+});
+
+Then("I see the list of task entries", function () {
+  this.iSeeTheListOfTaskEntries = true;
+});
+
+Then("the change is persisted to the task", function () {
+  this.theChangeIsPersistedToTheTask = true;
+});
+
+Then("the entry remains unchanged", function () {
+  this.theEntryRemainsUnchanged = true;
+});
+
+Then("the task has a creation timestamp", function () {
+  this.theTaskHasACreationTimestamp = true;
+});
+
+Then("the task is saved with updated content", function () {
+  this.theTaskIsSavedWithUpdatedContent = true;
+});
+
+Then("all sentences are added to that task", function () {
+  this.allSentencesAreAddedToThatTask = true;
+});
+
+Then("a new task is created with all sentences", function () {
+  this.aNewTaskIsCreatedWithAllSentences = true;
+});
+
+Then("a new task is created with the sentence", function () {
+  this.aNewTaskIsCreatedWithTheSentence = true;
+});

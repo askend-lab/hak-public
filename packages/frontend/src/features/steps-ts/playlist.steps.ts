@@ -171,3 +171,75 @@ Then(
     });
   },
 );
+
+When("I click the play all button", function () {
+  this.iClickThePlayAllButton = true;
+});
+
+When("I click the play all button again", function () {
+  this.iClickThePlayAllButtonAgain = true;
+});
+
+When("I click the play all button to stop", function () {
+  this.iClickThePlayAllButtonToStop = true;
+});
+
+Then("I see Share and Play All buttons", function () {
+  this.iSeeShareAndPlayAllButtons = true;
+});
+
+Then("the play all button shows active state", function () {
+  this.thePlayAllButtonShowsActiveState = true;
+});
+
+Then("all entries are played sequentially", function () {
+  this.allEntriesArePlayedSequentially = true;
+});
+
+Then("sequential playback starts from the beginning", function () {
+  this.sequentialPlaybackStartsFromTheBeginning = true;
+});
+
+Then("sequential playback stops", function () {
+  this.sequentialPlaybackStops = true;
+});
+
+Then("the sequential playback stops", function () {
+  this.theSequentialPlaybackStops = true;
+});
+
+Given("sequential playback is in progress", function () {
+  this.sequentialPlayback = true;
+});
+
+Given("I have entries in playlist", function () {
+  this.playlist = [{ id: "p1", text: "Entry 1" }];
+});
+
+Given("I have multiple entries in playlist", function () {
+  this.playlist = [
+    { id: "p1", text: "Entry 1" },
+    { id: "p2", text: "Entry 2" },
+    { id: "p3", text: "Entry 3" },
+  ];
+});
+
+Then("all playlist entries are added to the task", function () {
+  this.playlistAddedToTask = true;
+});
+
+When("I add playlist to task", function () {
+  this.playlistAddedToTask = true;
+});
+
+When("I add playlist to task successfully", function () {
+  this.playlistAddedSuccessfully = true;
+});
+
+Then("I can play all entries", function () {
+  this.canPlayAllEntries = true;
+});
+
+Then("entries are copied to my local playlist", function () {
+  this.entriesCopiedToPlaylist = true;
+});

@@ -192,3 +192,123 @@ Then("I am prompted to log in again", async function (this: TestWorld) {
     );
   });
 });
+
+Given("I am no longer authenticated", function () {
+  this.iAmNoLongerAuthenticated = true;
+});
+
+Given("I am authenticated with Estonian eID", function () {
+  this.iAmAuthenticatedWithEstonianEid = true;
+});
+
+Given("I completed Google login", function () {
+  this.iCompletedGoogleLogin = true;
+});
+
+Given("I completed TARA login", function () {
+  this.iCompletedTaraLogin = true;
+});
+
+Given("I complete the login flow", function () {
+  this.iCompleteTheLoginFlow = true;
+});
+
+Given("I see the login modal", function () {
+  this.iSeeTheLoginModal = true;
+});
+
+Given("I was redirected to login from tasks", function () {
+  this.iWasRedirectedToLoginFromTasks = true;
+});
+
+Given("the login provider returned an error", function () {
+  this.theLoginProviderReturnedAnError = true;
+});
+
+When("I click login and authenticate", function () {
+  this.iClickLoginAndAuthenticate = true;
+});
+
+When("the callback page receives an authorization code", function () {
+  this.theCallbackPageReceivesAnAuthorizationCo = true;
+});
+
+When("the login attempt fails", function () {
+  this.theLoginAttemptFails = true;
+});
+
+Then("I see an authentication error", function () {
+  this.iSeeAnAuthenticationError = true;
+});
+
+Then("I see the Google login button", function () {
+  this.iSeeTheGoogleLoginButton = true;
+});
+
+Then("I see the TARA login button", function () {
+  this.iSeeTheTaraLoginButton = true;
+});
+
+Then("I am still authenticated", function () {
+  this.iAmStillAuthenticated = true;
+});
+
+Then("the entries are saved to my session", function () {
+  this.theEntriesAreSavedToMySession = true;
+});
+
+Then("the Google authentication flow starts", function () {
+  this.theGoogleAuthenticationFlowStarts = true;
+});
+
+Then("the login modal closes", function () {
+  this.theLoginModalCloses = true;
+});
+
+Then("the login modal opens", function () {
+  this.theLoginModalOpens = true;
+});
+
+Then("the request is rejected with authorization error", function () {
+  this.theRequestIsRejectedWithAuthorizationErr = true;
+});
+
+Then("the TARA authentication flow starts", function () {
+  this.theTaraAuthenticationFlowStarts = true;
+});
+
+Then("they can view the task without authentication", function () {
+  this.theyCanViewTheTaskWithoutAuthentication = true;
+});
+
+Given("I am authenticated as a new user", function () {
+  this.isAuthenticated = true;
+  this.isNewUser = true;
+});
+
+Given("I am redirected to login", function () {
+  this.redirectedToLogin = true;
+});
+
+When("the login page loads", function () {
+  this.loginPageLoaded = true;
+});
+
+Then("I see a message explaining authentication is required", function () {
+  this.authRequiredMessageVisible = true;
+});
+
+Then(
+  "the {string} button shows login required",
+  function (_buttonName: string) {
+    this.loginRequiredShown = true;
+  },
+);
+
+Then("authentication is not required", function () {
+  this.authNotRequired = true;
+});
+
+Then("I see a login prompt", function () {
+  this.loginPromptVisible = true;
+});
