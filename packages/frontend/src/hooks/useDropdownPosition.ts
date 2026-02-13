@@ -105,11 +105,11 @@ export function useDropdownPosition({
   }, [isOpen, alignment, getAnchorElement]);
 
   // Adjust position after menu renders and when content changes
+  const contentKey = JSON.stringify(contentDeps);
   useEffect(() => {
     if (!isOpen) return;
     recalcPosition();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, recalcPosition, ...contentDeps]);
+  }, [isOpen, recalcPosition, contentKey]);
 
   // Keep position updated on scroll/resize
   useEffect(() => {

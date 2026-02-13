@@ -4,14 +4,5 @@ set -e
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
-DEVBOX_CLI="$PROJECT_ROOT/node_modules/.bin/devbox"
-DEVBOX_LOCAL="/home/alex/users/boxer/devbox/packages/hooks/src/cli/index.js"
-
 # Pass commit message file path to the hooks system
-if [ -x "$DEVBOX_CLI" ]; then
-  "$DEVBOX_CLI" run commit-msg "$1"
-elif [ -f "$DEVBOX_LOCAL" ]; then
-  node "$DEVBOX_LOCAL" run commit-msg "$1"
-else
-  echo "⚠ devbox not found — skipping commit-msg hook"
-fi
+node "/home/alex/users/boxer/devbox/packages/hooks/src/cli/index.js" run commit-msg "$1"

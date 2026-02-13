@@ -180,14 +180,14 @@ describe("AuthCallbackPage", () => {
     expect(loadingState).toBeTruthy();
   });
 
-  it("loading view has flex centered layout", () => {
+  it("loading view renders PageLoadingState with correct structure", () => {
     window.location.search = "?code=c";
     mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
     render(<AuthCallbackPage />);
     const container = document.querySelector(".page-loading-state") as HTMLElement;
-    expect(container?.style.display).toBe("flex");
-    expect(container?.style.justifyContent).toBe("center");
-    expect(container?.style.alignItems).toBe("center");
+    expect(container).toBeTruthy();
+    expect(container.getAttribute("role")).toBe("status");
+    expect(container.getAttribute("aria-live")).toBe("polite");
   });
 
   it("error text includes 'Sisselogimine ebaõnnestus' prefix with error detail", async () => {
