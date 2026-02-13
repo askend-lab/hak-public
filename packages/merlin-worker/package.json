@@ -1,5 +1,5 @@
 {
-  "name": "merlin-worker",
+  "name": "@hak/merlin-worker",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
