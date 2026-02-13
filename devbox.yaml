@@ -4,7 +4,9 @@ extends: "./defaults.yaml"
 project:
   name: "HAK"
 
-# Incremental testing - only runs affected tests (requires module-level opt-in)
+# Global excludes (merged with defaults)
+global_excludes:
+  - '**/.venv/**'
 
 # Test modules with coverage requirements
 test_modules:
@@ -17,7 +19,9 @@ test_modules:
   - name: merlin-worker
     path: packages/merlin-worker
     type: pytest
-    command: "echo 'Python package — tests run via pytest'"
+    command: ".venv/bin/pytest tests/ -v --json-report --json-report-file=pytest-results.json"
+    command_full: ".venv/bin/pytest tests/ -v --json-report --json-report-file=pytest-results.json --cov=worker --cov-report=json:coverage/coverage.json"
+    results_file: "pytest-results.json"
   - name: merlin-api
     path: packages/merlin-api
     type: jest
@@ -175,42 +179,34 @@ hooks:
 
   source-size:
     excludePaths:
+      # Build artifacts and reports
       - "**/eslint.base.config.mjs"
       - "**/*.generated.ts"
       - "**/.stryker-tmp/**"
       - "**/.old-frontend/**"
       - "**/.esbuild/**"
       - "**/.serverless/**"
-      - "**/steps-ts/**"
-      - "**/PronunciationVariants.tsx"
-      - "**/TaskDetailView.tsx"
       - "**/audit-results.json"
       - "**/jscpd-report.json"
       - "**/cucumber-results.json"
-      - "**/scripts/validate-design.js"
-      - "**/scripts/a11y-audit.mjs"
-      - "**/useSynthesis.test.ts"
-      - "**/SentenceSynthesisItem.test.tsx"
-      - "**/styles/**/*.scss"
-      - "**/*.full.test.tsx"
-      - "**/*.full.test.ts"
-      - "**/useSynthesisOrchestrator.test.ts"
-      - "**/useAudioPlayback.test.ts"
-      - "**/SharedTaskPage.test.tsx"
-      - "**/TasksView.test.tsx"
-      - "**/App.test.tsx"
-      - "**/context.test.tsx"
-      - "**/PronunciationVariants.test.tsx"
-      - "**/useSynthesis.branches.test.ts"
-      - "**/useTaskHandlers.test.ts"
-      - "**/boundary.test.ts"
-      - "**/dataTypes.test.ts"
       - "**/coverage-summary.json"
       - "**/.nyc_output/**"
       - "**/cucumber-report.json"
       - "**/merlin/**/*.py"
       - "**/merlin-worker/tools/**/*"
-      - "**/test.scss"
+      - "**/scripts/validate-design.js"
+      - "**/styles/**/*.scss"
+      - "**/styles/*.scss"
+      # Test files still over 400L (TODO: split these)
+      - "**/useSynthesis.test.ts"
+      - "**/SentenceSynthesisItem.test.tsx"
+      - "**/useSynthesisOrchestrator.test.ts"
+      - "**/SharedTaskPage.test.tsx"
+      - "**/App.test.tsx"
+      - "**/useSynthesis.branches.test.ts"
+      - "**/useTaskHandlers.test.ts"
+      - "**/boundary.test.ts"
+      - "**/PronunciationVariants.test.tsx"
 
   security-audit:
     packageManager: pnpm

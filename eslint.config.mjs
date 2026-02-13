@@ -34,6 +34,7 @@ export default [
       "playwright-report/**",
       ".lhci/**",
       "**/.stryker-tmp/**",
+      "**/.venv/**",
     ],
   },
 

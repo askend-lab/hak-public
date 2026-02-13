@@ -3,6 +3,7 @@ dist/
 package-lock.json
 __pycache__/
 *.pyc
+.venv/
 
 # Temporary files
 tmp/
@@ -11,6 +12,9 @@ tmp/
 **/coverage/
 **/jest-results*.json
 **/test-results*.json
+**/pytest-results.json
+**/coverage.json
+**/.coverage
 
 # Terraform
 .terraform/
@@ -69,3 +73,4 @@ packages/merlin-worker/tools/WORLD/test/test.cpp
 packages/merlin-worker/tools/WORLD/test/ctest.c
 packages/merlin-worker/tools/WORLD/test/*.wav
 packages/merlin-worker/tools/WORLD/wav_test/
+packages/merlin-worker/.coverage
