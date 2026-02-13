@@ -204,7 +204,7 @@ describe("env functions", () => {
   });
 
   it("getAwsRegion should return default when unset", () => {
-    delete process.env.AWS_REGION_NAME;
+    delete process.env.AWS_REGION;
     expect(getAwsRegion()).toBe("eu-west-1");
   });
 

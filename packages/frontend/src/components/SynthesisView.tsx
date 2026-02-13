@@ -5,6 +5,7 @@ import SynthesisPageHeader from "./SynthesisPageHeader";
 import SentenceMenu from "./SentenceMenu";
 import SentenceSynthesisItem from "./SentenceSynthesisItem";
 import { SentenceState } from "@/types/synthesis";
+import { SYNTHESIS_STRINGS } from "@/constants/ui-strings";
 
 interface Task {
   id: string;
@@ -84,15 +85,15 @@ interface TagMenuItem {
 
 const getTagMenuItems = (p: SynthesisViewProps): TagMenuItem[] => [
   {
-    label: "Vali sõna häälduskuju",
+    label: SYNTHESIS_STRINGS.TAG_MENU_VARIANTS,
     onClick: (sid, tidx, w) => p.onOpenVariantsFromMenu(sid, tidx, w),
   },
   {
-    label: "Muuda sõna kirjakuju",
+    label: SYNTHESIS_STRINGS.TAG_MENU_EDIT,
     onClick: (sid, tidx) => p.onEditTag(sid, tidx),
   },
   {
-    label: "Kustuta sõna",
+    label: SYNTHESIS_STRINGS.TAG_MENU_DELETE,
     onClick: (sid, tidx) => p.onDeleteTag(sid, tidx),
     danger: true,
   },
@@ -204,7 +205,7 @@ export default function SynthesisView(props: SynthesisViewProps) {
               onClick={props.onAddSentence}
               data-onboarding-target="add-sentence-button"
             >
-              Lisa lause
+              {SYNTHESIS_STRINGS.ADD_SENTENCE}
             </button>
           </div>
         </div>

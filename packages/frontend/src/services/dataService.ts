@@ -8,6 +8,11 @@ import { MockDataLoader } from "./storage/MockDataLoader";
 import { ShareService } from "./storage/ShareService";
 import { TaskRepository } from "./repository/TaskRepository";
 
+export interface DataServiceDeps {
+  storage?: SimpleStoreAdapter;
+  mockLoader?: MockDataLoader;
+}
+
 export class DataService {
   private static instance: DataService;
   private storage: SimpleStoreAdapter;
@@ -15,9 +20,9 @@ export class DataService {
   private shareService: ShareService;
   private repository: TaskRepository;
 
-  private constructor() {
-    this.storage = new SimpleStoreAdapter();
-    this.mockLoader = new MockDataLoader();
+  constructor(deps: DataServiceDeps = {}) {
+    this.storage = deps.storage ?? new SimpleStoreAdapter();
+    this.mockLoader = deps.mockLoader ?? new MockDataLoader();
     this.shareService = new ShareService(this.storage, this.mockLoader);
     this.repository = new TaskRepository(
       this.storage,
@@ -31,6 +36,10 @@ export class DataService {
       DataService.instance = new DataService();
     }
     return DataService.instance;
+  }
+
+  static resetInstance(): void {
+    DataService.instance = undefined as unknown as DataService;
   }
 
   async getUserTasks(userId: string): Promise<TaskSummary[]> {

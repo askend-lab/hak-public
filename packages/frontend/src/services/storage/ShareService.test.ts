@@ -8,16 +8,6 @@ vi.mock("@hak/shared", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
-const mockBaselineTasks: Record<string, unknown>[] = [];
-vi.mock("./MockDataLoader", () => {
-  return {
-    MockDataLoader: class {
-      loadBaselineTasks(): Promise<Record<string, unknown>[]> { return Promise.resolve([...mockBaselineTasks]); }
-      findTaskByShareToken(): Promise<null> { return Promise.resolve(null); }
-    },
-  };
-});
-
 const mockStorage = {
   saveTaskAsUnlisted: vi.fn().mockResolvedValue(undefined),
   getTaskByShareToken: vi.fn().mockResolvedValue(null),
@@ -63,10 +53,9 @@ describe("ShareService", () => {
 
   describe("getSharedTask", () => {
     it("returns baseline task when found", async () => {
-      mockBaselineTasks.push(mockTask);
+      mockLoader.loadBaselineTasks.mockResolvedValueOnce([mockTask]);
       const result = await service.getSharedTask("task-1");
       expect(result).toEqual(mockTask);
-      mockBaselineTasks.length = 0;
     });
 
     it("returns null when no baseline task found", async () => {

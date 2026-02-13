@@ -21,8 +21,7 @@ export class ShareService {
     logger.debug("Getting shared task:", taskId);
 
     // Check baseline tasks only - no shared storage fallback
-    const mockLoader = new MockDataLoader();
-    const baselineTasks = await mockLoader.loadBaselineTasks();
+    const baselineTasks = await this.mockLoader.loadBaselineTasks();
     const baselineTask = baselineTasks.find((task) => task.id === taskId);
     if (baselineTask) {
       logger.debug("Found baseline task:", baselineTask);

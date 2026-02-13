@@ -8,3 +8,9 @@ export { TEXT_LIMITS, TIMING } from "./constants";
 export type { TextLimitKey, TimingKey } from "./constants";
 export { sleep, isNonEmpty, isEmpty } from "./utils";
 export type { NullableString } from "./utils";
+export {
+  HTTP_STATUS,
+  createLambdaResponse,
+  extractErrorMessage,
+} from "./lambda";
+export type { LambdaResponse, HttpStatusCode } from "./lambda";

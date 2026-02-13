@@ -384,6 +384,9 @@ importers:
       '@aws-sdk/client-sqs':
         specifier: ^3.985.0
         version: 3.985.0
+      '@hak/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@types/jest':
         specifier: ^29.5.11
@@ -458,6 +461,9 @@ importers:
       '@aws-sdk/lib-dynamodb':
         specifier: ^3.985.0
         version: 3.985.0(@aws-sdk/client-dynamodb@3.985.0)
+      '@hak/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@types/aws-lambda':
         specifier: ^8.10.159
@@ -553,6 +559,10 @@ importers:
         version: 5.9.3
 
   packages/vabamorf-api:
+    dependencies:
+      '@hak/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@types/aws-lambda':
         specifier: ^8.10.130
