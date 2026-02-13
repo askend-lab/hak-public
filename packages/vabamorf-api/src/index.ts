@@ -3,7 +3,12 @@
 
 export { analyzeHandler, variantsHandler, healthHandler } from "./handler";
 export { createResponse, parseJsonBody, getFieldError, validateField } from "./validation";
-export { CORS_HEADERS } from "@hak/shared";
+export const CORS_HEADERS: Record<string, string> = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+};
 export { formatPhoneticText } from "./parser-helpers";
 export { buildDescription } from "./description-builder";
 export { closeVmetajson, isInitialized } from "./vmetajson";

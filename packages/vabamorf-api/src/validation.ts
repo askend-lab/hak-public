@@ -1,13 +1,28 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { createApiResponse, type LambdaResponse } from "@hak/shared";
+export interface LambdaResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+const CORS_HEADERS: Record<string, string> = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+};
 
 export function createResponse(
   statusCode: number,
   body: object,
 ): LambdaResponse {
-  return createApiResponse(statusCode, body);
+  return {
+    statusCode,
+    headers: { ...CORS_HEADERS },
+    body: JSON.stringify(body),
+  };
 }
 
 export function parseJsonBody(eventBody: string | null): unknown {
