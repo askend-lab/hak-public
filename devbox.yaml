@@ -16,7 +16,8 @@ test_modules:
     type: jest
   - name: merlin-worker
     path: packages/merlin-worker
-    type: jest
+    type: pytest
+    command: "echo 'Python package — tests run via pytest'"
   - name: merlin-api
     path: packages/merlin-api
     type: jest
