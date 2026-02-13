@@ -27,8 +27,6 @@ describe("ShareService sharing flow", () => {
         sharedTasksStorage = tasks;
         return Promise.resolve();
       }),
-      findAllUserTaskKeys: vi.fn().mockResolvedValue([]),
-      loadTasksByKey: vi.fn().mockResolvedValue([]),
       saveTaskAsUnlisted: vi.fn().mockImplementation((task: Task) => {
         if (task.shareToken) {
           unlistedTasksStorage[task.shareToken] = task;
