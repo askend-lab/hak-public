@@ -90,7 +90,8 @@ cd "$WORK_DIR/repo"
 echo ">>> Removing excluded paths..."
 REMOVED_COUNT=0
 for pattern in "${EXCLUDES[@]}"; do
-  if [[ -e "$pattern" ]]; then
+  # -e checks existing files, -L catches broken symlinks (e.g. defaults.yaml → devbox)
+  if [[ -e "$pattern" || -L "$pattern" ]]; then
     echo "  - $pattern"
     rm -rf "$pattern"
     REMOVED_COUNT=$((REMOVED_COUNT + 1))
