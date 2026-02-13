@@ -270,4 +270,46 @@ describe("SpecsNav badge classes and icons", () => {
     render(<SpecsNav {...defaultProps} />);
     expect(screen.getByText(/Features/)).toBeInTheDocument();
   });
+
+  it("toggles group on Enter key", async () => {
+    const onToggleGroup = vi.fn();
+    render(<SpecsNav {...defaultProps} onToggleGroup={onToggleGroup} />);
+    const { fireEvent } = await import("@testing-library/react");
+    const groupHeader = screen.getByText(/Group 1/).closest("[role='button']");
+    if (groupHeader) fireEvent.keyDown(groupHeader, { key: "Enter" });
+    expect(onToggleGroup).toHaveBeenCalledWith("Group 1");
+  });
+
+  it("toggles feature on Enter key", async () => {
+    const onToggleFeature = vi.fn();
+    const onSelectFeature = vi.fn();
+    render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        onToggleFeature={onToggleFeature}
+        onSelectFeature={onSelectFeature}
+      />,
+    );
+    const { fireEvent } = await import("@testing-library/react");
+    const featureItem = screen.getByText(/Feature 1/).closest("[role='button']");
+    if (featureItem) fireEvent.keyDown(featureItem, { key: "Enter" });
+    expect(onToggleFeature).toHaveBeenCalledWith("Feature 1");
+  });
+
+  it("selects feature on scenario Enter key", async () => {
+    const onSelectFeature = vi.fn();
+    const { container } = render(
+      <SpecsNav
+        {...defaultProps}
+        expandedGroups={new Set(["Group 1"])}
+        expandedFeatures={new Set(["Feature 1"])}
+        onSelectFeature={onSelectFeature}
+      />,
+    );
+    const { fireEvent } = await import("@testing-library/react");
+    const scenarioItem = container.querySelector(".specs-scenario__item");
+    if (scenarioItem) fireEvent.keyDown(scenarioItem, { key: "Enter" });
+    expect(onSelectFeature).toHaveBeenCalledWith("Feature 1");
+  });
 });

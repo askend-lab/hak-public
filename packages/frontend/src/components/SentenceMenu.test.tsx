@@ -287,4 +287,38 @@ describe("SentenceMenu structure and classes", () => {
     await userEvent.click(screen.getByText("Loo uus ülesanne"));
     expect(onClose).toHaveBeenCalled();
   });
+
+  it("search input click stops propagation", async () => {
+    render(<SentenceMenu {...defaultProps} isAuthenticated={true} />);
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
+    const searchInput = screen.getByPlaceholderText("Otsi");
+    const { fireEvent } = await import("@testing-library/react");
+    const event = new MouseEvent("click", { bubbles: true });
+    const stopSpy = vi.spyOn(event, "stopPropagation");
+    fireEvent(searchInput, event);
+    expect(stopSpy).toHaveBeenCalled();
+  });
+
+  it("Escape in tasks panel goes back to main", async () => {
+    const onClose = vi.fn();
+    const { container } = render(
+      <SentenceMenu {...defaultProps} isAuthenticated={true} onClose={onClose} />,
+    );
+    await userEvent.click(screen.getByText("Lisa ülesandesse"));
+    const { fireEvent } = await import("@testing-library/react");
+    const menuEl = container.querySelector(".synthesis__dropdown-menu");
+    if (menuEl) fireEvent.keyDown(menuEl, { key: "Escape" });
+    expect(screen.getByText("Uuri häälduskuju")).toBeInTheDocument();
+  });
+
+  it("Escape in main panel calls onClose", async () => {
+    const onClose = vi.fn();
+    const { container } = render(
+      <SentenceMenu {...defaultProps} isAuthenticated={true} onClose={onClose} />,
+    );
+    const { fireEvent } = await import("@testing-library/react");
+    const menuEl = container.querySelector(".synthesis__dropdown-menu");
+    if (menuEl) fireEvent.keyDown(menuEl, { key: "Escape" });
+    expect(onClose).toHaveBeenCalled();
+  });
 });

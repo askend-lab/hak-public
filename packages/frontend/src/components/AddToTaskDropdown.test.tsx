@@ -184,8 +184,112 @@ describe("AddToTaskDropdown", () => {
     });
   });
 
+  describe("confirm panel", () => {
+    it("shows confirm panel when task with entries is clicked", async () => {
+      const { DataService } = await import("@/services/dataService");
+      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
+        getUserTasks: vi.fn().mockResolvedValue([
+          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
+        ]),
+      });
+      const user = userEvent.setup();
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={2}
+        />,
+      );
+      await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
+      await user.click(screen.getByText("Full Task"));
+      await waitFor(() => expect(screen.getByText("Lisa juurde")).toBeInTheDocument());
+      expect(screen.getByText("Asenda olemasolevad")).toBeInTheDocument();
+    });
+
+    it("calls onSelectTask with append when Lisa juurde clicked", async () => {
+      const { DataService } = await import("@/services/dataService");
+      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
+        getUserTasks: vi.fn().mockResolvedValue([
+          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
+        ]),
+      });
+      const user = userEvent.setup();
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={2}
+        />,
+      );
+      await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
+      await user.click(screen.getByText("Full Task"));
+      await waitFor(() => expect(screen.getByText("Lisa juurde")).toBeInTheDocument());
+      await user.click(screen.getByText("Lisa juurde"));
+      expect(mockOnSelectTask).toHaveBeenCalledWith("task-3", "Full Task", "append");
+    });
+
+    it("calls onSelectTask with replace when Asenda clicked", async () => {
+      const { DataService } = await import("@/services/dataService");
+      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
+        getUserTasks: vi.fn().mockResolvedValue([
+          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
+        ]),
+      });
+      const user = userEvent.setup();
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={2}
+        />,
+      );
+      await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
+      await user.click(screen.getByText("Full Task"));
+      await waitFor(() => expect(screen.getByText("Asenda olemasolevad")).toBeInTheDocument());
+      await user.click(screen.getByText("Asenda olemasolevad"));
+      expect(mockOnSelectTask).toHaveBeenCalledWith("task-3", "Full Task", "replace");
+    });
+
+    it("goes back from confirm panel when Tagasi clicked", async () => {
+      const { DataService } = await import("@/services/dataService");
+      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
+        getUserTasks: vi.fn().mockResolvedValue([
+          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
+        ]),
+      });
+      const user = userEvent.setup();
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={2}
+        />,
+      );
+      await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
+      await user.click(screen.getByText("Full Task"));
+      await waitFor(() => expect(screen.getByText("Lisa juurde")).toBeInTheDocument());
+      await user.click(screen.getByLabelText("Tagasi"));
+      await waitFor(() => expect(screen.getByPlaceholderText("Otsi")).toBeInTheDocument());
+    });
+  });
+
   describe("search functionality", () => {
     it("filters tasks based on search query", async () => {
+      const { DataService } = await import("@/services/dataService");
+      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
+        getUserTasks: vi.fn().mockResolvedValue([
+          { id: "task-1", name: "Task One", description: "", entryCount: 0 },
+          { id: "task-2", name: "Task Two", description: "", entryCount: 0 },
+        ]),
+      });
       const { fireEvent } = await import("@testing-library/react");
       render(
         <AddToTaskDropdown
@@ -219,6 +323,13 @@ describe("AddToTaskDropdown", () => {
     });
 
     it("shows empty message when no tasks match", async () => {
+      const { DataService } = await import("@/services/dataService");
+      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
+        getUserTasks: vi.fn().mockResolvedValue([
+          { id: "task-1", name: "Task One", description: "", entryCount: 0 },
+          { id: "task-2", name: "Task Two", description: "", entryCount: 0 },
+        ]),
+      });
       const user = userEvent.setup();
       render(
         <AddToTaskDropdown
