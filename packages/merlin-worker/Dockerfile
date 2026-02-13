@@ -43,9 +43,9 @@ COPY --chown=merlin_user:merlin_user tools/ merlin_repo/tools/
 # Download voice models from S3 (267MB, too large for git)
 # Uses BuildKit secrets to avoid baking AWS credentials into image layers
 RUN pip install awscli
-RUN --mount=type=secret,id=aws_access_key_id \
-    --mount=type=secret,id=aws_secret_access_key \
-    --mount=type=secret,id=aws_session_token \
+RUN --mount=type=secret,id=aws_access_key_id,uid=1001 \
+    --mount=type=secret,id=aws_secret_access_key,uid=1001 \
+    --mount=type=secret,id=aws_session_token,uid=1001 \
     AWS_ACCESS_KEY_ID=$(cat /run/secrets/aws_access_key_id) \
     AWS_SECRET_ACCESS_KEY=$(cat /run/secrets/aws_secret_access_key) \
     AWS_SESSION_TOKEN=$(cat /run/secrets/aws_session_token) \
