@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { TaskRepository } from "./TaskRepository";
 import { SimpleStoreAdapter } from "../storage/SimpleStoreAdapter";
 import { MockDataLoader } from "../storage/MockDataLoader";
-import { ShareService } from "../storage/ShareService";
+import { ShareService } from "@/features/sharing/services/ShareService";
 import { Task, TaskEntry } from "@/types/task";
 
 describe("TaskRepository append/replace mode", () => {

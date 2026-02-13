@@ -27,7 +27,7 @@ const mockShareSvc = {
 
 vi.mock("./storage/SimpleStoreAdapter", () => ({ SimpleStoreAdapter: class {} }));
 vi.mock("./storage/MockDataLoader", () => ({ MockDataLoader: class {} }));
-vi.mock("./storage/ShareService", () => ({
+vi.mock("@/features/sharing/services/ShareService", () => ({
   ShareService: class {
     getSharedTask = mockShareSvc.getSharedTask;
     shareUserTask = mockShareSvc.shareUserTask;

@@ -3,8 +3,8 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ShareService } from "./ShareService";
-import { SimpleStoreAdapter } from "./SimpleStoreAdapter";
-import { MockDataLoader } from "./MockDataLoader";
+import { SimpleStoreAdapter } from "@/services/storage/SimpleStoreAdapter";
+import { MockDataLoader } from "@/services/storage/MockDataLoader";
 import { Task } from "@/types/task";
 
 describe("ShareService unlisted-only architecture", () => {

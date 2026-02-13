@@ -4,7 +4,7 @@
 import { Task, TaskEntry, TaskSummary, CreateTaskRequest } from "@/types/task";
 import { SimpleStoreAdapter } from "../storage/SimpleStoreAdapter";
 import { MockDataLoader } from "../storage/MockDataLoader";
-import { ShareService } from "../storage/ShareService";
+import { ShareService } from "@/features/sharing/services/ShareService";
 
 function generateId(prefix: string): string {
   return `${prefix}_${crypto.randomUUID()}`;

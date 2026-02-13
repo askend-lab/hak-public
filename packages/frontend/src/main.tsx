@@ -25,7 +25,7 @@ import { AuthProvider } from "./features/auth/services";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { OnboardingProvider } from "./features/onboarding/contexts/OnboardingContext";
 const AuthCallbackPage = lazy(() => import("./features/auth/pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
-const SharedTaskPage = lazy(() => import("./pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
+const SharedTaskPage = lazy(() => import("./features/sharing/pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
 import "./styles/main.scss";
 
 // Enable accessibility checking in development mode

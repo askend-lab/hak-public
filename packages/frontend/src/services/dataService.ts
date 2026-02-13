@@ -5,7 +5,7 @@ import { Task, TaskSummary, TaskEntry, CreateTaskRequest } from "@/types/task";
 import { logger } from "@hak/shared";
 import { SimpleStoreAdapter } from "./storage/SimpleStoreAdapter";
 import { MockDataLoader } from "./storage/MockDataLoader";
-import { ShareService } from "./storage/ShareService";
+import { ShareService } from "@/features/sharing/services/ShareService";
 import { TaskRepository } from "./repository/TaskRepository";
 
 export interface DataServiceDeps {

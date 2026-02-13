@@ -21,7 +21,7 @@ vi.mock("@/features/tasks/components/AddEntryModal", () => ({
       </div>
     ) : null,
 }));
-vi.mock("./ShareTaskModal", () => ({
+vi.mock("@/features/sharing/components/ShareTaskModal", () => ({
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? (
       <div data-testid="share-modal">
