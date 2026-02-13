@@ -24,7 +24,9 @@ Every push to `main` in `hak` triggers the GitHub Actions workflow `.github/work
 3. **Delete** excluded files/directories (handles both regular files and broken symlinks)
 4. **Clean up** `package.json`:
    - Remove internal scripts (`dx`, `dx:cli`, `postinstall`, `kill-ports`, `start:backend`)
-   - Add public-facing scripts (`test`, `build`, `typecheck`, `start`)
+   - Add public-facing scripts (`test`, `build`, `typecheck`, `start`, `prepare`, `lint`, `check`)
+   - Add `"prepare": "husky"` to activate pre-commit hooks for external contributors
+   - Remove internal-only devDependencies (`gherkin-lint`, `gitleaks`, `knip`, `madge`)
    - Rewrite repository URLs (`askend-lab/hak` → `askend-lab/hak-public`)
 5. **Clean up** frontend `package.json` — remove workspace deps on excluded packages
 6. **Clean up** `eslint.config.mjs` — remove DevBox reference
@@ -45,7 +47,8 @@ Controlled by `.opensource-exclude` in the repo root. Current exclusions:
 
 ### Internal Tooling
 - `devbox`, `devbox.yaml`, `defaults.yaml` — DevBox configuration
-- `.githooks/` — Git hooks (DevBox-managed)
+- `.githooks/` — Git hooks (DevBox-managed, replaced by `.husky/` in public repo)
+- `.gherkin-lintrc` — Gherkin linter config (internal tool)
 - `.agent-channel` — Agent communication
 
 ### Infrastructure
@@ -66,7 +69,7 @@ Controlled by `.opensource-exclude` in the repo root. Current exclusions:
 
 ### Config Files
 - `babel.config.js`, `jest.config.js`, `jest.setup.ts` — Reference internal packages
-- `knip.json`, `.npmrc`, `.gitleaks.toml`
+- `knip.json`, `.npmrc`, `.gitleaks.toml` — Internal tools/config
 
 ### Internal Docs
 - `README.md`, `CONTRIBUTING.md` — Replaced by `*.public.md` versions
@@ -79,12 +82,21 @@ These files exist in the private repo but are **transformed** during sync:
 
 | File | Transformation |
 |---|---|
-| `package.json` | Scripts replaced, URLs rewritten |
+| `package.json` | Scripts replaced, `prepare: husky` added, internal devDeps removed, URLs rewritten |
 | `packages/frontend/package.json` | Workspace deps on excluded packages removed |
 | `eslint.config.mjs` | DevBox comment removed |
 | `.gitignore` | Internal path references removed |
 | `README.public.md` → `README.md` | Renamed |
 | `CONTRIBUTING.public.md` → `CONTRIBUTING.md` | Renamed |
+
+### Pre-commit Hooks (Public Repo)
+
+The public repo uses **Husky + lint-staged** instead of DevBox:
+
+- `.husky/pre-commit` runs `pnpm lint-staged`
+- `lint-staged` runs ESLint on staged `.ts/.tsx/.js/.mjs/.cjs` files
+- `"prepare": "husky"` in `package.json` activates hooks on `pnpm install`
+- Full lint + typecheck + tests run in CI (`.github/workflows/build.yml`)
 
 ## How to Add/Remove Content from Public Repo
 
