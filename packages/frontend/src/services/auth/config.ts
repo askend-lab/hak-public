@@ -6,7 +6,7 @@ import { generateCodeVerifier, generateCodeChallenge } from "./pkce";
 const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
 export const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
-export const TARA_LOGIN_URL = "https://hak-api-dev.askend-lab.com/auth/tara/start";
+export const TARA_LOGIN_URL = import.meta.env?.VITE_TARA_LOGIN_URL ?? "";
 export const PKCE_STORAGE_KEY = "pkce_code_verifier";
 export const OAUTH2_TOKEN_PATH = "/oauth2/token";
 export const AUTH_CALLBACK_PATH = "/auth/callback";
@@ -45,9 +45,9 @@ export function getLogoutUri(hostname: string = getHostname()): string {
  */
 export const cognitoConfig = {
   region: import.meta.env?.VITE_COGNITO_REGION ?? "eu-west-1",
-  userPoolId: import.meta.env?.VITE_COGNITO_USER_POOL_ID ?? "eu-west-1_wlRtuLkG2",
-  clientId: import.meta.env?.VITE_COGNITO_CLIENT_ID ?? "64tf6nf61n6sgftqif6q975hka",
-  domain: import.meta.env?.VITE_COGNITO_DOMAIN ?? "askend-lab-auth.auth.eu-west-1.amazoncognito.com",
+  userPoolId: import.meta.env?.VITE_COGNITO_USER_POOL_ID ?? "",
+  clientId: import.meta.env?.VITE_COGNITO_CLIENT_ID ?? "",
+  domain: import.meta.env?.VITE_COGNITO_DOMAIN ?? "",
 
   get redirectUri(): string {
     return getRedirectUri();

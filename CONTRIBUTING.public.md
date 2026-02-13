@@ -15,8 +15,8 @@ No Docker, AWS CLI, or environment variables required. The dev server proxies AP
 ### Setup
 
 ```bash
-git clone https://github.com/askend-lab/hak.git
-cd hak
+git clone https://github.com/askend-lab/hak-public.git
+cd hak-public
 pnpm install
 pnpm start              # Dev server at http://localhost:5181
 ```
