@@ -1,7 +1,19 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { CORS_HEADERS, getCorsOrigin } from "@hak/shared";
+// Inlined from @hak/shared — vabamorf-api runs in standalone Docker without workspace packages
+function getCorsOrigin(): string {
+  return (typeof process !== "undefined" && process.env?.ALLOWED_ORIGIN) || "*";
+}
+
+const CORS_HEADERS: Record<string, string> = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
+};
+
+export { CORS_HEADERS };
 
 export interface LambdaResponse {
   statusCode: number;
