@@ -150,6 +150,7 @@ jobs:
             -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
       - name: Clear stale state lock
+        timeout-minutes: 2
         run: |
           # Query DynamoDB for any existing lock on this state
           LOCK_ID=$(aws dynamodb get-item \
@@ -166,16 +167,6 @@ jobs:
           else
             echo "✅ No stale lock found"
           fi
-        continue-on-error: true
-
-      - name: Import DynamoDB table (one-time)
-        run: |
-          terraform import -var="env=${{ matrix.environment }}" aws_dynamodb_table.single_table single-table-lambda-${{ matrix.environment }} 2>/dev/null || echo "Already imported or doesn't exist"
-        continue-on-error: true
-
-      - name: Import ECR vabamorf-api (one-time)
-        run: |
-          terraform import -var="env=${{ matrix.environment }}" aws_ecr_repository.vabamorf_api vabamorf-api 2>/dev/null || echo "Already imported or doesn't exist"
         continue-on-error: true
 
       - name: Terraform Apply (${{ matrix.environment }})
