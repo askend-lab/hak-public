@@ -74,15 +74,6 @@ export class SimpleStoreAdapter {
     return result.item?.data ?? null;
   }
 
-  async loadUserTasks(userId: string): Promise<Task[]> {
-    const data = await this.get("tasks", userId, "private");
-    return data ? (data.tasks as Task[]) : [];
-  }
-
-  async saveUserTasks(userId: string, tasks: Task[]): Promise<void> {
-    await this.save("tasks", userId, "private", { tasks });
-  }
-
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {
     try {
       const data = await this.get("tasks", shareToken, "unlisted");
@@ -91,6 +82,67 @@ export class SimpleStoreAdapter {
       logger.error("Failed to get task by share token:", error);
       return null;
     }
+  }
+
+  private async delete(
+    pk: string,
+    sk: string,
+    type: "private" | "shared" | "unlisted",
+  ): Promise<void> {
+    const params = new URLSearchParams({ pk, sk, type });
+    const response = await fetch(`${this.baseUrl}/delete?${params}`, {
+      method: "DELETE",
+      headers: this.getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      logger.error("SimpleStore delete failed:", error);
+      throw new Error(`Failed to delete: ${error}`);
+    }
+  }
+
+  private async query(
+    prefix: string,
+    type: "private" | "shared" | "unlisted",
+  ): Promise<Array<Record<string, unknown>>> {
+    const params = new URLSearchParams({ prefix, type });
+    const response = await fetch(`${this.baseUrl}/query?${params}`, {
+      headers: this.getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return [];
+      const error = await response.text();
+      logger.error("SimpleStore query failed:", error);
+      throw new Error(`Failed to query: ${error}`);
+    }
+
+    const result: SimpleStoreResponse = await response.json();
+    return (result.items ?? []).map((item) => item.data);
+  }
+
+  async saveTask(task: Task): Promise<void> {
+    await this.save(
+      "task",
+      task.id,
+      "private",
+      task as unknown as Record<string, unknown>,
+    );
+  }
+
+  async getTask(taskId: string): Promise<Task | null> {
+    const data = await this.get("task", taskId, "private");
+    return data ? (data as unknown as Task) : null;
+  }
+
+  async deleteTask(taskId: string): Promise<void> {
+    await this.delete("task", taskId, "private");
+  }
+
+  async queryUserTasks(): Promise<Task[]> {
+    const items = await this.query("task", "private");
+    return items as unknown as Task[];
   }
 
   async saveTaskAsUnlisted(task: Task): Promise<void> {

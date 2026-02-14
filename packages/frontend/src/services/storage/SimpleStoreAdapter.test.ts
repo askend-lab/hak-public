@@ -34,18 +34,18 @@ describe("SimpleStoreAdapter", () => {
     shareToken: "test-token",
   });
 
-  describe("loadUserTasks", () => {
-    it("returns tasks from SimpleStore", async () => {
-      const tasks = [createMockTask("task-1", "user-1")];
+  describe("queryUserTasks", () => {
+    it("returns tasks from SimpleStore query endpoint", async () => {
+      const task = createMockTask("task-1", "user-1");
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, item: { data: { tasks } } }),
+        json: async () => ({ success: true, items: [{ data: task }] }),
       });
 
-      const result = await adapter.loadUserTasks("user-1");
+      const result = await adapter.queryUserTasks();
 
       expect(mockFetch).toHaveBeenCalledWith(
-        "/api/get?pk=tasks&sk=user-1&type=private",
+        "/api/query?prefix=task&type=private",
         {
           headers: {
             "Content-Type": "application/json",
@@ -53,65 +53,21 @@ describe("SimpleStoreAdapter", () => {
           },
         },
       );
-      expect(result).toEqual(tasks);
+      expect(result).toEqual([task]);
     });
 
-    it("returns empty array when no tasks exist", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-      });
+    it("returns empty array on 404", async () => {
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
 
-      const result = await adapter.loadUserTasks("user-1");
+      const result = await adapter.queryUserTasks();
 
       expect(result).toEqual([]);
     });
 
-    it("throws error on network failure instead of silently returning empty array", async () => {
+    it("throws error on network failure", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(adapter.loadUserTasks("user-1")).rejects.toThrow(
-        "Network error",
-      );
-    });
-
-    it("throws error when API returns HTML instead of JSON", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => {
-          throw new SyntaxError("Unexpected token < in JSON");
-        },
-      });
-
-      await expect(adapter.loadUserTasks("user-1")).rejects.toThrow();
-    });
-  });
-
-  describe("saveUserTasks", () => {
-    it("saves tasks to SimpleStore with exact body", async () => {
-      const tasks = [createMockTask("task-1", "user-1")];
-      mockFetch.mockResolvedValueOnce({ ok: true });
-
-      await adapter.saveUserTasks("user-1", tasks);
-
-      const call = mockFetch.mock.calls[0] as [string, RequestInit];
-      const callBody = JSON.parse(call[1].body as string);
-      expect(callBody.pk).toBe("tasks");
-      expect(callBody.sk).toBe("user-1");
-      expect(callBody.type).toBe("private");
-      expect(callBody.ttl).toBe(0);
-      expect(callBody.data.tasks).toHaveLength(1);
-      expect(callBody.data.tasks[0].id).toBe("task-1");
-      expect(call[1].method).toBe("POST");
-    });
-
-    it("throws error on save failure instead of silently swallowing", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        text: async () => "Save failed",
-      });
-
-      await expect(adapter.saveUserTasks("user-1", [])).rejects.toThrow();
+      await expect(adapter.queryUserTasks()).rejects.toThrow("Network error");
     });
   });
 
@@ -139,7 +95,7 @@ describe("SimpleStoreAdapter mutation kills", () => {
 
   it("save uses /api/save URL", async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
-    await adapter.saveUserTasks("u1", [mkTask("t1")]);
+    await adapter.saveTask(mkTask("t1"));
     const url = mockFetch.mock.calls[0]?.[0] as string;
     expect(url).toBe("/api/save");
   });
@@ -147,7 +103,7 @@ describe("SimpleStoreAdapter mutation kills", () => {
   it("save error includes exact message prefix", async () => {
     const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockFetch.mockResolvedValueOnce({ ok: false, text: async () => "bad" });
-    await expect(adapter.saveUserTasks("u1", [])).rejects.toThrow("Failed to save: bad");
+    await expect(adapter.saveTask(mkTask("t1"))).rejects.toThrow("Failed to save: bad");
     expect(logSpy).toHaveBeenCalledWith("SimpleStore save failed:", "bad");
     logSpy.mockRestore();
   });
@@ -155,7 +111,7 @@ describe("SimpleStoreAdapter mutation kills", () => {
   it("get error includes exact message prefix", async () => {
     const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockFetch.mockResolvedValueOnce({ ok: false, status: 500, text: async () => "err" });
-    await expect(adapter.loadUserTasks("u1")).rejects.toThrow("Failed to get: err");
+    await expect(adapter.getTask("t1")).rejects.toThrow("Failed to get: err");
     expect(logSpy).toHaveBeenCalledWith("SimpleStore get failed:", "err");
     logSpy.mockRestore();
   });
