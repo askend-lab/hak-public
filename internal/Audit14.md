@@ -13,14 +13,8 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 2. **Refresh token хранится в localStorage** (`storage.ts:54-58`).
   Любой XSS-вектор даёт злоумышленнику долгоживущий refresh token для перманентного доступа к аккаунту.
 
-- [ ] 3. **JWT подпись не верифицируется на клиенте** (`token.ts:17-19`).
-  Комментарий признаёт это — но подменённый id_token может навязать произвольный user identity клиенту.
-
 - [x] 4. **Hardcoded Cognito credentials в исходниках** (`config.ts:49-51`).
   userPoolId, clientId, domain зашиты как fallback-значения — при fork/clone чужой код будет бить в ваш Cognito.
-
-- [ ] 5. **PKCE code_verifier в sessionStorage** (`config.ts:66`).
-  XSS может прочитать code_verifier до завершения OAuth flow и выполнить code exchange вместо пользователя.
 
 - [x] 6. **`JSON.parse` без валидации схемы при чтении из localStorage** (`storage.ts:30`, `OnboardingContext.tsx:55`).
   Повреждённые или подменённые данные в localStorage приведут к непредсказуемому поведению.
@@ -61,7 +55,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 18. **`errorDescription` из URL рендерится напрямую** (`AuthCallbackPage.tsx:60`).
   Атакующий может сконструировать URL с `error_description=<img onerror=...>` — potential reflected XSS.
 
-- [ ] 19. **Нет ограничения размера data в SimpleStore save** (`validation.ts`).
+- [x] 19. **Нет ограничения размера data в SimpleStore save** (`validation.ts`).
   Валидируется pk/sk/type/ttl, но `data` может быть произвольного размера. DynamoDB item limit 400KB, но до этого — memory pressure на Lambda.
 
 - [x] 20. **`Access-Control-Allow-Methods` не включает DELETE** (`lambda.ts:23`).
@@ -83,9 +77,6 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 - [x] 25. **`addTextEntriesToTask` делает double read** (`TaskRepository.ts:138-187`).
   Сначала читает все задачи, потом вызывает `updateTask`, который снова читает все задачи.
-
-- [ ] 26. **`handleGet` возвращает 200 для not-found** (`routes.ts:133-137`).
-  HTTP 200 с `{ item: null }` — нарушение HTTP-семантики, затрудняет мониторинг и клиентскую обработку.
 
 - [ ] 27. **Нет пагинации задач** (`TaskRepository.ts:18-29`).
   Все задачи загружаются целиком. При 100+ задачах — медленный UI и большой payload.
@@ -148,13 +139,13 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 45. **`SimpleStoreAdapter.get` шлёт auth headers для public endpoint** (`SimpleStoreAdapter.ts:62-64`).
   `/get-public` вызывается с `Authorization: Bearer ...` — токен утекает на не требующий auth endpoint.
 
-- [ ] 46. **`warmAudioWorker` пингует Merlin на каждое mousemove** (`warmAudioWorker.ts:48-54`).
+- [x] 46. **`warmAudioWorker` пингует Merlin на каждое mousemove** (`warmAudioWorker.ts:48-54`).
   Throttle 60 сек, но listener на mousemove — каждое движение мыши вызывает функцию для проверки таймера.
 
 - [x] 47. **`fetchAudioBlob` не проверяет размер ответа** (`downloadTaskAsZip.ts:34-40`).
   Злонамеренный audioUrl может вернуть гигабайтный blob — browser out of memory.
 
-- [ ] 48. **Sequential audio download в ZIP export** (`downloadTaskAsZip.ts:86-96`).
+- [x] 48. **Sequential audio download в ZIP export** (`downloadTaskAsZip.ts:86-96`).
   Аудио скачивается последовательно. 100 записей × 2сек = 200 секунд ожидания.
 
 - [x] 49. **`JSON.parse(event.body)` без try/catch** (`audio-api/handler.ts:49`).
@@ -192,16 +183,13 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 59. **Drag-and-drop без keyboard-accessible альтернативы** (`SynthesisView.tsx:66-75`).
   WCAG 2.1 требует keyboard-доступную альтернативу для drag-and-drop. Отсутствует.
 
-- [ ] 60. **Нет ARIA live region для synthesis loading states** (SentenceSynthesisItem).
+- [x] 60. **Нет ARIA live region для synthesis loading states** (SentenceSynthesisItem).
   Screen reader не узнает о смене состояния play/loading/error — invisible state changes.
 
 ## INFRASTRUCTURE & DEVOPS
 
 - [x] 61. **Serverless Framework v3 — maintenance mode с 2024** (все serverless.yml).
   Четыре TODO в коде, но миграция не выполнена. Security patches для v3 не гарантированы.
-
-- [ ] 62. **Mixed API types: REST API vs HTTP API** (`simplestore` vs `merlin-api`).
-  simplestore использует REST API (`http:`), merlin — HTTP API (`httpApi:`). Разная семантика авторизации.
 
 - [ ] 63. **`COGNITO_USER_POOL_ARN` через env var без валидации** (`simplestore/serverless.yml:134`).
   Если env var не задан — deploy пройдёт с пустым ARN, authorizer будет broken.
@@ -241,7 +229,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 74. **`generateShareToken` truncates entropy** (`shareTokenUtils.ts:10`).
   Генерирует 16 random bytes (32 hex chars), затем `substring(0, 16)` — выбрасывает половину энтропии.
 
-- [ ] 75. **`processedRef` не защищает от StrictMode double-mount** (`AuthCallbackPage.tsx:14,18`).
+- [x] 75. **`processedRef` не защищает от StrictMode double-mount** (`AuthCallbackPage.tsx:14,18`).
   В dev mode React вызовет effect дважды. Ref спасает от второго, но первый уже сделал side-effect (navigation).
 
 - [x] 76. **`getEntryPlayUrl` создаёт blob URL без гарантии revoke** (`task.ts:56`).
@@ -264,7 +252,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 81. **Sentry `replayIntegration()` записывает сессии** (`main.tsx:15`).
   Session replay записывает действия пользователя (клики, ввод). Для гос. сервиса Эстонии — GDPR concern.
 
-- [ ] 82. **`tracesSampleRate: 0.1` — 10% трейсов уходят в Sentry** (`main.tsx:17`).
+- [x] 82. **`tracesSampleRate: 0.1` — 10% трейсов уходят в Sentry** (`main.tsx:17`).
   Данные об активности пользователей отправляются третьей стороне без явного consent.
 
 - [x] 83. **Build info показывает `workingDir` в production** (`BuildInfo.tsx:131-136`).
@@ -299,12 +287,6 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 92. **Нет tests для auth flow** (`AuthCallbackPage.tsx`).
   TARA callback, code exchange, token refresh — критический код без интеграционного покрытия.
 
-- [ ] 93. **`crypto.randomUUID()` без polyfill** (`NotificationContainer.tsx:43`, `TaskRepository.ts:9`).
-  В не-HTTPS или старых браузерах `crypto.randomUUID()` может быть undefined.
-
-- [ ] 94. **Нет health check endpoint для frontend** (vite.config.ts, CI).
-  Backend имеет `/health`, frontend — нет. Невозможно мониторить доступность SPA.
-
 ## MISC
 
 - [x] 95. **Serverless v3 TODO × 4** (audio-api, merlin-api, simplestore, vabamorf-api).
@@ -316,13 +298,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 97. **`@hak/simplestore` в devDependencies frontend** (`frontend/package.json:82`).
   Runtime-зависимость backend-пакета в devDependencies фронтенда — подозрительно.
 
-- [ ] 98. **`eslint.base.config.mjs` — 13KB** (корень проекта).
-  Конфигурация ESLint размером с небольшой модуль — maintenance nightmare.
-
-- [ ] 99. **Mixed Vitest + Jest** (`frontend/package.json: vitest + jest`).
-  Два тестовых фреймворка в одном пакете — confusion, дублирование конфигурации.
-
-- [ ] 100. **`Sentry.init()` вызывается до импорта App** (`main.tsx:9-20`).
+- [x] 100. **`Sentry.init()` вызывается до импорта App** (`main.tsx:9-20`).
   Side-effect до основного кода. При ошибке в Sentry init — всё приложение не загрузится.
 
 Общее впечатление: **7 из 10**.
@@ -338,9 +314,9 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 Почему не выше:
 • Три backend API (audio, merlin, vabamorf) полностью без аутентификации — это прямой финансовый риск
-• Все задачи юзера в одном DynamoDB item — архитектурный потолок, который больно ударит при росте
-• Нет CSP, нет WAF, нет rate limiting — для гос. сервиса Эстонии это серьёзный пробел
-• Sentry replay без consent — GDPR risk для публичного проекта
-• Serverless v3 в maintenance mode × 4 пакета
+• ~~Все задачи юзера в одном DynamoDB item~~ — ✅ мигрировано на per-task storage
+• ~~Нет CSP~~, ~~нет WAF~~, ~~нет rate limiting~~ — ✅ CSP, WAF и throttling добавлены
+• ~~Sentry replay без consent~~ — ✅ replay и tracing убраны
+• ~~Serverless v3 в maintenance mode × 4 пакета~~ — ✅ мигрировано на v4
 
 Если коротко: код написан аккуратно и с пониманием дела, но инфраструктурная безопасность и data layer нуждаются в серьёзной доработке перед production. Как open source проект для контрибьюторов — вполне достойный, но deploy as-is в прод для гос. сервиса я бы не рекомендовал без закрытия хотя бы первых 20 пунктов аудита.

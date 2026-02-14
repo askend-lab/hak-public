@@ -116,6 +116,11 @@ export function validateStoreRequest(
 
     if (request.data !== undefined && typeof request.data !== "object") {
       errors.push("data must be an object");
+    } else if (request.data !== undefined) {
+      const dataSize = JSON.stringify(request.data).length;
+      if (dataSize > config.maxDataSizeBytes) {
+        errors.push(`data exceeds maximum size of ${config.maxDataSizeBytes} bytes`);
+      }
     }
   });
 }

@@ -85,20 +85,26 @@ export async function downloadTaskAsZip(
     .join("\n");
   folder.file("texts.txt", textsContent);
 
-  // Audio files
+  // Audio files — download in parallel batches for speed
   const total = task.entries.length;
-  let current = 0;
+  let completed = 0;
+  const BATCH_SIZE = 4;
 
-  for (const entry of task.entries) {
-    current++;
-    onProgress?.({ current, total });
+  for (let i = 0; i < task.entries.length; i += BATCH_SIZE) {
+    const batch = task.entries.slice(i, i + BATCH_SIZE);
+    const results = await Promise.all(
+      batch.map((entry) => fetchAudioBlob(entry)),
+    );
 
-    const blob = await fetchAudioBlob(entry);
-    if (blob) {
-      const index = String(current).padStart(3, "0");
-      const name = sanitizeFilename(entry.text) || "audio";
-      audioFolder.file(`${index}-${name}.wav`, blob);
-    }
+    results.forEach((blob, j) => {
+      completed++;
+      onProgress?.({ current: completed, total });
+      if (blob) {
+        const index = String(i + j + 1).padStart(3, "0");
+        const name = sanitizeFilename(batch[j]?.text ?? "") || "audio";
+        audioFolder.file(`${index}-${name}.wav`, blob);
+      }
+    });
   }
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
