@@ -12,11 +12,8 @@ Sentry.init({
   enabled: import.meta.env.PROD,
   integrations: [
     Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
   ],
   tracesSampleRate: 0.1,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
 });
 
 import App from "./App";

@@ -31,7 +31,7 @@ describe("useUserId", () => {
     expect(result.current).toBe("real-user-123");
   });
 
-  it("returns test-user when user is not authenticated", () => {
+  it("throws when user is not authenticated", () => {
     mockUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
@@ -47,7 +47,8 @@ describe("useUserId", () => {
       error: null,
     });
 
-    const { result } = renderHook(() => useUserId());
-    expect(result.current).toBe("test-user");
+    expect(() => renderHook(() => useUserId())).toThrow(
+      "useUserId: user is not authenticated",
+    );
   });
 });
