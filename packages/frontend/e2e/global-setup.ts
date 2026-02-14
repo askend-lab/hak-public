@@ -6,7 +6,7 @@ import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
-import { writeFileSync } from "fs";
+import { mkdirSync, writeFileSync } from "fs";
 
 const STORAGE_STATE_PATH = "e2e/.auth/user.json";
 const UNAUTH_STATE_PATH = "e2e/.auth/unauth.json";
@@ -54,6 +54,9 @@ async function getTestCredentials(): Promise<{
 }
 
 async function globalSetup(_config: FullConfig): Promise<void> {
+  // Ensure auth directory exists (CI starts with clean checkout)
+  mkdirSync("e2e/.auth", { recursive: true });
+
   // Always create unauthenticated storage state for no-auth tests
   writeFileSync(UNAUTH_STATE_PATH, EMPTY_STORAGE_STATE);
 
