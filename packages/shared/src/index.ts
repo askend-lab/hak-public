@@ -11,6 +11,7 @@ export type { NullableString } from "./utils";
 export {
   CORS_HEADERS,
   HTTP_STATUS,
+  getCorsOrigin,
   createLambdaResponse,
   createApiResponse,
   createBadRequestResponse,
