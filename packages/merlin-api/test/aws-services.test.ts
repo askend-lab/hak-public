@@ -90,7 +90,7 @@ describe("ecs", () => {
 
 describe("s3", () => {
   const { checkS3Cache, buildCacheKey, buildAudioUrl } = require("../src/s3");
-  const { isNotFoundError } = require("@hak/shared");
+  const { isNotFoundError } = require("../src/s3");
 
   describe("buildCacheKey", () => {
     it("should build cache key with .wav extension", () => {
