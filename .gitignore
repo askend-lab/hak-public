@@ -74,3 +74,4 @@ packages/merlin-worker/tools/WORLD/test/ctest.c
 packages/merlin-worker/tools/WORLD/test/*.wav
 packages/merlin-worker/tools/WORLD/wav_test/
 packages/merlin-worker/.coverage
+.playwright-browsers
