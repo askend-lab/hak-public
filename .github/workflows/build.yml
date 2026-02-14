@@ -52,6 +52,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Security audit
+        run: pnpm audit --audit-level=high
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@fb7eb401298e393da51cdcb2feb1ed0183619014 # v6
         with:

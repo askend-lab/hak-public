@@ -57,7 +57,9 @@ export function AuthCallbackPage() {
       const errorDescription = queryParams.get("error_description");
       if (errorParam) {
         logger.error("Auth callback error:", errorParam, errorDescription);
-        setError(errorDescription || errorParam);
+        // Sanitize URL-sourced error: strip HTML tags, truncate (defense-in-depth)
+        const rawMsg = errorDescription || errorParam || "Tundmatu viga";
+        setError(rawMsg.replace(/<[^>]*>/g, "").slice(0, 200));
         return;
       }
 
