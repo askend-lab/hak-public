@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-export { getAwsRegion } from "@hak/shared";
+export function getAwsRegion(): string {
+  return process.env.AWS_REGION ?? "eu-west-1";
+}
 
 export function getSqsQueueUrl(): string {
   return process.env.SQS_QUEUE_URL ?? "";
