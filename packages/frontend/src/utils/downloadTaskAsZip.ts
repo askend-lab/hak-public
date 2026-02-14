@@ -36,6 +36,10 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
   try {
     const response = await fetch(audioUrl);
     if (!response.ok) return null;
+    const contentLength = response.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > 50 * 1024 * 1024) {
+      return null; // Skip files > 50MB
+    }
     return await response.blob();
   } catch {
     return null;

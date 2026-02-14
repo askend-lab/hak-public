@@ -96,6 +96,13 @@ export class TaskRepository {
       throw new Error("Task not found");
     }
 
+    return this.applyTaskUpdate(existingTask, updates);
+  }
+
+  private async applyTaskUpdate(
+    existingTask: Task,
+    updates: Partial<Task>,
+  ): Promise<Task> {
     const updatedTask: Task = {
       ...existingTask,
       ...updates,
@@ -125,7 +132,7 @@ export class TaskRepository {
   }
 
   async addTextEntriesToTask(
-    userId: string,
+    _userId: string,
     taskId: string,
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
     mode: "append" | "replace" = "append",
@@ -167,7 +174,7 @@ export class TaskRepository {
     const updatedSequences = isReplace
       ? newTexts
       : [...(task.speechSequences ?? []), ...newTexts];
-    await this.updateTask(userId, taskId, {
+    await this.applyTaskUpdate(task, {
       entries: updatedEntries,
       speechSequences: updatedSequences,
     });
@@ -176,7 +183,7 @@ export class TaskRepository {
   }
 
   async updateTaskEntry(
-    userId: string,
+    _userId: string,
     taskId: string,
     entryId: string,
     updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>,
@@ -201,7 +208,7 @@ export class TaskRepository {
     const updatedEntries = [...(task.entries ?? [])];
     updatedEntries[entryIndex] = updatedEntry;
 
-    await this.updateTask(userId, taskId, { entries: updatedEntries });
+    await this.applyTaskUpdate(task, { entries: updatedEntries });
 
     return updatedEntry;
   }

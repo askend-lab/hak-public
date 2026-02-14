@@ -59,9 +59,13 @@ export class SimpleStoreAdapter {
   ): Promise<Record<string, unknown> | null> {
     const params = new URLSearchParams({ pk, sk, type });
     // Use /get-public for unlisted/shared/public (no auth required, rejects private type)
-    const endpoint = type === "private" ? "/get" : "/get-public";
+    const isPublic = type !== "private";
+    const endpoint = isPublic ? "/get-public" : "/get";
+    const headers = isPublic
+      ? { "Content-Type": CONTENT_TYPE_JSON }
+      : this.getAuthHeaders();
     const response = await fetch(`${this.baseUrl}${endpoint}?${params}`, {
-      headers: this.getAuthHeaders(),
+      headers,
     });
 
     if (!response.ok) {

@@ -32,6 +32,18 @@ function getGitInfo(): {
 
 const gitInfo = getGitInfo();
 
+// Warn if any proxy target looks like a production URL
+function checkProxyTargets(proxy: Record<string, { target?: string }>): void {
+  for (const [route, config] of Object.entries(proxy)) {
+    const target = typeof config === "string" ? config : config?.target;
+    if (target && /[-.]prod[.-]/.test(target)) {
+      console.warn(
+        `\x1b[33m⚠ WARNING: Proxy "${route}" targets PRODUCTION: ${target}\x1b[0m`,
+      );
+    }
+  }
+}
+
 export default defineConfig({
   define: {
     __BUILD_INFO__: JSON.stringify({
@@ -43,7 +55,17 @@ export default defineConfig({
       workingDir: process.cwd(),
     }),
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: "proxy-prod-warning",
+      configResolved(config): void {
+        if (config.command === "serve" && config.server?.proxy) {
+          checkProxyTargets(config.server.proxy as Record<string, { target?: string }>);
+        }
+      },
+    },
+  ],
   build: {
     rollupOptions: {
       onwarn(warning, defaultHandler) {
