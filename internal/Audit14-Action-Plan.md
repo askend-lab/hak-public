@@ -458,13 +458,13 @@ Legend:
 
 **P1 — Data integrity & compliance:**
 - [ ] #2 Refresh token storage
-- [ ] #4 Hardcoded Cognito creds
-- [ ] #6 JSON.parse validation
+- [x] #4 Hardcoded Cognito creds
+- [x] #6 JSON.parse validation
 - [ ] #23 Optimistic locking
-- [ ] #24 Delete unlisted copy
-- [ ] #28/#85 Shared task TTL
-- [ ] #86 Cookie consent
-- [ ] #84 User ID in profile
+- [x] #24 Delete unlisted copy
+- [x] #28/#85 Shared task TTL
+- [x] #86 Cookie consent
+- [x] #84 User ID in profile
 - [x] #87/#88 PII in code/logs
 
 **P2 — Code quality quick wins (< 1hr each):**

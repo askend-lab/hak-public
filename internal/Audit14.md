@@ -16,13 +16,13 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 3. **JWT подпись не верифицируется на клиенте** (`token.ts:17-19`).
   Комментарий признаёт это — но подменённый id_token может навязать произвольный user identity клиенту.
 
-- [ ] 4. **Hardcoded Cognito credentials в исходниках** (`config.ts:49-51`).
+- [x] 4. **Hardcoded Cognito credentials в исходниках** (`config.ts:49-51`).
   userPoolId, clientId, domain зашиты как fallback-значения — при fork/clone чужой код будет бить в ваш Cognito.
 
 - [ ] 5. **PKCE code_verifier в sessionStorage** (`config.ts:66`).
   XSS может прочитать code_verifier до завершения OAuth flow и выполнить code exchange вместо пользователя.
 
-- [ ] 6. **`JSON.parse` без валидации схемы при чтении из localStorage** (`storage.ts:30`, `OnboardingContext.tsx:55`).
+- [x] 6. **`JSON.parse` без валидации схемы при чтении из localStorage** (`storage.ts:30`, `OnboardingContext.tsx:55`).
   Повреждённые или подменённые данные в localStorage приведут к непредсказуемому поведению.
 
 - [x] 7. **Share token — всего 8 байт энтропии** (`shareTokenUtils.ts:4,10`).
@@ -270,13 +270,13 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 83. **Build info показывает `workingDir` в production** (`BuildInfo.tsx:131-136`).
   Путь к рабочей директории разработчика виден в UI — information disclosure.
 
-- [ ] 84. **User ID отображается в профиле** (`UserProfile.tsx:49,75`).
+- [x] 84. **User ID отображается в профиле** (`UserProfile.tsx:49,75`).
   Cognito sub (UUID) показан пользователю — внутренний идентификатор не должен быть в UI.
 
 - [ ] 85. **Shared tasks доступны без аутентификации навечно** (`SharedTaskPage.tsx`).
   Share token = permanent public access. Нет expiration, нет revoke, нет audit log.
 
-- [ ] 86. **Нет cookie consent / privacy banner** (index.html, App.tsx).
+- [x] 86. **Нет cookie consent / privacy banner** (index.html, App.tsx).
   Приложение использует localStorage, Sentry, Google Fonts — но consent не запрашивается.
 
 - [x] 87. **`logger.debug("Sharing task:", task)` логирует весь объект задачи** (`ShareService.ts:19`).
