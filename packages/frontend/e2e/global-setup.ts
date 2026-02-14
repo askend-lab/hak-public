@@ -44,7 +44,7 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   const page = await browser.newPage();
 
   // Navigate to tasks page which will redirect to Cognito login
-  await page.goto("http://localhost:5180/tasks");
+  await page.goto("http://localhost:5181/tasks");
 
   // Wait for Cognito login page
   await page.waitForURL(/cognito/);
@@ -67,13 +67,13 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     .click();
 
   // Wait for redirect back to app and auth callback to complete
-  await page.waitForURL(/localhost:5180/, { timeout: 30000 });
+  await page.waitForURL(/localhost:5181/, { timeout: 30000 });
 
   // Wait for auth to fully complete (page should be loaded with content)
   await page.waitForLoadState("networkidle");
 
   // Navigate to tasks to ensure we're authenticated
-  await page.goto("http://localhost:5180/tasks");
+  await page.goto("http://localhost:5181/tasks");
   await page.waitForSelector("h1", { timeout: 10000 });
 
   // Save authentication state (now includes localhost localStorage)
