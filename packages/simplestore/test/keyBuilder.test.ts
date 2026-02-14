@@ -5,7 +5,7 @@ import { buildKeys, buildPartitionKey } from "../src/core/store";
 import { parseTtl } from "../src/core/validation";
 import { ServerContext } from "../src/core/types";
 
-const config = { maxTtlSeconds: 31536000, keyDelimiter: "#" };
+const config = { maxTtlSeconds: 31536000, maxDataSizeBytes: 350000, keyDelimiter: "#" };
 const D = "#";
 
 describe("KeyBuilder", () => {

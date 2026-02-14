@@ -28,20 +28,25 @@ export function PlayButton({
   };
 
   return (
-    <button
-      className={`sentence-synthesis-item__play button button--primary button--icon-only button--circular ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={getAriaLabel()}
-      data-onboarding-target={onboardingTarget}
-    >
-      {isLoading ? (
-        <div className="loader-spinner"></div>
-      ) : isPlaying ? (
-        <PauseIcon size="2xl" />
-      ) : (
-        <PlayIcon size="2xl" />
-      )}
-    </button>
+    <>
+      <button
+        className={`sentence-synthesis-item__play button button--primary button--icon-only button--circular ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={getAriaLabel()}
+        data-onboarding-target={onboardingTarget}
+      >
+        {isLoading ? (
+          <div className="loader-spinner"></div>
+        ) : isPlaying ? (
+          <PauseIcon size="2xl" />
+        ) : (
+          <PlayIcon size="2xl" />
+        )}
+      </button>
+      <span aria-live="polite" className="sr-only">
+        {isLoading ? "Laadimine..." : isPlaying ? "Esitamine" : ""}
+      </span>
+    </>
   );
 }
