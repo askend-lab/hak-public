@@ -4,7 +4,7 @@
 import PronunciationVariants from "./PronunciationVariants";
 import SentencePhoneticPanel from "./SentencePhoneticPanel";
 import { useSynthesisPage } from "@/features/synthesis/contexts/SynthesisPageContext";
-import { MODAL_STRINGS } from "@/constants/ui-strings";
+import { MODAL_STRINGS } from "@/config/ui-strings";
 import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 
 interface SynthesisModalsProps {

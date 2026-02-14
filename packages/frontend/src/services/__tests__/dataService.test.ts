@@ -25,8 +25,8 @@ const mockShareSvc = {
   getTaskByShareToken: vi.fn().mockResolvedValue(null),
 };
 
-vi.mock("./storage/SimpleStoreAdapter", () => ({ SimpleStoreAdapter: class {} }));
-vi.mock("./storage/MockDataLoader", () => ({ MockDataLoader: class {} }));
+vi.mock("../storage/SimpleStoreAdapter", () => ({ SimpleStoreAdapter: class {} }));
+vi.mock("../storage/MockDataLoader", () => ({ MockDataLoader: class {} }));
 vi.mock("@/features/sharing/services/ShareService", () => ({
   ShareService: class {
     getSharedTask = mockShareSvc.getSharedTask;
@@ -34,7 +34,7 @@ vi.mock("@/features/sharing/services/ShareService", () => ({
     getTaskByShareToken = mockShareSvc.getTaskByShareToken;
   },
 }));
-vi.mock("./repository/TaskRepository", () => ({
+vi.mock("../repository/TaskRepository", () => ({
   TaskRepository: class {
     getUserTasks = mockRepo.getUserTasks;
     getUserCreatedTasks = mockRepo.getUserCreatedTasks;
@@ -48,7 +48,7 @@ vi.mock("./repository/TaskRepository", () => ({
   },
 }));
 
-import { DataService } from "./dataService";
+import { DataService } from "../dataService";
 
 describe("DataService", () => {
   let service: DataService;

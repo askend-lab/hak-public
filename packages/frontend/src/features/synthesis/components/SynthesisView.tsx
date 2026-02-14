@@ -5,7 +5,7 @@ import SynthesisPageHeader from "./SynthesisPageHeader";
 import SentenceMenu from "./SentenceMenu";
 import SentenceSynthesisItem from "./SentenceSynthesisItem";
 import { SentenceState } from "@/types/synthesis";
-import { SYNTHESIS_STRINGS } from "@/constants/ui-strings";
+import { SYNTHESIS_STRINGS } from "@/config/ui-strings";
 import { useSynthesisPage } from "@/features/synthesis/contexts/SynthesisPageContext";
 
 interface TagMenuItem {
