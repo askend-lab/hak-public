@@ -465,26 +465,26 @@ Legend:
 - [ ] #28/#85 Shared task TTL
 - [ ] #86 Cookie consent
 - [ ] #84 User ID in profile
-- [ ] #87/#88 PII in code/logs
+- [x] #87/#88 PII in code/logs
 
 **P2 — Code quality quick wins (< 1hr each):**
-- [ ] #20 CORS DELETE method
-- [ ] #37 Remove "use client"
-- [ ] #39 Remove unused _taskName
-- [ ] #49 JSON.parse try/catch
-- [ ] #51 MetricCard key
-- [ ] #53 Dead footer links
-- [ ] #54 Hardcoded email
-- [ ] #55 Estonian cancelText
-- [ ] #56 Notification limit
-- [ ] #57 BaseModal overflow
-- [ ] #58 Backdrop tabIndex
-- [ ] #71 console.error → logger
-- [ ] #72 Set instead of array
-- [ ] #73 String concat → join
-- [ ] #76 Blob URL revoke
-- [ ] #80 Unicode-safe slice
-- [ ] #97 Check simplestore dep type
+- [x] #20 CORS DELETE method
+- [x] #37 Remove "use client"
+- [x] #39 Use taskName in modal title
+- [x] #49 JSON.parse try/catch
+- [x] #51 MetricCard key
+- [x] #53 Dead footer links
+- [x] #54 Hardcoded email
+- [x] #55 Estonian cancelText
+- [x] #56 Notification limit
+- [x] #57 BaseModal overflow
+- [x] #58 Backdrop tabIndex (already resolved)
+- [x] #71 console.error → logger
+- [x] #72 Set instead of array
+- [x] #73 String concat → join
+- [x] #76 Blob URL revoke (already handled by callers)
+- [x] #80 Unicode-safe slice
+- [x] #97 simplestore dep type (verified: devDeps correct)
 
 **P3 — Architecture improvements:**
 - [ ] #16 Vite proxy warning
