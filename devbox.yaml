@@ -4,6 +4,9 @@ extends: "./defaults.yaml"
 project:
   name: "HAK"
 
+# Always run full test suite with coverage (prevents coverage gaps on pre-commit)
+test_mode: full
+
 # Global excludes (merged with defaults)
 global_excludes:
   - '**/.venv/**'
