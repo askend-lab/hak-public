@@ -1,3 +1,41 @@
+# Response headers policy — delivers CSP as an HTTP header (required for Report-Only mode)
+resource "aws_cloudfront_response_headers_policy" "security" {
+  name = "${local.app_name}-${var.env}-security-headers"
+
+  # CSP in Report-Only mode — must use custom header (CloudFront native only supports enforcing)
+  # TODO: switch to security_headers_config.content_security_policy after monitoring period
+  custom_headers_config {
+    items {
+      header   = "Content-Security-Policy-Report-Only"
+      value    = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.askend-lab.com https://*.amazonaws.com https://*.amazoncognito.com https://*.ingest.sentry.io; media-src 'self' https://*.amazonaws.com https://*.askend-lab.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      override = true
+    }
+  }
+
+  security_headers_config {
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+  }
+}
+
 # CloudFront Function to rewrite /api/* paths
 resource "aws_cloudfront_function" "api_rewrite" {
   name    = "${local.app_name}-${var.env}-api-rewrite"
@@ -123,11 +161,12 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-    compress               = true
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
+    viewer_protocol_policy     = "redirect-to-https"
+    min_ttl                    = 0
+    default_ttl                = 3600
+    max_ttl                    = 86400
+    compress                   = true
   }
 
   # Custom error response for SPA routing

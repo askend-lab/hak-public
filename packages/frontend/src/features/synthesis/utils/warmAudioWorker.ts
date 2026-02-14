@@ -14,15 +14,17 @@ export async function warmAudioWorker(): Promise<void> {
   if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
 
   try {
-    await fetch(WARMUP_API_PATH, {
+    const res = await fetch(WARMUP_API_PATH, {
       method: "POST",
       headers: { "Content-Type": CONTENT_TYPE_JSON },
     });
-    warmed = true;
-    lastActivity = Date.now();
-    logger.info("[Audio] Merlin warm-up triggered");
-  } catch (error) {
-    logger.warn("[Audio] Failed to warm up Merlin:", error);
+    if (res.ok) {
+      warmed = true;
+      lastActivity = Date.now();
+      logger.info("[Audio] Merlin warm-up triggered");
+    }
+  } catch {
+    // Network errors are expected during cold starts — silently retry on next call
   }
 }
 
