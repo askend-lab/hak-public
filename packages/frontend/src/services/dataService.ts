@@ -60,7 +60,7 @@ export class DataService {
       throw new Error("Task not found");
     }
 
-    logger.debug("Sharing task:", { userId, taskId, task });
+    logger.debug("Sharing task:", { userId, taskId });
     await this.shareService.shareUserTask(task);
   }
 

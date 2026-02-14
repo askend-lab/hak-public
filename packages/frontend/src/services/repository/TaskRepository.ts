@@ -115,6 +115,12 @@ export class TaskRepository {
     }
 
     await this.storage.deleteTask(taskId);
+
+    // Also delete the unlisted copy if it was shared
+    if (existingTask.shareToken) {
+      await this.storage.deleteUnlistedTask(existingTask.shareToken);
+    }
+
     return true;
   }
 

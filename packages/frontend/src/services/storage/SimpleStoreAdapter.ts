@@ -15,6 +15,7 @@ interface SimpleStoreResponse {
 
 const SIMPLE_STORE_BASE_URL = "/api";
 const SIMPLE_STORE_TTL_SECONDS = 0; // 0 = no expiration
+const UNLISTED_TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days for shared tasks
 
 export class SimpleStoreAdapter {
   private readonly baseUrl = SIMPLE_STORE_BASE_URL;
@@ -145,15 +146,34 @@ export class SimpleStoreAdapter {
     return items as unknown as Task[];
   }
 
+  async deleteUnlistedTask(shareToken: string): Promise<void> {
+    try {
+      await this.delete("tasks", shareToken, "unlisted");
+    } catch (error) {
+      logger.error("Failed to delete unlisted task:", error);
+    }
+  }
+
   async saveTaskAsUnlisted(task: Task): Promise<void> {
     if (!task.shareToken) {
       throw new Error("Task must have shareToken to save as unlisted");
     }
-    await this.save(
-      "tasks",
-      task.shareToken,
-      "unlisted",
-      task as unknown as Record<string, unknown>,
-    );
+    const response = await fetch(`${this.baseUrl}/save`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({
+        pk: "tasks",
+        sk: task.shareToken,
+        type: "unlisted",
+        ttl: UNLISTED_TTL_SECONDS,
+        data: task as unknown as Record<string, unknown>,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      logger.error("SimpleStore save unlisted failed:", error);
+      throw new Error(`Failed to save unlisted: ${error}`);
+    }
   }
 }

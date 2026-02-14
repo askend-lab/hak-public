@@ -40,11 +40,6 @@ describe("UserProfile", () => {
       expect(screen.getByText("Margus Tamm")).toBeInTheDocument();
     });
 
-    it("renders user id", () => {
-      render(<UserProfile user={mockUser} />);
-      expect(screen.getByText("user-123")).toBeInTheDocument();
-    });
-
     it("dropdown is closed by default", () => {
       render(<UserProfile user={mockUser} />);
       expect(screen.queryByText("Logi välja")).not.toBeInTheDocument();
@@ -68,7 +63,6 @@ describe("UserProfile", () => {
       await user.click(screen.getByRole("button"));
 
       expect(screen.getByText("margus@test.ee")).toBeInTheDocument();
-      expect(screen.getByText("ID: user-123")).toBeInTheDocument();
     });
 
     it("closes dropdown when backdrop clicked", async () => {

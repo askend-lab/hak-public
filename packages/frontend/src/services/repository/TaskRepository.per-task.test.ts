@@ -14,6 +14,7 @@ describe("TaskRepository per-task storage", () => {
     getTask: ReturnType<typeof vi.fn>;
     saveTask: ReturnType<typeof vi.fn>;
     deleteTask: ReturnType<typeof vi.fn>;
+    deleteUnlistedTask: ReturnType<typeof vi.fn>;
     saveTaskAsUnlisted: ReturnType<typeof vi.fn>;
   };
   const testUserId = "38001085718";
@@ -37,6 +38,7 @@ describe("TaskRepository per-task storage", () => {
       getTask: vi.fn().mockResolvedValue(null),
       saveTask: vi.fn().mockResolvedValue(undefined),
       deleteTask: vi.fn().mockResolvedValue(undefined),
+      deleteUnlistedTask: vi.fn().mockResolvedValue(undefined),
       saveTaskAsUnlisted: vi.fn().mockResolvedValue(undefined),
     };
     const shareService = new ShareService(

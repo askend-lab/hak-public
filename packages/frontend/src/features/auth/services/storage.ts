@@ -27,7 +27,13 @@ let memoryIdToken: string | null = null;
 export const AuthStorage = {
   getUser(): User | null {
     const stored = localStorage.getItem(STORAGE_KEYS.USER);
-    return stored ? JSON.parse(stored) : null;
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored) as User;
+    } catch {
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      return null;
+    }
   },
 
   setUser(user: User): void {
