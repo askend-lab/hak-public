@@ -43,6 +43,9 @@ export function setupSimpleStoreMock(): void {
       if (pk === "task" && sk) {
         delete tasks[sk];
       }
+      if (pk === "tasks" && sk) {
+        delete unlistedTasks[sk];
+      }
       return { ok: true, json: async (): Promise<{ success: boolean }> => ({ success: true }) };
     }
 

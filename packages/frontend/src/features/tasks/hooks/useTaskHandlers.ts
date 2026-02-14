@@ -75,9 +75,9 @@ export function useTaskHandlers(
   });
 
   return {
-    ...modals,
-    ...crud,
-    ...entries,
-    ...sharing,
+    modals,
+    crud,
+    entries,
+    sharing,
   };
 }

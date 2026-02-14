@@ -92,6 +92,24 @@ jobs:
           echo "CERTIFICATE_ARN=$(aws ssm get-parameter --name /hak/shared/certificate-arn --query Parameter.Value --output text)" >> $GITHUB_ENV
           echo "AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_ENV
 
+      - name: Validate required config
+        run: |
+          FAILED=false
+          for var in COGNITO_USER_POOL_ARN DOMAIN_NAME HOSTED_ZONE_ID CERTIFICATE_ARN AWS_ACCOUNT_ID; do
+            val="${!var}"
+            if [ -z "$val" ]; then
+              echo "❌ $var is empty or not set"
+              FAILED=true
+            fi
+          done
+          # Validate ARN format
+          if [[ -n "$COGNITO_USER_POOL_ARN" && ! "$COGNITO_USER_POOL_ARN" =~ ^arn:aws:cognito-idp: ]]; then
+            echo "❌ COGNITO_USER_POOL_ARN does not look like a valid Cognito ARN: $COGNITO_USER_POOL_ARN"
+            FAILED=true
+          fi
+          [ "$FAILED" == "true" ] && exit 1
+          echo "✅ All required config validated"
+
       - name: Get build manifest and current state
         id: state
         run: |

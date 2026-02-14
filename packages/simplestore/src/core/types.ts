@@ -54,6 +54,7 @@ export interface StoreItem {
   readonly owner: string;
   readonly createdAt: string;
   readonly updatedAt: string;
+  readonly version: number;
   readonly ttl?: number;
 }
 
@@ -93,7 +94,7 @@ export const DEFAULT_CONFIG: StoreConfig = {
  * Storage adapter interface - dependency injection point
  */
 export interface StorageAdapter {
-  put(item: StoreItem): Promise<void>;
+  put(item: StoreItem, expectedVersion?: number): Promise<void>;
   get(pk: string, sk: string): Promise<StoreItem | null>;
   delete(pk: string, sk: string): Promise<void>;
   queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]>;

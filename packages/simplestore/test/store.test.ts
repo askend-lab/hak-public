@@ -65,6 +65,16 @@ describe("Store", () => {
       expect(result.item?.data).toStrictEqual({});
     });
 
+    it("should increment version on each save", async () => {
+      const req: StoreRequest = { pk: "entity1", sk: "sort1", type: "private", ttl: ONE_HOUR, data: { name: "v1" } };
+      const r1 = await store.save(req);
+      expect(r1.item?.version).toBe(1);
+      const r2 = await store.save({ ...req, data: { name: "v2" } });
+      expect(r2.item?.version).toBe(2);
+      const r3 = await store.save({ ...req, data: { name: "v3" } });
+      expect(r3.item?.version).toBe(3);
+    });
+
     it("should preserve createdAt when updating existing item", async () => {
       const request: StoreRequest = {
         pk: "entity1",
@@ -284,7 +294,7 @@ describe("Store", () => {
       }
     });
 
-    it("should handle concurrent saves to the same key", async () => {
+    it("should handle concurrent saves to the same key (version conflicts expected)", async () => {
       const promises = Array.from({ length: 5 }, (_, i) =>
         store.save({
           pk: "shared-entity",
@@ -296,12 +306,12 @@ describe("Store", () => {
       );
 
       const results = await Promise.all(promises);
-      results.forEach((r) => expect(r.success).toBe(true));
-
-      // Last write wins
-      const get = await store.get("shared-entity", "shared-sort", "private");
-      expect(get.success).toBe(true);
-      expect(typeof get.item?.data.version).toBe("number");
+      // With optimistic locking, some saves may fail with version conflicts
+      const successes = results.filter((r) => r.success);
+      const failures = results.filter((r) => !r.success);
+      expect(successes.length).toBeGreaterThanOrEqual(1);
+      // Version conflicts are expected for concurrent writes
+      failures.forEach((r) => expect(r.error).toContain("modified"));
     });
 
     it("should handle concurrent reads and writes", async () => {
@@ -327,7 +337,11 @@ describe("Store", () => {
       );
 
       const allResults = await Promise.all([...reads, ...writes]);
-      allResults.forEach((r) => expect(r.success).toBe(true));
+      // All reads should succeed
+      allResults.slice(0, 5).forEach((r) => expect(r.success).toBe(true));
+      // At least one write should succeed; others may have version conflicts
+      const writeResults = allResults.slice(5);
+      expect(writeResults.filter((r) => r.success).length).toBeGreaterThanOrEqual(1);
     });
   });
 

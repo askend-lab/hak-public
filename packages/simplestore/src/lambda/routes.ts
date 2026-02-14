@@ -32,6 +32,7 @@ export const HTTP_ERRORS = {
 const ERROR_STATUS_MAP: Record<string, number> = {
   [ERRORS.NOT_FOUND]: HTTP_STATUS.NOT_FOUND,
   [ERRORS.ACCESS_DENIED]: HTTP_STATUS.FORBIDDEN,
+  [ERRORS.VERSION_CONFLICT]: 409,
 };
 
 export function createResponse(

@@ -111,13 +111,13 @@ export default function Home() {
               <ErrorBoundary>
                 <TasksView
                   selectedTaskId={selectedTaskId}
-                  taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
+                  taskRefreshTrigger={taskHandlers.modals.taskRefreshTrigger}
                   onBack={() => navigate("/tasks")}
                   onViewTask={(id) => navigate(`/tasks/${id}`)}
-                  onCreateTask={taskHandlers.handleCreateTask}
-                  onEditTask={taskHandlers.handleEditTask}
-                  onDeleteTask={taskHandlers.handleDeleteTask}
-                  onShareTask={taskHandlers.handleShareTask}
+                  onCreateTask={taskHandlers.crud.handleCreateTask}
+                  onEditTask={taskHandlers.crud.handleEditTask}
+                  onDeleteTask={taskHandlers.crud.handleDeleteTask}
+                  onShareTask={taskHandlers.sharing.handleShareTask}
                   onNavigateToSynthesis={() => navigate("/synthesis")}
                 />
               </ErrorBoundary>

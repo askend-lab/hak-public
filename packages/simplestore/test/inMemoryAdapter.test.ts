@@ -7,13 +7,14 @@ import { StoreItem } from "../src/core/types";
 describe("InMemoryAdapter", () => {
   let adapter: InMemoryAdapter;
 
-  const createItem = (pk: string, sk: string): StoreItem => ({
+  const createItem = (pk: string, sk: string, version = 1): StoreItem => ({
     PK: pk,
     SK: sk,
     data: { test: "value" },
     owner: "user-123",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    version,
     ttl: Math.floor(Date.now() / 1000) + 3600,
   });
 

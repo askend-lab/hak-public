@@ -21,6 +21,7 @@ import { parseTtl } from "./validation";
 export const ERRORS = {
   NOT_FOUND: "Item not found",
   ACCESS_DENIED: "Access denied: not owner",
+  VERSION_CONFLICT: "Item was modified by another request",
 } as const;
 
 /**
@@ -93,8 +94,9 @@ export class Store {
 
     return this.wrapAsync(async () => {
       const existing = await this.adapter.get(keys.pk, keys.sk);
-      const item = this.createItem(keys, request, existing?.createdAt);
-      await this.adapter.put(item);
+      const existingVersion = existing?.version ?? 0;
+      const item = this.createItem(keys, request, existing?.createdAt, existingVersion + 1);
+      await this.adapter.put(item, existing ? existingVersion : undefined);
       return { success: true, item };
     });
   }
@@ -181,6 +183,7 @@ export class Store {
     keys: { pk: string; sk: string },
     request: StoreRequest,
     existingCreatedAt?: string,
+    version: number = 1,
   ): StoreItem {
     const now = new Date().toISOString();
 
@@ -191,6 +194,7 @@ export class Store {
       owner: this.context.userId,
       createdAt: existingCreatedAt ?? now,
       updatedAt: now,
+      version,
     };
 
     if (request.ttl > 0) {

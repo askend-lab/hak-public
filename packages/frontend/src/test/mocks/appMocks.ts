@@ -110,45 +110,50 @@ export const mockSynthesis = (): {
   synthesizeAndPlay: vi.fn(),
 });
 
-export const mockTaskHandlers = (): {
-  showAddToTaskDropdown: false; setShowAddToTaskDropdown: MockFn; handleAddAllSentencesToTask: MockFn;
-  handleSelectTaskFromDropdown: MockFn; handleCreateNewFromDropdown: MockFn; handleCreateTask: MockFn;
-  handleEditTask: MockFn; handleDeleteTask: MockFn; handleShareTask: MockFn;
-  handleAddSentenceToExistingTask: MockFn; handleCreateNewTaskFromMenu: MockFn; taskRefreshTrigger: number;
-  showAddTaskModal: false; setShowAddTaskModal: MockFn; handleAddTask: MockFn;
-  showTaskEditModal: false; setShowTaskEditModal: MockFn; taskToEdit: null; setTaskToEdit: MockFn;
-  handleTaskUpdated: MockFn; showShareTaskModal: false; setShowShareTaskModal: MockFn;
-  taskToShare: null; setTaskToShare: MockFn; showDeleteConfirmation: false; taskToDelete: null;
-  handleConfirmDelete: MockFn; handleCancelDelete: MockFn;
-} => ({
-  showAddToTaskDropdown: false,
-  setShowAddToTaskDropdown: vi.fn(),
-  handleAddAllSentencesToTask: vi.fn(),
-  handleSelectTaskFromDropdown: vi.fn(),
-  handleCreateNewFromDropdown: vi.fn(),
-  handleCreateTask: vi.fn(),
-  handleEditTask: vi.fn(),
-  handleDeleteTask: vi.fn(),
-  handleShareTask: vi.fn(),
-  handleAddSentenceToExistingTask: vi.fn(),
-  handleCreateNewTaskFromMenu: vi.fn(),
-  taskRefreshTrigger: 0,
-  showAddTaskModal: false,
-  setShowAddTaskModal: vi.fn(),
-  handleAddTask: vi.fn(),
-  showTaskEditModal: false,
-  setShowTaskEditModal: vi.fn(),
-  taskToEdit: null,
-  setTaskToEdit: vi.fn(),
-  handleTaskUpdated: vi.fn().mockResolvedValue(undefined),
-  showShareTaskModal: false,
-  setShowShareTaskModal: vi.fn(),
-  taskToShare: null,
-  setTaskToShare: vi.fn(),
-  showDeleteConfirmation: false,
-  taskToDelete: null,
-  handleConfirmDelete: vi.fn(),
-  handleCancelDelete: vi.fn(),
+export const mockTaskHandlers = () => ({
+  modals: {
+    showAddToTaskDropdown: false,
+    setShowAddToTaskDropdown: vi.fn(),
+    showAddTaskModal: false,
+    setShowAddTaskModal: vi.fn(),
+    showTaskEditModal: false,
+    setShowTaskEditModal: vi.fn(),
+    taskToEdit: null,
+    setTaskToEdit: vi.fn(),
+    showShareTaskModal: false,
+    setShowShareTaskModal: vi.fn(),
+    taskToShare: null,
+    setTaskToShare: vi.fn(),
+    showDeleteConfirmation: false,
+    taskToDelete: null,
+    setTaskToDelete: vi.fn(),
+    taskRefreshTrigger: 0,
+    setTaskRefreshTrigger: vi.fn(),
+    pendingSentenceId: null,
+    setPendingSentenceId: vi.fn(),
+    isTaskCreationFromTasksView: false,
+    setIsTaskCreationFromTasksView: vi.fn(),
+  },
+  crud: {
+    handleCreateTask: vi.fn(),
+    handleAddTask: vi.fn(),
+    handleEditTask: vi.fn(),
+    handleTaskUpdated: vi.fn().mockResolvedValue(undefined),
+    handleDeleteTask: vi.fn(),
+    handleConfirmDelete: vi.fn(),
+    handleCancelDelete: vi.fn(),
+    handleCreateNewTaskFromMenu: vi.fn(),
+  },
+  entries: {
+    handleAddAllSentencesToTask: vi.fn(),
+    handleSelectTaskFromDropdown: vi.fn(),
+    handleCreateNewFromDropdown: vi.fn(),
+    handleAddSentenceToExistingTask: vi.fn(),
+  },
+  sharing: {
+    handleShareTask: vi.fn(),
+    handleRevokeShare: vi.fn(),
+  },
 });
 
 export const mockDragAndDrop = (): {

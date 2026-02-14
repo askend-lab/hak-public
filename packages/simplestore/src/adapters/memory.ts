@@ -6,6 +6,7 @@
  */
 
 import { StorageAdapter, StoreItem, DEFAULT_CONFIG } from "../core/types";
+import { VersionConflictError } from "./dynamodb";
 
 /**
  * In-memory store implementing StorageAdapter interface
@@ -23,8 +24,17 @@ export class InMemoryAdapter implements StorageAdapter {
     return `${pk}${this.delimiter}${sk}`;
   }
 
-  async put(item: StoreItem): Promise<void> {
+  async put(item: StoreItem, expectedVersion?: number): Promise<void> {
     const key = this.buildKey(item.PK, item.SK);
+    if (expectedVersion !== undefined) {
+      const existing = this.data.get(key);
+      const currentVersion = existing?.version ?? 0;
+      if (existing && currentVersion !== expectedVersion) {
+        throw new VersionConflictError(
+          "Item was modified by another request. Please retry.",
+        );
+      }
+    }
     this.data.set(key, { ...item });
   }
 

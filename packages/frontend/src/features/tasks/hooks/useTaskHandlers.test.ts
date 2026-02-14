@@ -40,6 +40,7 @@ const mockAddTextEntriesToTask = vi.fn().mockResolvedValue({});
 const mockGetUserTasks = vi
   .fn()
   .mockResolvedValue([{ id: "task-1", name: "Task 1" }]);
+const mockRevokeShare = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/services/dataService", () => ({
   DataService: {
@@ -51,6 +52,7 @@ vi.mock("@/services/dataService", () => ({
       shareUserTask: mockShareUserTask,
       addTextEntriesToTask: mockAddTextEntriesToTask,
       getUserTasks: mockGetUserTasks,
+      revokeShare: mockRevokeShare,
     })),
   },
 }));
@@ -87,8 +89,8 @@ describe("useTaskHandlers", () => {
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
     );
 
-    expect(result.current.showAddTaskModal).toBe(false);
-    expect(result.current.showAddToTaskDropdown).toBe(false);
+    expect(result.current.modals.showAddTaskModal).toBe(false);
+    expect(result.current.modals.showAddToTaskDropdown).toBe(false);
   });
 
   it("should toggle add to task dropdown", () => {
@@ -97,16 +99,16 @@ describe("useTaskHandlers", () => {
     );
 
     act(() => {
-      result.current.handleAddAllSentencesToTask();
+      result.current.entries.handleAddAllSentencesToTask();
     });
 
-    expect(result.current.showAddToTaskDropdown).toBe(true);
+    expect(result.current.modals.showAddToTaskDropdown).toBe(true);
 
     act(() => {
-      result.current.handleAddAllSentencesToTask();
+      result.current.entries.handleAddAllSentencesToTask();
     });
 
-    expect(result.current.showAddToTaskDropdown).toBe(false);
+    expect(result.current.modals.showAddToTaskDropdown).toBe(false);
   });
 
   it("should add sentences to existing task", async () => {
@@ -115,7 +117,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
+      await result.current.entries.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
     });
 
     expect(mockAddTextEntriesToTask).toHaveBeenCalledWith(
@@ -138,10 +140,10 @@ describe("useTaskHandlers", () => {
     );
 
     act(() => {
-      result.current.handleCreateNewFromDropdown();
+      result.current.entries.handleCreateNewFromDropdown();
     });
 
-    expect(result.current.showAddTaskModal).toBe(true);
+    expect(result.current.modals.showAddTaskModal).toBe(true);
   });
 
   it("should add single sentence to existing task", async () => {
@@ -150,7 +152,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleAddSentenceToExistingTask(
+      await result.current.entries.handleAddSentenceToExistingTask(
         "1",
         "task-1",
         "Task 1",
@@ -167,10 +169,10 @@ describe("useTaskHandlers", () => {
     );
 
     act(() => {
-      result.current.handleCreateNewTaskFromMenu("1");
+      result.current.crud.handleCreateNewTaskFromMenu("1");
     });
 
-    expect(result.current.showAddTaskModal).toBe(true);
+    expect(result.current.modals.showAddTaskModal).toBe(true);
   });
 
   it("should create task", () => {
@@ -179,10 +181,10 @@ describe("useTaskHandlers", () => {
     );
 
     act(() => {
-      result.current.handleCreateTask();
+      result.current.crud.handleCreateTask();
     });
 
-    expect(result.current.showAddTaskModal).toBe(true);
+    expect(result.current.modals.showAddTaskModal).toBe(true);
   });
 
   it("should add task with playlist entries", async () => {
@@ -191,7 +193,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleAddTask("New Task", "Description");
+      await result.current.crud.handleAddTask("New Task", "Description");
     });
 
     expect(mockCreateTask).toHaveBeenCalledWith(
@@ -209,7 +211,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleEditTask({
+      await result.current.crud.handleEditTask({
         id: "task-1",
         name: "Task 1",
         description: "Desc",
@@ -217,8 +219,8 @@ describe("useTaskHandlers", () => {
     });
 
     expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
-    expect(result.current.showTaskEditModal).toBe(true);
-    expect(result.current.taskToEdit).toEqual({
+    expect(result.current.modals.showTaskEditModal).toBe(true);
+    expect(result.current.modals.taskToEdit).toEqual({
       id: "task-1",
       name: "Task 1",
       description: "Desc",
@@ -238,14 +240,14 @@ describe("useTaskHandlers", () => {
 
     // Call handleTaskUpdated with updated task data
     await act(async () => {
-      await result.current.handleTaskUpdated(updatedTask);
+      await result.current.crud.handleTaskUpdated(updatedTask);
     });
 
     expect(mockUpdateTask).toHaveBeenCalledWith("user-1", "task-1", {
       name: "Updated Task",
       description: "Updated Desc",
     });
-    expect(result.current.showTaskEditModal).toBe(false);
+    expect(result.current.modals.showTaskEditModal).toBe(false);
   });
 
   it("should share task", async () => {
@@ -254,15 +256,25 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleShareTask({ id: "task-1", name: "Task 1" });
+      await result.current.sharing.handleShareTask({ id: "task-1", name: "Task 1" });
     });
 
     expect(mockShareUserTask).toHaveBeenCalledWith("user-1", "task-1");
-    expect(result.current.showShareTaskModal).toBe(true);
-    expect(result.current.taskToShare).toMatchObject({
+    expect(result.current.modals.showShareTaskModal).toBe(true);
+    expect(result.current.modals.taskToShare).toMatchObject({
       id: "task-1",
       name: "Task 1",
     });
+  });
+
+  it("should revoke share", async () => {
+    const { result } = renderHook(() =>
+      useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+    );
+    await act(async () => {
+      await result.current.sharing.handleRevokeShare("share-token-abc");
+    });
+    expect(mockRevokeShare).toHaveBeenCalledWith("share-token-abc");
   });
 
   it("should handle error when adding entries to task", async () => {
@@ -273,7 +285,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
+      await result.current.entries.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
     });
 
     expect(mockShowNotification).toHaveBeenCalledWith({
@@ -303,7 +315,7 @@ describe("useTaskHandlers", () => {
     );
 
     await act(async () => {
-      await result.current.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
+      await result.current.entries.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
     });
 
     expect(mockAddTextEntriesToTask).not.toHaveBeenCalled();
@@ -318,7 +330,7 @@ describe("useTaskHandlers", () => {
 
     // Set taskToEdit first in a separate act
     act(() => {
-      result.current.setTaskToEdit({
+      result.current.modals.setTaskToEdit({
         id: "task-1",
         name: "Updated",
         description: "Desc",
@@ -329,7 +341,7 @@ describe("useTaskHandlers", () => {
 
     // Then call handleTaskUpdated
     await act(async () => {
-      await result.current.handleTaskUpdated(updatedTask);
+      await result.current.crud.handleTaskUpdated(updatedTask);
     });
     expect(mockShowNotification).toHaveBeenCalledWith({
       type: "error",
@@ -344,14 +356,14 @@ describe("useTaskHandlers", () => {
     );
 
     act(() => {
-      result.current.setShowShareTaskModal(true);
+      result.current.modals.setShowShareTaskModal(true);
     });
-    expect(result.current.showShareTaskModal).toBe(true);
+    expect(result.current.modals.showShareTaskModal).toBe(true);
 
     act(() => {
-      result.current.setShowShareTaskModal(false);
+      result.current.modals.setShowShareTaskModal(false);
     });
-    expect(result.current.showShareTaskModal).toBe(false);
+    expect(result.current.modals.showShareTaskModal).toBe(false);
   });
 
   it("should close edit modal", () => {
@@ -360,14 +372,14 @@ describe("useTaskHandlers", () => {
     );
 
     act(() => {
-      result.current.setShowTaskEditModal(true);
+      result.current.modals.setShowTaskEditModal(true);
     });
-    expect(result.current.showTaskEditModal).toBe(true);
+    expect(result.current.modals.showTaskEditModal).toBe(true);
 
     act(() => {
-      result.current.setShowTaskEditModal(false);
+      result.current.modals.setShowTaskEditModal(false);
     });
-    expect(result.current.showTaskEditModal).toBe(false);
+    expect(result.current.modals.showTaskEditModal).toBe(false);
   });
 
   it("should toggle add task dropdown", () => {
@@ -376,9 +388,9 @@ describe("useTaskHandlers", () => {
     );
 
     act(() => {
-      result.current.setShowAddToTaskDropdown(true);
+      result.current.modals.setShowAddToTaskDropdown(true);
     });
-    expect(result.current.showAddToTaskDropdown).toBe(true);
+    expect(result.current.modals.showAddToTaskDropdown).toBe(true);
   });
 });
 
@@ -406,7 +418,7 @@ describe("useTaskHandlers edge cases", () => {
       useTaskHandlers(sentences, setView, setTaskId),
     );
     await act(async () => {
-      await result.current.handleAddSentenceToExistingTask(
+      await result.current.entries.handleAddSentenceToExistingTask(
         "nonexistent",
         "task-1",
         "Task 1",
@@ -430,7 +442,7 @@ describe("useTaskHandlers edge cases", () => {
       useTaskHandlers(empty, setView, setTaskId),
     );
     await act(async () => {
-      await result.current.handleAddSentenceToExistingTask(
+      await result.current.entries.handleAddSentenceToExistingTask(
         "1",
         "task-1",
         "Task 1",
@@ -446,7 +458,7 @@ describe("useTaskHandlers edge cases", () => {
       useTaskHandlers(sentences, setView, setTaskId),
     );
     await act(async () => {
-      await result.current.handleAddSentenceToExistingTask(
+      await result.current.entries.handleAddSentenceToExistingTask(
         "1",
         "task-1",
         "Task 1",
@@ -484,13 +496,13 @@ describe("useTaskHandlers edge cases", () => {
 
     // User clicks "Loo uus ülesanne" (Create new task) from Tasks view - NOT from synthesis
     act(() => {
-      result.current.handleCreateTask();
+      result.current.crud.handleCreateTask();
     });
-    expect(result.current.showAddTaskModal).toBe(true);
+    expect(result.current.modals.showAddTaskModal).toBe(true);
 
     // User submits the modal to create the task
     await act(async () => {
-      await result.current.handleAddTask("Empty Task", "");
+      await result.current.crud.handleAddTask("Empty Task", "");
     });
 
     // Task should be created WITHOUT any sentences from synthesis
@@ -537,13 +549,13 @@ describe("useTaskHandlers edge cases", () => {
 
     // User clicks "Create new task" from sentence 2's menu
     act(() => {
-      result.current.handleCreateNewTaskFromMenu("sent-2");
+      result.current.crud.handleCreateNewTaskFromMenu("sent-2");
     });
-    expect(result.current.showAddTaskModal).toBe(true);
+    expect(result.current.modals.showAddTaskModal).toBe(true);
 
     // User submits the modal to create the task
     await act(async () => {
-      await result.current.handleAddTask("My New Task", "Description");
+      await result.current.crud.handleAddTask("My New Task", "Description");
     });
 
     // Should only add sentence 2, NOT all 3 sentences

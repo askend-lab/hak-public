@@ -144,6 +144,7 @@ export function SharedTaskPage() {
                 </div>
                 <div className="shared-task-info-banner-description">
                   Kopeeri laused, et neid muuta ja uusi versioone luua.
+                  Jagamislink kehtib 90 päeva.
                 </div>
               </div>
               <button
