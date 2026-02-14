@@ -41,15 +41,21 @@ vi.mock("./VariantItem", () => ({
 }));
 vi.mock("./CustomVariantForm", () => ({
   CustomVariantForm: ({
+    onChange,
     onPlay,
     onUse,
     onClose,
   }: {
+    onChange: (v: string) => void;
     onPlay: () => void;
     onUse: () => void;
     onClose: () => void;
   }) => (
     <div data-testid="custom-form">
+      <input
+        data-testid="custom-input"
+        onChange={(e) => onChange(e.target.value)}
+      />
       <button onClick={onPlay}>Play Custom</button>
       <button onClick={onUse}>Use Custom</button>
       <button onClick={onClose}>Close Custom</button>
@@ -239,7 +245,18 @@ describe("PronunciationVariants", () => {
     expect(screen.queryByTestId("custom-form")).not.toBeInTheDocument();
   });
 
-  it("handles play custom variant", async () => {
+  it("handles play custom variant with value", async () => {
+    const user = userEvent.setup();
+    render(<PronunciationVariants {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByText("Loo oma variant")).toBeInTheDocument(),
+    );
+    await user.click(screen.getByText("Loo oma variant"));
+    await user.type(screen.getByTestId("custom-input"), "te`re");
+    await user.click(screen.getByText("Play Custom"));
+  });
+
+  it("handles play custom variant with empty value (no-op)", async () => {
     const user = userEvent.setup();
     render(<PronunciationVariants {...defaultProps} />);
     await waitFor(() =>
@@ -249,7 +266,22 @@ describe("PronunciationVariants", () => {
     await user.click(screen.getByText("Play Custom"));
   });
 
-  it("handles use custom variant", async () => {
+  it("handles use custom variant with value", async () => {
+    const onUseVariant = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <PronunciationVariants {...defaultProps} onUseVariant={onUseVariant} />,
+    );
+    await waitFor(() =>
+      expect(screen.getByText("Loo oma variant")).toBeInTheDocument(),
+    );
+    await user.click(screen.getByText("Loo oma variant"));
+    await user.type(screen.getByTestId("custom-input"), "te`re");
+    await user.click(screen.getByText("Use Custom"));
+    expect(onUseVariant).toHaveBeenCalledWith("te`re");
+  });
+
+  it("handles use custom variant with empty value (no-op)", async () => {
     const onUseVariant = vi.fn();
     const user = userEvent.setup();
     render(
@@ -260,6 +292,7 @@ describe("PronunciationVariants", () => {
     );
     await user.click(screen.getByText("Loo oma variant"));
     await user.click(screen.getByText("Use Custom"));
+    expect(onUseVariant).not.toHaveBeenCalled();
   });
 
   it("invokes onEnded callback when variant audio finishes", async () => {
@@ -333,7 +366,105 @@ describe("PronunciationVariants", () => {
       expect(screen.getByText("Loo oma variant")).toBeInTheDocument(),
     );
     await user.click(screen.getByText("Loo oma variant"));
+    await user.type(screen.getByTestId("custom-input"), "te`re");
     await user.click(screen.getByText("Play Custom"));
     await new Promise((r) => setTimeout(r, 20));
+  });
+
+  it("invokes custom variant onError callback", async () => {
+    const { createAudioPlayer } = await import("@/features/synthesis/utils/audioPlayer");
+    (createAudioPlayer as ReturnType<typeof vi.fn>).mockImplementation(
+      (_url: string, cbs: { onError?: () => void }) => {
+        const audio = {
+          play: vi.fn().mockImplementation(async () => {
+            setTimeout(() => cbs.onError?.(), 5);
+          }),
+          pause: vi.fn(),
+        };
+        return { audio };
+      },
+    );
+    const user = userEvent.setup();
+    render(<PronunciationVariants {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByText("Loo oma variant")).toBeInTheDocument(),
+    );
+    await user.click(screen.getByText("Loo oma variant"));
+    await user.type(screen.getByTestId("custom-input"), "te`re");
+    await user.click(screen.getByText("Play Custom"));
+    await new Promise((r) => setTimeout(r, 20));
+  });
+
+  it("handles custom variant play error", async () => {
+    const { synthesizeAuto } = await import("@/features/synthesis/utils/synthesize");
+    (synthesizeAuto as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error("synth fail"),
+    );
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<PronunciationVariants {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByText("Loo oma variant")).toBeInTheDocument(),
+    );
+    await user.click(screen.getByText("Loo oma variant"));
+    await user.type(screen.getByTestId("custom-input"), "te`re");
+    await user.click(screen.getByText("Play Custom"));
+    await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
+    consoleSpy.mockRestore();
+  });
+
+  it("toggles pause when clicking play on already-playing variant", async () => {
+    const { createAudioPlayer } = await import("@/features/synthesis/utils/audioPlayer");
+    const mockPause = vi.fn();
+    (createAudioPlayer as ReturnType<typeof vi.fn>).mockImplementation(
+      (_url: string, cbs: { onLoaded?: () => void }) => {
+        const audio = {
+          play: vi.fn().mockImplementation(async () => {
+            cbs.onLoaded?.();
+          }),
+          pause: mockPause,
+          src: "mock",
+        };
+        return { audio };
+      },
+    );
+    const user = userEvent.setup();
+    render(<PronunciationVariants {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByText("Variant 1")).toBeInTheDocument(),
+    );
+    const playBtns = screen.getAllByLabelText("play");
+    await user.click(playBtns[0]!);
+    // Second click on same variant should toggle pause
+    await user.click(playBtns[0]!);
+    expect(mockPause).toHaveBeenCalled();
+  });
+
+  it("toggles pause when clicking play on already-playing custom variant", async () => {
+    const { createAudioPlayer } = await import("@/features/synthesis/utils/audioPlayer");
+    const mockPause = vi.fn();
+    (createAudioPlayer as ReturnType<typeof vi.fn>).mockImplementation(
+      (_url: string, cbs: { onLoaded?: () => void }) => {
+        const audio = {
+          play: vi.fn().mockImplementation(async () => {
+            cbs.onLoaded?.();
+          }),
+          pause: mockPause,
+          src: "mock",
+        };
+        return { audio };
+      },
+    );
+    const user = userEvent.setup();
+    render(<PronunciationVariants {...defaultProps} />);
+    await waitFor(() =>
+      expect(screen.getByText("Loo oma variant")).toBeInTheDocument(),
+    );
+    await user.click(screen.getByText("Loo oma variant"));
+    await user.type(screen.getByTestId("custom-input"), "te`re");
+    await user.click(screen.getByText("Play Custom"));
+    // Second click should toggle pause
+    await user.click(screen.getByText("Play Custom"));
+    expect(mockPause).toHaveBeenCalled();
   });
 });
