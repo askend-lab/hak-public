@@ -33,6 +33,6 @@ jobs:
 
               console.log(`✅ Auto-approved PR #${prNumber}`);
             } catch (error) {
-              console.error(`❌ Failed to auto-approve: ${error.message}`);
-              throw error;
+              console.log(`⚠️ Auto-approve skipped for PR #${prNumber}: ${error.message}`);
+              console.log('This is expected when GITHUB_TOKEN cannot approve its own PRs.');
             }
