@@ -154,8 +154,6 @@ hooks:
     command: "pnpm lint"
     excludePaths:
       - "**/e2e/accessibility.spec.ts"
-      - "**/scripts/a11y-audit.mjs"
-      - "**/scripts/validate-design.js"
 
   run-typecheck:
     command: "pnpm -r exec tsc --noEmit"
@@ -197,7 +195,6 @@ hooks:
       - "**/cucumber-report.json"
       - "**/merlin/**/*.py"
       - "**/merlin-worker/tools/**/*"
-      - "**/scripts/validate-design.js"
       - "**/styles/**/*.scss"
       - "**/styles/*.scss"
       # Test files still over 400L (TODO: split these)
