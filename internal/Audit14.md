@@ -25,16 +25,16 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 6. **`JSON.parse` без валидации схемы при чтении из localStorage** (`storage.ts:30`, `OnboardingContext.tsx:55`).
   Повреждённые или подменённые данные в localStorage приведут к непредсказуемому поведению.
 
-- [ ] 7. **Share token — всего 8 байт энтропии** (`shareTokenUtils.ts:4,10`).
+- [x] 7. **Share token — всего 8 байт энтропии** (`shareTokenUtils.ts:4,10`).
   Генерируется 16 байт, но `substring(0, 16)` — это 16 hex-символов = 8 байт = 2^64 — перебираемо при отсутствии rate limit.
 
-- [ ] 8. **CORS `Access-Control-Allow-Origin: *`** (`lambda.ts:20`).
+- [x] 8. **CORS `Access-Control-Allow-Origin: *`** (`lambda.ts:20`).
   Wildcard CORS позволяет любому сайту делать authenticated-запросы к API, если браузер отправит credentials.
 
 - [ ] 9. **Нет rate limiting на API endpoints** (все serverless.yml).
   Synthesis, analyze, audio generate — все без throttling. Абьюзер может генерировать тысячи аудио за минуту.
 
-- [ ] 10. **Debug endpoint `/debug/error` доступен без аутентификации** (`handler.ts:134`).
+- [x] 10. **Debug endpoint `/debug/error` доступен без аутентификации** (`handler.ts:134`).
   Любой может триггерить 500-ки и спамить мониторинг/alerting-систему.
 
 - [ ] 11. **Audio API endpoints полностью без аутентификации** (`audio-api/serverless.yml:51-70`).
@@ -46,10 +46,10 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 13. **Vabamorf API полностью открыт** (`vabamorf-api/serverless.yml:30-35`).
   `/{proxy+}` + ANY method — абсолютно любой HTTP-запрос принимается без auth.
 
-- [ ] 14. **`useUserId()` возвращает `"test-user"` для неаутентифицированных** (`useUserId.ts:12`).
+- [x] 14. **`useUserId()` возвращает `"test-user"` для неаутентифицированных** (`useUserId.ts:12`).
   Все анонимные пользователи делят один userId — могут видеть и перезаписывать данные друг друга.
 
-- [ ] 15. **Нет Content-Security-Policy** (ни в index.html, ни в response headers).
+- [x] 15. **Нет Content-Security-Policy** (ни в index.html, ни в response headers).
   Без CSP любой инъецированный скрипт выполнится в контексте приложения без ограничений.
 
 - [ ] 16. **Vite dev proxy молча проксирует в production** (`vite.config.ts:91-102,113,173`).
@@ -261,7 +261,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## PRIVACY & COMPLIANCE
 
-- [ ] 81. **Sentry `replayIntegration()` записывает сессии** (`main.tsx:15`).
+- [x] 81. **Sentry `replayIntegration()` записывает сессии** (`main.tsx:15`).
   Session replay записывает действия пользователя (клики, ввод). Для гос. сервиса Эстонии — GDPR concern.
 
 - [ ] 82. **`tracesSampleRate: 0.1` — 10% трейсов уходят в Sentry** (`main.tsx:17`).
