@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { TaskSummary } from "@/types/task";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { logger } from "@hak/shared";
 import { SearchIcon, AddIcon, BackIcon } from "@/components/ui/Icons";
@@ -116,6 +116,7 @@ export default function AddToTaskDropdown({
   anchorRef: _anchorRef,
 }: AddToTaskDropdownProps) {
   const { user } = useAuth();
+  const dataService = useDataService();
   const [searchQuery, setSearchQuery] = useState("");
   const [tasks, setTasks] = useState<TaskSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -125,12 +126,12 @@ export default function AddToTaskDropdown({
   useEffect(() => {
     if (!isOpen || !user) return;
     setIsLoading(true);
-    DataService.getInstance()
+    dataService
       .getUserTasks(user.id)
       .then(setTasks)
       .catch((e) => logger.error("Failed to load tasks:", e))
       .finally(() => setIsLoading(false));
-  }, [isOpen, user]);
+  }, [isOpen, user, dataService]);
   useEffect(() => {
     if (isOpen && !selectedTask && searchInputRef.current)
       setTimeout(() => searchInputRef.current?.focus(), 100);

@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { TaskSummary } from "@/types/task";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 
 interface UseUserTasksResult {
@@ -16,6 +16,7 @@ interface UseUserTasksResult {
 
 export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
   const { user } = useAuth();
+  const dataService = useDataService();
   const [tasks, setTasks] = useState<TaskSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +31,6 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
 
       try {
         setIsLoading(true);
-        const dataService = DataService.getInstance();
         const userTasks = await dataService.getUserTasks(user.id);
         setTasks(userTasks);
       } catch (err) {
@@ -43,7 +43,7 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
     };
 
     loadTasks();
-  }, [user, refreshTrigger]);
+  }, [user, refreshTrigger, dataService]);
 
   return {
     tasks,

@@ -52,12 +52,7 @@ describe("DataService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (DataService as unknown as { instance: undefined }).instance = undefined;
-    service = DataService.getInstance();
-  });
-
-  it("returns singleton instance", () => {
-    expect(DataService.getInstance()).toBe(service);
+    service = new DataService();
   });
 
   it("getUserTasks delegates to repository", async () => {

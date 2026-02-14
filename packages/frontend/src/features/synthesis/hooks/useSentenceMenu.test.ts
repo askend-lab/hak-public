@@ -5,6 +5,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { logger } from "@hak/shared";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useSentenceMenu } from "./useSentenceMenu";
+import { createElement } from "react";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
@@ -13,16 +15,13 @@ vi.mock("@/features/auth/services", () => ({
   })),
 }));
 
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      getUserTasks: vi.fn().mockResolvedValue([
-        { id: "task-1", name: "Task 1" },
-        { id: "task-2", name: "Task 2" },
-      ]),
-    })),
-  },
-}));
+const mockDS = createMockDataService({
+  getUserTasks: vi.fn().mockResolvedValue([
+    { id: "task-1", name: "Task 1" },
+    { id: "task-2", name: "Task 2" },
+  ]),
+});
+function dsWrapper({ children }: { children: React.ReactNode }) { return createElement(DataServiceTestWrapper, { dataService: mockDS }, children); }
 
 describe("useSentenceMenu", () => {
   beforeEach(() => {
@@ -30,27 +29,27 @@ describe("useSentenceMenu", () => {
   });
 
   it("should initialize with null openMenuId", () => {
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: dsWrapper });
     expect(result.current.openMenuId).toBeNull();
   });
 
   it("should initialize with empty menuAnchorEl", () => {
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: dsWrapper });
     expect(result.current.menuAnchorEl).toEqual({});
   });
 
   it("should initialize with empty menuTasks", () => {
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: dsWrapper });
     expect(result.current.menuTasks).toEqual([]);
   });
 
   it("should initialize with empty menuSearchQuery", () => {
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: dsWrapper });
     expect(result.current.menuSearchQuery).toBe("");
   });
 
   it("should open menu and load tasks", async () => {
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: dsWrapper });
 
     const mockElement = document.createElement("button");
     const mockEvent = {
@@ -70,7 +69,7 @@ describe("useSentenceMenu", () => {
   });
 
   it("should close menu and clear search query", () => {
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: dsWrapper });
 
     act(() => {
       result.current.setMenuSearchQuery("test query");
@@ -87,7 +86,7 @@ describe("useSentenceMenu", () => {
   });
 
   it("should update menuSearchQuery", () => {
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: dsWrapper });
 
     act(() => {
       result.current.setMenuSearchQuery("new search");
@@ -98,12 +97,12 @@ describe("useSentenceMenu", () => {
 
   it("should handle getUserTasks error in handleMenuOpen", async () => {
     const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    const { DataService } = await import("@/services/dataService");
-    (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+    const errorDS = createMockDataService({
       getUserTasks: vi.fn().mockRejectedValue(new Error("load failed")),
     });
+    function errorWrapper({ children }: { children: React.ReactNode }) { return createElement(DataServiceTestWrapper, { dataService: errorDS }, children); }
 
-    const { result } = renderHook(() => useSentenceMenu());
+    const { result } = renderHook(() => useSentenceMenu(), { wrapper: errorWrapper });
 
     const mockEvent = {
       currentTarget: document.createElement("div"),

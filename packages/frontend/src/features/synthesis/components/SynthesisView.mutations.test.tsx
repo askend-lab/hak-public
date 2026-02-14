@@ -34,6 +34,8 @@ let mockContextValue: SynthesisPageContextValue;
 
 vi.mock("@/features/synthesis/contexts/SynthesisPageContext", () => ({
   useSynthesisPage: () => mockContextValue,
+  useSynthesisCore: () => mockContextValue,
+  useSynthesisInteraction: () => mockContextValue,
 }));
 
 vi.mock("@/features/synthesis/components/SynthesisPageHeader", () => ({

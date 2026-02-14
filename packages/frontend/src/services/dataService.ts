@@ -12,7 +12,6 @@ export interface DataServiceDeps {
 }
 
 export class DataService {
-  private static instance: DataService | null = null;
   private storage: SimpleStoreAdapter;
   private shareService: ShareService;
   private repository: TaskRepository;
@@ -24,18 +23,6 @@ export class DataService {
       this.storage,
       this.shareService,
     );
-  }
-
-  static getInstance(): DataService {
-    const existing = DataService.instance;
-    if (existing) return existing;
-    const created = new DataService();
-    DataService.instance = created;
-    return created;
-  }
-
-  static resetInstance(): void {
-    DataService.instance = null;
   }
 
   async getUserTasks(userId: string): Promise<TaskSummary[]> {

@@ -17,6 +17,10 @@ import {
 } from "./test/mocks/appMocks";
 
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
+vi.mock("./contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
+  CopiedEntriesProvider: ({ children }: { children: unknown }) => children,
+}));
 vi.mock("./contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => mockNotificationContext()),
 }));

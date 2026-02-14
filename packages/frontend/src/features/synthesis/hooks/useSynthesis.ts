@@ -1,20 +1,17 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu, convertTextToTags, normalizeTags, CACHE_INVALIDATION } from "@/types/synthesis";
+import { useCallback } from "react";
+import { convertTextToTags } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/features/synthesis/utils/phoneticMarkers";
-import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
-import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
 import { useTagEditor } from "./synthesis/useTagEditor";
-import { logger } from "@hak/shared";
 import { usePlaylistControl } from "./synthesis/usePlaylistControl";
 import { useTagUpdater } from "./synthesis/useTagUpdater";
-import { useNotification } from "@/contexts/NotificationContext";
+import { useInlineTagEditor } from "./synthesis/useInlineTagEditor";
+import { useSentenceActions } from "./synthesis/useSentenceActions";
 
 export function useSynthesis() {
-  const { showNotification } = useNotification();
   const orchestrator = useSynthesisOrchestrator();
   const {
     sentences,
@@ -33,9 +30,6 @@ export function useSynthesis() {
     synthesizeWithText,
   } = orchestrator;
 
-  const sentencesRef = useRef(sentences);
-  sentencesRef.current = sentences;
-
   const tagEditor = useTagEditor(getSentence, updateSentence);
   const { handleInputBlur } = tagEditor;
   const tagUpdater = useTagUpdater(setSentences);
@@ -52,8 +46,22 @@ export function useSynthesis() {
     updateAllSentences,
   );
 
-  const [editingTag, setEditingTag] = useState<EditingTag>(null);
-  const [openTagMenu, setOpenTagMenu] = useState<OpenTagMenu>(null);
+  const inlineEditor = useInlineTagEditor({
+    sentences,
+    getSentence,
+    tagUpdater,
+    synthesizeWithText,
+  });
+
+  const actions = useSentenceActions({
+    getSentence,
+    updateSentence,
+    synthesizeAndPlay,
+    synthesizeWithText,
+    handleRemoveSentence,
+    currentAudio,
+    playlist,
+  });
 
   const handleKeyDown = (e: React.KeyboardEvent, id: string): void => {
     tagEditor.handleKeyDown(e, id, (id: string, text?: string): void => {
@@ -64,182 +72,6 @@ export function useSynthesis() {
       }
     });
   };
-
-  const handleRemoveSentenceWrapper = useCallback(
-    (id: string) => {
-      handleRemoveSentence(id, true);
-    },
-    [handleRemoveSentence],
-  );
-
-  const handlePlay = useCallback(
-    (id: string): void => {
-      const sentence = getSentence(id);
-      if (!sentence) return;
-      // If sentence is already playing, stop it (pause behavior)
-      if (sentence.isPlaying) {
-        if (playlist.isPlayingAll || playlist.isLoadingPlayAll) {
-          // Stop the entire play-all sequence
-          playlist.handlePlayAll();
-        } else {
-          // Stop individual playback
-          if (currentAudio) {
-            currentAudio.pause();
-            currentAudio.src = "";
-          }
-          updateSentence(id, { isPlaying: false });
-        }
-        return;
-      }
-
-      if (sentence.currentInput.trim()) {
-        const inputWords = convertTextToTags(sentence.currentInput);
-        const allTags = normalizeTags([...sentence.tags, ...inputWords]);
-        const fullText = allTags.join(" ");
-        updateSentence(id, {
-          tags: allTags,
-          currentInput: "",
-          text: fullText,
-          ...CACHE_INVALIDATION,
-        });
-        synthesizeWithText(id, fullText);
-      } else if (sentence.tags.length > 0) {
-        synthesizeAndPlay(id);
-      }
-    },
-    [getSentence, updateSentence, synthesizeAndPlay, synthesizeWithText, currentAudio, playlist],
-  );
-
-  const handleDownload = useCallback(
-    async (id: string) => {
-      const sentence = getSentence(id);
-      if (!sentence) return;
-      let audioUrl = sentence.audioUrl;
-
-      if (!audioUrl) {
-        try {
-          audioUrl = await synthesizeAuto(sentence.text);
-          updateSentence(id, { audioUrl });
-        } catch (error) {
-          logger.error("Failed to generate audio:", error);
-          return;
-        }
-      }
-
-      if (!audioUrl) return;
-
-      try {
-        const audioResponse = await fetch(audioUrl);
-        const audioBlob = await audioResponse.blob();
-        const blobUrl = URL.createObjectURL(audioBlob);
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = `${sentence.text || "audio"}.wav`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      } catch (error) {
-        logger.error("Failed to download audio:", error);
-      }
-    },
-    [getSentence, updateSentence],
-  );
-
-  const handleCopyText = useCallback(
-    async (id: string) => {
-      const sentence = getSentence(id);
-      if (!sentence || !sentence.text.trim()) return;
-
-      await copyTextToClipboard(sentence.text, showNotification);
-    },
-    [getSentence, showNotification],
-  );
-
-  const handleDeleteTag = useCallback(
-    (sentenceId: string, tagIndex: number) => {
-      tagUpdater.deleteTag(sentenceId, tagIndex);
-      setOpenTagMenu(null);
-    },
-    [tagUpdater],
-  );
-
-  const handleEditTag = useCallback(
-    (sentenceId: string, tagIndex: number) => {
-      const sentence = getSentence(sentenceId);
-      if (!sentence) return;
-      const word = sentence.tags[tagIndex] ?? "";
-      setEditingTag({ sentenceId, tagIndex, value: word });
-      setOpenTagMenu(null);
-    },
-    [getSentence],
-  );
-
-  const handleEditTagChange = useCallback(
-    (value: string) => {
-      if (!editingTag) return;
-      setEditingTag({ ...editingTag, value });
-    },
-    [editingTag],
-  );
-
-  const handleEditTagCommit = useCallback(() => {
-    if (!editingTag) return;
-    const { sentenceId, tagIndex, value } = editingTag;
-    const trimmedValue = value.trim();
-
-    if (trimmedValue === "") {
-      tagUpdater.deleteTag(sentenceId, tagIndex);
-    } else {
-      const newWords = convertTextToTags(trimmedValue);
-      tagUpdater.replaceTag(sentenceId, tagIndex, newWords);
-    }
-    setEditingTag(null);
-  }, [editingTag, tagUpdater]);
-
-  const handleEditTagKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        if (editingTag) {
-          const sentenceId = editingTag.sentenceId;
-          const tagIndex = editingTag.tagIndex;
-          const trimmedValue = editingTag.value.trim();
-          // Compute the new text BEFORE commit clears editingTag
-          const sentence = sentencesRef.current.find(
-            (s) => s.id === sentenceId,
-          );
-          let newText = "";
-          if (sentence) {
-            if (trimmedValue === "") {
-              const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
-              newText = newTags.join(" ");
-            } else {
-              const newWords = convertTextToTags(trimmedValue);
-              const newTags = normalizeTags([
-                ...sentence.tags.slice(0, tagIndex),
-                ...newWords,
-                ...sentence.tags.slice(tagIndex + 1),
-              ]);
-              newText = newTags.join(" ");
-            }
-          }
-          handleEditTagCommit();
-          // Use synthesizeWithText to pass the correct text directly, bypassing stale ref
-          if (newText) {
-            synthesizeWithText(sentenceId, newText);
-          }
-        }
-      } else if (e.key === " ") {
-        e.preventDefault();
-        handleEditTagCommit();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        setEditingTag(null);
-      }
-    },
-    [editingTag, handleEditTagCommit, synthesizeWithText],
-  );
 
   const handleUseVariant = useCallback(
     (
@@ -285,25 +117,25 @@ export function useSynthesis() {
     setSentences,
     isPlayingAll: playlist.isPlayingAll,
     isLoadingPlayAll: playlist.isLoadingPlayAll,
-    editingTag,
-    openTagMenu,
-    setOpenTagMenu,
+    editingTag: inlineEditor.editingTag,
+    openTagMenu: inlineEditor.openTagMenu,
+    setOpenTagMenu: inlineEditor.setOpenTagMenu,
     setDemoSentences,
     handleTextChange,
     handleClearSentence,
     handleAddSentence,
-    handleRemoveSentence: handleRemoveSentenceWrapper,
+    handleRemoveSentence: actions.handleRemoveSentence,
     handleInputBlur,
     handleKeyDown,
-    handlePlay,
+    handlePlay: actions.handlePlay,
     handlePlayAll: playlist.handlePlayAll,
-    handleDownload,
-    handleCopyText,
-    handleDeleteTag,
-    handleEditTag,
-    handleEditTagChange,
-    handleEditTagCommit,
-    handleEditTagKeyDown,
+    handleDownload: actions.handleDownload,
+    handleCopyText: actions.handleCopyText,
+    handleDeleteTag: inlineEditor.handleDeleteTag,
+    handleEditTag: inlineEditor.handleEditTag,
+    handleEditTagChange: inlineEditor.handleEditTagChange,
+    handleEditTagCommit: inlineEditor.handleEditTagCommit,
+    handleEditTagKeyDown: inlineEditor.handleEditTagKeyDown,
     handleUseVariant,
     handleSentencePhoneticApply,
     synthesizeAndPlay,

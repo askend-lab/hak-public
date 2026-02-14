@@ -16,6 +16,9 @@ vi.mock("@/contexts/NotificationContext", () => ({
     showNotification: vi.fn(),
   }),
 }));
+vi.mock("@/contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
+}));
 
 describe("useSynthesis", () => {
   beforeEach(() => {

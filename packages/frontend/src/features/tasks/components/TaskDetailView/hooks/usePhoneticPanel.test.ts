@@ -7,15 +7,12 @@ import { renderHook, act } from "@testing-library/react";
 import { usePhoneticPanel } from "./usePhoneticPanel";
 import type { TaskEntry, Task } from "@/types/task";
 import { logger } from "@hak/shared";
+import { createElement } from "react";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockUpdateTaskEntry = vi.fn();
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: (): { updateTaskEntry: ReturnType<typeof vi.fn> } => ({
-      updateTaskEntry: mockUpdateTaskEntry,
-    }),
-  },
-}));
+const mockDS = createMockDataService({ updateTaskEntry: mockUpdateTaskEntry });
+function dsWrapper({ children }: { children: React.ReactNode }) { return createElement(DataServiceTestWrapper, { dataService: mockDS }, children); }
 
 vi.mock("@/features/synthesis/utils/phoneticMarkers", () => ({
   stripPhoneticMarkers: (text: string): string => text.replace(/[`~^]/g, ""),
@@ -53,6 +50,7 @@ describe("usePhoneticPanel", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      { wrapper: dsWrapper },
     );
     expect(result.current.showPhoneticPanel).toBe(false);
     expect(result.current.phoneticPanelEntryId).toBeNull();
@@ -62,6 +60,7 @@ describe("usePhoneticPanel", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handleExplorePhonetic("e1");
@@ -75,6 +74,7 @@ describe("usePhoneticPanel", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handleExplorePhonetic("nonexistent");
@@ -97,6 +97,7 @@ describe("usePhoneticPanel", () => {
         "u1",
         onMenuClose,
       ),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handleExplorePhonetic("e1");
@@ -120,6 +121,7 @@ describe("usePhoneticPanel", () => {
         "u1",
         onMenuClose,
       ),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handleExplorePhonetic("e1");
@@ -132,6 +134,7 @@ describe("usePhoneticPanel", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handleExplorePhonetic("e1");
@@ -158,6 +161,7 @@ describe("usePhoneticPanel", () => {
         "u1",
         onMenuClose,
       ),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -176,6 +180,7 @@ describe("usePhoneticPanel", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handlePhoneticApply("test");
@@ -190,6 +195,7 @@ describe("usePhoneticPanel", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handleExplorePhonetic("e1");

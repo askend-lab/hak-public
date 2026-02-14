@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { stripPhoneticMarkers } from "@/features/synthesis/utils/phoneticMarkers";
 import { analyzeText } from "@/features/synthesis/utils/analyzeApi";
 import { logger } from "@hak/shared";
@@ -23,6 +23,7 @@ export function usePhoneticPanel(
   userId: string | undefined,
   onMenuClose: () => void,
 ): UsePhoneticPanelReturn {
+  const dataService = useDataService();
   const [showPhoneticPanel, setShowPhoneticPanel] = useState(false);
   const [phoneticPanelEntryId, setPhoneticPanelEntryId] = useState<
     string | null
@@ -84,7 +85,7 @@ export function usePhoneticPanel(
       handleClosePhoneticPanel();
 
       try {
-        await DataService.getInstance().updateTaskEntry(
+        await dataService.updateTaskEntry(
           userId,
           task.id,
           phoneticPanelEntryId,
@@ -98,7 +99,7 @@ export function usePhoneticPanel(
         alert("Viga: häälduskuju salvestamine ebaõnnestus");
       }
     },
-    [phoneticPanelEntryId, task, userId, setEntries, handleClosePhoneticPanel],
+    [phoneticPanelEntryId, task, userId, setEntries, handleClosePhoneticPanel, dataService],
   );
 
   return {

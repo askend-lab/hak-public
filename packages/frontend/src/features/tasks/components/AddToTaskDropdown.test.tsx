@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddToTaskDropdown from "./AddToTaskDropdown";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const stableUser = {
   id: "38001085718",
@@ -17,16 +18,13 @@ vi.mock("@/features/auth/services", () => ({
   })),
 }));
 
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      getUserTasks: vi.fn().mockResolvedValue([
-        { id: "task-1", name: "Task One", description: "", entryCount: 0 },
-        { id: "task-2", name: "Task Two", description: "", entryCount: 0 },
-      ]),
-    })),
-  },
-}));
+const mockDS = createMockDataService({
+  getUserTasks: vi.fn().mockResolvedValue([
+    { id: "task-1", name: "Task One", description: "", entryCount: 0 },
+    { id: "task-2", name: "Task Two", description: "", entryCount: 0 },
+  ]),
+});
+const dsWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper>;
 
 describe("AddToTaskDropdown", () => {
   const mockOnClose = vi.fn();
@@ -47,6 +45,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
       expect(container.firstChild).toBeNull();
     });
@@ -60,6 +59,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {
@@ -76,6 +76,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {
@@ -92,6 +93,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {
@@ -108,6 +110,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {
@@ -128,6 +131,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {
@@ -151,6 +155,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {
@@ -172,6 +177,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {
@@ -185,13 +191,14 @@ describe("AddToTaskDropdown", () => {
   });
 
   describe("confirm panel", () => {
+    const fullTaskDS = createMockDataService({
+      getUserTasks: vi.fn().mockResolvedValue([
+        { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
+      ]),
+    });
+    const fullTaskWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={fullTaskDS}>{children}</DataServiceTestWrapper>;
+
     it("shows confirm panel when task with entries is clicked", async () => {
-      const { DataService } = await import("@/services/dataService");
-      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
-        getUserTasks: vi.fn().mockResolvedValue([
-          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
-        ]),
-      });
       const user = userEvent.setup();
       render(
         <AddToTaskDropdown
@@ -201,6 +208,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={2}
         />,
+        { wrapper: fullTaskWrapper },
       );
       await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
       await user.click(screen.getByText("Full Task"));
@@ -209,12 +217,6 @@ describe("AddToTaskDropdown", () => {
     });
 
     it("calls onSelectTask with append when Lisa juurde clicked", async () => {
-      const { DataService } = await import("@/services/dataService");
-      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
-        getUserTasks: vi.fn().mockResolvedValue([
-          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
-        ]),
-      });
       const user = userEvent.setup();
       render(
         <AddToTaskDropdown
@@ -224,6 +226,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={2}
         />,
+        { wrapper: fullTaskWrapper },
       );
       await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
       await user.click(screen.getByText("Full Task"));
@@ -233,12 +236,6 @@ describe("AddToTaskDropdown", () => {
     });
 
     it("calls onSelectTask with replace when Asenda clicked", async () => {
-      const { DataService } = await import("@/services/dataService");
-      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
-        getUserTasks: vi.fn().mockResolvedValue([
-          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
-        ]),
-      });
       const user = userEvent.setup();
       render(
         <AddToTaskDropdown
@@ -248,6 +245,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={2}
         />,
+        { wrapper: fullTaskWrapper },
       );
       await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
       await user.click(screen.getByText("Full Task"));
@@ -257,12 +255,6 @@ describe("AddToTaskDropdown", () => {
     });
 
     it("goes back from confirm panel when Tagasi clicked", async () => {
-      const { DataService } = await import("@/services/dataService");
-      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
-        getUserTasks: vi.fn().mockResolvedValue([
-          { id: "task-3", name: "Full Task", description: "", entryCount: 5 },
-        ]),
-      });
       const user = userEvent.setup();
       render(
         <AddToTaskDropdown
@@ -272,6 +264,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={2}
         />,
+        { wrapper: fullTaskWrapper },
       );
       await waitFor(() => expect(screen.getByText("Full Task")).toBeInTheDocument());
       await user.click(screen.getByText("Full Task"));
@@ -283,13 +276,6 @@ describe("AddToTaskDropdown", () => {
 
   describe("search functionality", () => {
     it("filters tasks based on search query", async () => {
-      const { DataService } = await import("@/services/dataService");
-      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
-        getUserTasks: vi.fn().mockResolvedValue([
-          { id: "task-1", name: "Task One", description: "", entryCount: 0 },
-          { id: "task-2", name: "Task Two", description: "", entryCount: 0 },
-        ]),
-      });
       const { fireEvent } = await import("@testing-library/react");
       render(
         <AddToTaskDropdown
@@ -299,6 +285,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(
@@ -323,13 +310,6 @@ describe("AddToTaskDropdown", () => {
     });
 
     it("shows empty message when no tasks match", async () => {
-      const { DataService } = await import("@/services/dataService");
-      (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue({
-        getUserTasks: vi.fn().mockResolvedValue([
-          { id: "task-1", name: "Task One", description: "", entryCount: 0 },
-          { id: "task-2", name: "Task Two", description: "", entryCount: 0 },
-        ]),
-      });
       const user = userEvent.setup();
       render(
         <AddToTaskDropdown
@@ -339,6 +319,7 @@ describe("AddToTaskDropdown", () => {
           onCreateNew={mockOnCreateNew}
           sentenceCount={3}
         />,
+        { wrapper: dsWrapper },
       );
 
       await waitFor(() => {

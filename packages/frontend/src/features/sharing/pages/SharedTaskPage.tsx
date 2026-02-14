@@ -3,12 +3,12 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { Task } from "@/types/task";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useSharedTaskAudio } from "@/features/sharing/hooks/useSharedTaskAudio";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { COPIED_ENTRIES_KEY } from "@/features/synthesis/hooks/synthesis/useSentenceState";
+import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
 import { logger } from "@hak/shared";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
@@ -20,6 +20,8 @@ export function SharedTaskPage() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const { showNotification } = useNotification();
+  const dataService = useDataService();
+  const { setCopiedEntries } = useCopiedEntries();
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +46,6 @@ export function SharedTaskPage() {
       }
 
       try {
-        const dataService = DataService.getInstance();
         const foundTask = await dataService.getTaskByShareToken(token);
 
         if (foundTask) {
@@ -79,7 +80,7 @@ export function SharedTaskPage() {
   const handleCopyToPlaylist = (): void => {
     if (!task?.entries) return;
 
-    sessionStorage.setItem(COPIED_ENTRIES_KEY, JSON.stringify(task.entries));
+    setCopiedEntries(task.entries);
     showNotification({ type: "success", message: "Laused kopeeritud!" });
     navigate("/synthesis");
   };

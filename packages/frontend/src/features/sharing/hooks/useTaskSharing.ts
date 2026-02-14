@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { logger } from "@hak/shared";
 
@@ -14,6 +14,7 @@ interface UseTaskSharingDeps {
 
 export function useTaskSharing(deps: UseTaskSharingDeps) {
   const { user } = useAuth();
+  const dataService = useDataService();
   const { setShowShareTaskModal, setTaskToShare, requireAuth } = deps;
 
   const handleShareTask = useCallback(
@@ -21,7 +22,6 @@ export function useTaskSharing(deps: UseTaskSharingDeps) {
       if (requireAuth()) return;
       if (!user) return;
       try {
-        const dataService = DataService.getInstance();
         await dataService.shareUserTask(user.id, task.id);
         const fullTask = await dataService.getTask(task.id, user.id);
         if (fullTask) {
@@ -36,21 +36,20 @@ export function useTaskSharing(deps: UseTaskSharingDeps) {
         logger.error("Failed to share task:", error);
       }
     },
-    [requireAuth, user],
+    [requireAuth, user, dataService],
   );
 
   const handleRevokeShare = useCallback(
     async (shareToken: string) => {
       if (!user) return;
       try {
-        const dataService = DataService.getInstance();
         await dataService.revokeShare(shareToken);
       } catch (error) {
         logger.error("Failed to revoke share:", error);
         throw error;
       }
     },
-    [user],
+    [user, dataService],
   );
 
   return { handleShareTask, handleRevokeShare };

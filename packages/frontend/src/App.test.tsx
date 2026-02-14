@@ -6,6 +6,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import Home from "./App";
+import { DataServiceTestWrapper } from "./test/dataServiceMock";
 import {
   mockAuthContext,
   mockNotificationContext,
@@ -18,6 +19,10 @@ import {
 } from "./test/mocks/appMocks";
 
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
+vi.mock("./contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
+  CopiedEntriesProvider: ({ children }: { children: unknown }) => children,
+}));
 vi.mock("./contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => mockNotificationContext()),
 }));
@@ -81,11 +86,9 @@ vi.mock("./features/onboarding/components", () => ({
     <div data-testid="onboarding-wizard">OnboardingWizard</div>
   ),
 }));
-vi.mock("./services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({ addTextEntriesToTask: vi.fn() })),
-  },
-}));
+function AppWrapper({ children }: { children: React.ReactNode }) {
+  return <DataServiceTestWrapper>{children}</DataServiceTestWrapper>;
+}
 
 describe("App (Home)", () => {
   beforeEach(() => {
@@ -98,6 +101,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByAltText("EKI Logo")).toBeInTheDocument();
     });
@@ -107,6 +111,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByText("Tekst kõneks")).toBeInTheDocument();
       expect(screen.getByText("Ülesanded")).toBeInTheDocument();
@@ -117,6 +122,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(await screen.findByText("Muuda tekst kõneks")).toBeInTheDocument();
     });
@@ -126,6 +132,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByTestId("footer")).toBeInTheDocument();
     });
@@ -135,6 +142,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByTitle("Näita juhendeid")).toBeInTheDocument();
     });
@@ -144,6 +152,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByText("Logi sisse")).toBeInTheDocument();
     });
@@ -174,6 +183,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(container.querySelector(".page-loading-state")).toBeInTheDocument();
     });
@@ -204,6 +214,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByTestId("role-selection")).toBeInTheDocument();
     });
@@ -231,6 +242,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByTestId("user-profile")).toBeInTheDocument();
     });
@@ -242,6 +254,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       const synthesisLink = screen.getByText("Tekst kõneks");
       expect(synthesisLink).toBeInTheDocument();
@@ -270,6 +283,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
 
       await user.click(screen.getByText("Ülesanded"));
@@ -305,6 +319,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(await screen.findByTestId("sentence-item-1")).toBeInTheDocument();
     });
@@ -314,6 +329,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(await screen.findByText("Lisa lause")).toBeInTheDocument();
     });
@@ -323,6 +339,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(await screen.findByText("Muuda tekst kõneks")).toBeInTheDocument();
     });
@@ -353,6 +370,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByTitle("Näita juhendeid")).toBeInTheDocument();
     });
@@ -383,6 +401,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
       expect(screen.getByTestId("onboarding-wizard")).toBeInTheDocument();
     });
@@ -412,6 +431,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
 
       await user.click(screen.getByText("Logi sisse"));
@@ -461,6 +481,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
 
       await user.click(screen.getByText("Ülesanded"));
@@ -534,6 +555,7 @@ describe("App (Home)", () => {
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
+        { wrapper: AppWrapper },
       );
 
       await user.click(await screen.findByText("Lisa lause"));

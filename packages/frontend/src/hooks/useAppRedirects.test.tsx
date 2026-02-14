@@ -31,9 +31,19 @@ vi.mock("@/features/onboarding/contexts/OnboardingContext", () => ({
   }),
 }));
 
-vi.mock("@/features/synthesis/hooks/synthesis/useSentenceState", () => ({
-  COPIED_ENTRIES_KEY: "test_copied_entries",
-}));
+let mockHasCopiedEntries = false;
+vi.mock("@/contexts/CopiedEntriesContext", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/contexts/CopiedEntriesContext")>();
+  return {
+    ...actual,
+    useCopiedEntries: () => ({
+      copiedEntries: null,
+      setCopiedEntries: vi.fn(),
+      consumeCopiedEntries: vi.fn().mockReturnValue(null),
+      hasCopiedEntries: mockHasCopiedEntries,
+    }),
+  };
+});
 
 function wrapper({ children }: { children: ReactNode }) {
   return <MemoryRouter>{children}</MemoryRouter>;
@@ -45,7 +55,7 @@ describe("useAppRedirects", () => {
     mockIsAuthenticated = false;
     mockOnboardingState = { completed: true, selectedRole: "teacher" };
     mockIsOnboardingLoading = false;
-    sessionStorage.clear();
+    mockHasCopiedEntries = false;
   });
 
   describe("handleTasksClick", () => {
@@ -116,8 +126,8 @@ describe("useAppRedirects", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it("does not redirect when sessionStorage has copied entries", () => {
-      sessionStorage.setItem("test_copied_entries", "true");
+    it("does not redirect when context has copied entries", () => {
+      mockHasCopiedEntries = true;
       mockOnboardingState = { completed: false, selectedRole: null };
       renderHook(() => useAppRedirects("synthesis"), { wrapper });
 

@@ -5,7 +5,7 @@ import TaskManager from "./TaskManager";
 import TaskDetailView from "./TaskDetailView";
 import { AddIcon } from "@/components/ui/Icons";
 import { PageLoadingState } from "@/components/ui/PageLoadingState";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { useUserTasks } from "@/hooks";
 import { logger } from "@hak/shared";
@@ -41,12 +41,12 @@ export default function TasksView({
   onNavigateToSynthesis,
 }: TasksViewProps) {
   const { user } = useAuth();
+  const dataService = useDataService();
   const { tasks, isLoading, error, isEmpty } = useUserTasks(taskRefreshTrigger);
 
   const handleEditTask = async (taskId: string) => {
     if (!user) return;
     try {
-      const dataService = DataService.getInstance();
       const task = await dataService.getTask(taskId, user.id);
       if (task) {
         const taskData: Task = { id: task.id, name: task.name };
@@ -61,7 +61,6 @@ export default function TasksView({
   const handleShareTask = async (taskId: string) => {
     if (!user) return;
     try {
-      const dataService = DataService.getInstance();
       const task = await dataService.getTask(taskId, user.id);
       if (task) {
         const taskData: Task = { id: task.id, name: task.name };

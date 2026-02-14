@@ -16,8 +16,7 @@ describe("DataService Error Handling and Edge Cases", () => {
     vi.clearAllMocks();
     resetSimpleStoreMock();
     setupSimpleStoreMock();
-    (DataService as unknown as { instance: null }).instance = null;
-    dataService = DataService.getInstance();
+    dataService = new DataService();
   });
 
   describe("SimpleStore error handling", () => {

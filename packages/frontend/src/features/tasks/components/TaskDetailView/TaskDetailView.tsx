@@ -6,9 +6,10 @@ import { Task, TaskEntry } from "@/types/task";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { convertTextToTags } from "@/types/synthesis";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
+import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
 import { logger } from "@hak/shared";
 import SentenceSynthesisItem from "@/features/synthesis/components/SentenceSynthesisItem";
 import ShareTaskModal from "@/features/sharing/components/ShareTaskModal";
@@ -45,6 +46,8 @@ export default function TaskDetailView({
 }: TaskDetailViewProps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
+  const dataService = useDataService();
+  const { setCopiedEntries } = useCopiedEntries();
   const [task, setTask] = useState<Task | null>(initialTask || null);
   const [entries, setEntries] = useState<TaskEntry[]>(
     initialTask?.entries || [],
@@ -92,10 +95,10 @@ export default function TaskDetailView({
   const handleCopyToSynthesis = useCallback(() => {
     if (!entries || entries.length === 0) return;
 
-    sessionStorage.setItem("copiedEntries", JSON.stringify(entries));
+    setCopiedEntries(entries);
     showNotification({ type: "success", message: "Laused kopeeritud!" });
     onNavigateToSynthesis();
-  }, [entries, showNotification, onNavigateToSynthesis]);
+  }, [entries, setCopiedEntries, showNotification, onNavigateToSynthesis]);
 
   // Load task data (skip if initialTask provided)
   useEffect(() => {
@@ -106,7 +109,7 @@ export default function TaskDetailView({
     }
 
     setIsLoading(true);
-    DataService.getInstance()
+    dataService
       .getTask(taskId, user.id)
       .then((taskData) => {
         if (taskData) {
@@ -122,7 +125,7 @@ export default function TaskDetailView({
         ),
       )
       .finally(() => setIsLoading(false));
-  }, [taskId, user, initialTask]);
+  }, [taskId, user, initialTask, dataService]);
 
   const handleCopyText = async (id: string) => {
     const entry = entries.find((e) => e.id === id);
@@ -142,7 +145,7 @@ export default function TaskDetailView({
 
     // Persist to backend
     try {
-      await DataService.getInstance().updateTask(user.id, taskId, {
+      await dataService.updateTask(user.id, taskId, {
         entries: updatedEntries,
       });
       if (entryToDelete) {

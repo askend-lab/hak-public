@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../features/auth/services/context";
-import { DataService } from "../services/dataService";
+import { useDataService } from "../contexts/DataServiceContext";
 
 interface ActivityMetric {
   label: string;
@@ -89,9 +89,9 @@ function useDashboardData() {
   const [metrics, setMetrics] = useState<ActivityMetric[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const dataService = useDataService();
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    const dataService = DataService.getInstance();
     let taskCount = 0,
       entryCount = 0;
     if (isAuthenticated && user) {
@@ -105,7 +105,7 @@ function useDashboardData() {
     ]);
     setRecentActivity([]);
     setIsLoading(false);
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, dataService]);
   useEffect(() => {
     loadData();
   }, [loadData]);

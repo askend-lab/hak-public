@@ -26,6 +26,8 @@ const mockContext = {
 
 vi.mock("@/features/synthesis/contexts/SynthesisPageContext", () => ({
   useSynthesisPage: () => mockContext,
+  useSynthesisCore: () => mockContext,
+  useSynthesisInteraction: () => mockContext,
 }));
 
 vi.mock("@/features/synthesis/components/PronunciationVariants", () => ({

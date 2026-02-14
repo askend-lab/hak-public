@@ -6,7 +6,7 @@ import SentenceMenu from "./SentenceMenu";
 import SentenceSynthesisItem from "./SentenceSynthesisItem";
 import { SentenceState } from "@/types/synthesis";
 import { SYNTHESIS_STRINGS } from "@/config/ui-strings";
-import { useSynthesisPage } from "@/features/synthesis/contexts/SynthesisPageContext";
+import { useSynthesisPage, useSynthesisCore } from "@/features/synthesis/contexts/SynthesisPageContext";
 
 interface TagMenuItem {
   label: string;
@@ -128,7 +128,7 @@ function SentenceItem({ sentence, sentenceIndex }: SentenceItemProps) {
 }
 
 export default function SynthesisView() {
-  const { synthesis, taskHandlers } = useSynthesisPage();
+  const { synthesis, taskHandlers } = useSynthesisCore();
 
   return (
     <>
