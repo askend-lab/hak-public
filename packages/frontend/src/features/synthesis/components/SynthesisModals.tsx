@@ -3,7 +3,7 @@
 
 import PronunciationVariants from "./PronunciationVariants";
 import SentencePhoneticPanel from "./SentencePhoneticPanel";
-import { useSynthesisPage } from "@/features/synthesis/contexts/SynthesisPageContext";
+import { useSynthesisCore, useSynthesisInteraction } from "@/features/synthesis/contexts/SynthesisPageContext";
 import { MODAL_STRINGS } from "@/config/ui-strings";
 import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 
@@ -14,7 +14,8 @@ interface SynthesisModalsProps {
 export default function SynthesisModals({
   showNotification,
 }: SynthesisModalsProps) {
-  const { synthesis, variants, handleUseVariant } = useSynthesisPage();
+  const { synthesis } = useSynthesisCore();
+  const { variants, handleUseVariant } = useSynthesisInteraction();
 
   return (
     <>

@@ -3,12 +3,24 @@
 
 import { describe, it, expect } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { useSynthesisPage } from "./SynthesisPageContext";
+import { useSynthesisCore, useSynthesisInteraction, useSynthesisPage } from "./SynthesisPageContext";
 
 describe("SynthesisPageContext", () => {
-  it("throws when used outside provider", () => {
+  it("useSynthesisCore throws when used outside provider", () => {
+    expect(() => renderHook(() => useSynthesisCore())).toThrow(
+      "useSynthesisCore must be used within SynthesisPageProvider",
+    );
+  });
+
+  it("useSynthesisInteraction throws when used outside provider", () => {
+    expect(() => renderHook(() => useSynthesisInteraction())).toThrow(
+      "useSynthesisInteraction must be used within SynthesisPageProvider",
+    );
+  });
+
+  it("useSynthesisPage throws when used outside provider", () => {
     expect(() => renderHook(() => useSynthesisPage())).toThrow(
-      "useSynthesisPage must be used within SynthesisPageProvider",
+      "useSynthesisCore must be used within SynthesisPageProvider",
     );
   });
 });
