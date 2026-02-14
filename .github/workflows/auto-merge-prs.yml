@@ -44,6 +44,6 @@ jobs:
               
               console.log(`✅ Auto-merge enabled for PR #${prNumber}`);
             } catch (error) {
-              console.error(`❌ Failed to enable auto-merge: ${error.message}`);
-              throw error;
+              console.log(`⚠️ Auto-merge skipped for PR #${prNumber}: ${error.message}`);
+              console.log('This is expected when branch protection or permissions prevent auto-merge.');
             }
