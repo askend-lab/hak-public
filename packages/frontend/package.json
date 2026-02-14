@@ -18,9 +18,6 @@
     "prebuild": "node scripts/sync-features.js",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "lint:fix": "eslint . --ext .ts,.tsx --fix --max-warnings=0",
-    "validate:design": "node scripts/validate-design.js",
-    "validate:design:json": "node scripts/validate-design.js --json",
-    "validate:design:suggestions": "node scripts/validate-design.js --fix-suggestions",
     "test:a11y": "playwright test e2e/accessibility.spec.ts",
     "test:a11y:report": "playwright test e2e/accessibility.spec.ts --reporter=html"
   },
