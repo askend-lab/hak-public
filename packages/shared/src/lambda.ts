@@ -3,7 +3,7 @@
 
 /**
  * Shared Lambda response utilities.
- * Eliminates duplication across merlin-api, audio-api, vabamorf-api, simplestore.
+ * Shared utilities used by merlin-api, vabamorf-api, simplestore.
  */
 
 export interface LambdaResponse {

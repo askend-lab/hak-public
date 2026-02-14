@@ -62,29 +62,6 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
   tags = local.common_tags
 }
 
-# Audio API 5XX Errors
-resource "aws_cloudwatch_metric_alarm" "audio_api_5xx_errors" {
-  alarm_name          = "hak-${var.env}-audio-api-5xx-errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "5XXError"
-  namespace           = "AWS/ApiGateway"
-  period              = 60
-  statistic           = "Sum"
-  threshold           = 0
-  alarm_description   = "CRITICAL: Audio API 5XX errors detected"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
-  treat_missing_data  = "notBreaching"
-  
-  dimensions = {
-    ApiName = "${var.env}-audio-api"
-    Stage   = var.env
-  }
-  
-  tags = local.common_tags
-}
-
 # Lambda Errors
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   alarm_name          = "hak-${var.env}-lambda-errors"
@@ -101,27 +78,6 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   
   dimensions = {
     FunctionName = "simplestore-${var.env}-api"
-  }
-  
-  tags = local.common_tags
-}
-
-# Audio Lambda Errors
-resource "aws_cloudwatch_metric_alarm" "audio_lambda_errors" {
-  alarm_name          = "hak-${var.env}-audio-lambda-errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 2
-  metric_name         = "Errors"
-  namespace           = "AWS/Lambda"
-  period              = 300
-  statistic           = "Sum"
-  threshold           = 3
-  alarm_description   = "Audio synthesis Lambda errors exceeded threshold"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
-  
-  dimensions = {
-    FunctionName = "hak-audio-${var.env}-synthesize"
   }
   
   tags = local.common_tags

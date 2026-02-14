@@ -2,8 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 /**
- * Shared environment utilities.
- * Eliminates duplication across audio-api, merlin-api.
+ * Shared environment utilities used by merlin-api.
  */
 
 export function getAwsRegion(): string {
