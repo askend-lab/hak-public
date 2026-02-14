@@ -18,7 +18,6 @@ export interface AuthState {
 export interface AuthTokens {
   accessToken: string;
   idToken: string;
-  refreshToken: string;
   expiresAt: number;
 }
 
@@ -31,7 +30,6 @@ export interface TokenPayload {
 export interface TaraTokens {
   accessToken: string;
   idToken: string;
-  refreshToken: string;
 }
 
 export interface AuthContextValue extends AuthState {

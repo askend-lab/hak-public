@@ -36,7 +36,7 @@ describe("isTokenExpired with 2-part valid-payload token", () => {
 
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(twoPartToken);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
+    global.fetch = vi.fn().mockResolvedValueOnce({ ok: false, status: 401 });
 
     function Checker() {
       const { isAuthenticated } = useAuth();
@@ -62,8 +62,6 @@ describe("refreshSession with successful refresh", () => {
     const token = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) + 3600 });
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(token);
-    mockAuthStorage.getRefreshToken.mockReturnValue("valid-rt");
-
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ access_token: "new-at" }),
@@ -101,7 +99,6 @@ describe("parseIdToken and isTokenExpired catch blocks", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   it("parseIdToken catch: 3-part token with invalid base64 payload returns null", () => {
@@ -111,7 +108,7 @@ describe("parseIdToken and isTokenExpired catch blocks", () => {
     function Comp() {
       const { handleTaraTokens } = useAuth();
       return <button onClick={() => {
-        result = handleTaraTokens({ accessToken: "a", idToken: badToken, refreshToken: "r" });
+        result = handleTaraTokens({ accessToken: "a", idToken: badToken });
       }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);
@@ -124,7 +121,7 @@ describe("parseIdToken and isTokenExpired catch blocks", () => {
     const badToken = "header.!!!invalid!!!.signature";
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(badToken);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
+    global.fetch = vi.fn().mockResolvedValueOnce({ ok: false, status: 401 });
     function Checker() {
       const { isAuthenticated } = useAuth();
       return <span data-testid="a">{String(isAuthenticated)}</span>;
@@ -140,7 +137,6 @@ describe("parseIdToken exp boundary precision", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   it("token expiring in 1 second is still accepted (> not >=)", () => {
@@ -150,7 +146,7 @@ describe("parseIdToken exp boundary precision", () => {
     function Comp() {
       const { handleTaraTokens } = useAuth();
       return <button onClick={() => {
-        result = handleTaraTokens({ accessToken: "a", idToken, refreshToken: "r" });
+        result = handleTaraTokens({ accessToken: "a", idToken });
       }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);

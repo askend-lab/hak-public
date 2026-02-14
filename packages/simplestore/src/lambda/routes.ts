@@ -6,7 +6,7 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { CORS_HEADERS, HTTP_STATUS } from "@hak/shared";
+import { CORS_HEADERS, HTTP_STATUS, getCorsOrigin } from "@hak/shared";
 
 import {
   Store,
@@ -39,10 +39,9 @@ export function createResponse(
   statusCode: number,
   body: unknown,
 ): APIGatewayProxyResult {
-  const origin = process.env.ALLOWED_ORIGIN || CORS_HEADERS["Access-Control-Allow-Origin"];
   return {
     statusCode,
-    headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": origin ?? "*" },
+    headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": getCorsOrigin() },
     body: JSON.stringify(body),
   };
 }

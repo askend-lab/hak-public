@@ -31,6 +31,10 @@ custom:
     securityPolicy: tls_1_2
     apiType: rest
 
+  allowedOrigin:
+    dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
+    prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -42,6 +46,7 @@ provider:
     APP_NAME: ${self:service}
     TENANT: default
     ENVIRONMENT: ${self:provider.stage}
+    ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}}
 
   iam:
     role:

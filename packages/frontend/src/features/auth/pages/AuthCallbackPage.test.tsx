@@ -106,7 +106,7 @@ describe("AuthCallbackPage", () => {
   });
 
   it("redirects to home when TARA tokens succeed", async () => {
-    window.location.search = "?access_token=at&id_token=it&refresh_token=rt";
+    window.location.search = "?access_token=at&id_token=it";
     mockHandleTaraTokens.mockReturnValue(true);
 
     render(<AuthCallbackPage />);
@@ -115,14 +115,13 @@ describe("AuthCallbackPage", () => {
       expect(mockHandleTaraTokens).toHaveBeenCalledWith({
         accessToken: "at",
         idToken: "it",
-        refreshToken: "rt",
       });
       expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
     });
   });
 
   it("shows TARA error with exact message and back button", async () => {
-    window.location.search = "?access_token=at&id_token=it&refresh_token=rt";
+    window.location.search = "?access_token=at&id_token=it";
     mockHandleTaraTokens.mockReturnValue(false);
 
     render(<AuthCallbackPage />);

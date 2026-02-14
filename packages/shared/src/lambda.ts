@@ -13,8 +13,18 @@ export interface LambdaResponse {
 }
 
 /**
+ * Returns the allowed CORS origin from ALLOWED_ORIGIN env var.
+ * Falls back to "*" when not set (local dev / tests).
+ */
+export function getCorsOrigin(): string {
+  // eslint-disable-next-line no-restricted-globals -- Lambda-only: safe in Node.js runtime
+  return (typeof process !== "undefined" && process.env?.ALLOWED_ORIGIN) || "*";
+}
+
+/**
  * Shared CORS headers for all Lambda API responses.
  * Single source of truth — eliminates inconsistencies across packages.
+ * Note: uses getCorsOrigin() so the origin is read at call time, not import time.
  */
 export const CORS_HEADERS: Record<string, string> = {
   "Content-Type": "application/json",
@@ -59,7 +69,10 @@ export function createApiResponse(
   statusCode: number,
   body: unknown,
 ): LambdaResponse {
-  return createLambdaResponse(statusCode, body, { ...CORS_HEADERS });
+  return createLambdaResponse(statusCode, body, {
+    ...CORS_HEADERS,
+    "Access-Control-Allow-Origin": getCorsOrigin(),
+  });
 }
 
 /**

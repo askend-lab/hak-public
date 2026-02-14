@@ -10,7 +10,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 1. **TARA токены передаются через URL query parameters** (`AuthCallbackPage.tsx:24-26`).
   Токены в URL сохраняются в browser history, server logs, Referer headers — утечка credentials.
 
-- [ ] 2. **Refresh token хранится в localStorage** (`storage.ts:54-58`).
+- [x] 2. **Refresh token хранится в localStorage** (`storage.ts:54-58`).
   Любой XSS-вектор даёт злоумышленнику долгоживущий refresh token для перманентного доступа к аккаунту.
 
 - [x] 4. **Hardcoded Cognito credentials в исходниках** (`config.ts:49-51`).
@@ -153,7 +153,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 49. **`JSON.parse(event.body)` без try/catch** (`audio-api/handler.ts:49`).
   Невалидный JSON тело запроса вызовет unhandled exception — 500 вместо 400.
 
-- [ ] 50. **Merlin CORS ограничен двумя origins, а shared lambda.ts — wildcard** (`merlin-api/serverless.yml:13-16`).
+- [x] 50. **Merlin CORS ограничен двумя origins, а shared lambda.ts — wildcard** (`merlin-api/serverless.yml:13-16`).
   Непоследовательная CORS-политика: один API строгий, остальные — открытые.
 
 ## UI & UX

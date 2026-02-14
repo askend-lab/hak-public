@@ -50,6 +50,8 @@ provider:
     FRONTEND_URL_DEV: ${ssm:/hak/dev/frontend-url}
     FRONTEND_URL_PROD: ${ssm:/hak/prod/frontend-url}
     STAGE: ${self:provider.stage}
+    ALLOWED_ORIGIN: ${ssm:/hak/${self:provider.stage}/frontend-url}
+    COGNITO_DOMAIN: ${ssm:/hak/${self:provider.stage}/cognito-domain}
   
   vpc:
     securityGroupIds:
@@ -98,6 +100,30 @@ functions:
       - http:
           path: /tara/callback
           method: get
+          cors: true
+
+  tokenRefresh:
+    handler: src/handler.refreshHandler
+    events:
+      - http:
+          path: /tara/refresh
+          method: post
+          cors: true
+      - http:
+          path: /tara/refresh
+          method: options
+          cors: true
+
+  tokenExchange:
+    handler: src/handler.exchangeCodeHandler
+    events:
+      - http:
+          path: /tara/exchange-code
+          method: post
+          cors: true
+      - http:
+          path: /tara/exchange-code
+          method: options
           cors: true
 
   cognitoTriggers:

@@ -18,8 +18,7 @@ Legend:
 **Action:** No immediate fix. Consider implementing POST-based code exchange if TARA supports `response_mode=form_post` in the future.
 
 ### #2 — Refresh token в localStorage
-**🔧 FIX** — Valid concern. localStorage is accessible to any JS on the page. httpOnly cookie is more secure.
-**Action:** Move refresh token storage from localStorage to an httpOnly, Secure, SameSite=Strict cookie set by the auth backend. Requires backend change in tara-auth Lambda to set cookie on token exchange and read it on refresh.
+**✅ DONE** — Refresh token moved from localStorage to httpOnly cookie (`hak_refresh_token`; Secure; SameSite=Lax; Domain=parent). Backend `/tara/refresh` and `/tara/exchange-code` endpoints added. Frontend no longer touches the refresh token.
 
 ### #3 — JWT подпись не верифицируется на клиенте
 **❌ WONTFIX** — Client-side JWT verification is a defense-in-depth measure but not strictly required. The id_token comes directly from the TARA/Cognito server via HTTPS — MITM is not possible. The server-side (API Gateway + Cognito authorizer) verifies tokens properly. Client-side verification would require embedding JWKS public keys and add complexity without meaningful security gain.
@@ -214,8 +213,7 @@ Legend:
 **Action:** Wrap in try/catch, return 400 `{ error: "Invalid JSON body" }`. Single fix in `handler.ts`.
 
 ### #50 — Непоследовательная CORS-политика
-**🔧 FIX** — Combine with #8.
-**Action:** Standardize CORS across all APIs. Authenticated endpoints: specific origins. Public endpoints: can remain wildcard until auth is added.
+**✅ DONE** — All APIs now use `ALLOWED_ORIGIN` env var via shared `getCorsOrigin()`. No more wildcard in deployed environments.
 
 ---
 
@@ -457,7 +455,7 @@ Legend:
 - [x] #81 Sentry replay GDPR
 
 **P1 — Data integrity & compliance:**
-- [ ] #2 Refresh token storage
+- [x] #2 Refresh token storage
 - [x] #4 Hardcoded Cognito creds
 - [x] #6 JSON.parse validation
 - [x] #23 Optimistic locking

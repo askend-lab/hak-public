@@ -2,12 +2,27 @@ service: vabamorf-api
 
 frameworkVersion: "3"
 
+custom:
+  allowedOrigin:
+    dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
+    prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
+
 provider:
   name: aws
   runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
   httpApi:
+    cors:
+      allowedOrigins:
+        - ${self:custom.allowedOrigin.${self:provider.stage}}
+      allowedMethods:
+        - GET
+        - POST
+        - OPTIONS
+      allowedHeaders:
+        - Content-Type
+        - Authorization
     throttle:
       rateLimit: 20
       burstLimit: 50
@@ -17,6 +32,7 @@ provider:
     DICT_PATH: /var/task
     AWS_LWA_PORT: 8080
     PORT: 8080
+    ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}}
 
   ecr:
     images:

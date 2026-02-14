@@ -24,7 +24,6 @@ describe("handleCodeCallback and handleTaraTokens", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   it("should handle code callback with valid tokens", async () => {
@@ -34,7 +33,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
       btoa(JSON.stringify({ sub: "user-1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
       ".sig";
     (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      accessToken: "access-tok", idToken: validIdToken, refreshToken: "refresh-tok",
+      accessToken: "access-tok", idToken: validIdToken,
     });
 
     function CallbackComponent() {
@@ -87,7 +86,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
         <div>
           <div data-testid="auth">{isAuthenticated ? "yes" : "no"}</div>
           <div data-testid="email">{user?.email ?? "none"}</div>
-          <button onClick={() => handleTaraTokens({ accessToken: "a", idToken: validIdToken, refreshToken: "r" })}>Tara</button>
+          <button onClick={() => handleTaraTokens({ accessToken: "a", idToken: validIdToken })}>Tara</button>
         </div>
       );
     }
@@ -105,7 +104,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
       return (
         <div>
           <div data-testid="auth">{isAuthenticated ? "yes" : "no"}</div>
-          <button onClick={() => handleTaraTokens({ accessToken: "a", idToken: "invalid", refreshToken: "r" })}>Tara</button>
+          <button onClick={() => handleTaraTokens({ accessToken: "a", idToken: "invalid" })}>Tara</button>
         </div>
       );
     }
@@ -146,8 +145,6 @@ describe("handleCodeCallback and handleTaraTokens", () => {
       btoa(JSON.stringify({ sub: "1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
       ".sig";
     mockAuthStorage.getAccessToken.mockReturnValue(validToken);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
-
     function RefreshComponent() {
       const { refreshSession, isAuthenticated } = useAuth();
       return (
@@ -174,7 +171,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
       btoa(JSON.stringify({ sub: "u1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
       ".sig";
     (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      accessToken: "at-1", idToken: validIdToken, refreshToken: "rt-1",
+      accessToken: "at-1", idToken: validIdToken,
     });
 
     function CbComponent() {
@@ -187,7 +184,6 @@ describe("handleCodeCallback and handleTaraTokens", () => {
     await act(async () => screen.getByText("Go").click());
     expect(mockAuthStorage.setAccessToken).toHaveBeenCalledWith("at-1");
     expect(mockAuthStorage.setIdToken).toHaveBeenCalledWith(validIdToken);
-    expect(mockAuthStorage.setRefreshToken).toHaveBeenCalledWith("rt-1");
   });
 
   it("should store all tokens on handleTaraTokens", async () => {
@@ -199,7 +195,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
     function TComponent() {
       const { handleTaraTokens } = useAuth();
       return (
-        <button onClick={() => handleTaraTokens({ accessToken: "ta-1", idToken: validIdToken, refreshToken: "tr-1" })}>Go</button>
+        <button onClick={() => handleTaraTokens({ accessToken: "ta-1", idToken: validIdToken })}>Go</button>
       );
     }
 
@@ -208,6 +204,5 @@ describe("handleCodeCallback and handleTaraTokens", () => {
     act(() => screen.getByText("Go").click());
     expect(mockAuthStorage.setAccessToken).toHaveBeenCalledWith("ta-1");
     expect(mockAuthStorage.setIdToken).toHaveBeenCalledWith(validIdToken);
-    expect(mockAuthStorage.setRefreshToken).toHaveBeenCalledWith("tr-1");
   });
 });

@@ -59,43 +59,34 @@ describe('handler.ts cookie mutation kills', () => {
   };
 
   describe('redirectToFrontendWithCookies', () => {
-    it('should set access_token cookie with correct value and max-age', async () => {
+    it('should pass access_token and id_token as URL params', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
-      const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
-      const c = cookies.find(x => x.startsWith('access_token='));
-      expect(c).toContain('access_token=acc-tok');
-      expect(c).toContain('Max-Age=7200');
-      expect(c).toContain('SameSite=Strict');
+      const url = new URL(String(result.headers?.Location));
+      expect(url.searchParams.get('access_token')).toBe('acc-tok');
+      expect(url.searchParams.get('id_token')).toBe('id-tok');
+      expect(url.searchParams.get('refresh_token')).toBeNull();
     });
 
-    it('should set id_token cookie with correct value', async () => {
+    it('should set hak_refresh_token cookie with 30-day max-age', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
       const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
-      const c = cookies.find(x => x.startsWith('id_token='));
-      expect(c).toContain('id_token=id-tok');
-      expect(c).toContain('Max-Age=7200');
-    });
-
-    it('should set refresh_token cookie with 30-day max-age', async () => {
-      const event = setupSuccessFlow();
-      const result = await callbackHandler(event);
-      const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
-      const c = cookies.find(x => x.startsWith('refresh_token='));
-      expect(c).toContain('refresh_token=ref-tok');
+      const c = cookies.find(x => x.startsWith('hak_refresh_token='));
+      expect(c).toContain('ref-tok');
       expect(c).toContain('Max-Age=2592000');
+      expect(c).toContain('HttpOnly');
+      expect(c).toContain('Secure');
+      expect(c).toContain('SameSite=Lax');
     });
 
-    it('should set is_authenticated=true (not HttpOnly)', async () => {
+    it('should NOT set access_token/id_token/is_authenticated as cookies', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
       const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
-      const c = cookies.find(x => x.startsWith('is_authenticated='));
-      expect(c).toContain('is_authenticated=true');
-      expect(c).not.toContain('HttpOnly');
-      expect(c).toContain('Secure');
-      expect(c).toContain('SameSite=Strict');
+      expect(cookies.find(x => x.startsWith('access_token='))).toBeUndefined();
+      expect(cookies.find(x => x.startsWith('id_token='))).toBeUndefined();
+      expect(cookies.find(x => x.startsWith('is_authenticated='))).toBeUndefined();
     });
 
     it('should clear state cookie in success cookies', async () => {
@@ -106,11 +97,11 @@ describe('handler.ts cookie mutation kills', () => {
       expect(c).toContain('Max-Age=0');
     });
 
-    it('should have 5 cookies total', async () => {
+    it('should have 2 cookies total (refresh + clear state)', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
       const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
-      expect(cookies).toHaveLength(5);
+      expect(cookies).toHaveLength(2);
     });
 
     it('should set no-store cache control', async () => {
@@ -119,10 +110,12 @@ describe('handler.ts cookie mutation kills', () => {
       expect(result.headers?.['Cache-Control']).toBe('no-store');
     });
 
-    it('should redirect to /auth/callback', async () => {
+    it('should redirect to /auth/callback with token params', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
-      expect(result.headers?.Location).toBe('https://hak-dev.askend-lab.com/auth/callback');
+      const url = new URL(String(result.headers?.Location));
+      expect(url.pathname).toBe('/auth/callback');
+      expect(url.origin).toBe('https://hak-dev.askend-lab.com');
     });
   });
 

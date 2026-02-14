@@ -4,6 +4,7 @@
 import {
   CORS_HEADERS,
   HTTP_STATUS,
+  getCorsOrigin,
   createLambdaResponse,
   createApiResponse,
   createBadRequestResponse,
@@ -21,8 +22,33 @@ describe("lambda", () => {
     });
   });
 
+  describe("getCorsOrigin", () => {
+    const originalEnv = process.env.ALLOWED_ORIGIN;
+    afterEach(() => {
+      if (originalEnv === undefined) delete process.env.ALLOWED_ORIGIN;
+      else process.env.ALLOWED_ORIGIN = originalEnv;
+    });
+
+    it("should return * when ALLOWED_ORIGIN is not set", () => {
+      delete process.env.ALLOWED_ORIGIN;
+      expect(getCorsOrigin()).toBe("*");
+    });
+
+    it("should return ALLOWED_ORIGIN when set", () => {
+      process.env.ALLOWED_ORIGIN = "https://example.com";
+      expect(getCorsOrigin()).toBe("https://example.com");
+    });
+  });
+
   describe("createApiResponse", () => {
+    const originalEnv = process.env.ALLOWED_ORIGIN;
+    afterEach(() => {
+      if (originalEnv === undefined) delete process.env.ALLOWED_ORIGIN;
+      else process.env.ALLOWED_ORIGIN = originalEnv;
+    });
+
     it("should create a response with CORS headers", () => {
+      delete process.env.ALLOWED_ORIGIN;
       const result = createApiResponse(200, { data: "test" });
       expect(result.statusCode).toBe(200);
       expect(result.headers["Access-Control-Allow-Origin"]).toBe("*");
@@ -30,7 +56,14 @@ describe("lambda", () => {
       expect(JSON.parse(result.body)).toStrictEqual({ data: "test" });
     });
 
+    it("should use ALLOWED_ORIGIN env var for origin header", () => {
+      process.env.ALLOWED_ORIGIN = "https://myapp.example.com";
+      const result = createApiResponse(200, {});
+      expect(result.headers["Access-Control-Allow-Origin"]).toBe("https://myapp.example.com");
+    });
+
     it("should include all CORS headers", () => {
+      delete process.env.ALLOWED_ORIGIN;
       const result = createApiResponse(201, {});
       for (const [key, value] of Object.entries(CORS_HEADERS)) {
         expect(result.headers[key]).toBe(value);
