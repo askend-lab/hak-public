@@ -25,8 +25,8 @@ resource "aws_cloudfront_origin_access_control" "website" {
 }
 
 # CloudFront distribution
-#tfsec:ignore:AVD-AWS-0011 WAF not required for educational platform; cost consideration for OSS project
 resource "aws_cloudfront_distribution" "website" {
+  web_acl_id          = aws_wafv2_web_acl.cloudfront.arn
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
@@ -87,7 +87,7 @@ resource "aws_cloudfront_distribution" "website" {
         query_string = ordered_cache_behavior.value.query_string
         headers = ordered_cache_behavior.value.auth ? [
           "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization"
-        ] : [
+          ] : [
           "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"
         ]
         cookies {
