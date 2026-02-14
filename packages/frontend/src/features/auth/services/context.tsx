@@ -15,10 +15,8 @@ import {
   getLoginUrl,
   getLogoutUrl,
   getTaraLoginUrl,
-  cognitoConfig,
   exchangeCodeForTokens,
-  CONTENT_TYPE_FORM,
-  OAUTH2_TOKEN_PATH,
+  AUTH_API_URL,
 } from "./config";
 import type { AuthContextValue, AuthState } from "./types";
 import { parseIdToken, isTokenExpired } from "./token";
@@ -37,20 +35,13 @@ interface AuthProviderProps {
 }
 
 export async function refreshTokens(): Promise<boolean> {
-  const refreshToken = AuthStorage.getRefreshToken();
-  if (!refreshToken) return false;
-
   try {
+    // Refresh token is in httpOnly cookie — backend reads it automatically
     const response = await fetch(
-      `https://${cognitoConfig.domain}${OAUTH2_TOKEN_PATH}`,
+      `${AUTH_API_URL}/tara/refresh`,
       {
         method: "POST",
-        headers: { "Content-Type": CONTENT_TYPE_FORM },
-        body: new URLSearchParams({
-          grant_type: "refresh_token",
-          client_id: cognitoConfig.clientId,
-          refresh_token: refreshToken,
-        }),
+        credentials: "include",
       },
     );
 
@@ -70,7 +61,7 @@ export async function refreshTokens(): Promise<boolean> {
 }
 
 function storeTokensAndSetAuth(
-  tokens: { accessToken: string; idToken: string; refreshToken: string },
+  tokens: { accessToken: string; idToken: string },
   setState: React.Dispatch<React.SetStateAction<AuthState>>,
 ): boolean {
   const user = parseIdToken(tokens.idToken);
@@ -78,7 +69,6 @@ function storeTokensAndSetAuth(
     AuthStorage.setUser(user);
     AuthStorage.setAccessToken(tokens.accessToken);
     AuthStorage.setIdToken(tokens.idToken);
-    AuthStorage.setRefreshToken(tokens.refreshToken);
     setState({
       user,
       isAuthenticated: true,
@@ -98,7 +88,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async function initAuth() {
       const storedUser = AuthStorage.getUser();
       const accessToken = AuthStorage.getAccessToken();
-      const hasRefreshToken = AuthStorage.getRefreshToken() !== null;
 
       if (storedUser && accessToken) {
         // Same session — tokens are in memory, check expiry
@@ -116,9 +105,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           AuthStorage.clear();
           setState({ ...initialState, isLoading: false });
         }
-      } else if (storedUser && hasRefreshToken) {
+      } else if (storedUser) {
         // Page refresh — access/id tokens are gone (in-memory only),
-        // but we have a refresh token to re-obtain them
+        // refresh token is in httpOnly cookie — try to re-obtain tokens
         const refreshed = await refreshTokens();
 
         if (refreshed) {
@@ -184,7 +173,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     (tokens: {
       accessToken: string;
       idToken: string;
-      refreshToken: string;
     }): boolean => {
       return storeTokensAndSetAuth(tokens, setState);
     },

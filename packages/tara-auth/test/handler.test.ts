@@ -3,6 +3,7 @@ import {
   callbackHandler,
   startHandler,
   STATE_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
   STATE_TTL_MS,
   REFRESH_TOKEN_MAX_AGE_S,
   AUTH_CALLBACK_PATH,
@@ -83,69 +84,43 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
     process.env.FRONTEND_URL_DEV = 'https://hak-dev.askend-lab.com';
   });
 
-  it('should return tokens in HttpOnly cookies, not in URL', async () => {
+  it('should pass access_token and id_token as URL params', async () => {
     const event = createEvent();
     const result = await callbackHandler(event);
 
-    // Should redirect to frontend
     expect(result.statusCode).toBe(302);
     expect(result.headers?.Location).toBeDefined();
 
-    // Tokens should NOT be in URL params
     const locationUrl = new URL(String(result.headers?.Location ?? ''));
-    expect(locationUrl.searchParams.get('access_token')).toBeNull();
-    expect(locationUrl.searchParams.get('id_token')).toBeNull();
+    expect(locationUrl.searchParams.get('access_token')).toBe('cognito-access-token');
+    expect(locationUrl.searchParams.get('id_token')).toBe('cognito-id-token');
+    // refresh_token should NOT be in URL
     expect(locationUrl.searchParams.get('refresh_token')).toBeNull();
   });
 
-  it('should set access_token as HttpOnly Secure cookie', async () => {
+  it('should set refresh_token as HttpOnly Secure cookie with domain', async () => {
     const event = createEvent();
     const result = await callbackHandler(event);
 
     const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
-    const accessTokenCookie = cookies.find(c => c.startsWith('access_token='));
+    const refreshCookie = cookies.find(c => c.startsWith(`${REFRESH_COOKIE_NAME}=`));
 
-    expect(accessTokenCookie).toBeDefined();
-    expect(accessTokenCookie).toContain('HttpOnly');
-    expect(accessTokenCookie).toContain('Secure');
-    expect(accessTokenCookie).toContain('SameSite=Strict');
+    expect(refreshCookie).toBeDefined();
+    expect(refreshCookie).toContain('cognito-refresh-token');
+    expect(refreshCookie).toContain('HttpOnly');
+    expect(refreshCookie).toContain('Secure');
+    expect(refreshCookie).toContain('SameSite=Lax');
+    expect(refreshCookie).toContain('Domain=');
   });
 
-  it('should set id_token as HttpOnly Secure cookie', async () => {
+  it('should NOT set access_token or id_token as cookies', async () => {
     const event = createEvent();
     const result = await callbackHandler(event);
 
     const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
-    const idTokenCookie = cookies.find(c => c.startsWith('id_token='));
-
-    expect(idTokenCookie).toBeDefined();
-    expect(idTokenCookie).toContain('HttpOnly');
-    expect(idTokenCookie).toContain('Secure');
-  });
-
-  it('should set refresh_token as HttpOnly Secure cookie', async () => {
-    const event = createEvent();
-    const result = await callbackHandler(event);
-
-    const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
-    const refreshTokenCookie = cookies.find(c => c.startsWith('refresh_token='));
-
-    expect(refreshTokenCookie).toBeDefined();
-    expect(refreshTokenCookie).toContain('HttpOnly');
-    expect(refreshTokenCookie).toContain('Secure');
-  });
-
-  it('should set is_authenticated cookie (not HttpOnly) for frontend', async () => {
-    const event = createEvent();
-    const result = await callbackHandler(event);
-
-    const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
-    const authCookie = cookies.find(c => c.startsWith('is_authenticated='));
-
-    expect(authCookie).toBeDefined();
-    expect(authCookie).toContain('is_authenticated=true');
-    // This cookie should NOT be HttpOnly so JS can read it
-    expect(authCookie).not.toContain('HttpOnly');
+    expect(cookies.find(c => c.startsWith('access_token='))).toBeUndefined();
+    expect(cookies.find(c => c.startsWith('id_token='))).toBeUndefined();
+    expect(cookies.find(c => c.startsWith('is_authenticated='))).toBeUndefined();
   });
 
   it('should redirect with error when TARA returns error param', async () => {
@@ -237,9 +212,14 @@ describe('handler constants', () => {
     expect(DEFAULT_FRONTEND_URL_DEV).toContain('hak-dev');
   });
 
-  it('TOKEN_COOKIE_OPTIONS should contain HttpOnly and Secure', () => {
+  it('TOKEN_COOKIE_OPTIONS should contain HttpOnly, Secure, and SameSite=Lax', () => {
     expect(TOKEN_COOKIE_OPTIONS).toContain('HttpOnly');
     expect(TOKEN_COOKIE_OPTIONS).toContain('Secure');
+    expect(TOKEN_COOKIE_OPTIONS).toContain('SameSite=Lax');
+  });
+
+  it('REFRESH_COOKIE_NAME should be hak_refresh_token', () => {
+    expect(REFRESH_COOKIE_NAME).toBe('hak_refresh_token');
   });
 
   it('RANDOM_STRING_LENGTH should be 32', () => {

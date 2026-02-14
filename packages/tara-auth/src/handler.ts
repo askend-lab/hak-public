@@ -1,17 +1,18 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse } from '@hak/shared';
+import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse, getCorsOrigin } from '@hak/shared';
 import { createTaraClient } from './tara-client';
 import { createCognitoClient } from './cognito-client';
 import { AuthState } from './types';
 import * as crypto from 'crypto';
 
 export const STATE_COOKIE_NAME = 'tara_auth_state';
+export const REFRESH_COOKIE_NAME = 'hak_refresh_token';
 export const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 export const REFRESH_TOKEN_MAX_AGE_S = 30 * 24 * 60 * 60; // 30 days
 export const AUTH_CALLBACK_PATH = '/auth/callback';
 export const DEFAULT_FRONTEND_URL_PROD = 'https://hak.askend-lab.com';
 export const DEFAULT_FRONTEND_URL_DEV = 'https://hak-dev.askend-lab.com';
-export const TOKEN_COOKIE_OPTIONS = 'HttpOnly; Secure; SameSite=Strict; Path=/';
+export const TOKEN_COOKIE_OPTIONS = 'HttpOnly; Secure; SameSite=Lax; Path=/';
 export const RANDOM_STRING_LENGTH = 32;
 
 export function getFrontendUrl(): string {
@@ -23,6 +24,39 @@ export function getFrontendUrl(): string {
 
 export function generateRandomString(length: number): string {
   return crypto.randomBytes(length).toString('base64url').substring(0, length);
+}
+
+export function getCookieDomain(): string {
+  const url = new URL(getFrontendUrl());
+  const parts = url.hostname.split('.');
+  return parts.length >= 2 ? '.' + parts.slice(-2).join('.') : url.hostname;
+}
+
+export function createRefreshCookie(refreshToken: string): string {
+  const domain = getCookieDomain();
+  return `${REFRESH_COOKIE_NAME}=${refreshToken}; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${REFRESH_TOKEN_MAX_AGE_S}`;
+}
+
+export function clearRefreshCookie(): string {
+  const domain = getCookieDomain();
+  return `${REFRESH_COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=0`;
+}
+
+export function parseRefreshCookie(cookieHeader: string | undefined): string | null {
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(';').map(c => c.trim());
+  const found = cookies.find(c => c.startsWith(`${REFRESH_COOKIE_NAME}=`));
+  if (!found) return null;
+  const value = found.substring(REFRESH_COOKIE_NAME.length + 1);
+  return value || null;
+}
+
+function corsResponseHeaders(): Record<string, string> {
+  return {
+    ...CORS_HEADERS,
+    'Access-Control-Allow-Origin': getCorsOrigin(),
+    'Access-Control-Allow-Credentials': 'true',
+  };
 }
 
 export function createStateCookie(state: AuthState): string {
@@ -179,18 +213,13 @@ function redirectToFrontendWithCookies(
   tokens: { accessToken: string; idToken: string; refreshToken: string; expiresIn: number }
 ): APIGatewayProxyResult {
   const url = new URL(AUTH_CALLBACK_PATH, baseUrl);
-  
-  // Token cookies - HttpOnly, Secure, SameSite=Strict
-  const cookieOptions = TOKEN_COOKIE_OPTIONS;
-  const maxAge = tokens.expiresIn;
-  const refreshMaxAge = REFRESH_TOKEN_MAX_AGE_S;
+  // Short-lived tokens go as URL params — frontend stores them in memory only
+  url.searchParams.set('access_token', tokens.accessToken);
+  url.searchParams.set('id_token', tokens.idToken);
 
+  // Refresh token goes ONLY in httpOnly cookie — never touches JS
   const cookies = [
-    `access_token=${tokens.accessToken}; ${cookieOptions}; Max-Age=${maxAge}`,
-    `id_token=${tokens.idToken}; ${cookieOptions}; Max-Age=${maxAge}`,
-    `refresh_token=${tokens.refreshToken}; ${cookieOptions}; Max-Age=${refreshMaxAge}`,
-    // is_authenticated is NOT HttpOnly so frontend JS can check auth state
-    `is_authenticated=true; Secure; SameSite=Strict; Path=/; Max-Age=${maxAge}`,
+    createRefreshCookie(tokens.refreshToken),
     clearStateCookie(),
   ];
 
@@ -205,4 +234,106 @@ function redirectToFrontendWithCookies(
     },
     body: '',
   };
+}
+
+export async function refreshHandler(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: corsResponseHeaders(), body: '' };
+  }
+
+  try {
+    const refreshToken = parseRefreshCookie(event.headers.Cookie || event.headers.cookie);
+    if (!refreshToken) {
+      return createLambdaResponse(HTTP_STATUS.UNAUTHORIZED, { error: 'No refresh token' }, corsResponseHeaders());
+    }
+
+    const cognitoDomain = process.env.COGNITO_DOMAIN;
+    const clientId = process.env.COGNITO_CLIENT_ID;
+    if (!cognitoDomain || !clientId) {
+      throw new Error('COGNITO_DOMAIN and COGNITO_CLIENT_ID must be set');
+    }
+
+    const response = await fetch(`https://${cognitoDomain}/oauth2/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ grant_type: 'refresh_token', client_id: clientId, refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) {
+      return {
+        statusCode: 401,
+        headers: corsResponseHeaders(),
+        multiValueHeaders: { 'Set-Cookie': [clearRefreshCookie()] },
+        body: JSON.stringify({ error: 'Token refresh failed' }),
+      };
+    }
+
+    const data = await response.json() as Record<string, unknown>;
+    return {
+      statusCode: 200,
+      headers: corsResponseHeaders(),
+      body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token }),
+    };
+  } catch (error) {
+    console.error('Refresh error:', error);
+    return {
+      statusCode: 401,
+      headers: corsResponseHeaders(),
+      multiValueHeaders: { 'Set-Cookie': [clearRefreshCookie()] },
+      body: JSON.stringify({ error: 'Token refresh failed' }),
+    };
+  }
+}
+
+export async function exchangeCodeHandler(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: corsResponseHeaders(), body: '' };
+  }
+
+  try {
+    if (!event.body) {
+      return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Missing request body' }, corsResponseHeaders());
+    }
+
+    let parsed: Record<string, string>;
+    try { parsed = JSON.parse(event.body) as Record<string, string>; }
+    catch { return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Invalid JSON' }, corsResponseHeaders()); }
+
+    const { code, code_verifier, redirect_uri } = parsed;
+    if (!code || !code_verifier || !redirect_uri) {
+      return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Missing code, code_verifier, or redirect_uri' }, corsResponseHeaders());
+    }
+
+    const cognitoDomain = process.env.COGNITO_DOMAIN;
+    const clientId = process.env.COGNITO_CLIENT_ID;
+    if (!cognitoDomain || !clientId) {
+      throw new Error('COGNITO_DOMAIN and COGNITO_CLIENT_ID must be set');
+    }
+
+    const response = await fetch(`https://${cognitoDomain}/oauth2/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ grant_type: 'authorization_code', client_id: clientId, code, redirect_uri, code_verifier }),
+    });
+
+    if (!response.ok) {
+      console.error('Code exchange failed:', response.status);
+      return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Code exchange failed' }, corsResponseHeaders());
+    }
+
+    const data = await response.json() as Record<string, unknown>;
+    return {
+      statusCode: 200,
+      headers: corsResponseHeaders(),
+      multiValueHeaders: { 'Set-Cookie': [createRefreshCookie(data.refresh_token as string)] },
+      body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
+    };
+  } catch (error) {
+    console.error('Exchange code error:', error);
+    return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
+  }
 }

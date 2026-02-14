@@ -144,7 +144,6 @@ describe("exchangeCodeForTokens", () => {
     const mockTokens = {
       access_token: "access-token",
       id_token: "id-token",
-      refresh_token: "refresh-token",
       expires_in: 3600,
     };
 
@@ -158,7 +157,6 @@ describe("exchangeCodeForTokens", () => {
     expect(result).toStrictEqual({
       accessToken: "access-token",
       idToken: "id-token",
-      refreshToken: "refresh-token",
       expiresIn: 3600,
     });
     expect(sessionStorage.getItem("pkce_code_verifier")).toBeNull();
@@ -184,7 +182,7 @@ describe("exchangeCodeForTokens", () => {
     consoleSpy.mockRestore();
   });
 
-  it("should send correct request to token endpoint", async () => {
+  it("should send correct request to backend exchange endpoint", async () => {
     sessionStorage.setItem("pkce_code_verifier", "my-verifier");
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -192,7 +190,6 @@ describe("exchangeCodeForTokens", () => {
       json: () => Promise.resolve({
         access_token: "a",
         id_token: "i",
-        refresh_token: "r",
         expires_in: 3600,
       }),
     });
@@ -200,19 +197,19 @@ describe("exchangeCodeForTokens", () => {
     await exchangeCodeForTokens("my-code");
 
     expect(global.fetch).toHaveBeenCalledWith(
-      `https://${cognitoConfig.domain}/oauth2/token`,
+      expect.stringContaining("/tara/exchange-code"),
       expect.objectContaining({
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       }),
     );
 
     const callArgs = vi.mocked(global.fetch).mock.calls[0] ?? [];
-    const body = callArgs[1]?.body as URLSearchParams;
-    expect(body.get("grant_type")).toBe("authorization_code");
-    expect(body.get("code")).toBe("my-code");
-    expect(body.get("code_verifier")).toBe("my-verifier");
-    expect(body.get("client_id")).toBe(cognitoConfig.clientId);
+    const body = JSON.parse(callArgs[1]?.body as string);
+    expect(body.code).toBe("my-code");
+    expect(body.code_verifier).toBe("my-verifier");
+    expect(body.redirect_uri).toBeTruthy();
   });
 
   it("should return null on network error", async () => {
@@ -236,15 +233,15 @@ describe("exchangeCodeForTokens", () => {
     consoleSpy.mockRestore();
   });
 
-  it("should include redirect_uri in token request body", async () => {
+  it("should include redirect_uri in request body", async () => {
     sessionStorage.setItem("pkce_code_verifier", "v");
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ access_token: "a", id_token: "i", refresh_token: "r", expires_in: 1 }),
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
     });
     await exchangeCodeForTokens("c");
-    const body = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]?.body as URLSearchParams;
-    expect(body.get("redirect_uri")).toBeTruthy();
+    const body = JSON.parse((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]?.body as string);
+    expect(body.redirect_uri).toBeTruthy();
   });
 });
 

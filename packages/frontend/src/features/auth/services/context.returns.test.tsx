@@ -25,14 +25,13 @@ describe("handleCodeCallback return values", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   it("returns true on successful code exchange", async () => {
     const config = await import("./config");
     const idToken = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) + 3600 });
     (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      accessToken: "at", idToken, refreshToken: "rt",
+      accessToken: "at", idToken,
     });
     let result: boolean | undefined;
     function Comp() {
@@ -62,7 +61,7 @@ describe("handleCodeCallback return values", () => {
   it("returns false when parseIdToken fails (invalid token)", async () => {
     const config = await import("./config");
     (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      accessToken: "at", idToken: "bad-token", refreshToken: "rt",
+      accessToken: "at", idToken: "bad-token",
     });
     let result: boolean | undefined;
     function Comp() {
@@ -81,7 +80,6 @@ describe("handleTaraTokens return values", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   it("returns true on valid TARA token", () => {
@@ -90,7 +88,7 @@ describe("handleTaraTokens return values", () => {
     function Comp() {
       const { handleTaraTokens } = useAuth();
       return <button onClick={() => {
-        result = handleTaraTokens({ accessToken: "a", idToken, refreshToken: "r" });
+        result = handleTaraTokens({ accessToken: "a", idToken });
       }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);
@@ -103,7 +101,7 @@ describe("handleTaraTokens return values", () => {
     function Comp() {
       const { handleTaraTokens } = useAuth();
       return <button onClick={() => {
-        result = handleTaraTokens({ accessToken: "a", idToken: "bad", refreshToken: "r" });
+        result = handleTaraTokens({ accessToken: "a", idToken: "bad" });
       }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);
@@ -123,7 +121,7 @@ describe("isTokenExpired edge cases via initAuth", () => {
   it("malformed 2-part token triggers refresh path", async () => {
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue("part1.part2");
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
+    global.fetch = vi.fn().mockResolvedValueOnce({ ok: false, status: 401 });
     render(
       <AuthProvider>
         <div data-testid="t">ok</div>
@@ -137,7 +135,7 @@ describe("isTokenExpired edge cases via initAuth", () => {
     const noExpToken = createJwt({ sub: "u1", email: "a@b.com" });
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(noExpToken);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
+    global.fetch = vi.fn().mockResolvedValueOnce({ ok: false, status: 401 });
     render(
       <AuthProvider>
         <div data-testid="t">ok</div>
@@ -170,11 +168,10 @@ describe("isTokenExpired edge cases via initAuth", () => {
     await waitFor(() => expect(screen.getByTestId("a")).toHaveTextContent("false"));
   });
 
-  it("refresh fetch to correct URL with domain", async () => {
+  it("refresh fetch calls backend /tara/refresh", async () => {
     const expired = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) - 100 });
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(expired);
-    mockAuthStorage.getRefreshToken.mockReturnValue("rt");
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true, json: () => Promise.resolve({ access_token: "na" }),
     });
@@ -185,8 +182,7 @@ describe("isTokenExpired edge cases via initAuth", () => {
     );
     await waitFor(() => expect(global.fetch).toHaveBeenCalled());
     const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string;
-    expect(url).toContain("/oauth2/token");
-    expect(url).toContain("https://");
+    expect(url).toContain("/tara/refresh");
   });
 });
 
@@ -195,7 +191,6 @@ describe("parseIdToken expiration boundary", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   it("rejects token at exact expiration time", () => {
@@ -205,7 +200,7 @@ describe("parseIdToken expiration boundary", () => {
     function Comp() {
       const { handleTaraTokens } = useAuth();
       return <button onClick={() => {
-        result = handleTaraTokens({ accessToken: "a", idToken, refreshToken: "r" });
+        result = handleTaraTokens({ accessToken: "a", idToken });
       }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);
@@ -222,7 +217,7 @@ describe("parseIdToken expiration boundary", () => {
         <div>
           <span data-testid="name">{user?.name ?? "none"}</span>
           <button onClick={() => {
-            result = handleTaraTokens({ accessToken: "a", idToken, refreshToken: "r" });
+            result = handleTaraTokens({ accessToken: "a", idToken });
           }}>go</button>
         </div>
       );

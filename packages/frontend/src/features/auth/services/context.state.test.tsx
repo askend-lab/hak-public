@@ -44,7 +44,6 @@ describe("auth/context state precision", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   afterEach(() => {
@@ -121,7 +120,6 @@ describe("auth/context state precision", () => {
     const expired = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) - 100 });
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(expired);
-    mockAuthStorage.getRefreshToken.mockReturnValue("rt");
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ access_token: "new-at", id_token: "new-id" }),
@@ -142,7 +140,6 @@ describe("auth/context state precision", () => {
     const expired = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) - 100 });
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(expired);
-    mockAuthStorage.getRefreshToken.mockReturnValue("rt");
     global.fetch = vi.fn().mockResolvedValueOnce({ ok: false, status: 400 });
     render(
       <AuthProvider>
@@ -160,7 +157,6 @@ describe("auth/context state precision", () => {
     const token = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) + 3600 });
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(token);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
     render(
       <AuthProvider>
         <StateChecker />
@@ -187,7 +183,7 @@ describe("auth/context state precision", () => {
           <span data-testid="loading">{String(ctx.isLoading)}</span>
           <span data-testid="error">{String(ctx.error)}</span>
           <span data-testid="user">{ctx.user?.id ?? "null"}</span>
-          <button onClick={() => ctx.handleTaraTokens({ accessToken: "at", idToken, refreshToken: "rt" })}>go</button>
+          <button onClick={() => ctx.handleTaraTokens({ accessToken: "at", idToken })}>go</button>
         </div>
       );
     }
@@ -207,14 +203,13 @@ describe("auth/context state precision", () => {
     });
     expect(mockAuthStorage.setUser).toHaveBeenCalled();
     expect(mockAuthStorage.setAccessToken).toHaveBeenCalledWith("at");
-    expect(mockAuthStorage.setRefreshToken).toHaveBeenCalledWith("rt");
   });
 
   it("handleCodeCallback sets all auth state correctly", async () => {
     const config = await import("./config");
     const idToken = createJwt({ sub: "c1", email: "cb@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
     (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      accessToken: "ca", idToken, refreshToken: "cr",
+      accessToken: "ca", idToken,
     });
 
     function CbChecker() {
@@ -243,14 +238,12 @@ describe("auth/context state precision", () => {
     });
     expect(mockAuthStorage.setUser).toHaveBeenCalled();
     expect(mockAuthStorage.setIdToken).toHaveBeenCalledWith(idToken);
-    expect(mockAuthStorage.setRefreshToken).toHaveBeenCalledWith("cr");
   });
 
   it("refresh response stores id_token and returns true", async () => {
     const expired = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) - 100 });
     mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
     mockAuthStorage.getAccessToken.mockReturnValue(expired);
-    mockAuthStorage.getRefreshToken.mockReturnValue("rt");
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ access_token: "na", id_token: "ni" }),

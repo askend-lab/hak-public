@@ -49,10 +49,6 @@ describe("AuthStorage", () => {
       expect(localStorage.getItem("hak_id_token")).toBeNull();
     });
 
-    it("stores refresh token under correct key", () => {
-      AuthStorage.setRefreshToken("tok");
-      expect(localStorage.getItem("hak_refresh_token")).toBe("tok");
-    });
   });
 
   describe("Token storage", () => {
@@ -68,16 +64,9 @@ describe("AuthStorage", () => {
       expect(AuthStorage.getIdToken()).toBe(token);
     });
 
-    it("should store and retrieve refresh token", () => {
-      const token = "refresh-token-123";
-      AuthStorage.setRefreshToken(token);
-      expect(AuthStorage.getRefreshToken()).toBe(token);
-    });
-
     it("should return null for missing tokens", () => {
       expect(AuthStorage.getAccessToken()).toBeNull();
       expect(AuthStorage.getIdToken()).toBeNull();
-      expect(AuthStorage.getRefreshToken()).toBeNull();
     });
   });
 
@@ -86,14 +75,11 @@ describe("AuthStorage", () => {
       AuthStorage.setUser({ id: "123", email: "test@example.com" });
       AuthStorage.setAccessToken("access-token");
       AuthStorage.setIdToken("id-token");
-      AuthStorage.setRefreshToken("refresh-token");
-
       AuthStorage.clear();
 
       expect(AuthStorage.getUser()).toBeNull();
       expect(AuthStorage.getAccessToken()).toBeNull();
       expect(AuthStorage.getIdToken()).toBeNull();
-      expect(AuthStorage.getRefreshToken()).toBeNull();
     });
 
     it("should clear Cognito-related localStorage keys", () => {

@@ -167,40 +167,32 @@ describe('TARA Custom Auth Integration Tests', () => {
       const result = await callbackHandler(event);
 
       expect(result.statusCode).toBe(302);
-      expect(result.headers?.Location).toBe(`${FRONTEND_URL}${AUTH_CALLBACK_PATH}`);
+      const url = new URL(String(result.headers?.Location));
+      expect(url.pathname).toBe(AUTH_CALLBACK_PATH);
+      expect(url.origin).toBe(FRONTEND_URL);
     });
 
-    it('should set HttpOnly cookies for tokens', async () => {
+    it('should pass tokens in URL params and set refresh cookie', async () => {
       const { stateValue, nonce, encodedCookie } = createValidState();
       setupSuccessfulMocks(nonce);
 
       const event = createCallbackEvent('auth-code-123', stateValue, encodedCookie);
       const result = await callbackHandler(event);
 
+      // Tokens in URL
+      const url = new URL(String(result.headers?.Location));
+      expect(url.searchParams.get('access_token')).toBe('cognito-access-token');
+      expect(url.searchParams.get('id_token')).toBe('cognito-id-token');
+
+      // Only refresh token in httpOnly cookie
       const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
-
-      const accessCookie = cookies.find(c => c.startsWith('access_token='));
-      expect(accessCookie).toContain('HttpOnly');
-      expect(accessCookie).toContain('Secure');
-
-      const idCookie = cookies.find(c => c.startsWith('id_token='));
-      expect(idCookie).toContain('HttpOnly');
-
-      const refreshCookie = cookies.find(c => c.startsWith('refresh_token='));
+      const refreshCookie = cookies.find(c => c.startsWith('hak_refresh_token='));
       expect(refreshCookie).toContain('HttpOnly');
-    });
+      expect(refreshCookie).toContain('Secure');
 
-    it('should set is_authenticated cookie readable by frontend', async () => {
-      const { stateValue, nonce, encodedCookie } = createValidState();
-      setupSuccessfulMocks(nonce);
-
-      const event = createCallbackEvent('auth-code-123', stateValue, encodedCookie);
-      const result = await callbackHandler(event);
-
-      const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
-      const authCookie = cookies.find(c => c.startsWith('is_authenticated='));
-      expect(authCookie).toBeDefined();
-      expect(authCookie).not.toContain('HttpOnly');
+      // No access/id cookies
+      expect(cookies.find(c => c.startsWith('access_token='))).toBeUndefined();
+      expect(cookies.find(c => c.startsWith('is_authenticated='))).toBeUndefined();
     });
 
     it('should call TARA and Cognito with correct parameters', async () => {

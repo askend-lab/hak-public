@@ -21,7 +21,6 @@ describe("AuthProvider", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
-    mockAuthStorage.getRefreshToken.mockReturnValue(null);
   });
 
   it("should initialize with loading state then become ready", async () => {

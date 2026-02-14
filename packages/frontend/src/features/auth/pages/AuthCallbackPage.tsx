@@ -20,16 +20,14 @@ export function AuthCallbackPage() {
 
       const queryParams = new URLSearchParams(window.location.search);
 
-      // Handle TARA tokens (tokens come directly in URL from TARA Lambda)
+      // Handle TARA tokens (access/id come as URL params, refresh is in httpOnly cookie)
       const accessToken = queryParams.get("access_token");
       const idToken = queryParams.get("id_token");
-      const refreshToken = queryParams.get("refresh_token");
 
-      if (accessToken && idToken && refreshToken) {
+      if (accessToken && idToken) {
         const success = handleTaraTokens({
           accessToken,
           idToken,
-          refreshToken,
         });
         if (success) {
           navigate("/", { replace: true });

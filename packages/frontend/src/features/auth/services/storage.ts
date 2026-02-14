@@ -5,22 +5,20 @@ import type { User } from "./types";
 
 const STORAGE_KEYS = {
   USER: "hak_user",
-  REFRESH_TOKEN: "hak_refresh_token",
 };
 
 // Legacy keys — removed from localStorage on clear() for migration
-const LEGACY_KEYS = ["hak_access_token", "hak_id_token"];
+const LEGACY_KEYS = ["hak_access_token", "hak_id_token", "hak_refresh_token"];
 
 const COGNITO_PROVIDER_PREFIX = "CognitoIdentityServiceProvider";
 
 // In-memory token storage — not persisted to localStorage.
-// Prevents XSS from stealing access/id tokens via localStorage.
-// Tokens are re-obtained on page load via refresh_token flow.
+// Prevents XSS from stealing tokens via localStorage.
+// Access/id tokens are re-obtained on page load via refresh_token flow.
 //
-// Note: refresh_token is stored in localStorage (not in-memory) so that
-// silent token refresh works across page reloads. This is standard practice
-// for SPA + Cognito — AWS Amplify does the same. Moving to httpOnly cookies
-// would require a backend proxy for the Cognito token endpoint.
+// Refresh token is stored in an httpOnly cookie set by the auth backend.
+// It never touches JavaScript — the backend /tara/refresh endpoint reads
+// it from the cookie and returns new access/id tokens.
 let memoryAccessToken: string | null = null;
 let memoryIdToken: string | null = null;
 
@@ -56,19 +54,10 @@ export const AuthStorage = {
     memoryIdToken = token;
   },
 
-  getRefreshToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-  },
-
-  setRefreshToken(token: string): void {
-    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
-  },
-
   clear(): void {
     memoryAccessToken = null;
     memoryIdToken = null;
     localStorage.removeItem(STORAGE_KEYS.USER);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
 
     // Clean up legacy keys from previous localStorage-based storage
     LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));

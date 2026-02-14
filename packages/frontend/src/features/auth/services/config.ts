@@ -8,6 +8,7 @@ const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
 export const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
 export const TARA_LOGIN_URL = import.meta.env?.VITE_TARA_LOGIN_URL ?? "";
+export const AUTH_API_URL = import.meta.env?.VITE_AUTH_API_URL ?? "";
 export const PKCE_STORAGE_KEY = "pkce_code_verifier";
 export const OAUTH2_TOKEN_PATH = "/oauth2/token";
 export const AUTH_CALLBACK_PATH = "/auth/callback";
@@ -92,7 +93,6 @@ export function getTaraLoginUrl(): string {
 export async function exchangeCodeForTokens(code: string): Promise<{
   accessToken: string;
   idToken: string;
-  refreshToken: string;
   expiresIn: number;
 } | null> {
   const codeVerifier = sessionStorage.getItem(PKCE_STORAGE_KEY);
@@ -101,21 +101,19 @@ export async function exchangeCodeForTokens(code: string): Promise<{
     return null;
   }
 
-  const requestBody = new URLSearchParams({
-    grant_type: "authorization_code",
-    client_id: cognitoConfig.clientId,
-    code,
-    redirect_uri: cognitoConfig.redirectUri,
-    code_verifier: codeVerifier,
-  });
-
   try {
+    // Exchange code via backend — refresh token is set as httpOnly cookie
     const response = await fetch(
-      `https://${cognitoConfig.domain}${OAUTH2_TOKEN_PATH}`,
+      `${AUTH_API_URL}/tara/exchange-code`,
       {
         method: "POST",
-        headers: { "Content-Type": CONTENT_TYPE_FORM },
-        body: requestBody,
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          code,
+          code_verifier: codeVerifier,
+          redirect_uri: cognitoConfig.redirectUri,
+        }),
       },
     );
 
@@ -135,7 +133,6 @@ export async function exchangeCodeForTokens(code: string): Promise<{
     return {
       accessToken: data.access_token,
       idToken: data.id_token,
-      refreshToken: data.refresh_token,
       expiresIn: data.expires_in,
     };
   } catch (error) {
