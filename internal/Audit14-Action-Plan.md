@@ -478,12 +478,17 @@ Legend:
 - [x] #55 Estonian cancelText
 - [x] #56 Notification limit
 - [x] #57 BaseModal overflow
-- [x] #58 Backdrop tabIndex (already resolved)
+- [x] #18 errorDescription sanitize
+- [x] #52 Dashboard fake data removed
+- [x] #58 Backdrop tabIndex
+- [x] #65 CI security audit
+- [x] #69 pnpm cache (verified: setup-node handles it)
 - [x] #71 console.error → logger
 - [x] #72 Set instead of array
 - [x] #73 String concat → join
-- [x] #76 Blob URL revoke (already handled by callers)
+- [x] #76 Blob URL revoke (verified: all callers revoke)
 - [x] #80 Unicode-safe slice
+- [x] #83 workingDir (verified: guarded by isLocalDev)
 - [x] #97 simplestore dep type (verified: devDeps correct)
 
 **P3 — Architecture improvements:**
