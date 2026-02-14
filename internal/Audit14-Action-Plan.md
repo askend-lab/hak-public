@@ -460,7 +460,7 @@ Legend:
 - [ ] #2 Refresh token storage
 - [x] #4 Hardcoded Cognito creds
 - [x] #6 JSON.parse validation
-- [ ] #23 Optimistic locking
+- [x] #23 Optimistic locking
 - [x] #24 Delete unlisted copy
 - [x] #28/#85 Shared task TTL
 - [x] #86 Cookie consent
@@ -496,13 +496,13 @@ Legend:
 - [ ] #19 SimpleStore data size limit
 - [x] #25 Double read
 - [ ] #26 handleGet 200→404
-- [ ] #33 Spread collision
+- [x] #33 Spread collision
 - [x] #35 Per-route ErrorBoundary
 - [x] #36 Nested ternary
 - [x] #38 warmAudioWorker init
 - [x] #42/#43 AbortController
 - [x] #45 Auth on public endpoint
 - [x] #47 Blob size check
-- [ ] #67 Audit overrides
+- [x] #67 Audit overrides
 - [x] #77 Stale closure
 - [x] #78 Clipboard feature detection
