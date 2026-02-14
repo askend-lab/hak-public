@@ -20,6 +20,9 @@ provider:
       allowedHeaders:
         - Content-Type
         - Authorization
+    throttle:
+      rateLimit: 5
+      burstLimit: 10
 
   environment:
     SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID}/hak-merlin-${self:provider.stage}-queue

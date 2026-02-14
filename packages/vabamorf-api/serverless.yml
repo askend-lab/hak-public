@@ -8,6 +8,10 @@ provider:
   runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
+  httpApi:
+    throttle:
+      rateLimit: 20
+      burstLimit: 50
 
   environment:
     VMETAJSON_PATH: /var/task/vmetajson.bin
