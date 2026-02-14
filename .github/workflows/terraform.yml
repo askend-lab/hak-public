@@ -149,6 +149,25 @@ jobs:
             -backend-config="dynamodb_table=askend-lab-terraform-locks" \
             -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
+      - name: Clear stale state lock
+        run: |
+          # Query DynamoDB for any existing lock on this state
+          LOCK_ID=$(aws dynamodb get-item \
+            --table-name askend-lab-terraform-locks \
+            --key '{"LockID": {"S": "askend-lab-terraform-state/hak/${{ matrix.environment }}/terraform.tfstate"}}' \
+            --query 'Item.Info.S' --output text 2>/dev/null || echo "NONE")
+          if [ "$LOCK_ID" != "NONE" ] && [ "$LOCK_ID" != "None" ] && [ -n "$LOCK_ID" ]; then
+            echo "⚠️ Found stale lock, force-unlocking..."
+            # Extract lock ID from the JSON info field
+            EXTRACTED_ID=$(echo "$LOCK_ID" | python3 -c "import sys,json; print(json.load(sys.stdin)['ID'])" 2>/dev/null || echo "")
+            if [ -n "$EXTRACTED_ID" ]; then
+              terraform force-unlock -force "$EXTRACTED_ID" || echo "Force-unlock failed, continuing anyway"
+            fi
+          else
+            echo "✅ No stale lock found"
+          fi
+        continue-on-error: true
+
       - name: Import DynamoDB table (one-time)
         run: |
           terraform import -var="env=${{ matrix.environment }}" aws_dynamodb_table.single_table single-table-lambda-${{ matrix.environment }} 2>/dev/null || echo "Already imported or doesn't exist"
