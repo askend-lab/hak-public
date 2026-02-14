@@ -109,92 +109,9 @@ export default defineConfig({
     port: 5181,
     strictPort: true,
     proxy: {
-      "/api/vabamorf": {
-        target: process.env.VITE_VABAMORF_URL ?? "https://vabamorf-dev.askend-lab.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/vabamorf/, ""),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
-            proxyReq.removeHeader("cookie");
-            proxyReq.removeHeader("Cookie");
-          });
-        },
-      },
-      "/api/merlin": {
-        target: process.env.VITE_MERLIN_URL ?? "https://merlin-prod.askend-lab.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/merlin/, ""),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
-            proxyReq.removeHeader("cookie");
-            proxyReq.removeHeader("Cookie");
-          });
-        },
-      },
-      "/api/audio": {
-        target: process.env.VITE_AUDIO_API_URL ?? "https://3ktlnibu21.execute-api.eu-west-1.amazonaws.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/audio/, "/dev"),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
-            proxyReq.removeHeader("cookie");
-            proxyReq.removeHeader("Cookie");
-          });
-        },
-      },
-      "/api/analyze": {
-        target: process.env.VITE_VABAMORF_URL ?? "https://vabamorf-dev.askend-lab.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
-            proxyReq.removeHeader("cookie");
-            proxyReq.removeHeader("Cookie");
-          });
-        },
-      },
-      "/api/variants": {
-        target: process.env.VITE_VABAMORF_URL ?? "https://vabamorf-dev.askend-lab.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
-            proxyReq.removeHeader("cookie");
-            proxyReq.removeHeader("Cookie");
-          });
-        },
-      },
-      "/api/synthesize": {
-        target: process.env.VITE_MERLIN_URL ?? "https://merlin-prod.askend-lab.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
-            proxyReq.removeHeader("cookie");
-            proxyReq.removeHeader("Cookie");
-          });
-        },
-      },
-      "/api/status": {
-        target: process.env.VITE_MERLIN_URL ?? "https://merlin-prod.askend-lab.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) => {
-            proxyReq.removeHeader("cookie");
-            proxyReq.removeHeader("Cookie");
-          });
-        },
-      },
       "/api": {
-        // Local development: use local serverless-offline
-        // target: 'http://localhost:4000',
-        // rewrite: (path) => path.replace(/^\/api/, '/dev'),
-
-        // Deployed API
-        target: "https://hak-api-dev.askend-lab.com",
+        target: process.env.VITE_API_URL ?? "https://hak-dev.askend-lab.com",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, "/api"),
         configure: (proxy) => {
           proxy.on("proxyReq", (proxyReq) => {
             proxyReq.removeHeader("cookie");

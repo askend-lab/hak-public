@@ -38,9 +38,9 @@ resource "aws_cloudfront_distribution" "website" {
     origin_access_control_id = aws_cloudfront_origin_access_control.website.id
   }
 
-  # Vabamorf API origin
+  # Vabamorf API origin (no public DNS — only reachable through CloudFront)
   origin {
-    domain_name = var.env == "prod" ? "vabamorf.${var.domain_name}" : "vabamorf-${var.env}.${var.domain_name}"
+    domain_name = local.vabamorf_api_domain
     origin_id   = "vabamorf-api"
     custom_origin_config {
       http_port              = 80
@@ -50,9 +50,9 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-  # Merlin API origin (can be overridden to use prod for dev environment)
+  # Merlin API origin (no public DNS — only reachable through CloudFront)
   origin {
-    domain_name = var.use_prod_merlin ? "merlin-prod.${var.domain_name}" : "merlin-${var.env}.${var.domain_name}"
+    domain_name = local.merlin_api_domain
     origin_id   = "merlin-api"
     custom_origin_config {
       http_port              = 80

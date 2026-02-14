@@ -1,9 +1,23 @@
+# Read API Gateway URLs from Serverless CloudFormation stacks
+# These APIs have no public DNS — only reachable through CloudFront
+data "aws_cloudformation_stack" "merlin_api" {
+  name = "merlin-api-${var.env}"
+}
+
+data "aws_cloudformation_stack" "vabamorf_api" {
+  name = "vabamorf-api-${var.env}"
+}
+
 locals {
   app_name = "hak"
   region   = "eu-west-1"
 
   # Domain logic: dev → hak-dev.example.com, prod → hak.example.com
   domain_name = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
+
+  # API Gateway domains (no public DNS — extracted from CloudFormation outputs)
+  merlin_api_domain   = replace(data.aws_cloudformation_stack.merlin_api.outputs["ApiEndpoint"], "https://", "")
+  vabamorf_api_domain = replace(data.aws_cloudformation_stack.vabamorf_api.outputs["ApiEndpoint"], "https://", "")
 
   # Resource naming
   website_bucket_name     = "${local.app_name}-${var.env}-website"

@@ -37,21 +37,6 @@ functions:
           path: /
           method: ANY
 
-plugins:
-  - serverless-domain-manager
-
-custom:
-  customDomain:
-    domainName: ${self:custom.domainNames.${self:provider.stage}}
-    certificateArn: ${env:CERTIFICATE_ARN, ''}
-    endpointType: REGIONAL
-    apiType: http
-    createRoute53Record: true
-    hostedZoneId: ${env:HOSTED_ZONE_ID, ''}
-  domainNames:
-    dev: vabamorf-dev.${env:DOMAIN_NAME, 'example.com'}
-    prod: vabamorf.${env:DOMAIN_NAME, 'example.com'}
-
 resources:
   Outputs:
     ApiEndpoint:

@@ -188,8 +188,8 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## INFRASTRUCTURE & DEVOPS
 
-- [x] 61. **Serverless Framework v3 — maintenance mode с 2024** (все serverless.yml).
-  Четыре TODO в коде, но миграция не выполнена. Security patches для v3 не гарантированы.
+- [ ] 61. **Serverless Framework v3 — maintenance mode с 2024** (все serverless.yml).
+  Все 5 сервисов на frameworkVersion "3". Миграция на v4 не выполнена.
 
 - [ ] 63. **`COGNITO_USER_POOL_ARN` через env var без валидации** (`simplestore/serverless.yml:134`).
   Если env var не задан — deploy пройдёт с пустым ARN, authorizer будет broken.
@@ -289,8 +289,8 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## MISC
 
-- [x] 95. **Serverless v3 TODO × 4** (audio-api, merlin-api, simplestore, vabamorf-api).
-  Один и тот же TODO "migrate to Serverless v4" в четырёх файлах — technical debt accumulation.
+- [ ] 95. **Serverless v3 TODO × 4** (audio-api, merlin-api, simplestore, vabamorf-api).
+  Все 5 сервисов (включая tara-auth) на frameworkVersion "3". Миграция не выполнена.
 
 - [ ] 96. **`getModifiableTasks` — лишняя индирекция** (`TaskRepository.ts:44-46`).
   Просто вызывает `getUserCreatedTasks` — добавляет confusion без добавления логики.
@@ -317,6 +317,6 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 • ~~Все задачи юзера в одном DynamoDB item~~ — ✅ мигрировано на per-task storage
 • ~~Нет CSP~~, ~~нет WAF~~, ~~нет rate limiting~~ — ✅ CSP, WAF и throttling добавлены
 • ~~Sentry replay без consent~~ — ✅ replay и tracing убраны
-• ~~Serverless v3 в maintenance mode × 4 пакета~~ — ✅ мигрировано на v4
+• Serverless v3 в maintenance mode × 5 пакетов — миграция на v4 не выполнена
 
 Если коротко: код написан аккуратно и с пониманием дела, но инфраструктурная безопасность и data layer нуждаются в серьёзной доработке перед production. Как open source проект для контрибьюторов — вполне достойный, но deploy as-is в прод для гос. сервиса я бы не рекомендовал без закрытия хотя бы первых 20 пунктов аудита.
