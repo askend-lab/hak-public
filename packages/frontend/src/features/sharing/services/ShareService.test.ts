@@ -24,17 +24,12 @@ const mockTask = {
   shareToken: "abc123",
 };
 
-const mockLoader = {
-  loadBaselineTasks: vi.fn().mockResolvedValue([]),
-  findTaskByShareToken: vi.fn().mockResolvedValue(null),
-};
-
 describe("ShareService", () => {
   let service: ShareService;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new ShareService(mockStorage as unknown as ConstructorParameters<typeof ShareService>[0], mockLoader as unknown as ConstructorParameters<typeof ShareService>[1]);
+    service = new ShareService(mockStorage as unknown as ConstructorParameters<typeof ShareService>[0]);
   });
 
   describe("generateShareToken", () => {
@@ -51,19 +46,6 @@ describe("ShareService", () => {
     });
   });
 
-  describe("getSharedTask", () => {
-    it("returns baseline task when found", async () => {
-      mockLoader.loadBaselineTasks.mockResolvedValueOnce([mockTask]);
-      const result = await service.getSharedTask("task-1");
-      expect(result).toEqual(mockTask);
-    });
-
-    it("returns null when no baseline task found", async () => {
-      const result = await service.getSharedTask("nonexistent");
-      expect(result).toBeNull();
-    });
-  });
-
   describe("shareUserTask", () => {
     it("calls saveTaskAsUnlisted", async () => {
       await service.shareUserTask(mockTask as unknown as Parameters<typeof service.shareUserTask>[0]);
@@ -77,13 +59,7 @@ describe("ShareService", () => {
   });
 
   describe("getTaskByShareToken", () => {
-    it("returns baseline task when found by share token", async () => {
-      mockLoader.findTaskByShareToken.mockResolvedValueOnce(mockTask);
-      const result = await service.getTaskByShareToken("abc123");
-      expect(result).toEqual(mockTask);
-    });
-
-    it("returns unlisted task when baseline not found", async () => {
+    it("returns unlisted task when found", async () => {
       mockStorage.getTaskByShareToken.mockResolvedValueOnce(mockTask);
       const result = await service.getTaskByShareToken("abc123");
       expect(result).toEqual(mockTask);

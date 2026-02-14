@@ -15,6 +15,11 @@ import {
   CheckCircleIcon,
   MenuIcon,
   TaskIcon,
+  VolumeIcon,
+  MuteIcon,
+  SpeedIcon,
+  PlusCircleIcon,
+  DocumentPlusIcon,
 } from "./Icons";
 
 describe("Icon component", () => {
@@ -116,5 +121,30 @@ describe("Named icon components", () => {
   it("TaskIcon renders correctly", () => {
     const { container } = render(<TaskIcon />);
     expect(container.querySelector(".icon")?.textContent).toBe("assignment");
+  });
+
+  it("VolumeIcon renders correctly", () => {
+    const { container } = render(<VolumeIcon />);
+    expect(container.querySelector(".icon")?.textContent).toBe("volume_up");
+  });
+
+  it("MuteIcon renders correctly", () => {
+    const { container } = render(<MuteIcon />);
+    expect(container.querySelector(".icon")?.textContent).toBe("volume_off");
+  });
+
+  it("SpeedIcon renders correctly", () => {
+    const { container } = render(<SpeedIcon />);
+    expect(container.querySelector(".icon")?.textContent).toBe("speed");
+  });
+
+  it("PlusCircleIcon renders correctly", () => {
+    const { container } = render(<PlusCircleIcon />);
+    expect(container.querySelector(".icon")?.textContent).toBe("add_circle");
+  });
+
+  it("DocumentPlusIcon renders correctly", () => {
+    const { container } = render(<DocumentPlusIcon />);
+    expect(container.querySelector(".icon")?.textContent).toBe("note_add");
   });
 });

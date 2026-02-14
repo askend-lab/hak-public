@@ -3,7 +3,6 @@
 
 import { Task, TaskEntry, TaskSummary, CreateTaskRequest } from "@/types/task";
 import { SimpleStoreAdapter } from "../storage/SimpleStoreAdapter";
-import { MockDataLoader } from "../storage/MockDataLoader";
 import { ShareService } from "@/features/sharing/services/ShareService";
 
 function generateId(prefix: string): string {
@@ -13,63 +12,13 @@ function generateId(prefix: string): string {
 export class TaskRepository {
   constructor(
     private storage: SimpleStoreAdapter,
-    private mockLoader: MockDataLoader,
     private shareService: ShareService,
   ) {}
 
-  private async loadAllData(userId: string): Promise<{
-    baselineTasks: Task[];
-    userTasks: Task[];
-    baselineAdditions: Record<string, TaskEntry[]>;
-  }> {
-    const [baselineTasks, userTasks, baselineAdditions] = await Promise.all([
-      this.mockLoader.loadBaselineTasks(),
-      this.storage.loadUserTasks(userId),
-      this.storage.loadBaselineTaskAdditions(userId),
-    ]);
-    return { baselineTasks, userTasks, baselineAdditions };
-  }
-
-  private findTask(
-    taskId: string,
-    data: { baselineTasks: Task[]; userTasks: Task[]; baselineAdditions: Record<string, TaskEntry[]> },
-  ): { task: Task; isUserTask: boolean } | null {
-    const userTask = data.userTasks.find((t) => t.id === taskId);
-    if (userTask) return { task: userTask, isUserTask: true };
-
-    const baselineTask = data.baselineTasks.find((t) => t.id === taskId);
-    if (baselineTask) {
-      return {
-        task: {
-          ...baselineTask,
-          entries: [
-            ...(baselineTask.entries ?? []),
-            ...(data.baselineAdditions[taskId] ?? []),
-          ],
-        },
-        isUserTask: false,
-      };
-    }
-    return null;
-  }
-
   async getUserTasks(userId: string): Promise<TaskSummary[]> {
-    const { baselineTasks, userTasks, baselineAdditions } =
-      await this.loadAllData(userId);
+    const userTasks = await this.storage.loadUserTasks(userId);
 
-    const userBaselineTasks = baselineTasks
-      .filter((task) => task.userId === userId)
-      .map((task) => ({
-        ...task,
-        entries: [
-          ...(task.entries ?? []),
-          ...(baselineAdditions[task.id] ?? []),
-        ],
-      }));
-
-    const allTasks = [...userBaselineTasks, ...userTasks];
-
-    return allTasks.map((task) => ({
+    return userTasks.map((task) => ({
       id: task.id,
       name: task.name,
       description: task.description ?? null,
@@ -97,9 +46,8 @@ export class TaskRepository {
   }
 
   async getTask(taskId: string, userId: string): Promise<Task | null> {
-    const data = await this.loadAllData(userId);
-    const found = this.findTask(taskId, data);
-    return found?.task ?? null;
+    const userTasks = await this.storage.loadUserTasks(userId);
+    return userTasks.find((t) => t.id === taskId) ?? null;
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
@@ -155,80 +103,36 @@ export class TaskRepository {
     const userTasks = await this.storage.loadUserTasks(userId);
     const taskIndex = userTasks.findIndex((task) => task.id === taskId);
 
-    if (taskIndex !== -1) {
-      const existingTask = userTasks[taskIndex];
-      if (!existingTask) return null;
-      const updatedTask: Task = {
-        ...existingTask,
-        ...updates,
-        updatedAt: new Date(),
-      };
-
-      userTasks[taskIndex] = updatedTask;
-      await this.storage.saveUserTasks(userId, userTasks);
-      // Sync unlisted storage for anonymous access
-      await this.storage.saveTaskAsUnlisted(updatedTask);
-      return updatedTask;
+    if (taskIndex === -1) {
+      throw new Error("Task not found");
     }
 
-    const baselineTasks = await this.mockLoader.loadBaselineTasks();
-    const baselineTask = baselineTasks.find((task) => task.id === taskId);
+    const existingTask = userTasks[taskIndex];
+    if (!existingTask) return null;
+    const updatedTask: Task = {
+      ...existingTask,
+      ...updates,
+      updatedAt: new Date(),
+    };
 
-    if (baselineTask) {
-      const baselineAdditions =
-        await this.storage.loadBaselineTaskAdditions(userId);
-      const additionalEntries = baselineAdditions[taskId] ?? [];
-
-      const mergedEntries = [
-        ...(baselineTask.entries ?? []),
-        ...additionalEntries,
-      ];
-
-      const taskCopy: Task = {
-        ...baselineTask,
-        userId,
-        entries: mergedEntries,
-        ...updates,
-        id: generateId("task"),
-        updatedAt: new Date(),
-        shareToken: this.shareService.generateShareToken(),
-      };
-
-      userTasks.push(taskCopy);
-      await this.storage.saveUserTasks(userId, userTasks);
-
-      if (baselineAdditions[taskId]) {
-        delete baselineAdditions[taskId];
-        await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
-      }
-
-      return taskCopy;
-    }
-
-    throw new Error("Task not found");
+    userTasks[taskIndex] = updatedTask;
+    await this.storage.saveUserTasks(userId, userTasks);
+    // Sync unlisted storage for anonymous access
+    await this.storage.saveTaskAsUnlisted(updatedTask);
+    return updatedTask;
   }
 
   async deleteTask(userId: string, taskId: string): Promise<boolean> {
     const userTasks = await this.storage.loadUserTasks(userId);
     const taskIndex = userTasks.findIndex((task) => task.id === taskId);
 
-    if (taskIndex !== -1) {
-      userTasks.splice(taskIndex, 1);
-      await this.storage.saveUserTasks(userId, userTasks);
-      return true;
+    if (taskIndex === -1) {
+      throw new Error("Task not found");
     }
 
-    const baselineTasks = await this.mockLoader.loadBaselineTasks();
-    const isBaselineTask = baselineTasks.some(
-      (task) => task.id === taskId && task.userId === userId,
-    );
-
-    if (isBaselineTask) {
-      // Baseline tasks cannot be deleted - they are read-only
-      throw new Error("Cannot delete baseline task");
-    }
-
-    throw new Error("Task not found");
+    userTasks.splice(taskIndex, 1);
+    await this.storage.saveUserTasks(userId, userTasks);
+    return true;
   }
 
   async addTextEntriesToTask(
@@ -237,12 +141,11 @@ export class TaskRepository {
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
     mode: "append" | "replace" = "append",
   ): Promise<TaskEntry[]> {
-    const data = await this.loadAllData(userId);
-    const found = this.findTask(taskId, data);
-    if (!found) {
+    const userTasks = await this.storage.loadUserTasks(userId);
+    const task = userTasks.find((t) => t.id === taskId);
+    if (!task) {
       throw new Error("Task not found");
     }
-    const { task, isUserTask } = found;
 
     const isReplace = mode === "replace";
     const currentEntries = task.entries ?? [];
@@ -270,26 +173,16 @@ export class TaskRepository {
       typeof entry === "string" ? entry : entry.text,
     );
 
-    if (isUserTask) {
-      const updatedEntries = isReplace
-        ? newEntries
-        : [...currentEntries, ...newEntries];
-      const updatedSequences = isReplace
-        ? newTexts
-        : [...(task.speechSequences ?? []), ...newTexts];
-      await this.updateTask(userId, taskId, {
-        entries: updatedEntries,
-        speechSequences: updatedSequences,
-      });
-    } else {
-      const baselineAdditions =
-        await this.storage.loadBaselineTaskAdditions(userId);
-      const existingAdditions = isReplace
-        ? []
-        : (baselineAdditions[taskId] ?? []);
-      baselineAdditions[taskId] = [...existingAdditions, ...newEntries];
-      await this.storage.saveBaselineTaskAdditions(userId, baselineAdditions);
-    }
+    const updatedEntries = isReplace
+      ? newEntries
+      : [...currentEntries, ...newEntries];
+    const updatedSequences = isReplace
+      ? newTexts
+      : [...(task.speechSequences ?? []), ...newTexts];
+    await this.updateTask(userId, taskId, {
+      entries: updatedEntries,
+      speechSequences: updatedSequences,
+    });
 
     return newEntries;
   }
@@ -300,12 +193,11 @@ export class TaskRepository {
     entryId: string,
     updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>,
   ): Promise<TaskEntry | null> {
-    const data = await this.loadAllData(userId);
-    const found = this.findTask(taskId, data);
-    if (!found) {
+    const userTasks = await this.storage.loadUserTasks(userId);
+    const task = userTasks.find((t) => t.id === taskId);
+    if (!task) {
       throw new Error("Task not found");
     }
-    const { task, isUserTask } = found;
 
     const entryIndex = task.entries?.findIndex((entry) => entry.id === entryId);
     if (entryIndex === undefined || entryIndex === -1) {
@@ -322,32 +214,7 @@ export class TaskRepository {
     const updatedEntries = [...(task.entries ?? [])];
     updatedEntries[entryIndex] = updatedEntry;
 
-    if (isUserTask) {
-      await this.updateTask(userId, taskId, { entries: updatedEntries });
-    } else {
-      const baselineTask = data.baselineTasks.find((t) => t.id === taskId);
-
-      if (baselineTask) {
-        const baselineAdditions =
-          await this.storage.loadBaselineTaskAdditions(userId);
-        const baselineEntryCount = baselineTask.entries?.length || 0;
-
-        if (entryIndex < baselineEntryCount) {
-          await this.updateTask(userId, taskId, { entries: updatedEntries });
-        } else {
-          const additions = baselineAdditions[taskId] ?? [];
-          const additionIndex = entryIndex - baselineEntryCount;
-          if (additionIndex >= 0 && additionIndex < additions.length) {
-            additions[additionIndex] = updatedEntry;
-            baselineAdditions[taskId] = additions;
-            await this.storage.saveBaselineTaskAdditions(
-              userId,
-              baselineAdditions,
-            );
-          }
-        }
-      }
-    }
+    await this.updateTask(userId, taskId, { entries: updatedEntries });
 
     return updatedEntry;
   }

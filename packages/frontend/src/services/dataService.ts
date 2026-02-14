@@ -4,29 +4,24 @@
 import { Task, TaskSummary, TaskEntry, CreateTaskRequest } from "@/types/task";
 import { logger } from "@hak/shared";
 import { SimpleStoreAdapter } from "./storage/SimpleStoreAdapter";
-import { MockDataLoader } from "./storage/MockDataLoader";
 import { ShareService } from "@/features/sharing/services/ShareService";
 import { TaskRepository } from "./repository/TaskRepository";
 
 export interface DataServiceDeps {
   storage?: SimpleStoreAdapter;
-  mockLoader?: MockDataLoader;
 }
 
 export class DataService {
   private static instance: DataService | null = null;
   private storage: SimpleStoreAdapter;
-  private mockLoader: MockDataLoader;
   private shareService: ShareService;
   private repository: TaskRepository;
 
   constructor(deps: DataServiceDeps = {}) {
     this.storage = deps.storage ?? new SimpleStoreAdapter();
-    this.mockLoader = deps.mockLoader ?? new MockDataLoader();
-    this.shareService = new ShareService(this.storage, this.mockLoader);
+    this.shareService = new ShareService(this.storage);
     this.repository = new TaskRepository(
       this.storage,
-      this.mockLoader,
       this.shareService,
     );
   }
@@ -57,10 +52,6 @@ export class DataService {
 
   async getTask(taskId: string, userId: string): Promise<Task | null> {
     return this.repository.getTask(taskId, userId);
-  }
-
-  async getSharedTask(taskId: string): Promise<Task | null> {
-    return this.shareService.getSharedTask(taskId);
   }
 
   async shareUserTask(userId: string, taskId: string): Promise<void> {

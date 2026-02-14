@@ -195,33 +195,6 @@ describe("DataService Error Handling and Edge Cases", () => {
     });
   });
 
-  describe("baseline task operations", () => {
-    it("filters deleted baseline tasks from getUserTasks", async () => {
-      // Get baseline tasks first
-      const allTasks = await dataService.getUserTasks(mockUserId);
-      const baselineTask = allTasks.find((t) => t.name.includes("Uudised"));
-
-      if (baselineTask) {
-        // Soft delete it
-        await dataService.deleteTask(mockUserId, baselineTask.id);
-
-        // Should not appear in list
-        const tasksAfterDelete = await dataService.getUserTasks(mockUserId);
-        expect(
-          tasksAfterDelete.find((t) => t.id === baselineTask.id),
-        ).toBeUndefined();
-      }
-    });
-  });
-
-  describe("getSharedTask behavior", () => {
-    it("returns null for non-baseline task (no shared storage fallback)", async () => {
-      // getSharedTask no longer uses shared storage - only checks baseline tasks
-      const result = await dataService.getSharedTask("some-id");
-      expect(result).toBeNull();
-    });
-  });
-
   describe("getTaskByShareToken edge cases", () => {
     it("returns null when task not found", async () => {
       const result =

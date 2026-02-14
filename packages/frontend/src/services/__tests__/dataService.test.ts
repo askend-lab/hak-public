@@ -20,16 +20,13 @@ const mockRepo = {
 };
 
 const mockShareSvc = {
-  getSharedTask: vi.fn().mockResolvedValue(null),
   shareUserTask: vi.fn().mockResolvedValue(undefined),
   getTaskByShareToken: vi.fn().mockResolvedValue(null),
 };
 
 vi.mock("../storage/SimpleStoreAdapter", () => ({ SimpleStoreAdapter: class {} }));
-vi.mock("../storage/MockDataLoader", () => ({ MockDataLoader: class {} }));
 vi.mock("@/features/sharing/services/ShareService", () => ({
   ShareService: class {
-    getSharedTask = mockShareSvc.getSharedTask;
     shareUserTask = mockShareSvc.shareUserTask;
     getTaskByShareToken = mockShareSvc.getTaskByShareToken;
   },
@@ -83,11 +80,6 @@ describe("DataService", () => {
   it("getTask delegates", async () => {
     await service.getTask("t1", "u1");
     expect(mockRepo.getTask).toHaveBeenCalledWith("t1", "u1");
-  });
-
-  it("getSharedTask delegates", async () => {
-    await service.getSharedTask("t1");
-    expect(mockShareSvc.getSharedTask).toHaveBeenCalledWith("t1");
   });
 
   it("shareUserTask gets task then shares", async () => {

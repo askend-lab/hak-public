@@ -2,18 +2,14 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { vi } from "vitest";
-import { Task, TaskEntry } from "@/types/task";
+import { Task } from "@/types/task";
 
 // In-memory storage to simulate SimpleStore
 let userTasks: Record<string, Task[]> = {};
-let baselineAdditions: Record<string, Record<string, TaskEntry[]>> = {};
-let sharedTasks: Task[] = [];
 let unlistedTasks: Record<string, Task> = {}; // keyed by shareToken
 
 export function resetSimpleStoreMock(): void {
   userTasks = {};
-  baselineAdditions = {};
-  sharedTasks = [];
   unlistedTasks = {};
 }
 
@@ -33,13 +29,8 @@ export function setupSimpleStoreMock(): void {
       if (type === "unlisted" && pk === "tasks") {
         // Save task as unlisted (keyed by shareToken in sk)
         unlistedTasks[sk] = data;
-      } else if (pk === "tasks" && !sk.startsWith("baseline-")) {
+      } else if (pk === "tasks") {
         userTasks[sk] = data.tasks || [];
-      } else if (pk === "tasks" && sk.startsWith("baseline-")) {
-        const userId = sk.replace("baseline-", "");
-        baselineAdditions[userId] = data.additions || {};
-      } else if (pk === "shared" && sk === "tasks") {
-        sharedTasks = data.tasks || [];
       }
 
       return {
@@ -74,7 +65,7 @@ export function setupSimpleStoreMock(): void {
         };
       }
 
-      if (pk === "tasks" && sk && !sk.startsWith("baseline-")) {
+      if (pk === "tasks" && sk) {
         const tasks = userTasks[sk] || [];
         if (tasks.length === 0) {
           return { ok: false, status: 404 };
@@ -85,30 +76,6 @@ export function setupSimpleStoreMock(): void {
             success: boolean;
             item: { data: { tasks: Task[] } };
           }> => ({ success: true, item: { data: { tasks } } }),
-        };
-      } else if (pk === "tasks" && sk?.startsWith("baseline-")) {
-        const userId = sk.replace("baseline-", "");
-        const additions = baselineAdditions[userId] || {};
-        if (Object.keys(additions).length === 0) {
-          return { ok: false, status: 404 };
-        }
-        return {
-          ok: true,
-          json: async (): Promise<{
-            success: boolean;
-            item: { data: { additions: Record<string, TaskEntry[]> } };
-          }> => ({ success: true, item: { data: { additions } } }),
-        };
-      } else if (pk === "shared" && sk === "tasks") {
-        if (sharedTasks.length === 0) {
-          return { ok: false, status: 404 };
-        }
-        return {
-          ok: true,
-          json: async (): Promise<{
-            success: boolean;
-            item: { data: { tasks: Task[] } };
-          }> => ({ success: true, item: { data: { tasks: sharedTasks } } }),
         };
       }
 
@@ -121,14 +88,4 @@ export function setupSimpleStoreMock(): void {
 
 export function getStoredUserTasks(userId: string): Task[] {
   return userTasks[userId] || [];
-}
-
-export function getStoredBaselineAdditions(
-  userId: string,
-): Record<string, TaskEntry[]> {
-  return baselineAdditions[userId] || {};
-}
-
-export function getStoredSharedTasks(): Task[] {
-  return sharedTasks;
 }
