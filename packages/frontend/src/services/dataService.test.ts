@@ -117,18 +117,18 @@ describe("DataService", () => {
     expect(mockRepo.deleteTask).toHaveBeenCalledWith("u1", "t1");
   });
 
-  it("addEntryToTask creates entry", async () => {
-    mockRepo.getTask.mockResolvedValueOnce({ id: "t1", entries: [] });
+  it("addEntryToTask delegates to addTextEntriesToTask", async () => {
+    const mockEntry = { id: "entry_1", taskId: "t1", text: "hi", stressedText: "hi", audioUrl: null, audioBlob: null, order: 1, createdAt: new Date() };
+    mockRepo.addTextEntriesToTask.mockResolvedValueOnce([mockEntry]);
     const e = await service.addEntryToTask("u1", "t1", {
       text: "hi", stressedText: "hi", audioUrl: null, audioBlob: null, order: 0,
     });
-    expect(e.taskId).toBe("t1");
+    expect(mockRepo.addTextEntriesToTask).toHaveBeenCalledWith("u1", "t1", [{ text: "hi", stressedText: "hi" }]);
     expect(e.text).toBe("hi");
-    expect(e.id).toContain("entry_");
   });
 
-  it("addEntryToTask throws when not found", async () => {
-    mockRepo.getTask.mockResolvedValueOnce(null);
+  it("addEntryToTask throws when task not found", async () => {
+    mockRepo.addTextEntriesToTask.mockRejectedValueOnce(new Error("Task not found"));
     await expect(service.addEntryToTask("u1", "t1", {
       text: "x", stressedText: "x", audioUrl: null, audioBlob: null, order: 0,
     })).rejects.toThrow("Task not found");

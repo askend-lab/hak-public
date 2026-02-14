@@ -177,11 +177,7 @@ describe("useVariantsPanel", () => {
     });
 
     expect(result.current.isVariantsPanelOpen).toBe(false);
-    expect(showNotification).toHaveBeenCalledWith(
-      "warning",
-      "Variante ei leitud",
-      "Sõna ei leidu eesti keeles või on valesti kirjutatud.",
-    );
+    expect(showNotification).toHaveBeenCalledWith({ type: "warning", message: "Variante ei leitud", description: "Sõna ei leidu eesti keeles või on valesti kirjutatud." });
     vi.useRealTimers();
   });
 
@@ -210,11 +206,7 @@ describe("useVariantsPanel", () => {
     });
 
     expect(result.current.isVariantsPanelOpen).toBe(false);
-    expect(showNotification).toHaveBeenCalledWith(
-      "error",
-      "Variantide laadimine ebaõnnestus",
-      "Sõna ei leidu eesti keeles või on valesti kirjutatud.",
-    );
+    expect(showNotification).toHaveBeenCalledWith({ type: "error", message: "Variantide laadimine ebaõnnestus", description: "Sõna ei leidu eesti keeles või on valesti kirjutatud." });
     vi.useRealTimers();
   });
 

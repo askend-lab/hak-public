@@ -10,7 +10,7 @@ import {
   useSentenceMenu,
 } from "@/hooks";
 import { SentenceState } from "@/types/synthesis";
-import { NotificationType } from "@/components/Notification";
+import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 
 type SynthesisHook = ReturnType<typeof useSynthesis>;
 type TaskHandlersHook = ReturnType<typeof useTaskHandlers>;
@@ -41,11 +41,7 @@ interface SynthesisPageProviderProps {
   setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>;
   synthesis: SynthesisHook;
   taskHandlers: TaskHandlersHook;
-  showNotification: (
-    type: NotificationType,
-    title: string,
-    desc?: string,
-  ) => void;
+  showNotification: (options: ShowNotificationOptions) => void;
   isAuthenticated: boolean;
   onLogin: () => void;
 }

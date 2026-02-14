@@ -143,10 +143,10 @@ describe("useTaskHandlers - Task Deletion", () => {
       await result.current.handleConfirmDelete();
     });
 
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "error",
-      "Ülesande kustutamine ebaõnnestus",
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "error",
+      message: "Ülesande kustutamine ebaõnnestus",
+    });
     consoleSpy.mockRestore();
   });
 });

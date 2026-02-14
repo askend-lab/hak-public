@@ -49,17 +49,15 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
         await dataService.addTextEntriesToTask(user.id, taskId, entries, _mode);
         setTaskRefreshTrigger((prev) => prev + 1);
         const count = entries.length;
-        showNotification(
-          "success",
-          TASK_STRINGS.ADDED_TO_TASK,
-          TASK_STRINGS.ADDED_ENTRIES(count, taskName),
-          undefined,
-          undefined,
-          viewTaskAction(taskId),
-        );
+        showNotification({
+          type: "success",
+          message: TASK_STRINGS.ADDED_TO_TASK,
+          description: TASK_STRINGS.ADDED_ENTRIES(count, taskName),
+          action: viewTaskAction(taskId),
+        });
       } catch (error) {
         logger.error("Failed to add entries:", error);
-        showNotification("error", TASK_STRINGS.ADD_ENTRIES_FAILED);
+        showNotification({ type: "error", message: TASK_STRINGS.ADD_ENTRIES_FAILED });
       }
     },
     [user, sentences, showNotification, viewTaskAction],
@@ -84,17 +82,15 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
           },
         ]);
         setTaskRefreshTrigger((prev) => prev + 1);
-        showNotification(
-          "success",
-          TASK_STRINGS.ADDED_TO_TASK,
-          TASK_STRINGS.ADDED_ENTRY(taskName),
-          undefined,
-          undefined,
-          viewTaskAction(taskId),
-        );
+        showNotification({
+          type: "success",
+          message: TASK_STRINGS.ADDED_TO_TASK,
+          description: TASK_STRINGS.ADDED_ENTRY(taskName),
+          action: viewTaskAction(taskId),
+        });
       } catch (error) {
         logger.error("Failed to add entry:", error);
-        showNotification("error", TASK_STRINGS.ADD_ENTRIES_FAILED);
+        showNotification({ type: "error", message: TASK_STRINGS.ADD_ENTRIES_FAILED });
       }
     },
     [user, sentences, showNotification, viewTaskAction],

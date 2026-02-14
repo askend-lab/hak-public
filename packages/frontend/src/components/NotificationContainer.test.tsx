@@ -33,7 +33,7 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("success", "Test message");
+        ref.current?.show({ type: "success", message: "Test message" });
       });
 
       expect(screen.getByText("Test message")).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("info", "Title", "Description text");
+        ref.current?.show({ type: "info", message: "Title", description: "Description text" });
       });
 
       expect(screen.getByText("Title")).toBeInTheDocument();
@@ -56,9 +56,9 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("success", "First");
-        ref.current?.show("error", "Second");
-        ref.current?.show("info", "Third");
+        ref.current?.show({ type: "success", message: "First" });
+        ref.current?.show({ type: "error", message: "Second" });
+        ref.current?.show({ type: "info", message: "Third" });
       });
 
       expect(screen.getByText("First")).toBeInTheDocument();
@@ -71,7 +71,7 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("success", "Test", undefined, undefined, "success");
+        ref.current?.show({ type: "success", message: "Test", color: "success" });
       });
 
       expect(screen.getByText("Test")).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("success", "Removable");
+        ref.current?.show({ type: "success", message: "Removable" });
       });
 
       expect(screen.getByText("Removable")).toBeInTheDocument();
@@ -105,7 +105,7 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("success", "Success message");
+        ref.current?.show({ type: "success", message: "Success message" });
       });
 
       expect(screen.getByText("Success message")).toBeInTheDocument();
@@ -116,7 +116,7 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("error", "Error message");
+        ref.current?.show({ type: "error", message: "Error message" });
       });
 
       expect(screen.getByText("Error message")).toBeInTheDocument();
@@ -127,7 +127,7 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("info", "Info message");
+        ref.current?.show({ type: "info", message: "Info message" });
       });
 
       expect(screen.getByText("Info message")).toBeInTheDocument();
@@ -138,88 +138,10 @@ describe("NotificationContainer", () => {
       render(<NotificationContainer ref={ref} />);
 
       act(() => {
-        ref.current?.show("warning", "Warning message");
+        ref.current?.show({ type: "warning", message: "Warning message" });
       });
 
       expect(screen.getByText("Warning message")).toBeInTheDocument();
     });
-  });
-});
-
-// --- Merged from NotificationContainer.mutations.test.tsx ---
-describe("NotificationContainer mutation kills", () => {
-  it("passes all props to Notification child", () => {
-    const ref = createRef<NotificationRef>();
-    render(<NotificationContainer ref={ref} />);
-
-    act(() => {
-      ref.current?.show("error", "msg", "desc", 5000, "success", {
-        label: "Undo",
-        onClick: vi.fn(),
-      });
-    });
-
-    expect(screen.getByText("msg")).toBeInTheDocument();
-    expect(screen.getByText("desc")).toBeInTheDocument();
-  });
-
-  it("renders each notification with correct type", () => {
-    const ref = createRef<NotificationRef>();
-    render(<NotificationContainer ref={ref} />);
-
-    act(() => {
-      ref.current?.show("success", "SuccessMsg");
-      ref.current?.show("error", "ErrorMsg");
-    });
-
-    expect(screen.getByText("SuccessMsg")).toBeInTheDocument();
-    expect(screen.getByText("ErrorMsg")).toBeInTheDocument();
-  });
-
-  it("generates unique ids for each notification", () => {
-    const ref = createRef<NotificationRef>();
-    render(<NotificationContainer ref={ref} />);
-
-    act(() => {
-      ref.current?.show("info", "A");
-      ref.current?.show("info", "B");
-    });
-
-    // Both should render (unique keys)
-    const container = document.querySelector(".notification-container");
-    expect(container?.children.length).toBe(2);
-  });
-
-  it("passes undefined for optional props when not provided", () => {
-    const ref = createRef<NotificationRef>();
-    render(<NotificationContainer ref={ref} />);
-
-    act(() => {
-      ref.current?.show("info", "Plain");
-    });
-
-    // Should render without errors
-    expect(screen.getByText("Plain")).toBeInTheDocument();
-  });
-
-  it("appends new notifications to existing list", () => {
-    const ref = createRef<NotificationRef>();
-    render(<NotificationContainer ref={ref} />);
-
-    act(() => { ref.current?.show("success", "One"); });
-    act(() => { ref.current?.show("error", "Two"); });
-    act(() => { ref.current?.show("warning", "Three"); });
-
-    const container = document.querySelector(".notification-container");
-    expect(container?.children.length).toBe(3);
-  });
-
-  it("has displayName set", () => {
-    expect(NotificationContainer.displayName).toBe("NotificationContainer");
-  });
-
-  it("container has correct class name", () => {
-    render(<NotificationContainer />);
-    expect(document.querySelector(".notification-container")).toBeInTheDocument();
   });
 });

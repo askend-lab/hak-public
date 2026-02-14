@@ -1,27 +1,16 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
-
 import { createContext, useContext, useRef, ReactNode } from "react";
 import NotificationContainer, {
   NotificationRef,
+  ShowNotificationOptions,
 } from "@/components/NotificationContainer";
-import {
-  NotificationType,
-  NotificationColor,
-  NotificationAction,
-} from "@/components/Notification";
+
+export type { ShowNotificationOptions };
 
 interface NotificationContextType {
-  showNotification: (
-    type: NotificationType,
-    message: string,
-    description?: string,
-    duration?: number,
-    color?: NotificationColor,
-    action?: NotificationAction,
-  ) => void;
+  showNotification: (options: ShowNotificationOptions) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -31,22 +20,8 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const notificationRef = useRef<NotificationRef>(null);
 
-  const showNotification = (
-    type: NotificationType,
-    message: string,
-    description?: string,
-    duration?: number,
-    color?: NotificationColor,
-    action?: NotificationAction,
-  ) => {
-    notificationRef.current?.show(
-      type,
-      message,
-      description,
-      duration,
-      color,
-      action,
-    );
+  const showNotification = (options: ShowNotificationOptions) => {
+    notificationRef.current?.show(options);
   };
 
   return (

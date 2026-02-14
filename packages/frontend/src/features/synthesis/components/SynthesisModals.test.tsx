@@ -79,6 +79,6 @@ describe("SynthesisModals", () => {
       "s1",
       "new-phonetic",
     );
-    expect(showNotification).toHaveBeenCalledWith("success", expect.any(String));
+    expect(showNotification).toHaveBeenCalledWith({ type: "success", message: expect.any(String) });
   });
 });

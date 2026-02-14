@@ -49,21 +49,20 @@ describe("NotificationContext", () => {
   it("should call show on notification ref", () => {
     const { result } = renderHook(() => useNotification(), { wrapper });
 
-    result.current.showNotification("success", "Test message");
-    result.current.showNotification("error", "Error message", "Description");
-    result.current.showNotification("info", "Info", "Desc", 5000);
-    result.current.showNotification("warning", "Warning", "Desc", 3000);
-    result.current.showNotification(
-      "success",
-      "Success",
-      "Desc",
-      4000,
-      undefined,
-      {
+    result.current.showNotification({ type: "success", message: "Test message" });
+    result.current.showNotification({ type: "error", message: "Error message", description: "Description" });
+    result.current.showNotification({ type: "info", message: "Info", description: "Desc", duration: 5000 });
+    result.current.showNotification({ type: "warning", message: "Warning", description: "Desc", duration: 3000 });
+    result.current.showNotification({
+      type: "success",
+      message: "Success",
+      description: "Desc",
+      duration: 4000,
+      action: {
         label: "Action",
         onClick: () => {},
       },
-    );
+    });
 
     expect(result.current.showNotification).toHaveBeenCalled;
   });

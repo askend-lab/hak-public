@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
-
 import { useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import Notification, {
   NotificationType,
@@ -20,15 +18,17 @@ export interface NotificationData {
   duration?: number | undefined;
 }
 
+export interface ShowNotificationOptions {
+  type: NotificationType;
+  message: string;
+  description?: string;
+  duration?: number;
+  color?: NotificationColor;
+  action?: NotificationAction;
+}
+
 export interface NotificationRef {
-  show: (
-    type: NotificationType,
-    message: string,
-    description?: string,
-    duration?: number,
-    color?: NotificationColor,
-    action?: NotificationAction,
-  ) => void;
+  show: (options: ShowNotificationOptions) => void;
 }
 
 const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
@@ -39,23 +39,16 @@ const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
   }, []);
 
   const show = useCallback(
-    (
-      type: NotificationType,
-      message: string,
-      description?: string,
-      duration?: number,
-      color?: NotificationColor,
-      action?: NotificationAction,
-    ) => {
+    (options: ShowNotificationOptions) => {
       const id = `notification-${crypto.randomUUID()}`;
       const notification: NotificationData = {
         id,
-        type,
-        color,
-        message,
-        description,
-        action,
-        duration,
+        type: options.type,
+        color: options.color,
+        message: options.message,
+        description: options.description,
+        action: options.action,
+        duration: options.duration,
       };
 
       setNotifications((prev) => [...prev, notification]);

@@ -92,14 +92,12 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
         setIsTaskCreationFromTasksView(false);
         setTaskRefreshTrigger((prev) => prev + 1);
         if (playlistEntries.length > 0) {
-          showNotification(
-            "success",
-            TASK_STRINGS.TASK_CREATED,
-            TASK_STRINGS.TASK_CREATED_DETAIL(title),
-            undefined,
-            undefined,
-            viewTaskAction(newTask.id),
-          );
+          showNotification({
+            type: "success",
+            message: TASK_STRINGS.TASK_CREATED,
+            description: TASK_STRINGS.TASK_CREATED_DETAIL(title),
+            action: viewTaskAction(newTask.id),
+          });
         }
         setSelectedTaskId(newTask.id);
       } catch (error) {
@@ -158,16 +156,14 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
         setShowTaskEditModal(false);
         setTaskToEdit(null);
         setTaskRefreshTrigger((prev) => prev + 1);
-        showNotification(
-          "success",
-          TASK_STRINGS.TASK_UPDATED(updatedTask.name),
-          undefined,
-          undefined,
-          "success",
-        );
+        showNotification({
+          type: "success",
+          message: TASK_STRINGS.TASK_UPDATED(updatedTask.name),
+          color: "success",
+        });
       } catch (error) {
         logger.error("Failed to update task:", error);
-        showNotification("error", TASK_STRINGS.TASK_UPDATE_FAILED);
+        showNotification({ type: "error", message: TASK_STRINGS.TASK_UPDATE_FAILED });
       }
     },
     [user, showNotification],
@@ -198,18 +194,16 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       const dataService = DataService.getInstance();
       await dataService.deleteTask(user.id, taskToDelete.id);
       setTaskRefreshTrigger((prev) => prev + 1);
-      showNotification(
-        "success",
-        TASK_STRINGS.TASK_DELETED(taskName),
-        undefined,
-        undefined,
-        "success",
-      );
+      showNotification({
+        type: "success",
+        message: TASK_STRINGS.TASK_DELETED(taskName),
+        color: "success",
+      });
       setSelectedTaskId(null);
       setCurrentView("tasks");
     } catch (error) {
       logger.error("Failed to delete task:", error);
-      showNotification("error", TASK_STRINGS.TASK_DELETE_FAILED);
+      showNotification({ type: "error", message: TASK_STRINGS.TASK_DELETE_FAILED });
     } finally {
       setShowDeleteConfirmation(false);
       setTaskToDelete(null);

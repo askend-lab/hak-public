@@ -80,7 +80,7 @@ export function SharedTaskPage() {
     if (!task?.entries) return;
 
     sessionStorage.setItem(COPIED_ENTRIES_KEY, JSON.stringify(task.entries));
-    showNotification("success", "Laused kopeeritud!");
+    showNotification({ type: "success", message: "Laused kopeeritud!" });
     navigate("/synthesis");
   };
 

@@ -257,10 +257,10 @@ describe("SharedTaskPage", () => {
     expect(JSON.parse(storedEntries!)).toEqual(mockTask.entries);
 
     // Check notification was shown
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "success",
-      "Laused kopeeritud!",
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "success",
+      message: "Laused kopeeritud!",
+    });
   });
 
   it("shows empty state when task has no entries", async () => {
@@ -394,10 +394,10 @@ describe("SharedTaskPage", () => {
     });
 
     await user.click(screen.getByRole("button", { name: /kopeeri/i }));
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      "success",
-      expect.any(String),
-    );
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      type: "success",
+      message: expect.any(String),
+    });
     expect(sessionStorage.getItem("copiedEntries")).toBeTruthy();
   });
 

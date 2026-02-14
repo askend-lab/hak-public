@@ -9,7 +9,7 @@ import * as Sentry from "@sentry/react";
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN ?? "",
   environment: import.meta.env.MODE,
-  enabled: true,
+  enabled: import.meta.env.PROD,
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
@@ -45,7 +45,7 @@ createRoot(rootElement).render(
         <NotificationProvider>
           <OnboardingProvider>
             <BrowserRouter>
-              <Suspense fallback={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div className="loader-spinner" style={{ width: 48, height: 48 }} /></div>}>
+              <Suspense fallback={<div className="app-loader"><div className="loader-spinner app-loader__spinner" /></div>}>
                 <Routes>
                   <Route path="/auth/callback" element={<AuthCallbackPage />} />
                   <Route

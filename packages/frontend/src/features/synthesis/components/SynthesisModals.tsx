@@ -5,14 +5,10 @@ import PronunciationVariants from "./PronunciationVariants";
 import SentencePhoneticPanel from "./SentencePhoneticPanel";
 import { useSynthesisPage } from "@/features/synthesis/contexts/SynthesisPageContext";
 import { MODAL_STRINGS } from "@/constants/ui-strings";
-import { NotificationType } from "@/components/Notification";
+import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 
 interface SynthesisModalsProps {
-  showNotification: (
-    type: NotificationType,
-    title: string,
-    desc?: string,
-  ) => void;
+  showNotification: (options: ShowNotificationOptions) => void;
 }
 
 export default function SynthesisModals({
@@ -48,7 +44,7 @@ export default function SynthesisModals({
               variants.sentencePhoneticId!,
               newPhoneticText,
             );
-            showNotification("success", MODAL_STRINGS.PHONETIC_APPLIED);
+            showNotification({ type: "success", message: MODAL_STRINGS.PHONETIC_APPLIED });
           }}
         />
       )}

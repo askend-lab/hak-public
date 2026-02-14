@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
-
 import { useState } from "react";
 import { useNotification } from "@/contexts/NotificationContext";
 import { logger } from "@hak/shared";
@@ -29,16 +27,14 @@ export default function ShareTaskModal({
     setIsCopying(true);
     try {
       await navigator.clipboard.writeText(shareUrl);
-      showNotification(
-        "success",
-        "Jagamislink kopeeritud!",
-        undefined,
-        undefined,
-        "success",
-      );
+      showNotification({
+        type: "success",
+        message: "Jagamislink kopeeritud!",
+        color: "success",
+      });
     } catch (e) {
       logger.error("Failed to copy share link:", e);
-      showNotification("error", "Viga lingi kopeerimisel");
+      showNotification({ type: "error", message: "Viga lingi kopeerimisel" });
     } finally {
       setIsCopying(false);
     }
