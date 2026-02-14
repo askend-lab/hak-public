@@ -26,6 +26,7 @@ functions:
       name: vabamorf
     timeout: 30
     memorySize: 1024
+    reservedConcurrency: 20
     events:
       - httpApi:
           path: /{proxy+}

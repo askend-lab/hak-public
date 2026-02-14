@@ -47,6 +47,7 @@ provider:
 functions:
   generate:
     handler: src/index.handler
+    reservedConcurrency: 10
     events:
       - http:
           path: /generate
@@ -55,6 +56,7 @@ functions:
 
   health:
     handler: src/index.healthHandler
+    reservedConcurrency: 5
     events:
       - http:
           path: /health
@@ -63,6 +65,7 @@ functions:
 
   warm:
     handler: src/index.warmHandler
+    reservedConcurrency: 2
     events:
       - http:
           path: /warm
