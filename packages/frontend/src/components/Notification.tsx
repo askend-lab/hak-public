@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
 
 import { useEffect } from "react";
 import { CloseIcon } from "./ui/Icons";

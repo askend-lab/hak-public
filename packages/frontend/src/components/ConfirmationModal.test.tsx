@@ -54,7 +54,7 @@ describe("ConfirmationModal", () => {
       );
       expect(screen.getByRole("button", { name: "OK" })).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "Cancel" }),
+        screen.getByRole("button", { name: "Tühista" }),
       ).toBeInTheDocument();
     });
 
@@ -108,7 +108,7 @@ describe("ConfirmationModal", () => {
         />,
       );
 
-      await user.click(screen.getByRole("button", { name: "Cancel" }));
+      await user.click(screen.getByRole("button", { name: "Tühista" }));
       expect(mockOnCancel).toHaveBeenCalled();
     });
   });

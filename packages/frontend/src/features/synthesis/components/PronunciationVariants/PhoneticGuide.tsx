@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
 
 import { CloseIcon, BackIcon } from "@/components/ui/Icons";
 import { markers } from "@/data/markerData";

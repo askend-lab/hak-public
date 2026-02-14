@@ -134,8 +134,8 @@ export default function Dashboard() {
         <p className="dashboard__subtitle">Rakenduse aktiivsuse ülevaade</p>
       </div>
       <div className="dashboard__metrics">
-        {metrics.map((m, i) => (
-          <MetricCard key={i} metric={m} />
+        {metrics.map((m) => (
+          <MetricCard key={m.label} metric={m} />
         ))}
       </div>
       <div className="dashboard__sections">

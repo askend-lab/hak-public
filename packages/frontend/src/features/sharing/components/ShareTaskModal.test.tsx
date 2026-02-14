@@ -42,7 +42,7 @@ describe("ShareTaskModal", () => {
           onClose={mockOnClose}
         />,
       );
-      expect(screen.getByText("Jaga ülesanne")).toBeInTheDocument();
+      expect(screen.getByText("Jaga ülesanne: Test Task")).toBeInTheDocument();
     });
 
     it("renders share URL with token", () => {
@@ -222,7 +222,7 @@ describe("ShareTaskModal mutation kills", () => {
 
   it("renders with correct modal title", () => {
     render(<ShareTaskModal isOpen={true} shareToken="abc" taskName="T" onClose={mockOnClose} />);
-    expect(screen.getByText("Jaga ülesanne")).toBeInTheDocument();
+    expect(screen.getByText("Jaga ülesanne: T")).toBeInTheDocument();
   });
 
   it("isCopying resets to false after successful copy", async () => {

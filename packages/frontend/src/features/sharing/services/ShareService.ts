@@ -16,14 +16,14 @@ export class ShareService {
   }
 
   async shareUserTask(task: Task): Promise<void> {
-    logger.debug("Sharing task:", task);
+    logger.debug("Sharing task:", task.id);
 
     try {
       // Save task as unlisted - directly accessible by shareToken
       await this.storage.saveTaskAsUnlisted(task);
       logger.debug("Task shared successfully as unlisted:", task.shareToken);
     } catch (error) {
-      console.error("Failed to share task:", error);
+      logger.error("Failed to share task:", error);
       throw new Error("Failed to share task");
     }
   }
@@ -34,7 +34,7 @@ export class ShareService {
     // Direct lookup by shareToken in unlisted storage - O(1)
     const unlistedTask = await this.storage.getTaskByShareToken(shareToken);
     if (unlistedTask) {
-      logger.debug("Found unlisted task with share token:", unlistedTask);
+      logger.debug("Found unlisted task with share token:", unlistedTask.id);
       return unlistedTask;
     }
 

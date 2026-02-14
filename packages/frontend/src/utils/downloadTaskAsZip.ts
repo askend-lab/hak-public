@@ -10,7 +10,9 @@ function sanitizeFilename(text: string): string {
   return text
     .replace(/[<>:"/\\|?*\x00-\x1f]/g, "")
     .replace(/\s+/g, "_")
-    .slice(0, 80);
+    .split("")
+    .slice(0, 80)
+    .join("");
 }
 
 async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
