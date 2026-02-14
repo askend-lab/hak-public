@@ -42,6 +42,10 @@ provider:
           Resource: arn:aws:s3:::hak-merlin-${self:provider.stage}-audio/*
         - Effect: Allow
           Action:
+            - s3:ListBucket
+          Resource: arn:aws:s3:::hak-merlin-${self:provider.stage}-audio
+        - Effect: Allow
+          Action:
             - ecs:UpdateService
             - ecs:DescribeServices
           Resource: arn:aws:ecs:${self:provider.region}:${env:AWS_ACCOUNT_ID}:service/hak-merlin-${self:provider.stage}/merlin-worker
