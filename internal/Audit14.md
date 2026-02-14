@@ -61,7 +61,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 18. **`errorDescription` из URL рендерится напрямую** (`AuthCallbackPage.tsx:60`).
   Атакующий может сконструировать URL с `error_description=<img onerror=...>` — potential reflected XSS.
 
-- [ ] 19. **Нет ограничения размера data в SimpleStore save** (`validation.ts`).
+- [x] 19. **Нет ограничения размера data в SimpleStore save** (`validation.ts`).
   Валидируется pk/sk/type/ttl, но `data` может быть произвольного размера. DynamoDB item limit 400KB, но до этого — memory pressure на Lambda.
 
 - [x] 20. **`Access-Control-Allow-Methods` не включает DELETE** (`lambda.ts:23`).
@@ -148,13 +148,13 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 45. **`SimpleStoreAdapter.get` шлёт auth headers для public endpoint** (`SimpleStoreAdapter.ts:62-64`).
   `/get-public` вызывается с `Authorization: Bearer ...` — токен утекает на не требующий auth endpoint.
 
-- [ ] 46. **`warmAudioWorker` пингует Merlin на каждое mousemove** (`warmAudioWorker.ts:48-54`).
+- [x] 46. **`warmAudioWorker` пингует Merlin на каждое mousemove** (`warmAudioWorker.ts:48-54`).
   Throttle 60 сек, но listener на mousemove — каждое движение мыши вызывает функцию для проверки таймера.
 
 - [x] 47. **`fetchAudioBlob` не проверяет размер ответа** (`downloadTaskAsZip.ts:34-40`).
   Злонамеренный audioUrl может вернуть гигабайтный blob — browser out of memory.
 
-- [ ] 48. **Sequential audio download в ZIP export** (`downloadTaskAsZip.ts:86-96`).
+- [x] 48. **Sequential audio download в ZIP export** (`downloadTaskAsZip.ts:86-96`).
   Аудио скачивается последовательно. 100 записей × 2сек = 200 секунд ожидания.
 
 - [x] 49. **`JSON.parse(event.body)` без try/catch** (`audio-api/handler.ts:49`).
@@ -192,7 +192,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 59. **Drag-and-drop без keyboard-accessible альтернативы** (`SynthesisView.tsx:66-75`).
   WCAG 2.1 требует keyboard-доступную альтернативу для drag-and-drop. Отсутствует.
 
-- [ ] 60. **Нет ARIA live region для synthesis loading states** (SentenceSynthesisItem).
+- [x] 60. **Нет ARIA live region для synthesis loading states** (SentenceSynthesisItem).
   Screen reader не узнает о смене состояния play/loading/error — invisible state changes.
 
 ## INFRASTRUCTURE & DEVOPS
@@ -241,7 +241,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 74. **`generateShareToken` truncates entropy** (`shareTokenUtils.ts:10`).
   Генерирует 16 random bytes (32 hex chars), затем `substring(0, 16)` — выбрасывает половину энтропии.
 
-- [ ] 75. **`processedRef` не защищает от StrictMode double-mount** (`AuthCallbackPage.tsx:14,18`).
+- [x] 75. **`processedRef` не защищает от StrictMode double-mount** (`AuthCallbackPage.tsx:14,18`).
   В dev mode React вызовет effect дважды. Ref спасает от второго, но первый уже сделал side-effect (navigation).
 
 - [x] 76. **`getEntryPlayUrl` создаёт blob URL без гарантии revoke** (`task.ts:56`).
@@ -264,7 +264,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 81. **Sentry `replayIntegration()` записывает сессии** (`main.tsx:15`).
   Session replay записывает действия пользователя (клики, ввод). Для гос. сервиса Эстонии — GDPR concern.
 
-- [ ] 82. **`tracesSampleRate: 0.1` — 10% трейсов уходят в Sentry** (`main.tsx:17`).
+- [x] 82. **`tracesSampleRate: 0.1` — 10% трейсов уходят в Sentry** (`main.tsx:17`).
   Данные об активности пользователей отправляются третьей стороне без явного consent.
 
 - [x] 83. **Build info показывает `workingDir` в production** (`BuildInfo.tsx:131-136`).
@@ -322,7 +322,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 99. **Mixed Vitest + Jest** (`frontend/package.json: vitest + jest`).
   Два тестовых фреймворка в одном пакете — confusion, дублирование конфигурации.
 
-- [ ] 100. **`Sentry.init()` вызывается до импорта App** (`main.tsx:9-20`).
+- [x] 100. **`Sentry.init()` вызывается до импорта App** (`main.tsx:9-20`).
   Side-effect до основного кода. При ошибке в Sentry init — всё приложение не загрузится.
 
 Общее впечатление: **7 из 10**.

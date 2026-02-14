@@ -51,7 +51,7 @@ export function initActivityListeners(): void {
   if (initialized) return;
   if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
 
-  const events = ["mousemove", "keydown", "touchstart", "scroll"];
+  const events = ["mouseenter", "keydown", "touchstart", "scroll"];
   events.forEach((event) => {
     window.addEventListener(event, () => pingMerlinOnActivity(), {
       passive: true,

@@ -345,7 +345,7 @@ describe("Validation", () => {
     });
 
     it("should use custom config maxTtlSeconds", () => {
-      const result = parseTtl(1001, { maxTtlSeconds: 1000, keyDelimiter: "#" });
+      const result = parseTtl(1001, { maxTtlSeconds: 1000, maxDataSizeBytes: 350000, keyDelimiter: "#" });
       expect(result.valid).toBe(false);
       if (!result.valid) {
         expect(result.error).toContain("1000");

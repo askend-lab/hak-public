@@ -368,6 +368,7 @@ describe("Store", () => {
     it("should use custom config when provided", () => {
       const customStore = new Store(db, context, {
         maxTtlSeconds: 1000,
+        maxDataSizeBytes: 350000,
         keyDelimiter: "|",
       });
       expect(customStore).toBeDefined();

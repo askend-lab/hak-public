@@ -72,6 +72,7 @@ export interface StoreResult {
  */
 export interface StoreConfig {
   readonly maxTtlSeconds: number;
+  readonly maxDataSizeBytes: number;
   readonly keyDelimiter: string;
 }
 
@@ -79,8 +80,12 @@ export interface StoreConfig {
 export const MAX_TTL_SECONDS = 31_536_000;
 
 /** Shared default configuration — used by store and validation */
+/** 350KB — safe limit below DynamoDB's 400KB item size cap */
+export const MAX_DATA_SIZE_BYTES = 350_000;
+
 export const DEFAULT_CONFIG: StoreConfig = {
   maxTtlSeconds: MAX_TTL_SECONDS,
+  maxDataSizeBytes: MAX_DATA_SIZE_BYTES,
   keyDelimiter: "#",
 };
 
