@@ -66,11 +66,11 @@ describe("useTaskHandlers - Task Deletion", () => {
     );
 
     await act(async () => {
-      await result.current.handleDeleteTask("task-1");
+      await result.current.crud.handleDeleteTask("task-1");
     });
 
-    expect(result.current.showDeleteConfirmation).toBe(true);
-    expect(result.current.taskToDelete).toEqual({
+    expect(result.current.modals.showDeleteConfirmation).toBe(true);
+    expect(result.current.modals.taskToDelete).toEqual({
       id: "task-1",
       name: "Task 1",
     });
@@ -82,15 +82,15 @@ describe("useTaskHandlers - Task Deletion", () => {
     );
 
     await act(async () => {
-      await result.current.handleDeleteTask("task-1");
+      await result.current.crud.handleDeleteTask("task-1");
     });
 
     await act(async () => {
-      await result.current.handleConfirmDelete();
+      await result.current.crud.handleConfirmDelete();
     });
 
     expect(mockDeleteTask).toHaveBeenCalledWith("user-1", "task-1");
-    expect(result.current.showDeleteConfirmation).toBe(false);
+    expect(result.current.modals.showDeleteConfirmation).toBe(false);
   });
 
   it("should redirect to task list after successful deletion", async () => {
@@ -99,11 +99,11 @@ describe("useTaskHandlers - Task Deletion", () => {
     );
 
     await act(async () => {
-      await result.current.handleDeleteTask("task-1");
+      await result.current.crud.handleDeleteTask("task-1");
     });
 
     await act(async () => {
-      await result.current.handleConfirmDelete();
+      await result.current.crud.handleConfirmDelete();
     });
 
     expect(mockDeleteTask).toHaveBeenCalledWith("user-1", "task-1");
@@ -117,15 +117,15 @@ describe("useTaskHandlers - Task Deletion", () => {
     );
 
     await act(async () => {
-      await result.current.handleDeleteTask("task-1");
+      await result.current.crud.handleDeleteTask("task-1");
     });
 
     act(() => {
-      result.current.handleCancelDelete();
+      result.current.crud.handleCancelDelete();
     });
 
-    expect(result.current.showDeleteConfirmation).toBe(false);
-    expect(result.current.taskToDelete).toBeNull();
+    expect(result.current.modals.showDeleteConfirmation).toBe(false);
+    expect(result.current.modals.taskToDelete).toBeNull();
   });
 
   it("should handle error when deleting task", async () => {
@@ -136,11 +136,11 @@ describe("useTaskHandlers - Task Deletion", () => {
     );
 
     await act(async () => {
-      await result.current.handleDeleteTask("task-1");
+      await result.current.crud.handleDeleteTask("task-1");
     });
 
     await act(async () => {
-      await result.current.handleConfirmDelete();
+      await result.current.crud.handleConfirmDelete();
     });
 
     expect(mockShowNotification).toHaveBeenCalledWith({

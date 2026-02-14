@@ -21,26 +21,33 @@ interface AppModalsProps {
   setShowLoginModal: (v: boolean) => void;
   isWizardActive: boolean;
   taskHandlers: {
-    showAddTaskModal: boolean;
-    setShowAddTaskModal: (v: boolean) => void;
-    handleAddTask: (t: string, d: string) => Promise<void>;
-    taskToEdit: Task | null;
-    showTaskEditModal: boolean;
-    setShowTaskEditModal: (v: boolean) => void;
-    setTaskToEdit: (t: Task | null) => void;
-    handleTaskUpdated: (updatedTask: {
-      id: string;
-      name: string;
-      description?: string | null;
-    }) => Promise<void>;
-    taskToShare: Task | null;
-    showShareTaskModal: boolean;
-    setShowShareTaskModal: (v: boolean) => void;
-    setTaskToShare: (t: Task | null) => void;
-    showDeleteConfirmation: boolean;
-    taskToDelete: Task | null;
-    handleConfirmDelete: () => void;
-    handleCancelDelete: () => void;
+    modals: {
+      showAddTaskModal: boolean;
+      setShowAddTaskModal: (v: boolean) => void;
+      taskToEdit: Task | null;
+      showTaskEditModal: boolean;
+      setShowTaskEditModal: (v: boolean) => void;
+      setTaskToEdit: (t: Task | null) => void;
+      taskToShare: Task | null;
+      showShareTaskModal: boolean;
+      setShowShareTaskModal: (v: boolean) => void;
+      setTaskToShare: (t: Task | null) => void;
+      showDeleteConfirmation: boolean;
+      taskToDelete: Task | null;
+    };
+    crud: {
+      handleAddTask: (t: string, d: string) => Promise<void>;
+      handleTaskUpdated: (updatedTask: {
+        id: string;
+        name: string;
+        description?: string | null;
+      }) => Promise<void>;
+      handleConfirmDelete: () => void;
+      handleCancelDelete: () => void;
+    };
+    sharing: {
+      handleRevokeShare?: (shareToken: string) => Promise<void>;
+    };
   };
 }
 
@@ -50,36 +57,44 @@ export default function AppModals({
   isWizardActive,
   taskHandlers,
 }: AppModalsProps) {
+  const { modals, crud, sharing } = taskHandlers;
   return (
     <>
       <AddEntryModal
-        isOpen={taskHandlers.showAddTaskModal}
-        onClose={() => taskHandlers.setShowAddTaskModal(false)}
-        onAdd={taskHandlers.handleAddTask}
+        isOpen={modals.showAddTaskModal}
+        onClose={() => modals.setShowAddTaskModal(false)}
+        onAdd={crud.handleAddTask}
       />
-      {taskHandlers.taskToEdit && (
+      {modals.taskToEdit && (
         <TaskEditModal
-          isOpen={taskHandlers.showTaskEditModal}
-          task={taskHandlers.taskToEdit}
+          isOpen={modals.showTaskEditModal}
+          task={modals.taskToEdit}
           onClose={() => {
-            taskHandlers.setShowTaskEditModal(false);
-            taskHandlers.setTaskToEdit(null);
+            modals.setShowTaskEditModal(false);
+            modals.setTaskToEdit(null);
           }}
           onSave={async (updatedTask) => {
-            await taskHandlers.handleTaskUpdated(updatedTask);
+            await crud.handleTaskUpdated(updatedTask);
           }}
-          setTaskToEdit={taskHandlers.setTaskToEdit}
+          setTaskToEdit={modals.setTaskToEdit}
         />
       )}
-      {taskHandlers.taskToShare && (
+      {modals.taskToShare && (
         <ShareTaskModal
-          isOpen={taskHandlers.showShareTaskModal}
-          shareToken={taskHandlers.taskToShare.shareToken || ""}
-          taskName={taskHandlers.taskToShare.name}
+          isOpen={modals.showShareTaskModal}
+          shareToken={modals.taskToShare.shareToken || ""}
+          taskName={modals.taskToShare.name}
           onClose={() => {
-            taskHandlers.setShowShareTaskModal(false);
-            taskHandlers.setTaskToShare(null);
+            modals.setShowShareTaskModal(false);
+            modals.setTaskToShare(null);
           }}
+          onRevoke={
+            sharing.handleRevokeShare && modals.taskToShare.shareToken
+              ? async () => {
+                  await sharing.handleRevokeShare!(modals.taskToShare!.shareToken!);
+                }
+              : undefined
+          }
         />
       )}
       <LoginModal
@@ -88,13 +103,13 @@ export default function AppModals({
         message={MODAL_STRINGS.LOGIN_MESSAGE}
       />
       <ConfirmationModal
-        isOpen={taskHandlers.showDeleteConfirmation}
+        isOpen={modals.showDeleteConfirmation}
         title={MODAL_STRINGS.DELETE_TASK_TITLE}
-        message={MODAL_STRINGS.DELETE_TASK_CONFIRM(taskHandlers.taskToDelete?.name ?? "")}
+        message={MODAL_STRINGS.DELETE_TASK_CONFIRM(modals.taskToDelete?.name ?? "")}
         confirmText={MODAL_STRINGS.DELETE_TASK_BUTTON}
         cancelText={MODAL_STRINGS.DELETE_TASK_CANCEL}
-        onConfirm={taskHandlers.handleConfirmDelete}
-        onCancel={taskHandlers.handleCancelDelete}
+        onConfirm={crud.handleConfirmDelete}
+        onCancel={crud.handleCancelDelete}
         variant="danger"
       />
       {isWizardActive && <OnboardingWizard />}

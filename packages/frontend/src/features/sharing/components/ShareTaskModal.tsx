@@ -11,6 +11,7 @@ interface ShareTaskModalProps {
   shareToken: string;
   taskName: string;
   onClose: () => void;
+  onRevoke?: (() => Promise<void>) | undefined;
 }
 
 export default function ShareTaskModal({
@@ -18,9 +19,11 @@ export default function ShareTaskModal({
   shareToken,
   taskName,
   onClose,
+  onRevoke,
 }: ShareTaskModalProps) {
   const { showNotification } = useNotification();
   const [isCopying, setIsCopying] = useState(false);
+  const [isRevoking, setIsRevoking] = useState(false);
   if (!isOpen) return null;
   const shareUrl = `${window.location.origin}/shared/task/${shareToken}`;
   const handleCopyLink = async () => {
@@ -63,6 +66,9 @@ export default function ShareTaskModal({
           className="share-task-modal__input"
         />
       </div>
+      <p className="share-task-modal__expiry">
+        Jagamislink kehtib 90 päeva.
+      </p>
       <div className="share-task-modal__actions">
         <button
           onClick={handleCopyLink}
@@ -72,6 +78,28 @@ export default function ShareTaskModal({
         >
           {isCopying ? "Kopeeritud!" : "Kopeeri"}
         </button>
+        {onRevoke && (
+          <button
+            onClick={async () => {
+              setIsRevoking(true);
+              try {
+                await onRevoke();
+                showNotification({ type: "success", message: "Jagamine tühistatud" });
+                onClose();
+              } catch (e) {
+                logger.error("Failed to revoke share:", e);
+                showNotification({ type: "error", message: "Viga jagamise tühistamisel" });
+              } finally {
+                setIsRevoking(false);
+              }
+            }}
+            disabled={isRevoking}
+            className="button button--danger"
+            type="button"
+          >
+            {isRevoking ? "Tühistamine..." : "Tühista jagamine"}
+          </button>
+        )}
       </div>
     </BaseModal>
   );

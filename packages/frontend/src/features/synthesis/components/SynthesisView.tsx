@@ -111,8 +111,8 @@ function SentenceItem({ sentence, sentenceIndex }: SentenceItemProps) {
             onSearchChange={menu.setMenuSearchQuery}
             isLoadingTasks={menu.isLoadingMenuTasks}
             tasks={menu.menuTasks}
-            onAddToTask={taskHandlers.handleAddSentenceToExistingTask}
-            onCreateNewTask={taskHandlers.handleCreateNewTaskFromMenu}
+            onAddToTask={taskHandlers.entries.handleAddSentenceToExistingTask}
+            onCreateNewTask={taskHandlers.crud.handleCreateNewTaskFromMenu}
             onExplorePhonetic={variants.handleExplorePhonetic}
             onDownload={synthesis.handleDownload}
             onCopyText={synthesis.handleCopyText}
@@ -136,12 +136,12 @@ export default function SynthesisView() {
         sentenceCount={synthesis.sentences.filter((s) => s.text.trim()).length}
         isPlayingAll={synthesis.isPlayingAll}
         isLoadingPlayAll={synthesis.isLoadingPlayAll}
-        onAddAllClick={taskHandlers.handleAddAllSentencesToTask}
+        onAddAllClick={taskHandlers.entries.handleAddAllSentencesToTask}
         onPlayAllClick={synthesis.handlePlayAll}
-        showDropdown={taskHandlers.showAddToTaskDropdown}
-        onDropdownClose={() => taskHandlers.setShowAddToTaskDropdown(false)}
-        onSelectTask={taskHandlers.handleSelectTaskFromDropdown}
-        onCreateNew={taskHandlers.handleCreateNewFromDropdown}
+        showDropdown={taskHandlers.modals.showAddToTaskDropdown}
+        onDropdownClose={() => taskHandlers.modals.setShowAddToTaskDropdown(false)}
+        onSelectTask={taskHandlers.entries.handleSelectTaskFromDropdown}
+        onCreateNew={taskHandlers.entries.handleCreateNewFromDropdown}
       />
       <div className="page-content">
         <div className="sentences-section">

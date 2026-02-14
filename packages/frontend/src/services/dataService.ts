@@ -110,6 +110,10 @@ export class DataService {
     return this.shareService.getTaskByShareToken(shareToken);
   }
 
+  async revokeShare(shareToken: string): Promise<void> {
+    await this.storage.deleteUnlistedTask(shareToken);
+  }
+
   async updateTaskEntry(
     userId: string,
     taskId: string,

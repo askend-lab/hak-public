@@ -78,4 +78,18 @@ describe("DataService Sharing", () => {
       expect(result).toBeNull();
     });
   });
+
+  describe("revokeShare", () => {
+    it("removes shared task by token", async () => {
+      const task = await dataService.createTask(mockUserId, {
+        name: "Revoke Task",
+        description: "Test",
+      });
+      await dataService.shareUserTask(mockUserId, task.id);
+      expect(await dataService.getTaskByShareToken(task.shareToken)).toBeDefined();
+
+      await dataService.revokeShare(task.shareToken);
+      expect(await dataService.getTaskByShareToken(task.shareToken)).toBeNull();
+    });
+  });
 });

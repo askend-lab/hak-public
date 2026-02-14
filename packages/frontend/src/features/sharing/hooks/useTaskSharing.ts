@@ -39,5 +39,19 @@ export function useTaskSharing(deps: UseTaskSharingDeps) {
     [requireAuth, user],
   );
 
-  return { handleShareTask };
+  const handleRevokeShare = useCallback(
+    async (shareToken: string) => {
+      if (!user) return;
+      try {
+        const dataService = DataService.getInstance();
+        await dataService.revokeShare(shareToken);
+      } catch (error) {
+        logger.error("Failed to revoke share:", error);
+        throw error;
+      }
+    },
+    [user],
+  );
+
+  return { handleShareTask, handleRevokeShare };
 }

@@ -245,4 +245,38 @@ describe("ShareTaskModal mutation kills", () => {
     expect(screen.getByRole("button", { name: "Kopeeri" })).not.toBeDisabled();
     spy.mockRestore();
   });
+
+  it("shows expiration notice", () => {
+    render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} />);
+    expect(screen.getByText(/90 päeva/)).toBeInTheDocument();
+  });
+
+  it("shows revoke button when onRevoke provided", () => {
+    const onRevoke = vi.fn().mockResolvedValue(undefined);
+    render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} onRevoke={onRevoke} />);
+    expect(screen.getByRole("button", { name: "Tühista jagamine" })).toBeInTheDocument();
+  });
+
+  it("does not show revoke button when onRevoke not provided", () => {
+    render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} />);
+    expect(screen.queryByRole("button", { name: "Tühista jagamine" })).not.toBeInTheDocument();
+  });
+
+  it("calls onRevoke and closes on revoke click", async () => {
+    const onRevoke = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} onRevoke={onRevoke} />);
+    await user.click(screen.getByRole("button", { name: "Tühista jagamine" }));
+    expect(onRevoke).toHaveBeenCalled();
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it("shows error notification when revoke fails", async () => {
+    const onRevoke = vi.fn().mockRejectedValue(new Error("fail"));
+    const user = userEvent.setup();
+    render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} onRevoke={onRevoke} />);
+    await user.click(screen.getByRole("button", { name: "Tühista jagamine" }));
+    expect(onRevoke).toHaveBeenCalled();
+    expect(mockOnClose).not.toHaveBeenCalled();
+  });
 });

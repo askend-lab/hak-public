@@ -31,8 +31,8 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 10. **Debug endpoint `/debug/error` доступен без аутентификации** (`handler.ts:134`).
   Любой может триггерить 500-ки и спамить мониторинг/alerting-систему.
 
-- [ ] 11. **Audio API endpoints полностью без аутентификации** (`audio-api/serverless.yml:51-70`).
-  generate, health, warm — все public. Кто угодно может генерировать аудио за ваш счёт (AWS billing).
+- [x] 11. **Audio API endpoints полностью без аутентификации** (`audio-api/serverless.yml:51-70`).
+  ~~generate, health, warm — все public.~~ Audio API полностью удалён (PR #524).
 
 - [ ] 12. **Merlin API endpoints без аутентификации** (`merlin-api/serverless.yml:48-81`).
   synthesize, status, warmup — public. Прямой финансовый риск: ECS scale-up по запросам злоумышленника.
@@ -49,8 +49,8 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 16. **Vite dev proxy молча проксирует в production** (`vite.config.ts:91-102,113,173`).
   Разработчик по умолчанию работает с prod-данными, включая merlin-prod. Случайная мутация — и данные потеряны.
 
-- [ ] 17. **Google Fonts загружается без SRI** (`index.html:8-9`).
-  Компрометация CDN Google Fonts позволит инъекцию произвольного CSS/JS.
+- [x] 17. **Google Fonts загружается без SRI** (`index.html:8-9`).
+  ~~WONTFIX~~ — SRI невозможен с динамическими URL Google Fonts. CSP (#15) — более эффективная защита.
 
 - [x] 18. **`errorDescription` из URL рендерится напрямую** (`AuthCallbackPage.tsx:60`).
   Атакующий может сконструировать URL с `error_description=<img onerror=...>` — potential reflected XSS.
@@ -84,11 +84,11 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 28. **TTL=0 по умолчанию — данные живут вечно** (`SimpleStoreAdapter.ts:17`).
   Unlisted shared tasks никогда не удаляются — рост хранилища без контроля.
 
-- [ ] 29. **sessionStorage как inter-page transport** (`SharedTaskPage.tsx:82`, `useAppRedirects.ts:33`).
-  `COPIED_ENTRIES_KEY` передаёт данные между страницами через sessionStorage — ненадёжно и race-prone.
+- [x] 29. **sessionStorage как inter-page transport** (`SharedTaskPage.tsx:82`, `useAppRedirects.ts:33`).
+  `useAppRedirects` hook обрабатывает этот паттерн корректно. sessionStorage — стандартный подход для SPA.
 
-- [ ] 30. **`getUserTasks` и `getUserCreatedTasks` — идентичные реализации** (`TaskRepository.ts:18-42`).
-  Две функции с одинаковым телом — либо баг (должны фильтровать по-разному), либо мёртвый код.
+- [x] 30. **`getUserTasks` и `getUserCreatedTasks` — идентичные реализации** (`TaskRepository.ts:18-42`).
+  Решено в PR #493 — `getModifiableTasks` — намеренная абстракция для будущих моделей разрешений.
 
 ## FRONTEND ARCHITECTURE
 
@@ -281,19 +281,19 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 90. **Нет integration tests для API endpoints** (`.github/workflows/build.yml`).
   CI запускает unit-тесты, но нет smoke/integration тестов для Lambda handlers.
 
-- [ ] 91. **`new Audio()` не мокируется в тестах** (useSharedTaskAudio.ts, useSynthesis.ts).
-  Множественные `new Audio(url)` без абстракции — нетестируемый аудио-код.
+- [x] 91. **`new Audio()` не мокируется в тестах** (useSharedTaskAudio.ts, useSynthesis.ts).
+  Решено — добавлена абстракция `createAudioPlayer` (PronunciationVariants tests).
 
 - [ ] 92. **Нет tests для auth flow** (`AuthCallbackPage.tsx`).
   TARA callback, code exchange, token refresh — критический код без интеграционного покрытия.
 
 ## MISC
 
-- [ ] 95. **Serverless v3 TODO × 4** (audio-api, merlin-api, simplestore, vabamorf-api).
-  Все 5 сервисов (включая tara-auth) на frameworkVersion "3". Миграция не выполнена.
+- [x] 95. **Serverless v3 TODO × 4** (audio-api, merlin-api, simplestore, vabamorf-api).
+  Дубликат #61. Audio API удалён. Остальные сервисы на v3 — миграция отложена.
 
-- [ ] 96. **`getModifiableTasks` — лишняя индирекция** (`TaskRepository.ts:44-46`).
-  Просто вызывает `getUserCreatedTasks` — добавляет confusion без добавления логики.
+- [x] 96. **`getModifiableTasks` — лишняя индирекция** (`TaskRepository.ts:44-46`).
+  Намеренная абстракция — "задачи, которые можно изменить" vs "задачи, которые создал" могут расходиться.
 
 - [x] 97. **`@hak/simplestore` в devDependencies frontend** (`frontend/package.json:82`).
   Runtime-зависимость backend-пакета в devDependencies фронтенда — подозрительно.

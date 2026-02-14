@@ -22,10 +22,11 @@ vi.mock("@/features/tasks/components/AddEntryModal", () => ({
     ) : null,
 }));
 vi.mock("@/features/sharing/components/ShareTaskModal", () => ({
-  default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
+  default: ({ isOpen, onClose, onRevoke }: { isOpen: boolean; onClose: () => void; onRevoke?: () => Promise<void> }) =>
     isOpen ? (
       <div data-testid="share-modal">
         <button onClick={onClose}>Close Share</button>
+        {onRevoke && <button onClick={() => onRevoke()}>Revoke</button>}
       </div>
     ) : null,
 }));
@@ -63,22 +64,27 @@ const baseProps = {
   setShowLoginModal: vi.fn(),
   isWizardActive: false,
   taskHandlers: {
-    showAddTaskModal: false,
-    setShowAddTaskModal: vi.fn(),
-    handleAddTask: vi.fn(),
-    taskToEdit: null,
-    showTaskEditModal: false,
-    setShowTaskEditModal: vi.fn(),
-    setTaskToEdit: vi.fn(),
-    handleTaskUpdated: vi.fn(),
-    taskToShare: null,
-    showShareTaskModal: false,
-    setShowShareTaskModal: vi.fn(),
-    setTaskToShare: vi.fn(),
-    showDeleteConfirmation: false,
-    taskToDelete: null,
-    handleConfirmDelete: vi.fn(),
-    handleCancelDelete: vi.fn(),
+    modals: {
+      showAddTaskModal: false,
+      setShowAddTaskModal: vi.fn(),
+      taskToEdit: null as { id: string; name: string } | null,
+      showTaskEditModal: false,
+      setShowTaskEditModal: vi.fn(),
+      setTaskToEdit: vi.fn(),
+      taskToShare: null as { id: string; name: string; shareToken?: string } | null,
+      showShareTaskModal: false,
+      setShowShareTaskModal: vi.fn(),
+      setTaskToShare: vi.fn(),
+      showDeleteConfirmation: false,
+      taskToDelete: null as { id: string; name: string } | null,
+    },
+    crud: {
+      handleAddTask: vi.fn(),
+      handleTaskUpdated: vi.fn(),
+      handleConfirmDelete: vi.fn(),
+      handleCancelDelete: vi.fn(),
+    },
+    sharing: {} as { handleRevokeShare?: (shareToken: string) => Promise<void> },
   },
 };
 
@@ -109,7 +115,7 @@ describe("AppModals", () => {
   it("renders add modal when showAddTaskModal is true", () => {
     const props = {
       ...baseProps,
-      taskHandlers: { ...baseProps.taskHandlers, showAddTaskModal: true },
+      taskHandlers: { ...baseProps.taskHandlers, modals: { ...baseProps.taskHandlers.modals, showAddTaskModal: true } },
     };
     render(<AppModals {...props} />);
     expect(screen.getByTestId("add-modal")).toBeInTheDocument();
@@ -121,8 +127,11 @@ describe("AppModals", () => {
       ...baseProps,
       taskHandlers: {
         ...baseProps.taskHandlers,
-        showAddTaskModal: true,
-        setShowAddTaskModal,
+        modals: {
+          ...baseProps.taskHandlers.modals,
+          showAddTaskModal: true,
+          setShowAddTaskModal,
+        },
       },
     };
     render(<AppModals {...props} />);
@@ -135,8 +144,11 @@ describe("AppModals", () => {
       ...baseProps,
       taskHandlers: {
         ...baseProps.taskHandlers,
-        taskToEdit: { id: "1", name: "T" },
-        showTaskEditModal: true,
+        modals: {
+          ...baseProps.taskHandlers.modals,
+          taskToEdit: { id: "1", name: "T" },
+          showTaskEditModal: true,
+        },
       },
     };
     render(<AppModals {...props} />);
@@ -150,10 +162,13 @@ describe("AppModals", () => {
       ...baseProps,
       taskHandlers: {
         ...baseProps.taskHandlers,
-        taskToEdit: { id: "1", name: "T" },
-        showTaskEditModal: true,
-        setShowTaskEditModal,
-        setTaskToEdit,
+        modals: {
+          ...baseProps.taskHandlers.modals,
+          taskToEdit: { id: "1", name: "T" },
+          showTaskEditModal: true,
+          setShowTaskEditModal,
+          setTaskToEdit,
+        },
       },
     };
     render(<AppModals {...props} />);
@@ -169,10 +184,13 @@ describe("AppModals", () => {
       ...baseProps,
       taskHandlers: {
         ...baseProps.taskHandlers,
-        taskToShare: { id: "1", name: "T", shareToken: "tok" },
-        showShareTaskModal: true,
-        setShowShareTaskModal,
-        setTaskToShare,
+        modals: {
+          ...baseProps.taskHandlers.modals,
+          taskToShare: { id: "1", name: "T", shareToken: "tok" },
+          showShareTaskModal: true,
+          setShowShareTaskModal,
+          setTaskToShare,
+        },
       },
     };
     render(<AppModals {...props} />);
@@ -186,8 +204,11 @@ describe("AppModals", () => {
       ...baseProps,
       taskHandlers: {
         ...baseProps.taskHandlers,
-        showDeleteConfirmation: true,
-        taskToDelete: { id: "1", name: "T" },
+        modals: {
+          ...baseProps.taskHandlers.modals,
+          showDeleteConfirmation: true,
+          taskToDelete: { id: "1", name: "T" },
+        },
       },
     };
     render(<AppModals {...props} />);
@@ -200,14 +221,39 @@ describe("AppModals", () => {
       ...baseProps,
       taskHandlers: {
         ...baseProps.taskHandlers,
-        showDeleteConfirmation: true,
-        taskToDelete: { id: "1", name: "T" },
-        handleConfirmDelete,
+        modals: {
+          ...baseProps.taskHandlers.modals,
+          showDeleteConfirmation: true,
+          taskToDelete: { id: "1", name: "T" },
+        },
+        crud: {
+          ...baseProps.taskHandlers.crud,
+          handleConfirmDelete,
+        },
       },
     };
     render(<AppModals {...props} />);
     fireEvent.click(screen.getByText("Confirm"));
     expect(handleConfirmDelete).toHaveBeenCalled();
+  });
+
+  it("calls handleRevokeShare via onRevoke when shareToken present", () => {
+    const handleRevokeShare = vi.fn().mockResolvedValue(undefined);
+    const props = {
+      ...baseProps,
+      taskHandlers: {
+        ...baseProps.taskHandlers,
+        modals: {
+          ...baseProps.taskHandlers.modals,
+          taskToShare: { id: "1", name: "T", shareToken: "tok" },
+          showShareTaskModal: true,
+        },
+        sharing: { handleRevokeShare },
+      },
+    };
+    render(<AppModals {...props} />);
+    fireEvent.click(screen.getByText("Revoke"));
+    expect(handleRevokeShare).toHaveBeenCalledWith("tok");
   });
 
   it("renders wizard when isWizardActive", () => {

@@ -4,7 +4,7 @@
 import { StorageAdapter, StoreItem } from "../src/core/types";
 
 export class FailingDynamoDB implements StorageAdapter {
-  put(): Promise<void> {
+  put(_item: StoreItem, _expectedVersion?: number): Promise<void> {
     throw new Error("DB error");
   }
   get(): Promise<StoreItem | null> {
@@ -25,7 +25,7 @@ export class InMemoryDynamoDB implements StorageAdapter {
     return `${pk}|${sk}`;
   }
 
-  put(item: StoreItem): Promise<void> {
+  put(item: StoreItem, _expectedVersion?: number): Promise<void> {
     const key = this.makeKey(item.PK, item.SK);
     this.items.set(key, { ...item });
     return Promise.resolve();
