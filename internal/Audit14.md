@@ -31,7 +31,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 8. **CORS `Access-Control-Allow-Origin: *`** (`lambda.ts:20`).
   Wildcard CORS позволяет любому сайту делать authenticated-запросы к API, если браузер отправит credentials.
 
-- [ ] 9. **Нет rate limiting на API endpoints** (все serverless.yml).
+- [x] 9. **Нет rate limiting на API endpoints** (все serverless.yml).
   Synthesis, analyze, audio generate — все без throttling. Абьюзер может генерировать тысячи аудио за минуту.
 
 - [x] 10. **Debug endpoint `/debug/error` доступен без аутентификации** (`handler.ts:134`).
@@ -69,10 +69,10 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## DATA & STATE
 
-- [ ] 21. **Все задачи пользователя в одном DynamoDB item** (`SimpleStoreAdapter.ts:77-79`).
+- [x] 21. **Все задачи пользователя в одном DynamoDB item** (`SimpleStoreAdapter.ts:77-79`).
   `loadUserTasks` читает один ключ с массивом всех задач. DynamoDB item limit = 400KB — при росте данных будет crash.
 
-- [ ] 22. **`saveUserTasks` перезаписывает весь массив задач** (`SimpleStoreAdapter.ts:82-84`).
+- [x] 22. **`saveUserTasks` перезаписывает весь массив задач** (`SimpleStoreAdapter.ts:82-84`).
   Каждое изменение одной задачи перезаписывает все задачи — потеря данных при параллельных операциях.
 
 - [ ] 23. **Нет optimistic locking / version check** (`TaskRepository.ts`).
@@ -142,7 +142,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 43. **`pollForAudio` не отменяем** (`synthesize.ts:25-39`).
   30 попыток × 1 сек — если компонент unmount, запросы продолжатся. Memory leak + wasted bandwidth.
 
-- [ ] 44. **Нет retry logic на failed API calls** (synthesize, analyze, variants).
+- [x] 44. **Нет retry logic на failed API calls** (synthesize, analyze, variants).
   Однократный сбой сети = полный отказ. Нет exponential backoff, нет retry.
 
 - [x] 45. **`SimpleStoreAdapter.get` шлёт auth headers для public endpoint** (`SimpleStoreAdapter.ts:62-64`).
@@ -197,7 +197,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## INFRASTRUCTURE & DEVOPS
 
-- [ ] 61. **Serverless Framework v3 — maintenance mode с 2024** (все serverless.yml).
+- [x] 61. **Serverless Framework v3 — maintenance mode с 2024** (все serverless.yml).
   Четыре TODO в коде, но миграция не выполнена. Security patches для v3 не гарантированы.
 
 - [ ] 62. **Mixed API types: REST API vs HTTP API** (`simplestore` vs `merlin-api`).
@@ -206,13 +206,13 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 63. **`COGNITO_USER_POOL_ARN` через env var без валидации** (`simplestore/serverless.yml:134`).
   Если env var не задан — deploy пройдёт с пустым ARN, authorizer будет broken.
 
-- [ ] 64. **Нет WAF перед API Gateway** (все serverless.yml).
+- [x] 64. **Нет WAF перед API Gateway** (все serverless.yml).
   Без Web Application Firewall — нет protection от SQL injection, DDoS, bot abuse на edge.
 
 - [x] 65. **CI/CD не запускает security audit** (`.github/workflows/build.yml`).
   `pnpm audit` не вызывается — уязвимости в dependencies не обнаруживаются автоматически.
 
-- [ ] 66. **Нет SAST/DAST в pipeline** (`.github/workflows/build.yml`).
+- [x] 66. **Нет SAST/DAST в pipeline** (`.github/workflows/build.yml`).
   Нет Snyk, Trivy, CodeQL — статический и динамический анализ безопасности отсутствует.
 
 - [ ] 67. **`pnpm overrides` для CVE — ручное управление** (`package.json:43-55`).
@@ -307,7 +307,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## MISC
 
-- [ ] 95. **Serverless v3 TODO × 4** (audio-api, merlin-api, simplestore, vabamorf-api).
+- [x] 95. **Serverless v3 TODO × 4** (audio-api, merlin-api, simplestore, vabamorf-api).
   Один и тот же TODO "migrate to Serverless v4" в четырёх файлах — technical debt accumulation.
 
 - [ ] 96. **`getModifiableTasks` — лишняя индирекция** (`TaskRepository.ts:44-46`).
