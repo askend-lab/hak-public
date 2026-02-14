@@ -74,13 +74,7 @@ jobs:
         id: plan
         env:
           TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          # Dev uses prod Merlin for audio generation (saves resources)
-          if [ "${{ matrix.environment }}" = "dev" ]; then
-            terraform plan -var="env=${{ matrix.environment }}" -var="use_prod_merlin=true" -no-color -input=false
-          else
-            terraform plan -var="env=${{ matrix.environment }}" -no-color -input=false
-          fi
+        run: terraform plan -var-file="environments/${{ matrix.environment }}.tfvars" -no-color -input=false
         continue-on-error: true
 
       - name: Comment PR
@@ -172,13 +166,7 @@ jobs:
       - name: Terraform Apply (${{ matrix.environment }})
         env:
           TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          # Dev uses prod Merlin for audio generation (saves resources)
-          if [ "${{ matrix.environment }}" = "dev" ]; then
-            terraform apply -var="env=${{ matrix.environment }}" -var="use_prod_merlin=true" -auto-approve -input=false
-          else
-            terraform apply -var="env=${{ matrix.environment }}" -auto-approve -input=false
-          fi
+        run: terraform apply -var-file="environments/${{ matrix.environment }}.tfvars" -auto-approve -input=false
 
       - name: Invalidate CloudFront Cache
         run: |
