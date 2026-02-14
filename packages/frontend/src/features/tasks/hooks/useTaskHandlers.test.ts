@@ -280,6 +280,7 @@ describe("useTaskHandlers", () => {
   it("should revoke share", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.sharing.handleRevokeShare("share-token-abc");
