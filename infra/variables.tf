@@ -8,12 +8,6 @@ variable "env" {
   }
 }
 
-variable "use_prod_merlin" {
-  description = "Use prod Merlin API for audio generation (allows disabling dev Merlin)"
-  type        = bool
-  default     = false
-}
-
 variable "domain_name" {
   description = "Base domain name (e.g. example.com)"
   type        = string

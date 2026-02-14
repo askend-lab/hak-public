@@ -4,4 +4,3 @@ wildcard_cert_arn      = "arn:aws:acm:eu-west-1:465168436856:certificate/f91069e
 artifacts_bucket       = "askend-lab-artifacts"
 terraform_state_bucket = "askend-lab-terraform-state"
 terraform_locks_table  = "askend-lab-terraform-locks"
-use_prod_merlin        = true

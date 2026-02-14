@@ -82,19 +82,14 @@ functions:
           path: /warmup
           method: POST
 
-plugins:
-  - serverless-domain-manager
-
-custom:
-  customDomain:
-    domainName: merlin-${self:provider.stage}.${env:DOMAIN_NAME, 'example.com'}
-    basePath: ""
-    stage: ${self:provider.stage}
-    certificateArn: ${env:CERTIFICATE_ARN, ''}
-    createRoute53Record: true
-    endpointType: REGIONAL
-    hostedZoneId: ${env:HOSTED_ZONE_ID, ''}
-    apiType: http
+resources:
+  Outputs:
+    ApiEndpoint:
+      Description: Merlin API Gateway endpoint URL
+      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+    HttpApiId:
+      Description: HTTP API ID (used by Terraform for CloudFront origin)
+      Value: !Ref HttpApi
 
 package:
   individually: true
