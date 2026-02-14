@@ -7,7 +7,6 @@ import { CONTENT_TYPE_JSON } from "./analyzeApi";
 let warmed = false;
 let lastActivity = 0;
 const ACTIVITY_THROTTLE = 60000; // 1 min between pings
-const AUDIO_WARM_API_PATH = "/api/audio/warm";
 const WARMUP_API_PATH = "/api/warmup";
 
 export async function warmAudioWorker(): Promise<void> {
@@ -15,22 +14,15 @@ export async function warmAudioWorker(): Promise<void> {
   if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
 
   try {
-    // Warm up both Audio and Merlin workers
-    await Promise.all([
-      fetch(AUDIO_WARM_API_PATH, {
-        method: "POST",
-        headers: { "Content-Type": CONTENT_TYPE_JSON },
-      }),
-      fetch(WARMUP_API_PATH, {
-        method: "POST",
-        headers: { "Content-Type": CONTENT_TYPE_JSON },
-      }),
-    ]);
+    await fetch(WARMUP_API_PATH, {
+      method: "POST",
+      headers: { "Content-Type": CONTENT_TYPE_JSON },
+    });
     warmed = true;
     lastActivity = Date.now();
-    logger.info("[Audio] Workers warm-up triggered");
+    logger.info("[Audio] Merlin warm-up triggered");
   } catch (error) {
-    logger.warn("[Audio] Failed to warm up workers:", error);
+    logger.warn("[Audio] Failed to warm up Merlin:", error);
   }
 }
 

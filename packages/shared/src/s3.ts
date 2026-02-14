@@ -2,8 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 /**
- * Shared S3 utilities.
- * Eliminates duplication across audio-api, merlin-api.
+ * Shared S3 utilities used by merlin-api.
  */
 
 import { HeadObjectCommand } from "@aws-sdk/client-s3";

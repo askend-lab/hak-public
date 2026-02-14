@@ -16,9 +16,6 @@ test_modules:
   - name: simplestore
     path: packages/simplestore
     type: jest
-  - name: audio-api
-    path: packages/audio-api
-    type: jest
   - name: merlin-worker
     path: packages/merlin-worker
     type: pytest

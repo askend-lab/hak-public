@@ -91,8 +91,7 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
           title  = "Lambda Invocations"
           region = local.region
           metrics = [
-            ["AWS/Lambda", "Invocations", "FunctionName", "simplestore-${var.env}-api", { stat = "Sum", period = 300 }],
-            ["AWS/Lambda", "Invocations", "FunctionName", "hak-audio-${var.env}-synthesize", { stat = "Sum", period = 300 }]
+            ["AWS/Lambda", "Invocations", "FunctionName", "simplestore-${var.env}-api", { stat = "Sum", period = 300 }]
           ]
           view = "timeSeries"
         }
@@ -107,8 +106,7 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
           title  = "Lambda Duration"
           region = local.region
           metrics = [
-            ["AWS/Lambda", "Duration", "FunctionName", "simplestore-${var.env}-api", { stat = "Average", period = 300 }],
-            ["AWS/Lambda", "Duration", "FunctionName", "hak-audio-${var.env}-synthesize", { stat = "Average", period = 300 }]
+            ["AWS/Lambda", "Duration", "FunctionName", "simplestore-${var.env}-api", { stat = "Average", period = 300 }]
           ]
           view = "timeSeries"
         }
@@ -123,8 +121,7 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
           title  = "Lambda Errors"
           region = local.region
           metrics = [
-            ["AWS/Lambda", "Errors", "FunctionName", "simplestore-${var.env}-api", { stat = "Sum", period = 300 }],
-            ["AWS/Lambda", "Errors", "FunctionName", "hak-audio-${var.env}-synthesize", { stat = "Sum", period = 300 }]
+            ["AWS/Lambda", "Errors", "FunctionName", "simplestore-${var.env}-api", { stat = "Sum", period = 300 }]
           ]
           view = "timeSeries"
         }

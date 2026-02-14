@@ -98,7 +98,6 @@ jobs:
             echo "No diff available (initial commit, workflow_dispatch, or same SHA) - building all"
             echo "frontend=true" >> $GITHUB_OUTPUT
             echo "simplestore=true" >> $GITHUB_OUTPUT
-            echo "audio-api=true" >> $GITHUB_OUTPUT
             echo "merlin-api=true" >> $GITHUB_OUTPUT
             echo "vabamorf-api=true" >> $GITHUB_OUTPUT
           else
@@ -109,7 +108,6 @@ jobs:
 
             echo "frontend=$( (echo "$CHANGED" | grep -q "^packages/frontend/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "simplestore=$( (echo "$CHANGED" | grep -q "^packages/simplestore/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "audio-api=$( (echo "$CHANGED" | grep -q "^packages/audio-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "merlin-api=$( (echo "$CHANGED" | grep -q "^packages/merlin-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
             echo "vabamorf-api=$( (echo "$CHANGED" | grep -q "^packages/vabamorf-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
 
@@ -117,7 +115,6 @@ jobs:
               echo "Root config changed - building all"
               echo "frontend=true" >> $GITHUB_OUTPUT
               echo "simplestore=true" >> $GITHUB_OUTPUT
-              echo "audio-api=true" >> $GITHUB_OUTPUT
               echo "merlin-api=true" >> $GITHUB_OUTPUT
               echo "vabamorf-api=true" >> $GITHUB_OUTPUT
             fi
@@ -142,10 +139,6 @@ jobs:
       - name: Build SimpleStore
         if: steps.detect.outputs.simplestore == 'true'
         run: pnpm --filter @hak/simplestore build
-
-      - name: Build Audio API
-        if: steps.detect.outputs.audio-api == 'true'
-        run: pnpm --filter @hak/audio-api build
 
       - name: Build Merlin API
         if: steps.detect.outputs.merlin-api == 'true'
@@ -191,7 +184,6 @@ jobs:
         env:
           FRONTEND_CHANGED: ${{ steps.detect.outputs.frontend }}
           SIMPLESTORE_CHANGED: ${{ steps.detect.outputs.simplestore }}
-          AUDIO_API_CHANGED: ${{ steps.detect.outputs.audio-api }}
           MERLIN_API_CHANGED: ${{ steps.detect.outputs.merlin-api }}
           VABAMORF_API_CHANGED: ${{ steps.detect.outputs.vabamorf-api }}
         run: |
@@ -224,7 +216,6 @@ jobs:
 
           upload_module "frontend" "packages/frontend/dist" "$FRONTEND_CHANGED"
           upload_module "simplestore" "packages/simplestore/dist" "$SIMPLESTORE_CHANGED"
-          upload_module "audio-api" "packages/audio-api/dist" "$AUDIO_API_CHANGED"
           upload_module "merlin-api" "packages/merlin-api/dist" "$MERLIN_API_CHANGED"
           upload_module "vabamorf-api" "packages/vabamorf-api/dist" "$VABAMORF_API_CHANGED"
 
@@ -235,7 +226,6 @@ jobs:
             --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg frontend "$( [ "$FRONTEND_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha frontend )" \
             --arg simplestore "$( [ "$SIMPLESTORE_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha simplestore )" \
-            --arg audio "$( [ "$AUDIO_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha audio-api )" \
             --arg merlin "$( [ "$MERLIN_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha merlin-api )" \
             --arg vabamorf "$( [ "$VABAMORF_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha vabamorf-api )" \
             '{
@@ -245,7 +235,6 @@ jobs:
               modules: {
                 frontend: $frontend,
                 simplestore: $simplestore,
-                "audio-api": $audio,
                 "merlin-api": $merlin,
                 "vabamorf-api": $vabamorf
               }

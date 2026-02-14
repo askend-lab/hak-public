@@ -51,7 +51,6 @@ module.exports = {
     "/node_modules/",
     SIMPLESTORE_PATH,
     "/packages/frontend/", // Frontend uses Vitest now
-    "packages/audio-api/test/features/", // Exclude audio-api E2E tests - run by audio-api module
   ],
   modulePathIgnorePatterns: [SIMPLESTORE_PATH],
   transform: {
