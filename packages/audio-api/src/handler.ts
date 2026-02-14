@@ -46,7 +46,12 @@ export async function handler(
   try {
     const { bucketName, queueUrl } = getRequiredEnvVars();
 
-    const body = JSON.parse(event.body) as RequestBody;
+    let body: RequestBody;
+    try {
+      body = JSON.parse(event.body) as RequestBody;
+    } catch {
+      return createErrorResponse("Invalid JSON body");
+    }
     const validation = validateText(body.text);
 
     if (!validation.valid) {

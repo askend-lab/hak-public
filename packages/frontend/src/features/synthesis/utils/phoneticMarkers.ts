@@ -51,22 +51,22 @@ const VABAMORF_MARKERS_TO_KEEP = new Set(Object.keys(MARKER_MAPPING));
 export function transformToUI(vabamorfText: string | null): string | null {
   if (!vabamorfText) return vabamorfText;
 
-  let result = "";
+  const parts: string[] = [];
 
   for (const char of vabamorfText) {
     if (VABAMORF_MARKERS_TO_KEEP.has(char)) {
       // Transform the marker to UI version
-      result += MARKER_MAPPING[char];
+      parts.push(MARKER_MAPPING[char] ?? char);
     } else if (isVabamorfMarker(char)) {
       // Omit this Vabamorf marker (not in our mapping)
       continue;
     } else {
       // Keep regular characters
-      result += char;
+      parts.push(char);
     }
   }
 
-  return result;
+  return parts.join("");
 }
 
 /**
@@ -82,19 +82,19 @@ export function transformToUI(vabamorfText: string | null): string | null {
 export function transformToVabamorf(uiText: string | null): string | null {
   if (!uiText) return uiText;
 
-  let result = "";
+  const parts: string[] = [];
 
   for (const char of uiText) {
     if (char in REVERSE_MARKER_MAPPING) {
       // Transform UI marker back to Vabamorf
-      result += REVERSE_MARKER_MAPPING[char];
+      parts.push(REVERSE_MARKER_MAPPING[char] ?? char);
     } else {
       // Keep everything else as-is
-      result += char;
+      parts.push(char);
     }
   }
 
-  return result;
+  return parts.join("");
 }
 
 /**
@@ -115,22 +115,12 @@ export function transformToVabamorf(uiText: string | null): string | null {
  * @param char - Character to check
  * @returns true if the character is a known Vabamorf marker
  */
+const VABAMORF_MARKERS = new Set([
+  "<", "?", "]", "~", "+", "_", "=", "[", "'", ".", "´", "`",
+]);
+
 export function isVabamorfMarker(char: string): boolean {
-  const vabamorfMarkers = [
-    "<",
-    "?",
-    "]",
-    "~",
-    "+",
-    "_",
-    "=",
-    "[",
-    "'",
-    ".",
-    "´",
-    "`",
-  ];
-  return vabamorfMarkers.includes(char);
+  return VABAMORF_MARKERS.has(char);
 }
 
 /**
@@ -149,16 +139,16 @@ export function stripPhoneticMarkers(
 ): string | null {
   if (!phoneticText) return phoneticText;
 
-  let result = "";
+  const parts: string[] = [];
 
   for (const char of phoneticText) {
     if (!isVabamorfMarker(char)) {
       // Keep only non-marker characters
-      result += char;
+      parts.push(char);
     }
   }
 
-  return result;
+  return parts.join("");
 }
 
 /**

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
 
 import BaseModal from "./BaseModal";
 
@@ -21,7 +20,7 @@ export default function ConfirmationModal({
   title,
   message,
   confirmText = "OK",
-  cancelText = "Cancel",
+  cancelText = "Tühista",
   onConfirm,
   onCancel,
   variant = "danger",

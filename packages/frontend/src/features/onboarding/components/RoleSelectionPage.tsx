@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
 
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";

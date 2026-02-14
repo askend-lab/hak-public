@@ -49,7 +49,7 @@ describe("Index Lambda Handlers", () => {
       const response = await lambdaHandler(event);
 
       expect(response.headers["Access-Control-Allow-Headers"]).toBe("Content-Type,Authorization");
-      expect(response.headers["Access-Control-Allow-Methods"]).toBe("GET,POST,OPTIONS");
+      expect(response.headers["Access-Control-Allow-Methods"]).toBe("GET,POST,DELETE,OPTIONS");
     });
   });
 

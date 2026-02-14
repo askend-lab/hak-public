@@ -51,7 +51,8 @@ const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
         duration: options.duration,
       };
 
-      setNotifications((prev) => [...prev, notification]);
+      const MAX_NOTIFICATIONS = 5;
+      setNotifications((prev) => [...prev, notification].slice(-MAX_NOTIFICATIONS));
     },
     [],
   );

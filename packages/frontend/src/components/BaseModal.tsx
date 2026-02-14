@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-"use client";
 
 import { useEffect, useRef, useId } from "react";
 import { CloseIcon } from "./ui/Icons";
@@ -109,6 +108,7 @@ export default function BaseModal({
 
     document.addEventListener("keydown", handleEscape);
     document.addEventListener("keydown", handleTabKey);
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     // Focus the modal or first focusable element
@@ -122,7 +122,7 @@ export default function BaseModal({
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.removeEventListener("keydown", handleTabKey);
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = previousOverflow;
 
       // Restore focus to previously focused element
       previousFocusRef.current?.focus();

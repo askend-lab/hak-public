@@ -36,11 +36,11 @@ describe("Footer", () => {
       render(<Footer />);
       expect(screen.getByText("Tagasiside")).toBeInTheDocument();
       expect(screen.getByText(/Saada meile oma mõtted/)).toBeInTheDocument();
-      const emailLink = screen.getByText("kristjan.suluste@eki.ee");
+      const emailLink = screen.getByText("eki@eki.ee");
       expect(emailLink).toBeInTheDocument();
       expect(emailLink.closest("a")).toHaveAttribute(
         "href",
-        "mailto:kristjan.suluste@eki.ee",
+        "mailto:eki@eki.ee",
       );
     });
 
@@ -157,11 +157,11 @@ describe("Footer", () => {
 
     it("renders feedback email link", () => {
       render(<Footer />);
-      const emailLink = screen.getByText("kristjan.suluste@eki.ee");
+      const emailLink = screen.getByText("eki@eki.ee");
       expect(emailLink).toBeInTheDocument();
       expect(emailLink.closest("a")).toHaveAttribute(
         "href",
-        "mailto:kristjan.suluste@eki.ee",
+        "mailto:eki@eki.ee",
       );
     });
 

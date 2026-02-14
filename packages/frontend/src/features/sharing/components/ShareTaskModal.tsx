@@ -16,7 +16,7 @@ interface ShareTaskModalProps {
 export default function ShareTaskModal({
   isOpen,
   shareToken,
-  taskName: _taskName,
+  taskName,
   onClose,
 }: ShareTaskModalProps) {
   const { showNotification } = useNotification();
@@ -43,7 +43,7 @@ export default function ShareTaskModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Jaga ülesanne"
+      title={`Jaga ülesanne: ${taskName}`}
       size="medium"
       className="share-task-modal"
     >

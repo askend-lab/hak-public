@@ -153,7 +153,7 @@ describe("BaseModal", () => {
     expect(document.body.style.overflow).toBe("hidden");
     expect(container.querySelector(".base-modal__backdrop")?.getAttribute("aria-hidden")).toBe("true");
     rerender(<BaseModal isOpen={false} onClose={vi.fn()}><p>Content</p></BaseModal>);
-    expect(document.body.style.overflow).toBe("unset");
+    expect(document.body.style.overflow).toBe("");
   });
 
   it("close button has type=button and base-modal__close class", () => {
