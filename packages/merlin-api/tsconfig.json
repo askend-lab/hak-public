@@ -4,10 +4,7 @@
     "module": "commonjs",
     "lib": ["ES2020"],
     "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@hak/shared": ["../shared/src"]
-    },
+    "rootDir": "./src",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true,

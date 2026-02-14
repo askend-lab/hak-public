@@ -42,7 +42,7 @@ export {
 } from "./env";
 
 export { buildAudioUrl, buildCacheKey, checkS3Cache } from "./s3";
-export { isNotFoundError } from "@hak/shared";
+export { isNotFoundError } from "./s3";
 export { sendToQueue } from "./sqs";
 export { describeService, scaleService, isEcsConfigured } from "./ecs";
 export type { EcsServiceState } from "./ecs";
