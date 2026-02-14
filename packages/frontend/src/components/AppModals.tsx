@@ -7,7 +7,7 @@ import ShareTaskModal from "@/features/sharing/components/ShareTaskModal";
 import LoginModal from "@/features/auth/components/LoginModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { OnboardingWizard } from "@/features/onboarding/components";
-import { MODAL_STRINGS } from "@/constants/ui-strings";
+import { MODAL_STRINGS } from "@/config/ui-strings";
 
 interface Task {
   id: string;

@@ -5,7 +5,7 @@ import { useState, useCallback } from "react";
 import { SentenceState, convertTextToTags, stripPunctuationForLookup } from "@/types/synthesis";
 import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 import { analyzeText, postJSON, VARIANTS_API_PATH } from "@/features/synthesis/utils/analyzeApi";
-import { VARIANTS_STRINGS } from "@/constants/ui-strings";
+import { VARIANTS_STRINGS } from "@/config/ui-strings";
 
 const VARIANTS_API_TIMEOUT_MS = 10000;
 const MIN_SPINNER_DISPLAY_MS = 500;
