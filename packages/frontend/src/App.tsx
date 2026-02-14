@@ -3,6 +3,7 @@
 
 import { useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
+import CookieConsent from "./components/CookieConsent";
 import Footer from "./components/Footer";
 import AppHeader from "./components/AppHeader";
 import AppModals from "./components/AppModals";
@@ -135,6 +136,7 @@ export default function Home() {
         isWizardActive={isWizardActive}
         taskHandlers={taskHandlers}
       />
+      <CookieConsent />
     </div>
   );
 }

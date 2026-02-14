@@ -45,7 +45,6 @@ export default function UserProfile({ user }: UserProfileProps) {
         <div className="user-profile__avatar">{getInitials(user)}</div>
         <div className="user-profile__info">
           <div className="user-profile__name">{getDisplayName(user)}</div>
-          <div className="user-profile__id">{user.id}</div>
         </div>
         <ChevronDownIcon
           size="md"
@@ -71,7 +70,6 @@ export default function UserProfile({ user }: UserProfileProps) {
                   {getDisplayName(user)}
                 </div>
                 <div className="user-profile__email">{user.email}</div>
-                <div className="user-profile__id--formatted">ID: {user.id}</div>
               </div>
             </div>
 
