@@ -114,6 +114,7 @@ export const mockTaskHandlers = () => ({
   modals: {
     showAddToTaskDropdown: false,
     setShowAddToTaskDropdown: vi.fn(),
+    taskRefreshTrigger: 0,
     showAddTaskModal: false,
     setShowAddTaskModal: vi.fn(),
     showTaskEditModal: false,
@@ -125,9 +126,9 @@ export const mockTaskHandlers = () => ({
     taskToShare: null,
     setTaskToShare: vi.fn(),
     showDeleteConfirmation: false,
+    setShowDeleteConfirmation: vi.fn(),
     taskToDelete: null,
     setTaskToDelete: vi.fn(),
-    taskRefreshTrigger: 0,
     setTaskRefreshTrigger: vi.fn(),
     pendingSentenceId: null,
     setPendingSentenceId: vi.fn(),
@@ -135,6 +136,7 @@ export const mockTaskHandlers = () => ({
     setIsTaskCreationFromTasksView: vi.fn(),
   },
   crud: {
+    handleCreateNewTaskFromMenu: vi.fn(),
     handleCreateTask: vi.fn(),
     handleAddTask: vi.fn(),
     handleEditTask: vi.fn(),
@@ -142,7 +144,6 @@ export const mockTaskHandlers = () => ({
     handleDeleteTask: vi.fn(),
     handleConfirmDelete: vi.fn(),
     handleCancelDelete: vi.fn(),
-    handleCreateNewTaskFromMenu: vi.fn(),
   },
   entries: {
     handleAddAllSentencesToTask: vi.fn(),
