@@ -6,11 +6,25 @@ import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSentenceState } from "./useSentenceState";
 
+let mockConsumeResult: unknown[] | null = null;
+vi.mock("@/contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({
+    copiedEntries: null,
+    setCopiedEntries: vi.fn(),
+    consumeCopiedEntries: vi.fn(() => {
+      const result = mockConsumeResult;
+      mockConsumeResult = null;
+      return result;
+    }),
+    hasCopiedEntries: false,
+  }),
+}));
+
 describe("useSentenceState", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    sessionStorage.clear();
+    mockConsumeResult = null;
   });
 
   it("initializes with default sentence", () => {
@@ -158,24 +172,12 @@ describe("useSentenceState", () => {
     expect(localStorage.getItem("eki_playlist_entries")).toBeNull();
   });
 
-  it("loads copied entries from sessionStorage", () => {
-    sessionStorage.setItem(
-      "copiedEntries",
-      JSON.stringify([
-        { id: "c1", text: "copied text", stressedText: "co`pied text" },
-      ]),
-    );
+  it("loads copied entries from context", () => {
+    mockConsumeResult = [
+      { id: "c1", text: "copied text", stressedText: "co`pied text" },
+    ];
     const { result } = renderHook(() => useSentenceState());
     expect(result.current.sentences[0]?.text).toBe("copied text");
-    expect(sessionStorage.getItem("copiedEntries")).toBeNull();
-  });
-
-  it("handles corrupted sessionStorage gracefully", () => {
-    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    sessionStorage.setItem("copiedEntries", "bad-json");
-    renderHook(() => useSentenceState());
-    expect(spy).toHaveBeenCalled();
-    spy.mockRestore();
   });
 
   it("persists to localStorage on change", () => {

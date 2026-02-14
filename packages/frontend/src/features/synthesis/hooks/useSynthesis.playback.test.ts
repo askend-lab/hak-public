@@ -11,6 +11,9 @@ vi.mock("@/contexts/NotificationContext", () => ({
     showNotification: vi.fn(),
   }),
 }));
+vi.mock("@/contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
+}));
 
 vi.mock("@/features/synthesis/utils/phoneticMarkers", () => ({
   stripPhoneticMarkers: (text: string): string => text.replace(/[·`´]/g, ""),

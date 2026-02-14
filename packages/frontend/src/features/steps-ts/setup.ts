@@ -28,6 +28,7 @@ import { AuthProvider } from "../auth/services";
 import { NotificationProvider } from "../../contexts/NotificationContext";
 import { OnboardingProvider } from "../onboarding/contexts/OnboardingContext";
 import { DataServiceProvider } from "../../contexts/DataServiceContext";
+import { CopiedEntriesProvider } from "../../contexts/CopiedEntriesContext";
 
 // Setup jsdom
 (global as unknown as Record<string, unknown>).import = {
@@ -166,7 +167,11 @@ export class TestWorld extends World {
             createElement(
               MemoryRouter,
               { initialEntries: ["/synthesis"] },
-              createElement(App),
+              createElement(
+                CopiedEntriesProvider,
+                null,
+                createElement(App),
+              ),
             ),
           ),
         ),

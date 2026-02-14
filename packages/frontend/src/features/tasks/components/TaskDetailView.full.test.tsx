@@ -17,6 +17,9 @@ vi.mock("@/features/auth/services", () => ({
 vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({ showNotification: vi.fn() })),
 }));
+vi.mock("@/contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
+}));
 
 vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),

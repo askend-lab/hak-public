@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -11,7 +11,17 @@ import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServic
 
 const mockGetTaskByShareToken = vi.fn();
 const mockShowNotification = vi.fn();
+const mockSetCopiedEntries = vi.fn();
 const mockDS = createMockDataService({ getTaskByShareToken: mockGetTaskByShareToken });
+
+vi.mock("@/contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({
+    copiedEntries: null,
+    setCopiedEntries: mockSetCopiedEntries,
+    consumeCopiedEntries: vi.fn().mockReturnValue(null),
+    hasCopiedEntries: false,
+  }),
+}));
 
 vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({
@@ -89,11 +99,6 @@ vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
 describe("SharedTaskPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    sessionStorage.clear();
-  });
-
-  afterEach(() => {
-    sessionStorage.clear();
   });
 
   const renderWithRouter = (token: string) => {
@@ -226,7 +231,7 @@ describe("SharedTaskPage", () => {
     });
   });
 
-  it("stores entries in sessionStorage when Kopeeri button clicked", async () => {
+  it("sets copied entries via context when Kopeeri button clicked", async () => {
     const user = userEvent.setup();
     const mockTask = {
       id: "task-1",
@@ -246,10 +251,8 @@ describe("SharedTaskPage", () => {
     const copyButton = screen.getByRole("button", { name: /kopeeri/i });
     await user.click(copyButton);
 
-    // Check that entries were stored in sessionStorage
-    const storedEntries = sessionStorage.getItem("copiedEntries");
-    expect(storedEntries).not.toBeNull();
-    expect(JSON.parse(storedEntries!)).toEqual(mockTask.entries);
+    // Check that entries were set via context
+    expect(mockSetCopiedEntries).toHaveBeenCalledWith(mockTask.entries);
 
     // Check notification was shown
     expect(mockShowNotification).toHaveBeenCalledWith({
@@ -360,7 +363,7 @@ describe("SharedTaskPage", () => {
     await user.click(screen.getByRole("button", { name: /mängi kõik/i }));
   });
 
-  it("copies entries to playlist via sessionStorage", async () => {
+  it("copies entries to playlist via context", async () => {
     const mockTask = {
       id: "task-123",
       name: "Test Task",
@@ -394,7 +397,7 @@ describe("SharedTaskPage", () => {
       type: "success",
       message: expect.any(String),
     });
-    expect(sessionStorage.getItem("copiedEntries")).toBeTruthy();
+    expect(mockSetCopiedEntries).toHaveBeenCalled();
   });
 
   it("disables buttons when there are no entries", async () => {

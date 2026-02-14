@@ -3,11 +3,11 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { SentenceState, convertTextToTags } from "@/types/synthesis";
+import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
 import { logger } from "@hak/shared";
 
 const STORAGE_KEY = "eki_synthesis_state";
 const LEGACY_PLAYLIST_KEY = "eki_playlist_entries";
-export const COPIED_ENTRIES_KEY = "copiedEntries";
 
 const ensureSentenceState = (
   sentence: Partial<SentenceState> &
@@ -130,7 +130,7 @@ export function useSentenceState(): {
 } {
   const [sentences, setSentences] = useState<SentenceState[]>(loadInitialState);
   const isInitialMount = useRef(true);
-  const processedCopiedEntries = useRef(false);
+  const { consumeCopiedEntries } = useCopiedEntries();
 
   // Persist sentences to localStorage whenever they change (skip initial mount)
   useEffect(() => {
@@ -163,36 +163,18 @@ export function useSentenceState(): {
     }
   }, []);
 
-  // Load copied entries from shared task - check on every render
+  // Load copied entries from context (set by SharedTaskPage or TaskDetailView)
   useEffect(() => {
-    // Skip if we already processed copiedEntries in this session
-    if (processedCopiedEntries.current) return;
-    
-    try {
-      const copied = sessionStorage.getItem(COPIED_ENTRIES_KEY);
-      if (copied) {
-        const entries = JSON.parse(copied);
-        if (Array.isArray(entries) && entries.length > 0) {
-          processedCopiedEntries.current = true;
-          setSentences((prev) => {
-            // If prev only has one empty sentence, replace it; otherwise append
-            const hasOnlyEmptySentence = prev.length === 1 && prev[0]?.text === "" && prev[0]?.tags.length === 0;
-            const transformedEntries = entries.map(transformEntryToSentence);
-            
-            return hasOnlyEmptySentence ? transformedEntries : [...prev, ...transformedEntries];
-          });
-          sessionStorage.removeItem(COPIED_ENTRIES_KEY);
-        }
-      }
-    } catch (error) {
-      logger.error(
-        "Failed to load copied entries from sessionStorage:",
-        error,
-      );
-      sessionStorage.removeItem(COPIED_ENTRIES_KEY);
+    const entries = consumeCopiedEntries();
+    if (entries && entries.length > 0) {
+      setSentences((prev) => {
+        // If prev only has one empty sentence, replace it; otherwise append
+        const hasOnlyEmptySentence = prev.length === 1 && prev[0]?.text === "" && prev[0]?.tags.length === 0;
+        const transformedEntries = entries.map(transformEntryToSentence);
+        return hasOnlyEmptySentence ? transformedEntries : [...prev, ...transformedEntries];
+      });
     }
-    // Run on every render to detect when copiedEntries appear (e.g., after navigation)
-  });
+  }, [consumeCopiedEntries]);
 
   const setDemoSentences = useCallback(() => {
     setSentences([

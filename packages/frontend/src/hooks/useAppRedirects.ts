@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/services";
 import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
-import { COPIED_ENTRIES_KEY } from "@/features/synthesis/hooks/synthesis/useSentenceState";
+import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
 import type { ViewType } from "./useCurrentView";
 
 /**
@@ -22,16 +22,10 @@ export function useAppRedirects(currentView: ViewType) {
   } = useOnboarding();
   const navigate = useNavigate();
 
+  const { hasCopiedEntries } = useCopiedEntries();
+
   const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
   const hasCheckedInitialRedirect = useRef(false);
-  const hadCopiedEntries = useRef(false);
-
-  // Capture copiedEntries presence before redirect check
-  // (useSentenceState clears sessionStorage in its own effect)
-  useEffect(() => {
-    hadCopiedEntries.current =
-      sessionStorage.getItem(COPIED_ENTRIES_KEY) !== null;
-  }, []);
 
   // Handle post-login redirect
   useEffect(() => {
@@ -49,9 +43,8 @@ export function useAppRedirects(currentView: ViewType) {
     if (!hasCheckedInitialRedirect.current) {
       hasCheckedInitialRedirect.current = true;
       // Skip role selection if user has copied entries from shared task
-      // Use ref captured during render since useSentenceState clears sessionStorage in its effect
       if (
-        !hadCopiedEntries.current &&
+        !hasCopiedEntries &&
         !onboardingState.completed &&
         !onboardingState.selectedRole &&
         currentView === "synthesis"

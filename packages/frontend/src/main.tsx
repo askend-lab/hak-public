@@ -22,6 +22,7 @@ import { AuthProvider } from "./features/auth/services";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { OnboardingProvider } from "./features/onboarding/contexts/OnboardingContext";
 import { DataServiceProvider } from "./contexts/DataServiceContext";
+import { CopiedEntriesProvider } from "./contexts/CopiedEntriesContext";
 const AuthCallbackPage = lazy(() => import("./features/auth/pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
 const SharedTaskPage = lazy(() => import("./features/sharing/pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
 import { initActivityListeners } from "./features/synthesis/utils/warmAudioWorker";
@@ -48,6 +49,7 @@ createRoot(rootElement).render(
           <NotificationProvider>
             <OnboardingProvider>
               <BrowserRouter>
+              <CopiedEntriesProvider>
               <Suspense fallback={<div className="app-loader"><div className="loader-spinner app-loader__spinner" /></div>}>
                 <Routes>
                   <Route path="/auth/callback" element={<AuthCallbackPage />} />
@@ -58,6 +60,7 @@ createRoot(rootElement).render(
                   <Route path="*" element={<App />} />
                 </Routes>
               </Suspense>
+              </CopiedEntriesProvider>
               </BrowserRouter>
             </OnboardingProvider>
           </NotificationProvider>

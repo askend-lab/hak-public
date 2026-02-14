@@ -9,6 +9,7 @@ import { convertTextToTags } from "@/types/synthesis";
 import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
+import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
 import { logger } from "@hak/shared";
 import SentenceSynthesisItem from "@/features/synthesis/components/SentenceSynthesisItem";
 import ShareTaskModal from "@/features/sharing/components/ShareTaskModal";
@@ -46,6 +47,7 @@ export default function TaskDetailView({
   const { user } = useAuth();
   const { showNotification } = useNotification();
   const dataService = useDataService();
+  const { setCopiedEntries } = useCopiedEntries();
   const [task, setTask] = useState<Task | null>(initialTask || null);
   const [entries, setEntries] = useState<TaskEntry[]>(
     initialTask?.entries || [],
@@ -93,10 +95,10 @@ export default function TaskDetailView({
   const handleCopyToSynthesis = useCallback(() => {
     if (!entries || entries.length === 0) return;
 
-    sessionStorage.setItem("copiedEntries", JSON.stringify(entries));
+    setCopiedEntries(entries);
     showNotification({ type: "success", message: "Laused kopeeritud!" });
     onNavigateToSynthesis();
-  }, [entries, showNotification, onNavigateToSynthesis]);
+  }, [entries, setCopiedEntries, showNotification, onNavigateToSynthesis]);
 
   // Load task data (skip if initialTask provided)
   useEffect(() => {

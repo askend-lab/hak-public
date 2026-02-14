@@ -21,6 +21,9 @@ vi.mock("@/features/auth/services", () => ({
 vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({ showNotification: mockShowNotification })),
 }));
+vi.mock("@/contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
+}));
 
 vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
   default: ({
