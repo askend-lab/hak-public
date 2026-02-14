@@ -58,7 +58,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 17. **Google Fonts загружается без SRI** (`index.html:8-9`).
   Компрометация CDN Google Fonts позволит инъекцию произвольного CSS/JS.
 
-- [ ] 18. **`errorDescription` из URL рендерится напрямую** (`AuthCallbackPage.tsx:60`).
+- [x] 18. **`errorDescription` из URL рендерится напрямую** (`AuthCallbackPage.tsx:60`).
   Атакующий может сконструировать URL с `error_description=<img onerror=...>` — potential reflected XSS.
 
 - [ ] 19. **Нет ограничения размера data в SimpleStore save** (`validation.ts`).
@@ -78,7 +78,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 23. **Нет optimistic locking / version check** (`TaskRepository.ts`).
   Два окна браузера → два read → два write → второй тихо перезатрёт изменения первого.
 
-- [ ] 24. **`deleteTask` не удаляет unlisted copy** (`TaskRepository.ts:125-136`).
+- [x] 24. **`deleteTask` не удаляет unlisted copy** (`TaskRepository.ts:125-136`).
   Удалённая задача остаётся доступной по share token навсегда — data leak.
 
 - [x] 25. **`addTextEntriesToTask` делает double read** (`TaskRepository.ts:138-187`).
@@ -90,7 +90,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 27. **Нет пагинации задач** (`TaskRepository.ts:18-29`).
   Все задачи загружаются целиком. При 100+ задачах — медленный UI и большой payload.
 
-- [ ] 28. **TTL=0 по умолчанию — данные живут вечно** (`SimpleStoreAdapter.ts:17`).
+- [x] 28. **TTL=0 по умолчанию — данные живут вечно** (`SimpleStoreAdapter.ts:17`).
   Unlisted shared tasks никогда не удаляются — рост хранилища без контроля.
 
 - [ ] 29. **sessionStorage как inter-page transport** (`SharedTaskPage.tsx:82`, `useAppRedirects.ts:33`).
@@ -168,7 +168,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 51. **Индекс как key в MetricCard** (`Dashboard.tsx:138`).
   `key={i}` — при изменении порядка метрик React перерендерит неправильные элементы.
 
-- [ ] 52. **Hardcoded fake data в Dashboard** (`Dashboard.tsx:108-110`).
+- [x] 52. **Hardcoded fake data в Dashboard** (`Dashboard.tsx:108-110`).
   Активность "Sisselogimine" захардкожена — Dashboard показывает ложные данные.
 
 - [x] 53. **Footer содержит мёртвые ссылки `href="#"`** (`Footer.tsx:29,32`).
@@ -186,7 +186,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 57. **BaseModal ставит `overflow: "unset"` при cleanup** (`BaseModal.tsx:125`).
   Не восстанавливает оригинальное значение. Если overflow было не default — layout break.
 
-- [ ] 58. **Backdrop div с `onKeyDown` без `tabIndex`** (`BuildInfoModal.tsx:107`).
+- [x] 58. **Backdrop div с `onKeyDown` без `tabIndex`** (`BuildInfoModal.tsx:107`).
   `role="presentation"` div не получит keyboard focus — `onKeyDown` handler никогда не сработает.
 
 - [ ] 59. **Drag-and-drop без keyboard-accessible альтернативы** (`SynthesisView.tsx:66-75`).
@@ -209,7 +209,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 64. **Нет WAF перед API Gateway** (все serverless.yml).
   Без Web Application Firewall — нет protection от SQL injection, DDoS, bot abuse на edge.
 
-- [ ] 65. **CI/CD не запускает security audit** (`.github/workflows/build.yml`).
+- [x] 65. **CI/CD не запускает security audit** (`.github/workflows/build.yml`).
   `pnpm audit` не вызывается — уязвимости в dependencies не обнаруживаются автоматически.
 
 - [ ] 66. **Нет SAST/DAST в pipeline** (`.github/workflows/build.yml`).
@@ -221,7 +221,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 68. **Нет dependabot/renovate конфигурации** (`.github/`).
   Зависимости не обновляются автоматически — security patches приходят с задержкой.
 
-- [ ] 69. **`build.yml` не кэширует pnpm store** (`.github/workflows/build.yml`).
+- [x] 69. **`build.yml` не кэширует pnpm store** (`.github/workflows/build.yml`).
   `cache: pnpm` в setup-node, но нет explicit store caching — CI медленнее чем нужно.
 
 - [ ] 70. **Нет staging environment** (`serverless.yml` — только dev и prod).
@@ -244,7 +244,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 75. **`processedRef` не защищает от StrictMode double-mount** (`AuthCallbackPage.tsx:14,18`).
   В dev mode React вызовет effect дважды. Ref спасает от второго, но первый уже сделал side-effect (navigation).
 
-- [ ] 76. **`getEntryPlayUrl` создаёт blob URL без гарантии revoke** (`task.ts:56`).
+- [x] 76. **`getEntryPlayUrl` создаёт blob URL без гарантии revoke** (`task.ts:56`).
   Каждый вызов создаёт `URL.createObjectURL` — caller должен revoke, но API не enforces это.
 
 - [x] 77. **`handlePlayAll` читает stale state через closure** (`useSharedTaskAudio.ts:179`).
@@ -267,7 +267,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 82. **`tracesSampleRate: 0.1` — 10% трейсов уходят в Sentry** (`main.tsx:17`).
   Данные об активности пользователей отправляются третьей стороне без явного consent.
 
-- [ ] 83. **Build info показывает `workingDir` в production** (`BuildInfo.tsx:131-136`).
+- [x] 83. **Build info показывает `workingDir` в production** (`BuildInfo.tsx:131-136`).
   Путь к рабочей директории разработчика виден в UI — information disclosure.
 
 - [x] 84. **User ID отображается в профиле** (`UserProfile.tsx:49,75`).
@@ -313,7 +313,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 96. **`getModifiableTasks` — лишняя индирекция** (`TaskRepository.ts:44-46`).
   Просто вызывает `getUserCreatedTasks` — добавляет confusion без добавления логики.
 
-- [ ] 97. **`@hak/simplestore` в devDependencies frontend** (`frontend/package.json:82`).
+- [x] 97. **`@hak/simplestore` в devDependencies frontend** (`frontend/package.json:82`).
   Runtime-зависимость backend-пакета в devDependencies фронтенда — подозрительно.
 
 - [ ] 98. **`eslint.base.config.mjs` — 13KB** (корень проекта).
