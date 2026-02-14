@@ -6,7 +6,7 @@ import { Task, TaskEntry } from "@/types/task";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { convertTextToTags } from "@/types/synthesis";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
 import { logger } from "@hak/shared";
@@ -45,6 +45,7 @@ export default function TaskDetailView({
 }: TaskDetailViewProps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
+  const dataService = useDataService();
   const [task, setTask] = useState<Task | null>(initialTask || null);
   const [entries, setEntries] = useState<TaskEntry[]>(
     initialTask?.entries || [],
@@ -106,7 +107,7 @@ export default function TaskDetailView({
     }
 
     setIsLoading(true);
-    DataService.getInstance()
+    dataService
       .getTask(taskId, user.id)
       .then((taskData) => {
         if (taskData) {
@@ -122,7 +123,7 @@ export default function TaskDetailView({
         ),
       )
       .finally(() => setIsLoading(false));
-  }, [taskId, user, initialTask]);
+  }, [taskId, user, initialTask, dataService]);
 
   const handleCopyText = async (id: string) => {
     const entry = entries.find((e) => e.id === id);
@@ -142,7 +143,7 @@ export default function TaskDetailView({
 
     // Persist to backend
     try {
-      await DataService.getInstance().updateTask(user.id, taskId, {
+      await dataService.updateTask(user.id, taskId, {
         entries: updatedEntries,
       });
       if (entryToDelete) {

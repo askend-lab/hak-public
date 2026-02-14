@@ -6,6 +6,8 @@ import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useTaskHandlers } from "./useTaskHandlers";
 import { SentenceState } from "@/types/synthesis";
+import { createElement } from "react";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockShowNotification = vi.fn();
 const mockSetShowLoginModal = vi.fn();
@@ -42,20 +44,17 @@ const mockGetUserTasks = vi
   .mockResolvedValue([{ id: "task-1", name: "Task 1" }]);
 const mockRevokeShare = vi.fn().mockResolvedValue(undefined);
 
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      createTask: mockCreateTask,
-      getTask: mockGetTask,
-      updateTask: mockUpdateTask,
-      deleteTask: mockDeleteTask,
-      shareUserTask: mockShareUserTask,
-      addTextEntriesToTask: mockAddTextEntriesToTask,
-      getUserTasks: mockGetUserTasks,
-      revokeShare: mockRevokeShare,
-    })),
-  },
-}));
+const mockDS = createMockDataService({
+  createTask: mockCreateTask,
+  getTask: mockGetTask,
+  updateTask: mockUpdateTask,
+  deleteTask: mockDeleteTask,
+  shareUserTask: mockShareUserTask,
+  addTextEntriesToTask: mockAddTextEntriesToTask,
+  getUserTasks: mockGetUserTasks,
+  revokeShare: mockRevokeShare,
+} as never);
+function dsWrapper({ children }: { children: React.ReactNode }) { return createElement(DataServiceTestWrapper, { dataService: mockDS }, children); }
 
 describe("useTaskHandlers", () => {
   const mockSentences: SentenceState[] = [
@@ -87,6 +86,7 @@ describe("useTaskHandlers", () => {
   it("should initialize with closed modals", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     expect(result.current.modals.showAddTaskModal).toBe(false);
@@ -96,6 +96,7 @@ describe("useTaskHandlers", () => {
   it("should toggle add to task dropdown", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     act(() => {
@@ -114,6 +115,7 @@ describe("useTaskHandlers", () => {
   it("should add sentences to existing task", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -137,6 +139,7 @@ describe("useTaskHandlers", () => {
   it("should open add task modal from dropdown", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     act(() => {
@@ -149,6 +152,7 @@ describe("useTaskHandlers", () => {
   it("should add single sentence to existing task", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -166,6 +170,7 @@ describe("useTaskHandlers", () => {
   it("should open add task modal from menu", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     act(() => {
@@ -178,6 +183,7 @@ describe("useTaskHandlers", () => {
   it("should create task", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     act(() => {
@@ -190,6 +196,7 @@ describe("useTaskHandlers", () => {
   it("should add task with playlist entries", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -208,6 +215,7 @@ describe("useTaskHandlers", () => {
   it("should edit task", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -230,6 +238,7 @@ describe("useTaskHandlers", () => {
   it("should update task", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     const updatedTask = {
@@ -253,6 +262,7 @@ describe("useTaskHandlers", () => {
   it("should share task", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -282,6 +292,7 @@ describe("useTaskHandlers", () => {
     const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -312,6 +323,7 @@ describe("useTaskHandlers", () => {
         mockSetCurrentView,
         mockSetSelectedTaskId,
       ),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -326,6 +338,7 @@ describe("useTaskHandlers", () => {
     const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     // Set taskToEdit first in a separate act
@@ -353,6 +366,7 @@ describe("useTaskHandlers", () => {
   it("should close share modal", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     act(() => {
@@ -369,6 +383,7 @@ describe("useTaskHandlers", () => {
   it("should close edit modal", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     act(() => {
@@ -385,6 +400,7 @@ describe("useTaskHandlers", () => {
   it("should toggle add task dropdown", () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     act(() => {
@@ -416,6 +432,7 @@ describe("useTaskHandlers edge cases", () => {
   it("does not add sentence when not found", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(sentences, setView, setTaskId),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.entries.handleAddSentenceToExistingTask(
@@ -440,6 +457,7 @@ describe("useTaskHandlers edge cases", () => {
     ];
     const { result } = renderHook(() =>
       useTaskHandlers(empty, setView, setTaskId),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.entries.handleAddSentenceToExistingTask(
@@ -456,6 +474,7 @@ describe("useTaskHandlers edge cases", () => {
     vi.spyOn(logger, "error").mockImplementation(() => {});
     const { result } = renderHook(() =>
       useTaskHandlers(sentences, setView, setTaskId),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.entries.handleAddSentenceToExistingTask(
@@ -492,6 +511,7 @@ describe("useTaskHandlers edge cases", () => {
     ];
     const { result } = renderHook(() =>
       useTaskHandlers(synthesisSentences, setView, setTaskId),
+      { wrapper: dsWrapper },
     );
 
     // User clicks "Loo uus ülesanne" (Create new task) from Tasks view - NOT from synthesis
@@ -545,6 +565,7 @@ describe("useTaskHandlers edge cases", () => {
     ];
     const { result } = renderHook(() =>
       useTaskHandlers(multipleSentences, setView, setTaskId),
+      { wrapper: dsWrapper },
     );
 
     // User clicks "Create new task" from sentence 2's menu

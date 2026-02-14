@@ -6,19 +6,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TaskDetailView from "./TaskDetailView";
 import { Task } from "@/types/task";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockGetTask = vi.fn();
 const mockUpdateTask = vi.fn();
 const mockShowNotification = vi.fn();
-
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      getTask: mockGetTask,
-      updateTask: mockUpdateTask,
-    })),
-  },
-}));
+const mockDS = createMockDataService({ getTask: mockGetTask, updateTask: mockUpdateTask } as never);
+const dsWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper>;
 
 vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({ user: { id: "u1", email: "test@test.com" } })),
@@ -192,7 +186,7 @@ describe("TaskDetailView", () => {
   });
 
   it("shows loading then renders task with entries", async () => {
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
     );
@@ -201,7 +195,7 @@ describe("TaskDetailView", () => {
 
   it("shows error when task not found", async () => {
     mockGetTask.mockResolvedValue(null);
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("error")).toBeInTheDocument(),
     );
@@ -210,21 +204,21 @@ describe("TaskDetailView", () => {
 
   it("shows error on fetch failure", async () => {
     mockGetTask.mockRejectedValue(new Error("Network fail"));
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("error")).toBeInTheDocument(),
     );
   });
 
   it("renders with initialTask (skips fetch)", async () => {
-    render(<TaskDetailView {...defaultProps} initialTask={mockTask} />);
+    render(<TaskDetailView {...defaultProps} initialTask={mockTask} />, { wrapper: dsWrapper });
     expect(screen.getByTestId("entry-e1")).toBeInTheDocument();
     expect(mockGetTask).not.toHaveBeenCalled();
   });
 
   it("renders empty state when task has no entries", async () => {
     mockGetTask.mockResolvedValue({ ...mockTask, entries: [] });
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("empty")).toBeInTheDocument(),
     );
@@ -232,7 +226,7 @@ describe("TaskDetailView", () => {
 
   it("handleDeleteEntry calls updateTask and shows notification", async () => {
     const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
     );
@@ -249,7 +243,7 @@ describe("TaskDetailView", () => {
   it("handleDeleteEntry reverts on error", async () => {
     mockUpdateTask.mockRejectedValueOnce(new Error("fail"));
     const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
     );
@@ -265,7 +259,7 @@ describe("TaskDetailView", () => {
 
   it("opens share modal from header", async () => {
     const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("header")).toBeInTheDocument(),
     );
@@ -289,7 +283,7 @@ describe("TaskDetailView", () => {
       handlePlayAll: vi.fn(),
     });
     const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
     );
@@ -301,7 +295,7 @@ describe("TaskDetailView", () => {
   it("shows error when no user", async () => {
     const { useAuth } = await import("@/features/auth/services");
     (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({ user: null });
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     await waitFor(() =>
       expect(screen.getByTestId("error")).toBeInTheDocument(),
     );

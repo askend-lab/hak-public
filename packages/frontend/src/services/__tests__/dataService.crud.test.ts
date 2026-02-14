@@ -17,9 +17,7 @@ describe("DataService CRUD Operations", () => {
     vi.clearAllMocks();
     resetSimpleStoreMock();
     setupSimpleStoreMock();
-    // Reset singleton for fresh instance
-    (DataService as unknown as { instance: null }).instance = null;
-    dataService = DataService.getInstance();
+    dataService = new DataService();
   });
 
   describe("createTask", () => {
@@ -217,7 +215,7 @@ describe("DataService CRUD Operations", () => {
       await dataService.createTask(mockUserId, taskData);
 
       // Simulate page reload - get fresh DataService instance
-      const freshDataService = DataService.getInstance();
+      const freshDataService = new DataService();
 
       const tasks = await freshDataService.getUserTasks(mockUserId);
       const taskNames = tasks.map((t) => t.name);

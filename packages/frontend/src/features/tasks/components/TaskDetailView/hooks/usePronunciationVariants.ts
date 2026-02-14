@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { convertTextToTags } from "@/types/synthesis";
 
 interface UsePronunciationVariantsReturn {
@@ -23,6 +23,7 @@ export function usePronunciationVariants(
   task: Task | null,
   userId: string | undefined,
 ): UsePronunciationVariantsReturn {
+  const dataService = useDataService();
   const [variantsWord, setVariantsWord] = useState<string | null>(null);
   const [variantsCustomPhonetic, setVariantsCustomPhonetic] = useState<
     string | null
@@ -97,7 +98,7 @@ export function usePronunciationVariants(
 
         try {
           if (userId) {
-            await DataService.getInstance().updateTaskEntry(
+            await dataService.updateTaskEntry(
               userId,
               task.id,
               selectedEntryId,
@@ -127,6 +128,7 @@ export function usePronunciationVariants(
       setEntries,
       userId,
       handleCloseVariants,
+      dataService,
     ],
   );
 

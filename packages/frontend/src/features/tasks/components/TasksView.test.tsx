@@ -6,18 +6,12 @@ import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TasksView from "./TasksView";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockGetTask = vi.fn();
 const mockGetTasks = vi.fn();
-
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      getTask: mockGetTask,
-      getTasks: mockGetTasks,
-    })),
-  },
-}));
+const mockDS = createMockDataService({ getTask: mockGetTask, getTasks: mockGetTasks } as never);
+const dsWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper>;
 
 vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
@@ -102,6 +96,7 @@ describe("TasksView - Edit Task Bug", () => {
         onShareTask={mockOnShareTask}
         onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />,
+      { wrapper: dsWrapper },
     );
 
     const editButton = screen.getByText("Edit Task 1");
@@ -137,6 +132,7 @@ describe("TasksView - Edit Task Bug", () => {
         onShareTask={mockOnShareTask}
         onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />,
+      { wrapper: dsWrapper },
     );
 
     const editButton = screen.getByText("Muuda");
@@ -178,6 +174,7 @@ describe("TasksView - Edit Task Bug", () => {
         onShareTask={mockOnShareTask}
         onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />,
+      { wrapper: dsWrapper },
     );
 
     await user.click(screen.getByText("Share Task 1"));
@@ -209,6 +206,7 @@ describe("TasksView - Edit Task Bug", () => {
         onShareTask={mockOnShareTask}
         onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />,
+      { wrapper: dsWrapper },
     );
 
     await user.click(screen.getByText("Edit Task 1"));
@@ -241,6 +239,7 @@ describe("TasksView - Edit Task Bug", () => {
         onShareTask={mockOnShareTask}
         onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />,
+      { wrapper: dsWrapper },
     );
 
     expect(screen.getByText(/Laen ülesandeid/)).toBeInTheDocument();
@@ -268,6 +267,7 @@ describe("TasksView - Edit Task Bug", () => {
         onShareTask={mockOnShareTask}
         onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />,
+      { wrapper: dsWrapper },
     );
 
     expect(screen.getByText(/Ülesanded puuduvad/)).toBeInTheDocument();
@@ -300,6 +300,7 @@ describe("TasksView - Edit Task Bug", () => {
         onShareTask={mockOnShareTask}
         onNavigateToSynthesis={mockOnNavigateToSynthesis}
       />,
+      { wrapper: dsWrapper },
     );
 
     await user.click(screen.getByText("Share Task 1"));

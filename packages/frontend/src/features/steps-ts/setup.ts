@@ -27,6 +27,7 @@ import App from "../../App";
 import { AuthProvider } from "../auth/services";
 import { NotificationProvider } from "../../contexts/NotificationContext";
 import { OnboardingProvider } from "../onboarding/contexts/OnboardingContext";
+import { DataServiceProvider } from "../../contexts/DataServiceContext";
 
 // Setup jsdom
 (global as unknown as Record<string, unknown>).import = {
@@ -151,18 +152,22 @@ export class TestWorld extends World {
 
   renderApp(): void {
     const element = createElement(
-      NotificationProvider,
+      AuthProvider,
       null,
       createElement(
-        AuthProvider,
+        DataServiceProvider,
         null,
         createElement(
-          OnboardingProvider,
+          NotificationProvider,
           null,
           createElement(
-            MemoryRouter,
-            { initialEntries: ["/synthesis"] },
-            createElement(App),
+            OnboardingProvider,
+            null,
+            createElement(
+              MemoryRouter,
+              { initialEntries: ["/synthesis"] },
+              createElement(App),
+            ),
           ),
         ),
       ),

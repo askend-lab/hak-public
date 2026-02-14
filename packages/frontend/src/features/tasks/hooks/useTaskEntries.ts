@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
@@ -21,6 +21,7 @@ interface UseTaskEntriesDeps {
 export function useTaskEntries(deps: UseTaskEntriesDeps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
+  const dataService = useDataService();
   const {
     sentences,
     setShowAddToTaskDropdown,
@@ -45,7 +46,6 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
       if (entries.length === 0) return;
 
       try {
-        const dataService = DataService.getInstance();
         await dataService.addTextEntriesToTask(user.id, taskId, entries, _mode);
         setTaskRefreshTrigger((prev) => prev + 1);
         const count = entries.length;
@@ -60,7 +60,7 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
         showNotification({ type: "error", message: TASK_STRINGS.ADD_ENTRIES_FAILED });
       }
     },
-    [user, sentences, showNotification, viewTaskAction],
+    [user, sentences, showNotification, viewTaskAction, dataService],
   );
 
   const handleCreateNewFromDropdown = useCallback(() => {
@@ -74,7 +74,6 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
       if (!sentence || !sentence.text.trim()) return;
 
       try {
-        const dataService = DataService.getInstance();
         await dataService.addTextEntriesToTask(user.id, taskId, [
           {
             text: sentence.text,
@@ -93,7 +92,7 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
         showNotification({ type: "error", message: TASK_STRINGS.ADD_ENTRIES_FAILED });
       }
     },
-    [user, sentences, showNotification, viewTaskAction],
+    [user, sentences, showNotification, viewTaskAction, dataService],
   );
 
   return {

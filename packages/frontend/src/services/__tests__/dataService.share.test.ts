@@ -16,8 +16,7 @@ describe("DataService Share Operations", () => {
     vi.clearAllMocks();
     resetSimpleStoreMock();
     setupSimpleStoreMock();
-    (DataService as unknown as { instance: null }).instance = null;
-    ds = DataService.getInstance();
+    ds = new DataService();
   });
 
   it("shareUserTask shares a task", async () => {

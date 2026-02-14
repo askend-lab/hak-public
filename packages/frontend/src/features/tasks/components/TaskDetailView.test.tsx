@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import TaskDetailView from "./TaskDetailView";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
@@ -32,16 +33,12 @@ const mockTask = {
 };
 
 const mockGetTask = vi.fn().mockResolvedValue(mockTask);
-
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      getTask: mockGetTask,
-      deleteTaskEntry: vi.fn().mockResolvedValue({}),
-      reorderTaskEntries: vi.fn().mockResolvedValue({}),
-    })),
-  },
-}));
+const mockDS = createMockDataService({
+  getTask: mockGetTask,
+  deleteTaskEntry: vi.fn().mockResolvedValue({}),
+  reorderTaskEntries: vi.fn().mockResolvedValue({}),
+} as never);
+const dsWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper>;
 
 describe("TaskDetailView", () => {
   const defaultProps = {
@@ -58,12 +55,12 @@ describe("TaskDetailView", () => {
   });
 
   it("should render loading state initially", () => {
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
     expect(screen.getByText(/laen/i)).toBeInTheDocument();
   });
 
   it("should render task name after loading", async () => {
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(screen.getByText("Test Task")).toBeInTheDocument();
@@ -71,7 +68,7 @@ describe("TaskDetailView", () => {
   });
 
   it("should call getTask with correct params", async () => {
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
@@ -80,7 +77,7 @@ describe("TaskDetailView", () => {
 
   it("should show error when task not found", async () => {
     mockGetTask.mockResolvedValue(null);
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(screen.getByText(/ei leitud/i)).toBeInTheDocument();
@@ -88,7 +85,7 @@ describe("TaskDetailView", () => {
   });
 
   it("should render task description when available", async () => {
-    render(<TaskDetailView {...defaultProps} />);
+    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(screen.getByText("Test Description")).toBeInTheDocument();

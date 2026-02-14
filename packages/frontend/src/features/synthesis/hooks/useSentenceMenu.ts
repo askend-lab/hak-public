@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { useAuth } from "@/features/auth/services";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { logger } from "@hak/shared";
 
 export function useSentenceMenu(): {
@@ -17,6 +17,7 @@ export function useSentenceMenu(): {
   handleMenuClose: () => void;
 } {
   const { user, isAuthenticated } = useAuth();
+  const dataService = useDataService();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<{
     [key: string]: HTMLElement | null;
@@ -38,7 +39,6 @@ export function useSentenceMenu(): {
       if (isAuthenticated && user) {
         setIsLoadingMenuTasks(true);
         try {
-          const dataService = DataService.getInstance();
           const tasks = await dataService.getUserTasks(user.id);
           setMenuTasks(tasks.map((t) => ({ id: t.id, name: t.name })));
         } catch (error) {
@@ -49,7 +49,7 @@ export function useSentenceMenu(): {
         }
       }
     },
-    [isAuthenticated, user],
+    [isAuthenticated, user, dataService],
   );
 
   const handleMenuClose = useCallback(() => {

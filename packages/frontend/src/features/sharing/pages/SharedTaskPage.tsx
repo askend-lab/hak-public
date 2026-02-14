@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { Task } from "@/types/task";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useSharedTaskAudio } from "@/features/sharing/hooks/useSharedTaskAudio";
@@ -20,6 +20,7 @@ export function SharedTaskPage() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const { showNotification } = useNotification();
+  const dataService = useDataService();
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +45,6 @@ export function SharedTaskPage() {
       }
 
       try {
-        const dataService = DataService.getInstance();
         const foundTask = await dataService.getTaskByShareToken(token);
 
         if (foundTask) {

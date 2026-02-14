@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback } from "react";
-import { DataService } from "@/services/dataService";
+import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
@@ -31,6 +31,7 @@ interface UseTaskCRUDDeps {
 export function useTaskCRUD(deps: UseTaskCRUDDeps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
+  const dataService = useDataService();
   const {
     sentences,
     setSelectedTaskId,
@@ -69,7 +70,6 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
     async (title: string, description: string) => {
       if (!user) return;
       try {
-        const dataService = DataService.getInstance();
         const entriesToAdd = isTaskCreationFromTasksView
           ? []
           : pendingSentenceId
@@ -121,7 +121,6 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       if (requireAuth()) return;
       if (!user) return;
       try {
-        const dataService = DataService.getInstance();
         const fullTask = await dataService.getTask(task.id, user.id);
         if (fullTask) {
           setTaskToEdit({
@@ -135,7 +134,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
         logger.error("Failed to load task:", error);
       }
     },
-    [requireAuth, user],
+    [requireAuth, user, dataService],
   );
 
   const handleTaskUpdated = useCallback(
@@ -146,7 +145,6 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
     }): Promise<void> => {
       if (!user) return;
       try {
-        const dataService = DataService.getInstance();
         await dataService.updateTask(user.id, updatedTask.id, {
           name: updatedTask.name,
           ...(updatedTask.description !== null && {
@@ -166,7 +164,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
         showNotification({ type: "error", message: TASK_STRINGS.TASK_UPDATE_FAILED });
       }
     },
-    [user, showNotification],
+    [user, showNotification, dataService],
   );
 
   const handleDeleteTask = useCallback(
@@ -174,7 +172,6 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       if (requireAuth()) return;
       if (!user) return;
       try {
-        const dataService = DataService.getInstance();
         const fullTask = await dataService.getTask(taskId, user.id);
         if (fullTask) {
           setTaskToDelete({ id: taskId, name: fullTask.name });
@@ -184,14 +181,13 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
         logger.error("Failed to load task:", error);
       }
     },
-    [requireAuth, user],
+    [requireAuth, user, dataService],
   );
 
   const handleConfirmDelete = useCallback(async () => {
     if (!user || !taskToDelete) return;
     const taskName = taskToDelete.name;
     try {
-      const dataService = DataService.getInstance();
       await dataService.deleteTask(user.id, taskToDelete.id);
       setTaskRefreshTrigger((prev) => prev + 1);
       showNotification({
@@ -208,7 +204,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       setShowDeleteConfirmation(false);
       setTaskToDelete(null);
     }
-  }, [user, taskToDelete, showNotification, setSelectedTaskId, setCurrentView]);
+  }, [user, taskToDelete, showNotification, setSelectedTaskId, setCurrentView, dataService]);
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirmation(false);

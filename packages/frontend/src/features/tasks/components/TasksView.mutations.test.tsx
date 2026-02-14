@@ -6,14 +6,11 @@ import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TasksView from "./TasksView";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockGetTask = vi.fn();
-
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({ getTask: mockGetTask, getUserTasks: vi.fn() })),
-  },
-}));
+const mockDS = createMockDataService({ getTask: mockGetTask });
+const dsWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper>;
 
 const mockUseAuth = vi.fn();
 vi.mock("@/features/auth/services", () => ({ useAuth: (...args: unknown[]) => mockUseAuth(...args) }));
@@ -81,20 +78,20 @@ describe("TasksView mutation kills", () => {
   });
 
   it("renders task list with header when tasks exist", () => {
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     expect(screen.getByText("Ülesanded")).toBeInTheDocument();
     expect(screen.getByText("Loo uus ülesanne")).toBeInTheDocument();
     expect(screen.getByTestId("task-manager")).toBeInTheDocument();
   });
 
   it("passes taskRefreshTrigger to useUserTasks", () => {
-    render(<TasksView {...props} taskRefreshTrigger={5} />);
+    render(<TasksView {...props} taskRefreshTrigger={5} />, { wrapper: dsWrapper });
     expect(mockUseUserTasks).toHaveBeenCalledWith(5);
   });
 
   it("shows loading spinner", () => {
     mockUseUserTasks.mockReturnValue({ tasks: [], isLoading: true, error: null, isEmpty: false });
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     expect(screen.getByText("Laen ülesandeid...")).toBeInTheDocument();
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
@@ -102,7 +99,7 @@ describe("TasksView mutation kills", () => {
   it("shows empty state with create button", async () => {
     mockUseUserTasks.mockReturnValue({ tasks: [], isLoading: false, error: null, isEmpty: true });
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     expect(screen.getByText("Ülesanded puuduvad")).toBeInTheDocument();
     expect(screen.getByText(/Sul pole veel/)).toBeInTheDocument();
     const btn = screen.getByText("Loo esimene ülesanne");
@@ -115,26 +112,26 @@ describe("TasksView mutation kills", () => {
       tasks: [{ id: "t1", name: "T", entryCount: 0 }],
       isLoading: false, error: "Load failed", isEmpty: false,
     });
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     expect(screen.getByText(/Viga ülesannete laadimisel: Load failed/)).toBeInTheDocument();
   });
 
   it("renders TaskDetailView when selectedTaskId is set", () => {
-    render(<TasksView {...props} selectedTaskId="t1" />);
+    render(<TasksView {...props} selectedTaskId="t1" />, { wrapper: dsWrapper });
     expect(screen.getByTestId("detail")).toBeInTheDocument();
     expect(screen.getByText("Detail:t1")).toBeInTheDocument();
   });
 
   it("calls onCreateTask from header button", async () => {
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("Loo uus ülesanne"));
     expect(props.onCreateTask).toHaveBeenCalled();
   });
 
   it("handleEditTask fetches task and calls onEditTask with data", async () => {
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("edit-t1"));
     await waitFor(() => {
       expect(mockGetTask).toHaveBeenCalledWith("t1", "u1");
@@ -147,7 +144,7 @@ describe("TasksView mutation kills", () => {
   it("handleEditTask includes description only when present", async () => {
     mockGetTask.mockResolvedValueOnce({ id: "t1", name: "T1", description: null });
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("edit-t1"));
     await waitFor(() => {
       const arg = props.onEditTask.mock.calls[0]?.[0];
@@ -159,7 +156,7 @@ describe("TasksView mutation kills", () => {
   it("handleEditTask skips onEditTask when task is null", async () => {
     mockGetTask.mockResolvedValueOnce(null);
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("edit-t1"));
     await waitFor(() => expect(mockGetTask).toHaveBeenCalled());
     expect(props.onEditTask).not.toHaveBeenCalled();
@@ -168,7 +165,7 @@ describe("TasksView mutation kills", () => {
   it("handleEditTask does nothing when user is null", async () => {
     mockUseAuth.mockReturnValue({ user: null });
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("edit-t1"));
     expect(mockGetTask).not.toHaveBeenCalled();
   });
@@ -177,7 +174,7 @@ describe("TasksView mutation kills", () => {
     const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockGetTask.mockRejectedValueOnce(new Error("fail"));
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("edit-t1"));
     await waitFor(() => expect(spy).toHaveBeenCalledWith("Failed to fetch task for editing:", expect.any(Error)));
     spy.mockRestore();
@@ -185,7 +182,7 @@ describe("TasksView mutation kills", () => {
 
   it("handleShareTask fetches task and calls onShareTask with shareToken", async () => {
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("share-t1"));
     await waitFor(() => {
       expect(props.onShareTask).toHaveBeenCalledWith(
@@ -197,7 +194,7 @@ describe("TasksView mutation kills", () => {
   it("handleShareTask omits description when null", async () => {
     mockGetTask.mockResolvedValueOnce({ id: "t1", name: "T", description: null, shareToken: "s" });
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("share-t1"));
     await waitFor(() => {
       const arg = props.onShareTask.mock.calls[0]?.[0];
@@ -208,7 +205,7 @@ describe("TasksView mutation kills", () => {
   it("handleShareTask omits shareToken when falsy", async () => {
     mockGetTask.mockResolvedValueOnce({ id: "t1", name: "T", description: "d", shareToken: "" });
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("share-t1"));
     await waitFor(() => {
       const arg = props.onShareTask.mock.calls[0]?.[0];
@@ -219,7 +216,7 @@ describe("TasksView mutation kills", () => {
   it("handleShareTask does nothing when user is null", async () => {
     mockUseAuth.mockReturnValue({ user: null });
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("share-t1"));
     expect(mockGetTask).not.toHaveBeenCalled();
   });
@@ -228,7 +225,7 @@ describe("TasksView mutation kills", () => {
     const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockGetTask.mockRejectedValueOnce(new Error("fail"));
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("share-t1"));
     await waitFor(() => expect(spy).toHaveBeenCalledWith("Failed to fetch task for sharing:", expect.any(Error)));
     spy.mockRestore();
@@ -237,7 +234,7 @@ describe("TasksView mutation kills", () => {
   it("handleShareTask skips when task null", async () => {
     mockGetTask.mockResolvedValueOnce(null);
     const user = userEvent.setup();
-    render(<TasksView {...props} />);
+    render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("share-t1"));
     await waitFor(() => expect(mockGetTask).toHaveBeenCalled());
     expect(props.onShareTask).not.toHaveBeenCalled();

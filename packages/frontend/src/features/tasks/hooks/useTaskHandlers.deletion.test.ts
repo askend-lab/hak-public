@@ -6,6 +6,8 @@ import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useTaskHandlers } from "./useTaskHandlers";
 import { SentenceState } from "@/types/synthesis";
+import { createElement } from "react";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockShowNotification = vi.fn();
 const mockSetShowLoginModal = vi.fn();
@@ -32,14 +34,8 @@ const mockGetTask = vi.fn().mockResolvedValue({
   shareToken: "token",
 });
 
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      deleteTask: mockDeleteTask,
-      getTask: mockGetTask,
-    })),
-  },
-}));
+const mockDS = createMockDataService({ deleteTask: mockDeleteTask, getTask: mockGetTask } as never);
+function dsWrapper({ children }: { children: React.ReactNode }) { return createElement(DataServiceTestWrapper, { dataService: mockDS }, children); }
 
 describe("useTaskHandlers - Task Deletion", () => {
   const mockSentences: SentenceState[] = [
@@ -63,6 +59,7 @@ describe("useTaskHandlers - Task Deletion", () => {
   it("should delete task with confirmation", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -79,6 +76,7 @@ describe("useTaskHandlers - Task Deletion", () => {
   it("should confirm delete", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -96,6 +94,7 @@ describe("useTaskHandlers - Task Deletion", () => {
   it("should redirect to task list after successful deletion", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -114,6 +113,7 @@ describe("useTaskHandlers - Task Deletion", () => {
   it("should cancel delete", async () => {
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {
@@ -133,6 +133,7 @@ describe("useTaskHandlers - Task Deletion", () => {
     const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     const { result } = renderHook(() =>
       useTaskHandlers(mockSentences, mockSetCurrentView, mockSetSelectedTaskId),
+      { wrapper: dsWrapper },
     );
 
     await act(async () => {

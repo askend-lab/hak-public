@@ -6,15 +6,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePronunciationVariants } from "./usePronunciationVariants";
 import type { TaskEntry, Task } from "@/types/task";
+import { createElement } from "react";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockUpdateTaskEntry = vi.fn();
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: (): { updateTaskEntry: ReturnType<typeof vi.fn> } => ({
-      updateTaskEntry: mockUpdateTaskEntry,
-    }),
-  },
-}));
+const mockDS = createMockDataService({ updateTaskEntry: mockUpdateTaskEntry });
+function dsWrapper({ children }: { children: React.ReactNode }) { return createElement(DataServiceTestWrapper, { dataService: mockDS }, children); }
 
 describe("usePronunciationVariants", () => {
   const mockEntry: TaskEntry = {
@@ -46,6 +43,7 @@ describe("usePronunciationVariants", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     expect(result.current.isVariantsPanelOpen).toBe(false);
     expect(result.current.variantsWord).toBeNull();
@@ -55,6 +53,7 @@ describe("usePronunciationVariants", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     act(() => {
       result.current.handleTagClick("e1", 0, "tere");
@@ -68,6 +67,7 @@ describe("usePronunciationVariants", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     act(() => {
       result.current.handleTagClick("e1", 0, "tere");
@@ -83,6 +83,7 @@ describe("usePronunciationVariants", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     await act(async () => {
       await result.current.handleUseVariant("te~re");
@@ -94,6 +95,7 @@ describe("usePronunciationVariants", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePronunciationVariants([], setEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     act(() => {
       // Manually set selected state by clicking a tag that won't exist
@@ -108,6 +110,7 @@ describe("usePronunciationVariants", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     act(() => {
       result.current.handleTagClick("e1", 99, "tere");
@@ -128,6 +131,7 @@ describe("usePronunciationVariants", () => {
 
     const { result } = renderHook(() =>
       usePronunciationVariants([mockEntry], invokingSetEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     act(() => {
       result.current.handleTagClick("e1", 0, "tere");
@@ -147,6 +151,7 @@ describe("usePronunciationVariants", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
       usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      { wrapper: dsWrapper },
     );
     act(() => {
       result.current.handleTagClick("e1", 0, "tere");

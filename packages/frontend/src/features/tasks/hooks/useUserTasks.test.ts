@@ -5,22 +5,21 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useUserTasks } from "./useUserTasks";
 import { useAuth } from "@/features/auth/services";
-import { DataService } from "@/services/dataService";
+import { createElement } from "react";
+import { DataServiceTestWrapper } from "@/test/dataServiceMock";
+import type { DataService } from "@/services/dataService";
 
 vi.mock("@/features/auth/services");
-vi.mock("@/services/dataService");
 
 const mockUseAuth = useAuth as ReturnType<typeof vi.fn>;
 const mockDataService = {
   getUserTasks: vi.fn(),
-};
+} as DataService & { getUserTasks: ReturnType<typeof vi.fn> };
+function dsWrapper({ children }: { children: React.ReactNode }) { return createElement(DataServiceTestWrapper, { dataService: mockDataService }, children); }
 
 describe("useUserTasks", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (DataService.getInstance as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockDataService,
-    );
   });
 
   it("returns empty tasks when user is not authenticated", async () => {
@@ -29,7 +28,7 @@ describe("useUserTasks", () => {
       isAuthenticated: false,
     });
 
-    const { result } = renderHook(() => useUserTasks());
+    const { result } = renderHook(() => useUserTasks(), { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -52,7 +51,7 @@ describe("useUserTasks", () => {
     });
     mockDataService.getUserTasks.mockResolvedValue(mockTasks);
 
-    const { result } = renderHook(() => useUserTasks());
+    const { result } = renderHook(() => useUserTasks(), { wrapper: dsWrapper });
 
     expect(result.current.isLoading).toBe(true);
 
@@ -72,7 +71,7 @@ describe("useUserTasks", () => {
     });
     mockDataService.getUserTasks.mockRejectedValue(new Error("Network error"));
 
-    const { result } = renderHook(() => useUserTasks());
+    const { result } = renderHook(() => useUserTasks(), { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -89,7 +88,7 @@ describe("useUserTasks", () => {
     });
     mockDataService.getUserTasks.mockRejectedValue("string error");
 
-    const { result } = renderHook(() => useUserTasks());
+    const { result } = renderHook(() => useUserTasks(), { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -109,7 +108,7 @@ describe("useUserTasks", () => {
 
     const { result, rerender } = renderHook(
       ({ refreshTrigger }) => useUserTasks(refreshTrigger),
-      { initialProps: { refreshTrigger: 0 } },
+      { initialProps: { refreshTrigger: 0 }, wrapper: dsWrapper },
     );
 
     await waitFor(() => {
@@ -132,7 +131,7 @@ describe("useUserTasks", () => {
     });
     mockDataService.getUserTasks.mockResolvedValue([]);
 
-    const { result } = renderHook(() => useUserTasks());
+    const { result } = renderHook(() => useUserTasks(), { wrapper: dsWrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -148,7 +147,7 @@ describe("useUserTasks", () => {
     });
     mockDataService.getUserTasks.mockReturnValue(new Promise(() => {})); // Never resolves
 
-    const { result } = renderHook(() => useUserTasks());
+    const { result } = renderHook(() => useUserTasks(), { wrapper: dsWrapper });
 
     expect(result.current.isLoading).toBe(true);
     expect(result.current.isEmpty).toBe(false);

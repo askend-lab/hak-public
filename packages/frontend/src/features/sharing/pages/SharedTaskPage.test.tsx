@@ -7,17 +7,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { SharedTaskPage } from "./SharedTaskPage";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockGetTaskByShareToken = vi.fn();
 const mockShowNotification = vi.fn();
-
-vi.mock("@/services/dataService", () => ({
-  DataService: {
-    getInstance: vi.fn(() => ({
-      getTaskByShareToken: mockGetTaskByShareToken,
-    })),
-  },
-}));
+const mockDS = createMockDataService({ getTaskByShareToken: mockGetTaskByShareToken });
 
 vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: vi.fn(() => ({
@@ -109,6 +103,7 @@ describe("SharedTaskPage", () => {
           <Route path="/shared/task/:token" element={<SharedTaskPage />} />
         </Routes>
       </MemoryRouter>,
+      { wrapper: ({ children }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper> },
     );
   };
 
@@ -287,6 +282,7 @@ describe("SharedTaskPage", () => {
           <Route path="/shared/" element={<SharedTaskPage />} />
         </Routes>
       </MemoryRouter>,
+      { wrapper: ({ children }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper> },
     );
 
     await waitFor(() => {
