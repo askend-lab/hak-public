@@ -69,8 +69,9 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 22. **`saveUserTasks` перезаписывает весь массив задач** (`SimpleStoreAdapter.ts:82-84`).
   Каждое изменение одной задачи перезаписывает все задачи — потеря данных при параллельных операциях.
 
-- [ ] 23. **Нет optimistic locking / version check** (`TaskRepository.ts`).
+- [x] 23. **Нет optimistic locking / version check** (`TaskRepository.ts`).
   Два окна браузера → два read → два write → второй тихо перезатрёт изменения первого.
+  ✅ Реализован optimistic locking с version field + conditional write в DynamoDB (PR #529).
 
 - [x] 24. **`deleteTask` не удаляет unlisted copy** (`TaskRepository.ts:125-136`).
   Удалённая задача остаётся доступной по share token навсегда — data leak.
@@ -98,8 +99,9 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 32. **`SynthesisPageContext` — god context** (`SynthesisPageContext.tsx:21-32`).
   Один context объединяет synthesis, tasks, drag-drop, variants, menu — любое изменение перерендерит всё дерево.
 
-- [ ] 33. **`useTaskHandlers` сливает три hooks через spread** (`useTaskHandlers.ts:77-81`).
+- [x] 33. **`useTaskHandlers` сливает три hooks через spread** (`useTaskHandlers.ts:77-81`).
   `...modals, ...crud, ...entries` — если два hook вернут одноимённое свойство, один тихо затрёт другой.
+  ✅ Рефакторинг на namespaced return: `{ modals, crud, entries, sharing }` (PR #529).
 
 - [ ] 34. **Singleton `DataService.getInstance()`** (`dataService.ts:29-35`).
   Глобальное состояние, невозможность параллельного тестирования, скрытое связывание.
@@ -191,8 +193,9 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 61. **Serverless Framework v3 — maintenance mode с 2024** (все serverless.yml).
   Все 5 сервисов на frameworkVersion "3". Миграция на v4 не выполнена.
 
-- [ ] 63. **`COGNITO_USER_POOL_ARN` через env var без валидации** (`simplestore/serverless.yml:134`).
+- [x] 63. **`COGNITO_USER_POOL_ARN` через env var без валидации** (`simplestore/serverless.yml:134`).
   Если env var не задан — deploy пройдёт с пустым ARN, authorizer будет broken.
+  ✅ Добавлена валидация в deploy.yml workflow (PR #529).
 
 - [x] 64. **Нет WAF перед API Gateway** (все serverless.yml).
   Без Web Application Firewall — нет protection от SQL injection, DDoS, bot abuse на edge.
@@ -203,8 +206,9 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 66. **Нет SAST/DAST в pipeline** (`.github/workflows/build.yml`).
   Нет Snyk, Trivy, CodeQL — статический и динамический анализ безопасности отсутствует.
 
-- [ ] 67. **`pnpm overrides` для CVE — ручное управление** (`package.json:43-55`).
+- [x] 67. **`pnpm overrides` для CVE — ручное управление** (`package.json:43-55`).
   13 overrides для security patches. Без automated vulnerability scanning это рухнет.
+  ✅ Обновлён override для qs >=6.14.2 (GHSA-w7fw-mjwx-w883) (PR #529).
 
 - [x] 68. **Нет dependabot/renovate конфигурации** (`.github/`).
   Зависимости не обновляются автоматически — security patches приходят с задержкой.
@@ -261,8 +265,9 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 84. **User ID отображается в профиле** (`UserProfile.tsx:49,75`).
   Cognito sub (UUID) показан пользователю — внутренний идентификатор не должен быть в UI.
 
-- [ ] 85. **Shared tasks доступны без аутентификации навечно** (`SharedTaskPage.tsx`).
+- [x] 85. **Shared tasks доступны без аутентификации навечно** (`SharedTaskPage.tsx`).
   Share token = permanent public access. Нет expiration, нет revoke, нет audit log.
+  ✅ Добавлен TTL 90 дней, expiration notice, кнопка revoke (PR #529).
 
 - [x] 86. **Нет cookie consent / privacy banner** (index.html, App.tsx).
   Приложение использует localStorage, Sentry, Google Fonts — но consent не запрашивается.
