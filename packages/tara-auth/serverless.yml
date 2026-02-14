@@ -1,6 +1,6 @@
 service: tara-auth
 
-frameworkVersion: '4'
+frameworkVersion: '3'
 
 plugins:
   - serverless-esbuild
