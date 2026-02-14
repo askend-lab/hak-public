@@ -1,7 +1,6 @@
 service: merlin-api
 
-# TODO: migrate to Serverless v4 (v3 is in maintenance mode since 2024)
-frameworkVersion: "3"
+frameworkVersion: "4"
 
 provider:
   name: aws

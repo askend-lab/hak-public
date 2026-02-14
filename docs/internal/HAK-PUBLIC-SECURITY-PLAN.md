@@ -7,47 +7,47 @@
 
 ## Фаза 1 — Немедленная защита (бесплатно, 1 день)
 
-- [ ] **1.1. Lambda concurrency limits на все API**
+- [x] **1.1. Lambda concurrency limits на все API**
   Добавить `reservedConcurrency` в serverless.yml каждого сервиса.
   Это потолок параллельных Lambda — при превышении AWS возвращает 429.
   Файлы: `audio-api/serverless.yml`, `merlin-api/serverless.yml`, `vabamorf-api/serverless.yml`.
   Стоимость: $0.
 
-- [ ] **1.2. Убрать Sentry Session Replay**
+- [x] **1.2. Убрать Sentry Session Replay**
   Удалить `replayIntegration()`, `replaysSessionSampleRate`, `replaysOnErrorSampleRate` из `main.tsx`.
   Error tracking и browser tracing остаются — они не требуют consent.
   Стоимость: $0. GDPR-риск устранён.
 
-- [ ] **1.3. Убрать debug endpoint**
+- [x] **1.3. Убрать debug endpoint**
   Удалить `/debug/error` из `simplestore/serverless.yml` и handler.
   Открытый endpoint для генерации 500 — лишняя attack surface.
   Стоимость: $0.
 
 ## Фаза 2 — API Gateway throttling (бесплатно, 1 день)
 
-- [ ] **2.1. Throttling на audio-api (REST API)**
+- [x] **2.1. Throttling на audio-api (REST API)**
   Добавить `provider.apiGateway.throttle` с `rateLimit: 10`, `burstLimit: 20`.
   REST API поддерживает это нативно в Serverless Framework.
   Стоимость: $0 (встроено в API Gateway).
 
-- [ ] **2.2. Throttling на merlin-api (HTTP API)**
+- [x] **2.2. Throttling на merlin-api (HTTP API)**
   Добавить CloudFormation resource для `AWS::ApiGatewayV2::Stage` с
   `DefaultRouteSettings.ThrottlingRateLimit: 5`, `ThrottlingBurstLimit: 10`.
   Стоимость: $0.
 
-- [ ] **2.3. Throttling на vabamorf-api (HTTP API)**
+- [x] **2.3. Throttling на vabamorf-api (HTTP API)**
   Аналогично merlin-api: `ThrottlingRateLimit: 20`, `ThrottlingBurstLimit: 50`.
   Морфологический анализ легче, можно лимит выше.
   Стоимость: $0.
 
 ## Фаза 3 — Content-Security-Policy (бесплатно, 2 дня)
 
-- [ ] **3.1. Составить список внешних ресурсов**
+- [x] **3.1. Составить список внешних ресурсов**
   Открыть prod в браузере, проверить Network tab. Зафиксировать все домены:
   fonts.googleapis.com, fonts.gstatic.com, *.ingest.sentry.io, browser.sentry-cdn.com,
   merlin-*, vabamorf-*, *.amazonaws.com (для аудио).
 
-- [ ] **3.2. Добавить CSP в Report-Only режиме**
+- [x] **3.2. Добавить CSP в Report-Only режиме**
   Meta tag в `index.html`:
   `<meta http-equiv="Content-Security-Policy-Report-Only" content="...">`
   Это не блокирует ничего, только логирует нарушения в консоль браузера.
@@ -81,21 +81,25 @@
 
 ## Фаза 5 — Serverless v3 → v4 (бесплатно, 3 дня)
 
-- [ ] **5.1. Проверить совместимость плагинов**
-  serverless-esbuild, serverless-offline, serverless-domain-manager — проверить
-  changelog каждого на v4 support.
+- [x] **5.1. Проверить совместимость плагинов**
+  Все плагины совместимы с v4:
+  - serverless-offline 14.4.0: peerDep `serverless: ^4.0.0`
+  - serverless-domain-manager 9.1.0: peerDep `serverless: >=3`
+  - serverless-esbuild 1.57.0: compatible
+  ⚠️ **Serverless v4 требует Dashboard account или license key** (бесплатно для open source,
+  но нужна настройка `SERVERLESS_ACCESS_KEY` в CI/CD).
 
-- [ ] **5.2. Мигрировать vabamorf-api (пилот)**
+- [x] **5.2. Мигрировать vabamorf-api (пилот)**
   Самый простой сервис: 1 function, 1 плагин. Обновить frameworkVersion,
   deploy в dev, smoke test.
 
-- [ ] **5.3. Мигрировать audio-api**
+- [x] **5.3. Мигрировать audio-api**
   2 плагина, 3 functions. Deploy в dev, проверить /generate, /health, /warm.
 
-- [ ] **5.4. Мигрировать merlin-api**
+- [x] **5.4. Мигрировать merlin-api**
   1 плагин, 4 functions. Deploy в dev, проверить /synthesize, /status, /health, /warmup.
 
-- [ ] **5.5. Мигрировать simplestore**
+- [x] **5.5. Мигрировать simplestore**
   3 плагина, DynamoDB resources. Самый сложный — тестировать тщательно.
 
 - [ ] **5.6. Deploy всех сервисов в prod**
