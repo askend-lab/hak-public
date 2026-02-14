@@ -104,7 +104,7 @@ const BuildInfoModal = ({
   info: RuntimeBuildInfo;
   onClose: () => void;
 }) => (
-  <div className="build-info-overlay" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }} role="presentation">
+  <div className="build-info-overlay" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }} role="presentation" tabIndex={-1}>
     <div role="dialog" aria-modal="true" aria-labelledby="build-info-title">
       <div className="build-info-modal" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
       <div className="build-info-modal__header">
