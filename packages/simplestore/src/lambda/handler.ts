@@ -130,8 +130,13 @@ function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
 export async function handler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
-  // Debug endpoint - no auth required
+  // Debug endpoint - only available in offline/dev mode
   if (event.httpMethod === "POST" && event.resource === "/debug/error") {
+    if (!isOfflineMode()) {
+      return createResponse(HTTP_STATUS.NOT_FOUND, {
+        error: HTTP_ERRORS.NOT_FOUND,
+      });
+    }
     return handleDebugError();
   }
 

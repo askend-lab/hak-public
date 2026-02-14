@@ -4,10 +4,13 @@
 import { useAuth } from "@/features/auth/services";
 
 /**
- * Get the current user ID or fallback to test user
- * Simplifies the repeated pattern: user?.id ?? 'test-user'
+ * Get the current user ID.
+ * Throws if user is not authenticated — callers must ensure auth before use.
  */
 export function useUserId(): string {
   const { user } = useAuth();
-  return user?.id ?? "test-user";
+  if (!user?.id) {
+    throw new Error("useUserId: user is not authenticated");
+  }
+  return user.id;
 }

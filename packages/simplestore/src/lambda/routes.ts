@@ -40,9 +40,10 @@ export function createResponse(
   statusCode: number,
   body: unknown,
 ): APIGatewayProxyResult {
+  const origin = process.env.ALLOWED_ORIGIN || CORS_HEADERS["Access-Control-Allow-Origin"];
   return {
     statusCode,
-    headers: { ...CORS_HEADERS },
+    headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": origin ?? "*" },
     body: JSON.stringify(body),
   };
 }

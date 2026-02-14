@@ -33,10 +33,10 @@ describe("ShareService", () => {
   });
 
   describe("generateShareToken", () => {
-    it("returns a 16-character hex string", () => {
+    it("returns a 32-character hex string", () => {
       const token = service.generateShareToken();
-      expect(token).toHaveLength(16);
-      expect(/^[0-9a-f]{16}$/.test(token)).toBe(true);
+      expect(token).toHaveLength(32);
+      expect(/^[0-9a-f]{32}$/.test(token)).toBe(true);
     });
 
     it("returns different tokens each call", () => {
