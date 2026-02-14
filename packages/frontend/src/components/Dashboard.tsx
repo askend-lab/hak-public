@@ -102,12 +102,8 @@ function useDashboardData() {
     setMetrics([
       { label: "Ülesanded", value: taskCount, icon: "📋" },
       { label: "Kirjed", value: entryCount, icon: "📝" },
-      { label: "Sünteesid", value: 0, icon: "🔊" },
-      { label: "Sessioone", value: 1, icon: "👤" },
     ]);
-    setRecentActivity([
-      { id: "1", description: "Sisselogimine", timestamp: new Date() },
-    ]);
+    setRecentActivity([]);
     setIsLoading(false);
   }, [isAuthenticated, user]);
   useEffect(() => {

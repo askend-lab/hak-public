@@ -92,13 +92,11 @@ describe("Dashboard", () => {
     await waitFor(() => expect(screen.getByText("Rakenduse aktiivsuse ülevaade")).toBeTruthy());
   });
 
-  it("renders all 4 metric labels", async () => {
+  it("renders metric labels", async () => {
     render(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText("Ülesanded")).toBeTruthy();
       expect(screen.getByText("Kirjed")).toBeTruthy();
-      expect(screen.getByText("Sünteesid")).toBeTruthy();
-      expect(screen.getByText("Sessioone")).toBeTruthy();
     });
   });
 
@@ -107,8 +105,6 @@ describe("Dashboard", () => {
     await waitFor(() => {
       expect(screen.getAllByText("📋").length).toBeGreaterThan(0);
       expect(screen.getByText("📝")).toBeTruthy();
-      expect(screen.getByText("🔊")).toBeTruthy();
-      expect(screen.getByText("👤")).toBeTruthy();
     });
   });
 
@@ -121,9 +117,9 @@ describe("Dashboard", () => {
     });
   });
 
-  it("renders activity item with description", async () => {
+  it("renders empty activity list", async () => {
     render(<Dashboard />);
-    await waitFor(() => expect(screen.getByText("Sisselogimine")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Tegevust pole veel")).toBeTruthy());
   });
 
   it("hides auth prompt when authenticated", async () => {
@@ -150,7 +146,7 @@ describe("Dashboard", () => {
     const { container } = render(<Dashboard />);
     await waitFor(() => {
       const values = container.querySelectorAll(".dashboard__metric-value");
-      expect(values.length).toBe(4);
+      expect(values.length).toBe(2);
     });
   });
 
