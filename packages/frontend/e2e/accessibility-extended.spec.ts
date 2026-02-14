@@ -22,7 +22,10 @@ const ONBOARDING_STATE = JSON.stringify({
 async function bypassOnboarding(page: Page) {
   await page.goto("/");
   await page.evaluate(
-    (state: string) => localStorage.setItem("eki_onboarding", state),
+    (state: string) => {
+      localStorage.setItem("eki_onboarding", state);
+      localStorage.setItem("hak_cookie_consent", "accepted");
+    },
     ONBOARDING_STATE,
   );
 }
