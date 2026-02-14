@@ -449,12 +449,12 @@ Legend:
 ### Recommended Fix Priority
 
 **P0 — Security critical (do first):**
-- [ ] #7/#74 Share token entropy
-- [ ] #14 test-user shared data
-- [ ] #8 CORS wildcard
-- [ ] #10 Debug endpoint
-- [ ] #15 CSP
-- [ ] #81 Sentry replay GDPR
+- [x] #7/#74 Share token entropy
+- [x] #14 test-user shared data
+- [x] #8 CORS wildcard
+- [x] #10 Debug endpoint
+- [x] #15 CSP
+- [x] #81 Sentry replay GDPR
 
 **P1 — Data integrity & compliance:**
 - [ ] #2 Refresh token storage
