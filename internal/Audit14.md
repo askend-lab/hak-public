@@ -52,7 +52,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [x] 15. **Нет Content-Security-Policy** (ни в index.html, ни в response headers).
   Без CSP любой инъецированный скрипт выполнится в контексте приложения без ограничений.
 
-- [ ] 16. **Vite dev proxy молча проксирует в production** (`vite.config.ts:91-102,113,173`).
+- [x] 16. **Vite dev proxy молча проксирует в production** (`vite.config.ts:91-102,113,173`).
   Разработчик по умолчанию работает с prod-данными, включая merlin-prod. Случайная мутация — и данные потеряны.
 
 - [ ] 17. **Google Fonts загружается без SRI** (`index.html:8-9`).
@@ -81,7 +81,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 24. **`deleteTask` не удаляет unlisted copy** (`TaskRepository.ts:125-136`).
   Удалённая задача остаётся доступной по share token навсегда — data leak.
 
-- [ ] 25. **`addTextEntriesToTask` делает double read** (`TaskRepository.ts:138-187`).
+- [x] 25. **`addTextEntriesToTask` делает double read** (`TaskRepository.ts:138-187`).
   Сначала читает все задачи, потом вызывает `updateTask`, который снова читает все задачи.
 
 - [ ] 26. **`handleGet` возвращает 200 для not-found** (`routes.ts:133-137`).
@@ -113,16 +113,16 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 34. **Singleton `DataService.getInstance()`** (`dataService.ts:29-35`).
   Глобальное состояние, невозможность параллельного тестирования, скрытое связывание.
 
-- [ ] 35. **Нет Error Boundary вокруг lazy routes** (`main.tsx:48-57`).
+- [x] 35. **Нет Error Boundary вокруг lazy routes** (`main.tsx:48-57`).
   Suspense есть, ErrorBoundary обёртывает всё приложение — но ошибка в одном route убьёт всё.
 
-- [ ] 36. **Глубокая вложенность тернарных операторов** (`useCurrentView.ts:29-41`).
+- [x] 36. **Глубокая вложенность тернарных операторов** (`useCurrentView.ts:29-41`).
   6 уровней вложенных ternary — нечитаемо и error-prone.
 
 - [x] 37. **`"use client"` в не-Next.js приложении** (`LoginModal.tsx:4`, `UserProfile.tsx:4`, и др.).
   Директива бессмысленна в Vite+React. Создаёт ложное впечатление server-side rendering.
 
-- [ ] 38. **Module-level side effects в `warmAudioWorker.ts:48-54`**.
+- [x] 38. **Module-level side effects в `warmAudioWorker.ts:48-54`**.
   Event listeners регистрируются при импорте модуля. Невозможно контролировать lifecycle, ломает тесты.
 
 - [x] 39. **`_taskName` accepted but unused** (`ShareTaskModal.tsx:19`).
@@ -136,22 +136,22 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 41. **`postJSON` не отправляет auth headers** (`analyzeApi.ts:21-32`).
   Все POST-запросы к analyze/synthesize идут без Authorization — API полагается только на отсутствие auth.
 
-- [ ] 42. **Нет AbortController в `synthesizeWithPolling`** (`synthesize.ts:50-64`).
+- [x] 42. **Нет AbortController в `synthesizeWithPolling`** (`synthesize.ts:50-64`).
   Пользователь уходит со страницы — polling продолжается 30 секунд в фоне.
 
-- [ ] 43. **`pollForAudio` не отменяем** (`synthesize.ts:25-39`).
+- [x] 43. **`pollForAudio` не отменяем** (`synthesize.ts:25-39`).
   30 попыток × 1 сек — если компонент unmount, запросы продолжатся. Memory leak + wasted bandwidth.
 
 - [ ] 44. **Нет retry logic на failed API calls** (synthesize, analyze, variants).
   Однократный сбой сети = полный отказ. Нет exponential backoff, нет retry.
 
-- [ ] 45. **`SimpleStoreAdapter.get` шлёт auth headers для public endpoint** (`SimpleStoreAdapter.ts:62-64`).
+- [x] 45. **`SimpleStoreAdapter.get` шлёт auth headers для public endpoint** (`SimpleStoreAdapter.ts:62-64`).
   `/get-public` вызывается с `Authorization: Bearer ...` — токен утекает на не требующий auth endpoint.
 
 - [ ] 46. **`warmAudioWorker` пингует Merlin на каждое mousemove** (`warmAudioWorker.ts:48-54`).
   Throttle 60 сек, но listener на mousemove — каждое движение мыши вызывает функцию для проверки таймера.
 
-- [ ] 47. **`fetchAudioBlob` не проверяет размер ответа** (`downloadTaskAsZip.ts:34-40`).
+- [x] 47. **`fetchAudioBlob` не проверяет размер ответа** (`downloadTaskAsZip.ts:34-40`).
   Злонамеренный audioUrl может вернуть гигабайтный blob — browser out of memory.
 
 - [ ] 48. **Sequential audio download в ZIP export** (`downloadTaskAsZip.ts:86-96`).
@@ -247,10 +247,10 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 76. **`getEntryPlayUrl` создаёт blob URL без гарантии revoke** (`task.ts:56`).
   Каждый вызов создаёт `URL.createObjectURL` — caller должен revoke, но API не enforces это.
 
-- [ ] 77. **`handlePlayAll` читает stale state через closure** (`useSharedTaskAudio.ts:179`).
+- [x] 77. **`handlePlayAll` читает stale state через closure** (`useSharedTaskAudio.ts:179`).
   `isPlayingAll`, `isLoadingPlayAll` замкнуты в useCallback — при быстром повторном вызове видят stale значения.
 
-- [ ] 78. **`navigator.clipboard.writeText` без feature detection** (`clipboardUtils.ts:16`).
+- [x] 78. **`navigator.clipboard.writeText` без feature detection** (`clipboardUtils.ts:16`).
   В HTTP (не HTTPS) контексте clipboard API недоступен — unhandled rejection.
 
 - [ ] 79. **`a.click()` download не работает в Safari iOS** (`downloadTaskAsZip.ts:104-106`, `useSynthesis.ts:138-140`).
