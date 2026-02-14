@@ -12,7 +12,6 @@ export {
   handleGetPublic,
   handleDelete,
   handleQuery,
-  handleDebugError,
   createResponse,
   HTTP_STATUS,
   HTTP_ERRORS,

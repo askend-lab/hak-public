@@ -1,13 +1,16 @@
 service: vabamorf-api
 
-# TODO: migrate to Serverless v4 (v3 is in maintenance mode since 2024)
-frameworkVersion: "3"
+frameworkVersion: "4"
 
 provider:
   name: aws
   runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
+  httpApi:
+    throttle:
+      rateLimit: 20
+      burstLimit: 50
 
   environment:
     VMETAJSON_PATH: /var/task/vmetajson.bin
@@ -26,6 +29,7 @@ functions:
       name: vabamorf
     timeout: 30
     memorySize: 1024
+    reservedConcurrency: 20
     events:
       - httpApi:
           path: /{proxy+}

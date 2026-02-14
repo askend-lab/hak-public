@@ -16,7 +16,6 @@ import {
   handleGetPublic,
   handleDelete,
   handleQuery,
-  handleDebugError,
   createResponse,
   HTTP_STATUS,
   HTTP_ERRORS,
@@ -130,16 +129,6 @@ function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
 export async function handler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
-  // Debug endpoint - only available in offline/dev mode
-  if (event.httpMethod === "POST" && event.resource === "/debug/error") {
-    if (!isOfflineMode()) {
-      return createResponse(HTTP_STATUS.NOT_FOUND, {
-        error: HTTP_ERRORS.NOT_FOUND,
-      });
-    }
-    return handleDebugError();
-  }
-
   const userId = getUserId(event);
 
   // Allow unauthenticated GET requests for shared data

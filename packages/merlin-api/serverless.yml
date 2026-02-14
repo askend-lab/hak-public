@@ -1,7 +1,6 @@
 service: merlin-api
 
-# TODO: migrate to Serverless v4 (v3 is in maintenance mode since 2024)
-frameworkVersion: "3"
+frameworkVersion: "4"
 
 provider:
   name: aws
@@ -20,6 +19,9 @@ provider:
       allowedHeaders:
         - Content-Type
         - Authorization
+    throttle:
+      rateLimit: 5
+      burstLimit: 10
 
   environment:
     SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID}/hak-merlin-${self:provider.stage}-queue
@@ -48,6 +50,7 @@ functions:
   synthesize:
     handler: dist/handler.synthesize
     timeout: 30
+    reservedConcurrency: 10
     events:
       - httpApi:
           path: /synthesize
@@ -56,6 +59,7 @@ functions:
   status:
     handler: dist/handler.status
     timeout: 10
+    reservedConcurrency: 10
     events:
       - httpApi:
           path: /status/{cacheKey}
@@ -64,6 +68,7 @@ functions:
   health:
     handler: dist/handler.health
     timeout: 5
+    reservedConcurrency: 5
     events:
       - httpApi:
           path: /health
@@ -72,6 +77,7 @@ functions:
   warmup:
     handler: dist/handler.warmup
     timeout: 10
+    reservedConcurrency: 2
     environment:
       ECS_CLUSTER: hak-merlin-${self:provider.stage}
       ECS_SERVICE: merlin-worker

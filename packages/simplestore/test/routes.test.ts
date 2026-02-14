@@ -8,7 +8,6 @@ import {
   handleGet,
   handleDelete,
   handleQuery,
-  handleDebugError,
   HTTP_STATUS,
   HTTP_ERRORS,
 } from "../src/lambda/routes";
@@ -298,19 +297,6 @@ describe("Routes", () => {
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
       const body = JSON.parse(response.body);
       expect(body.items).toStrictEqual([]);
-    });
-  });
-
-  describe("handleDebugError", () => {
-    it("should return INTERNAL_ERROR with error message", async () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
-      const response = await handleDebugError();
-      expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-      const body = JSON.parse(response.body);
-      expect(body.error).toContain("Intentional test error");
-      expect(body.timestamp).toBeDefined();
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
     });
   });
 

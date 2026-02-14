@@ -371,18 +371,4 @@ describe("Lambda Handler", () => {
     });
   });
 
-  describe("debug endpoint", () => {
-    it("should return 500 for debug/error endpoint", async () => {
-      const event = createEvent({
-        httpMethod: "POST",
-        path: "/debug/error",
-        resource: "/debug/error",
-      });
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
-      const result = await handler(event);
-      expect(result.statusCode).toBe(500);
-      expect(JSON.parse(result.body).error).toContain("Intentional");
-      consoleSpy.mockRestore();
-    });
-  });
 });
