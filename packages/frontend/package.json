@@ -18,6 +18,8 @@
     "prebuild": "node scripts/sync-features.js",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "lint:fix": "eslint . --ext .ts,.tsx --fix --max-warnings=0",
+    "test:e2e": "playwright test",
+    "test:e2e:report": "playwright test --reporter=html",
     "test:a11y": "playwright test e2e/accessibility.spec.ts",
     "test:a11y:report": "playwright test e2e/accessibility.spec.ts --reporter=html"
   },
