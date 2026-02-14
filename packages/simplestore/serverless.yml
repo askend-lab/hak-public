@@ -96,10 +96,6 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: !Ref ApiGatewayAuthorizer
-      - http:
-          path: /debug/error
-          method: post
-          cors: true
 
 resources:
   Resources:
