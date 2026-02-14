@@ -35,6 +35,8 @@ pnpm test -- --full    # Full suite with coverage
 ```
 
 Tests use **Jest** (backend packages) and **Vitest** (frontend).
+Frontend packages use **co-located tests** (`*.test.ts` next to source files).
+Backend packages use **separated tests** (`test/` directory).
 BDD specifications in Gherkin live in `packages/specifications/`.
 
 ## Contributing
