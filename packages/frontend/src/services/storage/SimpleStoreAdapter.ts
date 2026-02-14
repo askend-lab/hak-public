@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { Task, TaskEntry } from "@/types/task";
+import { Task } from "@/types/task";
 import { AuthStorage } from "@/features/auth/services/storage";
 import { CONTENT_TYPE_JSON } from "@/features/synthesis/utils/analyzeApi";
 import { logger } from "@hak/shared";
@@ -81,34 +81,6 @@ export class SimpleStoreAdapter {
 
   async saveUserTasks(userId: string, tasks: Task[]): Promise<void> {
     await this.save("tasks", userId, "private", { tasks });
-  }
-
-  async loadBaselineTaskAdditions(
-    userId: string,
-  ): Promise<Record<string, TaskEntry[]>> {
-    const data = await this.get("tasks", `baseline-${userId}`, "private");
-    return data ? (data.additions as Record<string, TaskEntry[]>) : {};
-  }
-
-  async saveBaselineTaskAdditions(
-    userId: string,
-    additions: Record<string, TaskEntry[]>,
-  ): Promise<void> {
-    await this.save("tasks", `baseline-${userId}`, "private", { additions });
-  }
-
-  async loadSharedTasks(): Promise<Task[]> {
-    const data = await this.get("shared", "tasks", "shared");
-    return data ? (data.tasks as Task[]) : [];
-  }
-
-  async saveSharedTasks(tasks: Task[]): Promise<void> {
-    try {
-      await this.save("shared", "tasks", "shared", { tasks });
-    } catch (error) {
-      logger.error("Failed to save shared tasks:", error);
-      throw error;
-    }
   }
 
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {

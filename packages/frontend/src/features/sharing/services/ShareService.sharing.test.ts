@@ -4,29 +4,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ShareService } from "./ShareService";
 import { SimpleStoreAdapter } from "@/services/storage/SimpleStoreAdapter";
-import { MockDataLoader } from "@/services/storage/MockDataLoader";
 import { Task } from "@/types/task";
 
 describe("ShareService sharing flow", () => {
   let shareService: ShareService;
   let mockStorage: SimpleStoreAdapter;
-  let mockLoader: MockDataLoader;
-  let sharedTasksStorage: Task[];
 
   let unlistedTasksStorage: Record<string, Task>;
 
   beforeEach(() => {
-    sharedTasksStorage = [];
     unlistedTasksStorage = {};
 
     mockStorage = {
-      loadSharedTasks: vi
-        .fn()
-        .mockImplementation(() => Promise.resolve(sharedTasksStorage)),
-      saveSharedTasks: vi.fn().mockImplementation((tasks: Task[]) => {
-        sharedTasksStorage = tasks;
-        return Promise.resolve();
-      }),
       saveTaskAsUnlisted: vi.fn().mockImplementation((task: Task) => {
         if (task.shareToken) {
           unlistedTasksStorage[task.shareToken] = task;
@@ -38,53 +27,7 @@ describe("ShareService sharing flow", () => {
       }),
     } as unknown as SimpleStoreAdapter;
 
-    mockLoader = {
-      loadBaselineTasks: vi.fn().mockResolvedValue([]),
-      findTaskByShareToken: vi.fn().mockResolvedValue(null),
-    } as unknown as MockDataLoader;
-
-    shareService = new ShareService(mockStorage, mockLoader);
-  });
-
-  it("getSharedTask returns baseline task when found", async () => {
-    const baselineTask: Task = {
-      id: "baseline-1",
-      userId: "u1",
-      name: "Baseline",
-      description: "",
-      entries: [],
-      speechSequences: [],
-      shareToken: "bt1",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    (
-      mockLoader.loadBaselineTasks as ReturnType<typeof vi.fn>
-    ).mockResolvedValueOnce([baselineTask]);
-
-    const result = await shareService.getSharedTask("baseline-1");
-    expect(result).toEqual(baselineTask);
-  });
-
-  it("getTaskByShareToken returns baseline task from mockLoader", async () => {
-    const baselineTask: Task = {
-      id: "bl-1",
-      userId: "u1",
-      name: "BL Task",
-      description: "",
-      entries: [],
-      speechSequences: [],
-      shareToken: "btoken",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    (
-      mockLoader.findTaskByShareToken as ReturnType<typeof vi.fn>
-    ).mockResolvedValue(baselineTask);
-
-    const result = await shareService.getTaskByShareToken("btoken");
-    expect(result).toEqual(baselineTask);
-    expect(mockStorage.getTaskByShareToken).not.toHaveBeenCalled();
+    shareService = new ShareService(mockStorage);
   });
 
   it("should find shared task by shareToken after sharing", async () => {

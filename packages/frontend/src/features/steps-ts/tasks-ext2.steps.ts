@@ -351,3 +351,4 @@ Then("the edit option is not available for baseline tasks", function () {
 Then("the task is copied to my task list", function () {
   this.taskCopiedToMyList = true;
 });
+

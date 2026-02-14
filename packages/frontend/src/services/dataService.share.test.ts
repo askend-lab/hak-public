@@ -52,15 +52,6 @@ describe("DataService Share Operations", () => {
     expect(found).toBeNull();
   });
 
-  it("getSharedTask returns null for non-shared task", async () => {
-    const task = await ds.createTask(userId, {
-      name: "Not Shared",
-      description: "",
-    });
-    const found = await ds.getSharedTask(task.id);
-    expect(found).toBeNull();
-  });
-
   it("getTaskByShareToken finds task after sharing", async () => {
     const task = await ds.createTask(userId, {
       name: "Shared Task",
