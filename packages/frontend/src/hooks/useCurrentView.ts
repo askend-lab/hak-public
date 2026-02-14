@@ -26,19 +26,17 @@ export function useCurrentView(): CurrentViewResult {
   const location = useLocation();
   const pathname = location.pathname;
 
-  const currentView: ViewType = pathname.startsWith("/tasks")
-    ? "tasks"
-    : pathname.startsWith("/specs")
-      ? "specs"
-      : pathname.startsWith("/dashboard")
-        ? "dashboard"
-        : pathname.startsWith("/role-selection")
-          ? "role-selection"
-          : pathname.startsWith("/accessibility")
-            ? "accessibility"
-            : pathname.startsWith("/privacy")
-              ? "privacy"
-            : "synthesis";
+  const VIEW_ROUTES: [string, ViewType][] = [
+    ["/tasks", "tasks"],
+    ["/specs", "specs"],
+    ["/dashboard", "dashboard"],
+    ["/role-selection", "role-selection"],
+    ["/accessibility", "accessibility"],
+    ["/privacy", "privacy"],
+  ];
+
+  const currentView: ViewType =
+    VIEW_ROUTES.find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? "synthesis";
 
   const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
   const selectedTaskId: string | null = taskIdMatch?.[1] || null;

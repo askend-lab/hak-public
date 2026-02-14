@@ -28,6 +28,12 @@ describe("AuthStorage", () => {
       AuthStorage.setUser({ id: "u1", email: "e" });
       expect(localStorage.getItem("hak_user")).not.toBeNull();
     });
+
+    it("returns null and cleans up corrupted user data", () => {
+      localStorage.setItem("hak_user", "not-valid-json{{{");
+      expect(AuthStorage.getUser()).toBeNull();
+      expect(localStorage.getItem("hak_user")).toBeNull();
+    });
   });
 
   describe("Token key verification", () => {

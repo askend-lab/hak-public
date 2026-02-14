@@ -23,7 +23,11 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 import { OnboardingProvider } from "./features/onboarding/contexts/OnboardingContext";
 const AuthCallbackPage = lazy(() => import("./features/auth/pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
 const SharedTaskPage = lazy(() => import("./features/sharing/pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
+import { initActivityListeners } from "./features/synthesis/utils/warmAudioWorker";
 import "./styles/main.scss";
+
+// Initialize warm-up activity listeners (mouse/keyboard/touch → keep Lambda warm)
+initActivityListeners();
 
 // Enable accessibility checking in development mode
 if (import.meta.env.DEV) {

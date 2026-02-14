@@ -13,7 +13,19 @@ export async function copyTextToClipboard(
   showNotification: (options: ShowNotificationOptions) => void,
 ): Promise<void> {
   try {
-    await navigator.clipboard.writeText(text);
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // Fallback for HTTP contexts where clipboard API is unavailable
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
     showNotification({
       type: "success",
       message: "Tekst kopeeritud!",

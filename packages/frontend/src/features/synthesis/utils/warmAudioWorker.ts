@@ -44,12 +44,18 @@ export function pingMerlinOnActivity(): void {
   fetch(WARMUP_API_PATH, { method: "POST" }).catch(() => {});
 }
 
-// Auto-ping on user activity (mouse, keyboard, touch)
-if (typeof window !== "undefined") {
+let initialized = false;
+
+// Initialize auto-ping on user activity (mouse, keyboard, touch)
+export function initActivityListeners(): void {
+  if (initialized) return;
+  if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
+
   const events = ["mousemove", "keydown", "touchstart", "scroll"];
   events.forEach((event) => {
     window.addEventListener(event, () => pingMerlinOnActivity(), {
       passive: true,
     });
   });
+  initialized = true;
 }

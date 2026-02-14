@@ -22,9 +22,10 @@ interface StatusResponse {
   error?: string;
 }
 
-async function pollForAudio(cacheKey: string): Promise<string> {
+async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
-    const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`);
+    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+    const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
     if (!response.ok) throw new Error("Status check failed");
     const data: StatusResponse = await response.json();
 
@@ -43,13 +44,14 @@ async function pollForAudio(cacheKey: string): Promise<string> {
  * Synthesize with automatic voice model selection.
  * Combines synthesizeWithPolling + getVoiceModel to avoid repeated pattern.
  */
-export async function synthesizeAuto(text: string): Promise<string> {
-  return synthesizeWithPolling(text, getVoiceModel(text));
+export async function synthesizeAuto(text: string, signal?: AbortSignal): Promise<string> {
+  return synthesizeWithPolling(text, getVoiceModel(text), signal);
 }
 
 export async function synthesizeWithPolling(
   text: string,
   voice: string,
+  signal?: AbortSignal,
 ): Promise<string> {
   const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice });
   if (!response.ok) throw new Error("Synthesis request failed");
@@ -60,5 +62,5 @@ export async function synthesizeWithPolling(
     return data.audioUrl;
   }
 
-  return pollForAudio(data.cacheKey);
+  return pollForAudio(data.cacheKey, signal);
 }

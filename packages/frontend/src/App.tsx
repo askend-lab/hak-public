@@ -12,6 +12,7 @@ import { RoleSelectionContent } from "./features/onboarding/components";
 import { useAuth } from "./features/auth/services";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./features/onboarding/contexts/OnboardingContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PageLoadingState } from "./components/ui/PageLoadingState";
 import { SynthesisPageProvider } from "./features/synthesis/contexts/SynthesisPageContext";
 import {
@@ -91,38 +92,44 @@ export default function Home() {
         ) : (
           <Suspense fallback={<PageLoadingState />}>
             {currentView === "synthesis" && (
-              <SynthesisPageProvider
-                sentences={synthesis.sentences}
-                setSentences={synthesis.setSentences}
-                synthesis={synthesis}
-                taskHandlers={taskHandlers}
-                showNotification={showNotification}
-                isAuthenticated={isAuthenticated}
-                onLogin={() => setShowLoginModal(true)}
-              >
-                <SynthesisView />
-                <SynthesisModals showNotification={showNotification} />
-              </SynthesisPageProvider>
+              <ErrorBoundary>
+                <SynthesisPageProvider
+                  sentences={synthesis.sentences}
+                  setSentences={synthesis.setSentences}
+                  synthesis={synthesis}
+                  taskHandlers={taskHandlers}
+                  showNotification={showNotification}
+                  isAuthenticated={isAuthenticated}
+                  onLogin={() => setShowLoginModal(true)}
+                >
+                  <SynthesisView />
+                  <SynthesisModals showNotification={showNotification} />
+                </SynthesisPageProvider>
+              </ErrorBoundary>
             )}
             {currentView === "tasks" && (
-              <TasksView
-                selectedTaskId={selectedTaskId}
-                taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
-                onBack={() => navigate("/tasks")}
-                onViewTask={(id) => navigate(`/tasks/${id}`)}
-                onCreateTask={taskHandlers.handleCreateTask}
-                onEditTask={taskHandlers.handleEditTask}
-                onDeleteTask={taskHandlers.handleDeleteTask}
-                onShareTask={taskHandlers.handleShareTask}
-                onNavigateToSynthesis={() => navigate("/synthesis")}
-              />
+              <ErrorBoundary>
+                <TasksView
+                  selectedTaskId={selectedTaskId}
+                  taskRefreshTrigger={taskHandlers.taskRefreshTrigger}
+                  onBack={() => navigate("/tasks")}
+                  onViewTask={(id) => navigate(`/tasks/${id}`)}
+                  onCreateTask={taskHandlers.handleCreateTask}
+                  onEditTask={taskHandlers.handleEditTask}
+                  onDeleteTask={taskHandlers.handleDeleteTask}
+                  onShareTask={taskHandlers.handleShareTask}
+                  onNavigateToSynthesis={() => navigate("/synthesis")}
+                />
+              </ErrorBoundary>
             )}
             {currentView === "specs" && (
-              <SpecsPage onBack={() => navigate("/synthesis")} />
+              <ErrorBoundary>
+                <SpecsPage onBack={() => navigate("/synthesis")} />
+              </ErrorBoundary>
             )}
-            {currentView === "dashboard" && <Dashboard />}
-            {currentView === "accessibility" && <AccessibilityPage />}
-            {currentView === "privacy" && <PrivacyPage />}
+            {currentView === "dashboard" && <ErrorBoundary><Dashboard /></ErrorBoundary>}
+            {currentView === "accessibility" && <ErrorBoundary><AccessibilityPage /></ErrorBoundary>}
+            {currentView === "privacy" && <ErrorBoundary><PrivacyPage /></ErrorBoundary>}
           </Suspense>
         )}
       </main>
