@@ -51,7 +51,7 @@ provider:
     FRONTEND_URL_PROD: ${ssm:/hak/prod/frontend-url}
     STAGE: ${self:provider.stage}
     ALLOWED_ORIGIN: ${ssm:/hak/${self:provider.stage}/frontend-url}
-    COGNITO_DOMAIN: ${ssm:/hak/${self:provider.stage}/cognito-domain}
+    COGNITO_DOMAIN: ${ssm:/hak/shared/cognito-domain}
   
   vpc:
     securityGroupIds:

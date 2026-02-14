@@ -136,7 +136,7 @@ jobs:
           get_module() { jq -r ".modules.\"$1\" // \"\"" "$2"; }
 
           # Compare modules and determine what to deploy
-          for module in frontend simplestore merlin-api vabamorf-api; do
+          for module in frontend simplestore merlin-api vabamorf-api tara-auth; do
             BUILD_SHA=$(get_module "$module" /tmp/build-manifest.json)
             CURRENT_SHA=$(get_module "$module" /tmp/current-state.json)
 
@@ -210,7 +210,7 @@ jobs:
           echo "✅ Frontend deployed to $BUCKET with build-info.json"
 
       - name: Install Serverless
-        if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true'
+        if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true' || steps.state.outputs.deploy_tara_auth == 'true'
         run: npm install -g serverless@3
 
       - name: Deploy SimpleStore
@@ -244,6 +244,13 @@ jobs:
           echo "Using ECR image: $VABAMORF_IMAGE_URI"
           serverless deploy --stage ${{ inputs.environment }}
           echo "✅ Vabamorf API deployed"
+
+      - name: Deploy Tara Auth
+        if: steps.state.outputs.deploy_tara_auth == 'true'
+        working-directory: packages/tara-auth
+        run: |
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
+          echo "✅ Tara Auth deployed"
 
       - name: Update deployment state
         run: |
@@ -282,3 +289,4 @@ jobs:
           [ "${{ steps.state.outputs.deploy_simplestore }}" == "true" ] && echo "- ✅ simplestore" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ simplestore (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_merlin_api }}" == "true" ] && echo "- ✅ merlin-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ merlin-api (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_vabamorf_api }}" == "true" ] && echo "- ✅ vabamorf-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ vabamorf-api (unchanged)" >> $GITHUB_STEP_SUMMARY
+          [ "${{ steps.state.outputs.deploy_tara_auth }}" == "true" ] && echo "- ✅ tara-auth" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ tara-auth (unchanged)" >> $GITHUB_STEP_SUMMARY
