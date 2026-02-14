@@ -123,7 +123,7 @@ export default function SpecsPage({ onBack }: SpecsPageProps) {
           }
           onSelectFeature={setSelectedFeature}
         />
-        <section className="specs-page__content">
+        <section className="specs-page__content" tabIndex={0}>
           <SpecsContent feature={selectedFeatureData} testSuites={testSuites} />
         </section>
       </div>

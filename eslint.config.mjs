@@ -33,6 +33,7 @@ export default [
       ".lhci/**",
       "**/.stryker-tmp/**",
       "**/.venv/**",
+      ".playwright-browsers/**",
     ],
   },
 

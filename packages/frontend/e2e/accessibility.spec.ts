@@ -10,7 +10,7 @@
  * Tests all major pages, modals, panels, and interactive states.
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 // WCAG 2.1 AA tags to test against
@@ -19,7 +19,7 @@ const WCAG_AA_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 /**
  * Run axe accessibility audit on current page
  */
-async function runAccessibilityAudit(page: ReturnType<typeof test.page>) {
+async function runAccessibilityAudit(page: Page) {
   const accessibilityScanResults = await new AxeBuilder({ page })
     .withTags(WCAG_AA_TAGS)
     .analyze();
@@ -32,7 +32,7 @@ async function runAccessibilityAudit(page: ReturnType<typeof test.page>) {
  */
 function expectNoSeriousViolations(
   results: Awaited<ReturnType<typeof runAccessibilityAudit>>,
-) {
+): void {
   const seriousViolations = results.violations.filter(
     (v) => v.impact === "critical" || v.impact === "serious",
   );
@@ -57,7 +57,7 @@ function expectNoSeriousViolations(
 function logViolations(
   results: Awaited<ReturnType<typeof runAccessibilityAudit>>,
   context: string,
-) {
+): void {
   if (results.violations.length > 0) {
     console.log(
       `[${context}] ${results.violations.length} accessibility issues:`,
@@ -74,7 +74,26 @@ function logViolations(
 // Page-Level Audits
 // =========================================================================
 
+// Bypass onboarding role selection so tests reach actual pages
+const ONBOARDING_STATE = JSON.stringify({
+  completed: true,
+  selectedRole: "learner",
+  completedAt: new Date().toISOString(),
+});
+
+async function bypassOnboarding(page: Page) {
+  await page.goto("/");
+  await page.evaluate(
+    (state: string) => localStorage.setItem("eki_onboarding", state),
+    ONBOARDING_STATE,
+  );
+}
+
 test.describe("Accessibility - WCAG 2.1 AA Compliance", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassOnboarding(page);
+  });
+
   test.describe("Synthesis Page (Main View)", () => {
     test("should have no critical accessibility violations on synthesis page", async ({
       page,

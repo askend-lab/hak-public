@@ -3,20 +3,37 @@
 
 import { test, expect } from "@playwright/test";
 
-test.describe("Speech Synthesis Prototype", () => {
-  test("should type word and play audio", async ({ page }) => {
-    // Go to main page
-    await page.goto("/");
+// Bypass onboarding role selection for all tests in this file
+const ONBOARDING_STATE = JSON.stringify({
+  completed: true,
+  selectedRole: "learner",
+  completedAt: new Date().toISOString(),
+});
 
-    // Find the first text input and type "tere"
-    const input = page.locator('input[type="text"]').first();
+test.describe("Speech Synthesis Prototype", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(
+      (state) => localStorage.setItem("eki_onboarding", state),
+      ONBOARDING_STATE,
+    );
+  });
+
+  test("should type word and play audio", async ({ page }) => {
+    // Go to synthesis page (after onboarding bypass)
+    await page.goto("/synthesis");
+    await page.waitForLoadState("networkidle");
+
+    // Find the first text input (TagsInput uses a plain input element)
+    const input = page.locator(".sentence-synthesis-item input").first();
+    await expect(input).toBeVisible({ timeout: 5000 });
     await input.fill("tere");
 
-    // Verify text was entered
-    await expect(input).toHaveValue("tere");
+    // Press Enter to commit the sentence
+    await input.press("Enter");
 
-    // Find and click the play button (button with ▶ symbol)
-    const playButton = page.locator("button").filter({ hasText: "▶" }).first();
+    // Find and click the play button (Material icon "play_arrow")
+    const playButton = page.locator("button").filter({ hasText: "Play" }).first();
     await playButton.click();
 
     // Wait for audio element to have a source (indicates synthesis completed)
