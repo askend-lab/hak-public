@@ -112,13 +112,13 @@ describe("App (Home)", () => {
       expect(screen.getByText("Ülesanded")).toBeInTheDocument();
     });
 
-    it("renders synthesis view by default", () => {
+    it("renders synthesis view by default", async () => {
       render(
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
       );
-      expect(screen.getByText("Muuda tekst kõneks")).toBeInTheDocument();
+      expect(await screen.findByText("Muuda tekst kõneks")).toBeInTheDocument();
     });
 
     it("renders footer", () => {
@@ -300,31 +300,31 @@ describe("App (Home)", () => {
       });
     });
 
-    it("renders sentence items", () => {
+    it("renders sentence items", async () => {
       render(
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
       );
-      expect(screen.getByTestId("sentence-item-1")).toBeInTheDocument();
+      expect(await screen.findByTestId("sentence-item-1")).toBeInTheDocument();
     });
 
-    it("renders add sentence button", () => {
+    it("renders add sentence button", async () => {
       render(
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
       );
-      expect(screen.getByText("Lisa lause")).toBeInTheDocument();
+      expect(await screen.findByText("Lisa lause")).toBeInTheDocument();
     });
 
-    it("renders page title", () => {
+    it("renders page title", async () => {
       render(
         <MemoryRouter>
           <Home />
         </MemoryRouter>,
       );
-      expect(screen.getByText("Muuda tekst kõneks")).toBeInTheDocument();
+      expect(await screen.findByText("Muuda tekst kõneks")).toBeInTheDocument();
     });
   });
 
@@ -464,7 +464,7 @@ describe("App (Home)", () => {
       );
 
       await user.click(screen.getByText("Ülesanded"));
-      expect(screen.getByTestId("task-manager")).toBeInTheDocument();
+      expect(await screen.findByTestId("task-manager")).toBeInTheDocument();
     });
   });
 
@@ -536,7 +536,7 @@ describe("App (Home)", () => {
         </MemoryRouter>,
       );
 
-      await user.click(screen.getByText("Lisa lause"));
+      await user.click(await screen.findByText("Lisa lause"));
       expect(handleAddSentence).toHaveBeenCalled();
     });
   });

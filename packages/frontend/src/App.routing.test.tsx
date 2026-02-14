@@ -88,14 +88,13 @@ describe("App Routing", () => {
   });
 
   describe("URL-based view rendering", () => {
-    it("renders synthesis view for /synthesis route", () => {
+    it("renders synthesis view for /synthesis route", async () => {
       render(
         <MemoryRouter initialEntries={["/synthesis"]}>
           <Home />
         </MemoryRouter>,
       );
-
-      expect(screen.getByTestId("synthesis-view")).toBeInTheDocument();
+      expect(await screen.findByTestId("synthesis-view")).toBeInTheDocument();
       expect(screen.queryByTestId("tasks-view")).not.toBeInTheDocument();
     });
 
@@ -121,8 +120,7 @@ describe("App Routing", () => {
           <Home />
         </MemoryRouter>,
       );
-
-      expect(screen.getByTestId("tasks-view")).toBeInTheDocument();
+      expect(await screen.findByTestId("tasks-view")).toBeInTheDocument();
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
@@ -148,42 +146,38 @@ describe("App Routing", () => {
           <Home />
         </MemoryRouter>,
       );
-
-      const tasksView = screen.getByTestId("tasks-view");
+      const tasksView = await screen.findByTestId("tasks-view");
       expect(tasksView).toBeInTheDocument();
       expect(tasksView).toHaveAttribute("data-task-id", "task-123");
     });
 
-    it("renders specs page for /specs route", () => {
+    it("renders specs page for /specs route", async () => {
       render(
         <MemoryRouter initialEntries={["/specs"]}>
           <Home />
         </MemoryRouter>,
       );
-
-      expect(screen.getByTestId("specs-page")).toBeInTheDocument();
+      expect(await screen.findByTestId("specs-page")).toBeInTheDocument();
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
-    it("renders dashboard for /dashboard route", () => {
+    it("renders dashboard for /dashboard route", async () => {
       render(
         <MemoryRouter initialEntries={["/dashboard"]}>
           <Home />
         </MemoryRouter>,
       );
-
-      expect(screen.getByTestId("dashboard")).toBeInTheDocument();
+      expect(await screen.findByTestId("dashboard")).toBeInTheDocument();
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
-    it("defaults to synthesis view for unknown route", () => {
+    it("defaults to synthesis view for unknown route", async () => {
       render(
         <MemoryRouter initialEntries={["/unknown-route"]}>
           <Home />
         </MemoryRouter>,
       );
-
-      expect(screen.getByTestId("synthesis-view")).toBeInTheDocument();
+      expect(await screen.findByTestId("synthesis-view")).toBeInTheDocument();
     });
   });
 
@@ -211,7 +205,7 @@ describe("App Routing", () => {
         </MemoryRouter>,
       );
 
-      const tasksView = screen.getByTestId("tasks-view");
+      const tasksView = await screen.findByTestId("tasks-view");
       expect(tasksView).toHaveAttribute("data-task-id", "abc-def-123");
     });
 
@@ -238,20 +232,19 @@ describe("App Routing", () => {
         </MemoryRouter>,
       );
 
-      const tasksView = screen.getByTestId("tasks-view");
+      const tasksView = await screen.findByTestId("tasks-view");
       expect(tasksView.getAttribute("data-task-id")).toBeFalsy();
     });
   });
 
   describe("view detection from pathname", () => {
-    it("detects synthesis view from /synthesis pathname", () => {
+    it("detects synthesis view from /synthesis pathname", async () => {
       render(
         <MemoryRouter initialEntries={["/synthesis"]}>
           <Home />
         </MemoryRouter>,
       );
-
-      expect(screen.getByTestId("synthesis-view")).toBeInTheDocument();
+      expect(await screen.findByTestId("synthesis-view")).toBeInTheDocument();
     });
 
     it("detects tasks view from /tasks pathname", async () => {
@@ -277,27 +270,27 @@ describe("App Routing", () => {
         </MemoryRouter>,
       );
 
-      expect(screen.getByTestId("tasks-view")).toBeInTheDocument();
+      expect(await screen.findByTestId("tasks-view")).toBeInTheDocument();
     });
 
-    it("detects specs view from /specs pathname", () => {
+    it("detects specs view from /specs pathname", async () => {
       render(
         <MemoryRouter initialEntries={["/specs"]}>
           <Home />
         </MemoryRouter>,
       );
 
-      expect(screen.getByTestId("specs-page")).toBeInTheDocument();
+      expect(await screen.findByTestId("specs-page")).toBeInTheDocument();
     });
 
-    it("detects dashboard view from /dashboard pathname", () => {
+    it("detects dashboard view from /dashboard pathname", async () => {
       render(
         <MemoryRouter initialEntries={["/dashboard"]}>
           <Home />
         </MemoryRouter>,
       );
 
-      expect(screen.getByTestId("dashboard")).toBeInTheDocument();
+      expect(await screen.findByTestId("dashboard")).toBeInTheDocument();
     });
   });
 

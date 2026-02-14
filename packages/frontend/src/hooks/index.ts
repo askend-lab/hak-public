@@ -10,4 +10,5 @@ export { useUserTasks } from "@/features/tasks/hooks/useUserTasks";
 export { useUserId } from "./useUserId";
 export { useCurrentView } from "./useCurrentView";
 export { useDocumentTitle } from "./useDocumentTitle";
+export { useAppRedirects } from "./useAppRedirects";
 export { useDropdownPosition } from "./useDropdownPosition";

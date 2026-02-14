@@ -13,7 +13,7 @@ import { useTaskSharing } from "@/features/sharing/hooks/useTaskSharing";
 export function useTaskHandlers(
   sentences: SentenceState[],
   setCurrentView: (view: "synthesis" | "tasks") => void,
-  setSelectedTaskId: (id: string | null) => void,
+  setSelectedTaskId: (id: string | null) => void = () => {},
 ) {
   const { isAuthenticated, setShowLoginModal } = useAuth();
 
