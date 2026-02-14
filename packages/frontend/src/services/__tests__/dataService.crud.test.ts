@@ -6,7 +6,7 @@ import { DataService } from "../dataService";
 import {
   setupSimpleStoreMock,
   resetSimpleStoreMock,
-  getStoredUserTasks,
+  getStoredTasks,
 } from "../__mocks__/simpleStoreMock";
 
 describe("DataService CRUD Operations", () => {
@@ -78,7 +78,7 @@ describe("DataService CRUD Operations", () => {
 
       await dataService.createTask(mockUserId, taskData);
 
-      const tasks = getStoredUserTasks(mockUserId);
+      const tasks = getStoredTasks();
       expect(tasks).toHaveLength(1);
       expect(tasks[0]?.name).toBe("Saved Task");
     });

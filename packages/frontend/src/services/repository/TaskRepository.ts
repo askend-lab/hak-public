@@ -15,39 +15,32 @@ export class TaskRepository {
     private shareService: ShareService,
   ) {}
 
-  async getUserTasks(userId: string): Promise<TaskSummary[]> {
-    const userTasks = await this.storage.loadUserTasks(userId);
-
-    return userTasks.map((task) => ({
+  private toSummary(task: Task): TaskSummary {
+    return {
       id: task.id,
       name: task.name,
       description: task.description ?? null,
       entryCount: task.entries?.length || 0,
       createdAt: new Date(task.createdAt),
       updatedAt: new Date(task.updatedAt),
-    }));
+    };
   }
 
-  async getUserCreatedTasks(userId: string): Promise<TaskSummary[]> {
-    const userTasks = await this.storage.loadUserTasks(userId);
-
-    return userTasks.map((task) => ({
-      id: task.id,
-      name: task.name,
-      description: task.description ?? null,
-      entryCount: task.entries?.length || 0,
-      createdAt: new Date(task.createdAt),
-      updatedAt: new Date(task.updatedAt),
-    }));
+  async getUserTasks(_userId: string): Promise<TaskSummary[]> {
+    const userTasks = await this.storage.queryUserTasks();
+    return userTasks.map((task) => this.toSummary(task));
   }
 
-  async getModifiableTasks(userId: string): Promise<TaskSummary[]> {
-    return this.getUserCreatedTasks(userId);
+  async getUserCreatedTasks(_userId: string): Promise<TaskSummary[]> {
+    return this.getUserTasks(_userId);
   }
 
-  async getTask(taskId: string, userId: string): Promise<Task | null> {
-    const userTasks = await this.storage.loadUserTasks(userId);
-    return userTasks.find((t) => t.id === taskId) ?? null;
+  async getModifiableTasks(_userId: string): Promise<TaskSummary[]> {
+    return this.getUserCreatedTasks(_userId);
+  }
+
+  async getTask(taskId: string, _userId: string): Promise<Task | null> {
+    return this.storage.getTask(taskId);
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
@@ -85,9 +78,7 @@ export class TaskRepository {
       shareToken: this.shareService.generateShareToken(),
     };
 
-    const userTasks = await this.storage.loadUserTasks(userId);
-    userTasks.push(newTask);
-    await this.storage.saveUserTasks(userId, userTasks);
+    await this.storage.saveTask(newTask);
 
     // Also save as unlisted for anonymous access via shareToken
     await this.storage.saveTaskAsUnlisted(newTask);
@@ -96,42 +87,34 @@ export class TaskRepository {
   }
 
   async updateTask(
-    userId: string,
+    _userId: string,
     taskId: string,
     updates: Partial<Task>,
   ): Promise<Task | null> {
-    const userTasks = await this.storage.loadUserTasks(userId);
-    const taskIndex = userTasks.findIndex((task) => task.id === taskId);
-
-    if (taskIndex === -1) {
+    const existingTask = await this.storage.getTask(taskId);
+    if (!existingTask) {
       throw new Error("Task not found");
     }
 
-    const existingTask = userTasks[taskIndex];
-    if (!existingTask) return null;
     const updatedTask: Task = {
       ...existingTask,
       ...updates,
       updatedAt: new Date(),
     };
 
-    userTasks[taskIndex] = updatedTask;
-    await this.storage.saveUserTasks(userId, userTasks);
+    await this.storage.saveTask(updatedTask);
     // Sync unlisted storage for anonymous access
     await this.storage.saveTaskAsUnlisted(updatedTask);
     return updatedTask;
   }
 
-  async deleteTask(userId: string, taskId: string): Promise<boolean> {
-    const userTasks = await this.storage.loadUserTasks(userId);
-    const taskIndex = userTasks.findIndex((task) => task.id === taskId);
-
-    if (taskIndex === -1) {
+  async deleteTask(_userId: string, taskId: string): Promise<boolean> {
+    const existingTask = await this.storage.getTask(taskId);
+    if (!existingTask) {
       throw new Error("Task not found");
     }
 
-    userTasks.splice(taskIndex, 1);
-    await this.storage.saveUserTasks(userId, userTasks);
+    await this.storage.deleteTask(taskId);
     return true;
   }
 
@@ -141,8 +124,7 @@ export class TaskRepository {
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
     mode: "append" | "replace" = "append",
   ): Promise<TaskEntry[]> {
-    const userTasks = await this.storage.loadUserTasks(userId);
-    const task = userTasks.find((t) => t.id === taskId);
+    const task = await this.storage.getTask(taskId);
     if (!task) {
       throw new Error("Task not found");
     }
@@ -193,8 +175,7 @@ export class TaskRepository {
     entryId: string,
     updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>,
   ): Promise<TaskEntry | null> {
-    const userTasks = await this.storage.loadUserTasks(userId);
-    const task = userTasks.find((t) => t.id === taskId);
+    const task = await this.storage.getTask(taskId);
     if (!task) {
       throw new Error("Task not found");
     }

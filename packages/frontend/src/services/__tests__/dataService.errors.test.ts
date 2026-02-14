@@ -30,15 +30,8 @@ describe("DataService Error Handling and Edge Cases", () => {
     });
 
     it("throws error on fetch failure during save", async () => {
-      // First call succeeds (load), second fails (save)
-      let callCount = 0;
-      global.fetch = vi.fn().mockImplementation(() => {
-        callCount++;
-        if (callCount <= 1) {
-          return Promise.resolve({ ok: false, status: 404 });
-        }
-        return Promise.reject(new Error("Save failed"));
-      });
+      // Save call fails directly (no load-all needed with per-task storage)
+      global.fetch = vi.fn().mockRejectedValue(new Error("Save failed"));
 
       await expect(
         dataService.createTask(mockUserId, { name: "Test", description: "" }),
@@ -46,7 +39,11 @@ describe("DataService Error Handling and Edge Cases", () => {
     });
 
     it("handles 404 responses gracefully", async () => {
-      global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 404 });
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        text: async () => "Not found",
+      });
       const consoleSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
