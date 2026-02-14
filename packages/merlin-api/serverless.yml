@@ -50,7 +50,6 @@ functions:
   synthesize:
     handler: dist/handler.synthesize
     timeout: 30
-    reservedConcurrency: 10
     events:
       - httpApi:
           path: /synthesize
@@ -59,7 +58,6 @@ functions:
   status:
     handler: dist/handler.status
     timeout: 10
-    reservedConcurrency: 10
     events:
       - httpApi:
           path: /status/{cacheKey}
@@ -68,7 +66,6 @@ functions:
   health:
     handler: dist/handler.health
     timeout: 5
-    reservedConcurrency: 5
     events:
       - httpApi:
           path: /health
@@ -77,7 +74,6 @@ functions:
   warmup:
     handler: dist/handler.warmup
     timeout: 10
-    reservedConcurrency: 2
     environment:
       ECS_CLUSTER: hak-merlin-${self:provider.stage}
       ECS_SERVICE: merlin-worker
