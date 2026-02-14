@@ -487,17 +487,17 @@ Legend:
 - [x] #97 simplestore dep type (verified: devDeps correct)
 
 **P3 — Architecture improvements:**
-- [ ] #16 Vite proxy warning
+- [x] #16 Vite proxy warning
 - [ ] #19 SimpleStore data size limit
-- [ ] #25 Double read
+- [x] #25 Double read
 - [ ] #26 handleGet 200→404
 - [ ] #33 Spread collision
-- [ ] #35 Per-route ErrorBoundary
-- [ ] #36 Nested ternary
-- [ ] #38 warmAudioWorker init
-- [ ] #42/#43 AbortController
-- [ ] #45 Auth on public endpoint
-- [ ] #47 Blob size check
+- [x] #35 Per-route ErrorBoundary
+- [x] #36 Nested ternary
+- [x] #38 warmAudioWorker init
+- [x] #42/#43 AbortController
+- [x] #45 Auth on public endpoint
+- [x] #47 Blob size check
 - [ ] #67 Audit overrides
-- [ ] #77 Stale closure
-- [ ] #78 Clipboard feature detection
+- [x] #77 Stale closure
+- [x] #78 Clipboard feature detection
