@@ -4,7 +4,7 @@
 import { useCallback } from "react";
 import { useAuth } from "@/features/auth/services";
 import { SentenceState } from "@/types/synthesis";
-import { TASK_STRINGS } from "@/constants/ui-strings";
+import { TASK_STRINGS } from "@/config/ui-strings";
 import { useTaskModals } from "./useTaskModals";
 import { useTaskCRUD } from "./useTaskCRUD";
 import { useTaskEntries } from "./useTaskEntries";

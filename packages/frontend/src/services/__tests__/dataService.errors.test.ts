@@ -2,11 +2,11 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { DataService } from "./dataService";
+import { DataService } from "../dataService";
 import {
   setupSimpleStoreMock,
   resetSimpleStoreMock,
-} from "./__mocks__/simpleStoreMock";
+} from "../__mocks__/simpleStoreMock";
 
 describe("DataService Error Handling and Edge Cases", () => {
   let dataService: DataService;

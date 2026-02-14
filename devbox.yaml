@@ -4,6 +4,9 @@ extends: "./defaults.yaml"
 project:
   name: "HAK"
 
+# Always run full test suite with coverage (prevents coverage gaps on pre-commit)
+test_mode: full
+
 # Global excludes (merged with defaults)
 global_excludes:
   - '**/.venv/**'
@@ -44,7 +47,7 @@ test_modules:
     min_coverage_branches: 85
     command: "pnpm test"
     command_full: "pnpm test:coverage"
-    results_file: "jest-results.json"
+    results_file: "test-results.json"
   - name: cucumber
     path: packages/frontend
     type: cucumber
@@ -81,7 +84,7 @@ hooks:
       - "**/WCAG_AUDIT_REPORT.md"
       - "**/DESIGN_SYSTEM_COMPLIANCE_REPORT.md"
       - "**/ACCESSIBILITY_REMEDIATION_BACKLOG.md"
-      - "docs/02-DESIGN-SYSTEM/07-Quality-Standards.md"
+      - "docs/internal/design-system/07-Quality-Standards.md"
       - "audits/**"
 
   language-check:
