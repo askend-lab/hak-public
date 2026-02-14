@@ -64,7 +64,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 19. **Нет ограничения размера data в SimpleStore save** (`validation.ts`).
   Валидируется pk/sk/type/ttl, но `data` может быть произвольного размера. DynamoDB item limit 400KB, но до этого — memory pressure на Lambda.
 
-- [ ] 20. **`Access-Control-Allow-Methods` не включает DELETE** (`lambda.ts:23`).
+- [x] 20. **`Access-Control-Allow-Methods` не включает DELETE** (`lambda.ts:23`).
   Заявлены GET,POST,OPTIONS, но simplestore имеет DELETE endpoint — CORS preflight для DELETE будет rejected.
 
 ## DATA & STATE
@@ -119,16 +119,16 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 36. **Глубокая вложенность тернарных операторов** (`useCurrentView.ts:29-41`).
   6 уровней вложенных ternary — нечитаемо и error-prone.
 
-- [ ] 37. **`"use client"` в не-Next.js приложении** (`LoginModal.tsx:4`, `UserProfile.tsx:4`, и др.).
+- [x] 37. **`"use client"` в не-Next.js приложении** (`LoginModal.tsx:4`, `UserProfile.tsx:4`, и др.).
   Директива бессмысленна в Vite+React. Создаёт ложное впечатление server-side rendering.
 
 - [ ] 38. **Module-level side effects в `warmAudioWorker.ts:48-54`**.
   Event listeners регистрируются при импорте модуля. Невозможно контролировать lifecycle, ломает тесты.
 
-- [ ] 39. **`_taskName` accepted but unused** (`ShareTaskModal.tsx:19`).
+- [x] 39. **`_taskName` accepted but unused** (`ShareTaskModal.tsx:19`).
   Параметр принимается и сразу переименовывается в `_taskName` — мёртвый код в API компонента.
 
-- [ ] 40. **Нет TypeScript `strict: true` в tsconfig** (не найден strict flag).
+- [x] 40. **Нет TypeScript `strict: true` в tsconfig** (не найден strict flag).
   Без strict mode — implicit any, nullable без проверок, слабая типобезопасность.
 
 ## API & NETWORK
@@ -157,7 +157,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 48. **Sequential audio download в ZIP export** (`downloadTaskAsZip.ts:86-96`).
   Аудио скачивается последовательно. 100 записей × 2сек = 200 секунд ожидания.
 
-- [ ] 49. **`JSON.parse(event.body)` без try/catch** (`audio-api/handler.ts:49`).
+- [x] 49. **`JSON.parse(event.body)` без try/catch** (`audio-api/handler.ts:49`).
   Невалидный JSON тело запроса вызовет unhandled exception — 500 вместо 400.
 
 - [ ] 50. **Merlin CORS ограничен двумя origins, а shared lambda.ts — wildcard** (`merlin-api/serverless.yml:13-16`).
@@ -165,25 +165,25 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## UI & UX
 
-- [ ] 51. **Индекс как key в MetricCard** (`Dashboard.tsx:138`).
+- [x] 51. **Индекс как key в MetricCard** (`Dashboard.tsx:138`).
   `key={i}` — при изменении порядка метрик React перерендерит неправильные элементы.
 
 - [ ] 52. **Hardcoded fake data в Dashboard** (`Dashboard.tsx:108-110`).
   Активность "Sisselogimine" захардкожена — Dashboard показывает ложные данные.
 
-- [ ] 53. **Footer содержит мёртвые ссылки `href="#"`** (`Footer.tsx:29,32`).
+- [x] 53. **Footer содержит мёртвые ссылки `href="#"`** (`Footer.tsx:29,32`).
   "Portaalist" и "Versiooniajalugu" ведут в никуда — broken navigation.
 
-- [ ] 54. **Email захардкожен в Footer** (`Footer.tsx:89,98`).
+- [x] 54. **Email захардкожен в Footer** (`Footer.tsx:89,98`).
   `kristjan.suluste@eki.ee` — персональный email в коде. При смене ответственного — правка в коде.
 
-- [ ] 55. **ConfirmationModal: cancelText="Cancel" на английском** (`ConfirmationModal.tsx:24`).
+- [x] 55. **ConfirmationModal: cancelText="Cancel" на английском** (`ConfirmationModal.tsx:24`).
   Всё приложение на эстонском, но дефолтная кнопка отмены — на английском.
 
-- [ ] 56. **Нет max count у notifications** (`NotificationContainer.tsx:54`).
+- [x] 56. **Нет max count у notifications** (`NotificationContainer.tsx:54`).
   `setNotifications(prev => [...prev, notification])` — без лимита. Массовые ошибки = сотни toast.
 
-- [ ] 57. **BaseModal ставит `overflow: "unset"` при cleanup** (`BaseModal.tsx:125`).
+- [x] 57. **BaseModal ставит `overflow: "unset"` при cleanup** (`BaseModal.tsx:125`).
   Не восстанавливает оригинальное значение. Если overflow было не default — layout break.
 
 - [ ] 58. **Backdrop div с `onKeyDown` без `tabIndex`** (`BuildInfoModal.tsx:107`).
@@ -218,7 +218,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 67. **`pnpm overrides` для CVE — ручное управление** (`package.json:43-55`).
   13 overrides для security patches. Без automated vulnerability scanning это рухнет.
 
-- [ ] 68. **Нет dependabot/renovate конфигурации** (`.github/`).
+- [x] 68. **Нет dependabot/renovate конфигурации** (`.github/`).
   Зависимости не обновляются автоматически — security patches приходят с задержкой.
 
 - [ ] 69. **`build.yml` не кэширует pnpm store** (`.github/workflows/build.yml`).
@@ -229,16 +229,16 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 
 ## CODE QUALITY
 
-- [ ] 71. **`console.error` вместо logger** (`ShareService.ts:27`).
+- [x] 71. **`console.error` вместо logger** (`ShareService.ts:27`).
   Один прямой `console.error` среди logger-вызовов — непоследовательное логирование.
 
-- [ ] 72. **`isVabamorfMarker` — array.includes вместо Set** (`phoneticMarkers.ts:119-133`).
+- [x] 72. **`isVabamorfMarker` — array.includes вместо Set** (`phoneticMarkers.ts:119-133`).
   Создаёт новый array при каждом вызове и ищет линейно. В hot path (char-by-char processing).
 
-- [ ] 73. **String concatenation в цикле** (`phoneticMarkers.ts:54-69`).
+- [x] 73. **String concatenation в цикле** (`phoneticMarkers.ts:54-69`).
   `result += char` в цикле — O(n²) string building вместо array.join().
 
-- [ ] 74. **`generateShareToken` truncates entropy** (`shareTokenUtils.ts:10`).
+- [x] 74. **`generateShareToken` truncates entropy** (`shareTokenUtils.ts:10`).
   Генерирует 16 random bytes (32 hex chars), затем `substring(0, 16)` — выбрасывает половину энтропии.
 
 - [ ] 75. **`processedRef` не защищает от StrictMode double-mount** (`AuthCallbackPage.tsx:14,18`).
@@ -256,7 +256,7 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 79. **`a.click()` download не работает в Safari iOS** (`downloadTaskAsZip.ts:104-106`, `useSynthesis.ts:138-140`).
   Программный `a.click()` для download блокируется Safari на iOS — файл не скачается.
 
-- [ ] 80. **`sanitizeFilename` может разрезать multi-byte char** (`downloadTaskAsZip.ts:13`).
+- [x] 80. **`sanitizeFilename` может разрезать multi-byte char** (`downloadTaskAsZip.ts:13`).
   `.slice(0, 80)` режет по JS code units — может разрезать эмодзи или Unicode символ пополам.
 
 ## PRIVACY & COMPLIANCE
@@ -279,10 +279,10 @@ Scope: весь проект hak-public (frontend, backend APIs, shared, infra)
 - [ ] 86. **Нет cookie consent / privacy banner** (index.html, App.tsx).
   Приложение использует localStorage, Sentry, Google Fonts — но consent не запрашивается.
 
-- [ ] 87. **`logger.debug("Sharing task:", task)` логирует весь объект задачи** (`ShareService.ts:19`).
+- [x] 87. **`logger.debug("Sharing task:", task)` логирует весь объект задачи** (`ShareService.ts:19`).
   В debug-логи попадает полное содержимое задачи включая пользовательский текст.
 
-- [ ] 88. **Personal email в исходном коде** (`Footer.tsx:89`).
+- [x] 88. **Personal email в исходном коде** (`Footer.tsx:89`).
   GDPR: персональные данные (email) в публичном open-source репозитории.
 
 ## TESTING & RELIABILITY
