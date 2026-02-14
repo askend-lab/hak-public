@@ -134,7 +134,7 @@
       font-family: $font-body;
       font-weight: $heading-page-description-weight;
       line-height: $heading-page-description-line;
-      color: $color-gray;
+      color: var(--color-text-on-secondary);
       margin: 0;
       font-size: $heading-page-description-size-mobile;
 

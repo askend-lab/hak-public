@@ -10,9 +10,27 @@
  * Split from accessibility.spec.ts for maintainability.
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
+
+// Bypass onboarding role selection so tests reach actual pages
+const ONBOARDING_STATE = JSON.stringify({
+  completed: true,
+  selectedRole: "learner",
+  completedAt: new Date().toISOString(),
+});
+
+async function bypassOnboarding(page: Page) {
+  await page.goto("/");
+  await page.evaluate(
+    (state: string) => localStorage.setItem("eki_onboarding", state),
+    ONBOARDING_STATE,
+  );
+}
 
 test.describe("Accessibility - Extended Checks", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassOnboarding(page);
+  });
   // =========================================================================
   // Touch Target Size Verification
   // =========================================================================

@@ -230,6 +230,8 @@ export default function SentenceSynthesisItem({
       {draggable && mode !== "readonly" && (
         <div
           className="sentence-synthesis-item__drag-handle"
+          role="button"
+          tabIndex={0}
           draggable
           onDragStart={handleDragStartInternal}
           onDragEnd={handleDragEndInternal}

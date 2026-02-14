@@ -28,7 +28,7 @@
 
   &__subtitle {
     font-size: $font-size-md;
-    color: $color-gray;
+    color: var(--color-text-on-secondary);
     margin: 0;
   }
 
