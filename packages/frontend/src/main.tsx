@@ -20,7 +20,7 @@ try {
   // Sentry init failure must not block app startup
 }
 
-import App from "./App";
+import AppLayout from "./App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthProvider } from "./features/auth/services";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -29,6 +29,14 @@ import { DataServiceProvider } from "./contexts/DataServiceContext";
 import { CopiedEntriesProvider } from "./contexts/CopiedEntriesContext";
 const AuthCallbackPage = lazy(() => import("./features/auth/pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
 const SharedTaskPage = lazy(() => import("./features/sharing/pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
+const SynthesisRoute = lazy(() => import("./routes/SynthesisRoute"));
+const TasksRoute = lazy(() => import("./routes/TasksRoute"));
+const SpecsRoute = lazy(() => import("./routes/SpecsRoute"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const AccessibilityPage = lazy(() => import("./pages/AccessibilityPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+const RoleSelectionRoute = lazy(() => import("./features/onboarding/components").then(m => ({ default: m.RoleSelectionContent })));
 import { initActivityListeners } from "./features/synthesis/utils/warmAudioWorker";
 import "./styles/main.scss";
 
@@ -61,7 +69,18 @@ createRoot(rootElement).render(
                     path="/shared/task/:token"
                     element={<SharedTaskPage />}
                   />
-                  <Route path="*" element={<App />} />
+                  <Route element={<AppLayout />}>
+                    <Route index element={<SynthesisRoute />} />
+                    <Route path="synthesis" element={<SynthesisRoute />} />
+                    <Route path="tasks" element={<TasksRoute />} />
+                    <Route path="tasks/:taskId" element={<TasksRoute />} />
+                    <Route path="specs" element={<SpecsRoute />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="role-selection" element={<RoleSelectionRoute />} />
+                    <Route path="accessibility" element={<AccessibilityPage />} />
+                    <Route path="privacy" element={<PrivacyPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Route>
                 </Routes>
               </Suspense>
               </CopiedEntriesProvider>

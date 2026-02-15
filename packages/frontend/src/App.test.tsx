@@ -3,9 +3,9 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
-import Home from "./App";
+import AppLayout from "./App";
 import { DataServiceTestWrapper } from "./test/dataServiceMock";
 import {
   mockAuthContext,
@@ -34,7 +34,6 @@ vi.mock("./hooks", async (importOriginal) => {
   return {
     ...actual,
     useSynthesis: vi.fn(() => mockSynthesis()),
-    useTaskHandlers: vi.fn(() => mockTaskHandlers()),
     useDragAndDrop: vi.fn(() => mockDragAndDrop()),
     useVariantsPanel: vi.fn(() => mockVariantsPanel()),
     useSentenceMenu: vi.fn(() => mockSentenceMenu()),
@@ -47,6 +46,12 @@ vi.mock("./hooks", async (importOriginal) => {
     useUserId: vi.fn(() => "38001085718"),
   };
 });
+vi.mock("./features/tasks/hooks/useTaskHandlers", () => ({
+  useTaskHandlers: vi.fn(() => mockTaskHandlers()),
+}));
+vi.mock("./features/synthesis/components/SynthesisModals", () => ({
+  default: () => null,
+}));
 
 vi.mock("./components/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
@@ -86,8 +91,28 @@ vi.mock("./features/onboarding/components", () => ({
     <div data-testid="onboarding-wizard">OnboardingWizard</div>
   ),
 }));
+import SynthesisRoute from "./routes/SynthesisRoute";
+import TasksRoute from "./routes/TasksRoute";
+
 function AppWrapper({ children }: { children: React.ReactNode }) {
   return <DataServiceTestWrapper>{children}</DataServiceTestWrapper>;
+}
+
+function renderWithRoutes(initialPath = "/") {
+  return render(
+    <MemoryRouter initialEntries={[initialPath]}>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route index element={<SynthesisRoute />} />
+          <Route path="synthesis" element={<SynthesisRoute />} />
+          <Route path="tasks" element={<TasksRoute />} />
+          <Route path="tasks/:taskId" element={<TasksRoute />} />
+          <Route path="role-selection" element={<div data-testid="role-selection">RoleSelection</div>} />
+        </Route>
+      </Routes>
+    </MemoryRouter>,
+    { wrapper: AppWrapper },
+  );
 }
 
 describe("App (Home)", () => {
@@ -97,63 +122,33 @@ describe("App (Home)", () => {
 
   describe("rendering", () => {
     it("renders header with logo", () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByAltText("EKI Logo")).toBeInTheDocument();
     });
 
     it("renders navigation links", () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByText("Tekst kõneks")).toBeInTheDocument();
       expect(screen.getByText("Ülesanded")).toBeInTheDocument();
     });
 
     it("renders synthesis view by default", async () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(await screen.findByText("Muuda tekst kõneks")).toBeInTheDocument();
     });
 
     it("renders footer", () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByTestId("footer")).toBeInTheDocument();
     });
 
     it("renders help button", () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByTitle("Näita juhendeid")).toBeInTheDocument();
     });
 
     it("renders login button when not authenticated", () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByText("Logi sisse")).toBeInTheDocument();
     });
   });
@@ -181,7 +176,7 @@ describe("App (Home)", () => {
 
       const { container } = render(
         <MemoryRouter>
-          <Home />
+          <AppLayout />
         </MemoryRouter>,
         { wrapper: AppWrapper },
       );
@@ -210,13 +205,8 @@ describe("App (Home)", () => {
         currentSteps: [],
       });
 
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
-      expect(screen.getByTestId("role-selection")).toBeInTheDocument();
+      renderWithRoutes("/role-selection");
+      expect(await screen.findByTestId("role-selection")).toBeInTheDocument();
     });
   });
 
@@ -238,24 +228,14 @@ describe("App (Home)", () => {
         handleTaraTokens: vi.fn(),
       });
 
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByTestId("user-profile")).toBeInTheDocument();
     });
   });
 
   describe("navigation", () => {
     it("synthesis link is rendered by default", () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       const synthesisLink = screen.getByText("Tekst kõneks");
       expect(synthesisLink).toBeInTheDocument();
     });
@@ -279,12 +259,7 @@ describe("App (Home)", () => {
       });
 
       const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
 
       await user.click(screen.getByText("Ülesanded"));
       expect(setShowLoginModal).toHaveBeenCalledWith(true);
@@ -315,32 +290,17 @@ describe("App (Home)", () => {
     });
 
     it("renders sentence items", async () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes("/synthesis");
       expect(await screen.findByTestId("sentence-item-1")).toBeInTheDocument();
     });
 
     it("renders add sentence button", async () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes("/synthesis");
       expect(await screen.findByText("Lisa lause")).toBeInTheDocument();
     });
 
     it("renders page title", async () => {
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes("/synthesis");
       expect(await screen.findByText("Muuda tekst kõneks")).toBeInTheDocument();
     });
   });
@@ -366,12 +326,7 @@ describe("App (Home)", () => {
         currentSteps: [],
       });
 
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByTitle("Näita juhendeid")).toBeInTheDocument();
     });
   });
@@ -397,12 +352,7 @@ describe("App (Home)", () => {
         currentSteps: [],
       });
 
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
       expect(screen.getByTestId("onboarding-wizard")).toBeInTheDocument();
     });
   });
@@ -427,12 +377,7 @@ describe("App (Home)", () => {
       });
 
       const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
 
       await user.click(screen.getByText("Logi sisse"));
       expect(setShowLoginModal).toHaveBeenCalledWith(true);
@@ -477,12 +422,7 @@ describe("App (Home)", () => {
       });
 
       const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes();
 
       await user.click(screen.getByText("Ülesanded"));
       expect(await screen.findByTestId("task-manager")).toBeInTheDocument();
@@ -551,12 +491,7 @@ describe("App (Home)", () => {
       });
 
       const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>,
-        { wrapper: AppWrapper },
-      );
+      renderWithRoutes("/synthesis");
 
       await user.click(await screen.findByText("Lisa lause"));
       expect(handleAddSentence).toHaveBeenCalled();

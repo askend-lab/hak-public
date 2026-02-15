@@ -1,37 +1,25 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useEffect, useRef, lazy, Suspense, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useMemo, useCallback } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import CookieConsent from "./components/CookieConsent";
 import Footer from "./components/Footer";
 import AppHeader from "./components/AppHeader";
 import AppModals from "./components/AppModals";
-import SynthesisModals from "./features/synthesis/components/SynthesisModals";
-import { RoleSelectionContent } from "./features/onboarding/components";
 import { useAuth } from "./features/auth/services";
 import { useNotification } from "./contexts/NotificationContext";
 import { useOnboarding } from "./features/onboarding/contexts/OnboardingContext";
-import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PageLoadingState } from "./components/ui/PageLoadingState";
-import { SynthesisPageProvider } from "./features/synthesis/contexts/SynthesisPageContext";
 import {
   useSynthesis,
-  useTaskHandlers,
-  useCurrentView,
   useDocumentTitle,
   useAppRedirects,
 } from "./hooks";
+import { useTaskHandlers } from "./features/tasks/hooks/useTaskHandlers";
+import type { AppLayoutContext } from "./routes/types";
 
-const SynthesisView = lazy(() => import("./features/synthesis/components/SynthesisView"));
-const TasksView = lazy(() => import("./features/tasks/components/TasksView"));
-const SpecsPage = lazy(() => import("./components/SpecsPage"));
-const Dashboard = lazy(() => import("./components/Dashboard"));
-const AccessibilityPage = lazy(() => import("./pages/AccessibilityPage"));
-const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
-const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
-
-export default function Home() {
+export default function AppLayout() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } =
     useAuth();
   const { showNotification } = useNotification();
@@ -41,7 +29,7 @@ export default function Home() {
     isLoading: isOnboardingLoading,
   } = useOnboarding();
   const navigate = useNavigate();
-  const { currentView, selectedTaskId } = useCurrentView();
+  const { pathname } = useLocation();
   useDocumentTitle();
 
   const synthesis = useSynthesis();
@@ -50,17 +38,17 @@ export default function Home() {
     synthesis.sentences,
     navigateToTasks,
   );
-  const { handleTasksClick } = useAppRedirects(currentView);
+  const { handleTasksClick } = useAppRedirects();
 
   const mainRef = useRef<HTMLElement>(null);
-  const prevViewRef = useRef(currentView);
+  const prevPathnameRef = useRef(pathname);
 
   useEffect(() => {
-    if (prevViewRef.current !== currentView) {
-      prevViewRef.current = currentView;
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname;
       mainRef.current?.focus({ preventScroll: true });
     }
-  }, [currentView]);
+  }, [pathname]);
 
   useEffect(() => {
     if (isWizardActive && onboardingState.selectedRole)
@@ -71,6 +59,14 @@ export default function Home() {
     synthesis.setDemoSentences,
   ]);
 
+  const outletContext = useMemo<AppLayoutContext>(() => ({
+    synthesis,
+    taskHandlers,
+    showNotification,
+    isAuthenticated,
+    setShowLoginModal,
+  }), [synthesis, taskHandlers, showNotification, isAuthenticated, setShowLoginModal]);
+
   if (isOnboardingLoading) {
     return (
       <div className="page-layout page-layout--centered">
@@ -79,7 +75,7 @@ export default function Home() {
     );
   }
 
-  const showRoleSelection = currentView === "role-selection";
+  const isRoleSelection = pathname === "/role-selection";
 
   return (
     <div className="page-layout">
@@ -98,54 +94,9 @@ export default function Home() {
         ref={mainRef}
         id="main-content"
         tabIndex={-1}
-        className={`page-layout__main ${showRoleSelection ? "role-selection-main" : ""}`}
+        className={`page-layout__main ${isRoleSelection ? "role-selection-main" : ""}`}
       >
-        {showRoleSelection ? (
-          <RoleSelectionContent />
-        ) : (
-          <Suspense fallback={<PageLoadingState />}>
-            {currentView === "synthesis" && (
-              <ErrorBoundary>
-                <SynthesisPageProvider
-                  sentences={synthesis.sentences}
-                  setSentences={synthesis.setSentences}
-                  synthesis={synthesis}
-                  taskHandlers={taskHandlers}
-                  showNotification={showNotification}
-                  isAuthenticated={isAuthenticated}
-                  onLogin={() => setShowLoginModal(true)}
-                >
-                  <SynthesisView />
-                  <SynthesisModals showNotification={showNotification} />
-                </SynthesisPageProvider>
-              </ErrorBoundary>
-            )}
-            {currentView === "tasks" && (
-              <ErrorBoundary>
-                <TasksView
-                  selectedTaskId={selectedTaskId}
-                  taskRefreshTrigger={taskHandlers.modals.taskRefreshTrigger}
-                  onBack={() => navigate("/tasks")}
-                  onViewTask={(id) => navigate(`/tasks/${id}`)}
-                  onCreateTask={taskHandlers.crud.handleCreateTask}
-                  onEditTask={taskHandlers.crud.handleEditTask}
-                  onDeleteTask={taskHandlers.crud.handleDeleteTask}
-                  onShareTask={taskHandlers.sharing.handleShareTask}
-                  onNavigateToSynthesis={() => navigate("/synthesis")}
-                />
-              </ErrorBoundary>
-            )}
-            {currentView === "specs" && (
-              <ErrorBoundary>
-                <SpecsPage onBack={() => navigate("/synthesis")} />
-              </ErrorBoundary>
-            )}
-            {currentView === "dashboard" && <ErrorBoundary><Dashboard /></ErrorBoundary>}
-            {currentView === "accessibility" && <ErrorBoundary><AccessibilityPage /></ErrorBoundary>}
-            {currentView === "privacy" && <ErrorBoundary><PrivacyPage /></ErrorBoundary>}
-            {currentView === "not-found" && <ErrorBoundary><NotFoundPage /></ErrorBoundary>}
-          </Suspense>
-        )}
+        <Outlet context={outletContext} />
       </main>
 
       <footer className="page-layout__footer page-footer--full">
