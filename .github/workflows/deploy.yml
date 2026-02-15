@@ -214,7 +214,7 @@ jobs:
 
       - name: Install Serverless
         if: steps.state.outputs.deploy_simplestore == 'true' || steps.state.outputs.deploy_merlin_api == 'true' || steps.state.outputs.deploy_vabamorf_api == 'true' || steps.state.outputs.deploy_tara_auth == 'true'
-        run: npm install -g serverless@3
+        run: npm install -g serverless@3.40.0
 
       - name: Deploy SimpleStore
         if: steps.state.outputs.deploy_simplestore == 'true'

@@ -24,6 +24,8 @@ describe("handleCodeCallback and handleTaraTokens", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
+    // Mock fetch so refreshTokens() fails fast instead of hanging
+    globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401 });
   });
 
   it("should handle code callback with valid tokens", async () => {

@@ -15,7 +15,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     allow {}
   }
 
-  # Rule 1: Per-IP rate limiting (300 requests per 5 minutes)
+  # Rule 1: Per-IP rate limiting (100 requests per 5 minutes)
   rule {
     name     = "rate-limit-per-ip"
     priority = 1

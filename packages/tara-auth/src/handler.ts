@@ -14,6 +14,7 @@ export const DEFAULT_FRONTEND_URL_PROD = 'https://hak.askend-lab.com';
 export const DEFAULT_FRONTEND_URL_DEV = 'https://hak-dev.askend-lab.com';
 export const TOKEN_COOKIE_OPTIONS = 'HttpOnly; Secure; SameSite=Lax; Path=/';
 export const RANDOM_STRING_LENGTH = 32;
+export const MAX_BODY_SIZE = 4096; // 4KB — auth requests are small JSON payloads
 
 export function getFrontendUrl(): string {
   const stage = process.env.STAGE || 'dev';
@@ -331,6 +332,10 @@ export async function exchangeCodeHandler(
   try {
     if (!event.body) {
       return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Missing request body' }, corsResponseHeaders());
+    }
+
+    if (event.body.length > MAX_BODY_SIZE) {
+      return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Request body too large' }, corsResponseHeaders());
     }
 
     let parsed: Record<string, string>;
