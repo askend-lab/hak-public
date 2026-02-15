@@ -95,7 +95,7 @@ export function SharedTaskPage() {
     return (
       <main className="shared-task-error">
         <h1>{error || "Ülesannet ei leitud"}</h1>
-        <p>Kontrolli, kas jagamislink on õige.</p>
+        <p>Jagamislink võib olla aegunud, tühistatud või vigane.</p>
       </main>
     );
   }
