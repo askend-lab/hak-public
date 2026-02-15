@@ -53,7 +53,7 @@ export async function synthesizeWithPolling(
   voice: string,
   signal?: AbortSignal,
 ): Promise<string> {
-  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice });
+  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, signal ? { signal } : {});
   if (!response.ok) throw new Error("Synthesis request failed");
 
   const data: SynthesizeResponse = await response.json();
