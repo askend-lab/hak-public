@@ -23,17 +23,9 @@ provider:
         - OPTIONS
       allowedHeaders:
         - Content-Type
-        - Authorization
     throttle:
       rateLimit: 2
       burstLimit: 4
-    authorizers:
-      cognitoJwt:
-        type: jwt
-        identitySource: $request.header.Authorization
-        issuerUrl: https://cognito-idp.${self:provider.region}.amazonaws.com/${env:COGNITO_USER_POOL_ID, ''}
-        audience:
-          - ${env:COGNITO_CLIENT_ID, ''}
 
   environment:
     SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID, '000000000000'}/hak-merlin-${self:provider.stage}-queue
@@ -71,8 +63,6 @@ functions:
       - httpApi:
           path: /synthesize
           method: POST
-          authorizer:
-            name: cognitoJwt
 
   status:
     handler: dist/handler.status
@@ -100,8 +90,6 @@ functions:
       - httpApi:
           path: /warmup
           method: POST
-          authorizer:
-            name: cognitoJwt
 
 resources:
   Outputs:
