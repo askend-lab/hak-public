@@ -62,6 +62,7 @@ provider:
             - dynamodb:GetItem
             - dynamodb:DeleteItem
             - dynamodb:Query
+            - dynamodb:UpdateItem
           Resource:
             - !GetAtt DataTable.Arn
 
