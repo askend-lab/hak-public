@@ -318,7 +318,7 @@ export async function exchangeCodeHandler(
       statusCode: 200,
       headers: corsResponseHeaders(),
       multiValueHeaders: { 'Set-Cookie': cookies },
-      body: JSON.stringify({ expires_in: data.expires_in }),
+      body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
     };
   } catch (error) {
     console.error('Exchange code error:', error instanceof Error ? error.message : 'Unknown error');

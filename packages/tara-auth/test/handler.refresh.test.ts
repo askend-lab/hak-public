@@ -150,7 +150,7 @@ describe('exchangeCodeHandler', () => {
     expect(JSON.parse(result.body).error).toContain('Missing');
   });
 
-  it('returns 200 with tokens in cookies (not body) on success', async () => {
+  it('returns 200 with tokens in body and cookies on success', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ access_token: 'at', id_token: 'id', refresh_token: 'rt', expires_in: 3600 }),
@@ -161,11 +161,11 @@ describe('exchangeCodeHandler', () => {
     const result = await exchangeCodeHandler(event);
     expect(result.statusCode).toBe(200);
     const body = JSON.parse(result.body);
-    // Tokens should NOT be in body (XSS protection)
-    expect(body.access_token).toBeUndefined();
-    expect(body.id_token).toBeUndefined();
+    // Tokens in body — needed because cross-domain fetch can't read Set-Cookie
+    expect(body.access_token).toBe('at');
+    expect(body.id_token).toBe('id');
     expect(body.expires_in).toBe(3600);
-    // Tokens should be in HttpOnly cookies
+    // Tokens also in cookies for same-domain requests (refresh, etc.)
     const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
     expect(cookies).toHaveLength(3);
     expect(cookies.find(c => c.includes('hak_refresh_token=rt'))).toBeDefined();
