@@ -39,6 +39,32 @@ Solid foundation: in-memory tokens, httpOnly cookies, PKCE, WAF, CSP, S3 access 
 **M7.** CloudFront logs capture URL params with tokens — **Resolved:** tokens no longer in URL (C1 fix).  
 **M8.** WAF rate too generous — **Fixed:** reduced from 300/5min to 100/5min (AWS minimum). merlin-api: 2/s burst 4. SimpleStore: 10/s burst 20.
 
+## Round 2 — Resolved ✅
+
+Second pass audit (2026-02-15). Items #4 and #12 deferred as accepted risk.
+
+### HIGH — fixed ✅
+
+**H6. Referrer-Policy mismatch** — CloudFront had `strict-origin-when-cross-origin`, docs said `no-referrer`. **Fixed:** changed to `no-referrer` in `cloudfront.tf`.  
+**H7. Raw error logging** — `createInternalErrorResponse` logged raw error objects with stack traces. **Fixed:** now logs `error.message` only (`shared/lambda.ts`).  
+**H8. Fargate open egress** — Security group allowed all outbound traffic. **Fixed:** restricted to HTTPS (port 443) only (`merlin/main.tf`).  
+**H9. GuardDuty no notifications** — Findings went nowhere. **Fixed:** EventBridge → SNS → Slack Lambda (`guardduty.tf`).  
+**H10. sync-to-public no verification** — `git push --force` without checking exclusions. **Fixed:** pre-push safety check for internal paths (`sync-to-public.sh`).
+
+### MEDIUM — fixed ✅
+
+**M9.** DynamoDB `Scan` permission for agent user — **Fixed:** removed, `Query` sufficient (`dynamodb.tf`).  
+**M10.** WAF logs 30-day retention — **Fixed:** increased to 90 days (`waf.tf`).  
+**M11.** ECS logs 14-day retention — **Fixed:** increased to 90 days (`merlin/main.tf`).  
+**M12.** `getCorsOrigin()` wildcard fallback — **Fixed:** returns `"null"` (restrictive) instead of `"*"` (`shared/lambda.ts`).  
+**M13.** Container Insights disabled — **Fixed:** enabled for ECS cluster (`merlin/main.tf`).  
+**M14.** Cognito ARN empty string fallback — **Fixed:** removed fallback; deploy fails loudly if env var missing (`serverless.yml`).
+
+### Deferred (accepted risk)
+
+**D1.** `merlin_audio` S3 bucket without encryption at rest — public audio content, non-sensitive. AES256 is free but requires bucket recreation.  
+**D2.** `merlin_audio` S3 bucket without versioning — audio files are cache-keyed and regenerable.
+
 ## By Design (not vulnerabilities)
 
 These items were initially flagged but are **intentional architectural decisions**, documented in the project README under "Security Considerations":
