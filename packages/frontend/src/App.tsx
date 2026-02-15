@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useEffect, useRef, lazy, Suspense } from "react";
+import { useEffect, useRef, lazy, Suspense, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import CookieConsent from "./components/CookieConsent";
 import Footer from "./components/Footer";
@@ -45,9 +45,10 @@ export default function Home() {
   useDocumentTitle();
 
   const synthesis = useSynthesis();
+  const navigateToTasks = useCallback((): void => { navigate("/tasks"); }, [navigate]);
   const taskHandlers = useTaskHandlers(
     synthesis.sentences,
-    () => navigate("/tasks"),
+    navigateToTasks,
   );
   const { handleTasksClick } = useAppRedirects(currentView);
 
