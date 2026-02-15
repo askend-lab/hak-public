@@ -16,8 +16,9 @@ locals {
   domain_name = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
 
   # API Gateway domains (no public DNS — extracted from CloudFormation outputs)
-  merlin_api_domain   = replace(data.aws_cloudformation_stack.merlin_api.outputs["ApiEndpoint"], "https://", "")
-  vabamorf_api_domain = replace(data.aws_cloudformation_stack.vabamorf_api.outputs["ApiEndpoint"], "https://", "")
+  # Use HttpApiUrl which exists in all stack versions (ApiEndpoint is missing in some prod stacks)
+  merlin_api_domain   = replace(data.aws_cloudformation_stack.merlin_api.outputs["HttpApiUrl"], "https://", "")
+  vabamorf_api_domain = replace(data.aws_cloudformation_stack.vabamorf_api.outputs["HttpApiUrl"], "https://", "")
 
   # Resource naming
   website_bucket_name     = "${local.app_name}-${var.env}-website"

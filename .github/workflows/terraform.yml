@@ -30,6 +30,7 @@ jobs:
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       matrix:
         environment: [dev, prod]
@@ -75,7 +76,6 @@ jobs:
         env:
           TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: terraform plan -var-file="environments/${{ matrix.environment }}.tfvars" -no-color -input=false
-        continue-on-error: true
 
       - name: Comment PR
         if: github.event_name == 'pull_request'
@@ -111,6 +111,7 @@ jobs:
     name: Terraform Apply
     needs: terraform-plan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     strategy:
       matrix:
@@ -163,22 +164,23 @@ jobs:
           fi
         continue-on-error: true
 
+      - name: Remove orphaned audio resources from state
+        run: |
+          # Audio resources were removed from code but still in state.
+          # S3 buckets aren't empty so Terraform can't destroy them.
+          # Remove from state — actual cleanup via cleanup-orphaned.yml workflow.
+          # Remove any remaining audio-related resources from state
+          for resource in $(terraform state list 2>/dev/null | grep -E '\.audio' || true); do
+            echo "Removing $resource from state..."
+            terraform state rm "$resource" 2>/dev/null || true
+          done
+          echo "✅ Orphaned resources removed from state"
+        continue-on-error: true
+
       - name: Terraform Apply (${{ matrix.environment }})
         env:
           TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: terraform apply -var-file="environments/${{ matrix.environment }}.tfvars" -auto-approve -input=false
-
-      - name: Invalidate CloudFront Cache
-        run: |
-          # Get CloudFront distribution ID from terraform output
-          DIST_ID=$(terraform output -raw cloudfront_distribution_id 2>/dev/null || echo "")
-          if [ -n "$DIST_ID" ]; then
-            echo "Invalidating CloudFront cache for distribution: $DIST_ID"
-            aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/api/*" "/*"
-            echo "✅ CloudFront cache invalidated"
-          else
-            echo "⚠️ Could not get CloudFront distribution ID, skipping invalidation"
-          fi
 
       - name: Deployment Summary
         run: |

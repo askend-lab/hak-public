@@ -50,6 +50,7 @@ jobs:
   deploy:
     name: Deploy ${{ inputs.build_id }} to ${{ inputs.environment }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: ${{ inputs.environment }}
 
     steps:
@@ -64,7 +65,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
           cache: "pnpm"
 
       - name: Configure npm registry auth
@@ -73,7 +74,7 @@ jobs:
           echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6

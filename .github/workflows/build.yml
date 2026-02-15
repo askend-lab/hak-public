@@ -11,6 +11,7 @@ permissions:
   id-token: write
   contents: read
   packages: read
+  pull-requests: read
 
 concurrency:
   group: build-${{ github.ref }}
@@ -23,6 +24,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     outputs:
       build_id: ${{ steps.build.outputs.build_id }}
@@ -33,35 +35,55 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check for code changes
+        id: filter
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
+        with:
+          filters: |
+            code:
+              - 'packages/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'tsconfig.json'
+              - '.github/workflows/build.yml'
+
       - name: Setup pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+        if: steps.filter.outputs.code == 'true'
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10
 
       - name: Setup Node.js
+        if: steps.filter.outputs.code == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
           cache: "pnpm"
 
       - name: Configure npm registry auth
+        if: steps.filter.outputs.code == 'true'
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Install dependencies
-        run: pnpm install
+        if: steps.filter.outputs.code == 'true'
+        run: pnpm install --frozen-lockfile
 
       - name: Security audit
+        if: steps.filter.outputs.code == 'true'
         run: pnpm audit --audit-level=high
+        continue-on-error: true
 
       - name: Configure AWS credentials
+        if: steps.filter.outputs.code == 'true'
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Load config from SSM
+        if: steps.filter.outputs.code == 'true'
         run: |
           echo "COGNITO_USER_POOL_ID=$(aws ssm get-parameter --name /hak/shared/cognito-user-pool-id --query Parameter.Value --output text 2>/dev/null || aws ssm get-parameter --name /hak/dev/cognito-user-pool-id --query Parameter.Value --output text)" >> $GITHUB_ENV
           echo "COGNITO_CLIENT_ID=$(aws ssm get-parameter --name /hak/shared/cognito-client-id --query Parameter.Value --output text 2>/dev/null || aws ssm get-parameter --name /hak/dev/cognito-client-id --query Parameter.Value --output text)" >> $GITHUB_ENV
@@ -70,6 +92,7 @@ jobs:
           echo "API_DOMAIN_DEV=$(aws ssm get-parameter --name /hak/dev/api-domain --query Parameter.Value --output text)" >> $GITHUB_ENV
 
       - name: Detect changes and prepare build
+        if: steps.filter.outputs.code == 'true'
         id: detect
         run: |
           LAST_BUILD=$(aws s3 ls s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/ --recursive | grep manifest.json | sort | tail -1 | awk '{print $4}' | cut -d'/' -f3)
@@ -97,38 +120,67 @@ jobs:
 
           if [ -z "$CHANGED" ]; then
             echo "No diff available (initial commit, workflow_dispatch, or same SHA) - building all"
-            echo "frontend=true" >> $GITHUB_OUTPUT
-            echo "simplestore=true" >> $GITHUB_OUTPUT
-            echo "merlin-api=true" >> $GITHUB_OUTPUT
-            echo "vabamorf-api=true" >> $GITHUB_OUTPUT
-            echo "tara-auth=true" >> $GITHUB_OUTPUT
+            for pkg in frontend simplestore merlin-api vabamorf-api shared tara-auth gherkin-parser; do
+              echo "$pkg=true" >> $GITHUB_OUTPUT
+            done
           else
             echo "Changed files: $CHANGED"
 
-            # Check if @hak/shared changed — if so, rebuild all dependent packages
+            # Check if @hak/shared changed — if so, rebuild and test all dependent packages
             SHARED_CHANGED=$(echo "$CHANGED" | grep -q "^packages/shared/" && echo true || echo false)
 
-            echo "frontend=$( (echo "$CHANGED" | grep -q "^packages/frontend/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "simplestore=$( (echo "$CHANGED" | grep -q "^packages/simplestore/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "merlin-api=$( (echo "$CHANGED" | grep -q "^packages/merlin-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "vabamorf-api=$( (echo "$CHANGED" | grep -q "^packages/vabamorf-api/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
-            echo "tara-auth=$( (echo "$CHANGED" | grep -q "^packages/tara-auth/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
-
+            # Root config changes trigger full build+test
             if echo "$CHANGED" | grep -qE "^(package\.json|pnpm-lock\.yaml|tsconfig\.json)$"; then
               echo "Root config changed - building all"
-              echo "frontend=true" >> $GITHUB_OUTPUT
-              echo "simplestore=true" >> $GITHUB_OUTPUT
-              echo "merlin-api=true" >> $GITHUB_OUTPUT
-              echo "vabamorf-api=true" >> $GITHUB_OUTPUT
-              echo "tara-auth=true" >> $GITHUB_OUTPUT
+              SHARED_CHANGED=true
             fi
+
+            for pkg in frontend simplestore merlin-api vabamorf-api tara-auth gherkin-parser; do
+              PKG_DIR=$(echo $pkg | tr '-' '-')
+              echo "$pkg=$( (echo "$CHANGED" | grep -q "^packages/$PKG_DIR/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
+            done
+            echo "shared=$SHARED_CHANGED" >> $GITHUB_OUTPUT
           fi
 
       - name: Generate feature specs
+        if: steps.filter.outputs.code == 'true'
         run: pnpm --filter @hak/frontend sync-features
 
-      - name: Run tests
-        run: pnpm test:all
+      - name: Lint
+        if: steps.filter.outputs.code == 'true'
+        run: pnpm lint
+
+      - name: Typecheck
+        if: steps.filter.outputs.code == 'true'
+        run: pnpm typecheck
+
+      - name: Test shared
+        if: steps.detect.outputs.shared == 'true'
+        run: pnpm --filter @hak/shared test:full
+
+      - name: Test frontend
+        if: steps.detect.outputs.frontend == 'true'
+        run: pnpm --filter @hak/frontend test:full
+
+      - name: Test simplestore
+        if: steps.detect.outputs.simplestore == 'true'
+        run: pnpm --filter @hak/simplestore test:full
+
+      - name: Test merlin-api
+        if: steps.detect.outputs.merlin-api == 'true'
+        run: pnpm --filter @hak/merlin-api test:full
+
+      - name: Test vabamorf-api
+        if: steps.detect.outputs.vabamorf-api == 'true'
+        run: pnpm --filter @hak/vabamorf-api test:full
+
+      - name: Test tara-auth
+        if: steps.detect.outputs.tara-auth == 'true'
+        run: pnpm --filter @hak/tara-auth test:full
+
+      - name: Test gherkin-parser
+        if: steps.detect.outputs.gherkin-parser == 'true'
+        run: pnpm --filter @hak/gherkin-parser test:full
 
       - name: Build frontend
         if: steps.detect.outputs.frontend == 'true'
@@ -159,13 +211,20 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
+      - name: Set up Docker Buildx
+        if: steps.detect.outputs.vabamorf-api == 'true'
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
+
       - name: Build Vabamorf Docker image
         if: steps.detect.outputs.vabamorf-api == 'true'
-        working-directory: packages/vabamorf-api
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          docker build --provenance=false -t $ECR_REGISTRY/vabamorf-api:${{ github.sha }} .
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: packages/vabamorf-api
+          load: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ github.sha }}
+          cache-from: type=gha,scope=vabamorf-api
+          cache-to: type=gha,mode=max,scope=vabamorf-api
+          provenance: false
 
       - name: Scan Docker image with Trivy
         if: steps.detect.outputs.vabamorf-api == 'true'
@@ -186,6 +245,7 @@ jobs:
           docker push $ECR_REGISTRY/vabamorf-api:${{ github.sha }}
 
       - name: Create full build artifact
+        if: steps.filter.outputs.code == 'true'
         id: build
         env:
           FRONTEND_CHANGED: ${{ steps.detect.outputs.frontend }}
@@ -254,6 +314,7 @@ jobs:
           cat /tmp/manifest.json
 
       - name: Build summary
+        if: steps.filter.outputs.code == 'true'
         run: |
           echo "## Build Complete ✅" >> $GITHUB_STEP_SUMMARY
           echo "- **Build ID**: ${{ steps.build.outputs.build_id }}" >> $GITHUB_STEP_SUMMARY
@@ -267,7 +328,7 @@ jobs:
   deploy-dev:
     name: Deploy to Dev
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.outputs.build_id != ''
     uses: ./.github/workflows/deploy.yml
     with:
       build_id: ${{ needs.build.outputs.build_id }}
