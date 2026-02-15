@@ -9,6 +9,11 @@ from unittest.mock import MagicMock, patch, mock_open
 
 import pytest
 
+TEST_WAV = "test.wav"
+TEST_PROC_WAV = "test_proc.wav"
+MERLIN_DIR = "/opt/merlin"
+CHECK_TOOLS_PATCH = "worker.check_tools"
+
 from worker import (
     WorkerConfig,
     SynthesisRequest,
@@ -45,7 +50,7 @@ class TestWorkerConfig:
             "SQS_QUEUE_URL": "https://sqs.eu-west-1.amazonaws.com/123/q",
             "S3_BUCKET": "my-bucket",
             "AWS_REGION": "us-east-1",
-            "MERLIN_DIR": "/opt/merlin",
+            "MERLIN_DIR": MERLIN_DIR,
             "TEMP_DIR": "/tmp/merlin",
         }
         with patch.dict(os.environ, env, clear=True):
@@ -53,12 +58,12 @@ class TestWorkerConfig:
         assert cfg.queue_url == env["SQS_QUEUE_URL"]
         assert cfg.bucket_name == env["S3_BUCKET"]
         assert cfg.aws_region == "us-east-1"
-        assert cfg.merlin_dir == "/opt/merlin"
+        assert cfg.merlin_dir == MERLIN_DIR
         assert cfg.temp_dir == "/tmp/merlin"
 
     def test_src_dir_property(self):
-        cfg = WorkerConfig("q", "b", "r", "/opt/merlin", "/tmp")
-        assert cfg.src_dir == "/opt/merlin/src"
+        cfg = WorkerConfig("q", "b", "r", MERLIN_DIR, "/tmp")
+        assert cfg.src_dir == f"{MERLIN_DIR}/src"
 
     def test_validate_missing_both(self):
         cfg = WorkerConfig("", "", "r", "d", "t")
@@ -153,14 +158,14 @@ class TestCheckTools:
 
 class TestApplySoxEffects:
     def test_no_effects(self, tmp_path):
-        wav = str(tmp_path / "test.wav")
+        wav = str(tmp_path / TEST_WAV)
         open(wav, "w").close()
         result = _apply_sox_effects(wav, speed=1.0, pitch=0, run_command=MagicMock())
         assert result == wav
 
     def test_speed_effect(self, tmp_path):
-        wav = str(tmp_path / "test.wav")
-        proc = str(tmp_path / "test_proc.wav")
+        wav = str(tmp_path / TEST_WAV)
+        proc = str(tmp_path / TEST_PROC_WAV)
         open(wav, "w").close()
 
         def fake_run(cmd, **kw):
@@ -171,8 +176,8 @@ class TestApplySoxEffects:
         assert not os.path.exists(wav)
 
     def test_pitch_effect(self, tmp_path):
-        wav = str(tmp_path / "test.wav")
-        proc = str(tmp_path / "test_proc.wav")
+        wav = str(tmp_path / TEST_WAV)
+        proc = str(tmp_path / TEST_PROC_WAV)
         open(wav, "w").close()
 
         def fake_run(cmd, **kw):
@@ -182,8 +187,8 @@ class TestApplySoxEffects:
         assert result == proc
 
     def test_both_effects(self, tmp_path):
-        wav = str(tmp_path / "test.wav")
-        proc = str(tmp_path / "test_proc.wav")
+        wav = str(tmp_path / TEST_WAV)
+        proc = str(tmp_path / TEST_PROC_WAV)
         open(wav, "w").close()
 
         captured_cmd = {}
@@ -200,7 +205,7 @@ class TestApplySoxEffects:
         assert "-200" in cmd
 
     def test_sox_fails_returns_original(self, tmp_path):
-        wav = str(tmp_path / "test.wav")
+        wav = str(tmp_path / TEST_WAV)
         open(wav, "w").close()
 
         result = _apply_sox_effects(wav, speed=1.5, pitch=0, run_command=MagicMock())
@@ -240,7 +245,6 @@ class TestSynthesizeAudio:
 
         def fake_run(cmd, **kw):
             # Find the wav path from the command and create it
-            cmd_str = cmd[2] if isinstance(cmd, list) and len(cmd) > 2 else ""
             # Extract temp dir to find where the wav should be
             temp_dir = config.temp_dir
             os.makedirs(temp_dir, exist_ok=True)
@@ -349,7 +353,7 @@ class TestRunWorker:
         sqs_client = MagicMock()
         sqs_client.receive_message.side_effect = KeyboardInterrupt
 
-        with patch("worker.check_tools"):
+        with patch(CHECK_TOOLS_PATCH):
             run_worker(cfg, sqs_client, MagicMock())
 
     def test_processes_messages(self):
@@ -368,7 +372,7 @@ class TestRunWorker:
 
         sqs_client.receive_message.side_effect = fake_receive
 
-        with patch("worker.check_tools"), patch("worker.process_message") as mock_proc:
+        with patch(CHECK_TOOLS_PATCH), patch("worker.process_message") as mock_proc:
             run_worker(cfg, sqs_client, s3_client)
 
         mock_proc.assert_called_once()
@@ -388,7 +392,7 @@ class TestRunWorker:
 
         sqs_client.receive_message.side_effect = fake_receive
 
-        with patch("worker.check_tools"), patch("time.sleep"):
+        with patch(CHECK_TOOLS_PATCH), patch("time.sleep"):
             run_worker(cfg, sqs_client, MagicMock())
 
         assert call_count == 2

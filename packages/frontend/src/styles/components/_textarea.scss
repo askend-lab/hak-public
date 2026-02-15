@@ -71,10 +71,10 @@
     border: none;
     background-color: $color-outlined-neutral;
     color: $color-overlay;
-  }
 
-  &::placeholder {
-    color: $color-overlay;
+    &::placeholder {
+      color: $color-overlay;
+    }
   }
 }
 
