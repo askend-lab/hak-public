@@ -15,7 +15,7 @@ Closes #
 ## Checklist
 
 - [ ] Tests added/updated
-- [ ] TypeScript compiles (`pnpm -r exec tsc --noEmit`)
+- [ ] TypeScript compiles (`pnpm typecheck`)
 - [ ] Lint passes (`pnpm lint`)
 - [ ] No `console.log` in production code
 - [ ] Documentation updated (if applicable)

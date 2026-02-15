@@ -32,8 +32,8 @@ TARA is Estonia's national authentication service. The flow:
 1. User clicks "Log in with TARA" in `LoginModal`
 2. Frontend redirects to `VITE_TARA_LOGIN_URL` (configured via env var)
 3. TARA authenticates the user (ID-card, Mobile-ID, or Smart-ID)
-4. TARA redirects back to the backend `tara-auth` Lambda
-5. `tara-auth` creates/finds the Cognito user and returns an auth code
+4. TARA redirects back to the backend authentication Lambda (not included in open-source release)
+5. The auth Lambda creates/finds the Cognito user and returns an auth code
 6. Frontend receives the code at `/auth/callback` and exchanges it for tokens
 
 ### Cognito Hosted UI
