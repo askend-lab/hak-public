@@ -29,9 +29,9 @@
 - [x] 17. **Error messages утекают детали** — `vabamorf-api/handler.ts:88-91`. `error.message` → клиенту.
 - [x] 18. **delete shared без ownership check** — `store.ts:139`. Любой authenticated пользователь удаляет чужие shared.
 - [ ] 19. **TTL=0 → данные живут вечно** — `validation.ts:82-84`. Shared/unlisted аккумулируются бесконечно.
-- [ ] 20. **SOX shell injection** — `worker.py:176`. `f"sox {wav_file} ..."` через `bash -c`. Пробелы/спецсимволы.
-- [ ] 21. **shell=True в generate.py** — `merlin/utils/generate.py:73`. `subprocess.Popen(args, shell=True)`.
-- [ ] 22. **SQS message не валидируется** — `worker.py:81-89`. `speed: "abc"` → RuntimeError в SOX.
+- [x] 20. **SOX shell injection** — `worker.py:176`. `f"sox {wav_file} ..."` через `bash -c`. Пробелы/спецсимволы.
+- [x] 21. **shell=True в generate.py** — `merlin/utils/generate.py:73`. `subprocess.Popen(args, shell=True)`.
+- [x] 22. **SQS message не валидируется** — `worker.py:81-89`. `speed: "abc"` → RuntimeError в SOX.
 - [ ] 23. **Нет DLQ для SQS** — отравленные сообщения retry бесконечно.
 - [x] 24. **JSON.parse без try/catch** — `merlin-api/handler.ts:52-54`. Невалидный JSON → 500 вместо 400.
 - [x] 25. **Нет backup/PITR для DynamoDB** — `simplestore/serverless.yml:107-123`. Потеря данных невосстановима.
@@ -42,7 +42,7 @@
 - [ ] 27. **Дублирование merlin-api ↔ shared** — s3.ts, response.ts, env.ts, HTTP_STATUS. 5+ файлов с копиями.
 - [ ] 28. **vabamorf-api инлайнит getCorsOrigin** — `validation.ts:5-7`. Docker причина, но два источника правды.
 - [ ] 29. **handleGet возвращает 200 для not-found** — `routes.ts:132-136`. Нарушение HTTP семантики.
-- [ ] 30. **queryBySortKeyPrefix без limit** — `dynamodb.ts:99-126`. Тысячи items → timeout.
+- [x] 30. **queryBySortKeyPrefix без limit** — `dynamodb.ts:99-126`. Тысячи items → timeout.
 - [ ] 31. **MAX_DATA_SIZE_BYTES не учитывает metadata** — `types.ts:85`. 350KB data + PK/SK → ~400KB DynamoDB limit.
 - [ ] 32. **Version conflict не обрабатывается на клиенте** — нет retry при VersionConflictError.
 - [ ] 33. **Dev proxy удаляет cookies** — `vite.config.ts:116-118`. Ломает httpOnly refresh flow при dev.
@@ -88,13 +88,13 @@
 ## Фаза 4 — Low Priority / Code Hygiene
 
 - [ ] 69. **pnpm.overrides — 13 ручных security patches** — Автоматизировать через Dependabot/Renovate.
-- [ ] 70. **Нет dependabot.yml** — dependency updates не автоматизированы.
+- [x] 70. **Нет dependabot.yml** — уже есть — dependency updates не автоматизированы.
 - [ ] 71. **test:full не запускает simplestore/merlin/vabamorf** — `package.json:16-17`. Только frontend+shared.
 - [ ] 72. **CI не тестирует tara-auth** — пакет отсутствует в public repo.
 - [ ] 73. **Нет integration/smoke tests для APIs** — только unit tests.
 - [ ] 74. **GitHub Actions SHA pins с ручными version comments** — могут устареть.
 - [ ] 75. **.nvmrc без версии pnpm** — pnpm version только в CI.
-- [ ] 76. **CONTRIBUTING.md без security checklist** — нет OWASP/security scan для PRs.
+- [x] 76. **CONTRIBUTING.md без security checklist** — нет OWASP/security scan для PRs.
 - [x] 77. **SECURITY.md: supported "1.x", actual "0.1.1"** — таблица не актуальна.
 - [x] 78. **Нет .dockerignore для merlin-worker** — test files, __pycache__ в image.
 - [x] 79. **logger.debug логирует shareToken** — `ShareService.ts:19,24`. При LOG_LEVEL=debug → CloudWatch.
