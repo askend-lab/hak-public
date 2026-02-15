@@ -62,13 +62,13 @@ jobs:
       - name: Terraform Plan
         working-directory: infra/merlin
         run: |
-          terraform plan -var="env=${{ github.event.inputs.environment || 'dev' }}" -out=tfplan
+          terraform plan -lock-timeout=60s -var="env=${{ github.event.inputs.environment || 'dev' }}" -out=tfplan
 
       - name: Terraform Apply
         if: github.event_name != 'pull_request'
         working-directory: infra/merlin
         run: |
-          terraform apply -auto-approve tfplan
+          terraform apply -lock-timeout=60s -auto-approve tfplan
 
       - name: Output values
         if: github.event_name != 'pull_request'
