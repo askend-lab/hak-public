@@ -58,7 +58,6 @@ packages/
   merlin-api/     - TTS gateway (synthesis requests, caching)
   merlin-worker/  - Estonian speech synthesis engine (Docker)
   vabamorf-api/   - Estonian morphological analysis
-  audio-api/      - Audio file storage and playback
   gherkin-parser/ - Gherkin specification parser
   specifications/ - BDD specifications
 

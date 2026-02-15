@@ -33,7 +33,6 @@ No Docker, AWS CLI, or environment variables needed — the dev server proxies A
 | `packages/merlin-api` | TTS gateway — synthesis requests, caching (Lambda) |
 | `packages/merlin-worker` | Estonian speech synthesis engine — Merlin TTS (Docker/ECS) |
 | `packages/vabamorf-api` | Estonian morphological analysis — stress, variants (Lambda) |
-| `packages/audio-api` | Audio file storage and playback (S3) |
 | `packages/specifications` | Gherkin BDD specifications |
 | `packages/gherkin-parser` | Gherkin-to-test mapping |
 

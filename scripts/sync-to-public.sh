@@ -144,12 +144,12 @@ if command -v node &>/dev/null; then
 
     // Replace devbox-dependent scripts with standalone equivalents
     pkg.scripts.prepare = 'husky';
-    pkg.scripts.test = 'pnpm -r --filter=@hak/frontend run test:full && pnpm -r --filter=@hak/shared run test:full';
+    pkg.scripts.test = 'pnpm -r --workspace-concurrency=4 run test:full';
     pkg.scripts['test:full'] = pkg.scripts.test;
     pkg.scripts['test:coverage'] = 'pnpm -r --filter=@hak/frontend run test:coverage';
     pkg.scripts.start = 'pnpm --filter @hak/frontend dev';
     pkg.scripts.build = 'pnpm --filter @hak/frontend build';
-    pkg.scripts.typecheck = 'pnpm --filter @hak/frontend --filter @hak/shared exec tsc --noEmit';
+    pkg.scripts.typecheck = 'pnpm -r exec tsc --noEmit';
     pkg.scripts.lint = 'eslint --max-warnings=0 .';
     pkg.scripts.check = 'pnpm lint && pnpm typecheck && pnpm test:all';
 
@@ -251,49 +251,39 @@ if [[ -f .github/pull_request_template.md ]]; then
   echo "  Fixed typecheck command"
 fi
 
-# --- Clean up ARCHITECTURE.md (remove infra/ section and DevBox references) ---
+# --- Clean up ARCHITECTURE.md (remove excluded packages, infra, DevBox refs) ---
 echo ">>> Cleaning ARCHITECTURE.md..."
 if [[ -f ARCHITECTURE.md ]]; then
-  # Remove the Infrastructure section that references infra/ (which is excluded)
   node -e "
     const fs = require('fs');
-    let content = fs.readFileSync('ARCHITECTURE.md', 'utf8');
-    // Remove ## Infrastructure section (everything from '## Infrastructure' to next '##' or end)
-    content = content.replace(/## Infrastructure\n[\s\S]*?(?=\n## |\n*$)/, '');
-    // Replace DevBox reference in Quality System section
-    content = content.replace('Pre-commit hooks (DevBox) enforce', 'Pre-commit hooks enforce');
-    // Remove tara-auth references (package excluded from public repo)
-    content = content.replace(/^- \*\*tara-auth\*\* —.*\n/gm, '');
-    // Fix backend count (Five → Four, since tara-auth is excluded)
-    content = content.replace('Five Lambda functions', 'Four Lambda functions');
-    // Remove Infrastructure line from Quality System (no infra in public repo)
-    content = content.replace(/^- \*\*Infrastructure\*\* —.*\n/gm, '');
-    // Rewrite Quality System intro (no pre-commit hooks in public repo)
-    content = content.replace(
+    let c = fs.readFileSync('ARCHITECTURE.md', 'utf8');
+    c = c.replace(/## Infrastructure\n[\s\S]*?(?=\n## |\n*$)/, '');
+    c = c.replace('Pre-commit hooks (DevBox) enforce', 'Pre-commit hooks enforce');
+    // Remove excluded packages (tara-auth, audio-api) from all lists
+    c = c.replace(/^- \*\*(tara-auth|audio-api)\*\* —.*\n/gm, '');
+    c = c.replace(/Five Lambda functions|Four Lambda functions/g, 'Three Lambda functions');
+    c = c.replace(/^\d+\..*audio-api\..*\n/gm, '');
+    c = c.replace(/^- \*\*Infrastructure\*\* —.*\n/gm, '');
+    c = c.replace(
       'Pre-commit hooks enforce quality on every commit. The commit is rejected if any check fails.',
       'Quality checks run in CI on every pull request. The PR is blocked if any check fails.'
     );
-    fs.writeFileSync('ARCHITECTURE.md', content);
-    console.log('  Removed infra/ section, DevBox ref, tara-auth refs, Infrastructure quality line, hooks claim');
+    fs.writeFileSync('ARCHITECTURE.md', c);
+    console.log('  Cleaned ARCHITECTURE.md (infra, DevBox, excluded packages)');
   "
 fi
 
 # --- Clean up ADR 003 (replace DevBox with standard hooks) ---
-echo ">>> Cleaning ADR docs..."
 if [[ -f docs/adr/003-tdd-devbox.md ]]; then
-  sed -i 's/DevBox pre-commit hooks/pre-commit hooks/g' docs/adr/003-tdd-devbox.md
-  sed -i 's/DevBox Hooks/Pre-commit Hooks/g' docs/adr/003-tdd-devbox.md
-  sed -i 's/DevBox is a custom tool — needs replacement with husky for OSS/Custom internal tool replaced with standard hooks/' docs/adr/003-tdd-devbox.md
-  echo "  Cleaned DevBox references in ADR 003"
+  sed -i -e 's/DevBox pre-commit hooks/pre-commit hooks/g' \
+    -e 's/DevBox Hooks/Pre-commit Hooks/g' \
+    -e 's/DevBox is a custom tool.*for OSS/Custom internal tool replaced with standard hooks/' docs/adr/003-tdd-devbox.md
+  mv docs/adr/003-tdd-devbox.md docs/adr/003-tdd-hooks.md
+  echo "  Cleaned and renamed ADR 003"
 fi
 if [[ -f docs/adr/README.md ]]; then
-  sed -i 's/TDD with DevBox hooks/TDD with pre-commit hooks/' docs/adr/README.md
-fi
-# Rename ADR 003 file and update link
-if [[ -f docs/adr/003-tdd-devbox.md ]]; then
-  mv docs/adr/003-tdd-devbox.md docs/adr/003-tdd-hooks.md
-  [[ -f docs/adr/README.md ]] && sed -i 's/003-tdd-devbox\.md/003-tdd-hooks.md/' docs/adr/README.md
-  echo "  Renamed 003-tdd-devbox.md → 003-tdd-hooks.md"
+  sed -i -e 's/TDD with DevBox hooks/TDD with pre-commit hooks/' \
+    -e 's/003-tdd-devbox\.md/003-tdd-hooks.md/' docs/adr/README.md
 fi
 
 # --- Clean up package.json scripts (frontend: e2e refs, merlin-api: deploy scripts) ---
@@ -329,6 +319,12 @@ rm -rf packages/merlin-worker/tools/SPTK-3.9/build 2>/dev/null
 rm -f packages/merlin-worker/tools/SPTK-3.9/lib/libSPTK.a 2>/dev/null
 echo "  Removed SPTK-3.9/build/ and duplicate libSPTK.a"
 
+# --- Clean up docs/API.md (remove tara-auth reference) ---
+if [[ -f docs/API.md ]]; then
+  sed -i 's/via `tara-auth` Lambda\./via AWS Cognito./' docs/API.md
+  echo "  Cleaned docs/API.md"
+fi
+
 # --- Clean up .gitignore (remove internal/unused patterns) ---
 echo ">>> Cleaning .gitignore..."
 if [[ -f .gitignore ]]; then
@@ -340,6 +336,10 @@ if [[ -f .gitignore ]]; then
     -e '/^\.vs$/d' -e '/^\*\.suo$/d' -e '/^\*\.sln$/d' -e '/^\*\.vcxproj/d' \
     -e '/^\.lhci$/d' -e '/^\.stryker-tmp$/d' \
     -e '/^$/N;/^\n$/d' .gitignore
+  # Add .env patterns if missing
+  if ! grep -q '^.env$' .gitignore; then
+    sed -i '/.venv\//a\.env\n.env.local\n.env.*.local' .gitignore
+  fi
   echo "  Cleaned .gitignore"
 fi
 
