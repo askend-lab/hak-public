@@ -11,7 +11,7 @@ import {
   type LambdaResponse,
 } from "./response";
 import { VOICE_DEFAULTS } from "./env";
-import { checkS3Cache, buildAudioUrl } from "./s3";
+import { checkS3Cache, buildAudioUrl, isValidCacheKey } from "./s3";
 import { sendToQueue } from "./sqs";
 import { describeService, scaleService, isEcsConfigured } from "./ecs";
 
@@ -62,8 +62,22 @@ export function applySynthesizeDefaults(body: SynthesizeRequest): SynthesizePara
   };
 }
 
+export const MAX_TEXT_LENGTH = 1000;
+export const SPEED_RANGE = { min: 0.5, max: 2.0 } as const;
+export const PITCH_RANGE = { min: -500, max: 500 } as const;
+
 export function validateText(text: unknown): text is string {
-  return typeof text === "string" && text !== "";
+  return typeof text === "string" && text !== "" && text.length <= MAX_TEXT_LENGTH;
+}
+
+export function validateParams(params: SynthesizeParams): string | null {
+  if (params.speed < SPEED_RANGE.min || params.speed > SPEED_RANGE.max) {
+    return `Speed must be between ${SPEED_RANGE.min} and ${SPEED_RANGE.max}`;
+  }
+  if (params.pitch < PITCH_RANGE.min || params.pitch > PITCH_RANGE.max) {
+    return `Pitch must be between ${PITCH_RANGE.min} and ${PITCH_RANGE.max}`;
+  }
+  return null;
 }
 
 export const WARMUP_COOLDOWN_MS = 60_000;
@@ -93,7 +107,13 @@ export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse
       return createBadRequest("Missing text field");
     }
 
-    const { text, voice, speed, pitch } = applySynthesizeDefaults(body);
+    const params = applySynthesizeDefaults(body);
+    const paramsError = validateParams(params);
+    if (paramsError) {
+      return createBadRequest(paramsError);
+    }
+
+    const { text, voice, speed, pitch } = params;
     const cacheKey = generateCacheKey(text, voice, speed, pitch);
 
     const cached = await checkS3Cache(cacheKey);
@@ -127,8 +147,8 @@ export async function status(event: StatusEvent): Promise<LambdaResponse> {
   try {
     const cacheKey = event.pathParameters?.cacheKey;
 
-    if (!cacheKey) {
-      return createBadRequest("Missing cacheKey");
+    if (!cacheKey || !isValidCacheKey(cacheKey)) {
+      return createBadRequest("Missing or invalid cacheKey");
     }
 
     const ready = await checkS3Cache(cacheKey);

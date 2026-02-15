@@ -2,6 +2,11 @@ service: merlin-api
 
 frameworkVersion: "3"
 
+custom:
+  allowedOrigin:
+    dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
+    prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -26,6 +31,7 @@ provider:
   environment:
     SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID}/hak-merlin-${self:provider.stage}-queue
     S3_BUCKET: hak-merlin-${self:provider.stage}-audio
+    ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}}
 
   iam:
     role:

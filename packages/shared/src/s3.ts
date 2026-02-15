@@ -74,8 +74,6 @@ export async function checkFileExists(
         message: error.message,
         code: error.code,
         statusCode: error.$metadata?.httpStatusCode,
-        bucket,
-        key,
       })}`,
     );
   }
