@@ -27,7 +27,7 @@ jobs:
                 mutation($prId: ID!) {
                   enablePullRequestAutoMerge(input: {
                     pullRequestId: $prId,
-                    mergeMethod: MERGE
+                    mergeMethod: SQUASH
                   }) {
                     pullRequest {
                       id

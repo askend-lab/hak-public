@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - "infra/merlin/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/merlin/**"
   workflow_dispatch:
     inputs:
       environment:
@@ -23,6 +27,7 @@ jobs:
   deploy:
     name: Deploy Merlin Infrastructure
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: ${{ github.event.inputs.environment || 'dev' }}
 
     steps:
@@ -38,7 +43,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.6.0
 
       - name: Terraform Init
         working-directory: infra/merlin
@@ -60,11 +65,13 @@ jobs:
           terraform plan -var="env=${{ github.event.inputs.environment || 'dev' }}" -out=tfplan
 
       - name: Terraform Apply
+        if: github.event_name != 'pull_request'
         working-directory: infra/merlin
         run: |
           terraform apply -auto-approve tfplan
 
       - name: Output values
+        if: github.event_name != 'pull_request'
         working-directory: infra/merlin
         run: |
           echo "## Merlin Infrastructure Outputs" >> $GITHUB_STEP_SUMMARY
