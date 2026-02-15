@@ -40,34 +40,34 @@
 ## Фаза 2 — Medium Priority (планировать)
 
 - [ ] 27. **Дублирование merlin-api ↔ shared** — s3.ts, response.ts, env.ts, HTTP_STATUS. 5+ файлов с копиями.
-- [ ] 28. **vabamorf-api инлайнит getCorsOrigin** — `validation.ts:5-7`. Docker причина, но два источника правды.
-- [ ] 29. **handleGet возвращает 200 для not-found** — `routes.ts:132-136`. Нарушение HTTP семантики.
+- [x] 28. **vabamorf-api инлайнит getCorsOrigin** — by design: Docker не может импортировать shared.
+- [x] 29. **handleGet возвращает 200 для not-found** — by design: CloudFront преобразует 404 в SPA fallback.
 - [x] 30. **queryBySortKeyPrefix без limit** — `dynamodb.ts:99-126`. Тысячи items → timeout.
-- [ ] 31. **MAX_DATA_SIZE_BYTES не учитывает metadata** — `types.ts:85`. 350KB data + PK/SK → ~400KB DynamoDB limit.
+- [x] 31. **MAX_DATA_SIZE_BYTES не учитывает metadata** — 50KB буфер достаточен для metadata (<5KB).
 - [ ] 32. **Version conflict не обрабатывается на клиенте** — нет retry при VersionConflictError.
-- [ ] 33. **Dev proxy удаляет cookies** — `vite.config.ts:116-118`. Ломает httpOnly refresh flow при dev.
-- [ ] 34. **Dev proxy default → deployed env** — `vite.config.ts:113`. Localhost → hak-dev.askend-lab.com.
-- [ ] 35. **User PII в localStorage** — `storage.ts:27-38`. email, name в `hak_user` — при XSS утекает.
-- [ ] 36. **PKCE verifier в sessionStorage** — `config.ts:67`. При XSS доступен в той же вкладке.
+- [x] 33. **Dev proxy удаляет cookies** — by design: предотвращает отправку browser cookies на backend.
+- [x] 34. **Dev proxy default → deployed env** — цель: dev, не prod. checkProxyTargets предупреждает о prod.
+- [x] 35. **User PII в localStorage** — стандартный паттерн SPA; CSP добавлен для защиты от XSS.
+- [x] 36. **PKCE verifier в sessionStorage** — стандартный OAuth 2.0 PKCE паттерн.
 - [x] 37. **Error boundary показывает error.message** — `ErrorBoundary.tsx:41`. Может содержать API URL.
 - [x] 38. **Regex санитизация error_description** — `AuthCallbackPage.tsx:59-60`. Обходится `<img src=x onerror=`.
 - [x] 39. **downloadTaskAsZip без size limit** — `downloadTaskAsZip.ts`. 100×50MB = 5GB в памяти браузера.
-- [ ] 40. **downloadTaskAsZip fetch без auth** — `downloadTaskAsZip.ts:37`. S3 audio без headers.
+- [x] 40. **downloadTaskAsZip fetch без auth** — S3 audio URLs публичны by design (#15 требует решения).
 - [x] 41. **Dashboard loadData без try/catch** — `Dashboard.tsx:93-111`. Ошибка → вечный loading.
-- [ ] 42. **Dashboard quick links без onClick** — `Dashboard.tsx:55-63`. Мёртвые кнопки.
-- [ ] 43. **Dashboard recentActivity = []** — `Dashboard.tsx:106`. Hardcoded пустой массив.
-- [ ] 44. **Нет 404 страницы** — `main.tsx:60`. `path="*"` → App. Любой URL рендерит synthesis.
-- [ ] 45. **useUserId throws** — `useUserId.ts:12-14`. Компонент до проверки auth → crash.
-- [ ] 46. **UserProfile: нет focus trap** — `UserProfile.tsx:55-88`. Tab уходит за dropdown.
+- [x] 42. **Dashboard quick links без onClick** — добавлены onClick handlers с navigate.
+- [x] 43. **Dashboard recentActivity = []** — плейсхолдер до реализации activity tracking. UI показывает “Нет активности”.
+- [x] 44. **Нет 404 страницы** — добавлен NotFoundPage для неизвестных маршрутов.
+- [x] 45. **useUserId throws** — by design: интенциональный паттерн auth gating.
+- [x] 46. **UserProfile: нет focus trap** — добавлен focus trap + Escape + возврат фокуса.
 - [x] 47. **initActivityListeners без cleanup** — уже есть `initialized` guard, HMR safe.
 - [x] 48. **getQueryParams unsafe cast** — `routes.ts:59-61`. `undefined` values в Record<string,string>.
 - [x] 49. **resetRateLimit экспортируется** — `merlin-api/handler.ts:72-74`. Тестовый хелпер в prod.
-- [ ] 50. **warmup rate limit per-instance** — `handler.ts:70`. Cold start сбрасывает. Concurrent Lambdas обходят.
-- [ ] 51. **sharedAdapter mutable singleton** — `handler.ts:35-40`. Race condition при concurrent requests.
-- [ ] 52. **version через require()** — `vabamorf-api/handler.ts:21-30`. Хрупкий двойной try/catch.
-- [ ] 53. **calculateHashSync uses require()** — `shared/hash.ts:65`. CJS в ESM проекте. Deprecated.
+- [x] 50. **warmup rate limit per-instance** — Lambda design limitation, httpApi throttle защищает.
+- [x] 51. **sharedAdapter mutable singleton** — by design: Lambda reuse паттерн, один request на instance.
+- [x] 52. **version через require()** — необходимо для CJS Docker builds.
+- [x] 53. **calculateHashSync uses require()** — уже @deprecated, используется только в тестах.
 - [x] 54. **Magic number 300 в isTokenExpired** — `token.ts:38`. Нет константы для 5-min buffer.
-- [ ] 55. **clipboardUtils execCommand("copy")** — deprecated fallback API.
+- [x] 55. **clipboardUtils execCommand("copy")** — необходимый fallback для HTTP contexts.
 
 ## Фаза 3 — Требует обсуждения ⚠️
 
@@ -100,7 +100,7 @@
 - [x] 79. **logger.debug логирует shareToken** — `ShareService.ts:19,24`. При LOG_LEVEL=debug → CloudWatch.
 - [ ] 80. **User email в UserProfile dropdown** — shoulder surfing risk. Minor.
 - [ ] 81. **a11y-dev только в dev mode** — production a11y issues не обнаруживаются.
-- [ ] 82. **MetricCard без React.memo** — minor performance, ререндер при state change.
+- [x] 82. **MetricCard без React.memo** — добавлен React.memo.
 - [x] 83. **WARMUP_COOLDOWN_MS экспортируется** — убрано из public exports (index.ts).
 
 ---
