@@ -35,7 +35,7 @@ packages/frontend/e2e/
 .github/workflows/auto-merge-prs.yml
 .github/workflows/auto-update-prs.yml
 .github/workflows/sync-to-public.yml
-.github/workflows/e2e-tests.yml
+.github/workflows/e2e.yml
 .github/workflows/cleanup-orphaned.yml
 
 # --- Config files referencing internal packages ---
