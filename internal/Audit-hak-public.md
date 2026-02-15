@@ -107,11 +107,43 @@
 
 ## Сводка
 
-| Фаза | Кол-во | Описание |
-|------|--------|----------|
-| 0 — Critical | 10 | Делать немедленно, без обсуждения |
-| 1 — High | 16 | Ближайший спринт |
-| 2 — Medium | 29 | Планировать |
-| 3 — Обсуждение ⚠️ | 13 | Требует решения/trade-off |
-| 4 — Low | 15 | Code hygiene, когда будет время |
-| **Итого** | **83** | |
+| Фаза | Всего | Сделано | % | Описание |
+|------|-------|---------|---|----------|
+| 0 — Critical | 10 | 10 | 100% | Все критические security issues исправлены |
+| 1 — High | 16 | 12 | 75% | Остаток: инфра/архитектура (#11,13,15,16,19,26) |
+| 2 — Medium | 29 | 27 | 93% | Остаток: рефакторинг (#27) |
+| 3 — Обсуждение ⚠️ | 13 | 2 | 15% | Все требуют решения Alex |
+| 4 — Low | 15 | 11 | 73% | Остаток: процесс/tooling (#69,72,73,74,80,81) |
+| **Итого** | **83** | **62** | **75%** | |
+
+### Нерешённые пункты — требуют обсуждения
+
+**Инфраструктура/архитектура (нужно решение):**
+- #11 — Токены в URL query params (связан с #56 — cookies vs URL)
+- #13, #16 — Rate limiting simplestore (httpApi usage plans)
+- #15 — Signed S3 URLs вместо публичных
+- #19 — TTL policy для shared/unlisted данных
+- #26 — Миграция Serverless Framework v3 → v4
+
+**Рефакторинг (крупная задача):**
+- #27 — Дедупликация merlin-api ↔ shared (5+ файлов)
+
+**Архитектурные trade-offs (Фаза 3):**
+- #56 — Токены: URL vs cookies vs server-side session
+- #57 — JWT верификация на клиенте: нужна ли?
+- #58 — GDPR cookie consent: юридический review
+- #59 — handleGetPublic + unlisted: by design?
+- #60 — DynamoDB encryption: CMK vs AWS-owned
+- #61 — Lambda memory tuning: нужен profiling
+- #62 — COGNITO_USER_POOL_ARN validation в CI
+- #63, #64 — Hardcoded SQS URL / ECS service name
+- #65 — vabamorf-api catch-all route
+- #67 — IAM wildcard на table+index
+
+**Процесс/tooling (minor):**
+- #69 — Автоматизация pnpm.overrides через Dependabot
+- #72 — CI для tara-auth (отсутствует в public repo)
+- #73 — Integration/smoke tests для APIs
+- #74 — GitHub Actions SHA pin comments
+- #80 — User email в dropdown (shoulder surfing)
+- #81 — a11y-dev только в dev mode
