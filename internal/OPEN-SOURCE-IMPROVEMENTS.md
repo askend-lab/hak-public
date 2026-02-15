@@ -92,7 +92,7 @@
   Указаны 11 runtime deps, но пропущены: `i18next`, `react-i18next`, `@sentry/react`, `sass`, `vite`.
   **Действие:** пройти по `dependencies` всех package.json и обновить NOTICE.
 
-- [ ] **3.7. Перенести полезные docs из internal в public** — отложено
+- [x] **3.7. Перенести полезные docs из internal в public**
   `docs/internal/design-system/` содержит 15 файлов (архитектура компонентов, layout guide, responsive testing). В `docs/02-DESIGN-SYSTEM/` только 4. Если design system публичный — стоит перенести.
   **Действие:** отобрать и перенести полезные гайды, убрав внутреннюю специфику.
 
