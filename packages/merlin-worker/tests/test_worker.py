@@ -108,11 +108,18 @@ class TestSynthesisRequest:
         assert req.pitch == 0
         assert req.cache_key == hashlib.md5(b"tere").hexdigest()
 
-    def test_from_message_empty_text(self):
-        msg = {"Body": json.dumps({})}
-        req = SynthesisRequest.from_message(msg)
-        assert req.text == ""
-        assert req.cache_key == hashlib.md5(b"").hexdigest()
+    @pytest.mark.parametrize("body,match", [
+        ({}, "Missing or empty text"),
+        ({"text": "   "}, "Missing or empty text"),
+        ({"text": "x" * 10001}, "Text too long"),
+        ({"text": "t", "speed": 5.0}, "Speed.*out of range"),
+        ({"text": "t", "pitch": 9999}, "Pitch.*out of range"),
+        ({"text": "t", "speed": "abc"}, "Invalid speed/pitch"),
+    ])
+    def test_from_message_validation(self, body, match):
+        msg = {"Body": json.dumps(body)}
+        with pytest.raises(ValueError, match=match):
+            SynthesisRequest.from_message(msg)
 
     def test_from_message_invalid_json(self):
         msg = {"Body": "not json"}
@@ -186,8 +193,11 @@ class TestApplySoxEffects:
             open(proc, "w").close()
 
         _apply_sox_effects(wav, speed=0.8, pitch=-200, run_command=fake_run)
-        assert "tempo 0.8" in captured_cmd["cmd"][2]
-        assert "pitch -200" in captured_cmd["cmd"][2]
+        cmd = captured_cmd["cmd"]
+        assert "tempo" in cmd
+        assert "0.8" in cmd
+        assert "pitch" in cmd
+        assert "-200" in cmd
 
     def test_sox_fails_returns_original(self, tmp_path):
         wav = str(tmp_path / "test.wav")

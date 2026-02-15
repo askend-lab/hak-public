@@ -8,6 +8,7 @@ import hashlib
 import json
 import logging
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -68,6 +69,11 @@ class WorkerConfig:
         return missing
 
 
+SPEED_MIN, SPEED_MAX = 0.5, 2.0
+PITCH_MIN, PITCH_MAX = -500, 500
+MAX_TEXT_LENGTH = 10000
+
+
 @dataclass
 class SynthesisRequest:
     """Parsed SQS message body."""
@@ -81,11 +87,29 @@ class SynthesisRequest:
     def from_message(message: Dict[str, Any]) -> "SynthesisRequest":
         body = json.loads(message["Body"])
         text = body.get("text", "")
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError("Missing or empty text field")
+        if len(text) > MAX_TEXT_LENGTH:
+            raise ValueError(f"Text too long ({len(text)} > {MAX_TEXT_LENGTH})")
+
+        speed = body.get("speed", 1.0)
+        pitch = body.get("pitch", 0)
+        try:
+            speed = float(speed)
+            pitch = int(pitch)
+        except (TypeError, ValueError) as e:
+            raise ValueError(f"Invalid speed/pitch: {e}") from e
+
+        if not (SPEED_MIN <= speed <= SPEED_MAX):
+            raise ValueError(f"Speed {speed} out of range [{SPEED_MIN}, {SPEED_MAX}]")
+        if not (PITCH_MIN <= pitch <= PITCH_MAX):
+            raise ValueError(f"Pitch {pitch} out of range [{PITCH_MIN}, {PITCH_MAX}]")
+
         return SynthesisRequest(
             text=text,
             voice=body.get("voice", "efm_l"),
-            speed=body.get("speed", 1.0),
-            pitch=body.get("pitch", 0),
+            speed=speed,
+            pitch=pitch,
             cache_key=body.get("cacheKey", hashlib.md5(text.encode()).hexdigest()),
         )
 
@@ -128,12 +152,13 @@ def synthesize_audio(
     wav_file = text_file.replace(".txt", ".wav")
 
     try:
-        cmd = [
+        cmd_parts = [
             "python", os.path.join(config.src_dir, "run_merlin.py"),
             config.merlin_dir, config.temp_dir, voice, text_file, wav_file,
         ]
+        safe_cmd = " ".join(shlex.quote(p) for p in cmd_parts)
         result = run_command(
-            ["bash", "-c", CONDA_PREFIX + " ".join(cmd)],
+            ["bash", "-c", CONDA_PREFIX + safe_cmd],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
@@ -166,16 +191,13 @@ def _apply_sox_effects(
         return wav_file
 
     processed = wav_file.replace(".wav", "_proc.wav")
-    effects = []
+    cmd = ["sox", wav_file, processed]
     if speed != 1.0:
-        effects.append(f"tempo {speed}")
+        cmd.extend(["tempo", str(speed)])
     if pitch != 0:
-        effects.append(f"pitch {int(pitch)}")
+        cmd.extend(["pitch", str(int(pitch))])
 
-    run_command(
-        ["bash", "-c", f"sox {wav_file} {processed} {' '.join(effects)}"],
-        timeout=SOX_TIMEOUT,
-    )
+    run_command(cmd, timeout=SOX_TIMEOUT)
 
     if os.path.exists(processed):
         os.remove(wav_file)
