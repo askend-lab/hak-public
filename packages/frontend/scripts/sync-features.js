@@ -77,9 +77,6 @@ function generateIndexCode(groups) {
   const spread = groups
     .map((g) => `  ...FEATURES_${g.toUpperCase()}`)
     .join(",\n");
-  const groupsObj = Object.fromEntries(
-    groups.map((g) => [g, `FEATURES_${g.toUpperCase()}`]),
-  );
 
   return `// SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
