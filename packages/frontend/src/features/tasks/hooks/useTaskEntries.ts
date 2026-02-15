@@ -46,7 +46,7 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
       if (entries.length === 0) return;
 
       try {
-        await dataService.addTextEntriesToTask(user.id, taskId, entries, _mode);
+        await dataService.addTextEntriesToTask(taskId, entries, _mode);
         setTaskRefreshTrigger((prev) => prev + 1);
         const count = entries.length;
         showNotification({
@@ -74,7 +74,7 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
       if (!sentence || !sentence.text.trim()) return;
 
       try {
-        await dataService.addTextEntriesToTask(user.id, taskId, [
+        await dataService.addTextEntriesToTask(taskId, [
           {
             text: sentence.text,
             stressedText: sentence.phoneticText || sentence.text,

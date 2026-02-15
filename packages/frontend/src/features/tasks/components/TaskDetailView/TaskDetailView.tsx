@@ -110,7 +110,7 @@ export default function TaskDetailView({
 
     setIsLoading(true);
     dataService
-      .getTask(taskId, user.id)
+      .getTask(taskId)
       .then((taskData) => {
         if (taskData) {
           setTask(taskData);
@@ -145,7 +145,7 @@ export default function TaskDetailView({
 
     // Persist to backend
     try {
-      await dataService.updateTask(user.id, taskId, {
+      await dataService.updateTask(taskId, {
         entries: updatedEntries,
       });
       if (entryToDelete) {

@@ -47,7 +47,7 @@ export default function TasksView({
   const handleEditTask = async (taskId: string) => {
     if (!user) return;
     try {
-      const task = await dataService.getTask(taskId, user.id);
+      const task = await dataService.getTask(taskId);
       if (task) {
         const taskData: Task = { id: task.id, name: task.name };
         if (task.description) taskData.description = task.description;
@@ -61,7 +61,7 @@ export default function TasksView({
   const handleShareTask = async (taskId: string) => {
     if (!user) return;
     try {
-      const task = await dataService.getTask(taskId, user.id);
+      const task = await dataService.getTask(taskId);
       if (task) {
         const taskData: Task = { id: task.id, name: task.name };
         if (task.description) taskData.description = task.description;

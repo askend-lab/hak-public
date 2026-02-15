@@ -134,7 +134,7 @@ describe("TasksView mutation kills", () => {
     render(<TasksView {...props} />, { wrapper: dsWrapper });
     await user.click(screen.getByText("edit-t1"));
     await waitFor(() => {
-      expect(mockGetTask).toHaveBeenCalledWith("t1", "u1");
+      expect(mockGetTask).toHaveBeenCalledWith("t1");
       expect(props.onEditTask).toHaveBeenCalledWith(
         expect.objectContaining({ id: "t1", name: "Task One" }),
       );

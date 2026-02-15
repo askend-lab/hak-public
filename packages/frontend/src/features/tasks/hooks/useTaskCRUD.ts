@@ -122,7 +122,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       if (requireAuth()) return;
       if (!user) return;
       try {
-        const fullTask = await dataService.getTask(task.id, user.id);
+        const fullTask = await dataService.getTask(task.id);
         if (fullTask) {
           setTaskToEdit({
             id: task.id,
@@ -146,7 +146,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
     }): Promise<void> => {
       if (!user) return;
       try {
-        await dataService.updateTask(user.id, updatedTask.id, {
+        await dataService.updateTask(updatedTask.id, {
           name: updatedTask.name,
           ...(updatedTask.description !== null && {
             description: updatedTask.description,
@@ -173,7 +173,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       if (requireAuth()) return;
       if (!user) return;
       try {
-        const fullTask = await dataService.getTask(taskId, user.id);
+        const fullTask = await dataService.getTask(taskId);
         if (fullTask) {
           setTaskToDelete({ id: taskId, name: fullTask.name });
           setShowDeleteConfirmation(true);
@@ -190,7 +190,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
     setIsDeleting(true);
     const taskName = taskToDelete.name;
     try {
-      await dataService.deleteTask(user.id, taskToDelete.id);
+      await dataService.deleteTask(taskToDelete.id);
       setTaskRefreshTrigger((prev) => prev + 1);
       showNotification({
         type: "success",

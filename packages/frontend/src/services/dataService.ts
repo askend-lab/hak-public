@@ -25,29 +25,29 @@ export class DataService {
     );
   }
 
-  async getUserTasks(userId: string): Promise<TaskSummary[]> {
-    return this.repository.getUserTasks(userId);
+  async getUserTasks(): Promise<TaskSummary[]> {
+    return this.repository.getUserTasks();
   }
 
-  async getUserCreatedTasks(userId: string): Promise<TaskSummary[]> {
-    return this.repository.getUserCreatedTasks(userId);
+  async getUserCreatedTasks(): Promise<TaskSummary[]> {
+    return this.repository.getUserCreatedTasks();
   }
 
-  async getModifiableTasks(userId: string): Promise<TaskSummary[]> {
-    return this.repository.getModifiableTasks(userId);
+  async getModifiableTasks(): Promise<TaskSummary[]> {
+    return this.repository.getModifiableTasks();
   }
 
-  async getTask(taskId: string, userId: string): Promise<Task | null> {
-    return this.repository.getTask(taskId, userId);
+  async getTask(taskId: string): Promise<Task | null> {
+    return this.repository.getTask(taskId);
   }
 
-  async shareUserTask(userId: string, taskId: string): Promise<void> {
-    const task = await this.repository.getTask(taskId, userId);
+  async shareUserTask(taskId: string): Promise<void> {
+    const task = await this.repository.getTask(taskId);
     if (!task) {
       throw new Error("Task not found");
     }
 
-    logger.debug("Sharing task:", { userId, taskId });
+    logger.debug("Sharing task:", { taskId });
     await this.shareService.shareUserTask(task);
   }
 
@@ -56,24 +56,21 @@ export class DataService {
   }
 
   async updateTask(
-    userId: string,
     taskId: string,
     updates: Partial<Task>,
   ): Promise<Task | null> {
-    return this.repository.updateTask(userId, taskId, updates);
+    return this.repository.updateTask(taskId, updates);
   }
 
-  async deleteTask(userId: string, taskId: string): Promise<boolean> {
-    return this.repository.deleteTask(userId, taskId);
+  async deleteTask(taskId: string): Promise<boolean> {
+    return this.repository.deleteTask(taskId);
   }
 
   async addEntryToTask(
-    userId: string,
     taskId: string,
     entryData: Omit<TaskEntry, "id" | "taskId" | "createdAt">,
   ): Promise<TaskEntry> {
     const entries = await this.repository.addTextEntriesToTask(
-      userId,
       taskId,
       [{ text: entryData.text, stressedText: entryData.stressedText }],
     );
@@ -85,12 +82,11 @@ export class DataService {
   }
 
   async addTextEntriesToTask(
-    userId: string,
     taskId: string,
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
     mode: "append" | "replace" = "append",
   ): Promise<TaskEntry[]> {
-    return this.repository.addTextEntriesToTask(userId, taskId, textEntries, mode);
+    return this.repository.addTextEntriesToTask(taskId, textEntries, mode);
   }
 
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {
@@ -102,11 +98,10 @@ export class DataService {
   }
 
   async updateTaskEntry(
-    userId: string,
     taskId: string,
     entryId: string,
     updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>,
   ): Promise<TaskEntry | null> {
-    return this.repository.updateTaskEntry(userId, taskId, entryId, updates);
+    return this.repository.updateTaskEntry(taskId, entryId, updates);
   }
 }

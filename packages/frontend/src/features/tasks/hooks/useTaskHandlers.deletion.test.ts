@@ -87,7 +87,7 @@ describe("useTaskHandlers - Task Deletion", () => {
       await result.current.crud.handleConfirmDelete();
     });
 
-    expect(mockDeleteTask).toHaveBeenCalledWith("user-1", "task-1");
+    expect(mockDeleteTask).toHaveBeenCalledWith("task-1");
     expect(result.current.modals.showDeleteConfirmation).toBe(false);
   });
 
@@ -105,7 +105,7 @@ describe("useTaskHandlers - Task Deletion", () => {
       await result.current.crud.handleConfirmDelete();
     });
 
-    expect(mockDeleteTask).toHaveBeenCalledWith("user-1", "task-1");
+    expect(mockDeleteTask).toHaveBeenCalledWith("task-1");
     expect(mockSetSelectedTaskId).toHaveBeenCalledWith(null);
     expect(mockSetCurrentView).toHaveBeenCalled();
   });

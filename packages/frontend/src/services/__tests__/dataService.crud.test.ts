@@ -87,14 +87,14 @@ describe("DataService CRUD Operations", () => {
       const taskData = { name: "User Task", description: "Test" };
       const created = await dataService.createTask(mockUserId, taskData);
 
-      const result = await dataService.getTask(created.id, mockUserId);
+      const result = await dataService.getTask(created.id);
 
       expect(result).toBeDefined();
       expect(result?.name).toBe("User Task");
     });
 
     it("returns null for non-existent task", async () => {
-      const result = await dataService.getTask("non-existent", mockUserId);
+      const result = await dataService.getTask("non-existent");
       expect(result).toBeNull();
     });
   });
@@ -104,7 +104,7 @@ describe("DataService CRUD Operations", () => {
       const taskData = { name: "Original", description: "Test" };
       const created = await dataService.createTask(mockUserId, taskData);
 
-      const result = await dataService.updateTask(mockUserId, created.id, {
+      const result = await dataService.updateTask(created.id, {
         name: "Updated",
       });
 
@@ -113,7 +113,7 @@ describe("DataService CRUD Operations", () => {
 
     it("throws for non-existent task", async () => {
       await expect(
-        dataService.updateTask(mockUserId, "non-existent", { name: "Test" }),
+        dataService.updateTask("non-existent", { name: "Test" }),
       ).rejects.toThrow("Task not found");
     });
   });
@@ -123,23 +123,23 @@ describe("DataService CRUD Operations", () => {
       const taskData = { name: "To Delete", description: "Test" };
       const created = await dataService.createTask(mockUserId, taskData);
 
-      const result = await dataService.deleteTask(mockUserId, created.id);
+      const result = await dataService.deleteTask(created.id);
 
       expect(result).toBe(true);
-      const task = await dataService.getTask(created.id, mockUserId);
+      const task = await dataService.getTask(created.id);
       expect(task).toBeNull();
     });
 
     it("throws for non-existent task", async () => {
       await expect(
-        dataService.deleteTask(mockUserId, "non-existent"),
+        dataService.deleteTask("non-existent"),
       ).rejects.toThrow("Task not found");
     });
   });
 
   describe("getUserTasks", () => {
     it("returns empty array for user with no tasks", async () => {
-      const result = await dataService.getUserTasks("new-user");
+      const result = await dataService.getUserTasks();
       // May include baseline tasks
       expect(Array.isArray(result)).toBe(true);
     });
@@ -154,7 +154,7 @@ describe("DataService CRUD Operations", () => {
         description: "",
       });
 
-      const result = await dataService.getUserTasks(mockUserId);
+      const result = await dataService.getUserTasks();
 
       const userTaskNames = result.map((t) => t.name);
       expect(userTaskNames).toContain("Task 1");
@@ -169,7 +169,7 @@ describe("DataService CRUD Operations", () => {
         description: "",
       });
 
-      const result = await dataService.getUserCreatedTasks(mockUserId);
+      const result = await dataService.getUserCreatedTasks();
 
       expect(result).toHaveLength(1);
       expect(result[0]?.name).toBe("User Task");
@@ -183,7 +183,7 @@ describe("DataService CRUD Operations", () => {
         description: "",
       });
 
-      const result = await dataService.getModifiableTasks(mockUserId);
+      const result = await dataService.getModifiableTasks();
 
       expect(result).toHaveLength(1);
       expect(result[0]?.name).toBe("Modifiable");
@@ -199,7 +199,7 @@ describe("DataService CRUD Operations", () => {
       await dataService.createTask(mockUserId, taskData);
 
       // Task should be immediately visible
-      const tasks = await dataService.getUserTasks(mockUserId);
+      const tasks = await dataService.getUserTasks();
       const taskNames = tasks.map((t) => t.name);
 
       expect(taskNames).toContain("New Task");
@@ -217,7 +217,7 @@ describe("DataService CRUD Operations", () => {
       // Simulate page reload - get fresh DataService instance
       const freshDataService = new DataService();
 
-      const tasks = await freshDataService.getUserTasks(mockUserId);
+      const tasks = await freshDataService.getUserTasks();
       const taskNames = tasks.map((t) => t.name);
 
       expect(taskNames).toContain("Persistent Task");
@@ -236,7 +236,7 @@ describe("DataService CRUD Operations", () => {
       expect(created.id).toBeDefined();
 
       // 2. Simulate navigation - fresh load of tasks (like opening /tasks page)
-      const tasks = await dataService.getUserTasks(mockUserId);
+      const tasks = await dataService.getUserTasks();
 
       // 3. Task should be in the list
       expect(tasks.length).toBeGreaterThan(0);
