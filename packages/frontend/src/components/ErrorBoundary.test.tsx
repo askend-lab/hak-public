@@ -40,7 +40,7 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>
     );
     expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
-    expect(screen.getByText("Test error message")).toBeInTheDocument();
+    expect(screen.getByText("Tekkis ootamatu viga")).toBeInTheDocument();
   });
 
   it("renders custom fallback when provided", () => {
@@ -61,7 +61,7 @@ describe("ErrorBoundary", () => {
 
     expect(screen.getByText("Midagi läks valesti")).toBeInTheDocument();
     expect(screen.getByText("Proovi uuesti")).toBeInTheDocument();
-    expect(screen.getByText("Test error message")).toBeInTheDocument();
+    expect(screen.getByText("Tekkis ootamatu viga")).toBeInTheDocument();
 
     // Click retry button - this calls setState to reset hasError and error
     fireEvent.click(screen.getByText("Proovi uuesti"));
@@ -134,7 +134,7 @@ describe("ErrorBoundary", () => {
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
-    const p = screen.getByText("Test error message");
+    const p = screen.getByText("Tekkis ootamatu viga");
     expect(p.style.color).toBe("#666");
     expect(p.style.marginTop).toBe("0.5rem");
   });

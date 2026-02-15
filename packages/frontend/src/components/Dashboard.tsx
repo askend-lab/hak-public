@@ -92,19 +92,22 @@ function useDashboardData() {
   const dataService = useDataService();
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    let taskCount = 0,
-      entryCount = 0;
-    if (isAuthenticated && user) {
-      const tasks = await dataService.getUserTasks(user.id);
-      taskCount = tasks.length;
-      entryCount = tasks.reduce((sum, task) => sum + task.entryCount, 0);
+    try {
+      let taskCount = 0,
+        entryCount = 0;
+      if (isAuthenticated && user) {
+        const tasks = await dataService.getUserTasks(user.id);
+        taskCount = tasks.length;
+        entryCount = tasks.reduce((sum, task) => sum + task.entryCount, 0);
+      }
+      setMetrics([
+        { label: "Ülesanded", value: taskCount, icon: "📋" },
+        { label: "Kirjed", value: entryCount, icon: "📝" },
+      ]);
+      setRecentActivity([]);
+    } finally {
+      setIsLoading(false);
     }
-    setMetrics([
-      { label: "Ülesanded", value: taskCount, icon: "📋" },
-      { label: "Kirjed", value: entryCount, icon: "📝" },
-    ]);
-    setRecentActivity([]);
-    setIsLoading(false);
   }, [isAuthenticated, user, dataService]);
   useEffect(() => {
     loadData();

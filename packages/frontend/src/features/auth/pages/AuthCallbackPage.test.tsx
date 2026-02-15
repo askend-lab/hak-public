@@ -62,7 +62,7 @@ describe("AuthCallbackPage", () => {
     render(<AuthCallbackPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/User denied/)).toBeInTheDocument();
+      expect(screen.getByText(/Autentimise viga/)).toBeInTheDocument();
     });
     expect(consoleSpy).toHaveBeenCalledWith(
       "Auth callback error:",
@@ -79,7 +79,7 @@ describe("AuthCallbackPage", () => {
     render(<AuthCallbackPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/server_error/)).toBeInTheDocument();
+      expect(screen.getByText(/Autentimise viga/)).toBeInTheDocument();
     });
     consoleSpy.mockRestore();
   });
@@ -189,12 +189,12 @@ describe("AuthCallbackPage", () => {
     expect(container.getAttribute("aria-live")).toBe("polite");
   });
 
-  it("error text includes 'Sisselogimine ebaõnnestus' prefix with error detail", async () => {
+  it("error text includes 'Sisselogimine ebaõnnestus' prefix with generic message", async () => {
     window.location.search = "?error=oops";
     render(<AuthCallbackPage />);
     await waitFor(() => {
       const p = screen.getByText(/Sisselogimine ebaõnnestus/);
-      expect(p.textContent).toContain("oops");
+      expect(p.textContent).toContain("Autentimise viga");
       expect(p.tagName).toBe("P");
     });
   });
