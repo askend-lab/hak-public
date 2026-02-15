@@ -12,7 +12,6 @@
     "url": "https://github.com/askend-lab/hak/issues"
   },
   "homepage": "https://github.com/askend-lab/hak#readme",
-  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dx": "node devbox dx",
     "dx:cli": "node devbox",

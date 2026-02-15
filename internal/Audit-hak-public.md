@@ -93,7 +93,7 @@
 - [ ] 72. **CI не тестирует tara-auth** — пакет отсутствует в public repo.
 - [ ] 73. **Нет integration/smoke tests для APIs** — только unit tests.
 - [ ] 74. **GitHub Actions SHA pins с ручными version comments** — могут устареть.
-- [x] 75. **.nvmrc без версии pnpm** — добавлен packageManager в package.json.
+- [ ] 75. **.nvmrc без версии pnpm** — packageManager конфликтует с CI pnpm/action-setup. Нужно обновить CI workflows.
 - [x] 76. **CONTRIBUTING.md без security checklist** — нет OWASP/security scan для PRs.
 - [x] 77. **SECURITY.md: supported "1.x", actual "0.1.1"** — таблица не актуальна.
 - [x] 78. **Нет .dockerignore для merlin-worker** — test files, __pycache__ в image.
