@@ -208,14 +208,13 @@ describe("parseIdToken expiration boundary", () => {
     expect(result).toBe(false);
   });
 
-  it("accepts token with no email (name fallback from undefined)", () => {
+  it("rejects token with no email claim", () => {
     const idToken = createJwt({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 3600 });
     let result: boolean | undefined;
     function Comp() {
-      const { handleTaraTokens, user } = useAuth();
+      const { handleTaraTokens } = useAuth();
       return (
         <div>
-          <span data-testid="name">{user?.name ?? "none"}</span>
           <button onClick={() => {
             result = handleTaraTokens({ accessToken: "a", idToken });
           }}>go</button>
@@ -224,6 +223,6 @@ describe("parseIdToken expiration boundary", () => {
     }
     render(<AuthProvider><Comp /></AuthProvider>);
     act(() => { screen.getByText("go").click(); });
-    expect(result).toBe(true);
+    expect(result).toBe(false);
   });
 });

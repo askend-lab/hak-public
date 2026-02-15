@@ -26,10 +26,10 @@ const FooterLinks = () => (
     <h2 className="footer-heading">Hääldusabiline</h2>
     <ul className="footer-links">
       <li>
-        <span>Portaalist</span>
+        <span className="footer-link--disabled" aria-disabled="true">Portaalist</span>
       </li>
       <li>
-        <span>Versiooniajalugu</span>
+        <span className="footer-link--disabled" aria-disabled="true">Versiooniajalugu</span>
       </li>
       <li>
         <a href="/privacy">Kasutus- ja privaatsustingimused</a>
@@ -50,6 +50,7 @@ const SocialLinks = () => (
           href="https://www.facebook.com/eestikeeleinstituut"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Facebook (avaneb uues aknas)"
         >
           <img src="/icons/facebook.svg" alt="" className="social-icon" />
           <span>Facebook</span>
@@ -60,6 +61,7 @@ const SocialLinks = () => (
           href="https://www.youtube.com/@EestiKeeleInstituut"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Youtube (avaneb uues aknas)"
         >
           <img src="/icons/youtube.svg" alt="" className="social-icon" />
           <span>Youtube</span>
@@ -70,6 +72,7 @@ const SocialLinks = () => (
           href="https://www.linkedin.com/company/eesti-keele-instituut"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="LinkedIn (avaneb uues aknas)"
         >
           <img src="/icons/linkedin.svg" alt="" className="social-icon" />
           <span>LinkedIn</span>

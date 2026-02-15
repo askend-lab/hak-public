@@ -23,7 +23,7 @@ export default function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="cookie-consent" role="alert">
+    <div className="cookie-consent" role="status">
       <div className="cookie-consent__content">
         <p className="cookie-consent__text">
           See rakendus kasutab küpsiseid ja kohalikku salvestusruumi

@@ -67,11 +67,9 @@ describe("parseIdToken", () => {
     expect(parseIdToken(token)?.name).toBe("alice");
   });
 
-  it("handles token without email (name is undefined)", () => {
+  it("rejects token without email claim", () => {
     const token = createJwt({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 3600 });
-    const user = parseIdToken(token);
-    expect(user?.id).toBe("u1");
-    expect(user?.email).toBeUndefined();
+    expect(parseIdToken(token)).toBeNull();
   });
 });
 

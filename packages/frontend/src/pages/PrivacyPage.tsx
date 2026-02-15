@@ -10,7 +10,7 @@ export default function PrivacyPage() {
 
       <div className="content-page__body">
         <div className="content-page__section">
-          <h4>Sissejuhatus</h4>
+          <h2>Sissejuhatus</h2>
           <p>
             Käesolev privaatsuspoliitika selgitab, kuidas Hääldusabilise
             veebirakendus töötleb isikuandmeid ja muud teavet teenuse pakkumiseks
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="content-page__section">
-          <h4>Vastutav töötleja ja kontakt</h4>
+          <h2>Vastutav töötleja ja kontakt</h2>
           <p>
             Vastutav töötleja: Eesti Keele Instituut (EKI), Roosikrantsi 6,
             10119 Tallinn, registrikood 70004011.
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="content-page__section">
-          <h4>Milliseid andmeid me töötleme</h4>
+          <h2>Milliseid andmeid me töötleme</h2>
           <h3>Kasutajakonto ja autentimine</h3>
           <ul>
             <li>
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="content-page__section">
-          <h4>Andmete töötlemise eesmärgid ja õiguslik alus</h4>
+          <h2>Andmete töötlemise eesmärgid ja õiguslik alus</h2>
           <ul>
             <li>
               teenuse osutamine (sh konto ja ülesannete haldus) — lepingu täitmine
@@ -91,7 +91,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="content-page__section">
-          <h4>Andmete säilitamine</h4>
+          <h2>Andmete säilitamine</h2>
           <ul>
             <li>
               kasutaja ülesannete andmeid säilitame teenuse osutamiseks seni,
@@ -111,7 +111,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="content-page__section">
-          <h4>Andmete jagamine ja volitatud töötlejad</h4>
+          <h2>Andmete jagamine ja volitatud töötlejad</h2>
           <p>
             Teenuse osutamisel kasutame usaldusväärseid teenusepakkujaid (nt
             pilveteenused, autentimisteenus, veamonitooring). Nendele edastame
@@ -176,7 +176,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="content-page__section">
-          <h4>Jagamine (jagatud lingid)</h4>
+          <h2>Jagamine (jagatud lingid)</h2>
           <p>
             Kui kasutaja jagab ülesannet, luuakse link (jagamistunnus), mille
             kaudu saab vastavat sisu vaadata ka ilma kontota. Jagatud lingi
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="content-page__section">
-          <h4>Kasutaja õigused</h4>
+          <h2>Kasutaja õigused</h2>
           <p>
             Teil on õigus taotleda juurdepääsu oma isikuandmetele, andmete
             parandamist, kustutamist, töötlemise piiramist, andmete ülekandmist
@@ -204,7 +204,7 @@ export default function PrivacyPage() {
       <div className="content-page__footer-band">
         <div className="content-page__body">
           <div className="content-page__section">
-            <h4>Järelevalveasutus</h4>
+            <h2>Järelevalveasutus</h2>
             <p>
               Kui leiate, et teie andmekaitseõigusi on rikutud, on teil õigus
               esitada kaebus Andmekaitse Inspektsioonile.
@@ -226,7 +226,7 @@ export default function PrivacyPage() {
           </div>
 
           <div className="content-page__section">
-            <h4>Poliitika uuendamine</h4>
+            <h2>Poliitika uuendamine</h2>
             <p>Käesolev privaatsuspoliitika on koostatud 12.02.2026.</p>
             <p>
               Vajadusel ajakohastame privaatsuspoliitikat vastavalt teenuse

@@ -23,8 +23,8 @@ export async function warmAudioWorker(): Promise<void> {
       lastActivity = Date.now();
       logger.info("[Audio] Merlin warm-up triggered");
     }
-  } catch {
-    // Network errors are expected during cold starts — silently retry on next call
+  } catch (err) {
+    logger.warn("[Audio] Merlin warm-up failed, will retry:", err);
   }
 }
 
@@ -41,15 +41,19 @@ export function pingMerlinOnActivity(): void {
 let initialized = false;
 
 // Initialize auto-ping on user activity (mouse, keyboard, touch)
-export function initActivityListeners(): void {
+export function initActivityListeners(): (() => void) | undefined {
   if (initialized) return;
   if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
 
+  const handler = (): void => pingMerlinOnActivity();
   const events = ["mouseenter", "keydown", "touchstart", "scroll"];
   events.forEach((event) => {
-    window.addEventListener(event, () => pingMerlinOnActivity(), {
-      passive: true,
-    });
+    window.addEventListener(event, handler, { passive: true });
   });
   initialized = true;
+
+  return () => {
+    events.forEach((event) => window.removeEventListener(event, handler));
+    initialized = false;
+  };
 }

@@ -103,9 +103,10 @@ export class TaskRepository {
     existingTask: Task,
     updates: Partial<Task>,
   ): Promise<Task> {
+    const { id: _id, userId: _uid, shareToken: _st, createdAt: _ca, ...safeUpdates } = updates;
     const updatedTask: Task = {
       ...existingTask,
-      ...updates,
+      ...safeUpdates,
       updatedAt: new Date(),
     };
 

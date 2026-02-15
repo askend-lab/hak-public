@@ -3,8 +3,26 @@
 
 import { Task } from "@/types/task";
 import { AuthStorage } from "@/features/auth/services/storage";
-import { CONTENT_TYPE_JSON } from "@/features/synthesis/utils/analyzeApi";
+import { CONTENT_TYPE_JSON } from "@/config/constants";
 import { logger } from "@hak/shared";
+
+/** Serialize a Task to a plain JSON-safe record for storage. */
+function taskToRecord(task: Task): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(task)) as Record<string, unknown>;
+}
+
+/** Deserialize a storage record back to a Task with basic runtime validation. */
+function recordToTask(data: Record<string, unknown>): Task | null {
+  if (
+    typeof data.id !== "string" ||
+    typeof data.userId !== "string" ||
+    typeof data.name !== "string"
+  ) {
+    logger.error("Invalid task data: missing required fields");
+    return null;
+  }
+  return data as unknown as Task;
+}
 
 interface SimpleStoreResponse {
   success: boolean;
@@ -82,7 +100,7 @@ export class SimpleStoreAdapter {
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {
     try {
       const data = await this.get("tasks", shareToken, "unlisted");
-      return data ? (data as unknown as Task) : null;
+      return data ? recordToTask(data) : null;
     } catch (error) {
       logger.error("Failed to get task by share token:", error);
       return null;
@@ -132,13 +150,13 @@ export class SimpleStoreAdapter {
       "task",
       task.id,
       "private",
-      task as unknown as Record<string, unknown>,
+      taskToRecord(task),
     );
   }
 
   async getTask(taskId: string): Promise<Task | null> {
     const data = await this.get("task", taskId, "private");
-    return data ? (data as unknown as Task) : null;
+    return data ? recordToTask(data) : null;
   }
 
   async deleteTask(taskId: string): Promise<void> {
@@ -147,7 +165,9 @@ export class SimpleStoreAdapter {
 
   async queryUserTasks(): Promise<Task[]> {
     const items = await this.query("task", "private");
-    return items as unknown as Task[];
+    return items
+      .map((item) => recordToTask(item))
+      .filter((t): t is Task => t !== null);
   }
 
   async deleteUnlistedTask(shareToken: string): Promise<void> {
@@ -170,7 +190,7 @@ export class SimpleStoreAdapter {
         sk: task.shareToken,
         type: "unlisted",
         ttl: UNLISTED_TTL_SECONDS,
-        data: task as unknown as Record<string, unknown>,
+        data: taskToRecord(task),
       }),
     });
 

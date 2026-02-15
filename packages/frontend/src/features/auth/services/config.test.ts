@@ -233,6 +233,19 @@ describe("exchangeCodeForTokens", () => {
     consoleSpy.mockRestore();
   });
 
+  it("should return null for invalid response shape", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "test-verifier");
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ unexpected: "data" }),
+    });
+    const result = await exchangeCodeForTokens("auth-code");
+    expect(result).toBeNull();
+    expect(consoleSpy).toHaveBeenCalledWith("[Auth] Invalid token exchange response shape");
+    consoleSpy.mockRestore();
+  });
+
   it("should NOT include redirect_uri in request body (hardcoded server-side)", async () => {
     sessionStorage.setItem("pkce_code_verifier", "v");
     global.fetch = vi.fn().mockResolvedValue({

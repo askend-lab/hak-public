@@ -54,11 +54,11 @@ function QuickLinks({ onNavigate }: { onNavigate: (path: string) => void }) {
       <h2 className="dashboard__section-title">Kiirlingid</h2>
       <div className="dashboard__quick-links">
         <button className="dashboard__quick-link" onClick={() => onNavigate("/synthesis")}>
-          <span className="dashboard__quick-link-icon">🎤</span>
+          <span className="dashboard__quick-link-icon" aria-hidden="true">🎤</span>
           <span>Uus süntees</span>
         </button>
         <button className="dashboard__quick-link" onClick={() => onNavigate("/tasks")}>
-          <span className="dashboard__quick-link-icon">📋</span>
+          <span className="dashboard__quick-link-icon" aria-hidden="true">📋</span>
           <span>Loo ülesanne</span>
         </button>
       </div>
