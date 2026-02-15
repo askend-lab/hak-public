@@ -23,7 +23,7 @@
 - [ ] 11. **Токены (access/id) в URL query params** — `AuthCallbackPage.tsx:24-25`. Видны в history, logs, Referer.
 - [x] 12. **JWT parseIdToken без проверки iss/aud** — `token.ts:26-27`. JWT от другого pool принимается.
 - [ ] 13. **Нет rate limiting на simplestore** — `simplestore/serverless.yml`. Бомбить `/save`, `/query` без лимитов.
-- [ ] 14. **CORS wildcard в CORS_HEADERS объекте** — `shared/lambda.ts:31`. Кто использует напрямую — получит `*`.
+- [x] 14. **CORS wildcard в CORS_HEADERS объекте** — `shared/lambda.ts:31`. Кто использует напрямую — получит `*`.
 - [ ] 15. **Публичные S3 audio URLs** — `merlin-api/s3.ts:72-73`. Нет signed URLs, bucket name раскрыт клиенту.
 - [ ] 16. **Anonymous access без rate limiting** — `simplestore/handler.ts:113-135`. Brute-force shared/unlisted данных.
 - [x] 17. **Error messages утекают детали** — `vabamorf-api/handler.ts:88-91`. `error.message` → клиенту.
@@ -95,7 +95,7 @@
 - [ ] 74. **GitHub Actions SHA pins с ручными version comments** — могут устареть.
 - [ ] 75. **.nvmrc без версии pnpm** — pnpm version только в CI.
 - [ ] 76. **CONTRIBUTING.md без security checklist** — нет OWASP/security scan для PRs.
-- [ ] 77. **SECURITY.md: supported "1.x", actual "0.1.1"** — таблица не актуальна.
+- [x] 77. **SECURITY.md: supported "1.x", actual "0.1.1"** — таблица не актуальна.
 - [ ] 78. **Нет .dockerignore для merlin-worker** — test files, __pycache__ в image.
 - [ ] 79. **logger.debug логирует shareToken** — `ShareService.ts:19,24`. При LOG_LEVEL=debug → CloudWatch.
 - [ ] 80. **User email в UserProfile dropdown** — shoulder surfing risk. Minor.
