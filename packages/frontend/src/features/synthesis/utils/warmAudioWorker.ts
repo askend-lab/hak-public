@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { logger } from "@hak/shared";
-import { CONTENT_TYPE_JSON } from "./analyzeApi";
+import { CONTENT_TYPE_JSON } from "@/config/constants";
 
 let warmed = false;
 let lastActivity = 0;
