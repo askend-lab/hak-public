@@ -10,7 +10,8 @@ export type ViewType =
   | "dashboard"
   | "role-selection"
   | "accessibility"
-  | "privacy";
+  | "privacy"
+  | "not-found";
 
 interface CurrentViewResult {
   currentView: ViewType;
@@ -35,8 +36,10 @@ export function useCurrentView(): CurrentViewResult {
     ["/privacy", "privacy"],
   ];
 
-  const currentView: ViewType =
-    VIEW_ROUTES.find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? "synthesis";
+  const SYNTHESIS_PATHS = ["/", "/synthesis"];
+  const matched = VIEW_ROUTES.find(([prefix]) => pathname.startsWith(prefix))?.[1];
+  const currentView: ViewType = matched
+    ?? (SYNTHESIS_PATHS.includes(pathname) ? "synthesis" : "not-found");
 
   const taskIdMatch = pathname.match(/^\/tasks\/([^/]+)$/);
   const selectedTaskId: string | null = taskIdMatch?.[1] || null;

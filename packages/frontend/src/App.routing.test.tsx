@@ -175,13 +175,13 @@ describe("App Routing", () => {
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
-    it("defaults to synthesis view for unknown route", async () => {
+    it("shows 404 page for unknown route", async () => {
       render(
         <MemoryRouter initialEntries={["/unknown-route"]}>
           <Home />
         </MemoryRouter>,
       );
-      expect(await screen.findByTestId("synthesis-view")).toBeInTheDocument();
+      expect(await screen.findByText("404")).toBeInTheDocument();
     });
   });
 
