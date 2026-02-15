@@ -96,8 +96,8 @@
 - [ ] 75. **.nvmrc без версии pnpm** — pnpm version только в CI.
 - [ ] 76. **CONTRIBUTING.md без security checklist** — нет OWASP/security scan для PRs.
 - [x] 77. **SECURITY.md: supported "1.x", actual "0.1.1"** — таблица не актуальна.
-- [ ] 78. **Нет .dockerignore для merlin-worker** — test files, __pycache__ в image.
-- [ ] 79. **logger.debug логирует shareToken** — `ShareService.ts:19,24`. При LOG_LEVEL=debug → CloudWatch.
+- [x] 78. **Нет .dockerignore для merlin-worker** — test files, __pycache__ в image.
+- [x] 79. **logger.debug логирует shareToken** — `ShareService.ts:19,24`. При LOG_LEVEL=debug → CloudWatch.
 - [ ] 80. **User email в UserProfile dropdown** — shoulder surfing risk. Minor.
 - [ ] 81. **a11y-dev только в dev mode** — production a11y issues не обнаруживаются.
 - [ ] 82. **MetricCard без React.memo** — minor performance, ререндер при state change.
