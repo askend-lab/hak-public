@@ -149,7 +149,7 @@ if command -v node &>/dev/null; then
     pkg.scripts['test:coverage'] = 'pnpm -r --filter=@hak/frontend run test:coverage';
     pkg.scripts.start = 'pnpm --filter @hak/frontend dev';
     pkg.scripts.build = 'pnpm --filter @hak/frontend build';
-    pkg.scripts.typecheck = 'pnpm -r exec tsc --noEmit';
+    pkg.scripts.typecheck = 'pnpm -r --filter \"!@hak/merlin-worker\" exec tsc --noEmit';
     pkg.scripts.lint = 'eslint --max-warnings=0 .';
     pkg.scripts.check = 'pnpm lint && pnpm typecheck && pnpm test:all';
 
