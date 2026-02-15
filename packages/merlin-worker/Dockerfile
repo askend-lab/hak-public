@@ -2,7 +2,7 @@
 # Merlin TTS SQS Worker
 # Source code from hak repo, voice models from S3
 
-FROM ubuntu:22.04@sha256:0eb0f877e1c869a300c442c41120e778571b2014696ec7967cd2b32e8e7bab55
+FROM ubuntu:22.04@sha256:34577a83cd7a8f1e55f6eb173fd9bb70c16127a83d6bf06f56f6b1fff9e406b9
 
 ENV DEBIAN_FRONTEND=noninteractive
 
