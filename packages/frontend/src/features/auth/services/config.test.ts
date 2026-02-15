@@ -141,15 +141,13 @@ describe("exchangeCodeForTokens", () => {
   it("should exchange code for tokens using PKCE", async () => {
     sessionStorage.setItem("pkce_code_verifier", "test-verifier");
 
-    const mockTokens = {
-      access_token: "access-token",
-      id_token: "id-token",
-      expires_in: 3600,
-    };
-
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(mockTokens),
+      json: () => Promise.resolve({
+        access_token: "access-token",
+        id_token: "id-token",
+        expires_in: 3600,
+      }),
     });
 
     const result = await exchangeCodeForTokens("auth-code");
