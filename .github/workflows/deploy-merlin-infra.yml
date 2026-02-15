@@ -23,6 +23,7 @@ jobs:
   deploy:
     name: Deploy Merlin Infrastructure
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: ${{ github.event.inputs.environment || 'dev' }}
 
     steps:
@@ -38,7 +39,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.6.0
 
       - name: Terraform Init
         working-directory: infra/merlin
