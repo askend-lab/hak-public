@@ -42,29 +42,32 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
-      - name: Build and push Docker image
-        working-directory: packages/merlin-worker
-        env:
-          DOCKER_BUILDKIT: "1"
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: merlin-worker
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
+
+      - name: Prepare BuildKit secrets
         run: |
-          # Write credentials to temp files for BuildKit secrets (not baked into image layers)
           echo -n "$AWS_ACCESS_KEY_ID" > /tmp/aws_access_key_id
           echo -n "$AWS_SECRET_ACCESS_KEY" > /tmp/aws_secret_access_key
           echo -n "$AWS_SESSION_TOKEN" > /tmp/aws_session_token
 
-          docker build \
-            --secret id=aws_access_key_id,src=/tmp/aws_access_key_id \
-            --secret id=aws_secret_access_key,src=/tmp/aws_secret_access_key \
-            --secret id=aws_session_token,src=/tmp/aws_session_token \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+      - name: Build and push Docker image
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: packages/merlin-worker
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/merlin-worker:${{ github.sha }}
+          cache-from: type=gha,scope=merlin-worker
+          cache-to: type=gha,mode=max,scope=merlin-worker
+          provenance: false
+          secrets: |
+            aws_access_key_id=/tmp/aws_access_key_id
+            aws_secret_access_key=/tmp/aws_secret_access_key
+            aws_session_token=/tmp/aws_session_token
 
-          # Clean up credential files
-          rm -f /tmp/aws_access_key_id /tmp/aws_secret_access_key /tmp/aws_session_token
-
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Clean up secrets
+        if: always()
+        run: rm -f /tmp/aws_access_key_id /tmp/aws_secret_access_key /tmp/aws_session_token
 
       - name: Deploy to dev
         if: github.event_name == 'push'
