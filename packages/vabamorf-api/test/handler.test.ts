@@ -204,6 +204,6 @@ describe("healthHandler", () => {
     expect(result.statusCode).toBe(200);
     const body = JSON.parse(result.body);
     expect(body.status).toBe("ok");
-    expect(body.version).toBe("1.0.0");
+    expect(body.version).toBe("0.1.0");
   });
 });

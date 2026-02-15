@@ -1,5 +1,4 @@
 # CI workflow for the public open-source repository (hak-public).
-# Renamed to build.yml during sync by scripts/sync-to-public.sh.
 name: Build & Test
 
 on:
