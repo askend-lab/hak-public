@@ -1,12 +1,10 @@
-# Response headers policy — delivers CSP as an HTTP header (required for Report-Only mode)
+# Response headers policy — delivers CSP and security headers
 resource "aws_cloudfront_response_headers_policy" "security" {
   name = "${local.app_name}-${var.env}-security-headers"
 
-  # CSP in Report-Only mode — must use custom header (CloudFront native only supports enforcing)
-  # TODO: switch to security_headers_config.content_security_policy after monitoring period
   custom_headers_config {
     items {
-      header   = "Content-Security-Policy-Report-Only"
+      header   = "Content-Security-Policy"
       value    = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.askend-lab.com https://*.amazonaws.com https://*.amazoncognito.com https://*.ingest.sentry.io; media-src 'self' https://*.amazonaws.com https://*.askend-lab.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
       override = true
     }
@@ -194,6 +192,12 @@ resource "aws_cloudfront_distribution" "website" {
     acm_certificate_arn      = aws_acm_certificate.website.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
+  }
+
+  logging_config {
+    include_cookies = false
+    bucket          = aws_s3_bucket.cloudfront_logs.bucket_regional_domain_name
+    prefix          = "cdn/"
   }
 
   tags = merge(local.common_tags, {

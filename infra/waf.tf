@@ -21,9 +21,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     priority = 1
 
     action {
-      count {}
-      # TODO: switch to block {} after 1 week of monitoring
-      # block {}
+      block {}
     }
 
     statement {
@@ -47,9 +45,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     priority = 2
 
     override_action {
-      count {}
-      # TODO: switch to none {} after 1 week of monitoring
-      # none {}
+      none {}
     }
 
     statement {

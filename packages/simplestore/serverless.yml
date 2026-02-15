@@ -121,6 +121,8 @@ resources:
         TimeToLiveSpecification:
           AttributeName: ttl
           Enabled: true
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
 
     # Cognito User Pool — ARN provided via environment variable
     ApiGatewayAuthorizer:

@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_throttling" {
   ok_actions          = [aws_sns_topic.alerts.arn]
   
   dimensions = {
-    TableName = "single-table-lambda-${var.env}"
+    TableName = "simplestore-${var.env}"
   }
   
   tags = local.common_tags
