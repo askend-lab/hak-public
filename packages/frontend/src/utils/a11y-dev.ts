@@ -45,6 +45,7 @@ export async function initA11yDevMode(): Promise<void> {
       ],
     });
 
+    exposeToWindow();
     console.info("🔍 Accessibility checker enabled (axe-core)");
   } catch (error) {
     console.warn("Failed to initialize accessibility checker:", error);
@@ -87,8 +88,10 @@ export async function runPageAudit(): Promise<void> {
   }
 }
 
-// Expose to window for manual testing in browser console
-if (typeof window !== "undefined") {
-  (window as unknown as { runA11yAudit: typeof runPageAudit }).runA11yAudit =
-    runPageAudit;
+// Expose to window for manual testing in browser console — called from initA11yDevMode
+function exposeToWindow(): void {
+  if (typeof window !== "undefined") {
+    (window as unknown as { runA11yAudit: typeof runPageAudit }).runA11yAudit =
+      runPageAudit;
+  }
 }

@@ -9,14 +9,16 @@ const MAX_POLL_ATTEMPTS = 30;
 const SYNTHESIZE_API_PATH = "/api/synthesize";
 const STATUS_API_PATH = "/api/status";
 
+type SynthesisStatus = "processing" | "ready" | "cached" | "error";
+
 interface SynthesizeResponse {
-  status: "processing" | "ready" | "cached";
+  status: SynthesisStatus;
   cacheKey: string;
   audioUrl: string | null;
 }
 
 interface StatusResponse {
-  status: "processing" | "ready" | "error";
+  status: SynthesisStatus;
   cacheKey: string;
   audioUrl: string | null;
   error?: string;
@@ -25,7 +27,15 @@ interface StatusResponse {
 async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
-    const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
+    let response: Response;
+    try {
+      response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
+    } catch (err) {
+      if (signal?.aborted) throw err;
+      // Transient network error — continue polling
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+      continue;
+    }
     if (!response.ok) throw new Error("Status check failed");
     const data: StatusResponse = await response.json();
 
