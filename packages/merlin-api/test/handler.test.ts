@@ -94,6 +94,16 @@ describe("parseRequestBody", () => {
     const body = JSON.stringify({ text: "a".repeat(MAX_BODY_SIZE - 20) });
     expect(parseRequestBody(body.slice(0, MAX_BODY_SIZE))).not.toBeNull();
   });
+
+  it("should throw on body exceeding MAX_BODY_SIZE", () => {
+    const largeBody = "x".repeat(MAX_BODY_SIZE + 1);
+    expect(() => parseRequestBody(largeBody)).toThrow(/exceeds/);
+  });
+
+  it("should accept body at MAX_BODY_SIZE", () => {
+    const body = JSON.stringify({ text: "a".repeat(MAX_BODY_SIZE - 20) });
+    expect(() => parseRequestBody(body.slice(0, MAX_BODY_SIZE))).not.toThrow();
+  });
 });
 
 describe("applySynthesizeDefaults", () => {
