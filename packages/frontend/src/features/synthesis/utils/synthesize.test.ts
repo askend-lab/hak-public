@@ -87,6 +87,41 @@ describe("synthesize", () => {
       vi.useRealTimers();
     });
 
+    it("retries polling on transient network error", async () => {
+      vi.useFakeTimers();
+
+      (global.fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              status: "processing",
+              cacheKey: "test-key",
+              audioUrl: null,
+            }),
+        })
+        // Network error on first poll
+        .mockRejectedValueOnce(new TypeError("Failed to fetch"))
+        // Successful poll after retry
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              status: "ready",
+              cacheKey: "test-key",
+              audioUrl: "http://example.com/audio.wav",
+            }),
+        });
+
+      const promise = synthesizeWithPolling("hello", "efm_l");
+      await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(1000);
+      const result = await promise;
+      expect(result).toBe("http://example.com/audio.wav");
+
+      vi.useRealTimers();
+    });
+
     it("throws error when polling status check fails", async () => {
       (global.fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({
