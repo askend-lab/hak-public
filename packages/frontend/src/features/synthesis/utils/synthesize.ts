@@ -3,6 +3,7 @@
 
 import { postJSON } from "./analyzeApi";
 import { getVoiceModel } from "@/types/synthesis";
+import { AuthStorage } from "@/features/auth/services/storage";
 
 const POLL_INTERVAL_MS = 1000;
 const MAX_POLL_ATTEMPTS = 30;
@@ -63,7 +64,11 @@ export async function synthesizeWithPolling(
   voice: string,
   signal?: AbortSignal,
 ): Promise<string> {
-  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, signal ? { signal } : {});
+  const token = AuthStorage.getAccessToken();
+  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, {
+    ...(signal && { signal }),
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  });
   if (!response.ok) throw new Error("Synthesis request failed");
 
   const data: SynthesizeResponse = await response.json();

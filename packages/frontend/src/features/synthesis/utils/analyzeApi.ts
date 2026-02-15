@@ -24,11 +24,12 @@ export function postJSON(
   body: Record<string, unknown>,
   options?: RequestInit,
 ): Promise<Response> {
+  const { headers: extraHeaders, ...rest } = options ?? {};
   return fetch(url, {
     method: "POST",
-    headers: { "Content-Type": CONTENT_TYPE_JSON },
+    headers: { "Content-Type": CONTENT_TYPE_JSON, ...extraHeaders as Record<string, string> },
     body: JSON.stringify(body),
-    ...options,
+    ...rest,
   });
 }
 
