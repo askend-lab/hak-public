@@ -72,27 +72,41 @@ describe("generateCacheKey", () => {
 describe("parseRequestBody", () => {
   it("should parse valid JSON body", () => {
     const result = parseRequestBody(JSON.stringify({ text: "hello" }));
-    expect(result).not.toBeNull();
-    expect(result?.text).toBe("hello");
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.text).toBe("hello");
+    }
   });
 
   it("should return empty object for undefined body", () => {
     const result = parseRequestBody(undefined);
-    expect(result).toStrictEqual({});
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data).toStrictEqual({});
+    }
   });
 
-  it("should return null on invalid JSON", () => {
-    expect(parseRequestBody("not json")).toBeNull();
+  it("should return error on invalid JSON", () => {
+    const result = parseRequestBody("not json");
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe("Invalid JSON body");
+    }
   });
 
-  it("should return null on body exceeding MAX_BODY_SIZE", () => {
+  it("should return error on body exceeding MAX_BODY_SIZE", () => {
     const largeBody = "x".repeat(MAX_BODY_SIZE + 1);
-    expect(parseRequestBody(largeBody)).toBeNull();
+    const result = parseRequestBody(largeBody);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe("Request body too large");
+    }
   });
 
   it("should accept body at MAX_BODY_SIZE", () => {
     const body = JSON.stringify({ text: "a".repeat(MAX_BODY_SIZE - 20) });
-    expect(parseRequestBody(body.slice(0, MAX_BODY_SIZE))).not.toBeNull();
+    const result = parseRequestBody(body.slice(0, MAX_BODY_SIZE));
+    expect(result.ok).toBe(true);
   });
 
 });

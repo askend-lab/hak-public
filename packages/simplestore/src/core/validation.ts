@@ -16,6 +16,7 @@ export interface ValidationResult {
 }
 
 const MAX_KEY_LENGTH = 1024;
+const KEY_DELIMITER = DEFAULT_CONFIG.keyDelimiter;
 const VALID_TYPES_SET = new Set<string>(VALID_DATA_TYPES);
 const VALID_TYPES_MESSAGE = `type must be one of: ${VALID_DATA_TYPES.join(", ")}`;
 
@@ -47,6 +48,18 @@ function validateRequiredString(
     errors.push(`${name} cannot be empty`);
   } else if (value.length > maxLength) {
     errors.push(`${name} exceeds maximum length of ${maxLength} characters`);
+  }
+}
+
+function validateKeyString(
+  value: unknown,
+  name: string,
+  errors: string[],
+  maxLength = MAX_KEY_LENGTH,
+): void {
+  validateRequiredString(value, name, errors, maxLength);
+  if (typeof value === "string" && value.includes(KEY_DELIMITER)) {
+    errors.push(`${name} must not contain the delimiter character '${KEY_DELIMITER}'`);
   }
 }
 
@@ -101,8 +114,8 @@ export function validateStoreRequest(
   config: StoreConfig = DEFAULT_CONFIG,
 ): ValidationResult {
   return collectErrors((errors) => {
-    validateRequiredString(request.pk, "pk", errors);
-    validateRequiredString(request.sk, "sk", errors);
+    validateKeyString(request.pk, "pk", errors);
+    validateKeyString(request.sk, "sk", errors);
     validateType(request.type, errors);
 
     if (typeof request.ttl !== "number") {
@@ -134,8 +147,8 @@ export function validateGetRequest(
   type: unknown,
 ): ValidationResult {
   return collectErrors((errors) => {
-    validateRequiredString(pk, "pk", errors);
-    validateRequiredString(sk, "sk", errors);
+    validateKeyString(pk, "pk", errors);
+    validateKeyString(sk, "sk", errors);
     validateType(type, errors);
   });
 }

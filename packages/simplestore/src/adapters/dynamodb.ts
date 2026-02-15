@@ -98,7 +98,7 @@ export class DynamoDBAdapter implements StorageAdapter {
   async queryBySortKeyPrefix(
     pk: string,
     skPrefix: string,
-    maxItems = 1000,
+    maxItems = 100,
   ): Promise<StoreItem[]> {
     const allItems: StoreItem[] = [];
     let lastEvaluatedKey: Record<string, unknown> | undefined;

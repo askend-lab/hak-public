@@ -122,11 +122,6 @@ export async function variantsHandler(
     const response = await analyze(parsed.value);
     const variants = extractVariants(response, parsed.value);
 
-    if (variants.length === 0)
-      return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
-        error: ERRORS.NO_VARIANTS,
-      });
-
     return createResponse(HTTP_STATUS.OK, { word: parsed.value, variants });
   } catch (error: unknown) {
     return handleError(error);

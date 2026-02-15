@@ -29,7 +29,7 @@ export function generateRandomString(length: number): string {
 
 export function getCookieDomain(): string {
   const url = new URL(getFrontendUrl());
-  return '.' + url.hostname;
+  return url.hostname;
 }
 
 export function createRefreshCookie(refreshToken: string): string {
@@ -263,6 +263,15 @@ function redirectToFrontendWithCookies(
   };
 }
 
+function requireCognitoConfig(): { cognitoDomain: string; clientId: string } {
+  const cognitoDomain = process.env.COGNITO_DOMAIN;
+  const clientId = process.env.COGNITO_CLIENT_ID;
+  if (!cognitoDomain || !clientId) {
+    throw new Error('COGNITO_DOMAIN and COGNITO_CLIENT_ID must be set');
+  }
+  return { cognitoDomain, clientId };
+}
+
 export async function refreshHandler(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
@@ -280,11 +289,7 @@ export async function refreshHandler(
       return createLambdaResponse(HTTP_STATUS.UNAUTHORIZED, { error: 'No refresh token' }, corsResponseHeaders());
     }
 
-    const cognitoDomain = process.env.COGNITO_DOMAIN;
-    const clientId = process.env.COGNITO_CLIENT_ID;
-    if (!cognitoDomain || !clientId) {
-      throw new Error('COGNITO_DOMAIN and COGNITO_CLIENT_ID must be set');
-    }
+    const { cognitoDomain, clientId } = requireCognitoConfig();
 
     const response = await fetch(`https://${cognitoDomain}/oauth2/token`, {
       method: 'POST',
@@ -347,11 +352,7 @@ export async function exchangeCodeHandler(
       return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Missing code or code_verifier' }, corsResponseHeaders());
     }
 
-    const cognitoDomain = process.env.COGNITO_DOMAIN;
-    const clientId = process.env.COGNITO_CLIENT_ID;
-    if (!cognitoDomain || !clientId) {
-      throw new Error('COGNITO_DOMAIN and COGNITO_CLIENT_ID must be set');
-    }
+    const { cognitoDomain, clientId } = requireCognitoConfig();
 
     // Hardcode redirect_uri server-side — never trust client-supplied value
     const redirectUri = `${getFrontendUrl()}${AUTH_CALLBACK_PATH}`;
@@ -368,11 +369,16 @@ export async function exchangeCodeHandler(
     }
 
     const data = await response.json() as Record<string, unknown>;
+    const cookies = [
+      createRefreshCookie(data.refresh_token as string),
+      createAccessTokenCookie(data.access_token as string),
+      createIdTokenCookie(data.id_token as string),
+    ];
     return {
       statusCode: 200,
       headers: corsResponseHeaders(),
-      multiValueHeaders: { 'Set-Cookie': [createRefreshCookie(data.refresh_token as string)] },
-      body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
+      multiValueHeaders: { 'Set-Cookie': cookies },
+      body: JSON.stringify({ expires_in: data.expires_in }),
     };
   } catch (error) {
     console.error('Exchange code error:', error instanceof Error ? error.message : 'Unknown error');
