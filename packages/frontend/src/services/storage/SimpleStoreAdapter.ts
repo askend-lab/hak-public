@@ -3,7 +3,7 @@
 
 import { Task } from "@/types/task";
 import { AuthStorage } from "@/features/auth/services/storage";
-import { CONTENT_TYPE_JSON } from "@/features/synthesis/utils/analyzeApi";
+import { CONTENT_TYPE_JSON } from "@/config/constants";
 import { logger } from "@hak/shared";
 
 /** Serialize a Task to a plain JSON-safe record for storage. */
