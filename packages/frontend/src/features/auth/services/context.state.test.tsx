@@ -44,6 +44,8 @@ describe("auth/context state precision", () => {
     vi.clearAllMocks();
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
+    // Mock fetch so refreshTokens() fails fast instead of hanging
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401 });
   });
 
   afterEach(() => {

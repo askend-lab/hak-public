@@ -2,7 +2,7 @@
 # Merlin TTS SQS Worker
 # Source code from hak repo, voice models from S3
 
-FROM ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+FROM ubuntu:22.04@sha256:0eb0f877e1c869a300c442c41120e778571b2014696ec7967cd2b32e8e7bab55
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -21,9 +21,9 @@ WORKDIR /home/merlin_user
 # Install Miniconda
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
-        MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-py37_4.9.2-Linux-aarch64.sh"; \
+        MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_24.9.2-0-Linux-aarch64.sh"; \
     else \
-        MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-py37_4.9.2-Linux-x86_64.sh"; \
+        MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_24.9.2-0-Linux-x86_64.sh"; \
     fi && \
     wget --quiet $MINICONDA_URL -O ~/miniconda.sh && \
     /bin/bash ~/miniconda.sh -b -p /home/merlin_user/miniconda3 && \
@@ -42,7 +42,7 @@ COPY --chown=merlin_user:merlin_user tools/ merlin_repo/tools/
 
 # Download voice models from S3 (267MB, too large for git)
 # Uses BuildKit secrets to avoid baking AWS credentials into image layers
-RUN pip install awscli
+RUN pip install awscli==1.36.40
 RUN --mount=type=secret,id=aws_access_key_id,uid=1001 \
     --mount=type=secret,id=aws_secret_access_key,uid=1001 \
     --mount=type=secret,id=aws_session_token,uid=1001 \
