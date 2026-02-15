@@ -43,11 +43,6 @@ export function useDocumentTitle(customTitle?: string): void {
       return;
     }
 
-    if (pathname.startsWith("/shared/task/")) {
-      document.title = `${APP_NAME} – Jagatud ülesanne`;
-      return;
-    }
-
     // Fallback
     document.title = APP_NAME;
   }, [pathname, customTitle]);

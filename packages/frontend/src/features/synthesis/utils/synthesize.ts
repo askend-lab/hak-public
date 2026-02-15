@@ -9,14 +9,16 @@ const MAX_POLL_ATTEMPTS = 30;
 const SYNTHESIZE_API_PATH = "/api/synthesize";
 const STATUS_API_PATH = "/api/status";
 
+type SynthesisStatus = "processing" | "ready" | "cached" | "error";
+
 interface SynthesizeResponse {
-  status: "processing" | "ready" | "cached";
+  status: SynthesisStatus;
   cacheKey: string;
   audioUrl: string | null;
 }
 
 interface StatusResponse {
-  status: "processing" | "ready" | "error";
+  status: SynthesisStatus;
   cacheKey: string;
   audioUrl: string | null;
   error?: string;

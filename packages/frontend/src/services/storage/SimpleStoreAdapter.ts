@@ -175,6 +175,7 @@ export class SimpleStoreAdapter {
       await this.delete("tasks", shareToken, "unlisted");
     } catch (error) {
       logger.error("Failed to delete unlisted task:", error);
+      throw error;
     }
   }
 
