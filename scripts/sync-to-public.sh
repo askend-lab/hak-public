@@ -254,12 +254,11 @@ fi
 # --- Clean up ARCHITECTURE.md (remove excluded packages, infra, DevBox refs) ---
 echo ">>> Cleaning ARCHITECTURE.md..."
 if [[ -f ARCHITECTURE.md ]]; then
-  node -e "
+  node << 'NODESCRIPT'
     const fs = require('fs');
     let c = fs.readFileSync('ARCHITECTURE.md', 'utf8');
     c = c.replace(/## Infrastructure\n[\s\S]*?(?=\n## |\n*$)/, '');
     c = c.replace('Pre-commit hooks (DevBox) enforce', 'Pre-commit hooks enforce');
-    // Remove excluded packages (tara-auth, audio-api) from all lists
     c = c.replace(/^- \*\*(tara-auth|audio-api)\*\* —.*\n/gm, '');
     c = c.replace(/Five Lambda functions|Four Lambda functions/g, 'Three Lambda functions');
     c = c.replace(/^\d+\..*audio-api\..*\n/gm, '');
@@ -268,11 +267,14 @@ if [[ -f ARCHITECTURE.md ]]; then
       'Pre-commit hooks enforce quality on every commit. The commit is rejected if any check fails.',
       'Quality checks run in CI on every pull request. The PR is blocked if any check fails.'
     );
-    // Replace internal Quality System table with what actually runs in public CI
-    c = c.replace(/\| Hook \| What it checks \|[\s\S]*?(?=\n[^|\n])/, '| Check | What it runs |\n|-------|--------------|\n| **Lint** | ESLint zero-warnings policy |\n| **Typecheck** | TypeScript strict compilation (`tsc --noEmit`) — frontend + shared |\n| **Tests** | Unit + integration tests across all packages |\n');
+    const newTable = '| Check | What it runs |\n|-------|--------------|\n'
+      + '| **Lint** | ESLint zero-warnings policy |\n'
+      + '| **Typecheck** | TypeScript strict compilation (`tsc --noEmit`) — frontend + shared |\n'
+      + '| **Tests** | Unit + integration tests across all packages |\n';
+    c = c.replace(/\| Hook \| What it checks \|[\s\S]*?(?=\n[^|\n])/, newTable);
     fs.writeFileSync('ARCHITECTURE.md', c);
     console.log('  Cleaned ARCHITECTURE.md');
-  "
+NODESCRIPT
 fi
 
 # --- Clean up ADR 003 (replace DevBox with standard hooks) ---
