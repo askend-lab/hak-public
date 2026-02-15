@@ -47,9 +47,9 @@ jobs:
 
       - name: Prepare BuildKit secrets
         run: |
-          echo -n "$AWS_ACCESS_KEY_ID" > /tmp/aws_access_key_id
-          echo -n "$AWS_SECRET_ACCESS_KEY" > /tmp/aws_secret_access_key
-          echo -n "$AWS_SESSION_TOKEN" > /tmp/aws_session_token
+          echo -n "$AWS_ACCESS_KEY_ID" > /tmp/aws_creds_key
+          echo -n "$AWS_SECRET_ACCESS_KEY" > /tmp/aws_creds_secret
+          echo -n "$AWS_SESSION_TOKEN" > /tmp/aws_creds_token
 
       - name: Build Docker image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
@@ -60,10 +60,10 @@ jobs:
           cache-from: type=gha,scope=merlin-worker
           cache-to: type=gha,mode=max,scope=merlin-worker
           provenance: false
-          secrets: |
-            aws_access_key_id=/tmp/aws_access_key_id
-            aws_secret_access_key=/tmp/aws_secret_access_key
-            aws_session_token=/tmp/aws_session_token
+          secret-files: |
+            aws_access_key_id=/tmp/aws_creds_key
+            aws_secret_access_key=/tmp/aws_creds_secret
+            aws_session_token=/tmp/aws_creds_token
 
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # master
@@ -82,7 +82,7 @@ jobs:
 
       - name: Clean up secrets
         if: always()
-        run: rm -f /tmp/aws_access_key_id /tmp/aws_secret_access_key /tmp/aws_session_token
+        run: rm -f /tmp/aws_creds_key /tmp/aws_creds_secret /tmp/aws_creds_token
 
       - name: Deploy to dev
         if: github.event_name == 'push'
