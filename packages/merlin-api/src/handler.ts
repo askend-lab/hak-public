@@ -15,7 +15,7 @@ import { checkS3Cache, buildAudioUrl, isValidCacheKey } from "./s3";
 import { sendToQueue } from "./sqs";
 import { describeService, scaleService, isEcsConfigured } from "./ecs";
 
-export const VERSION = "1.0.0";
+export const VERSION = "0.1.0";
 
 export interface SynthesizeRequest {
   text: string;

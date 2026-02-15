@@ -11,6 +11,9 @@
   "dependencies": {
     "@hak/gherkin-parser": "workspace:*"
   },
+  "scripts": {
+    "test:full": "echo 'Specifications package — no tests to run'"
+  },
   "devDependencies": {
     "typescript": "^5.0.0"
   }

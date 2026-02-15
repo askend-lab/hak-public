@@ -319,11 +319,12 @@ rm -rf packages/merlin-worker/tools/SPTK-3.9/build 2>/dev/null
 rm -f packages/merlin-worker/tools/SPTK-3.9/lib/libSPTK.a 2>/dev/null
 echo "  Removed SPTK-3.9/build/ and duplicate libSPTK.a"
 
-# --- Clean up docs/API.md (remove tara-auth reference) ---
-if [[ -f docs/API.md ]]; then
-  sed -i 's/via `tara-auth` Lambda\./via AWS Cognito./' docs/API.md
-  echo "  Cleaned docs/API.md"
-fi
+# --- Clean up docs (remove tara-auth references) ---
+[[ -f docs/API.md ]] && sed -i 's/via `tara-auth` Lambda\./via AWS Cognito./' docs/API.md
+[[ -f docs/AUTHENTICATION.md ]] && sed -i \
+  -e 's/the backend `tara-auth` Lambda/the backend authentication Lambda (not included in open-source release)/' \
+  -e 's/`tara-auth` creates\/finds/The auth Lambda creates\/finds/' docs/AUTHENTICATION.md
+echo "  Cleaned docs (API.md, AUTHENTICATION.md)"
 
 # --- Clean up .gitignore (remove internal/unused patterns) ---
 echo ">>> Cleaning .gitignore..."

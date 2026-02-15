@@ -31,12 +31,12 @@ provider:
       cognitoJwt:
         type: jwt
         identitySource: $request.header.Authorization
-        issuerUrl: https://cognito-idp.${self:provider.region}.amazonaws.com/${env:COGNITO_USER_POOL_ID}
+        issuerUrl: https://cognito-idp.${self:provider.region}.amazonaws.com/${env:COGNITO_USER_POOL_ID, ''}
         audience:
-          - ${env:COGNITO_CLIENT_ID}
+          - ${env:COGNITO_CLIENT_ID, ''}
 
   environment:
-    SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID}/hak-merlin-${self:provider.stage}-queue
+    SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID, '000000000000'}/hak-merlin-${self:provider.stage}-queue
     S3_BUCKET: hak-merlin-${self:provider.stage}-audio
     ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}}
 
@@ -47,7 +47,7 @@ provider:
           Action:
             - sqs:SendMessage
             - sqs:GetQueueUrl
-          Resource: arn:aws:sqs:${self:provider.region}:${env:AWS_ACCOUNT_ID}:hak-merlin-${self:provider.stage}-queue
+          Resource: arn:aws:sqs:${self:provider.region}:${env:AWS_ACCOUNT_ID, '000000000000'}:hak-merlin-${self:provider.stage}-queue
         - Effect: Allow
           Action:
             - s3:GetObject
@@ -61,7 +61,7 @@ provider:
           Action:
             - ecs:UpdateService
             - ecs:DescribeServices
-          Resource: arn:aws:ecs:${self:provider.region}:${env:AWS_ACCOUNT_ID}:service/hak-merlin-${self:provider.stage}/merlin-worker
+          Resource: arn:aws:ecs:${self:provider.region}:${env:AWS_ACCOUNT_ID, '000000000000'}:service/hak-merlin-${self:provider.stage}/merlin-worker
 
 functions:
   synthesize:
