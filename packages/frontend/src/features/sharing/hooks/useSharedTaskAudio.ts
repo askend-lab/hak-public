@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { TaskEntry, hasAudioSource, getEntryPlayUrl } from "@/types/task";
 import { synthesizeWithPolling } from "@/features/synthesis/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
@@ -25,6 +25,16 @@ export function useSharedTaskAudio(): UseSharedTaskAudioReturn {
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
     null,
   );
+
+  // Refs to avoid stale closures in handlePlayAll
+  const isPlayingAllRef = useRef(isPlayingAll);
+  isPlayingAllRef.current = isPlayingAll;
+  const isLoadingPlayAllRef = useRef(isLoadingPlayAll);
+  isLoadingPlayAllRef.current = isLoadingPlayAll;
+  const abortControllerRef = useRef(playAllAbortController);
+  abortControllerRef.current = playAllAbortController;
+  const currentAudioRef = useRef(currentAudio);
+  currentAudioRef.current = currentAudio;
 
   const synthesizeAndPlay = useCallback(
     async (stressedText: string, originalText: string, id: string) => {
@@ -176,14 +186,14 @@ export function useSharedTaskAudio(): UseSharedTaskAudioReturn {
 
   const handlePlayAll = useCallback(
     async (entries: TaskEntry[]) => {
-      if (isPlayingAll || isLoadingPlayAll) {
-        playAllAbortController?.abort();
+      if (isPlayingAllRef.current || isLoadingPlayAllRef.current) {
+        abortControllerRef.current?.abort();
         setPlayAllAbortController(null);
         setIsPlayingAll(false);
         setIsLoadingPlayAll(false);
-        if (currentAudio) {
-          currentAudio.pause();
-          currentAudio.src = "";
+        if (currentAudioRef.current) {
+          currentAudioRef.current.pause();
+          currentAudioRef.current.src = "";
           setCurrentAudio(null);
         }
         setCurrentPlayingId(null);
@@ -218,13 +228,7 @@ export function useSharedTaskAudio(): UseSharedTaskAudioReturn {
       setCurrentPlayingId(null);
       setCurrentLoadingId(null);
     },
-    [
-      isPlayingAll,
-      isLoadingPlayAll,
-      playAllAbortController,
-      currentAudio,
-      playSingleEntry,
-    ],
+    [playSingleEntry],
   );
 
   return {
