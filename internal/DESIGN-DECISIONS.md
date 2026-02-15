@@ -78,4 +78,15 @@ TARA использует стандартный OAuth2 Authorization Code flow:
 
 ---
 
-*Последнее обновление: 2026-02-15 (Eve, documentation audit — token handling updated to reflect C1 fix, rate limits corrected)*
+### CORS fallback behavior (#M12)
+**Решение:** `getCorsOrigin()` возвращает `"null"` (restrictive) если `ALLOWED_ORIGIN` env var отсутствует. Ранее fallback был `"*"`. Все Lambda обязаны иметь `ALLOWED_ORIGIN` в env.
+
+### Log retention (#M10, #M11)
+**Решение:** Минимум 90 дней для всех security-relevant логов (WAF, ECS). CloudTrail — 365 дней.
+
+### merlin_audio S3 encryption/versioning (#D1, #D2)
+**Решение:** Deferred. Контент публичный и regenerable. Encryption at rest бесплатен, но требует bucket recreation. Versioning не нужен для cache-keyed файлов.
+
+---
+
+*Последнее обновление: 2026-02-15 (Sam, security audit round 2 — CORS fallback, log retention, merlin_audio decisions)*

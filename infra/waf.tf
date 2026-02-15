@@ -79,7 +79,7 @@ resource "aws_cloudwatch_log_group" "waf" {
 
   # WAF logging requires the log group name to start with "aws-waf-logs-"
   name              = "aws-waf-logs-${local.app_name}-${var.env}"
-  retention_in_days = 30
+  retention_in_days = 90
 
   tags = merge(local.common_tags, {
     Name = "${local.app_name}-${var.env}-waf-logs"
