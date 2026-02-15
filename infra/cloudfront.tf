@@ -2,15 +2,12 @@
 resource "aws_cloudfront_response_headers_policy" "security" {
   name = "${local.app_name}-${var.env}-security-headers"
 
-  custom_headers_config {
-    items {
-      header   = "Content-Security-Policy"
-      value    = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.askend-lab.com https://*.amazonaws.com https://*.amazoncognito.com https://*.ingest.sentry.io; media-src 'self' https://*.amazonaws.com https://*.askend-lab.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+  security_headers_config {
+    content_security_policy {
+      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.askend-lab.com https://*.amazonaws.com https://*.amazoncognito.com https://*.ingest.sentry.io; media-src 'self' https://*.amazonaws.com https://*.askend-lab.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
       override = true
     }
-  }
 
-  security_headers_config {
     strict_transport_security {
       access_control_max_age_sec = 31536000
       include_subdomains         = true
