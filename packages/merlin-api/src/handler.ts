@@ -49,8 +49,12 @@ export function generateCacheKey(
   return createHash("sha256").update(input).digest("hex");
 }
 
-export function parseRequestBody(body?: string): SynthesizeRequest {
-  return JSON.parse(body ?? "{}") as SynthesizeRequest;
+export function parseRequestBody(body?: string): SynthesizeRequest | null {
+  try {
+    return JSON.parse(body ?? "{}") as SynthesizeRequest;
+  } catch {
+    return null;
+  }
 }
 
 export function applySynthesizeDefaults(body: SynthesizeRequest): SynthesizeParams {
@@ -102,9 +106,12 @@ function checkRateLimit(): LambdaResponse | null {
 export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> {
   try {
     const body = parseRequestBody(event.body);
+    if (!body) {
+      return createBadRequest("Invalid JSON body");
+    }
 
     if (!validateText(body.text)) {
-      return createBadRequest("Missing text field");
+      return createBadRequest("Missing or invalid text field");
     }
 
     const params = applySynthesizeDefaults(body);

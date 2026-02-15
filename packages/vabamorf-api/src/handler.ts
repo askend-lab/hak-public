@@ -85,9 +85,9 @@ function parseAndValidate(
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
-  const message = error instanceof Error ? error.message : ERRORS.UNKNOWN;
+  console.error(PROCESSING_ERROR_PREFIX, error);
   return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
-    error: `${PROCESSING_ERROR_PREFIX}${message}`,
+    error: `${PROCESSING_ERROR_PREFIX}${ERRORS.UNKNOWN}`,
   });
 }
 

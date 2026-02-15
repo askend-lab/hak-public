@@ -9,7 +9,7 @@
  * - shared: everyone sees, everyone can modify
  */
 
-import { Store } from "../src/core/store";
+import { Store, ERRORS } from "../src/core/store";
 import { ServerContext, DataType } from "../src/core/types";
 import { InMemoryAdapter } from "../src/adapters/memory";
 
@@ -173,7 +173,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       expect(result.items?.length).toBe(2);
     });
 
-    it("any user can delete shared item (not just owner)", async () => {
+    it("non-owner cannot delete shared item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         pk: "wiki",
@@ -185,6 +185,25 @@ describe("Data Types Access Control - Public & Shared", () => {
 
       const otherStore = new Store(db, otherUserContext);
       const result = await otherStore.delete(
+        "wiki",
+        "page1",
+        "shared" as DataType,
+      );
+      expect(result.success).toBe(false);
+      expect(result.error).toBe(ERRORS.ACCESS_DENIED);
+    });
+
+    it("owner can delete shared item", async () => {
+      const ownerStore = new Store(db, ownerContext);
+      await ownerStore.save({
+        pk: "wiki",
+        sk: "page1",
+        type: "shared" as DataType,
+        ttl: 3600,
+        data: {},
+      });
+
+      const result = await ownerStore.delete(
         "wiki",
         "page1",
         "shared" as DataType,

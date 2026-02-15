@@ -95,9 +95,9 @@ describe("synthesize", () => {
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
   });
 
-  it("should return 500 for invalid JSON body", async () => {
+  it("should return 400 for invalid JSON body", async () => {
     const response = await synthesize({ body: "not json" });
-    expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
   });
 });
 
