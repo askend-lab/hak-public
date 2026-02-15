@@ -137,8 +137,8 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
           title  = "DynamoDB Read/Write Capacity"
           region = local.region
           metrics = [
-            ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "single-table-lambda-${var.env}", { stat = "Sum", period = 300 }],
-            ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", "single-table-lambda-${var.env}", { stat = "Sum", period = 300 }]
+            ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", "simplestore-${var.env}", { stat = "Sum", period = 300 }],
+            ["AWS/DynamoDB", "ConsumedWriteCapacityUnits", "TableName", "simplestore-${var.env}", { stat = "Sum", period = 300 }]
           ]
           view = "timeSeries"
         }
@@ -153,7 +153,7 @@ resource "aws_cloudwatch_dashboard" "hak_activity" {
           title  = "DynamoDB Throttled Requests"
           region = local.region
           metrics = [
-            ["AWS/DynamoDB", "ThrottledRequests", "TableName", "single-table-lambda-${var.env}", { stat = "Sum", period = 300 }]
+            ["AWS/DynamoDB", "ThrottledRequests", "TableName", "simplestore-${var.env}", { stat = "Sum", period = 300 }]
           ]
           view = "timeSeries"
         }

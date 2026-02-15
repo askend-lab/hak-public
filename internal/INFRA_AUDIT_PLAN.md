@@ -51,25 +51,41 @@ Audited all Terraform files, Serverless configs, Dockerfiles, GitHub Actions wor
 
 ## Phase 4 — Cleanup (orphaned resources investigation)
 
-Investigation results from AWS CLI:
+### Bug found during investigation
 
-| # | Resource | Type | Status | Recommendation |
-|---|----------|------|--------|----------------|
-| 4.1 | `single-table-lambda-dev` | DynamoDB | 2 items, 378 bytes, created 2025-12-16 | ⚠️ Has data. Verify before deleting. |
-| 4.2 | `single-table-lambda-prod` | DynamoDB | 0 items, 0 bytes, created 2026-01-05 | ✅ Empty. Safe to delete. |
-| 4.3 | `dev-single-table-lambda` | REST API Gateway | Last modified unknown | Legacy. Verify no traffic, delete. |
-| 4.4 | `audio-api-dev-*` (3 functions) | Lambda | Last modified 2026-02-14, nodejs20.x | ⚠️ Recently updated! May still be active. |
-| 4.5 | `audio-api-prod-*` (3 functions) | Lambda | Last modified 2026-02-09, nodejs18.x | ⚠️ Recently updated! May still be active. |
-| 4.6 | `dev-audio-api` / `prod-audio-api` | REST API Gateway | Active | ⚠️ Goes with audio-api Lambdas. |
-| 4.7 | `hak-audio-dev` | S3 | Has `cache/` prefix, 0 objects | Likely safe to delete. |
-| 4.8 | `hak-audio-prod` | S3 | 0 objects, public read on `cache/*` | Likely safe to delete. |
-| 4.9 | `eki/merlin` | ECR | 15 images, no scan, MUTABLE | Legacy repo. Check if referenced anywhere. |
-| 4.10 | `eki/vabamorf` | ECR | 9 images, no scan, MUTABLE | Legacy repo. Check if referenced anywhere. |
-| 4.11 | `single-table-lambda-dev-users` | Cognito Pool | 0 users, created 2025-12-16 | ✅ Empty. Safe to delete. |
-| 4.12 | `hak-audio-generation-prod` + DLQ | SQS | 0 messages, created 2025-01-07 | Legacy queues from old audio-api. |
-| 4.13 | `serverless-vabamorf-api-dev/prod` | ECR | No scan, MUTABLE | Created by Serverless. Unmanaged. |
+**CloudWatch monitoring was watching the WRONG DynamoDB table!**
+- Alarms and dashboard referenced `single-table-lambda-${env}` (old table name)
+- Actual active table is `simplestore-${env}` (created by Serverless)
+- **Fixed:** Updated `cloudwatch-alarms.tf` and `cloudwatch-dashboard.tf`
+- **Fixed:** Updated agent-readonly IAM policy to reference `simplestore-*` tables
 
-**⚠️ Important:** Items 4.4-4.6 (audio-api-*) were updated as recently as Feb 14, 2026. These may NOT be orphaned — verify with team before deleting.
+### Investigation results from AWS CLI + CloudWatch metrics
+
+| # | Resource | Type | Status | Invocations (30d) | Recommendation |
+|---|----------|------|--------|-------------------|----------------|
+| 4.1 | `single-table-lambda-dev` | DynamoDB | 2 items, 378 bytes | N/A | ⚠️ Old table, has stale data. Managed by Terraform. Need `terraform state rm` then delete. |
+| 4.2 | `single-table-lambda-prod` | DynamoDB | 0 items, empty | N/A | ✅ Empty. Same removal process. |
+| 4.3 | `single-table-lambda-dev` | CF Stack + API GW + Lambda | Last updated 2025-12-17 | 0 | ✅ Dead. `serverless remove --stage dev` in old repo. |
+| 4.4 | `audio-api-dev` | CF Stack (3 Lambdas) | Updated 2026-02-14 | **0** | ✅ Deployed by CI but NEVER called. `serverless remove --stage dev`. |
+| 4.5 | `audio-api-prod` | CF Stack (3 Lambdas) | Updated 2026-02-09 | **0** | ✅ Deployed by CI but NEVER called. `serverless remove --stage prod`. |
+| 4.6 | `dev-audio-api` / `prod-audio-api` | REST API Gateway | Active but unused | 140 (dev) / 0 (prod) | Part of audio-api stacks, removed together. |
+| 4.7 | `hak-audio-dev` | S3 | `cache/` prefix only, 0 objects | N/A | ✅ Empty. Safe to delete. |
+| 4.8 | `hak-audio-prod` | S3 | 0 objects, public read on `cache/*` | N/A | ✅ Empty. Safe to delete. |
+| 4.9 | `hak-audio-generation-dev` + DLQ | SQS | 0 messages | N/A | Part of audio-api, removed together. |
+| 4.10 | `hak-audio-generation-prod` + DLQ | SQS | 0 messages | N/A | Part of audio-api, removed together. |
+| 4.11 | `eki/merlin` | ECR | 15 images, no scan, MUTABLE | N/A | Legacy. Not referenced in code. Delete after confirming. |
+| 4.12 | `eki/vabamorf` | ECR | 9 images, no scan, MUTABLE | N/A | Legacy. Not referenced in code. Delete after confirming. |
+| 4.13 | `single-table-lambda-dev-users` | Cognito Pool | 0 users | N/A | ✅ Empty. Safe to delete. |
+| 4.14 | `serverless-vabamorf-api-dev/prod` | ECR | No scan, MUTABLE | N/A | Created by Serverless. Low priority. |
+| 4.15 | `exams-backend-dev` | CF Stack (2 Lambdas) | Created 2025-10-28 | **0** | ✅ Dead. Not part of HAK project. |
+| 4.16 | `askendmcp-trello-mcp` | Lambda | Active | **0** | Not HAK project. Separate concern. |
+| 4.17 | `packages/audio-api/` | Directory | Only coverage artifacts, no source | N/A | ✅ Ghost directory. Delete from repo. |
+
+### Key insight: audio-api is NOT orphaned by accident
+- `audio-api` is the **predecessor** of `merlin-api` (same pattern: SQS queue, S3 bucket, Lambda)
+- It's deployed by some CI process (stacks updated Feb 9-14) but NOT in `deploy.yml`
+- Zero invocations confirms nobody uses it — the frontend calls `merlin-api` now
+- Safe to remove: `serverless remove` for both stacks will clean up Lambdas, API Gateway, SQS, and S3
 
 ---
 

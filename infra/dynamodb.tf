@@ -56,8 +56,8 @@ resource "aws_iam_user_policy" "agent_dynamodb_access" {
           "dynamodb:Scan"
         ]
         Resource = [
-          aws_dynamodb_table.single_table.arn,
-          "${aws_dynamodb_table.single_table.arn}/index/*"
+          "arn:aws:dynamodb:${local.region}:${data.aws_caller_identity.current.account_id}:table/simplestore-${var.env}",
+          "arn:aws:dynamodb:${local.region}:${data.aws_caller_identity.current.account_id}:table/simplestore-${var.env}/index/*"
         ]
       }
     ]
