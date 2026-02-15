@@ -81,7 +81,7 @@
     "jsdom": "^27.3.0",
     "nyc": "^17.1.0",
     "playwright": "^1.57.0",
-    "react-i18next": "^16.5.0",
+    "react-i18next": "^16.5.4",
     "sass": "^1.97.1",
     "@hak/simplestore": "workspace:*",
     "ts-jest": "^29.2.0",
