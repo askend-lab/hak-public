@@ -268,8 +268,10 @@ if [[ -f ARCHITECTURE.md ]]; then
       'Pre-commit hooks enforce quality on every commit. The commit is rejected if any check fails.',
       'Quality checks run in CI on every pull request. The PR is blocked if any check fails.'
     );
+    // Replace internal Quality System table with what actually runs in public CI
+    c = c.replace(/\| Hook \| What it checks \|[\s\S]*?(?=\n[^|\n])/, '| Check | What it runs |\n|-------|--------------|\n| **Lint** | ESLint zero-warnings policy |\n| **Typecheck** | TypeScript strict compilation (`tsc --noEmit`) — frontend + shared |\n| **Tests** | Unit + integration tests across all packages |\n');
     fs.writeFileSync('ARCHITECTURE.md', c);
-    console.log('  Cleaned ARCHITECTURE.md (infra, DevBox, excluded packages)');
+    console.log('  Cleaned ARCHITECTURE.md');
   "
 fi
 
@@ -313,21 +315,19 @@ if [[ -f packages/frontend/src/main.tsx ]]; then
   sed -i '/^\/\/ Build [0-9]\{14\}$/d' packages/frontend/src/main.tsx
 fi
 
-# --- Remove SPTK prebuilt binaries (Docker rebuilds from source via compile_tools.sh) ---
-echo ">>> Removing SPTK build artifacts..."
-rm -rf packages/merlin-worker/tools/SPTK-3.9/build 2>/dev/null
-rm -f packages/merlin-worker/tools/SPTK-3.9/lib/libSPTK.a 2>/dev/null
-echo "  Removed SPTK-3.9/build/ and duplicate libSPTK.a"
+# --- Remove SPTK prebuilt binaries (Docker rebuilds from source) ---
+rm -rf packages/merlin-worker/tools/SPTK-3.9/build packages/merlin-worker/tools/SPTK-3.9/lib/libSPTK.a 2>/dev/null
 
+# --- Clean up DevBox refs in specifications README and ADR 008 ---
+[[ -f packages/specifications/README.md ]] && sed -i 's/by the `gherkin-lint` DevBox hook/by CI lint checks/' packages/specifications/README.md
+[[ -f docs/adr/008-devbox-quality-system.md ]] && sed -i '1s/.*/# ADR 008: Quality System with Pre-Commit Hooks/' docs/adr/008-devbox-quality-system.md
+[[ -f docs/adr/README.md ]] && sed -i 's/DevBox quality system/Quality system/' docs/adr/README.md
 # --- Clean up docs (remove tara-auth references) ---
-[[ -f docs/API.md ]] && sed -i 's/via `tara-auth` Lambda\./via AWS Cognito./' docs/API.md
+[[ -f docs/API.md ]] && sed -i 's/via `tara-auth` Lambda[^.]*/via AWS Cognito/' docs/API.md
 [[ -f docs/AUTHENTICATION.md ]] && sed -i \
   -e 's/the backend `tara-auth` Lambda/the backend authentication Lambda (not included in open-source release)/' \
   -e 's/`tara-auth` creates\/finds/The auth Lambda creates\/finds/' docs/AUTHENTICATION.md
-echo "  Cleaned docs (API.md, AUTHENTICATION.md)"
-
 # --- Clean up .gitignore (remove internal/unused patterns) ---
-echo ">>> Cleaning .gitignore..."
 if [[ -f .gitignore ]]; then
   sed -i -e '/packages\/frontend\/src\/services\/merlin\//d' \
     -e '/packages\/frontend\/src\/services\/vabamorf\//d' \
@@ -341,7 +341,6 @@ if [[ -f .gitignore ]]; then
   if ! grep -q '^.env$' .gitignore; then
     sed -i '/.venv\//a\.env\n.env.local\n.env.*.local' .gitignore
   fi
-  echo "  Cleaned .gitignore"
 fi
 
 # --- Summary ---

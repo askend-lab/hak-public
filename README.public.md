@@ -61,8 +61,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for a system overview.
 |---------|-------------|
 | `pnpm start` | Start frontend dev server (port 5181) |
 | `pnpm check` | Run all checks: lint + typecheck + tests |
-| `pnpm lint` | ESLint + Gherkin lint |
-| `pnpm typecheck` | TypeScript type checking across all packages |
+| `pnpm lint` | ESLint with zero warnings policy |
+| `pnpm typecheck` | TypeScript type checking (frontend + shared) |
 | `pnpm test:all` | Run all tests across all packages |
 
 ### Code Quality
