@@ -10,9 +10,11 @@ export {
   parseRequestBody,
   applySynthesizeDefaults,
   validateText,
-  resetRateLimit,
+  validateParams,
   VERSION,
-  WARMUP_COOLDOWN_MS,
+  MAX_TEXT_LENGTH,
+  SPEED_RANGE,
+  PITCH_RANGE,
 } from "./handler";
 
 export type {
