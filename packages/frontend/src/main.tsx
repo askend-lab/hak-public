@@ -6,11 +6,13 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 
+import { hasTrackingConsent } from "./components/CookieConsent";
+
 try {
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN ?? "",
     environment: import.meta.env.MODE,
-    enabled: import.meta.env.PROD,
+    enabled: import.meta.env.PROD && hasTrackingConsent(),
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 0,
   });
@@ -71,4 +73,3 @@ createRoot(rootElement).render(
     </ErrorBoundary>
   </StrictMode>,
 );
-// Build 20260209115004

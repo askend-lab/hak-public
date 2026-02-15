@@ -72,10 +72,6 @@ export function AuthCallbackPage() {
     }
 
     void processCallback();
-
-    return () => {
-      processedRef.current = false;
-    };
   }, [handleCodeCallback, handleTaraTokens, navigate]);
 
   if (error) {

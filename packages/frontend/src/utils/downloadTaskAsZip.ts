@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import JSZip from "jszip";
+import { logger } from "@hak/shared";
 import { Task, TaskEntry, hasAudioSource } from "@/types/task";
 import { formatDateTime } from "@/utils/formatDate";
 import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
@@ -34,13 +35,18 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
 
   try {
     const response = await fetch(audioUrl);
-    if (!response.ok) return null;
+    if (!response.ok) {
+      logger.warn(`[ZIP] Skipping audio (HTTP ${response.status}): ${audioUrl.slice(0, 80)}`);
+      return null;
+    }
     const contentLength = response.headers.get("content-length");
     if (contentLength && parseInt(contentLength, 10) > 50 * 1024 * 1024) {
-      return null; // Skip files > 50MB
+      logger.warn("[ZIP] Skipping audio > 50MB");
+      return null;
     }
     return await response.blob();
-  } catch {
+  } catch (err) {
+    logger.warn("[ZIP] Failed to fetch audio:", err);
     return null;
   }
 }

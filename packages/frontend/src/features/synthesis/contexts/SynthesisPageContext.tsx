@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, useCallback, useMemo, ReactNode } from "react";
 import {
   useSynthesis,
   useTaskHandlers,
@@ -64,32 +64,40 @@ export function SynthesisPageProvider({
   const variants = useVariantsPanel(sentences, setSentences, showNotification);
   const menu = useSentenceMenu();
 
-  const handleUseVariant = (variantText: string) => {
+  const handleUseVariant = useCallback((variantText: string): void => {
     synthesis.handleUseVariant(
       variantText,
       variants.selectedSentenceId,
       variants.selectedTagIndex,
     );
     variants.setVariantsCustomPhonetic(variantText);
-  };
+  }, [synthesis, variants]);
 
-  const handleTagMenuOpen = (sentenceId: string, tagIndex: number) => {
+  const handleTagMenuOpen = useCallback((sentenceId: string, tagIndex: number): void => {
     const isOpen =
       synthesis.openTagMenu?.sentenceId === sentenceId &&
       synthesis.openTagMenu?.tagIndex === tagIndex;
     synthesis.setOpenTagMenu(
       isOpen ? null : { sentenceId, tagIndex },
     );
-  };
+  }, [synthesis]);
 
-  const handleTagMenuClose = () => synthesis.setOpenTagMenu(null);
+  const handleTagMenuClose = useCallback((): void => synthesis.setOpenTagMenu(null), [synthesis]);
+
+  const coreValue = useMemo(() => ({
+    synthesis, taskHandlers, isAuthenticated, onLogin,
+  }), [synthesis, taskHandlers, isAuthenticated, onLogin]);
+
+  const interactionValue = useMemo(() => ({
+    dragDrop, variants, menu, handleUseVariant, handleTagMenuOpen, handleTagMenuClose,
+  }), [dragDrop, variants, menu, handleUseVariant, handleTagMenuOpen, handleTagMenuClose]);
 
   return (
     <SynthesisCoreContext.Provider
-      value={{ synthesis, taskHandlers, isAuthenticated, onLogin }}
+      value={coreValue}
     >
       <SynthesisInteractionContext.Provider
-        value={{ dragDrop, variants, menu, handleUseVariant, handleTagMenuOpen, handleTagMenuClose }}
+        value={interactionValue}
       >
         {children}
       </SynthesisInteractionContext.Provider>

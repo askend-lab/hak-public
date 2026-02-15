@@ -50,6 +50,25 @@ describe("TaskRepository per-task storage", () => {
     );
   });
 
+  describe("createTask validation", () => {
+    it("rejects empty task name", async () => {
+      await expect(repository.createTask(testUserId, { name: "  " }))
+        .rejects.toThrow("Task name is required");
+    });
+
+    it("rejects task name exceeding max length", async () => {
+      const longName = "a".repeat(201);
+      await expect(repository.createTask(testUserId, { name: longName }))
+        .rejects.toThrow("exceeds 200 characters");
+    });
+
+    it("trims task name whitespace", async () => {
+      await repository.createTask(testUserId, { name: "  My Task  " });
+      const savedTask = storage.saveTask.mock.calls[0]?.[0];
+      expect(savedTask.name).toBe("My Task");
+    });
+  });
+
   describe("getUserTasks", () => {
     it("uses queryUserTasks instead of loading all tasks as blob", async () => {
       const tasks = [createTask("t1", "Alpha"), createTask("t2", "Beta")];

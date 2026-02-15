@@ -146,6 +146,26 @@ describe("downloadTaskAsZip", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
+  it("handles fetch failure gracefully (non-ok response)", async () => {
+    vi.spyOn(document.body, "appendChild").mockImplementation(() => null as unknown as Node);
+    vi.spyOn(document.body, "removeChild").mockImplementation(() => null as unknown as Node);
+    vi.spyOn(document, "createElement").mockReturnValue({
+      href: "",
+      download: "",
+      click: vi.fn(),
+    } as unknown as HTMLAnchorElement);
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      headers: { get: () => null },
+    });
+
+    // Should not throw — just skip the failed audio
+    await downloadTaskAsZip(mockTask);
+    expect(global.fetch).toHaveBeenCalled();
+  });
+
   it("synthesizes audio when entry has no audioUrl or audioBlob", async () => {
     vi.spyOn(document.body, "appendChild").mockImplementation(() => null as unknown as Node);
     vi.spyOn(document.body, "removeChild").mockImplementation(() => null as unknown as Node);
