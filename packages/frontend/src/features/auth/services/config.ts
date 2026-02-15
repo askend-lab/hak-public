@@ -112,7 +112,6 @@ export async function exchangeCodeForTokens(code: string): Promise<{
         body: JSON.stringify({
           code,
           code_verifier: codeVerifier,
-          redirect_uri: cognitoConfig.redirectUri,
         }),
       },
     );

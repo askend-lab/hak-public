@@ -14,6 +14,7 @@ import {
   StorageAdapter,
   StoreConfig,
   DEFAULT_CONFIG,
+  MAX_QUERY_ITEMS,
 } from "./types";
 import { parseTtl } from "./validation";
 
@@ -152,7 +153,7 @@ export class Store {
     const pk = this.resolvePartitionKey(type);
 
     return this.wrapAsync(async () => {
-      const items = await this.adapter.queryBySortKeyPrefix(pk, entityPkPrefix);
+      const items = await this.adapter.queryBySortKeyPrefix(pk, entityPkPrefix, MAX_QUERY_ITEMS);
       return { success: true, items };
     });
   }

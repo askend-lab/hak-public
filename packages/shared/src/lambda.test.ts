@@ -62,12 +62,13 @@ describe("lambda", () => {
       expect(result.headers["Access-Control-Allow-Origin"]).toBe("https://myapp.example.com");
     });
 
-    it("should include all CORS headers", () => {
+    it("should include all CORS headers plus dynamic origin", () => {
       delete process.env.ALLOWED_ORIGIN;
       const result = createApiResponse(201, {});
       for (const [key, value] of Object.entries(CORS_HEADERS)) {
         expect(result.headers[key]).toBe(value);
       }
+      expect(result.headers["Access-Control-Allow-Origin"]).toBe("*");
     });
   });
 

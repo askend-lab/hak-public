@@ -8,6 +8,7 @@ import {
   applySynthesizeDefaults,
   validateText,
   validateParams,
+  MAX_BODY_SIZE,
   health,
   VERSION,
 } from "../src/handler";
@@ -83,6 +84,17 @@ describe("parseRequestBody", () => {
   it("should return null on invalid JSON", () => {
     expect(parseRequestBody("not json")).toBeNull();
   });
+
+  it("should return null on body exceeding MAX_BODY_SIZE", () => {
+    const largeBody = "x".repeat(MAX_BODY_SIZE + 1);
+    expect(parseRequestBody(largeBody)).toBeNull();
+  });
+
+  it("should accept body at MAX_BODY_SIZE", () => {
+    const body = JSON.stringify({ text: "a".repeat(MAX_BODY_SIZE - 20) });
+    expect(parseRequestBody(body.slice(0, MAX_BODY_SIZE))).not.toBeNull();
+  });
+
 });
 
 describe("applySynthesizeDefaults", () => {
@@ -141,7 +153,7 @@ describe("createResponse", () => {
     const response = createResponse(HTTP_STATUS.OK, { status: "ok" });
 
     expect(response.statusCode).toBe(HTTP_STATUS.OK);
-    expect(response.headers).toStrictEqual({ ...CORS_HEADERS });
+    expect(response.headers).toStrictEqual({ ...CORS_HEADERS, "Access-Control-Allow-Origin": "*" });
     expect(JSON.parse(response.body)).toStrictEqual({ status: "ok" });
   });
 });
@@ -153,7 +165,7 @@ describe("createInternalError", () => {
 
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(JSON.parse(response.body).error).toBe("Internal server error");
-    expect(spy).toHaveBeenCalledWith("Test context:", expect.any(Error));
+    expect(spy).toHaveBeenCalledWith("Test context:", "fail");
     spy.mockRestore();
   });
 
@@ -162,7 +174,7 @@ describe("createInternalError", () => {
     const response = createInternalError("Context", "string error");
 
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(spy).toHaveBeenCalledWith("Context:", "string error");
+    expect(spy).toHaveBeenCalledWith("Context:", "Unknown error");
     spy.mockRestore();
   });
 });
@@ -344,7 +356,7 @@ describe("health", () => {
 
   it("should include CORS headers", async () => {
     const response = await health();
-    expect(response.headers).toStrictEqual({ ...CORS_HEADERS });
+    expect(response.headers).toStrictEqual({ ...CORS_HEADERS, "Access-Control-Allow-Origin": "*" });
   });
 });
 

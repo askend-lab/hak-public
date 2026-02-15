@@ -59,13 +59,21 @@ describe('handler.ts cookie mutation kills', () => {
   };
 
   describe('redirectToFrontendWithCookies', () => {
-    it('should pass access_token and id_token as URL params', async () => {
+    it('should set access_token and id_token as Secure cookies, not URL params', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
       const url = new URL(String(result.headers?.Location));
-      expect(url.searchParams.get('access_token')).toBe('acc-tok');
-      expect(url.searchParams.get('id_token')).toBe('id-tok');
-      expect(url.searchParams.get('refresh_token')).toBeNull();
+      expect(url.searchParams.get('access_token')).toBeNull();
+      expect(url.searchParams.get('id_token')).toBeNull();
+      expect(url.searchParams.get('auth')).toBe('success');
+      const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
+      const accessCookie = cookies.find(x => x.startsWith('hak_access_token='));
+      const idCookie = cookies.find(x => x.startsWith('hak_id_token='));
+      expect(accessCookie).toContain('Secure');
+      expect(accessCookie).toContain('SameSite=Lax');
+      expect(accessCookie).not.toContain('HttpOnly');
+      expect(idCookie).toContain('Secure');
+      expect(idCookie).not.toContain('HttpOnly');
     });
 
     it('should set hak_refresh_token cookie with 30-day max-age', async () => {
@@ -80,13 +88,13 @@ describe('handler.ts cookie mutation kills', () => {
       expect(c).toContain('SameSite=Lax');
     });
 
-    it('should NOT set access_token/id_token/is_authenticated as cookies', async () => {
+    it('should NOT set is_authenticated cookie or bare access_token/id_token cookies', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
       const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
+      expect(cookies.find(x => x.startsWith('is_authenticated='))).toBeUndefined();
       expect(cookies.find(x => x.startsWith('access_token='))).toBeUndefined();
       expect(cookies.find(x => x.startsWith('id_token='))).toBeUndefined();
-      expect(cookies.find(x => x.startsWith('is_authenticated='))).toBeUndefined();
     });
 
     it('should clear state cookie in success cookies', async () => {
@@ -97,11 +105,11 @@ describe('handler.ts cookie mutation kills', () => {
       expect(c).toContain('Max-Age=0');
     });
 
-    it('should have 2 cookies total (refresh + clear state)', async () => {
+    it('should have 4 cookies total (refresh + access + id + clear state)', async () => {
       const event = setupSuccessFlow();
       const result = await callbackHandler(event);
       const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
-      expect(cookies).toHaveLength(2);
+      expect(cookies).toHaveLength(4);
     });
 
     it('should set no-store cache control', async () => {

@@ -25,8 +25,8 @@ provider:
         - Content-Type
         - Authorization
     throttle:
-      rateLimit: 5
-      burstLimit: 10
+      rateLimit: 2
+      burstLimit: 4
     authorizers:
       cognitoJwt:
         type: jwt

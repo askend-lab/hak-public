@@ -53,6 +53,16 @@ pnpm test          # Make sure everything passes
 # Create a branch, make changes, open a PR
 ```
 
+## Security Considerations
+
+Some aspects of HAK's architecture are **intentionally open by design** and should not be treated as vulnerabilities:
+
+- **Merlin API (TTS) and Vabamorf API (NLP) are public endpoints** — no authentication is required. These APIs serve the core learning experience and must be accessible without login. Protection is via API Gateway throttling and AWS WAF rate limiting only.
+- **S3 audio storage is publicly readable** — synthesized audio files are served directly via CloudFront/S3. Content is non-sensitive educational material. Access is by content-hash URL; there is no authorization layer by design.
+- **Serverless Framework v3** — we use Serverless Framework v3 (EOL) intentionally. v4 requires a commercial license. We will migrate to v4 (or CDK/SAM) when the project transitions to open source and qualifies for the free tier. This is a cost decision, not an oversight.
+
+For the full security audit and current findings, see `internal/SECURITY-AUDIT-2026-02.md`.
+
 ## Built With AI
 
 This project is developed using an AI-assisted methodology with automated

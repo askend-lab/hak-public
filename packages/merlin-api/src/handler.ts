@@ -49,7 +49,12 @@ export function generateCacheKey(
   return createHash("sha256").update(input).digest("hex");
 }
 
+export const MAX_BODY_SIZE = 10_240; // 10KB
+
 export function parseRequestBody(body?: string): SynthesizeRequest | null {
+  if (body && body.length > MAX_BODY_SIZE) {
+    return null;
+  }
   try {
     return JSON.parse(body ?? "{}") as SynthesizeRequest;
   } catch {

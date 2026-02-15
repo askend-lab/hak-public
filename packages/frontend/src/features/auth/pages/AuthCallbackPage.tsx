@@ -20,22 +20,31 @@ export function AuthCallbackPage() {
 
       const queryParams = new URLSearchParams(window.location.search);
 
-      // Handle TARA tokens (access/id come as URL params, refresh is in httpOnly cookie)
-      const accessToken = queryParams.get("access_token");
-      const idToken = queryParams.get("id_token");
+      // Handle TARA auth success — tokens are in Secure cookies, not URL params
+      const authStatus = queryParams.get("auth");
+      if (authStatus === "success") {
+        const cookies = document.cookie.split(";").reduce(
+          (acc, c) => {
+            const parts = c.trim().split("=");
+            const k = parts[0] ?? "";
+            acc[k] = parts.slice(1).join("=");
+            return acc;
+          },
+          {} as Record<string, string>,
+        );
 
-      if (accessToken && idToken) {
-        const success = handleTaraTokens({
-          accessToken,
-          idToken,
-        });
-        if (success) {
-          navigate("/", { replace: true });
-          return;
-        } else {
-          setError("TARA autentimise viga. Palun proovi uuesti.");
-          return;
+        const accessToken = cookies["hak_access_token"];
+        const idToken = cookies["hak_id_token"];
+
+        if (accessToken && idToken) {
+          const success = handleTaraTokens({ accessToken, idToken });
+          if (success) {
+            navigate("/", { replace: true });
+            return;
+          }
         }
+        setError("TARA autentimise viga. Palun proovi uuesti.");
+        return;
       }
 
       // Handle Cognito code flow (Google/Facebook)

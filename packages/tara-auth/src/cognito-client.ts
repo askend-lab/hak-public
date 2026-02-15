@@ -23,6 +23,11 @@ export class CognitoClient {
   async findOrCreateUser(taraIdToken: TaraIdToken): Promise<string> {
     const personalCode = taraIdToken.sub;
 
+    // Validate personal code format to prevent Cognito filter injection
+    if (!/^[A-Z]{2}\d{11}$/.test(personalCode)) {
+      throw new Error('Invalid personal code format');
+    }
+
     // 1. Try to find user by personal_code custom attribute
     let username = await this.findUserByPersonalCode(personalCode);
     if (username) {

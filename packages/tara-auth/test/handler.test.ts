@@ -84,7 +84,7 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
     process.env.FRONTEND_URL_DEV = 'https://hak-dev.askend-lab.com';
   });
 
-  it('should pass access_token and id_token as URL params', async () => {
+  it('should not include tokens in URL params', async () => {
     const event = createEvent();
     const result = await callbackHandler(event);
 
@@ -92,10 +92,24 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
     expect(result.headers?.Location).toBeDefined();
 
     const locationUrl = new URL(String(result.headers?.Location ?? ''));
-    expect(locationUrl.searchParams.get('access_token')).toBe('cognito-access-token');
-    expect(locationUrl.searchParams.get('id_token')).toBe('cognito-id-token');
-    // refresh_token should NOT be in URL
-    expect(locationUrl.searchParams.get('refresh_token')).toBeNull();
+    expect(locationUrl.searchParams.get('access_token')).toBeNull();
+    expect(locationUrl.searchParams.get('id_token')).toBeNull();
+    expect(locationUrl.searchParams.get('auth')).toBe('success');
+  });
+
+  it('should set access/id tokens as Secure (non-HttpOnly) cookies', async () => {
+    const event = createEvent();
+    const result = await callbackHandler(event);
+
+    const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
+    const accessCookie = cookies.find(c => c.startsWith('hak_access_token='));
+    const idCookie = cookies.find(c => c.startsWith('hak_id_token='));
+    expect(accessCookie).toContain('cognito-access-token');
+    expect(accessCookie).toContain('Secure');
+    expect(accessCookie).not.toContain('HttpOnly');
+    expect(idCookie).toContain('cognito-id-token');
+    expect(idCookie).toContain('Secure');
+    expect(idCookie).not.toContain('HttpOnly');
   });
 
   it('should set refresh_token as HttpOnly Secure cookie with domain', async () => {
@@ -113,7 +127,7 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
     expect(refreshCookie).toContain('Domain=');
   });
 
-  it('should NOT set access_token or id_token as cookies', async () => {
+  it('should NOT set bare access_token/id_token or is_authenticated cookies', async () => {
     const event = createEvent();
     const result = await callbackHandler(event);
 

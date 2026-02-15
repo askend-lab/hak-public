@@ -23,6 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-ecs": "^3.990.0",
     "@aws-sdk/client-s3": "^3.990.0",
-    "@aws-sdk/client-sqs": "^3.990.0"
+    "@aws-sdk/client-sqs": "^3.990.0",
+    "@hak/shared": "workspace:*"
   }
 }

@@ -43,8 +43,8 @@ provider:
   region: ${opt:region, 'eu-west-1'}
   apiGateway:
     throttle:
-      burstLimit: 40
-      rateLimit: 20
+      rateLimit: 10
+      burstLimit: 20
 
   environment:
     TABLE_NAME: ${self:service}-${self:provider.stage}

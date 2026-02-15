@@ -105,8 +105,12 @@ describe("AuthCallbackPage", () => {
     expect(loadingState).toBeTruthy();
   });
 
-  it("redirects to home when TARA tokens succeed", async () => {
-    window.location.search = "?access_token=at&id_token=it";
+  it("redirects to home when TARA tokens succeed via cookies", async () => {
+    window.location.search = "?auth=success";
+    Object.defineProperty(document, "cookie", {
+      value: "hak_access_token=at; hak_id_token=it",
+      writable: true,
+    });
     mockHandleTaraTokens.mockReturnValue(true);
 
     render(<AuthCallbackPage />);
@@ -120,8 +124,12 @@ describe("AuthCallbackPage", () => {
     });
   });
 
-  it("shows TARA error with exact message and back button", async () => {
-    window.location.search = "?access_token=at&id_token=it";
+  it("shows TARA error when cookies missing", async () => {
+    window.location.search = "?auth=success";
+    Object.defineProperty(document, "cookie", {
+      value: "",
+      writable: true,
+    });
     mockHandleTaraTokens.mockReturnValue(false);
 
     render(<AuthCallbackPage />);
@@ -133,8 +141,12 @@ describe("AuthCallbackPage", () => {
     });
   });
 
-  it("does not call handleCodeCallback for TARA token flow", async () => {
-    window.location.search = "?access_token=at&id_token=it&refresh_token=rt";
+  it("does not call handleCodeCallback for TARA cookie flow", async () => {
+    window.location.search = "?auth=success";
+    Object.defineProperty(document, "cookie", {
+      value: "hak_access_token=at; hak_id_token=it",
+      writable: true,
+    });
     mockHandleTaraTokens.mockReturnValue(true);
 
     render(<AuthCallbackPage />);

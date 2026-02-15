@@ -84,6 +84,9 @@ export const MAX_TTL_SECONDS = 31_536_000;
 /** 350KB — safe limit below DynamoDB's 400KB item size cap */
 export const MAX_DATA_SIZE_BYTES = 350_000;
 
+/** Maximum items returned by a single query */
+export const MAX_QUERY_ITEMS = 100;
+
 export const DEFAULT_CONFIG: StoreConfig = {
   maxTtlSeconds: MAX_TTL_SECONDS,
   maxDataSizeBytes: MAX_DATA_SIZE_BYTES,
