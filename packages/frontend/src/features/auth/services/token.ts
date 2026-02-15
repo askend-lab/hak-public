@@ -13,18 +13,31 @@ export function decodeJwtPayload(token: string): Record<string, unknown> | null 
   }
 }
 
+export interface ParseIdTokenOptions {
+  expectedIssuer?: string;
+  expectedAudience?: string;
+}
+
 /**
  * Parse JWT id_token payload. Note: signature verification is not performed client-side
  * because tokens are obtained directly from Cognito over HTTPS. Server-side APIs should
  * verify tokens independently using Cognito's JWKS endpoint.
+ *
+ * When expectedIssuer/expectedAudience are provided, rejects tokens from other pools/apps.
  */
-export function parseIdToken(idToken: string): User | null {
+export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): User | null {
   const payload = decodeJwtPayload(idToken);
   if (!payload) return null;
 
   // Validate required claims
   if (!payload.sub || typeof payload.sub !== "string") return null;
   if (payload.exp && Date.now() / 1000 > (payload.exp as number)) return null;
+
+  // Validate issuer (Cognito User Pool URL)
+  if (options?.expectedIssuer && payload.iss !== options.expectedIssuer) return null;
+
+  // Validate audience (Cognito Client ID)
+  if (options?.expectedAudience && payload.aud !== options.expectedAudience) return null;
 
   return {
     id: payload.sub,
