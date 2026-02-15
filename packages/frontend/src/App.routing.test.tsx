@@ -3,8 +3,8 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import Home from "./App";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import AppLayout from "./App";
 import {
   mockAuthContext,
   mockNotificationContext,
@@ -32,7 +32,6 @@ vi.mock("./hooks", async (importOriginal) => {
   return {
     ...actual,
     useSynthesis: vi.fn(() => mockSynthesis()),
-    useTaskHandlers: vi.fn(() => mockTaskHandlers()),
     useDragAndDrop: vi.fn(() => mockDragAndDrop()),
     useVariantsPanel: vi.fn(() => mockVariantsPanel()),
     useSentenceMenu: vi.fn(() => mockSentenceMenu()),
@@ -57,6 +56,9 @@ vi.mock("./hooks", async (importOriginal) => {
     })),
   };
 });
+vi.mock("./features/tasks/hooks/useTaskHandlers", () => ({
+  useTaskHandlers: vi.fn(() => mockTaskHandlers()),
+}));
 vi.mock("./utils/warmAudioWorker", () => ({ warmAudioWorker: vi.fn() }));
 
 vi.mock("./components/Footer", () => ({
@@ -64,6 +66,9 @@ vi.mock("./components/Footer", () => ({
 }));
 vi.mock("./features/synthesis/components/SynthesisView", () => ({
   default: () => <div data-testid="synthesis-view">SynthesisView</div>,
+}));
+vi.mock("./features/synthesis/components/SynthesisModals", () => ({
+  default: () => null,
 }));
 vi.mock("./features/tasks/components/TasksView", () => ({
   default: ({ selectedTaskId }: { selectedTaskId: string | null }) => (
@@ -86,6 +91,33 @@ vi.mock("./features/onboarding/components", () => ({
   OnboardingWizard: () => null,
 }));
 
+import SynthesisRoute from "./routes/SynthesisRoute";
+import TasksRoute from "./routes/TasksRoute";
+import SpecsRoute from "./routes/SpecsRoute";
+
+function renderWithRoutes(initialPath: string) {
+  const Dashboard = vi.fn(() => <div data-testid="dashboard">Dashboard</div>);
+  const NotFoundPage = vi.fn(() => <div>404</div>);
+  const RoleSelectionContent = vi.fn(() => <div data-testid="role-selection">RoleSelection</div>);
+
+  return render(
+    <MemoryRouter initialEntries={[initialPath]}>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route index element={<SynthesisRoute />} />
+          <Route path="synthesis" element={<SynthesisRoute />} />
+          <Route path="tasks" element={<TasksRoute />} />
+          <Route path="tasks/:taskId" element={<TasksRoute />} />
+          <Route path="specs" element={<SpecsRoute />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="role-selection" element={<RoleSelectionContent />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
 describe("App Routing", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -93,11 +125,7 @@ describe("App Routing", () => {
 
   describe("URL-based view rendering", () => {
     it("renders synthesis view for /synthesis route", async () => {
-      render(
-        <MemoryRouter initialEntries={["/synthesis"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/synthesis");
       expect(await screen.findByTestId("synthesis-view")).toBeInTheDocument();
       expect(screen.queryByTestId("tasks-view")).not.toBeInTheDocument();
     });
@@ -119,11 +147,7 @@ describe("App Routing", () => {
         handleTaraTokens: vi.fn(),
       });
 
-      render(
-        <MemoryRouter initialEntries={["/tasks"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/tasks");
       expect(await screen.findByTestId("tasks-view")).toBeInTheDocument();
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
@@ -145,42 +169,26 @@ describe("App Routing", () => {
         handleTaraTokens: vi.fn(),
       });
 
-      render(
-        <MemoryRouter initialEntries={["/tasks/task-123"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/tasks/task-123");
       const tasksView = await screen.findByTestId("tasks-view");
       expect(tasksView).toBeInTheDocument();
       expect(tasksView).toHaveAttribute("data-task-id", "task-123");
     });
 
     it("renders specs page for /specs route", async () => {
-      render(
-        <MemoryRouter initialEntries={["/specs"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/specs");
       expect(await screen.findByTestId("specs-page")).toBeInTheDocument();
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
     it("renders dashboard for /dashboard route", async () => {
-      render(
-        <MemoryRouter initialEntries={["/dashboard"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/dashboard");
       expect(await screen.findByTestId("dashboard")).toBeInTheDocument();
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
 
     it("shows 404 page for unknown route", async () => {
-      render(
-        <MemoryRouter initialEntries={["/unknown-route"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/unknown-route");
       expect(await screen.findByText("404")).toBeInTheDocument();
     });
   });
@@ -203,11 +211,7 @@ describe("App Routing", () => {
         handleTaraTokens: vi.fn(),
       });
 
-      render(
-        <MemoryRouter initialEntries={["/tasks/abc-def-123"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/tasks/abc-def-123");
 
       const tasksView = await screen.findByTestId("tasks-view");
       expect(tasksView).toHaveAttribute("data-task-id", "abc-def-123");
@@ -230,11 +234,7 @@ describe("App Routing", () => {
         handleTaraTokens: vi.fn(),
       });
 
-      render(
-        <MemoryRouter initialEntries={["/tasks"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/tasks");
 
       const tasksView = await screen.findByTestId("tasks-view");
       expect(tasksView.getAttribute("data-task-id")).toBeFalsy();
@@ -243,11 +243,7 @@ describe("App Routing", () => {
 
   describe("view detection from pathname", () => {
     it("detects synthesis view from /synthesis pathname", async () => {
-      render(
-        <MemoryRouter initialEntries={["/synthesis"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/synthesis");
       expect(await screen.findByTestId("synthesis-view")).toBeInTheDocument();
     });
 
@@ -268,31 +264,19 @@ describe("App Routing", () => {
         handleTaraTokens: vi.fn(),
       });
 
-      render(
-        <MemoryRouter initialEntries={["/tasks/123"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/tasks/123");
 
       expect(await screen.findByTestId("tasks-view")).toBeInTheDocument();
     });
 
     it("detects specs view from /specs pathname", async () => {
-      render(
-        <MemoryRouter initialEntries={["/specs"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/specs");
 
       expect(await screen.findByTestId("specs-page")).toBeInTheDocument();
     });
 
     it("detects dashboard view from /dashboard pathname", async () => {
-      render(
-        <MemoryRouter initialEntries={["/dashboard"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/dashboard");
 
       expect(await screen.findByTestId("dashboard")).toBeInTheDocument();
     });
@@ -319,13 +303,9 @@ describe("App Routing", () => {
         currentSteps: [],
       });
 
-      render(
-        <MemoryRouter initialEntries={["/synthesis"]}>
-          <Home />
-        </MemoryRouter>,
-      );
+      renderWithRoutes("/role-selection");
 
-      expect(screen.getByTestId("role-selection")).toBeInTheDocument();
+      expect(await screen.findByTestId("role-selection")).toBeInTheDocument();
       expect(screen.queryByTestId("synthesis-view")).not.toBeInTheDocument();
     });
   });

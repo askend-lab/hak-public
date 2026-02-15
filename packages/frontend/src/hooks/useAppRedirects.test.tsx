@@ -45,8 +45,10 @@ vi.mock("@/contexts/CopiedEntriesContext", async (importOriginal) => {
   };
 });
 
-function wrapper({ children }: { children: ReactNode }) {
-  return <MemoryRouter>{children}</MemoryRouter>;
+function createWrapper(initialPath = "/synthesis") {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return <MemoryRouter initialEntries={[initialPath]}>{children}</MemoryRouter>;
+  };
 }
 
 describe("useAppRedirects", () => {
@@ -61,7 +63,7 @@ describe("useAppRedirects", () => {
   describe("handleTasksClick", () => {
     it("opens login modal when not authenticated", () => {
       mockIsAuthenticated = false;
-      const { result } = renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      const { result } = renderHook(() => useAppRedirects(), { wrapper: createWrapper() });
 
       act(() => result.current.handleTasksClick());
 
@@ -70,7 +72,7 @@ describe("useAppRedirects", () => {
 
     it("does nothing when authenticated", () => {
       mockIsAuthenticated = true;
-      const { result } = renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      const { result } = renderHook(() => useAppRedirects(), { wrapper: createWrapper() });
 
       act(() => result.current.handleTasksClick());
 
@@ -82,7 +84,7 @@ describe("useAppRedirects", () => {
   describe("post-login redirect", () => {
     it("navigates to /tasks after login when tasks access was pending", () => {
       mockIsAuthenticated = false;
-      const { result, rerender } = renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      const { result, rerender } = renderHook(() => useAppRedirects(), { wrapper: createWrapper() });
 
       // Click tasks while not authenticated
       act(() => result.current.handleTasksClick());
@@ -99,14 +101,14 @@ describe("useAppRedirects", () => {
   describe("onboarding redirect", () => {
     it("redirects to role-selection when onboarding not completed", () => {
       mockOnboardingState = { completed: false, selectedRole: null };
-      renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
 
       expect(mockNavigate).toHaveBeenCalledWith("/role-selection", { replace: true });
     });
 
     it("does not redirect when onboarding is completed", () => {
       mockOnboardingState = { completed: true, selectedRole: "teacher" };
-      renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
 
       expect(mockNavigate).not.toHaveBeenCalled();
     });
@@ -114,14 +116,14 @@ describe("useAppRedirects", () => {
     it("does not redirect when onboarding is loading", () => {
       mockIsOnboardingLoading = true;
       mockOnboardingState = { completed: false, selectedRole: null };
-      renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
 
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it("does not redirect when not on synthesis view", () => {
       mockOnboardingState = { completed: false, selectedRole: null };
-      renderHook(() => useAppRedirects("tasks"), { wrapper });
+      renderHook(() => useAppRedirects(), { wrapper: createWrapper("/tasks") });
 
       expect(mockNavigate).not.toHaveBeenCalled();
     });
@@ -129,14 +131,14 @@ describe("useAppRedirects", () => {
     it("does not redirect when context has copied entries", () => {
       mockHasCopiedEntries = true;
       mockOnboardingState = { completed: false, selectedRole: null };
-      renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
 
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it("only checks redirect once (initial load)", () => {
       mockOnboardingState = { completed: false, selectedRole: null };
-      const { rerender } = renderHook(() => useAppRedirects("synthesis"), { wrapper });
+      const { rerender } = renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
 
       expect(mockNavigate).toHaveBeenCalledTimes(1);
       mockNavigate.mockClear();

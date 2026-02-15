@@ -2,11 +2,10 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/features/auth/services";
 import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
 import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
-import type { ViewType } from "./useCurrentView";
 
 /**
  * Manages app-level redirects:
@@ -14,13 +13,14 @@ import type { ViewType } from "./useCurrentView";
  * - First-time user redirect to role selection
  * - Auth guard for tasks view access
  */
-export function useAppRedirects(currentView: ViewType) {
+export function useAppRedirects() {
   const { isAuthenticated, setShowLoginModal } = useAuth();
   const {
     state: onboardingState,
     isLoading: isOnboardingLoading,
   } = useOnboarding();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const { hasCopiedEntries } = useCopiedEntries();
 
@@ -47,7 +47,7 @@ export function useAppRedirects(currentView: ViewType) {
         !hasCopiedEntries &&
         !onboardingState.completed &&
         !onboardingState.selectedRole &&
-        currentView === "synthesis"
+        (pathname === "/" || pathname === "/synthesis")
       ) {
         navigate("/role-selection", { replace: true });
       }
@@ -56,7 +56,7 @@ export function useAppRedirects(currentView: ViewType) {
     isOnboardingLoading,
     onboardingState.completed,
     onboardingState.selectedRole,
-    currentView,
+    pathname,
     navigate,
     hasCopiedEntries,
   ]);
