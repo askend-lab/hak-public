@@ -13,6 +13,7 @@ const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
+  "Content-Security-Policy": "default-src 'none'",
 };
 
 export { CORS_HEADERS };
