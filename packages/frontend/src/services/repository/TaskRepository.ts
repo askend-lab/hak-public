@@ -9,6 +9,10 @@ function generateId(prefix: string): string {
   return `${prefix}_${crypto.randomUUID()}`;
 }
 
+const MAX_TASK_NAME_LENGTH = 200;
+const MAX_TASK_DESCRIPTION_LENGTH = 2000;
+const MAX_ENTRIES_PER_TASK = 500;
+
 export class TaskRepository {
   constructor(
     private storage: SimpleStoreAdapter,
@@ -16,13 +20,15 @@ export class TaskRepository {
   ) {}
 
   private toSummary(task: Task): TaskSummary {
+    const createdAt = new Date(task.createdAt);
+    const updatedAt = new Date(task.updatedAt);
     return {
       id: task.id,
       name: task.name,
       description: task.description ?? null,
       entryCount: task.entries?.length || 0,
-      createdAt: new Date(task.createdAt),
-      updatedAt: new Date(task.updatedAt),
+      createdAt: Number.isNaN(createdAt.getTime()) ? new Date() : createdAt,
+      updatedAt: Number.isNaN(updatedAt.getTime()) ? new Date() : updatedAt,
     };
   }
 
@@ -44,12 +50,23 @@ export class TaskRepository {
   }
 
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
+    const trimmedName = taskData.name.trim();
+    if (!trimmedName) {
+      throw new Error("Task name is required");
+    }
+    if (trimmedName.length > MAX_TASK_NAME_LENGTH) {
+      throw new Error(`Task name exceeds ${MAX_TASK_NAME_LENGTH} characters`);
+    }
+    const description = taskData.description?.trim() ?? null;
+    if (description && description.length > MAX_TASK_DESCRIPTION_LENGTH) {
+      throw new Error(`Task description exceeds ${MAX_TASK_DESCRIPTION_LENGTH} characters`);
+    }
     const taskId = generateId("task");
     const newTask: Task = {
       id: taskId,
       userId,
-      name: taskData.name,
-      description: taskData.description ?? null,
+      name: trimmedName,
+      description,
       speechSequences: taskData.speechSequences ?? [],
       entries:
         taskData.speechEntries?.map((entry, index) => ({
@@ -141,6 +158,11 @@ export class TaskRepository {
     const task = await this.storage.getTask(taskId);
     if (!task) {
       throw new Error("Task not found");
+    }
+
+    const currentCount = mode === "replace" ? 0 : (task.entries?.length ?? 0);
+    if (currentCount + textEntries.length > MAX_ENTRIES_PER_TASK) {
+      throw new Error(`Cannot exceed ${MAX_ENTRIES_PER_TASK} entries per task`);
     }
 
     const isReplace = mode === "replace";
