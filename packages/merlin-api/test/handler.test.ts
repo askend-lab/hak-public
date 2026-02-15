@@ -7,6 +7,7 @@ import {
   parseRequestBody,
   applySynthesizeDefaults,
   validateText,
+  validateParams,
   health,
   VERSION,
 } from "../src/handler";
@@ -70,7 +71,8 @@ describe("generateCacheKey", () => {
 describe("parseRequestBody", () => {
   it("should parse valid JSON body", () => {
     const result = parseRequestBody(JSON.stringify({ text: "hello" }));
-    expect(result.text).toBe("hello");
+    expect(result).not.toBeNull();
+    expect(result?.text).toBe("hello");
   });
 
   it("should return empty object for undefined body", () => {
@@ -78,8 +80,8 @@ describe("parseRequestBody", () => {
     expect(result).toStrictEqual({});
   });
 
-  it("should throw on invalid JSON", () => {
-    expect(() => parseRequestBody("not json")).toThrow();
+  it("should return null on invalid JSON", () => {
+    expect(parseRequestBody("not json")).toBeNull();
   });
 });
 
@@ -107,6 +109,30 @@ describe("applySynthesizeDefaults", () => {
       speed: 2.0,
       pitch: 3,
     });
+  });
+});
+
+describe("validateParams", () => {
+  const validParams = { text: "hello", voice: "default", speed: 1.0, pitch: 0 };
+
+  it("should return null for valid params", () => {
+    expect(validateParams(validParams)).toBeNull();
+  });
+
+  it("should reject speed below minimum", () => {
+    expect(validateParams({ ...validParams, speed: 0.1 })).toContain("Speed");
+  });
+
+  it("should reject speed above maximum", () => {
+    expect(validateParams({ ...validParams, speed: 3.0 })).toContain("Speed");
+  });
+
+  it("should reject pitch below minimum", () => {
+    expect(validateParams({ ...validParams, pitch: -600 })).toContain("Pitch");
+  });
+
+  it("should reject pitch above maximum", () => {
+    expect(validateParams({ ...validParams, pitch: 600 })).toContain("Pitch");
   });
 });
 
