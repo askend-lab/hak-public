@@ -25,15 +25,15 @@ Solid foundation: in-memory tokens, httpOnly cookies, PKCE, WAF, CSP, S3 access 
 
 **H3. SimpleStore — no throttling** — PAY_PER_REQUEST DynamoDB with no API throttle. **Fixed:** added 10 req/s burst 20.
 
-**H4. Data enumeration** — shared content queryable with predictable keys. **Mitigated:** throttling added (H3); further pagination limits can be added if needed.
+**H4. Data enumeration** — shared content queryable with predictable keys. **Fixed:** throttling added (H3) + query pagination capped at `MAX_QUERY_ITEMS=100`.
 
 **H5. CI audit `continue-on-error`** — build never failed on CVEs. **Fixed:** removed `continue-on-error`.
 
 ### MEDIUM — resolved ✅
 
 **M1.** State cookie missing `Domain=` — **Fixed:** added Domain attribute consistent with other cookies.  
-**M2.** No CSRF tokens on POST endpoints — **Accepted:** SameSite=Lax provides sufficient protection for our threat model.  
-**M3.** `console.error(error)` may leak stack traces to CloudWatch — **Accepted:** CloudWatch is access-controlled; low risk.  
+**M2.** No CSRF tokens on POST endpoints — **Fixed:** Origin header validation (`validateCsrfOrigin`) on all POST endpoints; returns 403 on mismatch.  
+**M3.** `console.error(error)` may leak stack traces to CloudWatch — **Fixed:** all error logging now sanitized to `error.message` only; no raw objects or stack traces.  
 **M5.** Cognito filter string interpolation — **Fixed:** personal code validated against `^[A-Z]{2}\d{11}$` before use.  
 **M6.** No application-level body size limits — **Fixed:** 10KB `MAX_BODY_SIZE` in merlin-api.  
 **M7.** CloudFront logs capture URL params with tokens — **Resolved:** tokens no longer in URL (C1 fix).  

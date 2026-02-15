@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { getCorsOrigin } from "@hak/shared";
-
 export interface LambdaResponse {
   statusCode: number;
   headers: Record<string, string>;
