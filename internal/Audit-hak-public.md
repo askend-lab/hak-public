@@ -7,34 +7,34 @@
 
 ## Фаза 0 — Security Critical (делать немедленно)
 
-- [ ] 1. **merlin-api CORS wildcard** — `response.ts` не использует `getCorsOrigin()`, hardcoded `"*"`. Чинить: импорт из shared.
+- [x] 1. **merlin-api CORS wildcard** — `response.ts` не использует `getCorsOrigin()`, hardcoded `"*"`. Чинить: импорт из shared.
 - [ ] 2. **synthesize без авторизации** — `merlin-api/serverless.yml:57-60` нет Cognito authorizer. Публичный TTS = абьюз.
 - [ ] 3. **warmup без авторизации** — `merlin-api/serverless.yml:84-87`. Любой масштабирует ECS → расходы.
-- [ ] 4. **mock-users.json в public/** — `frontend/public/data/mock-users.json` с эстонскими ID-кодами и email. Удалить.
-- [ ] 5. **Нет max text length в synthesize** — `validateText` проверяет только непустоту. Мегабайтный текст → TTS crash.
-- [ ] 6. **cacheKey без санитизации** — `handler.ts:128`, `s3.ts:68`. `cache/${cacheKey}.wav` → path traversal в S3.
-- [ ] 7. **speed/pitch не валидируются** — `handler.ts:56-63`. `speed:-999` передаётся в SOX через shell.
+- [x] 4. **mock-users.json в public/** — `frontend/public/data/mock-users.json` с эстонскими ID-кодами и email. Удалить.
+- [x] 5. **Нет max text length в synthesize** — `validateText` проверяет только непустоту. Мегабайтный текст → TTS crash.
+- [x] 6. **cacheKey без санитизации** — `handler.ts:128`, `s3.ts:68`. `cache/${cacheKey}.wav` → path traversal в S3.
+- [x] 7. **speed/pitch не валидируются** — `handler.ts:56-63`. `speed:-999` передаётся в SOX через shell.
 - [ ] 8. **Нет CSP headers** — нигде в проекте. XSS загрузит произвольные скрипты.
-- [ ] 9. **Нет security headers** — X-Content-Type-Options, X-Frame-Options, HSTS отсутствуют во всех Lambda API.
-- [ ] 10. **S3 bucket/key утекают в error** — `shared/s3.ts:72-79`, `merlin-api/s3.ts:53-62`. JSON с bucket name в throw.
+- [x] 9. **Нет security headers** — X-Content-Type-Options, X-Frame-Options, HSTS отсутствуют во всех Lambda API.
+- [x] 10. **S3 bucket/key утекают в error** — `shared/s3.ts:72-79`, `merlin-api/s3.ts:53-62`. JSON с bucket name в throw.
 
 ## Фаза 1 — High Priority (делать в ближайшем спринте)
 
 - [ ] 11. **Токены (access/id) в URL query params** — `AuthCallbackPage.tsx:24-25`. Видны в history, logs, Referer.
-- [ ] 12. **JWT parseIdToken без проверки iss/aud** — `token.ts:26-27`. JWT от другого pool принимается.
+- [x] 12. **JWT parseIdToken без проверки iss/aud** — `token.ts:26-27`. JWT от другого pool принимается.
 - [ ] 13. **Нет rate limiting на simplestore** — `simplestore/serverless.yml`. Бомбить `/save`, `/query` без лимитов.
 - [ ] 14. **CORS wildcard в CORS_HEADERS объекте** — `shared/lambda.ts:31`. Кто использует напрямую — получит `*`.
 - [ ] 15. **Публичные S3 audio URLs** — `merlin-api/s3.ts:72-73`. Нет signed URLs, bucket name раскрыт клиенту.
 - [ ] 16. **Anonymous access без rate limiting** — `simplestore/handler.ts:113-135`. Brute-force shared/unlisted данных.
-- [ ] 17. **Error messages утекают детали** — `vabamorf-api/handler.ts:88-91`. `error.message` → клиенту.
-- [ ] 18. **delete shared без ownership check** — `store.ts:139`. Любой authenticated пользователь удаляет чужие shared.
+- [x] 17. **Error messages утекают детали** — `vabamorf-api/handler.ts:88-91`. `error.message` → клиенту.
+- [x] 18. **delete shared без ownership check** — `store.ts:139`. Любой authenticated пользователь удаляет чужие shared.
 - [ ] 19. **TTL=0 → данные живут вечно** — `validation.ts:82-84`. Shared/unlisted аккумулируются бесконечно.
 - [ ] 20. **SOX shell injection** — `worker.py:176`. `f"sox {wav_file} ..."` через `bash -c`. Пробелы/спецсимволы.
 - [ ] 21. **shell=True в generate.py** — `merlin/utils/generate.py:73`. `subprocess.Popen(args, shell=True)`.
 - [ ] 22. **SQS message не валидируется** — `worker.py:81-89`. `speed: "abc"` → RuntimeError в SOX.
 - [ ] 23. **Нет DLQ для SQS** — отравленные сообщения retry бесконечно.
-- [ ] 24. **JSON.parse без try/catch** — `merlin-api/handler.ts:52-54`. Невалидный JSON → 500 вместо 400.
-- [ ] 25. **Нет backup/PITR для DynamoDB** — `simplestore/serverless.yml:107-123`. Потеря данных невосстановима.
+- [x] 24. **JSON.parse без try/catch** — `merlin-api/handler.ts:52-54`. Невалидный JSON → 500 вместо 400.
+- [x] 25. **Нет backup/PITR для DynamoDB** — `simplestore/serverless.yml:107-123`. Потеря данных невосстановима.
 - [ ] 26. **Serverless Framework v3 deprecated** — EOL September 2024. Нет security updates.
 
 ## Фаза 2 — Medium Priority (планировать)
@@ -49,11 +49,11 @@
 - [ ] 34. **Dev proxy default → deployed env** — `vite.config.ts:113`. Localhost → hak-dev.askend-lab.com.
 - [ ] 35. **User PII в localStorage** — `storage.ts:27-38`. email, name в `hak_user` — при XSS утекает.
 - [ ] 36. **PKCE verifier в sessionStorage** — `config.ts:67`. При XSS доступен в той же вкладке.
-- [ ] 37. **Error boundary показывает error.message** — `ErrorBoundary.tsx:41`. Может содержать API URL.
-- [ ] 38. **Regex санитизация error_description** — `AuthCallbackPage.tsx:59-60`. Обходится `<img src=x onerror=`.
+- [x] 37. **Error boundary показывает error.message** — `ErrorBoundary.tsx:41`. Может содержать API URL.
+- [x] 38. **Regex санитизация error_description** — `AuthCallbackPage.tsx:59-60`. Обходится `<img src=x onerror=`.
 - [ ] 39. **downloadTaskAsZip без size limit** — `downloadTaskAsZip.ts`. 100×50MB = 5GB в памяти браузера.
 - [ ] 40. **downloadTaskAsZip fetch без auth** — `downloadTaskAsZip.ts:37`. S3 audio без headers.
-- [ ] 41. **Dashboard loadData без try/catch** — `Dashboard.tsx:93-111`. Ошибка → вечный loading.
+- [x] 41. **Dashboard loadData без try/catch** — `Dashboard.tsx:93-111`. Ошибка → вечный loading.
 - [ ] 42. **Dashboard quick links без onClick** — `Dashboard.tsx:55-63`. Мёртвые кнопки.
 - [ ] 43. **Dashboard recentActivity = []** — `Dashboard.tsx:106`. Hardcoded пустой массив.
 - [ ] 44. **Нет 404 страницы** — `main.tsx:60`. `path="*"` → App. Любой URL рендерит synthesis.
@@ -81,7 +81,7 @@
 - [ ] ⚠️ 63. **SQS URL hardcoded pattern** — `merlin-api/serverless.yml:27`. !GetAtt vs env var конструкция. Cross-stack?
 - [ ] ⚠️ 64. **ECS service name hardcoded** — `serverless.yml:51`. Динамическая ссылка усложнит, hardcode прост. Trade-off.
 - [ ] ⚠️ 65. **vabamorf-api catch-all route** — `serverless.yml:50-54`. ANY /{proxy+}. Архитектурное решение — менять?
-- [ ] ⚠️ 66. **Git commit info в production build** — `vite.config.ts:48-56`. workingDir, commitMessage в JS bundle. Убрать workingDir? Commit info полезен для debugging.
+- [x] ⚠️ 66. **Git commit info в production build** — `vite.config.ts:48-56`. workingDir, commitMessage в JS bundle. Убрать workingDir? Commit info полезен для debugging.
 - [ ] ⚠️ 67. **IAM wildcard на table+index** — `serverless.yml:61`. !GetAtt DataTable.Arn покрывает и будущие GSI. Ограничить?
 - [ ] ⚠️ 68. **Sentry Session Replay risk** — Сейчас выключен по умолчанию. Добавить явный `replaysSessionSampleRate: 0`?
 
