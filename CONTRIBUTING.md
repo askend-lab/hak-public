@@ -7,7 +7,7 @@ Thank you for your interest in contributing to HAK - the Estonian language learn
 ### Prerequisites
 
 - Node.js 20+
-- pnpm 9+
+- pnpm 10+
 - AWS CLI (for deployment)
 
 ### Setup

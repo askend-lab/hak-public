@@ -13,7 +13,7 @@ Solid foundation: in-memory tokens, httpOnly cookies, PKCE, WAF, CSP, S3 access 
 
 **C1. Tokens in redirect URL** — access_token and id_token were passed as URL query params in 302 redirect. **Fixed:** tokens now set as Secure cookies; URL carries only `?auth=success` signal.
 
-**C3. No text length validation** — merlin-api accepted unlimited text. **Fixed:** enforced `TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH` (1000 chars), speed (0.5–2.0) and pitch (−10 to 10) range validation, plus 10KB body size limit.
+**C3. No text length validation** — merlin-api accepted unlimited text. **Fixed:** enforced `MAX_TEXT_LENGTH` (1000 chars), speed (0.5–2.0) and pitch (−500 to 500) range validation, plus 10KB body size limit.
 
 **C4. User-supplied redirect_uri** — client could send arbitrary redirect_uri to Cognito token endpoint. **Fixed:** redirect_uri hardcoded server-side; client no longer sends it.
 

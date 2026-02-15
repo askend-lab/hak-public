@@ -32,6 +32,10 @@ If you discover a security vulnerability, please report it by opening a **GitHub
 - **Medium**: Fix within 30 days
 - **Low**: Fix in next release
 
+## Security Audit
+
+For the full security audit findings and remediation status, see `internal/SECURITY-AUDIT-2026-02.md`. Architecture decisions related to security are documented in `internal/DESIGN-DECISIONS.md` and `docs/adr/`.
+
 ## Security best practices
 
 When contributing to this project:

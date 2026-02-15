@@ -2,26 +2,20 @@
 
 ## SimpleStore API
 
-Internal CRUD API for lessons, users, and progress. Base URL: `/api`
+Universal key-value CRUD API backed by DynamoDB single-table design. Base URL: via API Gateway. Requires Cognito JWT authorizer (except public/shared read endpoints).
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/lessons` | List all lessons |
-| `GET` | `/lessons/:id` | Get lesson by ID |
-| `POST` | `/lessons` | Create lesson |
-| `PUT` | `/lessons/:id` | Update lesson |
-| `DELETE` | `/lessons/:id` | Delete lesson |
-| `GET` | `/progress/:userId` | Get user progress |
-| `POST` | `/progress` | Save progress |
+| `POST` | `/save` | Create or update item |
+| `GET` | `/get?pk=...&sk=...&type=...` | Get item by key |
+| `DELETE` | `/delete?pk=...&sk=...&type=...` | Delete item (owner only) |
+| `GET` | `/query?prefix=...&type=...` | List items by prefix (max 100 results) |
+| `GET` | `/get-public?pk=...&sk=...` | Get public item (no auth) |
+| `GET` | `/get-shared?pk=...&sk=...` | Get shared item (no auth) |
 
-## Audio API
+Data types: `private` (owner only), `unlisted` (owner writes, anyone with key reads), `public` (everyone reads, owner writes), `shared` (everyone reads and writes).
 
-Audio file management. Base URL: `/api/audio`
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/audio/:key` | Get audio file from S3 |
-| `POST` | `/audio/upload` | Upload audio file |
+Rate limiting: 10 req/s, burst 20 (API Gateway throttle).
 
 ## Vabamorf API
 
@@ -97,15 +91,19 @@ Submits text for synthesis. Returns cache key for polling (or cached result dire
 curl -X POST /synthesize -H "Content-Type: application/json" -d '{"text": "Tere päevast", "voice": "efm_l"}'
 ```
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `text` | string | yes | — | Estonian text to synthesize |
-| `voice` | string | no | `efm_l` | Voice model |
-| `speed` | number | no | `1.0` | Speech speed multiplier |
-| `pitch` | number | no | `0` | Pitch adjustment |
+| Field | Type | Required | Default | Validation |
+|-------|------|----------|---------|------------|
+| `text` | string | yes | — | Non-empty, max 1000 characters |
+| `voice` | string | no | `efm_l` | Voice model identifier |
+| `speed` | number | no | `1.0` | 0.5–2.0 |
+| `pitch` | number | no | `0` | −500 to 500 |
+
+Request body limit: 10 KB. Invalid JSON returns 400.
 
 Response: `{"status": "ready"|"processing", "cacheKey": "...", "audioUrl": "..."}`.
 Cached returns 200, queued returns 202. `cacheKey` is SHA-256 of `text|voice|speed|pitch`.
+
+Rate limiting: 2 req/s, burst 4 (API Gateway throttle). Requires Cognito JWT authorization.
 
 ### GET /status/{cacheKey}
 
@@ -127,9 +125,20 @@ Errors: 429 (rate limited), 500 (missing ECS config).
 
 Both Vabamorf and Merlin expose `/health`: `{"status": "ok", "version": "1.0.0"}`.
 
-## Authentication
+## Authentication (TARA)
 
-Estonian eID (TARA) via `tara-auth` Lambda. Supports Smart-ID and Mobile-ID through AWS Cognito.
+Estonian eID authentication via `tara-auth` Lambda + AWS Cognito. Supports Smart-ID and Mobile-ID.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/tara/start` | Initiate TARA login (redirects to TARA) |
+| `GET` | `/tara/callback` | TARA OAuth2 callback (sets cookies, redirects to frontend) |
+| `POST` | `/tara/refresh` | Refresh access token using httpOnly cookie |
+| `POST` | `/tara/exchange-code` | Exchange authorization code for tokens |
+
+POST endpoints are protected by CSRF Origin header validation — requests without a matching `Origin` header return 403.
+
+Tokens: access and id tokens are set as Secure cookies on callback. Refresh token is httpOnly (never accessible to JS). `redirect_uri` is hardcoded server-side.
 
 ## Error Format
 
