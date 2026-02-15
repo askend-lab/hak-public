@@ -25,7 +25,7 @@
     "@types/nock": "^11.1.0",
     "@types/node": "^20.0.0",
     "aws-sdk-client-mock": "^4.1.0",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.27.3",
     "jest": "^30.2.0",
     "nock": "^14.0.10",
     "serverless": "^4.32.0",
