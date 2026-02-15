@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/services/context";
 import { useDataService } from "../contexts/DataServiceContext";
 
@@ -47,16 +48,16 @@ function ActivityItem({ activity }: { activity: RecentActivity }) {
   );
 }
 
-function QuickLinks() {
+function QuickLinks({ onNavigate }: { onNavigate: (path: string) => void }) {
   return (
     <div className="dashboard__section">
       <h2 className="dashboard__section-title">Kiirlingid</h2>
       <div className="dashboard__quick-links">
-        <button className="dashboard__quick-link">
+        <button className="dashboard__quick-link" onClick={() => onNavigate("/synthesis")}>
           <span className="dashboard__quick-link-icon">🎤</span>
           <span>Uus süntees</span>
         </button>
-        <button className="dashboard__quick-link">
+        <button className="dashboard__quick-link" onClick={() => onNavigate("/tasks")}>
           <span className="dashboard__quick-link-icon">📋</span>
           <span>Loo ülesanne</span>
         </button>
@@ -118,6 +119,7 @@ function useDashboardData() {
 export default function Dashboard() {
   const { metrics, recentActivity, isLoading, isAuthenticated } =
     useDashboardData();
+  const navigate = useNavigate();
   if (isLoading)
     return (
       <div className="dashboard">
@@ -139,7 +141,7 @@ export default function Dashboard() {
       </div>
       <div className="dashboard__sections">
         <ActivitySection recentActivity={recentActivity} />
-        <QuickLinks />
+        <QuickLinks onNavigate={navigate} />
       </div>
       {!isAuthenticated && (
         <div className="dashboard__auth-prompt">
