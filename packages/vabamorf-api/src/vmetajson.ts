@@ -23,135 +23,151 @@ const MAX_QUEUE_SIZE = 50;
 // Stryker disable next-line all: env default is equivalent
 const TIMEOUT_MS = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
 
-let vmetajsonProcess: ChildProcess | null = null;
-const requestQueue: QueuedRequest[] = [];
-let currentRequest: QueuedRequest | null = null;
-let buffer = "";
+export class VmetajsonProcess {
+  private process: ChildProcess | null = null;
+  private readonly requestQueue: QueuedRequest[] = [];
+  private currentRequest: QueuedRequest | null = null;
+  private buffer = "";
 
-function processNextRequest(): void {
-  // Stryker disable next-line all: guard conditions are equivalent
-  if (currentRequest || requestQueue.length === 0 || !vmetajsonProcess?.stdin) {
-    return;
+  private processNextRequest(): void {
+    // Stryker disable next-line all: guard conditions are equivalent
+    if (this.currentRequest || this.requestQueue.length === 0 || !this.process?.stdin) {
+      return;
+    }
+
+    const next = this.requestQueue.shift();
+    if (!next) return;
+    this.currentRequest = next;
+    this.process.stdin.write(`${JSON.stringify(this.currentRequest.input)}\n`);
   }
 
-  const next = requestQueue.shift();
-  if (!next) return;
-  currentRequest = next;
-  vmetajsonProcess.stdin.write(`${JSON.stringify(currentRequest.input)}\n`);
-}
-
-function finishCurrentRequest(action: (req: QueuedRequest) => void): void {
-  if (currentRequest) {
-    clearTimeout(currentRequest.timeoutId);
-    action(currentRequest);
-    currentRequest = null;
-    processNextRequest();
-  }
-}
-
-function completeCurrentRequest(response: VmetajsonResponse): void {
-  finishCurrentRequest((req) => req.resolve(response));
-}
-
-function failCurrentRequest(error: Error): void {
-  finishCurrentRequest((req) => req.reject(error));
-}
-
-export function initVmetajson(
-  binaryPath = "./vmetajson",
-  dictPath = ".",
-): void {
-  if (vmetajsonProcess) {
-    return;
+  private finishCurrentRequest(action: (req: QueuedRequest) => void): void {
+    if (this.currentRequest) {
+      clearTimeout(this.currentRequest.timeoutId);
+      action(this.currentRequest);
+      this.currentRequest = null;
+      this.processNextRequest();
+    }
   }
 
-  vmetajsonProcess = spawn(binaryPath, [`--path=${dictPath}`], {
-    stdio: ["pipe", "pipe", "pipe"],
-  });
+  private completeCurrentRequest(response: VmetajsonResponse): void {
+    this.finishCurrentRequest((req) => req.resolve(response));
+  }
 
-  // Stryker disable next-line all: optional chaining is equivalent
-  vmetajsonProcess.stderr?.on("data", (data: Buffer) => {
-    console.error("[vmetajson stderr]", data.toString());
-  });
+  private failCurrentRequest(error: Error): void {
+    this.finishCurrentRequest((req) => req.reject(error));
+  }
 
-  // Stryker disable next-line all: optional chaining is equivalent
-  vmetajsonProcess.stdout?.on("data", (data: Buffer) => {
-    buffer += data.toString();
-    const lines = buffer.split("\n");
+  init(binaryPath = "./vmetajson", dictPath = "."): void {
+    if (this.process) {
+      return;
+    }
 
-    // Stryker disable next-line all: boundary condition is equivalent
-    while (lines.length > 1) {
-      const line = lines.shift();
-      // Stryker disable next-line all: guard conditions are equivalent
-      if (line !== undefined && line.trim() !== "" && currentRequest) {
-        try {
-          const response = JSON.parse(line) as VmetajsonResponse;
-          completeCurrentRequest(response);
-        } catch {
-          failCurrentRequest(
-            new Error(`${PARSE_ERROR_PREFIX}${line}`),
-          );
+    this.process = spawn(binaryPath, [`--path=${dictPath}`], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    // Stryker disable next-line all: optional chaining is equivalent
+    this.process.stderr?.on("data", (data: Buffer) => {
+      console.error("[vmetajson stderr]", data.toString());
+    });
+
+    // Stryker disable next-line all: optional chaining is equivalent
+    this.process.stdout?.on("data", (data: Buffer) => {
+      this.buffer += data.toString();
+      const lines = this.buffer.split("\n");
+
+      // Stryker disable next-line all: boundary condition is equivalent
+      while (lines.length > 1) {
+        const line = lines.shift();
+        // Stryker disable next-line all: guard conditions are equivalent
+        if (line !== undefined && line.trim() !== "" && this.currentRequest) {
+          try {
+            const response = JSON.parse(line) as VmetajsonResponse;
+            this.completeCurrentRequest(response);
+          } catch {
+            this.failCurrentRequest(
+              new Error(`${PARSE_ERROR_PREFIX}${line}`),
+            );
+          }
         }
       }
+      // Stryker disable next-line all: empty string default is equivalent
+      this.buffer = lines[0] || "";
+    });
+
+    this.process.on("error", (err: Error) => {
+      this.failCurrentRequest(err);
+    });
+
+    this.process.on("exit", (code: number | null) => {
+      this.failCurrentRequest(
+        new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`),
+      );
+      this.process = null;
+    });
+  }
+
+  async analyze(text: string): Promise<VmetajsonResponse> {
+    if (!this.process) {
+      throw new Error(NOT_INITIALIZED_ERROR);
     }
-    // Stryker disable next-line all: empty string default is equivalent
-    buffer = lines[0] || "";
-  });
 
-  vmetajsonProcess.on("error", (err: Error) => {
-    failCurrentRequest(err);
-  });
+    if (this.requestQueue.length >= MAX_QUEUE_SIZE) {
+      throw new Error(QUEUE_FULL_ERROR);
+    }
 
-  vmetajsonProcess.on("exit", (code: number | null) => {
-    failCurrentRequest(
-      new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`),
-    );
-    vmetajsonProcess = null;
-  });
+    const input: VmetajsonInput = {
+      params: { vmetajson: VMETAJSON_PARAMS },
+      content: text,
+    };
+
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        const index = this.requestQueue.findIndex((r) => r.timeoutId === timeoutId);
+        // Stryker disable next-line all: boundary condition is equivalent
+        if (index !== -1) {
+          this.requestQueue.splice(index, 1);
+          reject(new Error(TIMEOUT_ERROR));
+          // Stryker disable next-line all: optional chaining is equivalent
+        } else if (this.currentRequest?.timeoutId === timeoutId) {
+          this.currentRequest = null;
+          reject(new Error(TIMEOUT_ERROR));
+          this.processNextRequest();
+        }
+      }, TIMEOUT_MS);
+
+      this.requestQueue.push({ resolve, reject, input, timeoutId });
+      this.processNextRequest();
+    });
+  }
+
+  close(): void {
+    if (this.process) {
+      this.process.kill();
+      this.process = null;
+    }
+  }
+
+  get initialized(): boolean {
+    return this.process !== null;
+  }
 }
 
-function createAnalyzeInput(text: string): VmetajsonInput {
-  return { params: { vmetajson: VMETAJSON_PARAMS }, content: text };
+const defaultInstance = new VmetajsonProcess();
+
+export function initVmetajson(binaryPath?: string, dictPath?: string): void {
+  defaultInstance.init(binaryPath, dictPath);
 }
 
 export async function analyze(text: string): Promise<VmetajsonResponse> {
-  if (!vmetajsonProcess) {
-    throw new Error(NOT_INITIALIZED_ERROR);
-  }
-
-  if (requestQueue.length >= MAX_QUEUE_SIZE) {
-    throw new Error(QUEUE_FULL_ERROR);
-  }
-
-  const input = createAnalyzeInput(text);
-
-  return new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      const index = requestQueue.findIndex((r) => r.timeoutId === timeoutId);
-      // Stryker disable next-line all: boundary condition is equivalent
-      if (index !== -1) {
-        requestQueue.splice(index, 1);
-        reject(new Error(TIMEOUT_ERROR));
-        // Stryker disable next-line all: optional chaining is equivalent
-      } else if (currentRequest?.timeoutId === timeoutId) {
-        currentRequest = null;
-        reject(new Error(TIMEOUT_ERROR));
-        processNextRequest();
-      }
-    }, TIMEOUT_MS);
-
-    requestQueue.push({ resolve, reject, input, timeoutId });
-    processNextRequest();
-  });
+  return defaultInstance.analyze(text);
 }
 
 export function closeVmetajson(): void {
-  if (vmetajsonProcess) {
-    vmetajsonProcess.kill();
-    vmetajsonProcess = null;
-  }
+  defaultInstance.close();
 }
 
 export function isInitialized(): boolean {
-  return vmetajsonProcess !== null;
+  return defaultInstance.initialized;
 }

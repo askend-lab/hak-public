@@ -61,7 +61,13 @@ async function checkFileExists(
   }
 }
 
-const s3Client = new S3Client({ region: getAwsRegion() });
+let _s3Client: S3Client | undefined;
+function getS3Client(): S3Client {
+  if (!_s3Client) {
+    _s3Client = new S3Client({ region: getAwsRegion() });
+  }
+  return _s3Client;
+}
 
 const VALID_CACHE_KEY = /^[a-f0-9]+$/;
 
@@ -78,5 +84,5 @@ export function buildAudioUrl(cacheKey: string): string {
 }
 
 export async function checkS3Cache(cacheKey: string): Promise<boolean> {
-  return checkFileExists(s3Client, getS3Bucket(), buildCacheKey(cacheKey));
+  return checkFileExists(getS3Client(), getS3Bucket(), buildCacheKey(cacheKey));
 }

@@ -28,6 +28,7 @@ jest.mock("@aws-sdk/lib-dynamodb", () => ({
   GetCommand: jest.fn().mockImplementation((params) => ({ input: params })),
   DeleteCommand: jest.fn().mockImplementation((params) => ({ input: params })),
   QueryCommand: jest.fn().mockImplementation((params) => ({ input: params })),
+  UpdateCommand: jest.fn().mockImplementation((params) => ({ input: params })),
 }));
 
 function makeItem(pk: string, sk: string, version = 1): StoreItem {
@@ -187,6 +188,50 @@ describe("DynamoDBAdapter", () => {
       const result = await adapter.queryBySortKeyPrefix("user#1", "task#");
 
       expect(result).toStrictEqual([]);
+    });
+  });
+
+  describe("upsert", () => {
+    it("should send UpdateCommand with correct params", async () => {
+      mockSend.mockResolvedValue({ Attributes: makeItem("pk1", "sk1") });
+
+      await adapter.upsert("pk1", "sk1", { data: { foo: "bar" }, owner: "user1" });
+
+      expect(mockSend).toHaveBeenCalledTimes(1);
+      const call = mockSend.mock.calls[0][0];
+      expect(call.input.TableName).toBe(TABLE);
+      expect(call.input.Key).toStrictEqual({ PK: "pk1", SK: "sk1" });
+      expect(call.input.UpdateExpression).toContain("if_not_exists(createdAt");
+      expect(call.input.UpdateExpression).toContain("if_not_exists(version");
+      expect(call.input.ReturnValues).toBe("ALL_NEW");
+    });
+
+    it("should include ttl when provided", async () => {
+      mockSend.mockResolvedValue({ Attributes: { ...makeItem("pk1", "sk1"), ttl: 9999 } });
+
+      await adapter.upsert("pk1", "sk1", { data: {}, owner: "user1", ttl: 9999 });
+
+      const call = mockSend.mock.calls[0][0];
+      expect(call.input.UpdateExpression).toContain("#ttl = :ttl");
+      expect(call.input.ExpressionAttributeValues[":ttl"]).toBe(9999);
+    });
+
+    it("should REMOVE ttl when not provided", async () => {
+      mockSend.mockResolvedValue({ Attributes: makeItem("pk1", "sk1") });
+
+      await adapter.upsert("pk1", "sk1", { data: {}, owner: "user1" });
+
+      const call = mockSend.mock.calls[0][0];
+      expect(call.input.UpdateExpression).toContain("REMOVE #ttl");
+    });
+
+    it("should return the upserted item", async () => {
+      const item = makeItem("pk1", "sk1");
+      mockSend.mockResolvedValue({ Attributes: item });
+
+      const result = await adapter.upsert("pk1", "sk1", { data: {}, owner: "user1" });
+
+      expect(result).toStrictEqual(item);
     });
   });
 });

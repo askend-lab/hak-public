@@ -8,7 +8,13 @@ import {
 } from "@aws-sdk/client-ecs";
 import { getAwsRegion, getEcsCluster, getEcsService } from "./env";
 
-const ecsClient = new ECSClient({ region: getAwsRegion() });
+let _ecsClient: ECSClient | undefined;
+function getEcsClient(): ECSClient {
+  if (!_ecsClient) {
+    _ecsClient = new ECSClient({ region: getAwsRegion() });
+  }
+  return _ecsClient;
+}
 
 export function isEcsConfigured(): boolean {
   return getEcsCluster() !== "" && getEcsService() !== "";
@@ -20,7 +26,7 @@ export interface EcsServiceState {
 }
 
 export async function describeService(): Promise<EcsServiceState> {
-  const result = await ecsClient.send(
+  const result = await getEcsClient().send(
     new DescribeServicesCommand({
       cluster: getEcsCluster(),
       services: [getEcsService()],
@@ -34,7 +40,7 @@ export async function describeService(): Promise<EcsServiceState> {
 }
 
 export async function scaleService(desiredCount: number): Promise<void> {
-  await ecsClient.send(
+  await getEcsClient().send(
     new UpdateServiceCommand({
       cluster: getEcsCluster(),
       service: getEcsService(),

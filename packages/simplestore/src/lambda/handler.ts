@@ -31,30 +31,35 @@ const ENV = {
   ENVIRONMENT: "ENVIRONMENT",
 } as const;
 
-/** Shared adapter instance for persistence across calls */
-let sharedAdapter: StorageAdapter | null = null;
-
-/** Set adapter (for testing or custom adapters) */
-export function setAdapter(adapter: StorageAdapter | null): void {
-  sharedAdapter = adapter;
-}
-
 function isOfflineMode(): boolean {
   return process.env[ENV.IS_OFFLINE] === "true";
 }
 
-/** Get or create adapter */
-function getAdapter(): StorageAdapter {
-  if (!sharedAdapter) {
-    const tableName = process.env[ENV.TABLE_NAME];
+export const adapterManager = {
+  _instance: null as StorageAdapter | null,
 
-    if (tableName && !isOfflineMode()) {
-      sharedAdapter = new DynamoDBAdapter(tableName);
-    } else {
-      sharedAdapter = new InMemoryAdapter();
+  set(adapter: StorageAdapter | null): void {
+    this._instance = adapter;
+  },
+
+  get(): StorageAdapter {
+    if (!this._instance) {
+      const tableName = process.env[ENV.TABLE_NAME];
+      this._instance = tableName && !isOfflineMode()
+        ? new DynamoDBAdapter(tableName)
+        : new InMemoryAdapter();
     }
-  }
-  return sharedAdapter;
+    return this._instance;
+  },
+
+  reset(): void {
+    this._instance = null;
+  },
+};
+
+/** Set adapter (for testing or custom adapters) */
+export function setAdapter(adapter: StorageAdapter | null): void {
+  adapterManager.set(adapter);
 }
 
 /**
@@ -96,7 +101,7 @@ function createContext(userId: string): ServerContext {
  * Create store instance
  */
 function createStore(userId: string): Store {
-  return new Store(getAdapter(), createContext(userId));
+  return new Store(adapterManager.get(), createContext(userId));
 }
 
 type RouteHandler = (event: APIGatewayProxyEvent, store: Store) => Promise<APIGatewayProxyResult>;

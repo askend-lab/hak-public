@@ -6,7 +6,7 @@ export { createResponse, parseJsonBody, getFieldError, validateField } from "./v
 export { CORS_HEADERS } from "./validation";
 export { formatPhoneticText } from "./parser-helpers";
 export { buildDescription } from "./description-builder";
-export { closeVmetajson, isInitialized } from "./vmetajson";
+export { VmetajsonProcess, closeVmetajson, isInitialized } from "./vmetajson";
 export type {
   AnalyzeRequest,
   AnalyzeResponse,
