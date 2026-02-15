@@ -71,6 +71,7 @@ export default function UserProfile({ user }: UserProfileProps) {
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="user-profile__button"
         aria-expanded={isDropdownOpen}
+        aria-haspopup="true"
         aria-label="Kasutaja profiil"
       >
         <div className="user-profile__avatar">{getInitials(user)}</div>
@@ -107,6 +108,7 @@ export default function UserProfile({ user }: UserProfileProps) {
               <button
                 onClick={handleLogout}
                 className="user-profile__action-button user-profile__action-button--danger"
+                role="menuitem"
               >
                 <div className="user-profile__action-button-content">
                   Logi välja
