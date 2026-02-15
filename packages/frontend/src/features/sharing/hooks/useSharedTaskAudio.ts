@@ -219,7 +219,8 @@ export function useSharedTaskAudio(): UseSharedTaskAudioReturn {
           isFirstEntry = false;
         }
 
-        if (!success || abortController.signal.aborted) break;
+        if (abortController.signal.aborted) break;
+        // Skip failed entries instead of stopping the playlist
       }
 
       setIsPlayingAll(false);
