@@ -20,7 +20,7 @@
   "devDependencies": {
     "@stryker-mutator/core": "^9.5.1",
     "@stryker-mutator/jest-runner": "^9.5.1",
-    "@types/aws-lambda": "^8.10.159",
+    "@types/aws-lambda": "^8.10.160",
     "@types/jest": "^30.0.0",
     "@types/nock": "^11.1.0",
     "@types/node": "^20.0.0",
