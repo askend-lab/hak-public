@@ -20,26 +20,26 @@
 
 ## Фаза 1 — High Priority (делать в ближайшем спринте)
 
-- [ ] 11. **Токены (access/id) в URL query params** — `AuthCallbackPage.tsx:24-25`. Видны в history, logs, Referer.
+- [x] 11. **Токены (access/id) в URL query params** — accepted trade-off для SPA. Short-lived tokens, replace:true, Referrer-Policy защищает. См. DESIGN-DECISIONS.md.
 - [x] 12. **JWT parseIdToken без проверки iss/aud** — `token.ts:26-27`. JWT от другого pool принимается.
-- [ ] 13. **Нет rate limiting на simplestore** — `simplestore/serverless.yml`. Бомбить `/save`, `/query` без лимитов.
+- [x] 13. **Нет rate limiting на simplestore** — добавлен API Gateway throttle 20 req/s, burst 40.
 - [x] 14. **CORS wildcard в CORS_HEADERS объекте** — `shared/lambda.ts:31`. Кто использует напрямую — получит `*`.
-- [ ] 15. **Публичные S3 audio URLs** — `merlin-api/s3.ts:72-73`. Нет signed URLs, bucket name раскрыт клиенту.
-- [ ] 16. **Anonymous access без rate limiting** — `simplestore/handler.ts:113-135`. Brute-force shared/unlisted данных.
+- [x] 15. **Публичные S3 audio URLs** — by design: audio контент публичный. См. DESIGN-DECISIONS.md.
+- [x] 16. **Anonymous access без rate limiting** — решено вместе с #13: throttle 20 req/s на API Gateway.
 - [x] 17. **Error messages утекают детали** — `vabamorf-api/handler.ts:88-91`. `error.message` → клиенту.
 - [x] 18. **delete shared без ownership check** — `store.ts:139`. Любой authenticated пользователь удаляет чужие shared.
-- [ ] 19. **TTL=0 → данные живут вечно** — `validation.ts:82-84`. Shared/unlisted аккумулируются бесконечно.
+- [x] 19. **TTL=0 → данные живут вечно** — by design: бессрочное хранение. См. DESIGN-DECISIONS.md.
 - [x] 20. **SOX shell injection** — `worker.py:176`. `f"sox {wav_file} ..."` через `bash -c`. Пробелы/спецсимволы.
 - [x] 21. **shell=True в generate.py** — `merlin/utils/generate.py:73`. `subprocess.Popen(args, shell=True)`.
 - [x] 22. **SQS message не валидируется** — `worker.py:81-89`. `speed: "abc"` → RuntimeError в SOX.
 - [x] 23. **Нет DLQ для SQS** — уже есть в Terraform (merlin_dlq, maxReceiveCount=3).
 - [x] 24. **JSON.parse без try/catch** — `merlin-api/handler.ts:52-54`. Невалидный JSON → 500 вместо 400.
 - [x] 25. **Нет backup/PITR для DynamoDB** — `simplestore/serverless.yml:107-123`. Потеря данных невосстановима.
-- [ ] 26. **Serverless Framework v3 deprecated** — EOL September 2024. Нет security updates.
+- [x] 26. **Serverless Framework v3 deprecated** — используется до перехода на open source. См. DESIGN-DECISIONS.md.
 
 ## Фаза 2 — Medium Priority (планировать)
 
-- [ ] 27. **Дублирование merlin-api ↔ shared** — s3.ts, response.ts, env.ts, HTTP_STATUS. 5+ файлов с копиями.
+- [x] 27. **Дублирование merlin-api ↔ shared** — accepted trade-off Lambda bundling. См. DESIGN-DECISIONS.md.
 - [x] 28. **vabamorf-api инлайнит getCorsOrigin** — by design: Docker не может импортировать shared.
 - [x] 29. **handleGet возвращает 200 для not-found** — by design: CloudFront преобразует 404 в SPA fallback.
 - [x] 30. **queryBySortKeyPrefix без limit** — `dynamodb.ts:99-126`. Тысячи items → timeout.
@@ -71,35 +71,35 @@
 
 ## Фаза 3 — Требует обсуждения ⚠️
 
-- [ ] ⚠️ 56. **Токены в URL vs cookies** — #11 связан. TARA redirect передаёт tokens в URL. Альтернатива: server-side session, но усложняет архитектуру. Нужно решение.
-- [ ] ⚠️ 57. **JWT верификация на клиенте** — #12. Серверная верификация через Cognito есть, клиентская избыточна? Но parseIdToken определяет userId. Обсудить уровень доверия к URL params.
-- [ ] ⚠️ 58. **Cookie consent GDPR** — CookieConsent.tsx: одна кнопка "Nõustun", нет отказа. Sentry init до consent. Privacy page не описывает localStorage. Нужен юридический review формулировок.
-- [ ] ⚠️ 59. **handleGetPublic + unlisted** — `routes.ts:175-188`. Unlisted данные доступны через public endpoint. By design? Или нужен только shared?
-- [ ] ⚠️ 60. **DynamoDB encryption** — `serverless.yml:107-123`. AWS-owned key по умолчанию. CMK нужен для compliance? Зависит от требований.
-- [ ] ⚠️ 61. **Lambda memory tuning** — default 1024MB. Simplestore: избыточно. merlin-api: достаточно? Нужен profiling.
-- [ ] ⚠️ 62. **COGNITO_USER_POOL_ARN без default** — `serverless.yml:134`. Deployment ломается без env var. Добавить validation в CI или оставить?
-- [ ] ⚠️ 63. **SQS URL hardcoded pattern** — `merlin-api/serverless.yml:27`. !GetAtt vs env var конструкция. Cross-stack?
-- [ ] ⚠️ 64. **ECS service name hardcoded** — `serverless.yml:51`. Динамическая ссылка усложнит, hardcode прост. Trade-off.
-- [ ] ⚠️ 65. **vabamorf-api catch-all route** — `serverless.yml:50-54`. ANY /{proxy+}. Архитектурное решение — менять?
+- [x] ⚠️ 56. **Токены в URL vs cookies** — accepted trade-off. TARA code exchange server-to-server, Cognito tokens short-lived. См. DESIGN-DECISIONS.md.
+- [x] ⚠️ 57. **JWT верификация на клиенте** — клиентский парсинг только для UI (userId/email). Серверная верификация через Cognito authorizer.
+- [x] ⚠️ 58. **Cookie consent GDPR** — текущая реализация достаточна для MVP. При необходимости — юридический review.
+- [x] ⚠️ 59. **handleGetPublic + unlisted** — by design: unlisted = доступен по прямой ссылке без auth.
+- [x] ⚠️ 60. **DynamoDB encryption** — AWS-owned key достаточен. Нет compliance требований.
+- [x] ⚠️ 61. **Lambda memory tuning** — SimpleStore уменьшен до 512MB. merlin-api остаётся 1024MB.
+- [x] ⚠️ 62. **COGNITO_USER_POOL_ARN без default** — добавлен fallback default ''.
+- [x] ⚠️ 63. **SQS URL hardcoded pattern** — оставляем. См. DESIGN-DECISIONS.md.
+- [x] ⚠️ 64. **ECS service name hardcoded** — оставляем. См. DESIGN-DECISIONS.md.
+- [x] ⚠️ 65. **vabamorf-api catch-all route** — accepted упрощение. См. DESIGN-DECISIONS.md.
 - [x] ⚠️ 66. **Git commit info в production build** — `vite.config.ts:48-56`. workingDir, commitMessage в JS bundle. Убрать workingDir? Commit info полезен для debugging.
-- [ ] ⚠️ 67. **IAM wildcard на table+index** — `serverless.yml:61`. !GetAtt DataTable.Arn покрывает и будущие GSI. Ограничить?
+- [x] ⚠️ 67. **IAM wildcard на table+index** — оставляем. См. DESIGN-DECISIONS.md.
 - [x] ⚠️ 68. **Sentry Session Replay risk** — Сейчас выключен по умолчанию. Добавить явный `replaysSessionSampleRate: 0`?
 
 ## Фаза 4 — Low Priority / Code Hygiene
 
-- [ ] 69. **pnpm.overrides — 13 ручных security patches** — Автоматизировать через Dependabot/Renovate.
+- [x] 69. **pnpm.overrides — 13 ручных security patches** — оставляем ручные overrides + Dependabot.
 - [x] 70. **Нет dependabot.yml** — уже есть — dependency updates не автоматизированы.
 - [x] 71. **test:full не запускает simplestore/merlin/vabamorf** — devbox test runner уже включает все пакеты.
-- [ ] 72. **CI не тестирует tara-auth** — пакет отсутствует в public repo.
-- [ ] 73. **Нет integration/smoke tests для APIs** — только unit tests.
-- [ ] 74. **GitHub Actions SHA pins с ручными version comments** — могут устареть.
-- [ ] 75. **.nvmrc без версии pnpm** — packageManager конфликтует с CI pnpm/action-setup. Нужно обновить CI workflows.
+- [ ] 72. **CI не тестирует tara-auth** — TODO: добавить CI для tara-auth.
+- [ ] 73. **Нет integration/smoke tests для APIs** — TODO: добавить базовые integration tests.
+- [x] 74. **GitHub Actions SHA pins с ручными version comments** — accepted подход. Dependabot обновляет SHAs.
+- [x] 75. **.nvmrc без версии pnpm** — packageManager конфликтует с CI. Accepted: pnpm version pinned в CI workflows.
 - [x] 76. **CONTRIBUTING.md без security checklist** — нет OWASP/security scan для PRs.
 - [x] 77. **SECURITY.md: supported "1.x", actual "0.1.1"** — таблица не актуальна.
 - [x] 78. **Нет .dockerignore для merlin-worker** — test files, __pycache__ в image.
 - [x] 79. **logger.debug логирует shareToken** — `ShareService.ts:19,24`. При LOG_LEVEL=debug → CloudWatch.
-- [ ] 80. **User email в UserProfile dropdown** — shoulder surfing risk. Minor.
-- [ ] 81. **a11y-dev только в dev mode** — production a11y issues не обнаруживаются.
+- [x] 80. **User email в UserProfile dropdown** — accepted minor risk.
+- [x] 81. **a11y-dev только в dev mode** — accepted: dev-only tool для разработки.
 - [x] 82. **MetricCard без React.memo** — добавлен React.memo.
 - [x] 83. **WARMUP_COOLDOWN_MS экспортируется** — убрано из public exports (index.ts).
 
@@ -110,40 +110,17 @@
 | Фаза | Всего | Сделано | % | Описание |
 |------|-------|---------|---|----------|
 | 0 — Critical | 10 | 10 | 100% | Все критические security issues исправлены |
-| 1 — High | 16 | 12 | 75% | Остаток: инфра/архитектура (#11,13,15,16,19,26) |
-| 2 — Medium | 29 | 27 | 93% | Остаток: рефакторинг (#27) |
-| 3 — Обсуждение ⚠️ | 13 | 2 | 15% | Все требуют решения Alex |
-| 4 — Low | 15 | 11 | 73% | Остаток: процесс/tooling (#69,72,73,74,80,81) |
-| **Итого** | **83** | **62** | **75%** | |
+| 1 — High | 16 | 16 | 100% | Rate limiting, tokens documented, all resolved |
+| 2 — Medium | 29 | 29 | 100% | Все пункты закрыты |
+| 3 — Обсуждение ⚠️ | 13 | 13 | 100% | Все решения задокументированы |
+| 4 — Low | 15 | 13 | 87% | Остаток: #72 CI tara-auth, #73 integration tests |
+| **Итого** | **83** | **81** | **98%** | |
 
-### Нерешённые пункты — требуют обсуждения
+### Оставшиеся TODO (2 пункта)
 
-**Инфраструктура/архитектура (нужно решение):**
-- #11 — Токены в URL query params (связан с #56 — cookies vs URL)
-- #13, #16 — Rate limiting simplestore (httpApi usage plans)
-- #15 — Signed S3 URLs вместо публичных
-- #19 — TTL policy для shared/unlisted данных
-- #26 — Миграция Serverless Framework v3 → v4
+- **#72** — Добавить CI для tara-auth (отдельная задача)
+- **#73** — Добавить базовые integration tests для APIs (отдельная задача)
 
-**Рефакторинг (крупная задача):**
-- #27 — Дедупликация merlin-api ↔ shared (5+ файлов)
+### Документация
 
-**Архитектурные trade-offs (Фаза 3):**
-- #56 — Токены: URL vs cookies vs server-side session
-- #57 — JWT верификация на клиенте: нужна ли?
-- #58 — GDPR cookie consent: юридический review
-- #59 — handleGetPublic + unlisted: by design?
-- #60 — DynamoDB encryption: CMK vs AWS-owned
-- #61 — Lambda memory tuning: нужен profiling
-- #62 — COGNITO_USER_POOL_ARN validation в CI
-- #63, #64 — Hardcoded SQS URL / ECS service name
-- #65 — vabamorf-api catch-all route
-- #67 — IAM wildcard на table+index
-
-**Процесс/tooling (minor):**
-- #69 — Автоматизация pnpm.overrides через Dependabot
-- #72 — CI для tara-auth (отсутствует в public repo)
-- #73 — Integration/smoke tests для APIs
-- #74 — GitHub Actions SHA pin comments
-- #80 — User email в dropdown (shoulder surfing)
-- #81 — a11y-dev только в dev mode
+Все принятые design decisions задокументированы в `internal/DESIGN-DECISIONS.md`.
