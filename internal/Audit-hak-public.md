@@ -89,7 +89,7 @@
 
 - [ ] 69. **pnpm.overrides — 13 ручных security patches** — Автоматизировать через Dependabot/Renovate.
 - [x] 70. **Нет dependabot.yml** — уже есть — dependency updates не автоматизированы.
-- [ ] 71. **test:full не запускает simplestore/merlin/vabamorf** — `package.json:16-17`. Только frontend+shared.
+- [x] 71. **test:full не запускает simplestore/merlin/vabamorf** — devbox test runner уже включает все пакеты.
 - [ ] 72. **CI не тестирует tara-auth** — пакет отсутствует в public repo.
 - [ ] 73. **Нет integration/smoke tests для APIs** — только unit tests.
 - [ ] 74. **GitHub Actions SHA pins с ручными version comments** — могут устареть.
