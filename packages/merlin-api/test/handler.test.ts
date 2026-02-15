@@ -3,7 +3,7 @@
 
 import {
   generateCacheKey,
-  resetRateLimit,
+  warmupRateLimit,
   parseRequestBody,
   applySynthesizeDefaults,
   validateText,
@@ -310,9 +310,9 @@ describe("isEcsConfigured", () => {
   });
 });
 
-describe("resetRateLimit", () => {
-  it("should be callable without error", () => {
-    expect(() => resetRateLimit()).not.toThrow();
+describe("warmupRateLimit", () => {
+  it("should be resettable without error", () => {
+    expect(() => warmupRateLimit.reset()).not.toThrow();
   });
 });
 

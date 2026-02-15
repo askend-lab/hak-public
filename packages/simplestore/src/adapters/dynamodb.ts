@@ -12,9 +12,10 @@ import {
   GetCommand,
   DeleteCommand,
   QueryCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 
-import { StorageAdapter, StoreItem } from "../core/types";
+import { StorageAdapter, StoreItem, UpsertFields } from "../core/types";
 
 const SK_PREFIX_CONDITION = "PK = :pk AND begins_with(SK, :skPrefix)";
 
@@ -91,10 +92,50 @@ export class DynamoDBAdapter implements StorageAdapter {
   }
 
   /**
-   * Queries items by partition key with sort key prefix
-   * Uses begins_with for efficient prefix matching
-   * Handles pagination to return all matching items
+   * Atomic upsert — single DynamoDB call, no read-before-write
+   * Uses if_not_exists for createdAt and atomic version increment
    */
+  async upsert(pk: string, sk: string, fields: UpsertFields): Promise<StoreItem> {
+    const now = new Date().toISOString();
+
+    let updateExpr =
+      "SET #data = :data, #owner = :owner, updatedAt = :now, " +
+      "createdAt = if_not_exists(createdAt, :now), " +
+      "version = if_not_exists(version, :zero) + :one";
+
+    const exprValues: Record<string, unknown> = {
+      ":data": fields.data,
+      ":owner": fields.owner,
+      ":now": now,
+      ":zero": 0,
+      ":one": 1,
+    };
+
+    if (fields.ttl !== undefined) {
+      updateExpr += ", #ttl = :ttl";
+      exprValues[":ttl"] = fields.ttl;
+    } else {
+      updateExpr += " REMOVE #ttl";
+    }
+
+    const result = await this.docClient.send(
+      new UpdateCommand({
+        TableName: this.tableName,
+        Key: this.dynamoKey(pk, sk),
+        UpdateExpression: updateExpr,
+        ExpressionAttributeNames: {
+          "#data": "data",
+          "#owner": "owner",
+          "#ttl": "ttl",
+        },
+        ExpressionAttributeValues: exprValues,
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return result.Attributes as StoreItem;
+  }
+
   async queryBySortKeyPrefix(
     pk: string,
     skPrefix: string,

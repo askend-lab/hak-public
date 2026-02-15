@@ -22,7 +22,7 @@ jest.mock("../src/ecs", () => {
   };
 });
 
-import { synthesize, status, warmup, resetRateLimit, WARMUP_COOLDOWN_MS } from "../src/handler";
+import { synthesize, status, warmup, warmupRateLimit, WARMUP_COOLDOWN_MS } from "../src/handler";
 import { checkS3Cache } from "../src/s3";
 import { sendToQueue } from "../src/sqs";
 import { describeService, scaleService } from "../src/ecs";
@@ -43,7 +43,7 @@ const mockScaleService = scaleService as jest.MockedFunction<typeof scaleService
 
 beforeEach(() => {
   setupTestEnv();
-  resetRateLimit();
+  warmupRateLimit.reset();
   jest.clearAllMocks();
   jest.spyOn(console, "error").mockImplementation();
 });

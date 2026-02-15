@@ -24,14 +24,14 @@ describe("DataService Share Operations", () => {
       name: "Share Test",
       description: "",
     });
-    await ds.shareUserTask(userId, task.id);
+    await ds.shareUserTask(task.id);
     // Verify task is now shared by checking it can be found by shareToken
     const shared = await ds.getTaskByShareToken(task.shareToken);
     expect(shared?.name).toBe("Share Test");
   });
 
   it("shareUserTask throws for non-existent task", async () => {
-    await expect(ds.shareUserTask(userId, "non-existent")).rejects.toThrow(
+    await expect(ds.shareUserTask("non-existent")).rejects.toThrow(
       "Task not found",
     );
   });
@@ -41,7 +41,7 @@ describe("DataService Share Operations", () => {
       name: "Token Test",
       description: "",
     });
-    await ds.shareUserTask(userId, task.id);
+    await ds.shareUserTask(task.id);
     const found = await ds.getTaskByShareToken(task.shareToken);
     expect(found?.name).toBe("Token Test");
   });
@@ -56,7 +56,7 @@ describe("DataService Share Operations", () => {
       name: "Shared Task",
       description: "",
     });
-    await ds.shareUserTask(userId, task.id);
+    await ds.shareUserTask(task.id);
     const found = await ds.getTaskByShareToken(task.shareToken);
     expect(found?.name).toBe("Shared Task");
   });

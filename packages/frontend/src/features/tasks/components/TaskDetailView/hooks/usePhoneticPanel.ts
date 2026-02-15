@@ -86,7 +86,6 @@ export function usePhoneticPanel(
 
       try {
         await dataService.updateTaskEntry(
-          userId,
           task.id,
           phoneticPanelEntryId,
           {

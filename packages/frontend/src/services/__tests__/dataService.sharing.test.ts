@@ -26,7 +26,7 @@ describe("DataService Sharing", () => {
         description: "Test",
       });
 
-      await dataService.shareUserTask(mockUserId, task.id);
+      await dataService.shareUserTask(task.id);
 
       // Verify task is accessible by shareToken
       const found = await dataService.getTaskByShareToken(task.shareToken);
@@ -36,7 +36,7 @@ describe("DataService Sharing", () => {
 
     it("throws when task not found", async () => {
       await expect(
-        dataService.shareUserTask(mockUserId, "non-existent"),
+        dataService.shareUserTask("non-existent"),
       ).rejects.toThrow("Task not found");
     });
 
@@ -46,10 +46,10 @@ describe("DataService Sharing", () => {
         description: "Original",
       });
 
-      await dataService.shareUserTask(mockUserId, task.id);
+      await dataService.shareUserTask(task.id);
 
-      await dataService.updateTask(mockUserId, task.id, { name: "Task v2" });
-      await dataService.shareUserTask(mockUserId, task.id);
+      await dataService.updateTask(task.id, { name: "Task v2" });
+      await dataService.shareUserTask(task.id);
 
       // Verify updated task is accessible by shareToken
       const found = await dataService.getTaskByShareToken(task.shareToken);
@@ -65,7 +65,7 @@ describe("DataService Sharing", () => {
       });
 
       // Share the task first so it can be found by token
-      await dataService.shareUserTask(mockUserId, task.id);
+      await dataService.shareUserTask(task.id);
 
       const result = await dataService.getTaskByShareToken(task.shareToken);
       expect(result).toBeDefined();
@@ -84,7 +84,7 @@ describe("DataService Sharing", () => {
         name: "Revoke Task",
         description: "Test",
       });
-      await dataService.shareUserTask(mockUserId, task.id);
+      await dataService.shareUserTask(task.id);
       expect(await dataService.getTaskByShareToken(task.shareToken)).toBeDefined();
 
       await dataService.revokeShare(task.shareToken);

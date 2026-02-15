@@ -30,4 +30,5 @@ export type {
   StoreResult,
   StoreConfig,
   StorageAdapter,
+  UpsertFields,
 } from "./types";

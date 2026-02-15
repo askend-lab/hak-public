@@ -31,7 +31,7 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
 
       try {
         setIsLoading(true);
-        const userTasks = await dataService.getUserTasks(user.id);
+        const userTasks = await dataService.getUserTasks();
         setTasks(userTasks);
       } catch (err) {
         setError(

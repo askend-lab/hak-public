@@ -83,7 +83,7 @@ export class Store {
 
   /**
    * Creates or updates an item in the store
-   * Preserves createdAt on update, only changes updatedAt
+   * Uses atomic upsert — single adapter call, no read-before-write
    */
   async save(request: StoreRequest): Promise<StoreResult> {
     const ttlResult = parseTtl(request.ttl, this.config);
@@ -94,10 +94,12 @@ export class Store {
     const keys = this.resolveKeys(request.type, request.pk, request.sk);
 
     return this.wrapAsync(async () => {
-      const existing = await this.adapter.get(keys.pk, keys.sk);
-      const existingVersion = existing?.version ?? 0;
-      const item = this.createItem(keys, request, existing?.createdAt, existingVersion + 1);
-      await this.adapter.put(item, existing ? existingVersion : undefined);
+      const fields: import("./types").UpsertFields = {
+        data: request.data ?? {},
+        owner: this.context.userId,
+        ...(request.ttl > 0 ? { ttl: this.calculateTtl(request.ttl) } : {}),
+      };
+      const item = await this.adapter.upsert(keys.pk, keys.sk, fields);
       return { success: true, item };
     });
   }
@@ -178,31 +180,6 @@ export class Store {
     } catch (error) {
       return { success: false, error: String(error) };
     }
-  }
-
-  private createItem(
-    keys: { pk: string; sk: string },
-    request: StoreRequest,
-    existingCreatedAt?: string,
-    version: number = 1,
-  ): StoreItem {
-    const now = new Date().toISOString();
-
-    const item: StoreItem = {
-      PK: keys.pk,
-      SK: keys.sk,
-      data: request.data ?? {},
-      owner: this.context.userId,
-      createdAt: existingCreatedAt ?? now,
-      updatedAt: now,
-      version,
-    };
-
-    if (request.ttl > 0) {
-      return { ...item, ttl: this.calculateTtl(request.ttl) };
-    }
-
-    return item;
   }
 
   private calculateTtl(ttlSeconds: number): number {

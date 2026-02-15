@@ -60,7 +60,6 @@ describe("TaskRepository append/replace mode", () => {
     storage.getTask.mockResolvedValue(task);
 
     await repository.addTextEntriesToTask(
-      testUserId,
       "task-append-1",
       ["New sentence"],
     );
@@ -76,7 +75,6 @@ describe("TaskRepository append/replace mode", () => {
     storage.getTask.mockResolvedValue(task);
 
     await repository.addTextEntriesToTask(
-      testUserId,
       "task-append-2",
       ["New sentence"],
       "append",
@@ -93,7 +91,6 @@ describe("TaskRepository append/replace mode", () => {
     storage.getTask.mockResolvedValue(task);
 
     await repository.addTextEntriesToTask(
-      testUserId,
       "task-replace-1",
       ["Replacement A", "Replacement B"],
       "replace",
@@ -111,7 +108,6 @@ describe("TaskRepository append/replace mode", () => {
     storage.getTask.mockResolvedValue(task);
 
     const entries = await repository.addTextEntriesToTask(
-      testUserId,
       "task-replace-2",
       ["First", "Second"],
       "replace",
