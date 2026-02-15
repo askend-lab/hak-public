@@ -169,7 +169,7 @@ jobs:
 
       - name: Scan Docker image with Trivy
         if: steps.detect.outputs.vabamorf-api == 'true'
-        uses: aquasecurity/trivy-action@22438a435773de8c97dc0958cc0b823c45b064ac # master
+        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # master
         with:
           image-ref: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ github.sha }}
           format: 'table'
