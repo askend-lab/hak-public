@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
 import "@testing-library/jest-dom";
 
 // Polyfill TextEncoder/TextDecoder for react-router-dom v7
