@@ -92,7 +92,8 @@ Audited all Terraform files, Serverless configs, Dockerfiles, GitHub Actions wor
 ## Execution Order
 
 1. ~~Phase 1: Sam implements terraform changes~~ ✅ DONE
-2. **Now:** Alex reviews PR with Phase 1 + Phase 3 configs
-3. **Phase 2:** Alex handles IAM/MFA items
-4. **Phase 3:** `terraform apply` for CloudTrail + GuardDuty after review
-5. **Phase 4:** Team discusses cleanup list, deletes confirmed orphans
+2. ~~Phase 3 partial: CloudTrail + GuardDuty configs~~ ✅ DONE
+3. ~~Phase 4 partial: Investigation + cleanup code~~ ✅ DONE
+4. **Now:** Merge PR → CI/CD auto-applies Terraform changes + deploys simplestore PITR
+5. **Then:** Run `cleanup-orphaned.yml` workflow (type DELETE to confirm)
+6. **Phase 2:** Alex handles IAM/MFA items (AWS console)
