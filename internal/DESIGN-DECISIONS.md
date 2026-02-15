@@ -6,19 +6,21 @@
 
 ## Authentication
 
-### Токены в URL query params (#11, #56)
-**Решение:** Accepted trade-off для SPA архитектуры.
+### Передача токенов после TARA callback (#11, #56, C1)
+**Решение:** Токены передаются через Secure cookies (после fix C1).
 
 TARA использует стандартный OAuth2 Authorization Code flow:
 1. tara-auth обменивает code на токены server-to-server (не через браузер)
-2. Cognito access/id tokens (short-lived, ~1 час) передаются фронтенду через URL params
+2. Cognito access/id tokens устанавливаются как Secure cookies в 302 redirect
 3. Refresh token передаётся ТОЛЬКО через httpOnly cookie (никогда не доступен JS)
-4. Фронтенд сразу делает `navigate("/", { replace: true })` — токены удаляются из URL и browser history
-5. `Cache-Control: no-store` предотвращает кеширование
-6. `Referrer-Policy: no-referrer` предотвращает утечку через Referer header
-7. CSP защищает от XSS, который мог бы перехватить токены
+4. URL redirect содержит только `?auth=success` — токены НЕ в URL
+5. Фронтенд читает access/id token из `document.cookie`, затем делает `navigate("/", { replace: true })`
+6. `Cache-Control: no-store` предотвращает кеширование
+7. `Referrer-Policy: no-referrer` предотвращает утечку через Referer header
+8. CSP защищает от XSS
+9. POST endpoints защищены CSRF-валидацией Origin header
 
-**Альтернатива:** Все токены в httpOnly cookies — но тогда JS не может прочитать id_token для извлечения userId/email, что необходимо для SPA.
+**История:** Ранее токены передавались через URL query params (accepted trade-off). Fix C1 (2026-02) перенёс их в cookies для устранения утечки через browser history, CloudFront logs и Referer headers.
 
 ### JWT верификация на клиенте (#57)
 **Решение:** Клиентский парсинг JWT — только для UI (извлечение userId, email). Серверная верификация через Cognito authorizer на каждом API запросе.
@@ -39,8 +41,11 @@ TARA использует стандартный OAuth2 Authorization Code flow:
 
 ## API & Infrastructure
 
-### Rate limiting (#13, #16)
-**Решение:** Добавлен throttle 20 req/s для simplestore API Gateway. merlin-api уже имеет rate limiting.
+### Rate limiting (#13, #16, M8)
+**Решение:** API Gateway throttling на всех сервисах:
+- simplestore: 10 req/s, burst 20
+- merlin-api: 2 req/s, burst 4
+- AWS WAF: 100 req/5 min per IP (AWS minimum)
 
 ### Lambda memory (#61)
 **Решение:** SimpleStore уменьшен до 512MB (достаточно для CRUD операций). merlin-api остаётся 1024MB.
@@ -73,4 +78,4 @@ TARA использует стандартный OAuth2 Authorization Code flow:
 
 ---
 
-*Последнее обновление: 2026-02-15 (Luna, по результатам обсуждения с Alex)*
+*Последнее обновление: 2026-02-15 (Eve, documentation audit — token handling updated to reflect C1 fix, rate limits corrected)*

@@ -17,7 +17,7 @@ pnpm run dx        # Full quality check: tests + hooks
 pnpm start         # Start dev server (http://localhost:5180)
 ```
 
-**Prerequisites:** Node.js 20+, pnpm 9+
+**Prerequisites:** Node.js 20+, pnpm 10+
 
 ## Architecture
 

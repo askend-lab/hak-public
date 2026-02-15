@@ -6,10 +6,9 @@ HAK is an Estonian language learning platform. Teachers create lessons with text
 
 **Client:** React SPA (Vite + SCSS/BEM), served via CloudFront CDN from S3.
 
-**Backend:** Five Lambda functions behind API Gateway, plus one Docker service on ECS:
+**Backend:** Four Lambda functions behind API Gateway, plus one Docker service on ECS:
 
 - **simplestore** — REST API for lessons, users, and progress. Reads/writes DynamoDB.
-- **audio-api** — Audio file upload, playback, and storage. Uses S3 for audio files.
 - **merlin-api** — TTS gateway. Accepts synthesis requests, sends them to SQS, checks results in S3.
 - **merlin-worker** — Estonian speech synthesis engine (Merlin). Runs as a Docker container on ECS Fargate. Polls SQS for jobs, runs Merlin TTS, uploads WAV files to S3.
 - **vabamorf-api** — Estonian morphological analysis. Lambda with a native binary (vmetajson) in a Docker container.
@@ -25,8 +24,7 @@ pnpm workspaces monorepo. Packages and their dependencies:
 
 - **frontend** — depends on `shared`, `specifications`, `simplestore` (dev)
 - **simplestore** — depends on `shared`
-- **audio-api** — depends on `shared`
-- **merlin-api** — depends on `shared`
+- **merlin-api** — standalone (inlines shared utilities for Lambda bundling)
 - **merlin-worker** — depends on `shared`
 - **vabamorf-api** — depends on `shared`
 - **tara-auth** — standalone
@@ -38,7 +36,6 @@ pnpm workspaces monorepo. Packages and their dependencies:
 
 - **frontend** — React, Vite, SCSS/BEM, Vitest. Runs on S3 + CloudFront. Teacher and student UI.
 - **simplestore** — TypeScript, DynamoDB SDK. Lambda. Lessons, users, progress CRUD.
-- **audio-api** — TypeScript, S3 SDK, SQS SDK. Lambda. Audio upload, playback, storage.
 - **merlin-api** — TypeScript, ECS SDK, S3 SDK, SQS SDK. Lambda. TTS request gateway.
 - **merlin-worker** — Python + TypeScript, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis.
 - **vabamorf-api** — TypeScript, native binary (vmetajson). Lambda (Docker). Estonian morphological analysis.
@@ -50,10 +47,9 @@ pnpm workspaces monorepo. Packages and their dependencies:
 ## Data Flow — Lesson Playback
 
 1. Student opens the app. CloudFront serves the React SPA from S3.
-2. Student navigates to a lesson. Frontend calls `GET /lessons/:id` via API Gateway.
+2. Student navigates to a lesson. Frontend calls `GET /get?pk=...&sk=...&type=...` via API Gateway.
 3. API Gateway routes to simplestore. Simplestore queries DynamoDB, returns lesson JSON.
-4. Frontend renders the lesson. For audio playback, it calls `GET /audio/:key`.
-5. API Gateway routes to audio-api. Audio-api fetches the WAV from S3 and streams it back.
+4. Frontend renders the lesson. Audio files are served directly from S3 via content-hash URLs.
 
 ## Data Flow — TTS Synthesis
 
@@ -88,9 +84,19 @@ All infrastructure is managed with Terraform in `infra/`.
 
 Pre-commit hooks (DevBox) enforce quality on every commit. The commit is rejected if any check fails.
 
-- **TypeScript strict** — no `any` types, explicit return types
-- **ESLint** — zero warnings policy
-- **Build check** — frontend and shared must compile (`tsc --noEmit`)
-- **Tests** — all tests must pass, coverage thresholds configured per package
-- **Code quality** — no console.log (use `logger`), import-first, duplicate detection (sonarjs), file size limits
-- **Infrastructure** — Docker lint, IaC security scan, plan validation
+| Hook | What it checks |
+|------|----------------|
+| **TYPE** | TypeScript strict compilation (`tsc --noEmit`) across all packages |
+| **RUN-LINT** | ESLint zero-warnings policy on changed files |
+| **DEAD-CODE** | Unused exports detection (knip) |
+| **PLAYWRIGHT** | E2E browser tests |
+| **SECURITY** | `pnpm audit` — 0 known CVEs |
+| **DEPS** | Unused/missing dependency detection |
+| **CIRCULAR-DEPS** | Circular import detection (madge) |
+| **JSCPD** | Copy-paste detection (≤5% threshold) |
+| **SRC-SIZE** | Source file size limit (≤400 lines) |
+| **MD-SIZE** | Markdown file size limit (≤200 lines) |
+| **SECRET** | Secret/credential scanning (gitleaks) |
+| **LANG** | Language consistency checking |
+
+Lint metrics enforced: complexity ≤10, function length ≤50L, nesting depth ≤4, no console statements, no magic numbers.
