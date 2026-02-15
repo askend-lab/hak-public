@@ -17,6 +17,7 @@ import {
   getTaraLoginUrl,
   exchangeCodeForTokens,
   AUTH_API_URL,
+  cognitoConfig,
 } from "./config";
 import type { AuthContextValue, AuthState } from "./types";
 import { parseIdToken, isTokenExpired } from "./token";
@@ -64,7 +65,15 @@ function storeTokensAndSetAuth(
   tokens: { accessToken: string; idToken: string },
   setState: React.Dispatch<React.SetStateAction<AuthState>>,
 ): boolean {
-  const user = parseIdToken(tokens.idToken);
+  const tokenOptions: Parameters<typeof parseIdToken>[1] = {};
+  if (cognitoConfig.region && cognitoConfig.userPoolId) {
+    tokenOptions.expectedIssuer =
+      `https://cognito-idp.${cognitoConfig.region}.amazonaws.com/${cognitoConfig.userPoolId}`;
+  }
+  if (cognitoConfig.clientId) {
+    tokenOptions.expectedAudience = cognitoConfig.clientId;
+  }
+  const user = parseIdToken(tokens.idToken, tokenOptions);
   if (user) {
     AuthStorage.setUser(user);
     AuthStorage.setAccessToken(tokens.accessToken);

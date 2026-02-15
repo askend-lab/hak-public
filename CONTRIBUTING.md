@@ -52,6 +52,17 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 4. Run linting: `pnpm lint`
 5. Open a PR with a clear description
 
+### Security Checklist
+
+Before submitting a PR, verify:
+
+- No secrets, API keys, or credentials in code or config
+- User input is validated and sanitized (length, type, range)
+- Error messages do not leak internal details (stack traces, file paths, bucket names)
+- No `shell=True` or string-interpolated shell commands
+- CORS origin is dynamic (`getCorsOrigin()`), not hardcoded `"*"`
+- Auth-required endpoints have authorizer configured
+
 ## Project Structure
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full monorepo structure, package dependencies, and data flows.

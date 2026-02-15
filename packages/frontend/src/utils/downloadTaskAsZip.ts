@@ -88,7 +88,9 @@ export async function downloadTaskAsZip(
   // Audio files — download in parallel batches for speed
   const total = task.entries.length;
   let completed = 0;
+  let totalBytes = 0;
   const BATCH_SIZE = 4;
+  const MAX_TOTAL_ZIP_BYTES = 500 * 1024 * 1024;
 
   for (let i = 0; i < task.entries.length; i += BATCH_SIZE) {
     const batch = task.entries.slice(i, i + BATCH_SIZE);
@@ -100,6 +102,10 @@ export async function downloadTaskAsZip(
       completed++;
       onProgress?.({ current: completed, total });
       if (blob) {
+        totalBytes += blob.size;
+        if (totalBytes > MAX_TOTAL_ZIP_BYTES) {
+          throw new Error("ZIP size limit exceeded (500MB)");
+        }
         const index = String(i + j + 1).padStart(3, "0");
         const name = sanitizeFilename(batch[j]?.text ?? "") || "audio";
         audioFolder.file(`${index}-${name}.wav`, blob);

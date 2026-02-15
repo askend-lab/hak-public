@@ -5,11 +5,9 @@ import { useState, useEffect } from "react";
 
 declare const __BUILD_INFO__: {
   commitHash: string;
-  commitMessage: string;
   branch: string;
   commitDate: string;
   buildTime: string;
-  workingDir: string;
 };
 
 interface RuntimeBuildInfo {
@@ -28,11 +26,9 @@ const buildTimeInfo =
     ? __BUILD_INFO__
     : {
         commitHash: "dev",
-        commitMessage: "",
         branch: "local",
         commitDate: "",
         buildTime: "",
-        workingDir: "",
       };
 
 function formatDateTime(dateString: string): string {
@@ -82,7 +78,7 @@ function useBuildInfo(): RuntimeBuildInfo {
       commitHash: runtimeInfo.commitHash || buildTimeInfo.commitHash,
       commitHashFull: runtimeInfo.commitHashFull,
       branch: runtimeInfo.branch || buildTimeInfo.branch,
-      message: runtimeInfo.message || buildTimeInfo.commitMessage,
+      message: runtimeInfo.message,
       builtAt: runtimeInfo.builtAt || buildTimeInfo.buildTime,
       deployedAt: runtimeInfo.deployedAt,
       environment: runtimeInfo.environment,
@@ -92,7 +88,7 @@ function useBuildInfo(): RuntimeBuildInfo {
   return {
     commitHash: buildTimeInfo.commitHash,
     branch: buildTimeInfo.branch,
-    message: buildTimeInfo.commitMessage,
+    message: undefined,
     builtAt: buildTimeInfo.buildTime,
   };
 }
@@ -127,13 +123,6 @@ const BuildInfoModal = ({
         <Row label="Built" value={formatDateTime(info.builtAt || "")} />
         {info.deployedAt && (
           <Row label="Deployed" value={formatDateTime(info.deployedAt)} />
-        )}
-        {isLocalDev() && buildTimeInfo.workingDir && (
-          <Row
-            label="Directory"
-            value={buildTimeInfo.workingDir}
-            className="build-info-path"
-          />
         )}
       </div>
       </div>

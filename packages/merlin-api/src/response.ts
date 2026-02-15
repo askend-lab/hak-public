@@ -7,11 +7,19 @@ export interface LambdaResponse {
   body: string;
 }
 
+// Inlined from @hak/shared — merlin-api is a standalone Lambda without workspace packages
+function getCorsOrigin(): string {
+  return (typeof process !== "undefined" && process.env?.ALLOWED_ORIGIN) || "*";
+}
+
 export const CORS_HEADERS: Record<string, string> = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
   "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Content-Security-Policy": "default-src 'none'",
 };
 
 export const HTTP_STATUS = {
@@ -31,7 +39,7 @@ export function createResponse(
 ): LambdaResponse {
   return {
     statusCode,
-    headers: { ...CORS_HEADERS },
+    headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": getCorsOrigin() },
     body: JSON.stringify(body),
   };
 }

@@ -3,8 +3,13 @@
 
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import { DataServiceTestWrapper } from "../test/dataServiceMock";
+
+function TestWrapper({ children }: { children?: React.ReactNode }) {
+  return <MemoryRouter><DataServiceTestWrapper>{children}</DataServiceTestWrapper></MemoryRouter>;
+}
 
 vi.mock("../features/auth/services/context", () => ({
   useAuth: vi.fn(() => ({
@@ -31,17 +36,17 @@ describe("Dashboard", () => {
   });
 
   it("renders dashboard container", () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     expect(document.querySelector(".dashboard")).toBeTruthy();
   });
 
   it("renders dashboard title after loading", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => expect(screen.getByText("Töölaud")).toBeTruthy());
   });
 
   it("shows auth prompt when not authenticated", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => expect(screen.getByText(/Logi sisse/)).toBeTruthy());
   });
 
@@ -60,35 +65,35 @@ describe("Dashboard", () => {
       handleCodeCallback: vi.fn(),
       handleTaraTokens: vi.fn(),
     });
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => expect(screen.getByText("Ülesanded")).toBeTruthy());
   });
 
   it("renders quick links section", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => expect(screen.getByText("Kiirlingid")).toBeTruthy());
   });
 
   it("renders recent activity section", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() =>
       expect(screen.getByText("Hiljutine tegevus")).toBeTruthy(),
     );
   });
 
   it("shows loading spinner initially", () => {
-    const { container } = render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    const { container } = render(<Dashboard />, { wrapper: TestWrapper });
     expect(container.querySelector(".loader-spinner")).toBeTruthy();
     expect(container.querySelector(".dashboard__loading")).toBeTruthy();
   });
 
   it("renders subtitle", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => expect(screen.getByText("Rakenduse aktiivsuse ülevaade")).toBeTruthy());
   });
 
   it("renders metric labels", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => {
       expect(screen.getByText("Ülesanded")).toBeTruthy();
       expect(screen.getByText("Kirjed")).toBeTruthy();
@@ -96,7 +101,7 @@ describe("Dashboard", () => {
   });
 
   it("renders metric icons", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => {
       expect(screen.getAllByText("📋").length).toBeGreaterThan(0);
       expect(screen.getByText("📝")).toBeTruthy();
@@ -104,7 +109,7 @@ describe("Dashboard", () => {
   });
 
   it("renders quick link buttons", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => {
       expect(screen.getByText("Uus süntees")).toBeTruthy();
       expect(screen.getByText("Loo ülesanne")).toBeTruthy();
@@ -113,7 +118,7 @@ describe("Dashboard", () => {
   });
 
   it("renders empty activity list", async () => {
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => expect(screen.getByText("Tegevust pole veel")).toBeTruthy());
   });
 
@@ -132,13 +137,13 @@ describe("Dashboard", () => {
       handleCodeCallback: vi.fn(),
       handleTaraTokens: vi.fn(),
     });
-    render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => expect(screen.getByText("Töölaud")).toBeTruthy());
     expect(screen.queryByText(/Logi sisse/)).toBeNull();
   });
 
   it("renders metric value elements", async () => {
-    const { container } = render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    const { container } = render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => {
       const values = container.querySelectorAll(".dashboard__metric-value");
       expect(values.length).toBe(2);
@@ -146,7 +151,7 @@ describe("Dashboard", () => {
   });
 
   it("has correct dashboard structure classes", async () => {
-    const { container } = render(<Dashboard />, { wrapper: DataServiceTestWrapper });
+    const { container } = render(<Dashboard />, { wrapper: TestWrapper });
     await waitFor(() => {
       expect(container.querySelector(".dashboard__header")).toBeTruthy();
       expect(container.querySelector(".dashboard__metrics")).toBeTruthy();

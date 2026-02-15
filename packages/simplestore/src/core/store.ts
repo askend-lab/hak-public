@@ -120,7 +120,7 @@ export class Store {
   }
 
   /**
-   * Deletes an item (owner only for private/unlisted/public, anyone for shared)
+   * Deletes an item (owner only for all data types)
    */
   async delete(
     entityPk: string,
@@ -136,7 +136,7 @@ export class Store {
         return { success: false, error: ERRORS.NOT_FOUND };
       }
 
-      if (type !== "shared" && !this.isOwner(existing)) {
+      if (!this.isOwner(existing)) {
         return { success: false, error: ERRORS.ACCESS_DENIED };
       }
 

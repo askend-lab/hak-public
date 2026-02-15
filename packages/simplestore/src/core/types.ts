@@ -97,5 +97,5 @@ export interface StorageAdapter {
   put(item: StoreItem, expectedVersion?: number): Promise<void>;
   get(pk: string, sk: string): Promise<StoreItem | null>;
   delete(pk: string, sk: string): Promise<void>;
-  queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]>;
+  queryBySortKeyPrefix(pk: string, skPrefix: string, maxItems?: number): Promise<StoreItem[]>;
 }

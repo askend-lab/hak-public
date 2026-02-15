@@ -2,6 +2,11 @@ service: merlin-api
 
 frameworkVersion: "3"
 
+custom:
+  allowedOrigin:
+    dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
+    prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -22,10 +27,18 @@ provider:
     throttle:
       rateLimit: 5
       burstLimit: 10
+    authorizers:
+      cognitoJwt:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: https://cognito-idp.${self:provider.region}.amazonaws.com/${env:COGNITO_USER_POOL_ID}
+        audience:
+          - ${env:COGNITO_CLIENT_ID}
 
   environment:
     SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID}/hak-merlin-${self:provider.stage}-queue
     S3_BUCKET: hak-merlin-${self:provider.stage}-audio
+    ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}}
 
   iam:
     role:
@@ -58,6 +71,8 @@ functions:
       - httpApi:
           path: /synthesize
           method: POST
+          authorizer:
+            name: cognitoJwt
 
   status:
     handler: dist/handler.status
@@ -85,6 +100,8 @@ functions:
       - httpApi:
           path: /warmup
           method: POST
+          authorizer:
+            name: cognitoJwt
 
 resources:
   Outputs:

@@ -200,11 +200,9 @@ describe("BuildInfo with __BUILD_INFO__ defined", () => {
   beforeAll(async () => {
     (globalThis as Record<string, unknown>).__BUILD_INFO__ = {
       commitHash: "abc123",
-      commitMessage: "test commit",
       branch: "test-branch",
       commitDate: "2026-06-01",
       buildTime: "2026-06-01T12:00:00Z",
-      workingDir: "/test/workspace",
     };
     vi.resetModules();
     const mod = await import("./BuildInfo");
@@ -229,19 +227,6 @@ describe("BuildInfo with __BUILD_INFO__ defined", () => {
     expect(screen.getByText("abc123")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button"));
     expect(screen.getByText("test-branch")).toBeInTheDocument();
-    expect(screen.getByText("test commit")).toBeInTheDocument();
-  });
-
-  it("shows Directory row on localhost with workingDir (kills L130)", () => {
-    vi.stubGlobal("fetch", vi.fn());
-    Object.defineProperty(window, "location", {
-      value: { hostname: "localhost" },
-      writable: true,
-    });
-    render(<BuildInfoDefined />);
-    fireEvent.click(screen.getByRole("button"));
-    expect(screen.getByText("Directory")).toBeInTheDocument();
-    expect(screen.getByText("/test/workspace")).toBeInTheDocument();
   });
 
   it("formats buildTime with formatDateTime (kills L35 empty string)", () => {

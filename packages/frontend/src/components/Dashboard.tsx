@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/services/context";
 import { useDataService } from "../contexts/DataServiceContext";
 
@@ -16,7 +17,7 @@ interface RecentActivity {
   timestamp: Date;
 }
 
-function MetricCard({ metric }: { metric: ActivityMetric }) {
+const MetricCard = memo(function MetricCard({ metric }: { metric: ActivityMetric }) {
   return (
     <div className="dashboard__metric-card">
       <div className="dashboard__metric-icon">{metric.icon}</div>
@@ -26,7 +27,7 @@ function MetricCard({ metric }: { metric: ActivityMetric }) {
       </div>
     </div>
   );
-}
+});
 
 function ActivityItem({ activity }: { activity: RecentActivity }) {
   return (
@@ -47,16 +48,16 @@ function ActivityItem({ activity }: { activity: RecentActivity }) {
   );
 }
 
-function QuickLinks() {
+function QuickLinks({ onNavigate }: { onNavigate: (path: string) => void }) {
   return (
     <div className="dashboard__section">
       <h2 className="dashboard__section-title">Kiirlingid</h2>
       <div className="dashboard__quick-links">
-        <button className="dashboard__quick-link">
+        <button className="dashboard__quick-link" onClick={() => onNavigate("/synthesis")}>
           <span className="dashboard__quick-link-icon">🎤</span>
           <span>Uus süntees</span>
         </button>
-        <button className="dashboard__quick-link">
+        <button className="dashboard__quick-link" onClick={() => onNavigate("/tasks")}>
           <span className="dashboard__quick-link-icon">📋</span>
           <span>Loo ülesanne</span>
         </button>
@@ -92,19 +93,22 @@ function useDashboardData() {
   const dataService = useDataService();
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    let taskCount = 0,
-      entryCount = 0;
-    if (isAuthenticated && user) {
-      const tasks = await dataService.getUserTasks(user.id);
-      taskCount = tasks.length;
-      entryCount = tasks.reduce((sum, task) => sum + task.entryCount, 0);
+    try {
+      let taskCount = 0,
+        entryCount = 0;
+      if (isAuthenticated && user) {
+        const tasks = await dataService.getUserTasks(user.id);
+        taskCount = tasks.length;
+        entryCount = tasks.reduce((sum, task) => sum + task.entryCount, 0);
+      }
+      setMetrics([
+        { label: "Ülesanded", value: taskCount, icon: "📋" },
+        { label: "Kirjed", value: entryCount, icon: "📝" },
+      ]);
+      setRecentActivity([]);
+    } finally {
+      setIsLoading(false);
     }
-    setMetrics([
-      { label: "Ülesanded", value: taskCount, icon: "📋" },
-      { label: "Kirjed", value: entryCount, icon: "📝" },
-    ]);
-    setRecentActivity([]);
-    setIsLoading(false);
   }, [isAuthenticated, user, dataService]);
   useEffect(() => {
     loadData();
@@ -115,6 +119,7 @@ function useDashboardData() {
 export default function Dashboard() {
   const { metrics, recentActivity, isLoading, isAuthenticated } =
     useDashboardData();
+  const navigate = useNavigate();
   if (isLoading)
     return (
       <div className="dashboard">
@@ -136,7 +141,7 @@ export default function Dashboard() {
       </div>
       <div className="dashboard__sections">
         <ActivitySection recentActivity={recentActivity} />
-        <QuickLinks />
+        <QuickLinks onNavigate={navigate} />
       </div>
       {!isAuthenticated && (
         <div className="dashboard__auth-prompt">

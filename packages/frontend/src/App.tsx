@@ -29,6 +29,7 @@ const SpecsPage = lazy(() => import("./components/SpecsPage"));
 const Dashboard = lazy(() => import("./components/Dashboard"));
 const AccessibilityPage = lazy(() => import("./pages/AccessibilityPage"));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 export default function Home() {
   const { user, isAuthenticated, showLoginModal, setShowLoginModal } =
@@ -130,6 +131,7 @@ export default function Home() {
             {currentView === "dashboard" && <ErrorBoundary><Dashboard /></ErrorBoundary>}
             {currentView === "accessibility" && <ErrorBoundary><AccessibilityPage /></ErrorBoundary>}
             {currentView === "privacy" && <ErrorBoundary><PrivacyPage /></ErrorBoundary>}
+            {currentView === "not-found" && <ErrorBoundary><NotFoundPage /></ErrorBoundary>}
           </Suspense>
         )}
       </main>

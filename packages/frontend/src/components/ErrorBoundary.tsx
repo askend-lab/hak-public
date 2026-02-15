@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
         <div style={{ padding: "2rem", textAlign: "center" }}>
           <h2>Midagi läks valesti</h2>
           <p style={{ color: "#666", marginTop: "0.5rem" }}>
-            {this.state.error?.message ?? "Tekkis ootamatu viga"}
+            Tekkis ootamatu viga
           </p>
           <button
             onClick={() => this.setState({ hasError: false, error: null })}

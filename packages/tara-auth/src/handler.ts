@@ -117,7 +117,7 @@ export async function startHandler(
     return createLambdaResponse(
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       { error: 'Failed to start TARA authentication' },
-      { ...CORS_HEADERS },
+      { ...CORS_HEADERS, "Access-Control-Allow-Origin": getCorsOrigin() },
     );
   }
 }

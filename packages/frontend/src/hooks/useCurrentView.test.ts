@@ -137,4 +137,16 @@ describe("useCurrentView", () => {
     expect(result.current.currentView).toBe("specs");
     expect(result.current.selectedTaskId).toBeNull();
   });
+
+  it("returns not-found view for unknown path", () => {
+    mockUseLocation.mockReturnValue({
+      pathname: "/nonexistent-page",
+      search: "",
+      hash: "",
+      state: null,
+      key: "default",
+    });
+    const { result } = renderHook(() => useCurrentView());
+    expect(result.current.currentView).toBe("not-found");
+  });
 });
