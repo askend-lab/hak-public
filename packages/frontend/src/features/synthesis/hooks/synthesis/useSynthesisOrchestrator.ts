@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useCallback, useRef } from "react";
-import { convertTextToTags, CACHE_INVALIDATION } from "@/types/synthesis";
+import { convertTextToTags, CACHE_INVALIDATION, type SentenceState } from "@/types/synthesis";
 import { useSentenceState } from "./useSentenceState";
 import { useAudioPlayer } from "./useAudioPlayer";
 import { useSynthesisAPI } from "./useSynthesisAPI";
@@ -139,7 +139,7 @@ export function useSynthesisOrchestrator(): ReturnType<
 
         await playAudio(result.audioUrl, {
           onLoadComplete: () => {
-            const updates: Record<string, unknown> = {
+            const updates: Partial<SentenceState> = {
               isLoading: false,
               isPlaying: true,
               phoneticText: result.phoneticText,

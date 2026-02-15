@@ -8,13 +8,12 @@ import LoginModal from "@/features/auth/components/LoginModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { OnboardingWizard } from "@/features/onboarding/components";
 import { MODAL_STRINGS } from "@/config/ui-strings";
+import type { Task } from "@/types/task";
 
-interface Task {
-  id: string;
-  name: string;
+type ModalTask = Pick<Task, "id" | "name"> & {
   description?: string | null;
   shareToken?: string;
-}
+};
 
 interface AppModalsProps {
   showLoginModal: boolean;
@@ -24,16 +23,16 @@ interface AppModalsProps {
     modals: {
       showAddTaskModal: boolean;
       setShowAddTaskModal: (v: boolean) => void;
-      taskToEdit: Task | null;
+      taskToEdit: ModalTask | null;
       showTaskEditModal: boolean;
       setShowTaskEditModal: (v: boolean) => void;
-      setTaskToEdit: (t: Task | null) => void;
-      taskToShare: Task | null;
+      setTaskToEdit: (t: ModalTask | null) => void;
+      taskToShare: ModalTask | null;
       showShareTaskModal: boolean;
       setShowShareTaskModal: (v: boolean) => void;
-      setTaskToShare: (t: Task | null) => void;
+      setTaskToShare: (t: ModalTask | null) => void;
       showDeleteConfirmation: boolean;
-      taskToDelete: Task | null;
+      taskToDelete: ModalTask | null;
     };
     crud: {
       handleAddTask: (t: string, d: string) => Promise<void>;

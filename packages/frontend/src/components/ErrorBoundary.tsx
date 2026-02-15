@@ -42,6 +42,7 @@ export class ErrorBoundary extends Component<Props, State> {
           </p>
           <button
             onClick={() => this.setState({ hasError: false, error: null })}
+            aria-label="Proovi lehte uuesti laadida"
             style={{
               marginTop: "1rem",
               padding: "0.5rem 1rem",

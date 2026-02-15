@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import CookieConsent from "./components/CookieConsent";
 import Footer from "./components/Footer";
@@ -51,6 +51,16 @@ export default function Home() {
   );
   const { handleTasksClick } = useAppRedirects(currentView);
 
+  const mainRef = useRef<HTMLElement>(null);
+  const prevViewRef = useRef(currentView);
+
+  useEffect(() => {
+    if (prevViewRef.current !== currentView) {
+      prevViewRef.current = currentView;
+      mainRef.current?.focus({ preventScroll: true });
+    }
+  }, [currentView]);
+
   useEffect(() => {
     if (isWizardActive && onboardingState.selectedRole)
       synthesis.setDemoSentences();
@@ -84,6 +94,7 @@ export default function Home() {
       />
 
       <main
+        ref={mainRef}
         id="main-content"
         tabIndex={-1}
         className={`page-layout__main ${showRoleSelection ? "role-selection-main" : ""}`}

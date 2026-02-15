@@ -127,6 +127,16 @@ export async function exchangeCodeForTokens(code: string): Promise<{
     }
 
     const data = await response.json();
+
+    if (
+      typeof data.access_token !== "string" ||
+      typeof data.id_token !== "string" ||
+      typeof data.expires_in !== "number"
+    ) {
+      logger.error("[Auth] Invalid token exchange response shape");
+      return null;
+    }
+
     sessionStorage.removeItem(PKCE_STORAGE_KEY);
 
     return {

@@ -9,8 +9,9 @@
  * - usePhoneticPanel.ts (1 call)
  */
 import { logger } from "@hak/shared";
+import { CONTENT_TYPE_JSON } from "@/config/constants";
 
-export const CONTENT_TYPE_JSON = "application/json";
+export { CONTENT_TYPE_JSON };
 export const ANALYZE_API_PATH = "/api/analyze";
 export const VARIANTS_API_PATH = "/api/variants";
 

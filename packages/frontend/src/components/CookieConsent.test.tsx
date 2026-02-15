@@ -14,14 +14,14 @@ describe("CookieConsent", () => {
 
   it("shows banner when no consent stored", () => {
     render(<CookieConsent />);
-    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeInTheDocument();
     expect(screen.getByText("Nõustun")).toBeInTheDocument();
   });
 
   it("hides banner when consent already accepted", () => {
     localStorage.setItem("hak_cookie_consent", "accepted");
     render(<CookieConsent />);
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("accepts consent and hides banner", async () => {
@@ -30,7 +30,7 @@ describe("CookieConsent", () => {
 
     await user.click(screen.getByText("Nõustun"));
 
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(localStorage.getItem("hak_cookie_consent")).toBe("accepted");
   });
 });

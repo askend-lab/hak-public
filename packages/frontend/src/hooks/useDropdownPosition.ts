@@ -5,6 +5,7 @@ import { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react
 
 const MENU_GAP = 4; // px gap between anchor and menu
 const VIEWPORT_PADDING = 8; // px minimum distance from viewport edges
+const ESTIMATED_MENU_WIDTH = 250; // px estimated width before menu is measured
 
 interface DropdownPosition {
   top: number;
@@ -96,7 +97,7 @@ export function useDropdownPosition({
         top: rect.bottom + MENU_GAP,
         left:
           alignment === "right"
-            ? Math.max(VIEWPORT_PADDING, rect.right - 250)
+            ? Math.max(VIEWPORT_PADDING, rect.right - ESTIMATED_MENU_WIDTH)
             : Math.max(VIEWPORT_PADDING, rect.left),
       });
     } else if (!isOpen) {

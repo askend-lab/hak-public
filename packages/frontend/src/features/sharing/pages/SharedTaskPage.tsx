@@ -62,7 +62,7 @@ export function SharedTaskPage() {
     }
 
     loadTask();
-  }, [token]);
+  }, [token, dataService]);
 
   const entries = task?.entries || [];
 
@@ -137,7 +137,7 @@ export function SharedTaskPage() {
         </div>
 
         <div className="page-content">
-          <div className="shared-task-info-banner shared-task-info-banner--inline">
+          <aside className="shared-task-info-banner shared-task-info-banner--inline" aria-label="Jagatud ülesande teave">
             <div className="shared-task-info-banner-content">
               <div className="shared-task-info-banner-text">
                 <div className="shared-task-info-banner-title">
@@ -156,7 +156,7 @@ export function SharedTaskPage() {
                 Kopeeri
               </button>
             </div>
-          </div>
+          </aside>
 
           <div className="shared-task-entries">
             {entries.length === 0 ? (

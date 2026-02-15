@@ -7,10 +7,9 @@ import { formatDateTime } from "@/utils/formatDate";
 import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
 
 function sanitizeFilename(text: string): string {
-  return text
-    .replace(/[<>:"/\\|?*\x00-\x1f]/g, "")
-    .replace(/\s+/g, "_")
-    .split("")
+  return Array.from(
+    text.replace(/[<>:"/\\|?*\x00-\x1f]/g, "").replace(/\s+/g, "_"),
+  )
     .slice(0, 80)
     .join("");
 }
