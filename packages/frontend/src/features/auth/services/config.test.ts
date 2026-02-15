@@ -209,7 +209,7 @@ describe("exchangeCodeForTokens", () => {
     const body = JSON.parse(callArgs[1]?.body as string);
     expect(body.code).toBe("my-code");
     expect(body.code_verifier).toBe("my-verifier");
-    expect(body.redirect_uri).toBeTruthy();
+    expect(body.redirect_uri).toBeUndefined();
   });
 
   it("should return null on network error", async () => {
@@ -233,7 +233,7 @@ describe("exchangeCodeForTokens", () => {
     consoleSpy.mockRestore();
   });
 
-  it("should include redirect_uri in request body", async () => {
+  it("should NOT include redirect_uri in request body (hardcoded server-side)", async () => {
     sessionStorage.setItem("pkce_code_verifier", "v");
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -241,7 +241,7 @@ describe("exchangeCodeForTokens", () => {
     });
     await exchangeCodeForTokens("c");
     const body = JSON.parse((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]?.body as string);
-    expect(body.redirect_uri).toBeTruthy();
+    expect(body.redirect_uri).toBeUndefined();
   });
 });
 

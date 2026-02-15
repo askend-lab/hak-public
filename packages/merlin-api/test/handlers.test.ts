@@ -63,6 +63,13 @@ describe("synthesize", () => {
     expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
   });
 
+  it("should return 400 for text exceeding max length", async () => {
+    const longText = "a".repeat(1001);
+    const response = await synthesize(createRequestEvent(longText));
+    expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(JSON.parse(response.body).error).toContain("exceeds maximum length");
+  });
+
   it("should return ready when cached", async () => {
     mockCheckS3Cache.mockResolvedValue(true);
 

@@ -183,8 +183,8 @@ describe('cookie helpers', () => {
 
   afterEach(() => { process.env = { ...originalEnv }; });
 
-  it('getCookieDomain extracts parent domain', () => {
-    expect(getCookieDomain()).toBe('.askend-lab.com');
+  it('getCookieDomain uses exact frontend hostname', () => {
+    expect(getCookieDomain()).toBe('.hak-dev.askend-lab.com');
   });
 
   it('createRefreshCookie includes all required attributes', () => {
@@ -193,7 +193,7 @@ describe('cookie helpers', () => {
     expect(cookie).toContain('HttpOnly');
     expect(cookie).toContain('Secure');
     expect(cookie).toContain('SameSite=Lax');
-    expect(cookie).toContain('Domain=.askend-lab.com');
+    expect(cookie).toContain('Domain=.hak-dev.askend-lab.com');
     expect(cookie).toContain('Max-Age=2592000');
   });
 

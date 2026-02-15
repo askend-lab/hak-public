@@ -347,6 +347,9 @@ importers:
       '@aws-sdk/client-sqs':
         specifier: ^3.990.0
         version: 3.990.0
+      '@hak/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@types/jest':
         specifier: ^30.0.0

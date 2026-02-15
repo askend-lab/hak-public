@@ -48,13 +48,13 @@ describe('CognitoClient mutation kills', () => {
     it('should use correct filter with personal_code attribute', async () => {
       mockSend.mockResolvedValueOnce({ Users: [{ Username: 'found-user' }] });
       const client = new CognitoClient(config);
-      const taraToken: TaraIdToken = { ...baseTaraToken, sub: 'EE12345', email: 'e@e.com' };
+      const taraToken: TaraIdToken = { ...baseTaraToken, sub: 'EE38001085718', email: 'e@e.com' };
       await client.findOrCreateUser(taraToken);
 
       const { ListUsersCommand } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
       expect(ListUsersCommand).toHaveBeenCalledWith({
         UserPoolId: 'test-pool-id',
-        Filter: '"custom:personal_code" = "EE12345"',
+        Filter: '"custom:personal_code" = "EE38001085718"',
         Limit: 1,
       });
     });
@@ -66,7 +66,7 @@ describe('CognitoClient mutation kills', () => {
         .mockResolvedValueOnce({}); // createUser
 
       const client = new CognitoClient(config);
-      const taraToken: TaraIdToken = { ...baseTaraToken, sub: 'EE12345', email: 'e@e.com' };
+      const taraToken: TaraIdToken = { ...baseTaraToken, sub: 'EE38001085718', email: 'e@e.com' };
       const result = await client.findOrCreateUser(taraToken);
       // createUser returns email as username
       expect(result).toBe('e@e.com');
@@ -75,7 +75,7 @@ describe('CognitoClient mutation kills', () => {
     it('should return Username from first user in response', async () => {
       mockSend.mockResolvedValueOnce({ Users: [{ Username: 'user-1' }, { Username: 'user-2' }] });
       const client = new CognitoClient(config);
-      const result = await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE12345', email: 'e@e.com' });
+      const result = await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE38001085718', email: 'e@e.com' });
       expect(result).toBe('user-1');
     });
   });
@@ -90,7 +90,7 @@ describe('CognitoClient mutation kills', () => {
         .mockResolvedValueOnce({}); // updatePersonalCode
 
       const client = new CognitoClient(config);
-      await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE12345', email: 'test@e.com' });
+      await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE38001085718', email: 'test@e.com' });
 
       const { ListUsersCommand } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
       // Second call should be email filter
@@ -107,8 +107,8 @@ describe('CognitoClient mutation kills', () => {
         .mockResolvedValueOnce({}); // createUser (no email search)
 
       const client = new CognitoClient(config);
-      const result = await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE12345' });
-      expect(result).toBe('EE12345@tara.ee');
+      const result = await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE38001085718' });
+      expect(result).toBe('EE38001085718@tara.ee');
       // Only 2 calls: findByPersonalCode + createUser (skipped findByEmail)
       expect(mockSend).toHaveBeenCalledTimes(2);
     });
@@ -124,13 +124,13 @@ describe('CognitoClient mutation kills', () => {
         .mockResolvedValueOnce({}); // updatePersonalCode
 
       const client = new CognitoClient(config);
-      await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE999', email: 'u@e.com' });
+      await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE39901011234', email: 'u@e.com' });
 
       const { AdminUpdateUserAttributesCommand } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
       expect(AdminUpdateUserAttributesCommand).toHaveBeenCalledWith({
         UserPoolId: 'test-pool-id',
         Username: 'email-user',
-        UserAttributes: [{ Name: 'custom:personal_code', Value: 'EE999' }],
+        UserAttributes: [{ Name: 'custom:personal_code', Value: 'EE39901011234' }],
       });
     });
   });
@@ -142,7 +142,7 @@ describe('CognitoClient mutation kills', () => {
       const client = new CognitoClient(config);
       const attrs = client.buildUserAttributes({
         ...baseTaraToken,
-        sub: 'EE123',
+        sub: 'EE49001011234',
         email: 'e@e.com',
         given_name: 'John',
         family_name: 'Doe',
@@ -151,7 +151,7 @@ describe('CognitoClient mutation kills', () => {
       expect(attrs).toStrictEqual([
         { Name: 'email', Value: 'e@e.com' },
         { Name: 'email_verified', Value: 'true' },
-        { Name: 'custom:personal_code', Value: 'EE123' },
+        { Name: 'custom:personal_code', Value: 'EE49001011234' },
         { Name: 'given_name', Value: 'John' },
         { Name: 'family_name', Value: 'Doe' },
       ]);
@@ -159,19 +159,19 @@ describe('CognitoClient mutation kills', () => {
 
     it('should return exactly 3 attributes when no names', () => {
       const client = new CognitoClient(config);
-      const attrs = client.buildUserAttributes({ ...baseTaraToken, sub: 'EE123', email: 'e@e.com' });
+      const attrs = client.buildUserAttributes({ ...baseTaraToken, sub: 'EE49001011234', email: 'e@e.com' });
       expect(attrs).toHaveLength(3);
     });
 
     it('should use fallback email with @tara.ee suffix', () => {
       const client = new CognitoClient(config);
-      const attrs = client.buildUserAttributes({ ...baseTaraToken, sub: 'EE55555' });
-      expect(attrs[0]).toStrictEqual({ Name: 'email', Value: 'EE55555@tara.ee' });
+      const attrs = client.buildUserAttributes({ ...baseTaraToken, sub: 'EE55501011234' });
+      expect(attrs[0]).toStrictEqual({ Name: 'email', Value: 'EE55501011234@tara.ee' });
     });
 
     it('should set email_verified to "true"', () => {
       const client = new CognitoClient(config);
-      const attrs = client.buildUserAttributes({ ...baseTaraToken, sub: 'X', email: 'a@b.com' });
+      const attrs = client.buildUserAttributes({ ...baseTaraToken, sub: 'EE60001011234', email: 'a@b.com' });
       const emailVerified = attrs.find(a => a.Name === 'email_verified');
       expect(emailVerified?.Value).toBe('true');
     });
@@ -187,7 +187,7 @@ describe('CognitoClient mutation kills', () => {
         .mockResolvedValueOnce({}); // createUser
 
       const client = new CognitoClient(config);
-      await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE123', email: 'u@e.com', given_name: 'J' });
+      await client.findOrCreateUser({ ...baseTaraToken, sub: 'EE49001011234', email: 'u@e.com', given_name: 'J' });
 
       const { AdminCreateUserCommand } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
       expect(AdminCreateUserCommand).toHaveBeenCalledWith({
@@ -195,7 +195,7 @@ describe('CognitoClient mutation kills', () => {
         Username: 'u@e.com',
         UserAttributes: expect.arrayContaining([
           { Name: 'email', Value: 'u@e.com' },
-          { Name: 'custom:personal_code', Value: 'EE123' },
+          { Name: 'custom:personal_code', Value: 'EE49001011234' },
         ]),
         MessageAction: 'SUPPRESS',
       });

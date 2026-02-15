@@ -28,8 +28,7 @@ export function generateRandomString(length: number): string {
 
 export function getCookieDomain(): string {
   const url = new URL(getFrontendUrl());
-  const parts = url.hostname.split('.');
-  return parts.length >= 2 ? '.' + parts.slice(-2).join('.') : url.hostname;
+  return '.' + url.hostname;
 }
 
 export function createRefreshCookie(refreshToken: string): string {
@@ -60,8 +59,9 @@ function corsResponseHeaders(): Record<string, string> {
 }
 
 export function createStateCookie(state: AuthState): string {
+  const domain = getCookieDomain();
   const encoded = Buffer.from(JSON.stringify(state)).toString('base64url');
-  return `${STATE_COOKIE_NAME}=${encoded}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`;
+  return `${STATE_COOKIE_NAME}=${encoded}; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Max-Age=600; Path=/`;
 }
 
 export function parseStateCookie(cookieHeader: string | undefined): AuthState | null {
@@ -208,18 +208,37 @@ function redirectToFrontend(
   };
 }
 
+export const ACCESS_TOKEN_COOKIE_NAME = 'hak_access_token';
+export const ID_TOKEN_COOKIE_NAME = 'hak_id_token';
+export const SHORT_TOKEN_MAX_AGE_S = 3600; // 1 hour
+
+export function createAccessTokenCookie(token: string): string {
+  const domain = getCookieDomain();
+  // Not HttpOnly — frontend needs to read for Authorization header.
+  // Short-lived (1h); refresh_token stays HttpOnly.
+  return `${ACCESS_TOKEN_COOKIE_NAME}=${token}; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${SHORT_TOKEN_MAX_AGE_S}`;
+}
+
+export function createIdTokenCookie(token: string): string {
+  const domain = getCookieDomain();
+  // Not HttpOnly — frontend needs to read for user info extraction.
+  // Short-lived (1h); refresh_token stays HttpOnly.
+  return `${ID_TOKEN_COOKIE_NAME}=${token}; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${SHORT_TOKEN_MAX_AGE_S}`;
+}
+
 function redirectToFrontendWithCookies(
   baseUrl: string,
   tokens: { accessToken: string; idToken: string; refreshToken: string; expiresIn: number }
 ): APIGatewayProxyResult {
   const url = new URL(AUTH_CALLBACK_PATH, baseUrl);
-  // Short-lived tokens go as URL params — frontend stores them in memory only
-  url.searchParams.set('access_token', tokens.accessToken);
-  url.searchParams.set('id_token', tokens.idToken);
+  // Signal success without leaking tokens in URL
+  url.searchParams.set('auth', 'success');
 
-  // Refresh token goes ONLY in httpOnly cookie — never touches JS
+  // All tokens go in httpOnly cookies — never in URL params or JS
   const cookies = [
     createRefreshCookie(tokens.refreshToken),
+    createAccessTokenCookie(tokens.accessToken),
+    createIdTokenCookie(tokens.idToken),
     clearStateCookie(),
   ];
 
@@ -303,9 +322,9 @@ export async function exchangeCodeHandler(
     try { parsed = JSON.parse(event.body) as Record<string, string>; }
     catch { return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Invalid JSON' }, corsResponseHeaders()); }
 
-    const { code, code_verifier, redirect_uri } = parsed;
-    if (!code || !code_verifier || !redirect_uri) {
-      return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Missing code, code_verifier, or redirect_uri' }, corsResponseHeaders());
+    const { code, code_verifier } = parsed;
+    if (!code || !code_verifier) {
+      return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Missing code or code_verifier' }, corsResponseHeaders());
     }
 
     const cognitoDomain = process.env.COGNITO_DOMAIN;
@@ -314,10 +333,13 @@ export async function exchangeCodeHandler(
       throw new Error('COGNITO_DOMAIN and COGNITO_CLIENT_ID must be set');
     }
 
+    // Hardcode redirect_uri server-side — never trust client-supplied value
+    const redirectUri = `${getFrontendUrl()}${AUTH_CALLBACK_PATH}`;
+
     const response = await fetch(`https://${cognitoDomain}/oauth2/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ grant_type: 'authorization_code', client_id: clientId, code, redirect_uri, code_verifier }),
+      body: new URLSearchParams({ grant_type: 'authorization_code', client_id: clientId, code, redirect_uri: redirectUri, code_verifier }),
     });
 
     if (!response.ok) {

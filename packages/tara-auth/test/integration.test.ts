@@ -172,25 +172,36 @@ describe('TARA Custom Auth Integration Tests', () => {
       expect(url.origin).toBe(FRONTEND_URL);
     });
 
-    it('should pass tokens in URL params and set refresh cookie', async () => {
+    it('should not pass tokens in URL params', async () => {
       const { stateValue, nonce, encodedCookie } = createValidState();
       setupSuccessfulMocks(nonce);
 
       const event = createCallbackEvent('auth-code-123', stateValue, encodedCookie);
       const result = await callbackHandler(event);
 
-      // Tokens in URL
       const url = new URL(String(result.headers?.Location));
-      expect(url.searchParams.get('access_token')).toBe('cognito-access-token');
-      expect(url.searchParams.get('id_token')).toBe('cognito-id-token');
+      expect(url.searchParams.get('access_token')).toBeNull();
+      expect(url.searchParams.get('id_token')).toBeNull();
+      expect(url.searchParams.get('auth')).toBe('success');
+    });
 
-      // Only refresh token in httpOnly cookie
+    it('should set tokens as Secure cookies with correct attributes', async () => {
+      const { stateValue, nonce, encodedCookie } = createValidState();
+      setupSuccessfulMocks(nonce);
+
+      const event = createCallbackEvent('auth-code-123', stateValue, encodedCookie);
+      const result = await callbackHandler(event);
+
       const cookies = (result.multiValueHeaders?.['Set-Cookie'] || []) as string[];
       const refreshCookie = cookies.find(c => c.startsWith('hak_refresh_token='));
+      const accessCookie = cookies.find(c => c.startsWith('hak_access_token='));
+      const idCookie = cookies.find(c => c.startsWith('hak_id_token='));
       expect(refreshCookie).toContain('HttpOnly');
       expect(refreshCookie).toContain('Secure');
-
-      // No access/id cookies
+      expect(accessCookie).toContain('cognito-access-token');
+      expect(accessCookie).not.toContain('HttpOnly');
+      expect(idCookie).toContain('cognito-id-token');
+      expect(idCookie).not.toContain('HttpOnly');
       expect(cookies.find(c => c.startsWith('access_token='))).toBeUndefined();
       expect(cookies.find(c => c.startsWith('is_authenticated='))).toBeUndefined();
     });
