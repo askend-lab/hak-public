@@ -58,6 +58,13 @@ function corsResponseHeaders(): Record<string, string> {
   };
 }
 
+export function validateCsrfOrigin(event: APIGatewayProxyEvent): boolean {
+  const origin = event.headers.Origin || event.headers.origin;
+  if (!origin) return false;
+  const expected = getFrontendUrl();
+  return origin === expected;
+}
+
 export function createStateCookie(state: AuthState): string {
   const domain = getCookieDomain();
   const encoded = Buffer.from(JSON.stringify(state)).toString('base64url');
@@ -113,7 +120,7 @@ export async function startHandler(
       body: '',
     };
   } catch (error) {
-    console.error('TARA start error:', error);
+    console.error('TARA start error:', error instanceof Error ? error.message : 'Unknown error');
     return createLambdaResponse(
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       { error: 'Failed to start TARA authentication' },
@@ -175,7 +182,7 @@ export async function callbackHandler(
     return redirectToFrontendWithCookies(frontendUrl, cognitoTokens);
 
   } catch (error) {
-    console.error('TARA callback error:', error);
+    console.error('TARA callback error:', error instanceof Error ? error.message : 'Unknown error');
     return redirectToFrontend(frontendUrl, { 
       error: 'Authentication failed - please try again' 
     }, clearStateCookie());
@@ -262,6 +269,10 @@ export async function refreshHandler(
     return { statusCode: 200, headers: corsResponseHeaders(), body: '' };
   }
 
+  if (!validateCsrfOrigin(event)) {
+    return createLambdaResponse(HTTP_STATUS.FORBIDDEN, { error: 'Invalid origin' }, corsResponseHeaders());
+  }
+
   try {
     const refreshToken = parseRefreshCookie(event.headers.Cookie || event.headers.cookie);
     if (!refreshToken) {
@@ -296,7 +307,7 @@ export async function refreshHandler(
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token }),
     };
   } catch (error) {
-    console.error('Refresh error:', error);
+    console.error('Refresh error:', error instanceof Error ? error.message : 'Unknown error');
     return {
       statusCode: 401,
       headers: corsResponseHeaders(),
@@ -311,6 +322,10 @@ export async function exchangeCodeHandler(
 ): Promise<APIGatewayProxyResult> {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: corsResponseHeaders(), body: '' };
+  }
+
+  if (!validateCsrfOrigin(event)) {
+    return createLambdaResponse(HTTP_STATUS.FORBIDDEN, { error: 'Invalid origin' }, corsResponseHeaders());
   }
 
   try {
@@ -355,7 +370,7 @@ export async function exchangeCodeHandler(
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
     };
   } catch (error) {
-    console.error('Exchange code error:', error);
+    console.error('Exchange code error:', error instanceof Error ? error.message : 'Unknown error');
     return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
   }
 }

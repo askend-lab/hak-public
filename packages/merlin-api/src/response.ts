@@ -50,7 +50,7 @@ export function createBadRequest(error: string): LambdaResponse {
 }
 
 export function createInternalError(context: string, error: unknown): LambdaResponse {
-  console.error(`${context}:`, error);
+  console.error(`${context}:`, error instanceof Error ? error.message : 'Unknown error');
   return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: "Internal server error",
   });

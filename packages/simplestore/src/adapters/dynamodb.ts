@@ -119,6 +119,11 @@ export class DynamoDBAdapter implements StorageAdapter {
       );
 
       allItems.push(...((result.Items ?? []) as StoreItem[]));
+
+      if (maxItems !== undefined && allItems.length >= maxItems) {
+        return allItems.slice(0, maxItems);
+      }
+
       lastEvaluatedKey = result.LastEvaluatedKey as
         | Record<string, unknown>
         | undefined;
