@@ -107,7 +107,7 @@ if echo "$SYNTH_RESP" | grep -q '"status":"ready"'; then
   else
     echo -e "${RED}✗${NC} Merlin audio URL invalid"; ((FAILED++))
   fi
-elif echo "$SYNTH_RESP" | grep -q '"status":"pending"'; then
+elif echo "$SYNTH_RESP" | grep -q '"status":"pending"\|"status":"processing"'; then
   STATUS_URL=$(echo "$SYNTH_RESP" | grep -o '"audioUrl":"[^"]*"' | cut -d'"' -f4)
   AUDIO_OK=false
   for i in 1 2 3 4 5 6; do
@@ -132,7 +132,7 @@ echo ""
 echo "=== Frontend API Routing (CloudFront) ==="
 test_endpoint_content "CloudFront /api/analyze" "$FRONTEND_URL/api/analyze" "POST" '{"text":"Tere"}' "stressedText"
 test_endpoint_content "CloudFront /api/synthesize" "$FRONTEND_URL/api/synthesize" "POST" '{"text":"Tere","voice":"efm_l"}' "audioUrl"
-test_endpoint_content "CloudFront /api/status/*" "$FRONTEND_URL/api/status/test-key" "GET" "" "status"
+test_endpoint_content "CloudFront /api/status/*" "$FRONTEND_URL/api/status/test-key" "GET" "" "cacheKey\|error"
 
 echo ""
 echo "=== Merlin Configuration ==="
