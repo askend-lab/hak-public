@@ -86,16 +86,17 @@ describe("validation — property-based tests", () => {
     });
   });
 
+  // Keys must not contain the delimiter character '#'
+  const validKeyArb = fc.string({ minLength: 1, maxLength: 1024 }).filter(
+    (s) => s.trim().length > 0 && !s.includes("#"),
+  );
+
   describe("validateStoreRequest", () => {
     it("valid requests always pass", () => {
       fc.assert(
         fc.property(
-          fc.string({ minLength: 1, maxLength: 1024 }).filter(
-            (s) => s.trim().length > 0,
-          ),
-          fc.string({ minLength: 1, maxLength: 1024 }).filter(
-            (s) => s.trim().length > 0,
-          ),
+          validKeyArb,
+          validKeyArb,
           validTypeArb,
           fc.integer({ min: 0, max: 31536000 }),
           (pk, sk, type, ttl) => {
@@ -128,12 +129,8 @@ describe("validation — property-based tests", () => {
     it("valid pk + sk + type always passes", () => {
       fc.assert(
         fc.property(
-          fc.string({ minLength: 1, maxLength: 1024 }).filter(
-            (s) => s.trim().length > 0,
-          ),
-          fc.string({ minLength: 1, maxLength: 1024 }).filter(
-            (s) => s.trim().length > 0,
-          ),
+          validKeyArb,
+          validKeyArb,
           validTypeArb,
           (pk, sk, type) => {
             const result = validateGetRequest(pk, sk, type);

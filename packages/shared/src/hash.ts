@@ -7,14 +7,7 @@
 
 import { isEmpty } from "./utils";
 
-interface BrowserSubtleCrypto {
-  digest(algorithm: string, data: ArrayBuffer | ArrayBufferView): Promise<ArrayBuffer>;
-}
-
-declare const window: { crypto?: { subtle?: BrowserSubtleCrypto } } | undefined;
-
 const HASH_ALGORITHM = "sha256";
-const BROWSER_HASH_ALGORITHM = "SHA-256";
 const CRYPTO_MODULE = "node:crypto";
 const ERROR_EMPTY_TEXT = "Text cannot be empty";
 
@@ -24,33 +17,16 @@ function validateHashInput(text: string): void {
   }
 }
 
-function toHexString(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let hex = "";
-  for (const byte of bytes) {
-    hex += byte.toString(16).padStart(2, "0");
-  }
-  return hex;
-}
-
-function getSubtleCrypto(): BrowserSubtleCrypto | undefined {
-  return typeof window !== "undefined" ? window?.crypto?.subtle : undefined;
-}
-
 function nodeHashHex(crypto: typeof import("node:crypto"), text: string): string {
   return crypto.createHash(HASH_ALGORITHM).update(text).digest("hex");
 }
 
+/**
+ * Async SHA-256 hash.
+ * Uses Node.js crypto (Lambda & backend) with dynamic import for ESM compat.
+ */
 export async function calculateHash(text: string): Promise<string> {
   validateHashInput(text);
-
-  const subtle = getSubtleCrypto();
-  if (subtle) {
-    const data = new TextEncoder().encode(text);
-    const hashBuffer = await subtle.digest(BROWSER_HASH_ALGORITHM, data);
-    return toHexString(hashBuffer);
-  }
-
   const crypto = await import(/* @vite-ignore */ CRYPTO_MODULE);
   return nodeHashHex(crypto, text);
 }
@@ -61,7 +37,6 @@ export async function calculateHash(text: string): Promise<string> {
  */
 export function calculateHashSync(text: string): string {
   validateHashInput(text);
-
   const crypto = require(CRYPTO_MODULE) as typeof import("node:crypto");
   return nodeHashHex(crypto, text);
 }

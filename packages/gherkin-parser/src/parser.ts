@@ -65,16 +65,16 @@ function classifyLine(line: string): LineType {
   return "other";
 }
 
-// #4 drainTags — explicit name for consume-and-clear
+// #4 drainTags — consume-and-clear: returns accumulated tags, resets array
 function drainTags(pendingTags: string[]): string[] {
   const tags = [...pendingTags];
-  pendingTags.splice(0);
+  pendingTags.length = 0;
   return tags;
 }
 
 // #10 clearTags — discard-only variant, no allocation
 function clearTags(pendingTags: string[]): void {
-  pendingTags.splice(0);
+  pendingTags.length = 0;
 }
 
 function parseTags(line: string): string[] {

@@ -62,7 +62,7 @@ jobs:
           cache: "pnpm"
 
       - name: Configure npm registry auth
-        if: steps.filter.outputs.code == 'true'
+        if: steps.filter.outputs.code == 'true' && secrets.NPM_TOKEN != ''
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc

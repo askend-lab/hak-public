@@ -275,10 +275,9 @@ jobs:
           cat /tmp/deployment-state.json
 
       - name: Smoke test
-        continue-on-error: true
         run: |
           chmod +x scripts/smoke-test.sh
-          ./scripts/smoke-test.sh ${{ inputs.environment }} || echo "⚠️ Smoke test had issues but deploy succeeded"
+          ./scripts/smoke-test.sh ${{ inputs.environment }}
 
       - name: Summary
         run: |
