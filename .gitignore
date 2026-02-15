@@ -34,6 +34,9 @@ playwright-report
 **/reports/mutation/
 **/.nyc_output/
 
+# ESLint cache
+.eslintcache
+
 # macOS
 .DS_Store
 

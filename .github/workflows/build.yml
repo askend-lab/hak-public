@@ -28,6 +28,7 @@ jobs:
 
     outputs:
       build_id: ${{ steps.build.outputs.build_id }}
+      has_deploy_changes: ${{ steps.build.outputs.has_deploy_changes }}
 
     steps:
       - name: Checkout code
@@ -309,6 +310,13 @@ jobs:
             }' > /tmp/manifest.json
 
           aws s3 cp /tmp/manifest.json ${S3_PATH}/manifest.json --sse AES256
+          # Check if any deployable module actually changed
+          if [ "$FRONTEND_CHANGED" == "true" ] || [ "$SIMPLESTORE_CHANGED" == "true" ] || [ "$MERLIN_API_CHANGED" == "true" ] || [ "$VABAMORF_API_CHANGED" == "true" ] || [ "$TARA_AUTH_CHANGED" == "true" ]; then
+            echo "has_deploy_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_deploy_changes=false" >> $GITHUB_OUTPUT
+          fi
+
           echo "✅ Build $BUILD_ID created"
           cat /tmp/manifest.json
 
@@ -327,7 +335,7 @@ jobs:
   deploy-dev:
     name: Deploy to Dev
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.outputs.build_id != ''
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.outputs.build_id != '' && needs.build.outputs.has_deploy_changes == 'true'
     uses: ./.github/workflows/deploy.yml
     with:
       build_id: ${{ needs.build.outputs.build_id }}

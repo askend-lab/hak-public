@@ -221,7 +221,7 @@ jobs:
         working-directory: packages/simplestore
         run: |
           mkdir -p dist && cp -r ../../artifacts/simplestore/* dist/ 2>/dev/null || true
-          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1 --force
+          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
           echo "✅ SimpleStore deployed"
 
       - name: Deploy Merlin API
@@ -229,7 +229,7 @@ jobs:
         working-directory: packages/merlin-api
         run: |
           mkdir -p dist && cp -r ../../artifacts/merlin-api/* dist/ 2>/dev/null || true
-          serverless deploy --stage ${{ inputs.environment }} --force
+          serverless deploy --stage ${{ inputs.environment }}
           echo "✅ Merlin API deployed"
 
       - name: Login to ECR
