@@ -58,6 +58,7 @@ export function useAppRedirects(currentView: ViewType) {
     onboardingState.selectedRole,
     currentView,
     navigate,
+    hasCopiedEntries,
   ]);
 
   const handleTasksClick = () => {

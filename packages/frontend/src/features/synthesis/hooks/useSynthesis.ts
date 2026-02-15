@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { convertTextToTags } from "@/types/synthesis";
 import { stripPhoneticMarkers } from "@/features/synthesis/utils/phoneticMarkers";
 import { useSynthesisOrchestrator } from "./synthesis/useSynthesisOrchestrator";
@@ -112,7 +112,7 @@ export function useSynthesis() {
     [setSentences],
   );
 
-  return {
+  return useMemo(() => ({
     sentences,
     setSentences,
     isPlayingAll: playlist.isPlayingAll,
@@ -139,5 +139,32 @@ export function useSynthesis() {
     handleUseVariant,
     handleSentencePhoneticApply,
     synthesizeAndPlay,
-  };
+  }), [
+    sentences,
+    setSentences,
+    playlist.isPlayingAll,
+    playlist.isLoadingPlayAll,
+    inlineEditor.editingTag,
+    inlineEditor.openTagMenu,
+    inlineEditor.setOpenTagMenu,
+    setDemoSentences,
+    handleTextChange,
+    handleClearSentence,
+    handleAddSentence,
+    actions.handleRemoveSentence,
+    handleInputBlur,
+    handleKeyDown,
+    actions.handlePlay,
+    playlist.handlePlayAll,
+    actions.handleDownload,
+    actions.handleCopyText,
+    inlineEditor.handleDeleteTag,
+    inlineEditor.handleEditTag,
+    inlineEditor.handleEditTagChange,
+    inlineEditor.handleEditTagCommit,
+    inlineEditor.handleEditTagKeyDown,
+    handleUseVariant,
+    handleSentencePhoneticApply,
+    synthesizeAndPlay,
+  ]);
 }

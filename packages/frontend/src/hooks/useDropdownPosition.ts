@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 
 const MENU_GAP = 4; // px gap between anchor and menu
 const VIEWPORT_PADDING = 8; // px minimum distance from viewport edges
@@ -106,7 +106,7 @@ export function useDropdownPosition({
   }, [isOpen, alignment, getAnchorElement]);
 
   // Adjust position after menu renders and when content changes
-  const contentKey = JSON.stringify(contentDeps);
+  const contentKey = useMemo(() => JSON.stringify(contentDeps), [contentDeps]);
   useEffect(() => {
     if (!isOpen) return;
     recalcPosition();
