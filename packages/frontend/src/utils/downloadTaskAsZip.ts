@@ -26,7 +26,8 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
   if (!audioUrl) {
     try {
       audioUrl = await synthesizeAuto(entry.stressedText || entry.text);
-    } catch {
+    } catch (err) {
+      logger.warn("[ZIP] Synthesis failed for entry, skipping:", err);
       return null;
     }
   }
