@@ -70,6 +70,8 @@ functions:
       - httpApi:
           path: /synthesize
           method: POST
+          authorizer:
+            name: cognitoJwt
 
   status:
     handler: dist/handler.status
@@ -97,6 +99,8 @@ functions:
       - httpApi:
           path: /warmup
           method: POST
+          authorizer:
+            name: cognitoJwt
 
 resources:
   Outputs:
