@@ -51,7 +51,7 @@
 - [ ] 36. **PKCE verifier в sessionStorage** — `config.ts:67`. При XSS доступен в той же вкладке.
 - [x] 37. **Error boundary показывает error.message** — `ErrorBoundary.tsx:41`. Может содержать API URL.
 - [x] 38. **Regex санитизация error_description** — `AuthCallbackPage.tsx:59-60`. Обходится `<img src=x onerror=`.
-- [ ] 39. **downloadTaskAsZip без size limit** — `downloadTaskAsZip.ts`. 100×50MB = 5GB в памяти браузера.
+- [x] 39. **downloadTaskAsZip без size limit** — `downloadTaskAsZip.ts`. 100×50MB = 5GB в памяти браузера.
 - [ ] 40. **downloadTaskAsZip fetch без auth** — `downloadTaskAsZip.ts:37`. S3 audio без headers.
 - [x] 41. **Dashboard loadData без try/catch** — `Dashboard.tsx:93-111`. Ошибка → вечный loading.
 - [ ] 42. **Dashboard quick links без onClick** — `Dashboard.tsx:55-63`. Мёртвые кнопки.
@@ -60,13 +60,13 @@
 - [ ] 45. **useUserId throws** — `useUserId.ts:12-14`. Компонент до проверки auth → crash.
 - [ ] 46. **UserProfile: нет focus trap** — `UserProfile.tsx:55-88`. Tab уходит за dropdown.
 - [ ] 47. **initActivityListeners без cleanup** — `main.tsx:33`. HMR → duplicate listeners.
-- [ ] 48. **getQueryParams unsafe cast** — `routes.ts:59-61`. `undefined` values в Record<string,string>.
-- [ ] 49. **resetRateLimit экспортируется** — `merlin-api/handler.ts:72-74`. Тестовый хелпер в prod.
+- [x] 48. **getQueryParams unsafe cast** — `routes.ts:59-61`. `undefined` values в Record<string,string>.
+- [x] 49. **resetRateLimit экспортируется** — `merlin-api/handler.ts:72-74`. Тестовый хелпер в prod.
 - [ ] 50. **warmup rate limit per-instance** — `handler.ts:70`. Cold start сбрасывает. Concurrent Lambdas обходят.
 - [ ] 51. **sharedAdapter mutable singleton** — `handler.ts:35-40`. Race condition при concurrent requests.
 - [ ] 52. **version через require()** — `vabamorf-api/handler.ts:21-30`. Хрупкий двойной try/catch.
 - [ ] 53. **calculateHashSync uses require()** — `shared/hash.ts:65`. CJS в ESM проекте. Deprecated.
-- [ ] 54. **Magic number 300 в isTokenExpired** — `token.ts:38`. Нет константы для 5-min buffer.
+- [x] 54. **Magic number 300 в isTokenExpired** — `token.ts:38`. Нет константы для 5-min buffer.
 - [ ] 55. **clipboardUtils execCommand("copy")** — deprecated fallback API.
 
 ## Фаза 3 — Требует обсуждения ⚠️
