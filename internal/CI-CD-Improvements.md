@@ -21,8 +21,7 @@ PRs merge into main even when Build fails. Root cause: no required status checks
 
 - [x] Add required status check "Build" to main branch protection (GitHub Settings)
 - [x] Enable "Require branches to be up to date before merging"
-- [x] Scope `auto-approve-prs.yml` to dependabot only (`if: github.actor == 'dependabot[bot]'`)
-- [x] Scope `auto-merge-prs.yml` to dependabot only (same condition)
+- [x] Keep auto-approve and auto-merge for ALL PRs (required status checks are the gate that prevents merging when builds fail)
 - [x] Change `mergeMethod: MERGE` → `SQUASH` in auto-merge-prs.yml
 
 ## P1 — Build Reliability
@@ -44,7 +43,7 @@ PRs merge into main even when Build fails. Root cause: no required status checks
 ## P3 — Incrementality & Speed
 
 - [x] Make test running incremental — use change detection outputs to run only affected package tests
-- [ ] Add paths-ignore or `dorny/paths-filter` to build.yml (skipped: breaks required status checks for docs-only PRs)
+- [x] Add `dorny/paths-filter` to build.yml (docs-only PRs skip all heavy steps, workflow still succeeds for required check)
 - [ ] Split monolithic build job into parallel jobs: check → build [matrix] → upload
 - [x] Add Docker layer caching for vabamorf-api (`docker/build-push-action` + GHA cache)
 - [ ] Make deploy.yml `pnpm install` conditional — skip when only frontend (S3 copy) is being deployed

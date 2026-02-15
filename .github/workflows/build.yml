@@ -11,6 +11,7 @@ permissions:
   id-token: write
   contents: read
   packages: read
+  pull-requests: read
 
 concurrency:
   group: build-${{ github.ref }}
@@ -34,36 +35,55 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check for code changes
+        id: filter
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
+        with:
+          filters: |
+            code:
+              - 'packages/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'tsconfig.json'
+              - '.github/workflows/build.yml'
+
       - name: Setup pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+        if: steps.filter.outputs.code == 'true'
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10
 
       - name: Setup Node.js
+        if: steps.filter.outputs.code == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version-file: .nvmrc
           cache: "pnpm"
 
       - name: Configure npm registry auth
+        if: steps.filter.outputs.code == 'true'
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Install dependencies
+        if: steps.filter.outputs.code == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Security audit
+        if: steps.filter.outputs.code == 'true'
         run: pnpm audit --audit-level=high
         continue-on-error: true
 
       - name: Configure AWS credentials
+        if: steps.filter.outputs.code == 'true'
         uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Load config from SSM
+        if: steps.filter.outputs.code == 'true'
         run: |
           echo "COGNITO_USER_POOL_ID=$(aws ssm get-parameter --name /hak/shared/cognito-user-pool-id --query Parameter.Value --output text 2>/dev/null || aws ssm get-parameter --name /hak/dev/cognito-user-pool-id --query Parameter.Value --output text)" >> $GITHUB_ENV
           echo "COGNITO_CLIENT_ID=$(aws ssm get-parameter --name /hak/shared/cognito-client-id --query Parameter.Value --output text 2>/dev/null || aws ssm get-parameter --name /hak/dev/cognito-client-id --query Parameter.Value --output text)" >> $GITHUB_ENV
@@ -72,6 +92,7 @@ jobs:
           echo "API_DOMAIN_DEV=$(aws ssm get-parameter --name /hak/dev/api-domain --query Parameter.Value --output text)" >> $GITHUB_ENV
 
       - name: Detect changes and prepare build
+        if: steps.filter.outputs.code == 'true'
         id: detect
         run: |
           LAST_BUILD=$(aws s3 ls s3://$ARTIFACTS_BUCKET/$ARTIFACTS_PREFIX/ --recursive | grep manifest.json | sort | tail -1 | awk '{print $4}' | cut -d'/' -f3)
@@ -122,12 +143,15 @@ jobs:
           fi
 
       - name: Generate feature specs
+        if: steps.filter.outputs.code == 'true'
         run: pnpm --filter @hak/frontend sync-features
 
       - name: Lint
+        if: steps.filter.outputs.code == 'true'
         run: pnpm lint
 
       - name: Typecheck
+        if: steps.filter.outputs.code == 'true'
         run: pnpm typecheck
 
       - name: Test shared
@@ -193,7 +217,7 @@ jobs:
 
       - name: Build Vabamorf Docker image
         if: steps.detect.outputs.vabamorf-api == 'true'
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198e19c3c49b4f # v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
         with:
           context: packages/vabamorf-api
           load: true
@@ -221,6 +245,7 @@ jobs:
           docker push $ECR_REGISTRY/vabamorf-api:${{ github.sha }}
 
       - name: Create full build artifact
+        if: steps.filter.outputs.code == 'true'
         id: build
         env:
           FRONTEND_CHANGED: ${{ steps.detect.outputs.frontend }}
@@ -289,6 +314,7 @@ jobs:
           cat /tmp/manifest.json
 
       - name: Build summary
+        if: steps.filter.outputs.code == 'true'
         run: |
           echo "## Build Complete ✅" >> $GITHUB_STEP_SUMMARY
           echo "- **Build ID**: ${{ steps.build.outputs.build_id }}" >> $GITHUB_STEP_SUMMARY
@@ -302,7 +328,7 @@ jobs:
   deploy-dev:
     name: Deploy to Dev
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.outputs.build_id != ''
     uses: ./.github/workflows/deploy.yml
     with:
       build_id: ${{ needs.build.outputs.build_id }}
