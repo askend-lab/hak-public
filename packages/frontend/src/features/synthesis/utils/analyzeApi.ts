@@ -46,13 +46,14 @@ export async function analyzeText(text: string): Promise<string | null> {
     const response = await postJSON(ANALYZE_API_PATH, { text });
 
     if (!response.ok) {
+      logger.error(`[Analyze] HTTP ${response.status} for text: "${text.slice(0, 50)}"`);
       return null;
     }
 
     const data: AnalyzeResponse = await response.json();
     return data.stressedText || null;
   } catch (error) {
-    logger.error("Failed to analyze text:", error);
+    logger.error("[Analyze] Network error:", error);
     return null;
   }
 }
