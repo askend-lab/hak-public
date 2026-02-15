@@ -141,15 +141,15 @@ describe("exchangeCodeForTokens", () => {
   it("should exchange code for tokens using PKCE", async () => {
     sessionStorage.setItem("pkce_code_verifier", "test-verifier");
 
-    const mockTokens = {
-      access_token: "access-token",
-      id_token: "id-token",
-      expires_in: 3600,
-    };
-
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(mockTokens),
+      json: () => Promise.resolve({ expires_in: 3600 }),
+    });
+
+    Object.defineProperty(document, "cookie", {
+      value: "hak_access_token=access-token; hak_id_token=id-token",
+      writable: true,
+      configurable: true,
     });
 
     const result = await exchangeCodeForTokens("auth-code");
@@ -187,11 +187,13 @@ describe("exchangeCodeForTokens", () => {
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({
-        access_token: "a",
-        id_token: "i",
-        expires_in: 3600,
-      }),
+      json: () => Promise.resolve({ expires_in: 3600 }),
+    });
+
+    Object.defineProperty(document, "cookie", {
+      value: "hak_access_token=a; hak_id_token=i",
+      writable: true,
+      configurable: true,
     });
 
     await exchangeCodeForTokens("my-code");
@@ -250,11 +252,34 @@ describe("exchangeCodeForTokens", () => {
     sessionStorage.setItem("pkce_code_verifier", "v");
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
+      json: () => Promise.resolve({ expires_in: 1 }),
+    });
+    Object.defineProperty(document, "cookie", {
+      value: "hak_access_token=a; hak_id_token=i",
+      writable: true,
+      configurable: true,
     });
     await exchangeCodeForTokens("c");
     const body = JSON.parse((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]?.body as string);
     expect(body.redirect_uri).toBeUndefined();
+  });
+
+  it("should return null when cookies are missing after exchange", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "test-verifier");
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ expires_in: 3600 }),
+    });
+    Object.defineProperty(document, "cookie", {
+      value: "",
+      writable: true,
+      configurable: true,
+    });
+    const result = await exchangeCodeForTokens("auth-code");
+    expect(result).toBeNull();
+    expect(consoleSpy).toHaveBeenCalledWith("[Auth] Tokens not found in cookies after exchange");
+    consoleSpy.mockRestore();
   });
 });
 

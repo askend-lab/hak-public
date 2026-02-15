@@ -128,20 +128,35 @@ export async function exchangeCodeForTokens(code: string): Promise<{
 
     const data = await response.json();
 
-    if (
-      typeof data.access_token !== "string" ||
-      typeof data.id_token !== "string" ||
-      typeof data.expires_in !== "number"
-    ) {
+    if (typeof data.expires_in !== "number") {
       logger.error("[Auth] Invalid token exchange response shape");
+      return null;
+    }
+
+    // Tokens are set as non-HttpOnly cookies by the backend — read them
+    const cookies = document.cookie.split(";").reduce(
+      (acc, c) => {
+        const parts = c.trim().split("=");
+        const k = parts[0] ?? "";
+        acc[k] = parts.slice(1).join("=");
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    const accessToken = cookies["hak_access_token"];
+    const idToken = cookies["hak_id_token"];
+
+    if (!accessToken || !idToken) {
+      logger.error("[Auth] Tokens not found in cookies after exchange");
       return null;
     }
 
     sessionStorage.removeItem(PKCE_STORAGE_KEY);
 
     return {
-      accessToken: data.access_token,
-      idToken: data.id_token,
+      accessToken,
+      idToken,
       expiresIn: data.expires_in,
     };
   } catch (error) {
