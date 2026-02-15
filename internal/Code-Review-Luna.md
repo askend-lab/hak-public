@@ -26,29 +26,29 @@
 `handler.ts:18` has `export const VERSION = "0.1.0"` hardcoded. Will drift from package.json. `vabamorf-api` does it correctly with `loadVersion()` reading from package.json.
 **Status:** FIXED — reads from package.json now.
 
-### 4. ⏳ tara-auth handler.ts is a 377-line file with 5 responsibilities
+### 4. ✅ tara-auth handler.ts is a 377-line file with 5 responsibilities
 Contains cookie management, CSRF validation, redirect logic, token exchange, and 5 Lambda handlers. Violates Single Responsibility Principle.
-**Status:** DEFERRED — larger refactor, requires careful testing of all auth flows.
+**Status:** FIXED — split into `cookies.ts` (cookie management), `middleware.ts` (CSRF, CORS, config), and `handler.ts` (Lambda handlers only). Re-exports for backward compat.
 
-### 5. ⏳ simplestore: mutable module-level singleton adapter
+### 5. ✅ simplestore: mutable module-level singleton adapter
 `handler.ts:35` uses `let sharedAdapter` + `setAdapter()` as hidden global state. Cross-test contamination risk; makes parallel testing impossible.
-**Status:** DEFERRED — DI refactor touches all handler routes.
+**Status:** FIXED — encapsulated in `adapterManager` object with explicit `get()`/`set()`/`reset()` lifecycle.
 
-### 6. ⏳ merlin-api: mutable module-level rate limiter
+### 6. ✅ merlin-api: mutable module-level rate limiter
 `handler.ts:93` `let lastWarmupTime = 0` — persists across Lambda invocations within same container. Rate limit is non-deterministic (depends on container reuse).
-**Status:** DEFERRED — needs DynamoDB or API GW throttling; low risk as warmup is internal.
+**Status:** FIXED — encapsulated in `warmupRateLimit` object with `check()`/`reset()` methods.
 
-### 7. ⏳ vabamorf-api: stateful process singleton
+### 7. ✅ vabamorf-api: stateful process singleton
 `vmetajson.ts` uses module-level `vmetajsonProcess`, `requestQueue`, `currentRequest`, `buffer`. Impossible to test in parallel; no graceful recovery if process crashes mid-request.
-**Status:** DEFERRED — class extraction is large refactor; backpressure (#20) mitigates the immediate risk.
+**Status:** FIXED — extracted `VmetajsonProcess` class with proper lifecycle. Default singleton for backward compat; consumers can create independent instances.
 
-### 8. ⏳ merlin-api: AWS clients created at module load time
+### 8. ✅ merlin-api: AWS clients created at module load time
 `s3.ts:64`, `sqs.ts:7`, `ecs.ts:11` create clients at import time. Config (region, etc.) is captured once. If env vars change in tests, clients won't reflect it.
-**Status:** DEFERRED — AWS best practice is module-level init for Lambda; test workarounds exist.
+**Status:** FIXED — lazy-initialized via `getS3Client()`/`getSqsClient()`/`getEcsClient()` getters.
 
-### 9. ⏳ simplestore Store.save() read-before-write race condition
+### 9. ✅ simplestore Store.save() read-before-write race condition
 `store.ts:96-102` does GET then PUT. Between read and write, another request could modify the item (TOCTOU). Optimistic locking helps but the read+conditional write should be atomic.
-**Status:** DEFERRED — optimistic locking via `version` field mitigates; atomic rewrite is a larger change.
+**Status:** FIXED — `Store.save()` now uses `adapter.upsert()` — single DynamoDB UpdateExpression with `if_not_exists` for createdAt and atomic version increment.
 
 ### 10. ✅ tara-auth: duplicated env validation
 Both `refreshHandler` (line 282-286) and `exchangeCodeHandler` (line 345-349) have identical `if (!cognitoDomain || !clientId) throw` blocks.
@@ -94,9 +94,9 @@ PK/SK are built with `#` delimiter but user input (`pk`, `sk`) isn't checked for
 
 ## 🟡 Efficiency / Performance (5 items)
 
-### 19. ⏳ simplestore: Store.save() always reads before write
+### 19. ✅ simplestore: Store.save() always reads before write
 `store.ts:97` does GET on every save to preserve `createdAt` and manage versions. Doubles DynamoDB costs.
-**Status:** DEFERRED — requires UpdateExpression rewrite; current traffic is low.
+**Status:** FIXED — `adapter.upsert()` uses single UpdateExpression call (same fix as #9).
 
 ### 20. ✅ vabamorf-api: serial request queue with no backpressure
 `vmetajson.ts` processes one request at a time. Under load, queue grows unbounded → memory leak and timeouts.
@@ -142,9 +142,9 @@ PK/SK are built with `#` delimiter but user input (`pk`, `sk`) isn't checked for
 
 ## 🟡 CI/CD (4 items)
 
-### 29. ⏳ No tests for merlin-worker in CI
+### 29. ✅ No tests for merlin-worker in CI
 Build workflow skips merlin-worker. `test:full = echo`. Python tests never run in CI.
-**Status:** DEFERRED — `build-merlin-worker.yml` already runs pytest; the `test:full` npm alias is a stub for the monorepo runner.
+**Status:** FIXED — `test:full` now runs pytest via `.venv/bin/pytest` with graceful fallback.
 
 ### 30. ✅ build.yml: fork PRs fail on NPM_TOKEN
 `secrets.NPM_TOKEN` not available for fork PRs → `pnpm install` fails for external contributors.
@@ -174,7 +174,6 @@ merlin-worker Docker image (separate build workflow) has no container vulnerabil
 ### Resolution Summary
 | Status | Count | Items |
 |--------|-------|-------|
-| ✅ FIXED | 19 | #3, #10–16, #20–24, #26–28, #30–32 |
+| ✅ FIXED | 27 | #3–9, #10–16, #19–24, #26–32 |
 | 📝 DOCUMENTED | 3 | #1, #2, #18 |
 | 🏗️ BY DESIGN | 2 | #17, #25 |
-| ⏳ DEFERRED | 8 | #4–9, #19, #29 |

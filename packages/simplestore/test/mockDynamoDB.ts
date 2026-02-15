@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { StorageAdapter, StoreItem } from "../src/core/types";
+import { StorageAdapter, StoreItem, UpsertFields } from "../src/core/types";
 
 export class FailingDynamoDB implements StorageAdapter {
   put(_item: StoreItem, _expectedVersion?: number): Promise<void> {
@@ -14,6 +14,9 @@ export class FailingDynamoDB implements StorageAdapter {
     throw new Error("DB error");
   }
   queryBySortKeyPrefix(): Promise<StoreItem[]> {
+    throw new Error("DB error");
+  }
+  upsert(): Promise<StoreItem> {
     throw new Error("DB error");
   }
 }
@@ -51,6 +54,24 @@ export class InMemoryDynamoDB implements StorageAdapter {
       }
     }
     return Promise.resolve(results);
+  }
+
+  upsert(pk: string, sk: string, fields: UpsertFields): Promise<StoreItem> {
+    const key = this.makeKey(pk, sk);
+    const existing = this.items.get(key);
+    const now = new Date().toISOString();
+    const item: StoreItem = {
+      PK: pk,
+      SK: sk,
+      data: fields.data,
+      owner: fields.owner,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+      version: (existing?.version ?? 0) + 1,
+      ...(fields.ttl !== undefined ? { ttl: fields.ttl } : {}),
+    };
+    this.items.set(key, { ...item });
+    return Promise.resolve({ ...item });
   }
 
   clear(): void {

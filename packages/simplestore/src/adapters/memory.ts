@@ -5,7 +5,7 @@
  * In-memory storage adapter for testing
  */
 
-import { StorageAdapter, StoreItem, DEFAULT_CONFIG } from "../core/types";
+import { StorageAdapter, StoreItem, UpsertFields, DEFAULT_CONFIG } from "../core/types";
 import { VersionConflictError } from "./dynamodb";
 
 /**
@@ -62,6 +62,26 @@ export class InMemoryAdapter implements StorageAdapter {
     }
 
     return results;
+  }
+
+  async upsert(pk: string, sk: string, fields: UpsertFields): Promise<StoreItem> {
+    const key = this.buildKey(pk, sk);
+    const existing = this.data.get(key);
+    const now = new Date().toISOString();
+
+    const item: StoreItem = {
+      PK: pk,
+      SK: sk,
+      data: fields.data,
+      owner: fields.owner,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+      version: (existing?.version ?? 0) + 1,
+      ...(fields.ttl !== undefined ? { ttl: fields.ttl } : {}),
+    };
+
+    this.data.set(key, { ...item });
+    return { ...item };
   }
 
   /** Reset all data (for test isolation) */

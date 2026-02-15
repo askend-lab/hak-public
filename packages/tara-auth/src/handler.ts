@@ -3,95 +3,62 @@ import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse, getCorsOrigin } from '
 import { createTaraClient } from './tara-client';
 import { createCognitoClient } from './cognito-client';
 import { AuthState } from './types';
-import * as crypto from 'crypto';
 
-export const STATE_COOKIE_NAME = 'tara_auth_state';
-export const REFRESH_COOKIE_NAME = 'hak_refresh_token';
-export const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-export const REFRESH_TOKEN_MAX_AGE_S = 30 * 24 * 60 * 60; // 30 days
-export const AUTH_CALLBACK_PATH = '/auth/callback';
-export const DEFAULT_FRONTEND_URL_PROD = 'https://hak.askend-lab.com';
-export const DEFAULT_FRONTEND_URL_DEV = 'https://hak-dev.askend-lab.com';
-export const TOKEN_COOKIE_OPTIONS = 'HttpOnly; Secure; SameSite=Lax; Path=/';
-export const RANDOM_STRING_LENGTH = 32;
-export const MAX_BODY_SIZE = 4096; // 4KB — auth requests are small JSON payloads
+import {
+  STATE_TTL_MS,
+  getFrontendUrl,
+  createStateCookie,
+  parseStateCookie,
+  clearStateCookie,
+  createRefreshCookie,
+  clearRefreshCookie,
+  parseRefreshCookie,
+  createAccessTokenCookie,
+  createIdTokenCookie,
+} from './cookies';
 
-export function getFrontendUrl(): string {
-  const stage = process.env.STAGE || 'dev';
-  return stage === 'prod'
-    ? process.env.FRONTEND_URL_PROD || DEFAULT_FRONTEND_URL_PROD
-    : process.env.FRONTEND_URL_DEV || DEFAULT_FRONTEND_URL_DEV;
-}
+import {
+  AUTH_CALLBACK_PATH,
+  RANDOM_STRING_LENGTH,
+  MAX_BODY_SIZE,
+  generateRandomString,
+  corsResponseHeaders,
+  validateCsrfOrigin,
+  requireCognitoConfig,
+} from './middleware';
 
-export function generateRandomString(length: number): string {
-  return crypto.randomBytes(length).toString('base64url').substring(0, length);
-}
+// Re-export everything from cookies and middleware for backward compatibility
+export {
+  STATE_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
+  ACCESS_TOKEN_COOKIE_NAME,
+  ID_TOKEN_COOKIE_NAME,
+  STATE_TTL_MS,
+  REFRESH_TOKEN_MAX_AGE_S,
+  SHORT_TOKEN_MAX_AGE_S,
+  TOKEN_COOKIE_OPTIONS,
+  DEFAULT_FRONTEND_URL_PROD,
+  DEFAULT_FRONTEND_URL_DEV,
+  getFrontendUrl,
+  getCookieDomain,
+  createStateCookie,
+  parseStateCookie,
+  clearStateCookie,
+  createRefreshCookie,
+  clearRefreshCookie,
+  parseRefreshCookie,
+  createAccessTokenCookie,
+  createIdTokenCookie,
+} from './cookies';
 
-export function getCookieDomain(): string {
-  const url = new URL(getFrontendUrl());
-  return url.hostname;
-}
-
-export function createRefreshCookie(refreshToken: string): string {
-  const domain = getCookieDomain();
-  return `${REFRESH_COOKIE_NAME}=${refreshToken}; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${REFRESH_TOKEN_MAX_AGE_S}`;
-}
-
-export function clearRefreshCookie(): string {
-  const domain = getCookieDomain();
-  return `${REFRESH_COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=0`;
-}
-
-export function parseRefreshCookie(cookieHeader: string | undefined): string | null {
-  if (!cookieHeader) return null;
-  const cookies = cookieHeader.split(';').map(c => c.trim());
-  const found = cookies.find(c => c.startsWith(`${REFRESH_COOKIE_NAME}=`));
-  if (!found) return null;
-  const value = found.substring(REFRESH_COOKIE_NAME.length + 1);
-  return value || null;
-}
-
-function corsResponseHeaders(): Record<string, string> {
-  return {
-    ...CORS_HEADERS,
-    'Access-Control-Allow-Origin': getCorsOrigin(),
-    'Access-Control-Allow-Credentials': 'true',
-  };
-}
-
-export function validateCsrfOrigin(event: APIGatewayProxyEvent): boolean {
-  const origin = event.headers.Origin || event.headers.origin;
-  if (!origin) return false;
-  const expected = getFrontendUrl();
-  return origin === expected;
-}
-
-export function createStateCookie(state: AuthState): string {
-  const domain = getCookieDomain();
-  const encoded = Buffer.from(JSON.stringify(state)).toString('base64url');
-  return `${STATE_COOKIE_NAME}=${encoded}; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Max-Age=600; Path=/`;
-}
-
-export function parseStateCookie(cookieHeader: string | undefined): AuthState | null {
-  if (!cookieHeader) return null;
-
-  const cookies = cookieHeader.split(';').map(c => c.trim());
-  const stateCookie = cookies.find(c => c.startsWith(`${STATE_COOKIE_NAME}=`));
-  
-  if (!stateCookie) return null;
-
-  try {
-    const encoded = stateCookie.split('=')[1];
-    const decoded = Buffer.from(encoded, 'base64url').toString('utf-8');
-    return JSON.parse(decoded) as AuthState;
-  } catch {
-    return null;
-  }
-}
-
-export function clearStateCookie(): string {
-  return `${STATE_COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/`;
-}
+export {
+  AUTH_CALLBACK_PATH,
+  RANDOM_STRING_LENGTH,
+  MAX_BODY_SIZE,
+  generateRandomString,
+  corsResponseHeaders,
+  validateCsrfOrigin,
+} from './middleware';
 
 export async function startHandler(
   _event: APIGatewayProxyEvent
@@ -216,24 +183,6 @@ function redirectToFrontend(
   };
 }
 
-export const ACCESS_TOKEN_COOKIE_NAME = 'hak_access_token';
-export const ID_TOKEN_COOKIE_NAME = 'hak_id_token';
-export const SHORT_TOKEN_MAX_AGE_S = 3600; // 1 hour
-
-export function createAccessTokenCookie(token: string): string {
-  const domain = getCookieDomain();
-  // Not HttpOnly — frontend needs to read for Authorization header.
-  // Short-lived (1h); refresh_token stays HttpOnly.
-  return `${ACCESS_TOKEN_COOKIE_NAME}=${token}; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${SHORT_TOKEN_MAX_AGE_S}`;
-}
-
-export function createIdTokenCookie(token: string): string {
-  const domain = getCookieDomain();
-  // Not HttpOnly — frontend needs to read for user info extraction.
-  // Short-lived (1h); refresh_token stays HttpOnly.
-  return `${ID_TOKEN_COOKIE_NAME}=${token}; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${SHORT_TOKEN_MAX_AGE_S}`;
-}
-
 function redirectToFrontendWithCookies(
   baseUrl: string,
   tokens: { accessToken: string; idToken: string; refreshToken: string; expiresIn: number }
@@ -261,15 +210,6 @@ function redirectToFrontendWithCookies(
     },
     body: '',
   };
-}
-
-function requireCognitoConfig(): { cognitoDomain: string; clientId: string } {
-  const cognitoDomain = process.env.COGNITO_DOMAIN;
-  const clientId = process.env.COGNITO_CLIENT_ID;
-  if (!cognitoDomain || !clientId) {
-    throw new Error('COGNITO_DOMAIN and COGNITO_CLIENT_ID must be set');
-  }
-  return { cognitoDomain, clientId };
 }
 
 export async function refreshHandler(

@@ -94,6 +94,15 @@ export const DEFAULT_CONFIG: StoreConfig = {
 };
 
 /**
+ * Fields for atomic upsert — adapter handles createdAt/version atomically
+ */
+export interface UpsertFields {
+  readonly data: Record<string, unknown>;
+  readonly owner: string;
+  readonly ttl?: number;
+}
+
+/**
  * Storage adapter interface - dependency injection point
  */
 export interface StorageAdapter {
@@ -101,4 +110,5 @@ export interface StorageAdapter {
   get(pk: string, sk: string): Promise<StoreItem | null>;
   delete(pk: string, sk: string): Promise<void>;
   queryBySortKeyPrefix(pk: string, skPrefix: string, maxItems?: number): Promise<StoreItem[]>;
+  upsert(pk: string, sk: string, fields: UpsertFields): Promise<StoreItem>;
 }

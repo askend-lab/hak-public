@@ -4,10 +4,16 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import { getAwsRegion, getSqsQueueUrl } from "./env";
 
-const sqsClient = new SQSClient({ region: getAwsRegion() });
+let _sqsClient: SQSClient | undefined;
+function getSqsClient(): SQSClient {
+  if (!_sqsClient) {
+    _sqsClient = new SQSClient({ region: getAwsRegion() });
+  }
+  return _sqsClient;
+}
 
 export async function sendToQueue(message: object): Promise<string> {
-  const result = await sqsClient.send(
+  const result = await getSqsClient().send(
     new SendMessageCommand({
       QueueUrl: getSqsQueueUrl(),
       MessageBody: JSON.stringify(message),

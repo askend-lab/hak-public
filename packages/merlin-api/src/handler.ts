@@ -106,23 +106,25 @@ export function validateParams(params: SynthesizeParams): string | null {
 }
 
 export const WARMUP_COOLDOWN_MS = 60_000;
-let lastWarmupTime = 0;
 
-export function resetRateLimit(): void {
-  lastWarmupTime = 0;
-}
-
-function checkRateLimit(): LambdaResponse | null {
-  const now = Date.now();
-  if (now - lastWarmupTime < WARMUP_COOLDOWN_MS) {
-    return createResponse(HTTP_STATUS.TOO_MANY_REQUESTS, {
-      error: "Rate limited. Try again later.",
-      retryAfterMs: WARMUP_COOLDOWN_MS - (now - lastWarmupTime),
-    });
-  }
-  lastWarmupTime = now;
-  return null;
-}
+export const warmupRateLimit = {
+  _lastTime: 0,
+  reset(): void {
+    this._lastTime = 0;
+  },
+  check(): LambdaResponse | null {
+    const now = Date.now();
+    const elapsed = now - this._lastTime;
+    if (elapsed < WARMUP_COOLDOWN_MS) {
+      return createResponse(HTTP_STATUS.TOO_MANY_REQUESTS, {
+        error: "Rate limited. Try again later.",
+        retryAfterMs: WARMUP_COOLDOWN_MS - elapsed,
+      });
+    }
+    this._lastTime = now;
+    return null;
+  },
+};
 
 export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> {
   try {
@@ -197,7 +199,7 @@ export async function health(): Promise<LambdaResponse> {
 }
 
 export async function warmup(): Promise<LambdaResponse> {
-  const rateLimited = checkRateLimit();
+  const rateLimited = warmupRateLimit.check();
   if (rateLimited) return rateLimited;
 
   if (!isEcsConfigured()) {
