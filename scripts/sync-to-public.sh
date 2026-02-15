@@ -370,25 +370,24 @@ if [[ "$DRY_RUN" == "true" ]]; then
   exit 0
 fi
 
+# --- Safety check: verify internal files were excluded before pushing ---
+echo ">>> Verifying internal files are excluded..."
+for p in infra/ internal/ packages/tara-auth/ .githooks/ devbox.yaml defaults.yaml; do
+  [[ -e "$p" ]] && { echo "ABORTING: $p still present! Check .opensource-exclude"; exit 1; }
+done
+echo "  All sensitive paths verified excluded."
+
 # --- Push to public repository ---
 echo ">>> Pushing to public repository: $PUBLIC_REPO"
-
-# Configure git identity for the temp clone
 git config user.email "noreply@users.noreply.github.com"
 git config user.name "HAK Open-Source Sync"
-
-# Remove existing origin and add public repo
 git remote remove origin
 git remote add origin "$PUBLIC_REPO"
-
-# Force push the cleaned branch
-# (First time: creates the branch. Subsequent: updates it.)
 git add -A
 git commit -m "sync: update from internal repository
 
 Automated sync from askend-lab/hak internal repository.
 Excludes internal tooling, infrastructure, and backend packages." --allow-empty
-
 git push --force origin "$BRANCH"
 
 echo ""

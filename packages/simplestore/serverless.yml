@@ -138,7 +138,7 @@ resources:
         IdentitySource: method.request.header.Authorization
         RestApiId: !Ref ApiGatewayRestApi
         ProviderARNs:
-          - ${env:COGNITO_USER_POOL_ARN, ''}
+          - ${env:COGNITO_USER_POOL_ARN}
 
   Outputs:
     ApiEndpoint:

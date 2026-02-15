@@ -14,11 +14,16 @@ export interface LambdaResponse {
 
 /**
  * Returns the allowed CORS origin from ALLOWED_ORIGIN env var.
- * Falls back to "*" when not set (local dev / tests).
+ * Returns "null" (restrictive) when not set to prevent accidental wildcard CORS.
  */
 export function getCorsOrigin(): string {
   // eslint-disable-next-line no-restricted-globals -- Lambda-only: safe in Node.js runtime
-  return (typeof process !== "undefined" && process.env?.ALLOWED_ORIGIN) || "*";
+  const origin = typeof process !== "undefined" ? process.env?.ALLOWED_ORIGIN : undefined;
+  if (!origin) {
+    console.warn("ALLOWED_ORIGIN not set — defaulting to restrictive 'null' origin");
+    return "null";
+  }
+  return origin;
 }
 
 /**
@@ -92,7 +97,7 @@ export function createInternalErrorResponse(
   context: string,
   error: unknown,
 ): LambdaResponse {
-  console.error(`${context}:`, error);
+  console.error(`${context}:`, error instanceof Error ? error.message : String(error));
   return createApiResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: "Internal server error",
   });
