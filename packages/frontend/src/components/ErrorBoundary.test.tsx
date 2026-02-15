@@ -146,7 +146,7 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>
     );
     const btn = screen.getByText("Proovi uuesti");
-    expect(btn.style.marginTop).toBe("1rem");
+    expect(btn.parentElement?.style.marginTop).toBe("1rem");
     expect(btn.style.borderRadius).toBe("0.5rem");
     expect(btn.style.cursor).toBe("pointer");
     expect(btn.style.background).toBe("#fff");

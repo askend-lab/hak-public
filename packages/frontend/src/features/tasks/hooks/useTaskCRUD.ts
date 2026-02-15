@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useDataService } from "@/contexts/DataServiceContext";
 import { useAuth } from "@/features/auth/services";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -32,6 +32,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
   const dataService = useDataService();
+  const [isDeleting, setIsDeleting] = useState(false);
   const {
     sentences,
     setSelectedTaskId,
@@ -186,6 +187,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
 
   const handleConfirmDelete = useCallback(async () => {
     if (!user || !taskToDelete) return;
+    setIsDeleting(true);
     const taskName = taskToDelete.name;
     try {
       await dataService.deleteTask(user.id, taskToDelete.id);
@@ -201,6 +203,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       logger.error("Failed to delete task:", error);
       showNotification({ type: "error", message: TASK_STRINGS.TASK_DELETE_FAILED });
     } finally {
+      setIsDeleting(false);
       setShowDeleteConfirmation(false);
       setTaskToDelete(null);
     }
@@ -220,5 +223,6 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
     handleDeleteTask,
     handleConfirmDelete,
     handleCancelDelete,
+    isDeleting,
   };
 }
