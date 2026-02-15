@@ -150,7 +150,7 @@ describe('exchangeCodeHandler', () => {
     expect(JSON.parse(result.body).error).toContain('Missing');
   });
 
-  it('returns 200 with tokens and sets refresh cookie on success', async () => {
+  it('returns 200 with tokens in cookies (not body) on success', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ access_token: 'at', id_token: 'id', refresh_token: 'rt', expires_in: 3600 }),
@@ -161,11 +161,16 @@ describe('exchangeCodeHandler', () => {
     const result = await exchangeCodeHandler(event);
     expect(result.statusCode).toBe(200);
     const body = JSON.parse(result.body);
-    expect(body.access_token).toBe('at');
-    expect(body.id_token).toBe('id');
+    // Tokens should NOT be in body (XSS protection)
+    expect(body.access_token).toBeUndefined();
+    expect(body.id_token).toBeUndefined();
     expect(body.expires_in).toBe(3600);
+    // Tokens should be in HttpOnly cookies
     const cookies = result.multiValueHeaders?.['Set-Cookie'] as string[];
-    expect(cookies?.find(c => c.includes('rt'))).toBeDefined();
+    expect(cookies).toHaveLength(3);
+    expect(cookies.find(c => c.includes('hak_refresh_token=rt'))).toBeDefined();
+    expect(cookies.find(c => c.includes('hak_access_token=at'))).toBeDefined();
+    expect(cookies.find(c => c.includes('hak_id_token=id'))).toBeDefined();
   });
 
   it('returns 400 when Cognito rejects code exchange', async () => {
@@ -205,7 +210,7 @@ describe('cookie helpers', () => {
   afterEach(() => { process.env = { ...originalEnv }; });
 
   it('getCookieDomain uses exact frontend hostname', () => {
-    expect(getCookieDomain()).toBe('.hak-dev.askend-lab.com');
+    expect(getCookieDomain()).toBe('hak-dev.askend-lab.com');
   });
 
   it('createRefreshCookie includes all required attributes', () => {
@@ -214,7 +219,7 @@ describe('cookie helpers', () => {
     expect(cookie).toContain('HttpOnly');
     expect(cookie).toContain('Secure');
     expect(cookie).toContain('SameSite=Lax');
-    expect(cookie).toContain('Domain=.hak-dev.askend-lab.com');
+    expect(cookie).toContain('Domain=hak-dev.askend-lab.com');
     expect(cookie).toContain('Max-Age=2592000');
   });
 

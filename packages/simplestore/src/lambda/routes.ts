@@ -177,13 +177,15 @@ export async function handleQuery(
     : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
 }
 
+const PUBLIC_ALLOWED_TYPES = new Set(["shared", "unlisted", "public"]);
+
 export async function handleGetPublic(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
   const { type } = getQueryParams(event);
 
-  if (type === "private") {
+  if (!type || !PUBLIC_ALLOWED_TYPES.has(type)) {
     return createResponse(HTTP_STATUS.BAD_REQUEST, {
       error: HTTP_ERRORS.PRIVATE_NOT_ALLOWED,
     });

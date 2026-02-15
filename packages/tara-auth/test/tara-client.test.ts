@@ -1,5 +1,6 @@
 import {
   createTaraClient,
+  _resetSecretsCache,
   DEFAULT_TARA_ISSUER,
   DEFAULT_CALLBACK_URL,
   OIDC_AUTHORIZE_PATH,
@@ -27,6 +28,7 @@ describe('createTaraClient', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    _resetSecretsCache();
     process.env = { ...originalEnv };
     process.env.TARA_ISSUER = 'https://tara-test.ria.ee';
     process.env.TARA_CLIENT_ID = 'test-client-id';

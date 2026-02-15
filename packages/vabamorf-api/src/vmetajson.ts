@@ -15,8 +15,10 @@ interface QueuedRequest {
 const VMETAJSON_PARAMS = ["--stem", "--addphonetics"] as const;
 const TIMEOUT_ERROR = "vmetajson timeout";
 const NOT_INITIALIZED_ERROR = "vmetajson process not initialized";
+const QUEUE_FULL_ERROR = "vmetajson queue full — too many concurrent requests";
 const PARSE_ERROR_PREFIX = "Failed to parse vmetajson response: ";
 const EXIT_ERROR_PREFIX = "vmetajson exited with code ";
+const MAX_QUEUE_SIZE = 50;
 
 // Stryker disable next-line all: env default is equivalent
 const TIMEOUT_MS = parseInt(process.env.VMETAJSON_TIMEOUT_MS ?? "5000", 10);
@@ -115,6 +117,10 @@ function createAnalyzeInput(text: string): VmetajsonInput {
 export async function analyze(text: string): Promise<VmetajsonResponse> {
   if (!vmetajsonProcess) {
     throw new Error(NOT_INITIALIZED_ERROR);
+  }
+
+  if (requestQueue.length >= MAX_QUEUE_SIZE) {
+    throw new Error(QUEUE_FULL_ERROR);
   }
 
   const input = createAnalyzeInput(text);

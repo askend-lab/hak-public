@@ -1,4 +1,5 @@
 import * as jose from 'jose';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { TaraIdToken, TaraTokens } from './types';
 
 export const DEFAULT_TARA_ISSUER = 'https://tara-test.ria.ee';
@@ -15,11 +16,48 @@ export interface TaraClient {
   verifyIdToken(idToken: string, expectedNonce: string): Promise<TaraIdToken>;
 }
 
+interface TaraSecrets {
+  clientId: string;
+  clientSecret: string;
+  callbackUrl: string;
+}
+
+// Cache secrets for Lambda container lifetime
+let cachedSecrets: TaraSecrets | null = null;
+
+async function loadTaraSecrets(): Promise<TaraSecrets> {
+  if (cachedSecrets) return cachedSecrets;
+
+  const secretsArn = process.env.TARA_SECRETS_ARN;
+  if (secretsArn) {
+    const client = new SecretsManagerClient({ region: process.env.AWS_REGION || 'eu-west-1' });
+    const result = await client.send(new GetSecretValueCommand({ SecretId: secretsArn }));
+    const secret = JSON.parse(result.SecretString || '{}') as Record<string, string>;
+    cachedSecrets = {
+      clientId: secret.TARA_CLIENT_ID || '',
+      clientSecret: secret.TARA_CLIENT_SECRET || '',
+      callbackUrl: secret.TARA_CALLBACK_URL || DEFAULT_CALLBACK_URL,
+    };
+  } else {
+    // Fallback to env vars for local development
+    cachedSecrets = {
+      clientId: process.env.TARA_CLIENT_ID || '',
+      clientSecret: process.env.TARA_CLIENT_SECRET || '',
+      callbackUrl: process.env.TARA_CALLBACK_URL || DEFAULT_CALLBACK_URL,
+    };
+  }
+
+  return cachedSecrets;
+}
+
+/** @internal Reset secrets cache — for testing only */
+export function _resetSecretsCache(): void {
+  cachedSecrets = null;
+}
+
 export async function createTaraClient(): Promise<TaraClient> {
   const issuer = process.env.TARA_ISSUER || DEFAULT_TARA_ISSUER;
-  const clientId = process.env.TARA_CLIENT_ID || '';
-  const clientSecret = process.env.TARA_CLIENT_SECRET || '';
-  const callbackUrl = process.env.TARA_CALLBACK_URL || DEFAULT_CALLBACK_URL;
+  const { clientId, clientSecret, callbackUrl } = await loadTaraSecrets();
 
   const JWKS = jose.createRemoteJWKSet(new URL(`${issuer}${OIDC_JWKS_PATH}`));
 

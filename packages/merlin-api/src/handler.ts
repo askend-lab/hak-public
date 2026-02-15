@@ -15,7 +15,19 @@ import { checkS3Cache, buildAudioUrl, isValidCacheKey } from "./s3";
 import { sendToQueue } from "./sqs";
 import { describeService, scaleService, isEcsConfigured } from "./ecs";
 
-export const VERSION = "0.1.0";
+// Read version from package.json (same pattern as vabamorf-api)
+function loadVersion(): string {
+  try {
+    return require("./package.json").version;
+  } catch {
+    try {
+      return require("../package.json").version;
+    } catch {
+      return "0.0.0";
+    }
+  }
+}
+export const VERSION = loadVersion();
 
 export interface SynthesizeRequest {
   text: string;
@@ -51,14 +63,18 @@ export function generateCacheKey(
 
 export const MAX_BODY_SIZE = 10_240; // 10KB
 
-export function parseRequestBody(body?: string): SynthesizeRequest | null {
+export type ParseBodyResult =
+  | { ok: true; data: SynthesizeRequest }
+  | { ok: false; error: string };
+
+export function parseRequestBody(body?: string): ParseBodyResult {
   if (body && body.length > MAX_BODY_SIZE) {
-    return null;
+    return { ok: false, error: "Request body too large" };
   }
   try {
-    return JSON.parse(body ?? "{}") as SynthesizeRequest;
+    return { ok: true, data: JSON.parse(body ?? "{}") as SynthesizeRequest };
   } catch {
-    return null;
+    return { ok: false, error: "Invalid JSON body" };
   }
 }
 
@@ -110,10 +126,11 @@ function checkRateLimit(): LambdaResponse | null {
 
 export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> {
   try {
-    const body = parseRequestBody(event.body);
-    if (!body) {
-      return createBadRequest("Invalid JSON body");
+    const parsed = parseRequestBody(event.body);
+    if (!parsed.ok) {
+      return createBadRequest(parsed.error);
     }
+    const body = parsed.data;
 
     if (!validateText(body.text)) {
       return createBadRequest("Missing or invalid text field");

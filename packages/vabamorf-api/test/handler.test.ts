@@ -185,15 +185,17 @@ describe("variantsHandler", () => {
     expect(body.variants[0].text).toBe("n<oor_m<ees");
   });
 
-  it("should return 500 if no variants found", async () => {
+  it("should return 200 with empty variants when word not found", async () => {
     mockAnalyze.mockResolvedValue({ annotations: { tokens: [] } });
 
     const event = createEvent({ word: "xyz" });
 
     const result = await variantsHandler(event);
 
-    expect(result.statusCode).toBe(500);
-    expect(JSON.parse(result.body).error).toContain("No phonetic variants");
+    expect(result.statusCode).toBe(200);
+    const body = JSON.parse(result.body);
+    expect(body.word).toBe("xyz");
+    expect(body.variants).toHaveLength(0);
   });
 });
 
