@@ -35,7 +35,9 @@ export function pingMerlinOnActivity(): void {
   if (now - lastActivity < ACTIVITY_THROTTLE) return;
   lastActivity = now;
 
-  fetch(WARMUP_API_PATH, { method: "POST" }).catch(() => {});
+  fetch(WARMUP_API_PATH, { method: "POST" }).catch((err) => {
+    logger.warn("[Audio] Activity ping failed:", err);
+  });
 }
 
 let initialized = false;
