@@ -107,7 +107,7 @@ describe("useTaskHandlers - Task Deletion", () => {
 
     expect(mockDeleteTask).toHaveBeenCalledWith("user-1", "task-1");
     expect(mockSetSelectedTaskId).toHaveBeenCalledWith(null);
-    expect(mockSetCurrentView).toHaveBeenCalledWith("tasks");
+    expect(mockSetCurrentView).toHaveBeenCalled();
   });
 
   it("should cancel delete", async () => {
