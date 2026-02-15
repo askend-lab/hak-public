@@ -11,6 +11,8 @@ try {
     dsn: import.meta.env.VITE_SENTRY_DSN ?? "",
     environment: import.meta.env.MODE,
     enabled: import.meta.env.PROD,
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 0,
   });
 } catch {
   // Sentry init failure must not block app startup

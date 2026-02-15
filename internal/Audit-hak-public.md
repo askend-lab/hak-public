@@ -83,7 +83,7 @@
 - [ ] ⚠️ 65. **vabamorf-api catch-all route** — `serverless.yml:50-54`. ANY /{proxy+}. Архитектурное решение — менять?
 - [x] ⚠️ 66. **Git commit info в production build** — `vite.config.ts:48-56`. workingDir, commitMessage в JS bundle. Убрать workingDir? Commit info полезен для debugging.
 - [ ] ⚠️ 67. **IAM wildcard на table+index** — `serverless.yml:61`. !GetAtt DataTable.Arn покрывает и будущие GSI. Ограничить?
-- [ ] ⚠️ 68. **Sentry Session Replay risk** — Сейчас выключен по умолчанию. Добавить явный `replaysSessionSampleRate: 0`?
+- [x] ⚠️ 68. **Sentry Session Replay risk** — Сейчас выключен по умолчанию. Добавить явный `replaysSessionSampleRate: 0`?
 
 ## Фаза 4 — Low Priority / Code Hygiene
 
