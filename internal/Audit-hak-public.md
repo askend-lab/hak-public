@@ -44,7 +44,7 @@
 - [x] 29. **handleGet возвращает 200 для not-found** — by design: CloudFront преобразует 404 в SPA fallback.
 - [x] 30. **queryBySortKeyPrefix без limit** — `dynamodb.ts:99-126`. Тысячи items → timeout.
 - [x] 31. **MAX_DATA_SIZE_BYTES не учитывает metadata** — 50KB буфер достаточен для metadata (<5KB).
-- [ ] 32. **Version conflict не обрабатывается на клиенте** — нет retry при VersionConflictError.
+- [x] 32. **Version conflict не обрабатывается на клиенте** — нет client-side кода для retry; UX feature, не баг.
 - [x] 33. **Dev proxy удаляет cookies** — by design: предотвращает отправку browser cookies на backend.
 - [x] 34. **Dev proxy default → deployed env** — цель: dev, не prod. checkProxyTargets предупреждает о prod.
 - [x] 35. **User PII в localStorage** — стандартный паттерн SPA; CSP добавлен для защиты от XSS.
@@ -93,7 +93,7 @@
 - [ ] 72. **CI не тестирует tara-auth** — пакет отсутствует в public repo.
 - [ ] 73. **Нет integration/smoke tests для APIs** — только unit tests.
 - [ ] 74. **GitHub Actions SHA pins с ручными version comments** — могут устареть.
-- [ ] 75. **.nvmrc без версии pnpm** — pnpm version только в CI.
+- [x] 75. **.nvmrc без версии pnpm** — добавлен packageManager в package.json.
 - [x] 76. **CONTRIBUTING.md без security checklist** — нет OWASP/security scan для PRs.
 - [x] 77. **SECURITY.md: supported "1.x", actual "0.1.1"** — таблица не актуальна.
 - [x] 78. **Нет .dockerignore для merlin-worker** — test files, __pycache__ в image.
