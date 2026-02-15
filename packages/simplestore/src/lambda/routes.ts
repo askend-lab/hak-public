@@ -57,7 +57,12 @@ function createErrorResponse(
 }
 
 function getQueryParams(event: APIGatewayProxyEvent): Record<string, string> {
-  return (event.queryStringParameters ?? {}) as Record<string, string>;
+  const raw = event.queryStringParameters ?? {};
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (value !== undefined) result[key] = value;
+  }
+  return result;
 }
 
 function validateOrError(

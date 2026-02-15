@@ -46,9 +46,11 @@ export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): Us
   };
 }
 
+export const TOKEN_EXPIRY_BUFFER_SECONDS = 300;
+
 export function isTokenExpired(
   token: string,
-  bufferSeconds = 300,
+  bufferSeconds = TOKEN_EXPIRY_BUFFER_SECONDS,
 ): boolean {
   const payload = decodeJwtPayload(token);
   if (!payload) return true;
