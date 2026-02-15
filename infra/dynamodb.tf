@@ -14,8 +14,7 @@ resource "aws_iam_user_policy" "agent_dynamodb_access" {
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem",
-          "dynamodb:Query",
-          "dynamodb:Scan"
+          "dynamodb:Query"
         ]
         Resource = [
           "arn:aws:dynamodb:${local.region}:${data.aws_caller_identity.current.account_id}:table/simplestore-${var.env}",

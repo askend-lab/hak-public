@@ -22,8 +22,8 @@ export function useTaskSharing(deps: UseTaskSharingDeps) {
       if (requireAuth()) return;
       if (!user) return;
       try {
-        await dataService.shareUserTask(user.id, task.id);
-        const fullTask = await dataService.getTask(task.id, user.id);
+        await dataService.shareUserTask(task.id);
+        const fullTask = await dataService.getTask(task.id);
         if (fullTask) {
           setTaskToShare(
             task.shareToken

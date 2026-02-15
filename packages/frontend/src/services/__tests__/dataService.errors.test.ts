@@ -23,7 +23,7 @@ describe("DataService Error Handling and Edge Cases", () => {
     it("throws error on fetch failure for user tasks", async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
-      await expect(dataService.getUserCreatedTasks(mockUserId)).rejects.toThrow(
+      await expect(dataService.getUserCreatedTasks()).rejects.toThrow(
         "Network error",
       );
     });
@@ -47,7 +47,7 @@ describe("DataService Error Handling and Edge Cases", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
-      const tasks = await dataService.getUserTasks(mockUserId);
+      const tasks = await dataService.getUserTasks();
       expect(Array.isArray(tasks)).toBe(true);
 
       consoleSpy.mockRestore();
@@ -61,7 +61,7 @@ describe("DataService Error Handling and Edge Cases", () => {
         description: "Test",
       });
 
-      const entry = await dataService.addEntryToTask(mockUserId, task.id, {
+      const entry = await dataService.addEntryToTask(task.id, {
         text: "New Entry",
         stressedText: "New Entry",
         audioUrl: null,
@@ -76,7 +76,7 @@ describe("DataService Error Handling and Edge Cases", () => {
 
     it("throws when adding entry to non-existent task", async () => {
       await expect(
-        dataService.addEntryToTask(mockUserId, "non-existent", {
+        dataService.addEntryToTask("non-existent", {
           text: "Entry",
           stressedText: "Entry",
           audioUrl: null,
@@ -95,7 +95,6 @@ describe("DataService Error Handling and Edge Cases", () => {
       });
 
       const entries = await dataService.addTextEntriesToTask(
-        mockUserId,
         task.id,
         ["Entry 1", "Entry 2", "Entry 3"],
       );
@@ -112,7 +111,6 @@ describe("DataService Error Handling and Edge Cases", () => {
       });
 
       const entries = await dataService.addTextEntriesToTask(
-        mockUserId,
         task.id,
         [
           { text: "Hello", stressedText: "Hel·lo" },
@@ -126,7 +124,7 @@ describe("DataService Error Handling and Edge Cases", () => {
 
     it("throws when adding entries to non-existent task", async () => {
       await expect(
-        dataService.addTextEntriesToTask(mockUserId, "non-existent", ["Entry"]),
+        dataService.addTextEntriesToTask("non-existent", ["Entry"]),
       ).rejects.toThrow("Task not found");
     });
 
@@ -138,7 +136,6 @@ describe("DataService Error Handling and Edge Cases", () => {
       });
 
       const entries = await dataService.addTextEntriesToTask(
-        mockUserId,
         task.id,
         ["New 1", "New 2"],
       );
@@ -159,7 +156,6 @@ describe("DataService Error Handling and Edge Cases", () => {
       const entryId = task.entries[0]?.id ?? "";
 
       const updated = await dataService.updateTaskEntry(
-        mockUserId,
         task.id,
         entryId,
         { text: "Updated text", stressedText: "Updated text" },
@@ -170,7 +166,7 @@ describe("DataService Error Handling and Edge Cases", () => {
 
     it("throws when task not found", async () => {
       await expect(
-        dataService.updateTaskEntry(mockUserId, "non-existent", "entry-id", {
+        dataService.updateTaskEntry("non-existent", "entry-id", {
           text: "Test",
         }),
       ).rejects.toThrow("Task not found");
@@ -184,7 +180,7 @@ describe("DataService Error Handling and Edge Cases", () => {
       });
 
       await expect(
-        dataService.updateTaskEntry(mockUserId, task.id, "non-existent-entry", {
+        dataService.updateTaskEntry(task.id, "non-existent-entry", {
           text: "Test",
         }),
       ).rejects.toThrow("Entry not found");
@@ -203,7 +199,7 @@ describe("DataService Error Handling and Edge Cases", () => {
         name: "Shared Task",
         description: "",
       });
-      await dataService.shareUserTask(mockUserId, task.id);
+      await dataService.shareUserTask(task.id);
 
       const result = await dataService.getTaskByShareToken(task.shareToken);
       expect(result?.name).toBe("Shared Task");
@@ -239,7 +235,7 @@ describe("DataService Error Handling and Edge Cases", () => {
         .mockImplementation(() => {});
 
       await expect(
-        dataService.shareUserTask(mockUserId, task.id),
+        dataService.shareUserTask(task.id),
       ).rejects.toThrow("Failed to share task");
 
       consoleSpy.mockRestore();

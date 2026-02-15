@@ -164,7 +164,7 @@ resource "aws_ecs_cluster" "merlin" {
 
   setting {
     name  = "containerInsights"
-    value = "disabled"
+    value = "enabled"
   }
 
   tags = local.tags
@@ -277,7 +277,7 @@ resource "aws_iam_role_policy" "ecs_task" {
 
 resource "aws_cloudwatch_log_group" "merlin" {
   name              = "/ecs/${local.name_prefix}"
-  retention_in_days = 14
+  retention_in_days = 90
 
   tags = local.tags
 }
@@ -394,11 +394,14 @@ resource "aws_security_group" "merlin_worker" {
   description = "Security group for Merlin worker"
   vpc_id      = data.aws_vpc.default.id
 
+  # Restrict egress to HTTPS only (AWS services: ECR, S3, SQS, CloudWatch)
+  # TODO: Move to private subnets + NAT gateway to eliminate public IP requirement
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to AWS services"
   }
 
   tags = local.tags

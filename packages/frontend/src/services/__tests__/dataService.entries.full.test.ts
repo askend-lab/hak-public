@@ -26,7 +26,7 @@ describe("DataService Entry Operations", () => {
         description: "",
       });
 
-      const entry = await dataService.addEntryToTask(mockUserId, task.id, {
+      const entry = await dataService.addEntryToTask(task.id, {
         text: "New entry",
         stressedText: "New entry",
         audioUrl: null,
@@ -40,7 +40,7 @@ describe("DataService Entry Operations", () => {
 
     it("throws for non-existent task", async () => {
       await expect(
-        dataService.addEntryToTask(mockUserId, "non-existent", {
+        dataService.addEntryToTask("non-existent", {
           text: "Test",
           stressedText: "Test",
           audioUrl: null,
@@ -59,7 +59,6 @@ describe("DataService Entry Operations", () => {
       });
 
       const entries = await dataService.addTextEntriesToTask(
-        mockUserId,
         task.id,
         ["Entry 1", "Entry 2", "Entry 3"],
       );
@@ -77,7 +76,6 @@ describe("DataService Entry Operations", () => {
       });
 
       const entries = await dataService.addTextEntriesToTask(
-        mockUserId,
         task.id,
         [
           { text: "Hello", stressedText: "Hel·lo" },
@@ -97,7 +95,6 @@ describe("DataService Entry Operations", () => {
       });
 
       const entries = await dataService.addTextEntriesToTask(
-        mockUserId,
         task.id,
         ["New 1", "New 2"],
       );
@@ -108,7 +105,7 @@ describe("DataService Entry Operations", () => {
 
     it("throws for non-existent task", async () => {
       await expect(
-        dataService.addTextEntriesToTask(mockUserId, "non-existent", ["Test"]),
+        dataService.addTextEntriesToTask("non-existent", ["Test"]),
       ).rejects.toThrow("Task not found");
     });
   });

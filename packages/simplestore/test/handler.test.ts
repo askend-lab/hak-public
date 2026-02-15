@@ -65,7 +65,7 @@ describe("Lambda Handler", () => {
       const event = createEvent({ path: "/unknown" });
       const result = await handler(event);
       expect(result.headers?.["Content-Type"]).toBe("application/json");
-      expect(result.headers?.["Access-Control-Allow-Origin"]).toBe("*");
+      expect(result.headers?.["Access-Control-Allow-Origin"]).toBe("null");
     });
   });
 

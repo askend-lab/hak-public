@@ -29,9 +29,9 @@ describe("lambda", () => {
       else process.env.ALLOWED_ORIGIN = originalEnv;
     });
 
-    it("should return * when ALLOWED_ORIGIN is not set", () => {
+    it("should return null when ALLOWED_ORIGIN is not set", () => {
       delete process.env.ALLOWED_ORIGIN;
-      expect(getCorsOrigin()).toBe("*");
+      expect(getCorsOrigin()).toBe("null");
     });
 
     it("should return ALLOWED_ORIGIN when set", () => {
@@ -51,7 +51,7 @@ describe("lambda", () => {
       delete process.env.ALLOWED_ORIGIN;
       const result = createApiResponse(200, { data: "test" });
       expect(result.statusCode).toBe(200);
-      expect(result.headers["Access-Control-Allow-Origin"]).toBe("*");
+      expect(result.headers["Access-Control-Allow-Origin"]).toBe("null");
       expect(result.headers["Content-Type"]).toBe("application/json");
       expect(JSON.parse(result.body)).toStrictEqual({ data: "test" });
     });
@@ -68,7 +68,7 @@ describe("lambda", () => {
       for (const [key, value] of Object.entries(CORS_HEADERS)) {
         expect(result.headers[key]).toBe(value);
       }
-      expect(result.headers["Access-Control-Allow-Origin"]).toBe("*");
+      expect(result.headers["Access-Control-Allow-Origin"]).toBe("null");
     });
   });
 
@@ -77,7 +77,7 @@ describe("lambda", () => {
       const result = createBadRequestResponse("Invalid input");
       expect(result.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
       expect(JSON.parse(result.body)).toStrictEqual({ error: "Invalid input" });
-      expect(result.headers["Access-Control-Allow-Origin"]).toBe("*");
+      expect(result.headers["Access-Control-Allow-Origin"]).toBe("null");
     });
   });
 
@@ -89,7 +89,7 @@ describe("lambda", () => {
 
       expect(result.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
       expect(JSON.parse(result.body)).toStrictEqual({ error: "Internal server error" });
-      expect(consoleSpy).toHaveBeenCalledWith("UserService.get:", testError);
+      expect(consoleSpy).toHaveBeenCalledWith("UserService.get:", "db connection failed");
       consoleSpy.mockRestore();
     });
   });

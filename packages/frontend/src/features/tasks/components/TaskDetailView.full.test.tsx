@@ -112,7 +112,7 @@ describe("TaskDetailView Full", () => {
 
   it("renders with taskId prop", () => {
     render(<TaskDetailView {...props} />, { wrapper: dsWrapper });
-    expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
+    expect(mockGetTask).toHaveBeenCalledWith("task-1");
   });
 
   it("opens share modal", async () => {
@@ -256,7 +256,7 @@ describe("TaskDetailView Full", () => {
     await waitFor(() =>
       expect(screen.getByText("Test Task")).toBeInTheDocument(),
     );
-    expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
+    expect(mockGetTask).toHaveBeenCalledWith("task-1");
   });
 
   it("handles task refresh", async () => {
@@ -266,7 +266,7 @@ describe("TaskDetailView Full", () => {
     );
     rerender(<TaskDetailView {...props} taskId="task-2" />);
     await waitFor(() =>
-      expect(mockGetTask).toHaveBeenCalledWith("task-2", "user-1"),
+      expect(mockGetTask).toHaveBeenCalledWith("task-2"),
     );
   });
 
@@ -280,7 +280,7 @@ describe("TaskDetailView Full", () => {
     render(<TaskDetailView {...props} taskId={dynamicTaskId} />, { wrapper: dsWrapper });
 
     await waitFor(() => {
-      expect(mockGetTask).toHaveBeenCalledWith(dynamicTaskId, "user-1");
+      expect(mockGetTask).toHaveBeenCalledWith(dynamicTaskId);
     });
     await waitFor(() => {
       expect(screen.getByText("Test Task")).toBeInTheDocument();

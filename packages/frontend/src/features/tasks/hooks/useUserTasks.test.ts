@@ -61,7 +61,7 @@ describe("useUserTasks", () => {
 
     expect(result.current.tasks).toEqual(mockTasks);
     expect(result.current.isEmpty).toBe(false);
-    expect(mockDataService.getUserTasks).toHaveBeenCalledWith("user-123");
+    expect(mockDataService.getUserTasks).toHaveBeenCalled();
   });
 
   it("handles error when loading tasks fails", async () => {

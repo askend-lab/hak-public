@@ -97,7 +97,7 @@ function useDashboardData() {
       let taskCount = 0,
         entryCount = 0;
       if (isAuthenticated && user) {
-        const tasks = await dataService.getUserTasks(user.id);
+        const tasks = await dataService.getUserTasks();
         taskCount = tasks.length;
         entryCount = tasks.reduce((sum, task) => sum + task.entryCount, 0);
       }

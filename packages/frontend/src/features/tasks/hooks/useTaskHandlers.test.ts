@@ -123,7 +123,6 @@ describe("useTaskHandlers", () => {
     });
 
     expect(mockAddTextEntriesToTask).toHaveBeenCalledWith(
-      "user-1",
       "task-1",
       expect.any(Array),
       "append",
@@ -226,7 +225,7 @@ describe("useTaskHandlers", () => {
       });
     });
 
-    expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
+    expect(mockGetTask).toHaveBeenCalledWith("task-1");
     expect(result.current.modals.showTaskEditModal).toBe(true);
     expect(result.current.modals.taskToEdit).toEqual({
       id: "task-1",
@@ -252,7 +251,7 @@ describe("useTaskHandlers", () => {
       await result.current.crud.handleTaskUpdated(updatedTask);
     });
 
-    expect(mockUpdateTask).toHaveBeenCalledWith("user-1", "task-1", {
+    expect(mockUpdateTask).toHaveBeenCalledWith("task-1", {
       name: "Updated Task",
       description: "Updated Desc",
     });
@@ -269,7 +268,7 @@ describe("useTaskHandlers", () => {
       await result.current.sharing.handleShareTask({ id: "task-1", name: "Task 1" });
     });
 
-    expect(mockShareUserTask).toHaveBeenCalledWith("user-1", "task-1");
+    expect(mockShareUserTask).toHaveBeenCalledWith("task-1");
     expect(result.current.modals.showShareTaskModal).toBe(true);
     expect(result.current.modals.taskToShare).toMatchObject({
       id: "task-1",
