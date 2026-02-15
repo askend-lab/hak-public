@@ -169,21 +169,12 @@ jobs:
           # Audio resources were removed from code but still in state.
           # S3 buckets aren't empty so Terraform can't destroy them.
           # Remove from state — actual cleanup via cleanup-orphaned.yml workflow.
-          for resource in \
-            "aws_s3_bucket.audio" \
-            "aws_s3_bucket_server_side_encryption_configuration.audio" \
-            "aws_s3_bucket_public_access_block.audio" \
-            "aws_s3_bucket_cors_configuration.audio" \
-            "aws_s3_bucket_lifecycle_configuration.audio" \
-            "aws_s3_bucket_policy.audio" \
-            "aws_sqs_queue.audio_generation" \
-            "aws_sqs_queue.audio_generation_dlq" \
-            "aws_iam_role.audio_api_lambda" \
-            "aws_iam_role_policy.audio_api_lambda" \
-            "aws_iam_role_policy_attachment.audio_api_lambda_basic"; do
+          # Remove any remaining audio-related resources from state
+          for resource in $(terraform state list 2>/dev/null | grep -E '\.audio' || true); do
+            echo "Removing $resource from state..."
             terraform state rm "$resource" 2>/dev/null || true
           done
-          echo "✅ Orphaned audio resources removed from state"
+          echo "✅ Orphaned resources removed from state"
         continue-on-error: true
 
       - name: Terraform Apply (${{ matrix.environment }})
