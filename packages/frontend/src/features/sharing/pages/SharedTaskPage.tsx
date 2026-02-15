@@ -62,7 +62,7 @@ export function SharedTaskPage() {
     }
 
     loadTask();
-  }, [token]);
+  }, [token, dataService]);
 
   const entries = task?.entries || [];
 
