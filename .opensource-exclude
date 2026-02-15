@@ -52,6 +52,7 @@ knip.json
 
 # --- Internal documentation ---
 internal/
+docs/internal/
 
 # --- Internal docs (replaced by *.public.md versions) ---
 README.md

@@ -112,20 +112,15 @@ for pub_file in *.public.md; do
   mv "$pub_file" "$target"
 done
 
-# --- Copy public CI workflow (build.public.yml → .github/workflows/build.yml) ---
-echo ">>> Setting up public CI workflow..."
-if [[ -f .github/workflows/build.public.yml ]]; then
-  mkdir -p .github/workflows
-  mv .github/workflows/build.public.yml .github/workflows/build.yml
-  echo "  build.public.yml → .github/workflows/build.yml"
-fi
-
-# --- Copy public .env.example ---
-echo ">>> Setting up .env.example..."
-if [[ -f .env.example.public ]]; then
-  mv .env.example.public .env.example
-  echo "  .env.example.public → .env.example"
-fi
+# --- Rename *.public.* config files for public repo ---
+echo ">>> Setting up public config files..."
+mkdir -p .github/workflows
+for pair in ".github/workflows/build.public.yml:.github/workflows/build.yml" \
+            ".github/dependabot.public.yml:.github/dependabot.yml" \
+            ".env.example.public:.env.example"; do
+  src="${pair%%:*}"; dst="${pair##*:}"
+  [[ -f "$src" ]] && mv "$src" "$dst" && echo "  $src → $dst"
+done
 
 # --- Clean up pnpm-workspace.yaml (still points to packages/*) ---
 # No change needed — pnpm ignores missing directories silently.

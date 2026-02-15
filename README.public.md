@@ -1,8 +1,10 @@
 # HAK — Estonian Language Learning Platform
 
+[![Build & Test](https://github.com/askend-lab/hak-public/actions/workflows/build.yml/badge.svg)](https://github.com/askend-lab/hak-public/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220.svg)](https://pnpm.io/)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 An open-source language learning platform where teachers create interactive
 Estonian lessons with text-to-speech audio, and students complete them.
@@ -81,8 +83,10 @@ BDD specifications in Gherkin live in `packages/specifications/`.
 
 We welcome contributions! Please read:
 
-1. [Contributing Guide](CONTRIBUTING.md)
-2. [Security Policy](SECURITY.md)
+1. [Code of Conduct](CODE_OF_CONDUCT.md)
+2. [Contributing Guide](CONTRIBUTING.md)
+3. [Security Policy](SECURITY.md)
+4. [Support](SUPPORT.md)
 
 ```bash
 pnpm install

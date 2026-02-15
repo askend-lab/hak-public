@@ -53,7 +53,10 @@ function generateGroupCode(features, groupName) {
     })
     .join(",\n\n");
 
-  return `// AUTO-GENERATED - DO NOT EDIT
+  return `// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+//
+// AUTO-GENERATED - DO NOT EDIT
 // Run: pnpm --filter @hak/frontend sync-features
 // Group: ${groupName}
 
@@ -78,7 +81,10 @@ function generateIndexCode(groups) {
     groups.map((g) => [g, `FEATURES_${g.toUpperCase()}`]),
   );
 
-  return `// AUTO-GENERATED - DO NOT EDIT
+  return `// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+//
+// AUTO-GENERATED - DO NOT EDIT
 // Run: pnpm --filter @hak/frontend sync-features
 // Source: packages/specifications/*/*.feature
 
