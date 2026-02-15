@@ -8,8 +8,8 @@
 ## Фаза 0 — Security Critical (делать немедленно)
 
 - [x] 1. **merlin-api CORS wildcard** — `response.ts` не использует `getCorsOrigin()`, hardcoded `"*"`. Чинить: импорт из shared.
-- [ ] 2. **synthesize без авторизации** — `merlin-api/serverless.yml:57-60` нет Cognito authorizer. Публичный TTS = абьюз.
-- [ ] 3. **warmup без авторизации** — `merlin-api/serverless.yml:84-87`. Любой масштабирует ECS → расходы.
+- [x] 2. **synthesize без авторизации** — `merlin-api/serverless.yml:57-60` нет Cognito authorizer. Публичный TTS = абьюз.
+- [x] 3. **warmup без авторизации** — `merlin-api/serverless.yml:84-87`. Любой масштабирует ECS → расходы.
 - [x] 4. **mock-users.json в public/** — `frontend/public/data/mock-users.json` с эстонскими ID-кодами и email. Удалить.
 - [x] 5. **Нет max text length в synthesize** — `validateText` проверяет только непустоту. Мегабайтный текст → TTS crash.
 - [x] 6. **cacheKey без санитизации** — `handler.ts:128`, `s3.ts:68`. `cache/${cacheKey}.wav` → path traversal в S3.
@@ -32,7 +32,7 @@
 - [x] 20. **SOX shell injection** — `worker.py:176`. `f"sox {wav_file} ..."` через `bash -c`. Пробелы/спецсимволы.
 - [x] 21. **shell=True в generate.py** — `merlin/utils/generate.py:73`. `subprocess.Popen(args, shell=True)`.
 - [x] 22. **SQS message не валидируется** — `worker.py:81-89`. `speed: "abc"` → RuntimeError в SOX.
-- [ ] 23. **Нет DLQ для SQS** — отравленные сообщения retry бесконечно.
+- [x] 23. **Нет DLQ для SQS** — уже есть в Terraform (merlin_dlq, maxReceiveCount=3).
 - [x] 24. **JSON.parse без try/catch** — `merlin-api/handler.ts:52-54`. Невалидный JSON → 500 вместо 400.
 - [x] 25. **Нет backup/PITR для DynamoDB** — `simplestore/serverless.yml:107-123`. Потеря данных невосстановима.
 - [ ] 26. **Serverless Framework v3 deprecated** — EOL September 2024. Нет security updates.
