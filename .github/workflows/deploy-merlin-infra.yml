@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - "infra/merlin/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/merlin/**"
   workflow_dispatch:
     inputs:
       environment:
@@ -61,11 +65,13 @@ jobs:
           terraform plan -var="env=${{ github.event.inputs.environment || 'dev' }}" -out=tfplan
 
       - name: Terraform Apply
+        if: github.event_name != 'pull_request'
         working-directory: infra/merlin
         run: |
           terraform apply -auto-approve tfplan
 
       - name: Output values
+        if: github.event_name != 'pull_request'
         working-directory: infra/merlin
         run: |
           echo "## Merlin Infrastructure Outputs" >> $GITHUB_STEP_SUMMARY
