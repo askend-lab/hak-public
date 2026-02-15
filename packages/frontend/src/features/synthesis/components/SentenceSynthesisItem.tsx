@@ -86,7 +86,7 @@ interface SentenceSynthesisItemProps {
   sentenceIndex?: number;
 }
 
-export default function SentenceSynthesisItem({
+function SentenceSynthesisItem({
   id,
   text,
   tags = [],
@@ -281,3 +281,5 @@ export default function SentenceSynthesisItem({
     </div>
   );
 }
+
+export default React.memo(SentenceSynthesisItem);

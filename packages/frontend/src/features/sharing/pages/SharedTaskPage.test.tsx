@@ -300,7 +300,7 @@ describe("SharedTaskPage", () => {
     renderWithRouter("abc123");
 
     await waitFor(() => {
-      expect(screen.getByText(/Viga/i)).toBeInTheDocument();
+      expect(screen.getByText("Viga ülesande laadimisel")).toBeInTheDocument();
     });
   });
 

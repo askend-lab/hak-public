@@ -12,7 +12,7 @@ import { logger } from "@hak/shared";
 interface UseTaskCRUDDeps {
   sentences: SentenceState[];
   setSelectedTaskId: (id: string | null) => void;
-  setCurrentView: (view: "synthesis" | "tasks") => void;
+  onNavigateToTasks: () => void;
   setShowAddTaskModal: (show: boolean) => void;
   setShowTaskEditModal: (show: boolean) => void;
   setShowDeleteConfirmation: (show: boolean) => void;
@@ -35,7 +35,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
   const {
     sentences,
     setSelectedTaskId,
-    setCurrentView,
+    onNavigateToTasks,
     setShowAddTaskModal,
     setShowTaskEditModal,
     setShowDeleteConfirmation,
@@ -112,7 +112,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       isTaskCreationFromTasksView,
       showNotification,
       setSelectedTaskId,
-      setCurrentView,
+      onNavigateToTasks,
     ],
   );
 
@@ -196,7 +196,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
         color: "success",
       });
       setSelectedTaskId(null);
-      setCurrentView("tasks");
+      onNavigateToTasks();
     } catch (error) {
       logger.error("Failed to delete task:", error);
       showNotification({ type: "error", message: TASK_STRINGS.TASK_DELETE_FAILED });
@@ -204,7 +204,7 @@ export function useTaskCRUD(deps: UseTaskCRUDDeps) {
       setShowDeleteConfirmation(false);
       setTaskToDelete(null);
     }
-  }, [user, taskToDelete, showNotification, setSelectedTaskId, setCurrentView, dataService]);
+  }, [user, taskToDelete, showNotification, setSelectedTaskId, onNavigateToTasks, dataService]);
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirmation(false);

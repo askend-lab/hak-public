@@ -12,7 +12,7 @@ import { useTaskSharing } from "@/features/sharing/hooks/useTaskSharing";
 
 export function useTaskHandlers(
   sentences: SentenceState[],
-  setCurrentView: (view: "synthesis" | "tasks") => void,
+  onNavigateToTasks: () => void,
   setSelectedTaskId: (id: string | null) => void = () => {},
 ) {
   const { isAuthenticated, setShowLoginModal } = useAuth();
@@ -34,16 +34,16 @@ export function useTaskHandlers(
       label: TASK_STRINGS.VIEW_TASK,
       onClick: (): void => {
         setSelectedTaskId(taskId);
-        setCurrentView("tasks");
+        onNavigateToTasks();
       },
     }),
-    [setSelectedTaskId, setCurrentView],
+    [setSelectedTaskId, onNavigateToTasks],
   );
 
   const crud = useTaskCRUD({
     sentences,
     setSelectedTaskId,
-    setCurrentView,
+    onNavigateToTasks,
     setShowAddTaskModal: modals.setShowAddTaskModal,
     setShowTaskEditModal: modals.setShowTaskEditModal,
     setShowDeleteConfirmation: modals.setShowDeleteConfirmation,
