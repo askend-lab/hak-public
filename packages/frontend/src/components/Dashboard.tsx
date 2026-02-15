@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/services/context";
 import { useDataService } from "../contexts/DataServiceContext";
@@ -17,7 +17,7 @@ interface RecentActivity {
   timestamp: Date;
 }
 
-function MetricCard({ metric }: { metric: ActivityMetric }) {
+const MetricCard = memo(function MetricCard({ metric }: { metric: ActivityMetric }) {
   return (
     <div className="dashboard__metric-card">
       <div className="dashboard__metric-icon">{metric.icon}</div>
@@ -27,7 +27,7 @@ function MetricCard({ metric }: { metric: ActivityMetric }) {
       </div>
     </div>
   );
-}
+});
 
 function ActivityItem({ activity }: { activity: RecentActivity }) {
   return (
