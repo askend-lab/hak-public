@@ -14,7 +14,7 @@
 - [x] 5. **Нет max text length в synthesize** — `validateText` проверяет только непустоту. Мегабайтный текст → TTS crash.
 - [x] 6. **cacheKey без санитизации** — `handler.ts:128`, `s3.ts:68`. `cache/${cacheKey}.wav` → path traversal в S3.
 - [x] 7. **speed/pitch не валидируются** — `handler.ts:56-63`. `speed:-999` передаётся в SOX через shell.
-- [ ] 8. **Нет CSP headers** — нигде в проекте. XSS загрузит произвольные скрипты.
+- [x] 8. **Нет CSP headers** — нигде в проекте. XSS загрузит произвольные скрипты.
 - [x] 9. **Нет security headers** — X-Content-Type-Options, X-Frame-Options, HSTS отсутствуют во всех Lambda API.
 - [x] 10. **S3 bucket/key утекают в error** — `shared/s3.ts:72-79`, `merlin-api/s3.ts:53-62`. JSON с bucket name в throw.
 
