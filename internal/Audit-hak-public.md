@@ -59,7 +59,7 @@
 - [ ] 44. **Нет 404 страницы** — `main.tsx:60`. `path="*"` → App. Любой URL рендерит synthesis.
 - [ ] 45. **useUserId throws** — `useUserId.ts:12-14`. Компонент до проверки auth → crash.
 - [ ] 46. **UserProfile: нет focus trap** — `UserProfile.tsx:55-88`. Tab уходит за dropdown.
-- [ ] 47. **initActivityListeners без cleanup** — `main.tsx:33`. HMR → duplicate listeners.
+- [x] 47. **initActivityListeners без cleanup** — уже есть `initialized` guard, HMR safe.
 - [x] 48. **getQueryParams unsafe cast** — `routes.ts:59-61`. `undefined` values в Record<string,string>.
 - [x] 49. **resetRateLimit экспортируется** — `merlin-api/handler.ts:72-74`. Тестовый хелпер в prod.
 - [ ] 50. **warmup rate limit per-instance** — `handler.ts:70`. Cold start сбрасывает. Concurrent Lambdas обходят.
@@ -101,7 +101,7 @@
 - [ ] 80. **User email в UserProfile dropdown** — shoulder surfing risk. Minor.
 - [ ] 81. **a11y-dev только в dev mode** — production a11y issues не обнаруживаются.
 - [ ] 82. **MetricCard без React.memo** — minor performance, ререндер при state change.
-- [ ] 83. **WARMUP_COOLDOWN_MS экспортируется** — internal constant видна снаружи.
+- [x] 83. **WARMUP_COOLDOWN_MS экспортируется** — убрано из public exports (index.ts).
 
 ---
 
