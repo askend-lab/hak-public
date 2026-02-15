@@ -48,11 +48,9 @@ export default defineConfig({
   define: {
     __BUILD_INFO__: JSON.stringify({
       commitHash: gitInfo.commitHash,
-      commitMessage: gitInfo.commitMessage,
       branch: gitInfo.branch,
       commitDate: gitInfo.commitDate,
       buildTime: new Date().toISOString(),
-      workingDir: process.cwd(),
     }),
   },
   plugins: [
