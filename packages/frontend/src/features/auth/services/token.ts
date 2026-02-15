@@ -39,10 +39,13 @@ export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): Us
   // Validate audience (Cognito Client ID)
   if (options?.expectedAudience && payload.aud !== options.expectedAudience) return null;
 
+  const email = typeof payload.email === "string" ? payload.email : undefined;
+  if (!email) return null;
+
   return {
     id: payload.sub,
-    email: payload.email as string,
-    name: (payload.name as string) ?? (payload.email as string)?.split("@")[0],
+    email,
+    name: typeof payload.name === "string" ? payload.name : (email.split("@")[0] ?? email),
   };
 }
 
