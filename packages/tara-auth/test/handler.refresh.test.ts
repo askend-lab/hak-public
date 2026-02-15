@@ -173,6 +173,28 @@ describe('exchangeCodeHandler', () => {
     expect(cookies.find(c => c.includes('hak_id_token=id'))).toBeDefined();
   });
 
+  // Regression: tokens were once omitted from body (only in cookies).
+  // Cross-domain fetch (hak-api-dev → hak-dev) cannot read Set-Cookie,
+  // so tokens MUST be in the JSON body for the frontend to use them.
+  it('MUST include access_token and id_token in response body (cross-domain requirement)', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: 'tok-a', id_token: 'tok-i', refresh_token: 'tok-r', expires_in: 7200 }),
+    });
+    const event = makeEvent({
+      body: JSON.stringify({ code: 'c', code_verifier: 'v' }),
+    });
+    const result = await exchangeCodeHandler(event);
+    const body = JSON.parse(result.body);
+    // These assertions guard against a regression where tokens were removed
+    // from the body in the name of "XSS protection". The access_token and
+    // id_token cookies are non-HttpOnly by design, so body inclusion adds
+    // no additional XSS risk.
+    expect(body).toHaveProperty('access_token', 'tok-a');
+    expect(body).toHaveProperty('id_token', 'tok-i');
+    expect(body).toHaveProperty('expires_in', 7200);
+  });
+
   it('returns 400 when Cognito rejects code exchange', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 400 });
     const event = makeEvent({

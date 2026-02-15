@@ -244,6 +244,22 @@ describe("exchangeCodeForTokens", () => {
     consoleSpy.mockRestore();
   });
 
+  // Regression: backend once returned only { expires_in } without tokens in body,
+  // causing "Invalid token exchange response shape". Tokens MUST be in body because
+  // cross-domain fetch (hak-api-dev → hak-dev) cannot read Set-Cookie headers.
+  it("should reject response with only expires_in (no tokens in body)", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "test-verifier");
+    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ expires_in: 3600 }),
+    });
+    const result = await exchangeCodeForTokens("auth-code");
+    expect(result).toBeNull();
+    expect(consoleSpy).toHaveBeenCalledWith("[Auth] Invalid token exchange response shape");
+    consoleSpy.mockRestore();
+  });
+
   it("should NOT include redirect_uri in request body (hardcoded server-side)", async () => {
     sessionStorage.setItem("pkce_code_verifier", "v");
     global.fetch = vi.fn().mockResolvedValue({
