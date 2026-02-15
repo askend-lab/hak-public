@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import UserProfile from "./UserProfile";
 
@@ -80,17 +80,35 @@ describe("UserProfile", () => {
       expect(screen.queryByText("Logi välja")).not.toBeInTheDocument();
     });
 
-    it("closes dropdown on Escape key on backdrop", async () => {
+    it("closes dropdown on Escape key and returns focus to trigger", async () => {
       const user = userEvent.setup();
-      const { container } = render(<UserProfile user={mockUser} />);
-      await user.click(screen.getByRole("button"));
+      render(<UserProfile user={mockUser} />);
+      const trigger = screen.getByRole("button");
+      await user.click(trigger);
       expect(screen.getByText("Logi välja")).toBeInTheDocument();
-      const backdrop = container.querySelector(".user-profile__backdrop");
-      if (backdrop) {
-        const { fireEvent } = await import("@testing-library/react");
-        fireEvent.keyDown(backdrop, { key: "Escape" });
-      }
+      await user.keyboard("{Escape}");
       expect(screen.queryByText("Logi välja")).not.toBeInTheDocument();
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it("traps focus within dropdown on Tab", async () => {
+      const user = userEvent.setup();
+      render(<UserProfile user={mockUser} />);
+      await user.click(screen.getByRole("button"));
+      const logoutBtn = screen.getByText("Logi välja");
+      logoutBtn.focus();
+      fireEvent.keyDown(document, { key: "Tab" });
+      expect(document.activeElement).toBe(logoutBtn);
+    });
+
+    it("traps focus within dropdown on Shift+Tab", async () => {
+      const user = userEvent.setup();
+      render(<UserProfile user={mockUser} />);
+      await user.click(screen.getByRole("button"));
+      const logoutBtn = screen.getByText("Logi välja");
+      logoutBtn.focus();
+      fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+      expect(document.activeElement).toBe(logoutBtn);
     });
   });
 

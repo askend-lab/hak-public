@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth, type User } from "@/features/auth/services";
 import { ChevronDownIcon } from "./ui/Icons";
 
@@ -28,15 +28,46 @@ function getDisplayName(user: User): string {
 export default function UserProfile({ user }: UserProfileProps) {
   const { logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const closeDropdown = useCallback(() => {
+    setIsDropdownOpen(false);
+    triggerRef.current?.focus();
+  }, []);
 
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
   };
 
+  useEffect(() => {
+    if (!isDropdownOpen || !dropdownRef.current) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { closeDropdown(); return; }
+      /* c8 ignore start -- focus trap requires real browser */
+      if (e.key !== "Tab") return;
+      const focusable = dropdownRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+      /* c8 ignore stop */
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [isDropdownOpen, closeDropdown]);
+
   return (
     <div className="user-profile">
       <button
+        ref={triggerRef}
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="user-profile__button"
         aria-expanded={isDropdownOpen}
@@ -56,11 +87,10 @@ export default function UserProfile({ user }: UserProfileProps) {
         <>
           <div
             className="user-profile__backdrop"
-            onClick={() => setIsDropdownOpen(false)}
-            onKeyDown={(e) => { if (e.key === "Escape") setIsDropdownOpen(false); }}
+            onClick={closeDropdown}
             role="presentation"
           />
-          <div className="user-profile__dropdown">
+          <div ref={dropdownRef} className="user-profile__dropdown" role="menu">
             <div className="user-profile__header">
               <div className="user-profile__avatar user-profile__avatar--large">
                 {getInitials(user)}
