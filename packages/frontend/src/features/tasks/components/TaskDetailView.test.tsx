@@ -74,7 +74,7 @@ describe("TaskDetailView", () => {
     render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
 
     await waitFor(() => {
-      expect(mockGetTask).toHaveBeenCalledWith("task-1", "user-1");
+      expect(mockGetTask).toHaveBeenCalledWith("task-1");
     });
   });
 

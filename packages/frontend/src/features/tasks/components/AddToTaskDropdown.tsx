@@ -127,7 +127,7 @@ export default function AddToTaskDropdown({
     if (!isOpen || !user) return;
     setIsLoading(true);
     dataService
-      .getUserTasks(user.id)
+      .getUserTasks()
       .then(setTasks)
       .catch((e) => logger.error("Failed to load tasks:", e))
       .finally(() => setIsLoading(false));

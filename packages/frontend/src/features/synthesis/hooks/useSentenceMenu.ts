@@ -39,7 +39,7 @@ export function useSentenceMenu(): {
       if (isAuthenticated && user) {
         setIsLoadingMenuTasks(true);
         try {
-          const tasks = await dataService.getUserTasks(user.id);
+          const tasks = await dataService.getUserTasks();
           setMenuTasks(tasks.map((t) => ({ id: t.id, name: t.name })));
         } catch (error) {
           logger.error("Failed to load tasks for menu:", error);

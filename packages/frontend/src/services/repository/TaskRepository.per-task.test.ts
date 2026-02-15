@@ -74,7 +74,7 @@ describe("TaskRepository per-task storage", () => {
       const tasks = [createTask("t1", "Alpha"), createTask("t2", "Beta")];
       storage.queryUserTasks.mockResolvedValue(tasks);
 
-      const result = await repository.getUserTasks(testUserId);
+      const result = await repository.getUserTasks();
 
       expect(storage.queryUserTasks).toHaveBeenCalledOnce();
       expect(result).toHaveLength(2);
@@ -85,7 +85,7 @@ describe("TaskRepository per-task storage", () => {
     it("returns empty array when no tasks", async () => {
       storage.queryUserTasks.mockResolvedValue([]);
 
-      const result = await repository.getUserTasks(testUserId);
+      const result = await repository.getUserTasks();
 
       expect(result).toEqual([]);
     });
@@ -96,7 +96,7 @@ describe("TaskRepository per-task storage", () => {
       const task = createTask("t1");
       storage.getTask.mockResolvedValue(task);
 
-      const result = await repository.getTask("t1", testUserId);
+      const result = await repository.getTask("t1");
 
       expect(storage.getTask).toHaveBeenCalledWith("t1");
       expect(result).toEqual(task);
@@ -105,7 +105,7 @@ describe("TaskRepository per-task storage", () => {
     it("returns null when task not found", async () => {
       storage.getTask.mockResolvedValue(null);
 
-      const result = await repository.getTask("nonexistent", testUserId);
+      const result = await repository.getTask("nonexistent");
 
       expect(result).toBeNull();
     });
@@ -137,7 +137,7 @@ describe("TaskRepository per-task storage", () => {
       const task = createTask("t1", "Old Name");
       storage.getTask.mockResolvedValue(task);
 
-      const result = await repository.updateTask(testUserId, "t1", {
+      const result = await repository.updateTask("t1", {
         name: "New Name",
       });
 
@@ -152,14 +152,14 @@ describe("TaskRepository per-task storage", () => {
       storage.getTask.mockResolvedValue(null);
 
       await expect(
-        repository.updateTask(testUserId, "nonexistent", { name: "X" }),
+        repository.updateTask("nonexistent", { name: "X" }),
       ).rejects.toThrow("Task not found");
     });
 
     it("syncs unlisted storage after update", async () => {
       storage.getTask.mockResolvedValue(createTask("t1"));
 
-      await repository.updateTask(testUserId, "t1", { name: "Updated" });
+      await repository.updateTask("t1", { name: "Updated" });
 
       expect(storage.saveTaskAsUnlisted).toHaveBeenCalledOnce();
     });
@@ -169,7 +169,7 @@ describe("TaskRepository per-task storage", () => {
     it("deletes single task by id", async () => {
       storage.getTask.mockResolvedValue(createTask("t1"));
 
-      const result = await repository.deleteTask(testUserId, "t1");
+      const result = await repository.deleteTask("t1");
 
       expect(storage.deleteTask).toHaveBeenCalledWith("t1");
       expect(result).toBe(true);
@@ -179,7 +179,7 @@ describe("TaskRepository per-task storage", () => {
       storage.getTask.mockResolvedValue(null);
 
       await expect(
-        repository.deleteTask(testUserId, "nonexistent"),
+        repository.deleteTask("nonexistent"),
       ).rejects.toThrow("Task not found");
     });
   });
@@ -203,7 +203,6 @@ describe("TaskRepository per-task storage", () => {
       storage.getTask.mockResolvedValue(task);
 
       const entries = await repository.addTextEntriesToTask(
-        testUserId,
         "t1",
         ["New"],
         "append",
@@ -233,7 +232,6 @@ describe("TaskRepository per-task storage", () => {
       storage.getTask.mockResolvedValue(task);
 
       const entries = await repository.addTextEntriesToTask(
-        testUserId,
         "t1",
         ["A", "B"],
         "replace",
@@ -264,7 +262,6 @@ describe("TaskRepository per-task storage", () => {
       storage.getTask.mockResolvedValue(task);
 
       const result = await repository.updateTaskEntry(
-        testUserId,
         "t1",
         "e1",
         { text: "Updated", stressedText: "Updated" },

@@ -99,7 +99,6 @@ export function usePronunciationVariants(
         try {
           if (userId) {
             await dataService.updateTaskEntry(
-              userId,
               task.id,
               selectedEntryId,
               {

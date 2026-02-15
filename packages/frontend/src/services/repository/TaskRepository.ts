@@ -32,20 +32,20 @@ export class TaskRepository {
     };
   }
 
-  async getUserTasks(_userId: string): Promise<TaskSummary[]> {
+  async getUserTasks(): Promise<TaskSummary[]> {
     const userTasks = await this.storage.queryUserTasks();
     return userTasks.map((task) => this.toSummary(task));
   }
 
-  async getUserCreatedTasks(_userId: string): Promise<TaskSummary[]> {
-    return this.getUserTasks(_userId);
+  async getUserCreatedTasks(): Promise<TaskSummary[]> {
+    return this.getUserTasks();
   }
 
-  async getModifiableTasks(_userId: string): Promise<TaskSummary[]> {
-    return this.getUserCreatedTasks(_userId);
+  async getModifiableTasks(): Promise<TaskSummary[]> {
+    return this.getUserCreatedTasks();
   }
 
-  async getTask(taskId: string, _userId: string): Promise<Task | null> {
+  async getTask(taskId: string): Promise<Task | null> {
     return this.storage.getTask(taskId);
   }
 
@@ -104,7 +104,6 @@ export class TaskRepository {
   }
 
   async updateTask(
-    _userId: string,
     taskId: string,
     updates: Partial<Task>,
   ): Promise<Task | null> {
@@ -133,7 +132,7 @@ export class TaskRepository {
     return updatedTask;
   }
 
-  async deleteTask(_userId: string, taskId: string): Promise<boolean> {
+  async deleteTask(taskId: string): Promise<boolean> {
     const existingTask = await this.storage.getTask(taskId);
     if (!existingTask) {
       throw new Error("Task not found");
@@ -150,7 +149,6 @@ export class TaskRepository {
   }
 
   async addTextEntriesToTask(
-    _userId: string,
     taskId: string,
     textEntries: string[] | Array<{ text: string; stressedText: string }>,
     mode: "append" | "replace" = "append",
@@ -206,7 +204,6 @@ export class TaskRepository {
   }
 
   async updateTaskEntry(
-    _userId: string,
     taskId: string,
     entryId: string,
     updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>,
