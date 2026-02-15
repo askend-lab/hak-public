@@ -26,12 +26,6 @@ const FooterLinks = () => (
     <h2 className="footer-heading">Hääldusabiline</h2>
     <ul className="footer-links">
       <li>
-        <span className="footer-link--disabled" aria-disabled="true">Portaalist</span>
-      </li>
-      <li>
-        <span className="footer-link--disabled" aria-disabled="true">Versiooniajalugu</span>
-      </li>
-      <li>
         <a href="/privacy">Kasutus- ja privaatsustingimused</a>
       </li>
       <li>

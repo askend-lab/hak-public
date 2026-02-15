@@ -20,8 +20,6 @@ describe("Footer", () => {
     it("renders Hääldusabiline section", () => {
       render(<Footer />);
       expect(screen.getByText("Hääldusabiline")).toBeInTheDocument();
-      expect(screen.getByText("Portaalist")).toBeInTheDocument();
-      expect(screen.getByText("Versiooniajalugu")).toBeInTheDocument();
     });
 
     it("renders social media section", () => {
@@ -106,8 +104,6 @@ describe("Footer", () => {
 
     it("renders footer links", () => {
       render(<Footer />);
-      expect(screen.getByText("Portaalist")).toBeInTheDocument();
-      expect(screen.getByText("Versiooniajalugu")).toBeInTheDocument();
       expect(
         screen.getByText("Kasutus- ja privaatsustingimused"),
       ).toBeInTheDocument();
