@@ -92,6 +92,15 @@ functions:
           method: POST
 
 resources:
+  Resources:
+    HttpApiRoutePostSynthesize:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        AuthorizationType: NONE
+    HttpApiRoutePostWarmup:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        AuthorizationType: NONE
   Outputs:
     ApiEndpoint:
       Description: Merlin API Gateway endpoint URL
