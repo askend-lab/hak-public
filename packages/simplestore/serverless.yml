@@ -38,8 +38,13 @@ custom:
 provider:
   name: aws
   runtime: nodejs20.x
+  memorySize: 512
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
+  apiGateway:
+    throttle:
+      burstLimit: 40
+      rateLimit: 20
 
   environment:
     TABLE_NAME: ${self:service}-${self:provider.stage}
@@ -133,7 +138,7 @@ resources:
         IdentitySource: method.request.header.Authorization
         RestApiId: !Ref ApiGatewayRestApi
         ProviderARNs:
-          - ${env:COGNITO_USER_POOL_ARN}
+          - ${env:COGNITO_USER_POOL_ARN, ''}
 
   Outputs:
     ApiEndpoint:
