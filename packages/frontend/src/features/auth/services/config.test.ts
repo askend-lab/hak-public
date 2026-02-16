@@ -18,11 +18,11 @@ describe("cognitoConfig", () => {
     expect(typeof cognitoConfig.domain).toBe("string");
   });
 
-  it("should default to empty strings when env vars are not set", () => {
-    expect(cognitoConfig.region).toBe("");
-    expect(cognitoConfig.userPoolId).toBe("");
-    expect(cognitoConfig.clientId).toBe("");
-    expect(cognitoConfig.domain).toBe("");
+  it("should use dev defaults on localhost when env vars are not set", () => {
+    expect(cognitoConfig.region).toBe("eu-west-1");
+    expect(cognitoConfig.userPoolId).toBe("eu-west-1_wlRtuLkG2");
+    expect(cognitoConfig.clientId).toBe("64tf6nf61n6sgftqif6q975hka");
+    expect(cognitoConfig.domain).toBe("askend-lab-auth.auth.eu-west-1.amazoncognito.com");
   });
 
   it("should have exact OAuth scopes", () => {
@@ -192,7 +192,7 @@ describe("exchangeCodeForTokens", () => {
     consoleSpy.mockRestore();
   });
 
-  it("should send correct request to backend exchange endpoint", async () => {
+  it("should send correct request to Cognito token endpoint on localhost", async () => {
     sessionStorage.setItem("pkce_code_verifier", "my-verifier");
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -207,19 +207,19 @@ describe("exchangeCodeForTokens", () => {
     await exchangeCodeForTokens("my-code");
 
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/tara/exchange-code"),
+      "/oauth2/token",
       expect.objectContaining({
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }),
     );
 
     const callArgs = vi.mocked(global.fetch).mock.calls[0] ?? [];
-    const body = JSON.parse(callArgs[1]?.body as string);
-    expect(body.code).toBe("my-code");
-    expect(body.code_verifier).toBe("my-verifier");
-    expect(body.redirect_uri).toBeUndefined();
+    const body = new URLSearchParams(callArgs[1]?.body as string);
+    expect(body.get("code")).toBe("my-code");
+    expect(body.get("code_verifier")).toBe("my-verifier");
+    expect(body.get("grant_type")).toBe("authorization_code");
+    expect(body.get("redirect_uri")).toContain("/auth/callback");
   });
 
   it("should return null on network error", async () => {
@@ -272,15 +272,89 @@ describe("exchangeCodeForTokens", () => {
     consoleSpy.mockRestore();
   });
 
-  it("should NOT include redirect_uri in request body (hardcoded server-side)", async () => {
+  it("should include redirect_uri in local dev direct Cognito exchange", async () => {
     sessionStorage.setItem("pkce_code_verifier", "v");
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
     });
     await exchangeCodeForTokens("c");
-    const body = JSON.parse((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]?.body as string);
-    expect(body.redirect_uri).toBeUndefined();
+    const body = new URLSearchParams((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]?.body as string);
+    expect(body.get("redirect_uri")).toContain("/auth/callback");
+  });
+});
+
+describe("local dev direct Cognito exchange", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    vi.restoreAllMocks();
+  });
+
+  it("should use /oauth2/token path (not backend endpoint) on localhost", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "v");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
+    });
+    await exchangeCodeForTokens("c");
+    const url = vi.mocked(global.fetch).mock.calls[0]?.[0] as string;
+    expect(url).toBe("/oauth2/token");
+    expect(url).not.toContain("/tara/exchange-code");
+  });
+
+  it("should use form-urlencoded content type (not JSON)", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "v");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
+    });
+    await exchangeCodeForTokens("c");
+    const opts = vi.mocked(global.fetch).mock.calls[0]?.[1];
+    expect(opts?.headers).toStrictEqual({ "Content-Type": "application/x-www-form-urlencoded" });
+  });
+
+  it("should send client_id in request body", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "v");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
+    });
+    await exchangeCodeForTokens("c");
+    const body = new URLSearchParams(vi.mocked(global.fetch).mock.calls[0]?.[1]?.body as string);
+    expect(body.get("client_id")).toBe(cognitoConfig.clientId);
+  });
+
+  it("should send localhost redirect_uri matching cognitoConfig", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "v");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
+    });
+    await exchangeCodeForTokens("c");
+    const body = new URLSearchParams(vi.mocked(global.fetch).mock.calls[0]?.[1]?.body as string);
+    expect(body.get("redirect_uri")).toBe("http://localhost:5181/auth/callback");
+  });
+
+  it("should not send credentials: include (no httpOnly cookies in direct exchange)", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "v");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
+    });
+    await exchangeCodeForTokens("c");
+    const opts = vi.mocked(global.fetch).mock.calls[0]?.[1];
+    expect(opts?.credentials).toBeUndefined();
+  });
+
+  it("should send grant_type=authorization_code", async () => {
+    sessionStorage.setItem("pkce_code_verifier", "v");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ access_token: "a", id_token: "i", expires_in: 1 }),
+    });
+    await exchangeCodeForTokens("c");
+    const body = new URLSearchParams(vi.mocked(global.fetch).mock.calls[0]?.[1]?.body as string);
+    expect(body.get("grant_type")).toBe("authorization_code");
   });
 });
 
