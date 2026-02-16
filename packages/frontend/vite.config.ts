@@ -117,8 +117,8 @@ export default defineConfig({
           });
         },
       },
-      "/auth": {
-        target: process.env.VITE_API_URL ?? "https://hak-dev.askend-lab.com",
+      "/auth/tara": {
+        target: process.env.VITE_AUTH_PROXY_TARGET ?? "https://hak-api-dev.askend-lab.com",
         changeOrigin: true,
       },
     },
