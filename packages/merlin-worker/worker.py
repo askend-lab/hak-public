@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import shlex
+import signal
 import subprocess
 import sys
 import tempfile
@@ -71,7 +72,7 @@ class WorkerConfig:
 
 SPEED_MIN, SPEED_MAX = 0.5, 2.0
 PITCH_MIN, PITCH_MAX = -500, 500
-MAX_TEXT_LENGTH = 10000
+MAX_TEXT_LENGTH = 1000
 
 
 @dataclass
@@ -110,7 +111,7 @@ class SynthesisRequest:
             voice=body.get("voice", "efm_l"),
             speed=speed,
             pitch=pitch,
-            cache_key=body.get("cacheKey", hashlib.md5(text.encode()).hexdigest()),
+            cache_key=body.get("cacheKey", hashlib.sha256(text.encode()).hexdigest()),
         )
 
 
@@ -253,8 +254,21 @@ def process_message(
         return False
 
 
+_shutdown_requested = False
+
+
+def _sigterm_handler(signum: int, frame: Any) -> None:
+    global _shutdown_requested
+    _shutdown_requested = True
+    logger.info("SIGTERM received, finishing current message before shutdown...")
+
+
 def run_worker(config: WorkerConfig, sqs_client: Any, s3_client: Any) -> None:
-    """Main polling loop. Runs until KeyboardInterrupt."""
+    """Main polling loop. Runs until KeyboardInterrupt or SIGTERM."""
+    global _shutdown_requested
+    _shutdown_requested = False
+    signal.signal(signal.SIGTERM, _sigterm_handler)
+
     logger.info("Merlin SQS Worker starting...")
     logger.info("Queue: %s, Bucket: %s", config.queue_url, config.bucket_name)
 
@@ -265,7 +279,7 @@ def run_worker(config: WorkerConfig, sqs_client: Any, s3_client: Any) -> None:
 
     check_tools(config.merlin_dir)
 
-    while True:
+    while not _shutdown_requested:
         try:
             resp = sqs_client.receive_message(
                 QueueUrl=config.queue_url,
@@ -281,6 +295,9 @@ def run_worker(config: WorkerConfig, sqs_client: Any, s3_client: Any) -> None:
         except Exception:
             logger.exception("Worker error, retrying in %ds", ERROR_RETRY_DELAY)
             time.sleep(ERROR_RETRY_DELAY)
+
+    if _shutdown_requested:
+        logger.info("Shutting down gracefully (SIGTERM)")
 
 
 def main() -> None:

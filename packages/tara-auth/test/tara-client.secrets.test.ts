@@ -85,8 +85,16 @@ describe('Secrets Manager integration', () => {
     expect(mockSend).toHaveBeenCalledTimes(1);
   });
 
-  it('should fall back to env vars when TARA_SECRETS_ARN is not set', async () => {
+  it('should throw when TARA_SECRETS_ARN is not set in non-dev', async () => {
     delete process.env.TARA_SECRETS_ARN;
+    process.env.STAGE = 'prod';
+
+    await expect(createTaraClient()).rejects.toThrow('TARA_SECRETS_ARN must be set in non-dev environments');
+  });
+
+  it('should fall back to env vars when TARA_SECRETS_ARN is not set (dev)', async () => {
+    delete process.env.TARA_SECRETS_ARN;
+    process.env.STAGE = 'dev';
     process.env.TARA_CLIENT_ID = 'env-client-id';
     process.env.TARA_CLIENT_SECRET = 'env-secret';
 

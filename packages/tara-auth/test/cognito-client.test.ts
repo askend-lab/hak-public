@@ -1,5 +1,5 @@
 import { CognitoClient, createCognitoClient } from '../src/cognito-client';
-import { TaraIdToken, TARA_VERIFIED, DEFAULT_EXPIRES_IN, PERSONAL_CODE_ATTR, buildFallbackEmail } from '../src/types';
+import { TaraIdToken, TARA_VERIFIED, PERSONAL_CODE_ATTR, buildFallbackEmail } from '../src/types';
 
 const mockSend = jest.fn();
 jest.mock('@aws-sdk/client-cognito-identity-provider', () => ({
@@ -225,7 +225,7 @@ describe('CognitoClient', () => {
       await expect(client.generateTokens('test@example.com')).rejects.toThrow('Token generation failed');
     });
 
-    it('should return empty strings for missing token fields', async () => {
+    it('should throw when token fields are missing', async () => {
       mockSend
         .mockResolvedValueOnce({ ChallengeName: 'CUSTOM_CHALLENGE', Session: 's' })
         .mockResolvedValueOnce({
@@ -238,11 +238,7 @@ describe('CognitoClient', () => {
         });
 
       const client = new CognitoClient(mockConfig);
-      const tokens = await client.generateTokens('test@example.com');
-      expect(tokens.accessToken).toBe('');
-      expect(tokens.idToken).toBe('');
-      expect(tokens.refreshToken).toBe('');
-      expect(tokens.expiresIn).toBe(DEFAULT_EXPIRES_IN);
+      await expect(client.generateTokens('test@example.com')).rejects.toThrow('Cognito returned incomplete tokens');
     });
   });
 

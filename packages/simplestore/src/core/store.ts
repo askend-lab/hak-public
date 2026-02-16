@@ -94,6 +94,13 @@ export class Store {
     const keys = this.resolveKeys(request.type, request.pk, request.sk);
 
     return this.wrapAsync(async () => {
+      if (request.type === "public" || request.type === "unlisted") {
+        const existing = await this.adapter.get(keys.pk, keys.sk);
+        if (existing && !this.isOwner(existing)) {
+          return { success: false, error: ERRORS.ACCESS_DENIED };
+        }
+      }
+
       const fields: import("./types").UpsertFields = {
         data: request.data ?? {},
         owner: this.context.userId,
@@ -133,6 +140,13 @@ export class Store {
     const keys = this.resolveKeys(type, entityPk, entitySk);
 
     return this.wrapAsync(async () => {
+      if (this.adapter.conditionalDelete) {
+        const result = await this.adapter.conditionalDelete(keys.pk, keys.sk, this.context.userId);
+        if (result === "not_found") return { success: false, error: ERRORS.NOT_FOUND };
+        if (result === "not_owner") return { success: false, error: ERRORS.ACCESS_DENIED };
+        return { success: true };
+      }
+
       const existing = await this.adapter.get(keys.pk, keys.sk);
 
       if (!existing) {
@@ -178,6 +192,7 @@ export class Store {
     try {
       return await fn();
     } catch (error) {
+      console.error("[SimpleStore] Operation failed:", error);
       return { success: false, error: String(error) };
     }
   }

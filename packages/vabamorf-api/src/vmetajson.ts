@@ -101,9 +101,15 @@ export class VmetajsonProcess {
     });
 
     this.process.on("exit", (code: number | null) => {
-      this.failCurrentRequest(
-        new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`),
-      );
+      const exitError = new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`);
+      this.failCurrentRequest(exitError);
+      while (this.requestQueue.length > 0) {
+        const queued = this.requestQueue.shift();
+        if (queued) {
+          clearTimeout(queued.timeoutId);
+          queued.reject(exitError);
+        }
+      }
       this.process = null;
     });
   }

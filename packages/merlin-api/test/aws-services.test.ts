@@ -181,11 +181,12 @@ describe("sqs", () => {
       expect(mockSend).toHaveBeenCalledTimes(1);
     });
 
-    it("should return empty string when MessageId is undefined", async () => {
+    it("should throw when MessageId is undefined", async () => {
       mockSend.mockResolvedValue({});
 
-      const result = await sendToQueue({ text: "hello" });
-      expect(result).toBe("");
+      await expect(sendToQueue({ text: "hello" })).rejects.toThrow(
+        "SQS SendMessage did not return a MessageId",
+      );
     });
   });
 });

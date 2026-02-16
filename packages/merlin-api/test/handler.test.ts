@@ -269,9 +269,9 @@ describe("env functions", () => {
     expect(getSqsQueueUrl()).toBe(TEST_QUEUE_URL);
   });
 
-  it("getS3Bucket should return empty when unset", () => {
+  it("getS3Bucket should throw when unset", () => {
     delete process.env.S3_BUCKET;
-    expect(getS3Bucket()).toBe("");
+    expect(() => getS3Bucket()).toThrow("Invalid or missing S3_BUCKET");
   });
 
   it("getSqsQueueUrl should return empty when unset", () => {

@@ -19,5 +19,8 @@ export async function sendToQueue(message: object): Promise<string> {
       MessageBody: JSON.stringify(message),
     }),
   );
-  return result.MessageId ?? "";
+  if (!result.MessageId) {
+    throw new Error("SQS SendMessage did not return a MessageId");
+  }
+  return result.MessageId;
 }

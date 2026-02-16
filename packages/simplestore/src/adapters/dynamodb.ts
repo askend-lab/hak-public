@@ -92,6 +92,31 @@ export class DynamoDBAdapter implements StorageAdapter {
   }
 
   /**
+   * Atomic conditional delete — single DynamoDB call with owner check
+   * Returns status string instead of throwing for expected conditions
+   */
+  async conditionalDelete(pk: string, sk: string, expectedOwner: string): Promise<"deleted" | "not_found" | "not_owner"> {
+    try {
+      await this.docClient.send(
+        new DeleteCommand({
+          TableName: this.tableName,
+          Key: this.dynamoKey(pk, sk),
+          ConditionExpression: "attribute_exists(PK) AND #owner = :expectedOwner",
+          ExpressionAttributeNames: { "#owner": "owner" },
+          ExpressionAttributeValues: { ":expectedOwner": expectedOwner },
+        }),
+      );
+      return "deleted";
+    } catch (error) {
+      if (error instanceof ConditionalCheckFailedException) {
+        const item = await this.get(pk, sk);
+        return item ? "not_owner" : "not_found";
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Atomic upsert — single DynamoDB call, no read-before-write
    * Uses if_not_exists for createdAt and atomic version increment
    */

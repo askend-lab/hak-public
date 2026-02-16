@@ -109,6 +109,7 @@ export interface StorageAdapter {
   put(item: StoreItem, expectedVersion?: number): Promise<void>;
   get(pk: string, sk: string): Promise<StoreItem | null>;
   delete(pk: string, sk: string): Promise<void>;
+  conditionalDelete?(pk: string, sk: string, expectedOwner: string): Promise<"deleted" | "not_found" | "not_owner">;
   queryBySortKeyPrefix(pk: string, skPrefix: string, maxItems?: number): Promise<StoreItem[]>;
   upsert(pk: string, sk: string, fields: UpsertFields): Promise<StoreItem>;
 }
