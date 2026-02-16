@@ -142,7 +142,12 @@ export function useSentenceState(): {
       const toStore = sanitizeForStorage(sentences);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
     } catch (error) {
-      logger.error("Failed to save synthesis state to localStorage:", error);
+      const isQuotaError = error instanceof DOMException && (error.name === "QuotaExceededError" || error.code === 22);
+      if (isQuotaError) {
+        logger.warn("[Synthesis] localStorage quota exceeded — state not saved");
+      } else {
+        logger.error("Failed to save synthesis state to localStorage:", error);
+      }
     }
   }, [sentences]);
 
