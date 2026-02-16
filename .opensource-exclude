@@ -50,6 +50,9 @@ knip.json
 # --- Note: .github/workflows/build.public.yml and .env.example.public are NOT excluded ---
 # They are renamed during sync (build.public.yml → build.yml, .env.example.public → .env.example)
 
+# --- Scripts with hardcoded infrastructure URLs ---
+scripts/smoke-test.sh
+
 # --- Internal documentation ---
 internal/
 docs/internal/
