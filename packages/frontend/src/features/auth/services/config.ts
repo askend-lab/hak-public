@@ -7,8 +7,14 @@ import { logger } from "@hak/shared";
 const LOCAL_PORT = import.meta.env?.VITE_PORT ?? "5181";
 
 export const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
-export const TARA_LOGIN_URL = import.meta.env?.VITE_TARA_LOGIN_URL ?? "";
-export const AUTH_API_URL = import.meta.env?.VITE_AUTH_API_URL ?? "";
+
+function isLocalDev(): boolean {
+  const hostname = getHostname();
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
+export const TARA_LOGIN_URL = import.meta.env?.VITE_TARA_LOGIN_URL ?? (isLocalDev() ? "/auth/tara/start" : "");
+export const AUTH_API_URL = import.meta.env?.VITE_AUTH_API_URL ?? (isLocalDev() ? "/auth" : "");
 export const PKCE_STORAGE_KEY = "pkce_code_verifier";
 export const OAUTH2_TOKEN_PATH = "/oauth2/token";
 export const AUTH_CALLBACK_PATH = "/auth/callback";

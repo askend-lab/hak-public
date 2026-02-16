@@ -117,6 +117,10 @@ export default defineConfig({
           });
         },
       },
+      "/auth": {
+        target: process.env.VITE_API_URL ?? "https://hak-dev.askend-lab.com",
+        changeOrigin: true,
+      },
     },
   },
 });
