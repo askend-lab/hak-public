@@ -1,4 +1,4 @@
-# ADR 003: TDD Enforcement via DevBox Hooks
+# ADR 003: TDD Enforcement via Pre-commit Hooks
 
 **Status:** Accepted  
 **Date:** 2025-01
@@ -9,7 +9,7 @@ Code quality degraded rapidly during the prototype phase. We needed automated en
 
 ## Decision
 
-Use **DevBox pre-commit hooks** to enforce TDD: every `feat:` or `fix:` commit must include corresponding test files. Coverage thresholds are set per module.
+Use **pre-commit hooks** to enforce TDD: every `feat:` or `fix:` commit must include corresponding test files. Coverage thresholds are set per module.
 
 ## Consequences
 
@@ -17,4 +17,4 @@ Use **DevBox pre-commit hooks** to enforce TDD: every `feat:` or `fix:` commit m
 - **Positive:** Coverage thresholds prevent regression
 - **Positive:** Works with AI-assisted development (agents must write tests too)
 - **Negative:** Initial setup overhead for hook configuration
-- **Negative:** DevBox is a custom tool — needs replacement with husky for OSS
+- **Negative:** Custom internal tool replaced with standard hooks

@@ -1,6 +1,6 @@
 /**
  * HAK ESLint Configuration
- * Extends base config from DevBox with project-specific overrides
+ * Extends base config with project-specific overrides
  */
 import baseConfig from "./eslint.base.config.mjs";
 

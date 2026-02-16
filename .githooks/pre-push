@@ -1,6 +1,0 @@
-#!/bin/sh
-# Git pre-push hook - empty by design
-# All checks run on pre-commit for fastest feedback
-# This hook exists but does nothing (no duplication)
-
-exit 0
