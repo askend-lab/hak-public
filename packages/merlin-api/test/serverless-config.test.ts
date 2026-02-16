@@ -3,7 +3,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-const yaml = require("js-yaml"); // eslint-disable-line
+const yaml = require("js-yaml");
 
 // Custom YAML schema that handles CloudFormation intrinsic function tags (!Sub, !Ref, etc.)
 const CF_TAGS = ["!Sub", "!Ref", "!GetAtt", "!Join", "!Select", "!If", "!Not", "!Equals"];
