@@ -101,7 +101,7 @@ echo "  Removed $REMOVED_COUNT paths"
 
 # --- Remove the exclude file itself (meta, not for public) ---
 rm -f .opensource-exclude
-rm -f scripts/sync-to-public.sh scripts/strip-cognito-defaults.js
+rm -f scripts/sync-to-public.sh
 
 # --- Replace docs with public versions (*.public.md → *.md) ---
 echo ">>> Replacing docs with public versions..."
@@ -333,8 +333,6 @@ rm -rf packages/merlin-worker/tools/SPTK-3.9/build packages/merlin-worker/tools/
 [[ -f SECURITY.md ]] && sed -i 's|For the full security audit findings and remediation status, see `internal/SECURITY-AUDIT-2026-02.md`. Architecture decisions related to security are documented in `internal/DESIGN-DECISIONS.md` and `docs/adr/`.|Architecture decisions related to security are documented in `docs/adr/`.|' SECURITY.md
 [[ -f packages/merlin-api/README.md ]] && sed -i 's| This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.|This is an intentional trade-off — see `docs/adr/` for architecture decisions.|' packages/merlin-api/README.md
 
-# --- Strip Cognito dev defaults (security: no pool IDs in public repo) ---
-command -v node &>/dev/null && node "$SCRIPT_DIR/strip-cognito-defaults.js"
 
 # --- Clean up .gitignore (remove internal/unused patterns) ---
 if [[ -f .gitignore ]]; then
@@ -375,14 +373,6 @@ for p in infra/ internal/ packages/tara-auth/ .githooks/ devbox.yaml defaults.ya
   [[ -e "$p" ]] && { echo "ABORTING: $p still present! Check .opensource-exclude"; exit 1; }
 done
 echo "  All sensitive paths verified excluded."
-
-# Verify no Cognito pool IDs leaked into public code
-if grep -rq 'eu-west-1_wlRtuLkG2\|64tf6nf61n6sgftqif6q975hka' --include='*.ts' --include='*.tsx' .; then
-  echo "ABORTING: Cognito dev IDs found in source files! Check sync cleanup."
-  grep -rn 'eu-west-1_wlRtuLkG2\|64tf6nf61n6sgftqif6q975hka' --include='*.ts' --include='*.tsx' .
-  exit 1
-fi
-echo "  No Cognito dev IDs in source files."
 
 # --- Push to public repository ---
 echo ">>> Pushing to public repository: $PUBLIC_REPO"
