@@ -25,7 +25,7 @@
 Severity scale: 🔴 Critical · 🟠 High · 🟡 Medium  
 💥 = fix is **dangerous** — unit tests won't catch regression, requires manual/integration testing  
 ✅ Tests added for #1, #3, #4, #5 — reduced dangerous from 9 to 4
-✅ Fixed in this PR: #2, #3, #4, #5, #6, #11, #12, #13, #14, #19, #20, #24, #25, #28 (14 of 30)
+✅ Fixed in this PR: #2, #3, #4, #5, #6, #11, #12, #13, #14, #19, #20, #25, #28 (13 of 30)
 
 ---
 
@@ -156,7 +156,7 @@ Severity scale: 🔴 Critical · 🟠 High · 🟡 Medium
   **File:** `infra/merlin/main.tf:166-168`
   **Note:** Already fixed — `containerInsights = "enabled"` in current code. False positive.
 
-- [x] **24. ECR Lifecycle Keeps Only 10 Images**  
+- [ ] **24. ECR Lifecycle Keeps Only 10 Images**  
   **File:** `infra/merlin/main.tf:137-156`  
   **Issue:** `countNumber = 10`. With immutable tags, once 10 images exist, older ones are deleted. If a rollback is needed beyond 10 deploys, the image is gone. With frequent CI builds, 10 images could cover only a few weeks.  
   **Fix:** Increase to 25-30, or add a "keep tagged with `release-*`" rule.
