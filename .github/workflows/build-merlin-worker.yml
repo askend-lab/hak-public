@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "packages/merlin-worker/**"
+      - ".github/workflows/build-merlin-worker.yml"
   workflow_dispatch:
 
 permissions:
@@ -89,7 +90,6 @@ jobs:
         run: rm -f /tmp/aws_creds_key /tmp/aws_creds_secret /tmp/aws_creds_token
 
       - name: Deploy to dev
-        if: github.event_name == 'push'
         run: |
           aws ecs update-service \
             --cluster hak-merlin-dev \
