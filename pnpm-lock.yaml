@@ -354,12 +354,18 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/node':
         specifier: ^20.10.6
         version: 20.19.27
       jest:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@20.19.27)(node-notifier@8.0.2)
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.1
       serverless:
         specifier: ^4.32.0
         version: 4.32.0
@@ -3383,6 +3389,9 @@ packages:
 
   '@types/jest@30.0.0':
     resolution: {integrity: sha512-XTYugzhuwqWjws0CVz8QpM36+T+Dz5mTEBKhNs/esGLnCIlGdRy+Dq78NRjd7ls7r8BC8ZRMOrKlkO1hU0JOwA==}
+
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
 
   '@types/jsdom@21.1.7':
     resolution: {integrity: sha512-yOriVnggzrnQ3a9OKOCxaVuSug3w3/SbOj5i7VwXWZEyUNl3bLF9V3MfxGbZKuwqJOQyRfqXyROBB1CoZLFWzA==}
@@ -12330,7 +12339,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       collect-v8-coverage: 1.0.3
 
-  '@jest/test-sequencer@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))':
+  '@jest/test-sequencer@26.6.3':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -12338,11 +12347,7 @@ snapshots:
       jest-runner: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
       jest-runtime: 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@30.2.0':
     dependencies:
@@ -13417,6 +13422,8 @@ snapshots:
     dependencies:
       expect: 30.2.0
       pretty-format: 30.2.0
+
+  '@types/js-yaml@4.0.9': {}
 
   '@types/jsdom@21.1.7':
     dependencies:
@@ -16346,7 +16353,7 @@ snapshots:
   jest-config@26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3)):
     dependencies:
       '@babel/core': 7.29.0
-      '@jest/test-sequencer': 26.6.3(ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3))
+      '@jest/test-sequencer': 26.6.3
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.29.0)
       chalk: 4.1.2
