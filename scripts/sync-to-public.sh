@@ -101,7 +101,7 @@ echo "  Removed $REMOVED_COUNT paths"
 
 # --- Remove the exclude file itself (meta, not for public) ---
 rm -f .opensource-exclude
-rm -rf scripts/sync-to-public.sh
+rm -f scripts/sync-to-public.sh scripts/strip-cognito-defaults.js
 
 # --- Replace docs with public versions (*.public.md → *.md) ---
 echo ">>> Replacing docs with public versions..."

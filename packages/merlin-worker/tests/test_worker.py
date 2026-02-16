@@ -31,9 +31,6 @@ from worker import (
 )
 
 
-# ---------------------------------------------------------------------------
-# WorkerConfig
-# ---------------------------------------------------------------------------
 
 class TestWorkerConfig:
     def test_from_env_defaults(self):
@@ -82,9 +79,6 @@ class TestWorkerConfig:
         assert cfg.validate() == []
 
 
-# ---------------------------------------------------------------------------
-# SynthesisRequest
-# ---------------------------------------------------------------------------
 
 class TestSynthesisRequest:
     def test_from_message_full(self):
@@ -111,7 +105,7 @@ class TestSynthesisRequest:
         assert req.voice == "efm_l"
         assert req.speed == 1.0
         assert req.pitch == 0
-        assert req.cache_key == hashlib.md5(b"tere").hexdigest()
+        assert req.cache_key == hashlib.sha256(b"tere").hexdigest()
 
     @pytest.mark.parametrize("body,match", [
         ({}, "Missing or empty text"),
@@ -132,9 +126,6 @@ class TestSynthesisRequest:
             SynthesisRequest.from_message(msg)
 
 
-# ---------------------------------------------------------------------------
-# check_tools
-# ---------------------------------------------------------------------------
 
 class TestCheckTools:
     def test_tools_present(self, tmp_path):
@@ -152,9 +143,6 @@ class TestCheckTools:
         check_tools(str(tmp_path))
 
 
-# ---------------------------------------------------------------------------
-# _apply_sox_effects
-# ---------------------------------------------------------------------------
 
 class TestApplySoxEffects:
     def test_no_effects(self, tmp_path):
@@ -212,9 +200,6 @@ class TestApplySoxEffects:
         assert result == wav
 
 
-# ---------------------------------------------------------------------------
-# _cleanup_files
-# ---------------------------------------------------------------------------
 
 class TestCleanupFiles:
     def test_cleanup_existing(self, tmp_path):
@@ -231,9 +216,6 @@ class TestCleanupFiles:
         _cleanup_files(str(tmp_path / "missing.txt"), str(tmp_path / "missing.wav"))
 
 
-# ---------------------------------------------------------------------------
-# synthesize_audio
-# ---------------------------------------------------------------------------
 
 class TestSynthesizeAudio:
     @pytest.fixture
@@ -274,9 +256,6 @@ class TestSynthesizeAudio:
             synthesize_audio("tere", config, run_command=fake_run)
 
 
-# ---------------------------------------------------------------------------
-# upload_to_s3
-# ---------------------------------------------------------------------------
 
 class TestUploadToS3:
     def test_upload(self):
@@ -292,9 +271,6 @@ class TestUploadToS3:
         assert url == "https://bucket.s3.eu-west-1.amazonaws.com/cache/key123.wav"
 
 
-# ---------------------------------------------------------------------------
-# process_message
-# ---------------------------------------------------------------------------
 
 class TestProcessMessage:
     @pytest.fixture
@@ -338,9 +314,6 @@ class TestProcessMessage:
         sqs_client.delete_message.assert_not_called()
 
 
-# ---------------------------------------------------------------------------
-# run_worker
-# ---------------------------------------------------------------------------
 
 class TestRunWorker:
     def test_missing_config_exits(self):
@@ -396,3 +369,19 @@ class TestRunWorker:
             run_worker(cfg, sqs_client, MagicMock())
 
         assert call_count == 2
+
+    def test_sigterm_graceful_shutdown(self):
+        import worker
+        cfg = WorkerConfig("queue", "bucket", "r", "d", "t")
+        sqs = MagicMock()
+        calls = 0
+        def recv(**kw):
+            nonlocal calls; calls += 1
+            if calls == 1:
+                worker._sigterm_handler(None, None)
+                return {"Messages": []}
+            raise AssertionError("Should not poll after SIGTERM")
+        sqs.receive_message.side_effect = recv
+        with patch(CHECK_TOOLS_PATCH):
+            run_worker(cfg, sqs, MagicMock())
+        assert worker._shutdown_requested is True and calls == 1
