@@ -23,6 +23,10 @@ permissions:
   id-token: write
   contents: read
 
+concurrency:
+  group: merlin-infra-${{ github.event.inputs.environment || 'dev' }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy Merlin Infrastructure
@@ -52,12 +56,6 @@ jobs:
             -backend-config="bucket=askend-lab-terraform-state" \
             -backend-config="dynamodb_table=askend-lab-terraform-locks" \
             -backend-config="key=merlin/${{ github.event.inputs.environment || 'dev' }}/terraform.tfstate"
-
-      - name: Import ECR repository (one-time)
-        working-directory: infra/merlin
-        run: |
-          terraform import -var="env=${{ github.event.inputs.environment || 'dev' }}" aws_ecr_repository.merlin_worker merlin-worker 2>/dev/null || echo "Already imported or doesn't exist"
-        continue-on-error: true
 
       - name: Terraform Plan
         working-directory: infra/merlin
