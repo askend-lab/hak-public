@@ -19,6 +19,15 @@ vi.mock("./config", async (importOriginal) => {
 
 const mockAuthStorage = vi.mocked(AuthStorage);
 
+const DEV_ISS = "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_wlRtuLkG2";
+const DEV_AUD = "64tf6nf61n6sgftqif6q975hka";
+
+function createJwt(payload: Record<string, unknown>): string {
+  const h = btoa(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const b = btoa(JSON.stringify({ iss: DEV_ISS, aud: DEV_AUD, ...payload }));
+  return `${h}.${b}.sig`;
+}
+
 describe("handleCodeCallback and handleTaraTokens", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -30,10 +39,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
 
   it("should handle code callback with valid tokens", async () => {
     const config = await import("./config");
-    const validIdToken =
-      btoa(JSON.stringify({ alg: "RS256" })) + "." +
-      btoa(JSON.stringify({ sub: "user-1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
-      ".sig";
+    const validIdToken = createJwt({ sub: "user-1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
     (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       accessToken: "access-tok", idToken: validIdToken,
     });
@@ -77,10 +83,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
   });
 
   it("should handle TARA tokens with valid id_token", async () => {
-    const validIdToken =
-      btoa(JSON.stringify({ alg: "RS256" })) + "." +
-      btoa(JSON.stringify({ sub: "tara-user", email: "tara@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
-      ".sig";
+    const validIdToken = createJwt({ sub: "tara-user", email: "tara@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
 
     function TaraComponent() {
       const { handleTaraTokens, isAuthenticated, user } = useAuth();
@@ -142,11 +145,8 @@ describe("handleCodeCallback and handleTaraTokens", () => {
 
   it("should call refreshSession and clear auth on failure", async () => {
     mockAuthStorage.getUser.mockReturnValue({ id: "1", email: "test@test.com" });
-    const validToken =
-      btoa(JSON.stringify({ alg: "RS256" })) + "." +
-      btoa(JSON.stringify({ sub: "1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
-      ".sig";
-    mockAuthStorage.getAccessToken.mockReturnValue(validToken);
+    const validIdToken = createJwt({ iss: DEV_ISS, aud: DEV_AUD, sub: "1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
+    mockAuthStorage.getAccessToken.mockReturnValue(validIdToken);
     function RefreshComponent() {
       const { refreshSession, isAuthenticated } = useAuth();
       return (
@@ -168,10 +168,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
 
   it("should store all tokens on handleCodeCallback", async () => {
     const config = await import("./config");
-    const validIdToken =
-      btoa(JSON.stringify({ alg: "RS256" })) + "." +
-      btoa(JSON.stringify({ sub: "u1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
-      ".sig";
+    const validIdToken = createJwt({ sub: "u1", email: "test@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
     (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       accessToken: "at-1", idToken: validIdToken,
     });
@@ -189,10 +186,7 @@ describe("handleCodeCallback and handleTaraTokens", () => {
   });
 
   it("should store all tokens on handleTaraTokens", async () => {
-    const validIdToken =
-      btoa(JSON.stringify({ alg: "RS256" })) + "." +
-      btoa(JSON.stringify({ sub: "t1", email: "tara@test.com", exp: Math.floor(Date.now() / 1000) + 3600 })) +
-      ".sig";
+    const validIdToken = createJwt({ sub: "t1", email: "tara@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
 
     function TComponent() {
       const { handleTaraTokens } = useAuth();

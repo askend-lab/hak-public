@@ -14,9 +14,12 @@ vi.mock("./config", async (importOriginal) => {
 
 const mockAuthStorage = vi.mocked(AuthStorage);
 
+const DEV_ISS = "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_wlRtuLkG2";
+const DEV_AUD = "64tf6nf61n6sgftqif6q975hka";
+
 function createJwt(payload: Record<string, unknown>): string {
   const h = btoa(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const b = btoa(JSON.stringify(payload));
+  const b = btoa(JSON.stringify({ iss: DEV_ISS, aud: DEV_AUD, ...payload }));
   return `${h}.${b}.sig`;
 }
 

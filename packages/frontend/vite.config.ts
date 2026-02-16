@@ -120,6 +120,19 @@ export default defineConfig({
       "/auth/tara": {
         target: process.env.VITE_AUTH_PROXY_TARGET ?? "https://hak-api-dev.askend-lab.com",
         changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq) => {
+            // Backend CSRF check (validateCsrfOrigin) compares Origin header
+            // against getFrontendUrl() which returns the dev frontend URL.
+            // changeOrigin only rewrites Host, not Origin — fix it here.
+            const frontendOrigin = process.env.VITE_API_URL ?? "https://hak-dev.askend-lab.com";
+            proxyReq.setHeader("Origin", frontendOrigin);
+          });
+        },
+      },
+      "/oauth2/token": {
+        target: `https://${process.env.VITE_COGNITO_DOMAIN ?? "askend-lab-auth.auth.eu-west-1.amazoncognito.com"}`,
+        changeOrigin: true,
       },
     },
   },

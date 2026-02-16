@@ -52,10 +52,10 @@ export function getLogoutUri(hostname: string = getHostname()): string {
  * @see https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-idp-settings.html
  */
 export const cognitoConfig = {
-  region: import.meta.env?.VITE_COGNITO_REGION ?? "",
-  userPoolId: import.meta.env?.VITE_COGNITO_USER_POOL_ID ?? "",
-  clientId: import.meta.env?.VITE_COGNITO_CLIENT_ID ?? "",
-  domain: import.meta.env?.VITE_COGNITO_DOMAIN ?? "",
+  region: import.meta.env?.VITE_COGNITO_REGION ?? (isLocalDev() ? "eu-west-1" : ""),
+  userPoolId: import.meta.env?.VITE_COGNITO_USER_POOL_ID ?? (isLocalDev() ? "eu-west-1_wlRtuLkG2" : ""),
+  clientId: import.meta.env?.VITE_COGNITO_CLIENT_ID ?? (isLocalDev() ? "64tf6nf61n6sgftqif6q975hka" : ""),
+  domain: import.meta.env?.VITE_COGNITO_DOMAIN ?? (isLocalDev() ? "askend-lab-auth.auth.eu-west-1.amazoncognito.com" : ""),
 
   get redirectUri(): string {
     return getRedirectUri();
@@ -108,19 +108,33 @@ export async function exchangeCodeForTokens(code: string): Promise<{
   }
 
   try {
-    // Exchange code via backend — refresh token is set as httpOnly cookie
-    const response = await fetch(
-      `${AUTH_API_URL}/tara/exchange-code`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          code,
-          code_verifier: codeVerifier,
-        }),
-      },
-    );
+    // Local dev: exchange directly with Cognito via proxy to avoid redirect_uri
+    // mismatch (backend hardcodes deployed URL, but we need localhost).
+    // Production: exchange via backend — refresh token is set as httpOnly cookie.
+    const response = isLocalDev()
+      ? await fetch(OAUTH2_TOKEN_PATH, {
+          method: "POST",
+          headers: { "Content-Type": CONTENT_TYPE_FORM },
+          body: new URLSearchParams({
+            grant_type: "authorization_code",
+            client_id: cognitoConfig.clientId,
+            code,
+            redirect_uri: cognitoConfig.redirectUri,
+            code_verifier: codeVerifier,
+          }),
+        })
+      : await fetch(
+          `${AUTH_API_URL}/tara/exchange-code`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              code,
+              code_verifier: codeVerifier,
+            }),
+          },
+        );
 
     if (!response.ok) {
       const errorData = await response.text();
