@@ -85,7 +85,10 @@ resource "aws_s3_bucket_cors_configuration" "merlin_audio" {
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "HEAD"]
-    allowed_origins = ["*"]
+    allowed_origins = [
+      "https://hak-dev.askend-lab.com",
+      "https://hak.askend-lab.com"
+    ]
     expose_headers  = ["ETag"]
     max_age_seconds = 3600
   }
@@ -125,7 +128,7 @@ resource "aws_s3_bucket_policy" "merlin_audio_public_read" {
 
 resource "aws_ecr_repository" "merlin_worker" {
   name                 = "merlin-worker"
-  image_tag_mutability = "IMMUTABLE"
+  image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
