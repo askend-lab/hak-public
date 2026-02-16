@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { describe, it, expect, afterEach, beforeEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 
 describe("config default hostname detection", () => {
   const origHostname = window.location.hostname;
@@ -11,6 +11,11 @@ describe("config default hostname detection", () => {
       writable: true,
       value: "prod.example.com",
     });
+    // Stub required env vars so requireEnv() doesn't throw in non-localhost
+    vi.stubEnv("VITE_COGNITO_REGION", "eu-west-1");
+    vi.stubEnv("VITE_COGNITO_USER_POOL_ID", "test-pool");
+    vi.stubEnv("VITE_COGNITO_CLIENT_ID", "test-client");
+    vi.stubEnv("VITE_COGNITO_DOMAIN", "test.auth.example.com");
   });
 
   afterEach(() => {
@@ -18,6 +23,7 @@ describe("config default hostname detection", () => {
       writable: true,
       value: origHostname,
     });
+    vi.unstubAllEnvs();
   });
 
   it("getRedirectUri uses window.location.hostname by default", async () => {

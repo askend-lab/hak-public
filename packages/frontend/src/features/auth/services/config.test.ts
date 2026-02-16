@@ -358,6 +358,15 @@ describe("local dev direct Cognito exchange", () => {
   });
 });
 
+describe("fail-fast config validation", () => {
+  it("should throw when required env var is missing in non-localhost", async () => {
+    vi.stubGlobal("location", { hostname: "app.example.com", href: "" });
+    vi.resetModules();
+    await expect(() => import("./config")).rejects.toThrow("Missing required env var");
+    vi.unstubAllGlobals();
+  });
+});
+
 describe("PKCE code verifier format", () => {
   it("should store base64url-safe verifier without +, /, or = chars", async () => {
     sessionStorage.clear();

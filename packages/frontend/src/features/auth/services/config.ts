@@ -55,10 +55,7 @@ function requireEnv(key: string, localDefault: string): string {
   const value = import.meta.env?.[key];
   if (value) return value;
   if (isLocalDev()) return localDefault;
-  if (import.meta.env?.PROD) {
-    logger.error(`[Auth] Missing required env var: ${key}`);
-  }
-  return "";
+  throw new Error(`[Auth] Missing required env var: ${key}. Set it in .env.local or CI environment.`);
 }
 
 export const cognitoConfig = {
