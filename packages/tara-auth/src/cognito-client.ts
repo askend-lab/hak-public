@@ -63,6 +63,9 @@ export class CognitoClient {
   }
 
   private async findUserByEmail(email: string): Promise<string | null> {
+    if (!/^[^\s"\\@]+@[^\s"\\@]+\.[^\s"\\@]+$/.test(email)) {
+      return null;
+    }
     try {
       const command = new ListUsersCommand({
         UserPoolId: this.config.userPoolId,
@@ -170,11 +173,15 @@ export class CognitoClient {
         throw new Error('No authentication result from Cognito');
       }
 
+      const { AccessToken, IdToken, RefreshToken, ExpiresIn } = authResponse.AuthenticationResult;
+      if (!AccessToken || !IdToken || !RefreshToken) {
+        throw new Error('Cognito returned incomplete tokens');
+      }
       return {
-        accessToken: authResponse.AuthenticationResult.AccessToken || '',
-        idToken: authResponse.AuthenticationResult.IdToken || '',
-        refreshToken: authResponse.AuthenticationResult.RefreshToken || '',
-        expiresIn: authResponse.AuthenticationResult.ExpiresIn || DEFAULT_EXPIRES_IN,
+        accessToken: AccessToken,
+        idToken: IdToken,
+        refreshToken: RefreshToken,
+        expiresIn: ExpiresIn || DEFAULT_EXPIRES_IN,
       };
     } catch (error) {
       throw new Error(`Token generation failed: ${error}`);

@@ -141,11 +141,11 @@ resource "aws_ecr_lifecycle_policy" "merlin_worker" {
     rules = [
       {
         rulePriority = 1
-        description  = "Keep last 10 images"
+        description  = "Keep last 25 images"
         selection = {
           tagStatus   = "any"
           countType   = "imageCountMoreThan"
-          countNumber = 10
+          countNumber = 25
         }
         action = {
           type = "expire"

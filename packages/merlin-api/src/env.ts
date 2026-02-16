@@ -9,8 +9,14 @@ export function getSqsQueueUrl(): string {
   return process.env.SQS_QUEUE_URL ?? "";
 }
 
+const VALID_BUCKET_NAME = /^[a-z0-9][a-z0-9.\-]{1,61}[a-z0-9]$/;
+
 export function getS3Bucket(): string {
-  return process.env.S3_BUCKET ?? "";
+  const bucket = process.env.S3_BUCKET ?? "";
+  if (!VALID_BUCKET_NAME.test(bucket)) {
+    throw new Error(`Invalid or missing S3_BUCKET: "${bucket}"`);
+  }
+  return bucket;
 }
 
 export function getEcsCluster(): string {

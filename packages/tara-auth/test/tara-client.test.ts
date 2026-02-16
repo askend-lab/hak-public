@@ -30,6 +30,7 @@ describe('createTaraClient', () => {
     jest.clearAllMocks();
     _resetSecretsCache();
     process.env = { ...originalEnv };
+    process.env.STAGE = 'dev';
     process.env.TARA_ISSUER = 'https://tara-test.ria.ee';
     process.env.TARA_CLIENT_ID = 'test-client-id';
     process.env.TARA_CLIENT_SECRET = 'test-secret';

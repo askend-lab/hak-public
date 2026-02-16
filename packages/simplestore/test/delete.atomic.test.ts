@@ -43,6 +43,16 @@ class OperationSpyAdapter implements StorageAdapter {
     this.data.delete(this.key(pk, sk));
   }
 
+  async conditionalDelete(pk: string, sk: string, expectedOwner: string): Promise<"deleted" | "not_found" | "not_owner"> {
+    this.operations.push("conditionalDelete");
+    const key = this.key(pk, sk);
+    const existing = this.data.get(key);
+    if (!existing) return "not_found";
+    if (existing.owner !== expectedOwner) return "not_owner";
+    this.data.delete(key);
+    return "deleted";
+  }
+
   async queryBySortKeyPrefix(pk: string, skPrefix: string): Promise<StoreItem[]> {
     this.operations.push("query");
     const results: StoreItem[] = [];
@@ -125,16 +135,7 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
     expect(result.error).toBe(ERRORS.NOT_FOUND);
   });
 
-  /**
-   * After the fix, delete should use a single conditional delete call
-   * instead of get-then-delete (two calls). This test will need to be
-   * updated when the StorageAdapter interface gets a conditionalDelete method.
-   *
-   * For now, this test documents the current TOCTOU pattern: it records
-   * that two separate adapter calls (get + delete) are made.
-   * After fix: this should be a single "conditionalDelete" call.
-   */
-  it("TOCTOU: current delete uses get-then-delete (two operations)", async () => {
+  it("delete uses single atomic conditionalDelete (no TOCTOU)", async () => {
     const spy = new OperationSpyAdapter();
     const store = new Store(spy, ownerContext);
 
@@ -143,10 +144,6 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
 
     await store.delete("doc", "1", "public");
 
-    // Current behavior: get (ownership check) then delete = 2 operations
-    // After fix: should be 1 conditional delete operation
-    // When implementing the fix, change this assertion:
-    //   expect(spy.operations).toEqual(["conditionalDelete"]);
-    expect(spy.operations).toStrictEqual(["get", "delete"]);
+    expect(spy.operations).toStrictEqual(["conditionalDelete"]);
   });
 });

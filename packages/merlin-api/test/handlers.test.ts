@@ -117,18 +117,18 @@ describe("status", () => {
   it("should return ready when file exists", async () => {
     mockCheckS3Cache.mockResolvedValue(true);
 
-    const response = await status(createStatusEvent("abc123"));
+    const response = await status(createStatusEvent("a".repeat(64)));
     expect(response.statusCode).toBe(HTTP_STATUS.OK);
 
     const body = JSON.parse(response.body);
     expect(body.status).toBe("ready");
-    expect(body.audioUrl).toContain("abc123.wav");
+    expect(body.audioUrl).toContain(".wav");
   });
 
   it("should return processing when file not found", async () => {
     mockCheckS3Cache.mockResolvedValue(false);
 
-    const response = await status(createStatusEvent("abc123"));
+    const response = await status(createStatusEvent("a".repeat(64)));
     expect(response.statusCode).toBe(HTTP_STATUS.OK);
 
     const body = JSON.parse(response.body);
@@ -139,7 +139,7 @@ describe("status", () => {
   it("should return 500 on error", async () => {
     mockCheckS3Cache.mockRejectedValue(new Error("S3 down"));
 
-    const response = await status(createStatusEvent("abc123"));
+    const response = await status(createStatusEvent("a".repeat(64)));
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
   });
 });

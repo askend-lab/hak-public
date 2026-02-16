@@ -6,7 +6,7 @@ Expected behavior after fix: worker registers signal.SIGTERM handler that
 sets a shutdown flag. The polling loop checks the flag and exits after
 finishing the current message.
 
-Tests marked with xfail will fail now and pass after the fix.
+Fix implemented: _shutdown_requested flag + signal.SIGTERM handler.
 """
 
 import json
@@ -30,7 +30,6 @@ class TestSigtermGracefulShutdown:
     def config(self):
         return WorkerConfig("https://sqs.example.com/q", "bucket", "eu-west-1", "/opt/merlin", "/tmp")
 
-    @pytest.mark.xfail(reason="Audit #5: SIGTERM not handled yet — will pass after fix")
     def test_worker_has_sigterm_handler(self):
         """After fix, worker module should register a SIGTERM handler."""
         import worker
@@ -39,7 +38,6 @@ class TestSigtermGracefulShutdown:
         assert hasattr(worker, "_shutdown_requested") or hasattr(worker, "shutdown_flag"), \
             "Worker should expose a shutdown flag for SIGTERM handling"
 
-    @pytest.mark.xfail(reason="Audit #5: SIGTERM not handled yet — will pass after fix")
     def test_sigterm_stops_worker_subprocess(self):
         """
         Run worker in a subprocess, send SIGTERM, verify clean exit.

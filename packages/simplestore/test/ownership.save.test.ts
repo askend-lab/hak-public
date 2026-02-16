@@ -36,7 +36,7 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
   });
 
   describe("public type — non-owner cannot overwrite", () => {
-    it.failing("should reject save from non-owner on existing public item", async () => {
+    it("should reject save from non-owner on existing public item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         pk: "lesson",
@@ -59,7 +59,7 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
       expect(result.error).toContain("not owner");
     });
 
-    it.failing("should preserve original data after rejected overwrite", async () => {
+    it("should preserve original data after rejected overwrite", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         pk: "lesson",
@@ -120,7 +120,7 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
   });
 
   describe("unlisted type — non-owner cannot overwrite", () => {
-    it.failing("should reject save from non-owner on existing unlisted item", async () => {
+    it("should reject save from non-owner on existing unlisted item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         pk: "share-link",

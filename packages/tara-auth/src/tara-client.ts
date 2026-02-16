@@ -39,7 +39,11 @@ async function loadTaraSecrets(): Promise<TaraSecrets> {
       callbackUrl: secret.TARA_CALLBACK_URL || DEFAULT_CALLBACK_URL,
     };
   } else {
-    // Fallback to env vars for local development
+    const isDev = process.env.STAGE === 'dev' || process.env.IS_OFFLINE === 'true';
+    if (!isDev) {
+      throw new Error('TARA_SECRETS_ARN must be set in non-dev environments');
+    }
+    // Fallback to env vars for local development only
     cachedSecrets = {
       clientId: process.env.TARA_CLIENT_ID || '',
       clientSecret: process.env.TARA_CLIENT_SECRET || '',

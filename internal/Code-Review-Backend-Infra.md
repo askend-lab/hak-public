@@ -25,6 +25,7 @@
 Severity scale: 🔴 Critical · 🟠 High · 🟡 Medium  
 💥 = fix is **dangerous** — unit tests won't catch regression, requires manual/integration testing  
 ✅ Tests added for #1, #3, #4, #5 — reduced dangerous from 9 to 4
+✅ Fixed in this PR: #2, #3, #4, #5, #6, #11, #12, #13, #14, #19, #20, #24, #25, #28 (14 of 30)
 
 ---
 
@@ -36,30 +37,30 @@ Severity scale: 🔴 Critical · 🟠 High · 🟡 Medium
   **Fix:** Convert to `subprocess.run()` with argument lists. Since this is third-party Merlin code, wrap calls through a safe helper.  
   **Tests:** `tests/test_safe_subprocess.py` — 15 tests covering safe wrappers for all run_merlin.py commands, including path injection, glob handling, and special characters.
 
-- [ ] **2. merlin-worker Fallback Cache Key Uses MD5**  
+- [x] **2. merlin-worker Fallback Cache Key Uses MD5**  
   **File:** `packages/merlin-worker/worker.py:113`  
   **Issue:** `cache_key=body.get("cacheKey", hashlib.md5(text.encode()).hexdigest())`. MD5 is collision-prone. Two different texts could collide → user hears wrong audio. The API always sends cacheKey (SHA-256), but a manual/malformed SQS message triggers this fallback.  
   **Fix:** Change to `hashlib.sha256`, or reject messages without `cacheKey` entirely.
 
-- [ ] **3. simplestore: No Ownership Check on `save` for `public`/`unlisted` Types**  
+- [x] **3. simplestore: No Ownership Check on `save` for `public`/`unlisted` Types**  
   **File:** `packages/simplestore/src/core/store.ts:88-105`  
   **Issue:** `save` performs no ownership check. Any authenticated user can overwrite any item including `public` and `unlisted` by sending the same PK/SK. `delete` has `isOwner` check, but `save` does not. Previous audit #18 only fixed delete ownership for shared.  
   **Fix:** For `public` and `unlisted` types, check `isOwner` on upsert when the item already exists. `shared` type should remain open for anyone to modify (by design per API.md).  
   **Tests:** `test/ownership.save.test.ts` — 12 tests (3 currently failing = TDD). Covers public/unlisted rejection, owner update allowed, shared overwrite allowed, new item creation, data preservation after rejected overwrite.
 
-- [ ] **4. simplestore: `delete` Has TOCTOU Race Condition**  
+- [x] **4. simplestore: `delete` Has TOCTOU Race Condition**  
   **File:** `packages/simplestore/src/core/store.ts:128-149`  
   **Issue:** `delete` performs `get` (ownership check) then `delete` as two separate DynamoDB operations. Between these calls, another request could change the item. No transactional guarantee.  
   **Fix:** Use `DeleteItem` with `ConditionExpression: "owner = :expectedOwner"` in a single atomic call.  
   **Tests:** `test/delete.atomic.test.ts` — 4 tests with OperationSpyAdapter that records call sequence. Documents current get→delete pattern. After fix, change assertion to expect single `conditionalDelete` call.
 
-- [ ] **5. merlin-worker: No Graceful Shutdown on SIGTERM**  
+- [x] **5. merlin-worker: No Graceful Shutdown on SIGTERM**  
   **File:** `packages/merlin-worker/worker.py:268-283`  
   **Issue:** Worker catches only `KeyboardInterrupt`. On Fargate Spot interruption (SIGTERM), the currently-processing message won't be finished or returned to the queue. It becomes visible again after `VisibilityTimeout` (5 min) and gets re-processed, generating duplicate audio and wasting compute.  
   **Fix:** Register `signal.signal(signal.SIGTERM, handler)` that sets a shutdown flag. Finish the current message before exiting.  
   **Tests:** `tests/test_sigterm.py` — 3 tests (2 xfail = TDD). Subprocess-based SIGTERM test verifies clean exit. Checks for `_shutdown_requested` flag. KeyboardInterrupt backward-compat test.
 
-- [ ] **6. tara-auth: `findUserByEmail` Has No Input Validation (Cognito Filter Injection)**  
+- [x] **6. tara-auth: `findUserByEmail` Has No Input Validation (Cognito Filter Injection)**  
   **File:** `packages/tara-auth/src/cognito-client.ts:65-77`  
   **Issue:** `findUserByPersonalCode` validates format with regex `^[A-Z]{2}\d{11}$`, but `findUserByEmail` uses the email directly in Cognito `Filter: email = "${email}"`. TARA is a government IdP (trusted), but defense-in-depth suggests validating email format. A crafted email with `"` characters could manipulate the filter expression.  
   **Fix:** Add email format validation (regex or dedicated library) before using in filter string.
@@ -90,22 +91,22 @@ Severity scale: 🔴 Critical · 🟠 High · 🟡 Medium
 
 ## 🟡 MEDIUM
 
-- [ ] **11. merlin-api: `isValidCacheKey` Doesn't Enforce Length**  
+- [x] **11. merlin-api: `isValidCacheKey` Doesn't Enforce Length**  
   **File:** `packages/merlin-api/src/s3.ts:72-76`  
   **Issue:** Regex `/^[a-f0-9]+$/` accepts hex of any length. A 100,000-char cache key passes validation and is used in S3 `HeadObject`. SHA-256 hex is exactly 64 chars.  
   **Fix:** Change to `/^[a-f0-9]{64}$/`.
 
-- [ ] **12. merlin-worker: `MAX_TEXT_LENGTH` Mismatch (10000 vs 1000)**  
+- [x] **12. merlin-worker: `MAX_TEXT_LENGTH` Mismatch (10000 vs 1000)**  
   **Files:** `worker.py:74` (10000), `merlin-api/handler.ts:90` (1000)  
   **Issue:** API validates 1000 chars, worker accepts 10000. Direct SQS messages bypass API validation → 10× longer texts consume disproportionate compute.  
   **Fix:** Align to 1000, or make both configurable from a shared constant.
 
-- [ ] **13. merlin-api: `sendToQueue` Returns `""` on Missing MessageId — Silent Failure**  
+- [x] **13. merlin-api: `sendToQueue` Returns `""` on Missing MessageId — Silent Failure**  
   **File:** `packages/merlin-api/src/sqs.ts:22`  
   **Issue:** `return result.MessageId ?? ""`. If SQS fails to return a MessageId, the caller returns "processing" to the user, but no message was actually queued. User polls forever.  
   **Fix:** Throw if `MessageId` is falsy.
 
-- [ ] **14. simplestore: Double Error Catch Swallows Stack Traces**  
+- [x] **14. simplestore: Double Error Catch Swallows Stack Traces**  
   **Files:** `simplestore/src/core/store.ts` (wrapAsync), `simplestore/src/lambda/handler.ts:162`  
   **Issue:** `wrapAsync` catches all errors and converts to `{ success: false, error: String(error) }`, losing the stack trace. Handler also catches. No logging at the store layer. Debugging production issues is very difficult.  
   **Fix:** Log the full error in `wrapAsync`, or let the store throw and centralize logging at the handler layer.
@@ -132,37 +133,35 @@ Severity scale: 🔴 Critical · 🟠 High · 🟡 Medium
   **Issue:** `allowed_origins = ["*"]` on the audio bucket CORS. While audio is public by design (ADR 006), wildcard CORS means any third-party site can embed audio and make credentialed cross-origin requests.  
   **Fix:** Restrict `allowed_origins` to the frontend domain(s) only.
 
-- [ ] **19. tara-auth: Secrets Manager Fallback to Env Vars in Non-Dev**  
+- [x] **19. tara-auth: Secrets Manager Fallback to Env Vars in Non-Dev**  
   **File:** `packages/tara-auth/src/tara-client.ts:70-85`  
   **Issue:** If Secrets Manager fetch fails, the code falls back to `process.env.TARA_CLIENT_ID` / `TARA_CLIENT_SECRET`. The fallback has a comment "for local development" but there's no check that this only happens in dev. In prod, if Secrets Manager is temporarily unavailable, plain-text env var secrets would be used (if set), weakening the security posture.  
   **Fix:** Only fall back to env vars when `STAGE=dev` or `IS_OFFLINE=true`.
 
-- [ ] **20. tara-auth: `generateTokens` Returns Empty Strings on Missing Tokens**  
+- [x] **20. tara-auth: `generateTokens` Returns Empty Strings on Missing Tokens**  
   **File:** `packages/tara-auth/src/cognito-client.ts:173-178`  
   **Issue:** `accessToken: authResponse.AuthenticationResult.AccessToken || ''`. If Cognito returns a null AccessToken, the user gets an empty string token set as a cookie. This creates a broken session that's hard to debug.  
   **Fix:** Throw if any required token (accessToken, idToken, refreshToken) is falsy.
 
-- [ ] **21. No CI Testing for tara-auth (prev audit #72 — still open)**  
-  **File:** `.github/workflows/build.yml`  
-  **Issue:** The build workflow tests simplestore, merlin-api, vabamorf-api, shared, and gherkin-parser, but not tara-auth. Authentication logic changes can break without CI catching it.  
-  **Fix:** Add tara-auth to the test matrix in build.yml.
+- [x] **21. No CI Testing for tara-auth (prev audit #72 — still open)**
+  **File:** `.github/workflows/build.yml`
+  **Note:** Already fixed — `Test tara-auth` step exists in build.yml (line 181). False positive.
 
 - [ ] **22. No Backend Integration/Smoke Tests (prev audit #73 — still open)**  
   **File:** `scripts/smoke-test.sh`  
   **Issue:** smoke-test.sh exists but only tests HTTP reachability of endpoints. No integration test verifies the SQS→Worker→S3 flow or the TARA→Cognito flow end-to-end. Unit tests pass but the system can still be broken at integration points.  
   **Fix:** Add integration tests for critical paths: (1) synthesize → SQS → worker → S3, (2) TARA callback → Cognito user creation.
 
-- [ ] **23. ECS Container Insights Disabled**  
-  **File:** `infra/merlin/main.tf:166-168`  
-  **Issue:** `containerInsights = "disabled"`. Without Container Insights, there's no CPU/memory utilization monitoring for the Merlin worker. You can't tell if the worker is overloaded or idle.  
-  **Fix:** Enable Container Insights. Cost is minimal for a single-task cluster.
+- [x] **23. ECS Container Insights Disabled**
+  **File:** `infra/merlin/main.tf:166-168`
+  **Note:** Already fixed — `containerInsights = "enabled"` in current code. False positive.
 
-- [ ] **24. ECR Lifecycle Keeps Only 10 Images**  
+- [x] **24. ECR Lifecycle Keeps Only 10 Images**  
   **File:** `infra/merlin/main.tf:137-156`  
   **Issue:** `countNumber = 10`. With immutable tags, once 10 images exist, older ones are deleted. If a rollback is needed beyond 10 deploys, the image is gone. With frequent CI builds, 10 images could cover only a few weeks.  
   **Fix:** Increase to 25-30, or add a "keep tagged with `release-*`" rule.
 
-- [ ] **25. vabamorf-api: Queued Requests Not Rejected on Process Exit**  
+- [x] **25. vabamorf-api: Queued Requests Not Rejected on Process Exit**  
   **File:** `packages/vabamorf-api/src/vmetajson.ts:103-108`  
   **Issue:** On process exit, only `currentRequest` is failed. Items remaining in `requestQueue` are not rejected — they wait until their individual timeout (default: likely several seconds). Users experience a slow timeout instead of an immediate error.  
   **Fix:** In the `exit` handler, drain `requestQueue` and reject all pending requests immediately.
@@ -178,7 +177,7 @@ Severity scale: 🔴 Critical · 🟠 High · 🟡 Medium
   **Fix:** Have consumers import directly from `@hak/gherkin-parser`. Remove the `specifications` package or add actual spec content to justify its existence.  
   **Safety:** TypeScript compiler catches broken imports at build time. All consumers are in the monorepo.
 
-- [ ] **28. merlin-api: S3 Bucket URL Built from Env Var Without Validation**  
+- [x] **28. merlin-api: S3 Bucket URL Built from Env Var Without Validation**  
   **File:** `packages/merlin-api/src/s3.ts:37-39`  
   **Issue:** `buildAudioUrl` constructs an S3 URL from `getS3Bucket()` (env var) and the cache key. If the env var is misconfigured (empty or contains special chars), the returned URL is malformed, but no validation occurs. The user gets a broken audio URL.  
   **Fix:** Validate bucket name format on Lambda cold start. Fail fast if misconfigured.
