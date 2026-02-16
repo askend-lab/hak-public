@@ -22,10 +22,13 @@ WORKDIR /home/merlin_user
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
         MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_24.9.2-0-Linux-aarch64.sh"; \
+        MINICONDA_SHA256="4607ec9145ad9c0413e6300dab3febe442e265efce486176ef1f8518ba8bfaeb"; \
     else \
         MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_24.9.2-0-Linux-x86_64.sh"; \
+        MINICONDA_SHA256="4b540d78e5bdd770b39216c0563424ef6656504cbe24c67b2d0454c2eb7afe93"; \
     fi && \
     wget --quiet $MINICONDA_URL -O ~/miniconda.sh && \
+    echo "${MINICONDA_SHA256}  /home/merlin_user/miniconda.sh" | sha256sum -c - && \
     /bin/bash ~/miniconda.sh -b -p /home/merlin_user/miniconda3 && \
     rm ~/miniconda.sh && \
     /home/merlin_user/miniconda3/bin/conda clean -afy

@@ -18,6 +18,11 @@ RUN chmod +x /var/task/vmetajson.bin
 # Copy compiled TypeScript (from dist/src/ to root)
 COPY dist/src/ /var/task/
 
+# Run as non-root user
+RUN adduser --disabled-password --gecos '' --home /var/task appuser && \
+    chown -R appuser:appuser /var/task
+USER appuser
+
 # Set environment variables
 ENV VMETAJSON_PATH=/var/task/vmetajson.bin
 ENV DICT_PATH=/var/task

@@ -69,9 +69,13 @@ jobs:
           cache: "pnpm"
 
       - name: Configure npm registry auth
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          if [ -n "$NPM_TOKEN" ]; then
+            echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > ~/.npmrc
+            echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          fi
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

@@ -144,7 +144,7 @@ jobs:
             -backend-config="dynamodb_table=askend-lab-terraform-locks" \
             -backend-config="key=hak/${{ matrix.environment }}/terraform.tfstate"
 
-      - name: Clear stale state lock
+      - name: Check for stale state lock
         timeout-minutes: 2
         run: |
           # Query DynamoDB for any existing lock on this state
@@ -153,16 +153,13 @@ jobs:
             --key '{"LockID": {"S": "askend-lab-terraform-state/hak/${{ matrix.environment }}/terraform.tfstate"}}' \
             --query 'Item.Info.S' --output text 2>/dev/null || echo "NONE")
           if [ "$LOCK_ID" != "NONE" ] && [ "$LOCK_ID" != "None" ] && [ -n "$LOCK_ID" ]; then
-            echo "⚠️ Found stale lock, force-unlocking..."
-            # Extract lock ID from the JSON info field
-            EXTRACTED_ID=$(echo "$LOCK_ID" | python3 -c "import sys,json; print(json.load(sys.stdin)['ID'])" 2>/dev/null || echo "")
-            if [ -n "$EXTRACTED_ID" ]; then
-              terraform force-unlock -force "$EXTRACTED_ID" || echo "Force-unlock failed, continuing anyway"
-            fi
+            echo "::error::⚠️ Terraform state is locked! Another apply may be in progress or a previous run crashed."
+            echo "Lock info: $LOCK_ID"
+            echo "To manually unlock: terraform force-unlock -force <LOCK_ID>"
+            exit 1
           else
             echo "✅ No stale lock found"
           fi
-        continue-on-error: true
 
       - name: Remove orphaned audio resources from state
         run: |
