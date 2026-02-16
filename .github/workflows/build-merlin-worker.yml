@@ -76,10 +76,13 @@ jobs:
           severity: 'CRITICAL,HIGH'
           trivyIgnores: packages/merlin-worker/.trivyignore
 
-      - name: Push Docker image
+      - name: Tag and push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: docker push $ECR_REGISTRY/merlin-worker:${{ github.sha }}
+        run: |
+          docker tag $ECR_REGISTRY/merlin-worker:${{ github.sha }} $ECR_REGISTRY/merlin-worker:latest
+          docker push $ECR_REGISTRY/merlin-worker:${{ github.sha }}
+          docker push $ECR_REGISTRY/merlin-worker:latest
 
       - name: Clean up secrets
         if: always()
