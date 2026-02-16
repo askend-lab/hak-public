@@ -3,7 +3,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const yaml = require("js-yaml");
 
 // Custom YAML schema that handles CloudFormation intrinsic function tags (!Sub, !Ref, etc.)
@@ -82,47 +82,50 @@ describe("serverless.yml — public endpoint guarantees", () => {
     const fn = config.functions.synthesize;
     expect(fn).toBeDefined();
 
-    const httpEvent = fn!.events?.find((e) => e.httpApi);
+    const httpEvent = fn?.events?.find((e) => e.httpApi);
     expect(httpEvent).toBeDefined();
-    expect(httpEvent!.httpApi!.path).toBe("/synthesize");
-    expect(httpEvent!.httpApi!.method).toBe("POST");
-    expect(httpEvent!.httpApi!.authorizer).toBeUndefined();
+    expect(httpEvent?.httpApi?.path).toBe("/synthesize");
+    expect(httpEvent?.httpApi?.method).toBe("POST");
+    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
   it("should not have authorizer on POST /warmup route", () => {
     const fn = config.functions.warmup;
     expect(fn).toBeDefined();
 
-    const httpEvent = fn!.events?.find((e) => e.httpApi);
+    const httpEvent = fn?.events?.find((e) => e.httpApi);
     expect(httpEvent).toBeDefined();
-    expect(httpEvent!.httpApi!.path).toBe("/warmup");
-    expect(httpEvent!.httpApi!.method).toBe("POST");
-    expect(httpEvent!.httpApi!.authorizer).toBeUndefined();
+    expect(httpEvent?.httpApi?.path).toBe("/warmup");
+    expect(httpEvent?.httpApi?.method).toBe("POST");
+    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
   it("should not have authorizer on GET /status/{cacheKey} route", () => {
     const fn = config.functions.status;
     expect(fn).toBeDefined();
 
-    const httpEvent = fn!.events?.find((e) => e.httpApi);
+    const httpEvent = fn?.events?.find((e) => e.httpApi);
     expect(httpEvent).toBeDefined();
-    expect(httpEvent!.httpApi!.authorizer).toBeUndefined();
+    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
   it("should not have authorizer on GET /health route", () => {
     const fn = config.functions.health;
     expect(fn).toBeDefined();
 
-    const httpEvent = fn!.events?.find((e) => e.httpApi);
+    const httpEvent = fn?.events?.find((e) => e.httpApi);
     expect(httpEvent).toBeDefined();
-    expect(httpEvent!.httpApi!.authorizer).toBeUndefined();
+    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
   it("should not have authorizer on any route", () => {
     for (const [name, fn] of Object.entries(config.functions)) {
       for (const event of fn.events ?? []) {
+        expect(
+          event.httpApi?.authorizer,
+        ).toBeUndefined();
         if (event.httpApi?.authorizer) {
-          fail(
+          throw new Error(
             `Function "${name}" route ${event.httpApi.method} ${event.httpApi.path} ` +
               `has an authorizer. All merlin-api endpoints must be public.`,
           );
@@ -135,13 +138,13 @@ describe("serverless.yml — public endpoint guarantees", () => {
     const resources = config.resources?.Resources;
     expect(resources).toBeDefined();
 
-    const synthRoute = resources!["HttpApiRoutePostSynthesize"];
+    const synthRoute = resources?.["HttpApiRoutePostSynthesize"];
     expect(synthRoute).toBeDefined();
-    expect(synthRoute!.Properties?.AuthorizationType).toBe("NONE");
+    expect(synthRoute?.Properties?.AuthorizationType).toBe("NONE");
 
-    const warmupRoute = resources!["HttpApiRoutePostWarmup"];
+    const warmupRoute = resources?.["HttpApiRoutePostWarmup"];
     expect(warmupRoute).toBeDefined();
-    expect(warmupRoute!.Properties?.AuthorizationType).toBe("NONE");
+    expect(warmupRoute?.Properties?.AuthorizationType).toBe("NONE");
   });
 
   it("should not include Authorization in CORS allowedHeaders", () => {
