@@ -111,6 +111,13 @@ export function useAudioPlayer(): {
 
         const cleanup = (): void => {
           setCurrentAudio(null);
+          abortSignal.removeEventListener("abort", onAbort);
+        };
+
+        const onAbort = (): void => {
+          audio.pause();
+          cleanup();
+          resolve(false);
         };
 
         audio.onended = (): void => {
@@ -129,11 +136,7 @@ export function useAudioPlayer(): {
           resolve(false);
         };
 
-        abortSignal.addEventListener("abort", (): void => {
-          audio.pause();
-          cleanup();
-          resolve(false);
-        });
+        abortSignal.addEventListener("abort", onAbort);
 
         audio.play().catch((): void => {
           cleanup();

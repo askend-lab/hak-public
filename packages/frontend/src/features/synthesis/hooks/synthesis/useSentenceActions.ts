@@ -102,7 +102,8 @@ export function useSentenceActions({
         const blobUrl = URL.createObjectURL(audioBlob);
         const a = document.createElement("a");
         a.href = blobUrl;
-        a.download = `${sentence.text || "audio"}.wav`;
+        const safeName = (sentence.text || "audio").replace(/[<>:"/\\|?*\x00-\x1f\s]+/g, "_").slice(0, 80);
+        a.download = `${safeName}.wav`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

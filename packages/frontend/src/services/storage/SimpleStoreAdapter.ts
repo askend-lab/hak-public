@@ -11,7 +11,7 @@ function taskToRecord(task: Task): Record<string, unknown> {
   return JSON.parse(JSON.stringify(task)) as Record<string, unknown>;
 }
 
-/** Deserialize a storage record back to a Task with basic runtime validation. */
+/** Deserialize a storage record back to a Task with runtime validation. */
 function recordToTask(data: Record<string, unknown>): Task | null {
   if (
     typeof data.id !== "string" ||
@@ -21,7 +21,17 @@ function recordToTask(data: Record<string, unknown>): Task | null {
     logger.error("Invalid task data: missing required fields");
     return null;
   }
-  return data as unknown as Task;
+  return {
+    id: data.id,
+    userId: data.userId,
+    name: data.name,
+    description: typeof data.description === "string" ? data.description : null,
+    speechSequences: Array.isArray(data.speechSequences) ? data.speechSequences as string[] : [],
+    entries: Array.isArray(data.entries) ? data.entries as Task["entries"] : [],
+    createdAt: data.createdAt instanceof Date ? data.createdAt : new Date(data.createdAt as string || Date.now()),
+    updatedAt: data.updatedAt instanceof Date ? data.updatedAt : new Date(data.updatedAt as string || Date.now()),
+    shareToken: typeof data.shareToken === "string" ? data.shareToken : "",
+  };
 }
 
 interface SimpleStoreResponse {

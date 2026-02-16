@@ -220,7 +220,7 @@ describe("synthesize", () => {
       // Prevent unhandled rejection warning during timer advancement
       const safePromise = promise.catch(() => {});
       for (let i = 0; i < 30; i++) {
-        await vi.advanceTimersByTimeAsync(1000);
+        await vi.advanceTimersByTimeAsync(8000);
       }
       await safePromise;
 

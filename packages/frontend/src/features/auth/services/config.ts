@@ -51,11 +51,21 @@ export function getLogoutUri(hostname: string = getHostname()): string {
  *
  * @see https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-idp-settings.html
  */
+function requireEnv(key: string, localDefault: string): string {
+  const value = import.meta.env?.[key];
+  if (value) return value;
+  if (isLocalDev()) return localDefault;
+  if (import.meta.env?.PROD) {
+    logger.error(`[Auth] Missing required env var: ${key}`);
+  }
+  return "";
+}
+
 export const cognitoConfig = {
-  region: import.meta.env?.VITE_COGNITO_REGION ?? (isLocalDev() ? "eu-west-1" : ""),
-  userPoolId: import.meta.env?.VITE_COGNITO_USER_POOL_ID ?? (isLocalDev() ? "eu-west-1_wlRtuLkG2" : ""),
-  clientId: import.meta.env?.VITE_COGNITO_CLIENT_ID ?? (isLocalDev() ? "64tf6nf61n6sgftqif6q975hka" : ""),
-  domain: import.meta.env?.VITE_COGNITO_DOMAIN ?? (isLocalDev() ? "askend-lab-auth.auth.eu-west-1.amazoncognito.com" : ""),
+  region: requireEnv("VITE_COGNITO_REGION", "eu-west-1"),
+  userPoolId: requireEnv("VITE_COGNITO_USER_POOL_ID", "eu-west-1_wlRtuLkG2"),
+  clientId: requireEnv("VITE_COGNITO_CLIENT_ID", "64tf6nf61n6sgftqif6q975hka"),
+  domain: requireEnv("VITE_COGNITO_DOMAIN", "askend-lab-auth.auth.eu-west-1.amazoncognito.com"),
 
   get redirectUri(): string {
     return getRedirectUri();

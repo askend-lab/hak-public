@@ -28,13 +28,14 @@ interface StatusResponse {
 async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+    const delay = Math.min(POLL_INTERVAL_MS * Math.pow(2, Math.min(i, 3)), 8000);
     let response: Response;
     try {
       response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
     } catch (err) {
       if (signal?.aborted) throw err;
       // Transient network error — continue polling
-      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+      await new Promise((resolve) => setTimeout(resolve, delay));
       continue;
     }
     if (!response.ok) throw new Error("Status check failed");
@@ -46,7 +47,7 @@ async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<str
     if (data.status === "error") {
       throw new Error(data.error ?? "Synthesis failed");
     }
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
   throw new Error("Synthesis timed out");
 }
