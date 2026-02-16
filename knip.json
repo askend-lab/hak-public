@@ -8,7 +8,8 @@
     "packages/frontend/**",
     "packages/simplestore/test/**",
     "**/stryker.config.mjs",
-    "bundlesize.config.json"
+    "bundlesize.config.json",
+    "scripts/strip-cognito-defaults.js"
   ],
   "ignoreDependencies": [
     "@babel/*",

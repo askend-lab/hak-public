@@ -329,6 +329,13 @@ rm -rf packages/merlin-worker/tools/SPTK-3.9/build packages/merlin-worker/tools/
 [[ -f docs/AUTHENTICATION.md ]] && sed -i \
   -e 's/the backend `tara-auth` Lambda/the backend authentication Lambda (not included in open-source release)/' \
   -e 's/`tara-auth` creates\/finds/The auth Lambda creates\/finds/' docs/AUTHENTICATION.md
+# --- Clean up docs (remove internal/ file references that don't exist in public repo) ---
+[[ -f SECURITY.md ]] && sed -i 's|For the full security audit findings and remediation status, see `internal/SECURITY-AUDIT-2026-02.md`. Architecture decisions related to security are documented in `internal/DESIGN-DECISIONS.md` and `docs/adr/`.|Architecture decisions related to security are documented in `docs/adr/`.|' SECURITY.md
+[[ -f packages/merlin-api/README.md ]] && sed -i 's| This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.|This is an intentional trade-off — see `docs/adr/` for architecture decisions.|' packages/merlin-api/README.md
+
+# --- Strip Cognito dev defaults (security: no pool IDs in public repo) ---
+command -v node &>/dev/null && node "$SCRIPT_DIR/strip-cognito-defaults.js"
+
 # --- Clean up .gitignore (remove internal/unused patterns) ---
 if [[ -f .gitignore ]]; then
   sed -i -e '/packages\/frontend\/src\/services\/merlin\//d' \
@@ -347,35 +354,35 @@ fi
 
 # --- Summary ---
 echo ""
-echo ">>> Files remaining in public repo:"
-find . -maxdepth 2 -not -path './.git/*' -not -path './.git' -not -path './node_modules/*' | sort | head -60
-echo ""
-
 TOTAL_FILES=$(find . -type f -not -path './.git/*' -not -path './node_modules/*' | wc -l)
-echo "Total files: $TOTAL_FILES"
+echo ">>> $TOTAL_FILES files remaining in public repo"
 
 # --- Dry run: copy to output or just stop ---
 if [[ "$DRY_RUN" == "true" ]]; then
   if [[ -n "$OUTPUT_DIR" ]]; then
-    echo ""
-    echo ">>> Copying filtered tree to $OUTPUT_DIR..."
     mkdir -p "$OUTPUT_DIR"
     rsync -a --exclude='.git' --exclude='node_modules' "$WORK_DIR/repo/" "$OUTPUT_DIR/"
     echo "Done! Inspect: $OUTPUT_DIR"
   else
-    echo ""
-    echo "Dry run complete. No changes pushed."
-    echo "Use --output DIR to save the filtered tree for inspection."
+    echo "Dry run complete. Use --output DIR to save filtered tree."
   fi
   exit 0
 fi
 
 # --- Safety check: verify internal files were excluded before pushing ---
 echo ">>> Verifying internal files are excluded..."
-for p in infra/ internal/ packages/tara-auth/ .githooks/ devbox.yaml defaults.yaml; do
+for p in infra/ internal/ packages/tara-auth/ .githooks/ devbox.yaml defaults.yaml scripts/smoke-test.sh; do
   [[ -e "$p" ]] && { echo "ABORTING: $p still present! Check .opensource-exclude"; exit 1; }
 done
 echo "  All sensitive paths verified excluded."
+
+# Verify no Cognito pool IDs leaked into public code
+if grep -rq 'eu-west-1_wlRtuLkG2\|64tf6nf61n6sgftqif6q975hka' --include='*.ts' --include='*.tsx' .; then
+  echo "ABORTING: Cognito dev IDs found in source files! Check sync cleanup."
+  grep -rn 'eu-west-1_wlRtuLkG2\|64tf6nf61n6sgftqif6q975hka' --include='*.ts' --include='*.tsx' .
+  exit 1
+fi
+echo "  No Cognito dev IDs in source files."
 
 # --- Push to public repository ---
 echo ">>> Pushing to public repository: $PUBLIC_REPO"
@@ -389,7 +396,4 @@ git commit -m "sync: update from internal repository
 Automated sync from askend-lab/hak internal repository.
 Excludes internal tooling, infrastructure, and backend packages." --allow-empty
 git push --force origin "$BRANCH"
-
-echo ""
-echo "=== Sync complete! ==="
-echo "Public repo updated: $PUBLIC_REPO (branch: $BRANCH)"
+echo "=== Sync complete: $PUBLIC_REPO (branch: $BRANCH) ==="
