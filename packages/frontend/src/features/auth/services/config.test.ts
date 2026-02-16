@@ -120,10 +120,10 @@ describe("getLogoutUrl", () => {
 });
 
 describe("getTaraLoginUrl", () => {
-  it("should return TARA login URL from env var (empty default)", async () => {
+  it("should return TARA login URL (localhost default via proxy)", async () => {
     const { getTaraLoginUrl } = await import("./config");
     const url = getTaraLoginUrl();
-    expect(url).toBe("");
+    expect(url).toBe("/auth/tara/start");
   });
 });
 
