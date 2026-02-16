@@ -10,6 +10,7 @@ Fix implemented: _shutdown_requested flag + signal.SIGTERM handler.
 """
 
 import json
+import os
 import signal
 import subprocess
 import sys
@@ -66,7 +67,7 @@ print("CLEAN_EXIT")
             [sys.executable, "-c", script],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd="/home/alex/users/luna/hak/packages/merlin-worker",
+            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         )
 
         # Give worker time to start and enter poll loop
