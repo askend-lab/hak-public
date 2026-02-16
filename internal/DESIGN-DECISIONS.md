@@ -87,6 +87,46 @@ TARA использует стандартный OAuth2 Authorization Code flow:
 ### merlin_audio S3 encryption/versioning (#D1, #D2)
 **Решение:** Deferred. Контент публичный и regenerable. Encryption at rest бесплатен, но требует bucket recreation. Versioning не нужен для cache-keyed файлов.
 
+### Auto-approve + auto-merge PRs (#SEC-04)
+**Решение:** By design. Репозиторий приватный с одним разработчиком. Auto-approve + auto-merge ускоряет CI/CD workflow. Пересмотреть при росте команды или переходе на public repo.
+
+### access_token / id_token cookies не HttpOnly (#SEC-03)
+**Решение:** By design. Фронтенд читает access/id token из `document.cookie` для формирования `Authorization` header.
+
+Mitigation layers:
+1. Refresh token — HttpOnly (JS не может его прочитать)
+2. Access/id tokens short-lived (1 час)
+3. CSP блокирует inline scripts и external script sources
+4. CSRF origin validation на всех POST endpoints
+5. SameSite=Lax предотвращает отправку cookies при cross-site requests
+6. HSTS preload предотвращает downgrade-атаки
+
+BFF-паттерн (Backend-for-Frontend) рассмотрен и отклонён — добавляет latency и сложность без значимой выгоды при наличии вышеуказанных mitigations.
+
+### refreshHandler возвращает токены в JSON body (#SEC-05)
+**Решение:** By design. Consistent с `exchangeCodeHandler`. Токены уже доступны через non-HttpOnly cookies. Endpoint защищён CSRF origin validation. Дополнительной экспозиции нет.
+
+### Публичные API без аутентификации — merlin-api, vabamorf-api (#C2)
+**Решение:** By design. Эти API обслуживают основной learning experience и должны быть доступны без логина. Защита:
+- API Gateway throttling (merlin: 2/s burst 4, vabamorf: 5/s)
+- AWS WAF rate limiting (100 req/5 min per IP)
+- Input validation на всех endpoints
+- Cache-key дедупликация предотвращает повторную генерацию
+
+### S3 audio без CloudFront (#SEC-01b)
+**Решение:** Evaluated and rejected. Причина: synthesis polling flow требует мгновенной доступности файла после `put_object` в S3. CloudFront — CDN с edge caching, что вносит задержку при первом запросе (cache miss → origin fetch). Direct S3 URL доступен мгновенно.
+
+Audio контент:
+- Non-sensitive (публичный образовательный материал)
+- Hash-keyed URLs (непредсказуемые)
+- CORS ограничен на app domains (fix SEC-01a, 2026-02-16)
+- S3 bucket policy — read-only для `*` (by design #15)
+
+### ECR MUTABLE tag policy (#SEC-02)
+**Решение:** ECR repository `merlin-worker` использует `MUTABLE` tags. CI pushит `:latest` при каждом билде, ECS task definition ссылается на `:latest`. `scan_on_push = true` обеспечивает сканирование каждого нового image.
+
+IMMUTABLE tags рассмотрены и отклонены — потребовали бы динамического обновления ECS task definition с SHA тегом при каждом деплое, что усложняет CI/CD без значимой выгоды для single-developer проекта.
+
 ---
 
-*Последнее обновление: 2026-02-15 (Sam, security audit round 2 — CORS fallback, log retention, merlin_audio decisions)*
+*Последнее обновление: 2026-02-16 (Sam, security audit round 3 — auto-approve, token cookies, CloudFront rejection, ECR mutability, public APIs)*
