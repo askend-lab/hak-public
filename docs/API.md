@@ -127,7 +127,7 @@ Both Vabamorf and Merlin expose `/health`: `{"status": "ok", "version": "1.0.0"}
 
 ## Authentication (TARA)
 
-Estonian eID authentication via `tara-auth` Lambda + AWS Cognito. Supports Smart-ID and Mobile-ID.
+Estonian eID authentication via AWS Cognito. Supports Smart-ID and Mobile-ID.
 
 | Method | Path | Description |
 |--------|------|-------------|
