@@ -57,8 +57,8 @@
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "@typescript-eslint/parser": "^8.55.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.16",
     "axe-core": "^4.11.1",
@@ -70,7 +70,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
+    "eslint-plugin-react-refresh": "^0.5.0",
     "happy-dom": "^20.0.11",
     "i18next": "^25.7.3",
     "jest": "^30.2.0",
@@ -86,7 +86,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.15.0",
+    "typescript-eslint": "^8.56.0",
     "vite": "^7.3.1",
     "vitest": "^4.0.16"
   }
