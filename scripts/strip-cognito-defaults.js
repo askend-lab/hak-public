@@ -10,11 +10,14 @@ const path = require('path');
 
 const authDir = 'packages/frontend/src/features/auth/services';
 
-// 1. config.ts — replace isLocalDev() ternaries with empty string defaults
+// 1. config.ts — strip hardcoded Cognito dev defaults
 const configPath = path.join(authDir, 'config.ts');
 if (fs.existsSync(configPath)) {
   let c = fs.readFileSync(configPath, 'utf8');
+  // Pattern A: isLocalDev() ternary — (isLocalDev() ? "value" : "")
   c = c.replace(/\(isLocalDev\(\) \? "[^"]*" : ""\)/g, '""');
+  // Pattern B: requireEnv() with localDefault — requireEnv("KEY", "value")
+  c = c.replace(/requireEnv\("([^"]+)",\s*"[^"]+"\)/g, 'requireEnv("$1", "")');
   fs.writeFileSync(configPath, c);
   console.log('  Stripped Cognito dev defaults from config.ts');
 }
