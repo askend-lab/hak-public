@@ -127,6 +127,18 @@ describe("getTaraLoginUrl", () => {
   });
 });
 
+describe("localhost auth defaults", () => {
+  it("should default AUTH_API_URL to /auth on localhost", async () => {
+    const { AUTH_API_URL } = await import("./config");
+    expect(AUTH_API_URL).toBe("/auth");
+  });
+
+  it("should default TARA_LOGIN_URL to /auth/tara/start on localhost", async () => {
+    const { TARA_LOGIN_URL } = await import("./config");
+    expect(TARA_LOGIN_URL).toBe("/auth/tara/start");
+  });
+});
+
 describe("exchangeCodeForTokens", () => {
   beforeEach(() => {
     sessionStorage.clear();
