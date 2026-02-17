@@ -1,5 +1,7 @@
 # DNS record for website - pointing to CloudFront
+# Skipped when manage_dns=false (external domain like eki.ee — DNS managed by domain owner)
 resource "aws_route53_record" "website" {
+  count   = var.manage_dns ? 1 : 0
   zone_id = data.terraform_remote_state.infra.outputs.route53_zone_id
   name    = local.domain_name
   type    = "A"
@@ -11,7 +13,7 @@ resource "aws_route53_record" "website" {
   }
 }
 
-# DNS validation records for ACM certificate
+# DNS validation records for ACM certificate (main domain — always managed in Route53)
 resource "aws_route53_record" "cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.website.domain_validation_options : dvo.domain_name => {

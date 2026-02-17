@@ -33,6 +33,18 @@ variable "terraform_locks_table" {
   type        = string
 }
 
+variable "custom_domain" {
+  description = "Custom domain name override (e.g. haaldusabiline.eki.ee). When set, overrides the computed domain."
+  type        = string
+  default     = ""
+}
+
+variable "manage_dns" {
+  description = "Whether Terraform manages DNS records. Set to false for external domains (e.g. eki.ee)"
+  type        = bool
+  default     = true
+}
+
 variable "slack_webhook_url" {
   description = "Slack webhook URL for CloudWatch alerts (create at https://api.slack.com/apps)"
   type        = string
