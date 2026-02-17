@@ -169,6 +169,16 @@
 
 - [ ] **Monitoring / Observability** — достаточно ли метрик? Алерты настроены? Dashboards полезны? Можно ли быстро найти причину проблемы? Distributed tracing? Log aggregation?
 
+### 💰 Финансы и закупки
+
+- [ ] **Финансовый директор / CFO** — общая стоимость владения (TCO). Месячные расходы AWS, прогноз роста при масштабировании (100/1000/10000 пользователей). Лицензионные расходы (Serverless v4? Sentry? домен?). Стоимость человеко-часов на поддержку. ROI от open source. Сравнение cloud vs self-hosted.
+
+- [ ] **Procurement / закупщик инфраструктуры** — если нужно мигрировать с AWS: on-premise requirements, минимальные серверные мощности, GPU для TTS (Merlin), storage для аудио, сетевые требования. Что если гос. организация требует размещение в Эстонии? Есть ли зависимость от конкретного облачного провайдера (vendor lock-in)?
+
+- [ ] **Capacity planner** — текущие лимиты: Lambda concurrency, DynamoDB throughput, SQS message rate, ECS task count, S3 request rate. При каком числе пользователей каждый лимит станет проблемой? Есть ли bottleneck, который не масштабируется линейно?
+
+- [ ] **Budget auditor** — отслеживание расходов: есть ли AWS Budget alerts? Cost anomaly detection? Tagging strategy для cost allocation? Reserved instances vs on-demand? Savings Plans? Может ли один пользователь случайно сгенерировать $1000 счёт?
+
 ---
 
 ## Сводка
