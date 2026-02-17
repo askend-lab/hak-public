@@ -173,7 +173,9 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | C18 | `C18-abuse-spam-prevention.md` | Kuritarvituse ennetamine | 17 | 1 | 16 |
 | C19 | `C19-documentation-completeness.md` | Dokumentatsiooni täielikkus | 27 | 2 | 25 |
 | C20 | `C20-ci-cd-pipeline.md` | CI/CD Pipeline | 25 | 11 | 14 |
-| | **Kokku** | | **452** | **172** | **280** |
+| C21 | `C21-linguistic-accuracy.md` | Keeleline täpsus | 26 | 8 | 18 |
+| C22 | `C22-production-readiness.md` | Tootmisvalmidus (P0–P2) | 37 | 0 | 37 |
+| | **Kokku** | | **515** | **180** | **335** |
 
 ---
 
@@ -182,6 +184,6 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | Kategooria | Failid | Leide/Punkte | ✅ Hea | ⚠️ Probleem |
 |------------|--------|-------------|--------|-------------|
 | Rolliauditid (#1–#25) | 25 | 587 | 217 | 362 |
-| Kontrollnimekirjad (C01–C20) | 20 | 452 | 172 | 280 |
+| Kontrollnimekirjad (C01–C22) | 22 | 515 | 180 | 335 |
 | Koondkokkuvõte (00-summary) | 1 | — | — | — |
-| **Kokku** | **46** | **1039** | **389** | **642** |
+| **Kokku** | **48** | **1102** | **397** | **697** |
