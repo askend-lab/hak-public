@@ -170,7 +170,10 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | C15 | `C15-vendor-lockin.md` | Vendor Lock-in / Migratsioon | 18 | 6 | 12 |
 | C16 | `C16-cfo-tco.md` | CFO / TCO analüüs | 9 | 2 | 7 |
 | C17 | `C17-api-developer-experience.md` | API / Arendajakogemus | 21 | 4 | 17 |
-| | **Kokku** | | **383** | **158** | **225** |
+| C18 | `C18-abuse-spam-prevention.md` | Kuritarvituse ennetamine | 17 | 1 | 16 |
+| C19 | `C19-documentation-completeness.md` | Dokumentatsiooni täielikkus | 27 | 2 | 25 |
+| C20 | `C20-ci-cd-pipeline.md` | CI/CD Pipeline | 25 | 11 | 14 |
+| | **Kokku** | | **452** | **172** | **280** |
 
 ---
 
@@ -179,6 +182,6 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | Kategooria | Failid | Leide/Punkte | ✅ Hea | ⚠️ Probleem |
 |------------|--------|-------------|--------|-------------|
 | Rolliauditid (#1–#25) | 25 | 587 | 217 | 362 |
-| Kontrollnimekirjad (C01–C17) | 17 | 383 | 158 | 225 |
+| Kontrollnimekirjad (C01–C20) | 20 | 452 | 172 | 280 |
 | Koondkokkuvõte (00-summary) | 1 | — | — | — |
-| **Kokku** | **43** | **970** | **375** | **587** |
+| **Kokku** | **46** | **1039** | **389** | **642** |
