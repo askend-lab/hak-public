@@ -175,7 +175,10 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | C20 | `C20-ci-cd-pipeline.md` | CI/CD Pipeline | 25 | 11 | 14 |
 | C21 | `C21-linguistic-accuracy.md` | Keeleline täpsus | 26 | 8 | 18 |
 | C22 | `C22-production-readiness.md` | Tootmisvalmidus (P0–P2) | 37 | 0 | 37 |
-| | **Kokku** | | **515** | **180** | **335** |
+| C23 | `C23-eu-accessibility-directive.md` | EL-i ligipääsetavuse direktiiv | 30 | 13 | 17 |
+| C24 | `C24-testing-strategy.md` | Testimisstrateegia | 26 | 11 | 15 |
+| C25 | `C25-open-source-compliance.md` | Avatud lähtekoodi vastavus | 25 | 7 | 18 |
+| | **Kokku** | | **596** | **211** | **385** |
 
 ---
 
@@ -184,6 +187,6 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | Kategooria | Failid | Leide/Punkte | ✅ Hea | ⚠️ Probleem |
 |------------|--------|-------------|--------|-------------|
 | Rolliauditid (#1–#25) | 25 | 587 | 217 | 362 |
-| Kontrollnimekirjad (C01–C22) | 22 | 515 | 180 | 335 |
+| Kontrollnimekirjad (C01–C25) | 25 | 596 | 211 | 385 |
 | Koondkokkuvõte (00-summary) | 1 | — | — | — |
-| **Kokku** | **48** | **1102** | **397** | **697** |
+| **Kokku** | **51** | **1183** | **428** | **747** |
