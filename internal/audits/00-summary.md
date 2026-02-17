@@ -146,3 +146,35 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | 23 | `23-competitor-analyst.md` | Konkurendianalüütik |
 | 24 | `24-data-analyst.md` | Andmeanalüütik |
 | 25 | `25-translator.md` | Vandetõlk / tõlkija |
+
+---
+
+## Tehnilised kontrollnimekirjad (Checklists)
+
+| # | Fail | Teema | Punktid | ✅ | ⚠️ |
+|---|------|-------|---------|----|----|
+| C01 | `C01-gdpr-privacy.md` | GDPR / Privaatsus | 36 | 22 | 14 |
+| C02 | `C02-seo.md` | SEO | 22 | 9 | 13 |
+| C03 | `C03-finops-cost.md` | FinOps / Kuluanalüüs | 25 | 14 | 11 |
+| C04 | `C04-dynamodb-database.md` | DynamoDB / Andmebaas | 24 | 13 | 11 |
+| C05 | `C05-disaster-recovery.md` | Disaster Recovery | 20 | 7 | 13 |
+| C06 | `C06-monitoring-observability.md` | Monitooring / Jälgitavus | 22 | 7 | 15 |
+| C07 | `C07-content-copywriter.md` | Sisu / Copywriter | 22 | 10 | 12 |
+| C08 | `C08-senior-architect.md` | Vanemarhitekt | 25 | 11 | 14 |
+| C09 | `C09-capacity-planner.md` | Võimsuse planeerimine | 18 | 9 | 9 |
+| C10 | `C10-iske-iso27001.md` | ISKE / ISO 27001 | 28 | 11 | 17 |
+| C11 | `C11-legal-tos.md` | Õiguslik / Kasutustingimused | 22 | 8 | 14 |
+| C12 | `C12-junior-developer.md` | Junior-arendaja onboarding | 26 | 10 | 16 |
+| C13 | `C13-budget-auditor.md` | Eelarve audiitor | 17 | 4 | 13 |
+| | **Kokku** | | **307** | **135** | **172** |
+
+---
+
+## Kogu auditi kokkuvõte
+
+| Kategooria | Failid | Leide/Punkte | ✅ Hea | ⚠️ Probleem |
+|------------|--------|-------------|--------|-------------|
+| Rolliauditid (#1–#25) | 25 | 587 | 217 | 362 |
+| Kontrollnimekirjad (C01–C13) | 13 | 307 | 135 | 172 |
+| Koondkokkuvõte (00-summary) | 1 | — | — | — |
+| **Kokku** | **39** | **894** | **352** | **534** |
