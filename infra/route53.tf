@@ -13,16 +13,15 @@ resource "aws_route53_record" "website" {
   }
 }
 
-# DNS validation records for ACM certificate
-# Skipped when manage_dns=false — output validation records for external DNS owner instead
+# DNS validation records for ACM certificate (main domain — always managed in Route53)
 resource "aws_route53_record" "cert_validation" {
-  for_each = var.manage_dns ? {
+  for_each = {
     for dvo in aws_acm_certificate.website.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  } : {}
+  }
 
   allow_overwrite = true
   name            = each.value.name

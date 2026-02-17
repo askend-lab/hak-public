@@ -224,8 +224,25 @@ resource "aws_acm_certificate" "website" {
 }
 
 resource "aws_acm_certificate_validation" "website" {
-  count                   = var.manage_dns ? 1 : 0
   provider                = aws.us_east_1
   certificate_arn         = aws_acm_certificate.website.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
+
+# ACM Certificate for custom domain (e.g. haaldusabiline.eki.ee)
+# Phase 1: cert is created and pending DNS validation
+# Phase 2: after domain owner adds CNAME, cert validates → add as CloudFront alias
+resource "aws_acm_certificate" "custom_domain" {
+  count             = var.custom_domain != "" ? 1 : 0
+  provider          = aws.us_east_1
+  domain_name       = var.custom_domain
+  validation_method = "DNS"
+
+  tags = merge(local.common_tags, {
+    Name = var.custom_domain
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
