@@ -12,8 +12,10 @@ locals {
   app_name = "hak"
   region   = "eu-west-1"
 
-  # Domain logic: dev → hak-dev.example.com, prod → hak.example.com
-  domain_name = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
+  # Domain logic: custom_domain overrides computed name (for external domains like eki.ee)
+  # Default: dev → hak-dev.example.com, prod → hak.example.com
+  computed_domain = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
+  domain_name     = var.custom_domain != "" ? var.custom_domain : local.computed_domain
 
   # API Gateway domains (no public DNS — extracted from CloudFormation outputs)
   # Use HttpApiUrl which exists in all stack versions (ApiEndpoint is missing in some prod stacks)

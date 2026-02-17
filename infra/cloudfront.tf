@@ -4,7 +4,7 @@ resource "aws_cloudfront_response_headers_policy" "security" {
 
   security_headers_config {
     content_security_policy {
-      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.askend-lab.com https://*.amazonaws.com https://*.amazoncognito.com https://*.ingest.sentry.io; media-src 'self' https://*.amazonaws.com https://*.askend-lab.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.askend-lab.com https://*.eki.ee https://*.amazonaws.com https://*.amazoncognito.com https://*.ingest.sentry.io; media-src 'self' https://*.amazonaws.com https://*.askend-lab.com https://*.eki.ee; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
       override = true
     }
 
@@ -224,6 +224,7 @@ resource "aws_acm_certificate" "website" {
 }
 
 resource "aws_acm_certificate_validation" "website" {
+  count                   = var.manage_dns ? 1 : 0
   provider                = aws.us_east_1
   certificate_arn         = aws_acm_certificate.website.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
