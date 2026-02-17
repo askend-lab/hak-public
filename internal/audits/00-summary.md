@@ -166,7 +166,11 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | C11 | `C11-legal-tos.md` | Õiguslik / Kasutustingimused | 22 | 8 | 14 |
 | C12 | `C12-junior-developer.md` | Junior-arendaja onboarding | 26 | 10 | 16 |
 | C13 | `C13-budget-auditor.md` | Eelarve audiitor | 17 | 4 | 13 |
-| | **Kokku** | | **307** | **135** | **172** |
+| C14 | `C14-pentester-redteam.md` | Pentester / Red Team (OWASP) | 28 | 11 | 17 |
+| C15 | `C15-vendor-lockin.md` | Vendor Lock-in / Migratsioon | 18 | 6 | 12 |
+| C16 | `C16-cfo-tco.md` | CFO / TCO analüüs | 9 | 2 | 7 |
+| C17 | `C17-api-developer-experience.md` | API / Arendajakogemus | 21 | 4 | 17 |
+| | **Kokku** | | **383** | **158** | **225** |
 
 ---
 
@@ -175,6 +179,6 @@ Järgnevad probleemid tuvastati **mitmes auditis**, mis näitab nende kõrget pr
 | Kategooria | Failid | Leide/Punkte | ✅ Hea | ⚠️ Probleem |
 |------------|--------|-------------|--------|-------------|
 | Rolliauditid (#1–#25) | 25 | 587 | 217 | 362 |
-| Kontrollnimekirjad (C01–C13) | 13 | 307 | 135 | 172 |
+| Kontrollnimekirjad (C01–C17) | 17 | 383 | 158 | 225 |
 | Koondkokkuvõte (00-summary) | 1 | — | — | — |
-| **Kokku** | **39** | **894** | **352** | **534** |
+| **Kokku** | **43** | **970** | **375** | **587** |
