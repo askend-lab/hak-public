@@ -99,6 +99,78 @@
 
 ---
 
+## 🎯 Запланированные аудиты (новые перспективы)
+
+### 👤 Пользовательские роли
+
+- [ ] **Ученик-новичок** — человек, который плохо знает эстонский язык и пришёл учиться. Понятен ли интерфейс? Есть ли onboarding? Можно ли пользоваться без инструкции? Ошибки пугают или помогают? Мотивирует ли платформа продолжать?
+
+- [ ] **Учитель эстонского языка** — использует платформу для подготовки материалов, задаёт тексты ученикам, проверяет произношение. Удобно ли создавать задания? Можно ли шарить задачи ученикам? Есть ли bulk-операции? Экспорт для класса?
+
+- [ ] **Продвинутый пользователь** — знает эстонский хорошо, использует для проверки произношения сложных слов, морфологический анализ. Power-user flow: горячие клавиши, быстрая навигация, batch-обработка.
+
+- [ ] **Родитель ребёнка** — ребёнок учит эстонский в школе, родитель помогает. Безопасность контента, простота использования, отсутствие отвлекающих элементов, возможность контроля прогресса.
+
+- [ ] **Пожилой пользователь** — пенсионер, переехавший в Эстонию. Крупный шрифт, контраст, простые инструкции, минимум технических действий, толерантность к ошибкам.
+
+- [ ] **Мобильный пользователь** — использует только телефон. Responsive, touch-friendly, быстрая загрузка на 3G, offline-режим, удобство ввода текста на маленьком экране.
+
+- [ ] **Пользователь с инвалидностью** — screen reader, keyboard-only, low vision, motor impairment. WCAG 2.1 AA compliance, focus management, ARIA, альтернативные способы взаимодействия.
+
+### 🏛️ Государственные и институциональные роли
+
+- [ ] **Чиновник Министерства образования** — оценивает платформу для включения в гос. программу. Соответствие стандартам, масштабируемость, стоимость, безопасность данных граждан, accessibility compliance, языковая политика.
+
+- [ ] **GDPR/Privacy аудитор** — проверка на соответствие защите персональных данных. Cookie consent, data minimization, right to deletion, data processing agreements, третьи стороны (Sentry, Google Fonts, AWS), хранение PII.
+
+- [ ] **Юридический аудит** — Terms of Service, Privacy Policy, лицензирование контента, open source compliance (MIT), ответственность за качество TTS-произношения, доступность для публичного сектора.
+
+- [ ] **Аудитор информационной безопасности (ISKE/ISO 27001)** — эстонский стандарт ISKE для гос. систем. Классификация данных, управление доступом, журналирование, incident response, backup/restore.
+
+### 🔧 Технические роли
+
+- [ ] **Open Source контрибьютор** — первый раз видит проект. README понятен? Можно ли запустить локально за 15 минут? Contributing guide? Тесты проходят? Code style понятен? Issue templates?
+
+- [ ] **Junior-разработчик** — только что пришёл в команду. Onboarding experience: структура проекта, документация, naming conventions, паттерны. Сколько времени до первого PR?
+
+- [ ] **Senior архитектор** — оценивает масштабируемость, maintainability, tech debt. Правильные ли абстракции? Где bottlenecks при росте? Что сломается первым при 10x нагрузке?
+
+- [ ] **Performance-инженер** — load testing, profiling, bundle size, Time to Interactive, Core Web Vitals, API latency p99, DynamoDB capacity planning, Lambda cold starts.
+
+- [ ] **Злобный DevOps** — ищет слабые места в CI/CD, инфраструктуре, мониторинге. Что случится если Lambda упадёт? Если DynamoDB throttle? Если S3 недоступен? Disaster recovery? Rollback? Нет ли single points of failure?
+
+- [ ] **Database архитектор** — схема DynamoDB, partition key design, access patterns, hot partitions, item size limits, GSI стратегия, миграции, backup/restore.
+
+- [ ] **API consumer / Developer Experience** — разработчик, который хочет использовать HAK API. Документация? OpenAPI spec? SDK? Rate limits понятны? Error messages полезны? Backward compatibility?
+
+### 🎭 Adversarial / Stress-testing
+
+- [ ] **Пентестер / Red team** — активная попытка взлома. SQL injection, XSS, CSRF, IDOR, privilege escalation, API abuse, DDoS, supply chain attack через dependencies.
+
+- [ ] **Абьюзер / Спамер** — пытается злоупотребить TTS для генерации контента в промышленных масштабах. Rate limit bypass, account farming, audio scraping, cost amplification.
+
+- [ ] **Конкурентный аналитик** — сравнение с Keeleklikk, Speakly, Lingvist, Google Translate TTS. Что HAK делает лучше/хуже? Уникальные features? Positioning?
+
+- [ ] **Troll / вредный пользователь** — вводит оскорбительный текст, пытается генерировать неприемлемый аудио-контент, шарит вредоносные задачи. Content moderation? Abuse reporting?
+
+### 📐 Качество и контент
+
+- [ ] **Лингвист / фонетик** — точность морфологического анализа, качество TTS произношения, обработка исключений (иностранные слова, аббревиатуры, числа, даты). Vabamorf coverage.
+
+- [ ] **UX/UI дизайнер** — визуальный дизайн, consistency, spacing, typography, color system, interaction patterns, micro-animations, empty states, loading states, error states.
+
+- [ ] **Контент-стратег / copywriter** — тон голоса, error messages, microcopy, onboarding тексты, empty states, помощь в интерфейсе. Всё на эстонском? Качество переводов?
+
+- [ ] **SEO-специалист** — для hak-public: meta tags, structured data, sitemap, robots.txt, Open Graph, page speed, indexability. Для SPA: SSR/prerender?
+
+- [ ] **Cost analyst / FinOps** — AWS billing breakdown. Что стоит дороже всего? Lambda vs Fargate. S3 storage growth. DynamoDB pricing. CloudFront transfer. Можно ли оптимизировать?
+
+- [ ] **Disaster recovery / Business continuity** — что если AWS eu-west-1 упадёт? RTO/RPO? Backup strategy? Restore procedure? Runbook для инцидентов?
+
+- [ ] **Monitoring / Observability** — достаточно ли метрик? Алерты настроены? Dashboards полезны? Можно ли быстро найти причину проблемы? Distributed tracing? Log aggregation?
+
+---
+
 ## Сводка
 
 | Аудит | Findings | Resolved | Open |
