@@ -1,161 +1,161 @@
-# Аудит: Ученик-новичок (Õppija)
+# Audit: Algaja õppija (Õppija)
 
-**Перспектива:** Человек, который плохо знает эстонский язык и пришёл учиться произношению.
-**Аудитор:** Luna | **Дата:** 2026-02-17
-**Метод:** Анализ исходного кода — весь user flow от первого визита до регулярного использования.
-
----
-
-## Профиль пользователя
-
-Мария, 35 лет, переехала в Эстонию из Украины. Знает основы эстонского (A2), но произношение слабое — коллеги не всегда понимают. Хочет тренировать произношение дома. Не очень уверенный пользователь компьютера, телефон использует активно.
+**Vaatenurk:** Inimene, kes valdab eesti keelt halvasti ja tuli õppima hääldust.
+**Audiitor:** Luna | **Kuupäev:** 2026-02-17
+**Meetod:** Lähtekoodi analüüs — kogu kasutajateekond esimesest külastusest regulaarse kasutamiseni.
 
 ---
 
-## Путь пользователя (User Journey)
+## Kasutajaprofiil
 
-### Этап 1: Первый визит
-
-- [x] **1.1. Приложение загружается без авторизации** — синтез доступен сразу, не требует логина. Это правильно: снижает барьер входа. Ученик может сразу начать пробовать.
-
-- [x] **1.2. Есть выбор роли при первом визите** — `RoleSelectionPage` показывает 3 карточки: Õppija, Õpetaja, Uurija. Для новичка очевидно, что надо выбрать "Õppija". Текст описания понятный: "Sisesta lause ja kuula, kuidas see kõlab."
-
-- [x] **1.3. Onboarding wizard запускается после выбора роли** — 5 шагов для ученика: ввод текста → прослушивание → варианты произношения → добавление предложений → сохранение в задание. Хорошая последовательность.
-
-- [ ] **1.4. Onboarding wizard не объясняет, что такое "hääldusvariant"** — шаг 3 говорит "Kliki sõnal, et näha erinevaid häälduse variante", но для новичка непонятно, зачем нужны варианты произношения и что с ними делать. Нет контекста: "Eesti keeles on sõnadel mitu hääldusviisi. Siin saad valida sobiva."
-  **Влияние:** Средний — ученик может пропустить важную функцию или запутаться.
-
-- [ ] **1.5. Wizard можно пропустить случайным кликом** — клик по overlay (`wizard__overlay onClick={onSkip}`) закрывает весь wizard. Для неуверенного пользователя, который случайно кликнул мимо tooltip, wizard исчезает навсегда. `saveToStorage(true, ...)` записывает completed=true.
-  **Влияние:** Высокий — ученик теряет onboarding. Кнопка "Abi ja juhend" в header позволяет вернуться к выбору роли, но это неочевидно.
-
-- [ ] **1.6. Нет возможности повторить wizard без сброса** — `resetOnboarding` есть в коде, но не экспонирован в UI. Кнопка "?" в header (`onHelpClick`) перенаправляет на `/role-selection`, что заново запускает wizard, но ученик не знает об этом.
-  **Влияние:** Средний — нет явной кнопки "Пройти обучение заново".
-
-### Этап 2: Основное взаимодействие (Синтез)
-
-- [x] **2.1. Заголовок страницы понятный** — "Muuda tekst kõneks" с подзаголовком "Sisesta lause või sõna, et kuulata selle hääldust ja uurida variante". Для A2 ученика вполне читаемо.
-
-- [x] **2.2. Текстовое поле готово к вводу** — `SentenceSynthesisItem` в режиме `input` показывает поле ввода с кнопкой Play. Интуитивно понятно.
-
-- [ ] **2.3. Нет placeholder текста в поле ввода** — `placeholder` prop передаётся, но не устанавливается по умолчанию в `SynthesisView`. Поле ввода пустое без подсказки. Новичок может не понимать, что именно вводить — слово? предложение? абзац?
-  **Влияние:** Средний — добавить placeholder типа "Nt: Tere, kuidas läheb?" помогло бы сориентироваться.
-
-- [ ] **2.4. Нет примеров или быстрых фраз для начинающих** — после wizard ученик видит пустое поле. Нет кнопки "Proovi näidislauset" или предложенных фраз для тренировки. Опытный пользователь напишет сам, но новичок может застрять.
-  **Влияние:** Высокий — первое впечатление от пустого экрана может быть отталкивающим. Demo sentences устанавливаются только во время wizard (`setDemoSentences`), но после завершения wizard они не сохраняются.
-
-- [x] **2.5. Play кнопка имеет loading state** — `PlayButton` показывает spinner при загрузке и `aria-live="polite"` с текстом "Laadimine..." / "Esitamine". Хорошо для UX и accessibility.
-
-- [ ] **2.6. Нет визуального feedback при ошибке синтеза** — `useSynthesisOrchestrator` при ошибке делает `updateSentence(id, { isLoading: false, isPlaying: false })` и `logger.error`. Пользователь видит, что spinner исчез, но не получает никакого уведомления — кнопка просто возвращается в исходное состояние. Непонятно: не работает? слово неправильное? сервер упал?
-  **Влияние:** Высокий — молчаливые ошибки — один из худших UX-паттернов для новичков. Нужен toast: "Häälduse loomine ebaõnnestus. Proovi uuesti."
-
-- [ ] **2.7. Нет ограничения на ввод и нет подсказки о максимальной длине** — бэкенд ограничивает текст 1000 символами (`MAX_TEXT_LENGTH`), но фронтенд не показывает ни counter символов, ни предупреждение при приближении к лимиту. Ученик может ввести длинный текст, нажать Play и получить молчаливую ошибку.
-  **Влияние:** Средний — добавить character counter и/или предупреждение.
-
-### Этап 3: Изучение произношения (Варианты)
-
-- [ ] **3.1. Меню предложения перегружено для новичка** — `SentenceMenu` показывает 5 пунктов: "Lisa ülesandesse", "Uuri häälduskuju", "Lae alla .wav fail", "Kopeeri tekst", "Eemalda". Для начинающего ученика "Uuri häälduskuju" и ".wav fail" — непонятные термины. Нет иконок для визуальной навигации (кроме chevron и add icon).
-  **Влияние:** Средний — меню функционально, но визуальные подсказки (иконки) помогли бы навигации.
-
-- [ ] **3.2. Ошибка "Variante ei leitud" неинформативна для ученика** — `VARIANTS_STRINGS.NOT_FOUND_DESC`: "Sõna ei leidu eesti keeles või on valesti kirjutatud." Для ученика, который ввёл слово с ошибкой, это не помогает — нет подсказки, как исправить. Нет предложения "Kas mõtlesid: [правильное слово]?"
-  **Влияние:** Средний — для обучающей платформы отсутствие spell-check подсказок — упущенная возможность.
-
-- [x] **3.3. Тег-клик открывает варианты** — клик на слово в предложении открывает панель вариантов. Хороший паттерн — ученик может исследовать каждое слово.
-
-- [ ] **3.4. Нет объяснения, что означают варианты произношения** — когда ученик видит список вариантов (VariantsList), нет пояснения, чем они отличаются. Фонетическая нотация непонятна человеку без лингвистического образования.
-  **Влияние:** Средний — "Vali sobiv hääldusvariant" подразумевает, что ученик знает, какой вариант "подходящий". Нужна хотя бы иконка Play рядом с каждым вариантом для прослушивания.
-
-### Этап 4: Сохранение и организация
-
-- [x] **4.1. Кнопка "Lisa ülesandesse" понятна** — в SynthesisPageHeader показывает количество предложений. Для ученика "ülesanne" = задание, знакомое слово.
-
-- [ ] **4.2. Сохранение требует авторизации, но это не объяснено заранее** — при клике на "Lisa ülesandesse" без авторизации открывается `LoginModal`. Но до клика нет индикации, что эта функция требует логина. Ученик может ввести 10 предложений, нажать "сохранить" и узнать, что нужен аккаунт. Предложения не теряются (сохранены в state), но момент неприятный.
-  **Влияние:** Средний — добавить tooltip или badge "Nõuab sisselogimist" рядом с кнопкой сохранения.
-
-- [ ] **4.3. Login modal не объясняет преимущества авторизации** — текст "Sisene oma Google kontoga, et luua ja hallata ülesandeid" минимален. Для ученика неочевидно: зачем мне задания? что дает аккаунт? Нет bullet-points: "✓ Salvesta harjutused ✓ Jaga õpetajaga ✓ Jätka hiljem".
-  **Влияние:** Низкий — функционально работает, но conversion rate мог бы быть выше с лучшим value proposition.
-
-- [x] **4.4. Два способа авторизации** — TARA (ID-kaart/Mobiil-ID) и Google. Для жителя Эстонии оба знакомы. TARA — primary, Google — secondary. Правильный приоритет.
-
-- [ ] **4.5. После логина нет автоматического возврата к действию** — если ученик нажал "Lisa ülesandesse" → открылся LoginModal → залогинился → redirect на "/" → ученик оказывается на synthesis page, но контекстное меню (добавить в задание) уже закрыто. Нужно снова нажать кнопку.
-  **Влияние:** Низкий — предложения сохраняются в state, но UX прерывается. `pendingTasksViewAccess` обрабатывает redirect в `/tasks`, но не в контекст "добавить в задание".
-
-### Этап 5: Получение задания от учителя (Shared Task)
-
-- [x] **5.1. Shared task доступен без авторизации** — `SharedTaskPage` не требует логина. Ученик получает ссылку от учителя и сразу видит задание.
-
-- [x] **5.2. Banner объясняет контекст** — "Jagatud ülesanne" с описанием "Kopeeri laused, et neid muuta ja uusi versioone luua. Jagamislink kehtib 90 päeva." Понятно и полезно.
-
-- [x] **5.3. Кнопка "Kopeeri" копирует предложения в synthesis** — после клика redirect на `/synthesis` с предзаполненными предложениями. Хороший flow для ученика.
-
-- [ ] **5.4. Ошибка при невалидном share token непонятна** — "Ülesannet ei leitud" с пояснением "Jagamislink võib olla aegunud, tühistatud või vigane." Хорошее описание, но нет кнопки "Tagasi avalehele" или другого действия — ученик оказывается в тупике.
-  **Влияние:** Средний — нет навигации из error state shared task page. Нет ни header с навигацией, ни кнопки возврата.
-
-### Этап 6: Повторное использование
-
-- [x] **6.1. Состояние сохраняется в localStorage** — `useSentenceState` сохраняет предложения между сессиями. Ученик закрыл вкладку — открыл снова — предложения на месте.
-
-- [ ] **6.2. Нет истории или прогресса** — после того как ученик потренировался, нет никакого tracking: сколько слов прослушано, сколько времени потрачено, какие слова были сложными. Для учебной платформы это базовая мотивационная функция.
-  **Влияние:** Высокий — без прогресса ученику сложно оценить свои усилия и мотивировать себя продолжать.
-
-- [ ] **6.3. Нет напоминаний или рекомендаций** — платформа пассивна: ученик должен сам решить, что тренировать. Нет "Sõnad, mida peaksid harjutama", нет daily goals, нет streak counter.
-  **Влияние:** Средний — для MVP это нормально, но для обучающей платформы retention будет низким.
-
-### Этап 7: Accessibility и удобство
-
-- [x] **7.1. Skip link присутствует** — "Liigu põhisisu juurde" в `App.tsx`. Стандартная accessibility практика.
-
-- [x] **7.2. ARIA labels на эстонском** — "Sulge juhend", "Eelmine samm", "Järgmine samm", "Lohista järjestamiseks", "Rohkem valikuid". Правильный язык для целевой аудитории.
-
-- [ ] **7.3. PlayButton aria-labels на английском** — `getAriaLabel()` возвращает "Loading", "Playing", "Play" — на английском. Все остальные labels на эстонском. Inconsistency для screen reader.
-  **Влияние:** Средний — screen reader пользователь услышит mix языков. Должно быть "Laadimine", "Esitamine", "Esita".
-
-- [ ] **7.4. Drag-and-drop без keyboard альтернативы** — `SentenceSynthesisItem` с `draggable` не имеет keyboard-accessible способа изменить порядок предложений. Для ученика с ограниченными моторными возможностями — нет способа переупорядочить.
-  **Влияние:** Средний — задокументировано в AccessibilityPage как известный недостаток. Но для обучающей платформы публичного сектора это compliance issue.
-
-### Этап 8: Общее впечатление от UI
-
-- [x] **8.1. Cookie consent имеет кнопку "Keeldun"** — GDPR compliant с возможностью отказа.
-
-- [x] **8.2. Privacy policy и Accessibility statement существуют** — `/privacy` и `/accessibility` доступны из footer. Профессионально оформлены на эстонском.
-
-- [ ] **8.3. Footer содержит много информации, не релевантной ученику** — адрес EKI, регистрационный код, номер кеeленыу. Для ученика-иностранца с A2 уровнем — информационный шум. Обратная связь (eki@eki.ee) buried среди контактов.
-  **Влияние:** Низкий — стандартный гос. footer, но ссылка на feedback могла бы быть более prominent.
-
-- [ ] **8.4. Нет языка интерфейса кроме эстонского** — весь UI только на эстонском. Для ученика с A2 уровнем некоторые UI-элементы могут быть непонятны: "Uuri häälduskuju", "Hääldusabiline", "Ligipääsetavuse teatis". Нет переключателя на русский/английский.
-  **Влияние:** Высокий — целевая аудитория (изучающие эстонский) по определению не владеют эстонским в совершенстве. Интерфейс на изучаемом языке — и педагогический приём (immersion), и барьер. Минимум: ключевые error messages и onboarding на русском/английском.
-
-- [ ] **8.5. Нет тёмной темы** — для длительных сессий тренировки (вечером) нет dark mode. Не критично, но modern expectation.
-  **Влияние:** Низкий.
+Maria, 35-aastane, kolis Eestisse Ukrainast. Valdab eesti keele aluseid (A2), kuid hääldus on nõrk — kolleegid ei saa alati aru. Tahab harjutada hääldust kodus. Pole eriti enesekindel arvutikasutaja, telefoni kasutab aktiivselt.
 
 ---
 
-## Сводка
+## Kasutajateekond (User Journey)
 
-| Категория | Всего | ✅ Хорошо | ⚠️ Проблема |
-|-----------|-------|-----------|-------------|
-| Первый визит / Onboarding | 6 | 3 | 3 |
-| Основной синтез | 7 | 2 | 5 |
-| Варианты произношения | 4 | 1 | 3 |
-| Сохранение / Auth | 5 | 2 | 3 |
-| Shared tasks | 4 | 3 | 1 |
-| Повторное использование | 3 | 1 | 2 |
-| Accessibility / UI | 5 | 2 | 3 |
-| Общий UI | 5 | 2 | 3 |
-| **Итого** | **39** | **16** | **23** |
+### Etapp 1: Esimene külastus
 
-## Топ-5 проблем (по влиянию на ученика)
+- [x] **1.1. Rakendus laadib ilma autentimiseta** — süntees on kohe saadaval, sisselogimist pole vaja. See on õige: vähendab sisenemisbarjääri. Õppija saab kohe proovida.
 
-1. **Нет feedback при ошибке синтеза** (#2.6) — ученик не понимает, что произошло
-2. **Нет примеров/быстрых фраз** (#2.4) — пустой экран после onboarding отталкивает
-3. **UI только на эстонском** (#8.4) — целевая аудитория по определению не владеет языком
-4. **Нет прогресса/истории** (#6.2) — нет мотивации продолжать
-5. **Wizard закрывается случайным кликом** (#1.5) — ученик теряет onboarding
+- [x] **1.2. Rolli valik esimesel külastusel** — `RoleSelectionPage` näitab 3 kaarti: Õppija, Õpetaja, Uurija. Algajale on selge, et valida tuleb "Õppija". Kirjelduse tekst on arusaadav: "Sisesta lause ja kuula, kuidas see kõlab."
 
-## Что сделано хорошо
+- [x] **1.3. Onboarding wizard käivitub pärast rolli valikut** — 5 sammu õppijale: teksti sisestus → kuulamine → hääldusvariantide uurimine → lausete lisamine → ülesandesse salvestamine. Hea järjestus.
 
-- Синтез доступен без авторизации — нулевой барьер входа
-- Role-based onboarding wizard — правильный подход
-- Shared tasks работают без логина — учитель→ученик flow бесшовный
-- Cookie consent с кнопкой отказа
-- Хорошие ARIA labels (за исключением PlayButton)
-- Состояние сохраняется между сессиями
+- [ ] **1.4. Onboarding wizard ei selgita, mis on "hääldusvariant"** — samm 3 ütleb "Kliki sõnal, et näha erinevaid häälduse variante", kuid algajale on arusaamatu, milleks on vaja hääldusvariante ja mida nendega teha. Puudub kontekst: "Eesti keeles on sõnadel mitu hääldusviisi. Siin saad valida sobiva."
+  **Mõju:** Keskmine — õppija võib olulise funktsiooni vahele jätta või segadusse sattuda.
+
+- [ ] **1.5. Wizardi saab juhuslikult klõpsuga vahele jätta** — klõps overlay'l (`wizard__overlay onClick={onSkip}`) sulgeb kogu wizardi. Ebakindla kasutaja jaoks, kes klõpsas kogemata tooltip'ist mööda, kaob wizard jäädavalt. `saveToStorage(true, ...)` kirjutab completed=true.
+  **Mõju:** Kõrge — õppija kaotab onboarding'u. Päises olev "Abi ja juhend" nupp võimaldab rolli valikule tagasi minna, kuid see pole ilmne.
+
+- [ ] **1.6. Wizardi ei saa lähtestamata uuesti läbida** — `resetOnboarding` on koodis olemas, kuid pole kasutajaliideses saadaval. Päises olev "?" nupp (`onHelpClick`) suunab `/role-selection` lehele, mis käivitab wizardi uuesti, kuid õppija ei tea sellest.
+  **Mõju:** Keskmine — puudub selge nupp "Läbi juhend uuesti".
+
+### Etapp 2: Põhiline suhtlus (Süntees)
+
+- [x] **2.1. Lehe pealkiri on selge** — "Muuda tekst kõneks" alapealkirjaga "Sisesta lause või sõna, et kuulata selle hääldust ja uurida variante". A2 õppija jaoks piisavalt loetav.
+
+- [x] **2.2. Tekstiväli on sisestuseks valmis** — `SentenceSynthesisItem` režiimis `input` näitab sisestusvälja koos Play-nupuga. Intuitiivselt arusaadav.
+
+- [ ] **2.3. Sisestusväljal puudub placeholder-tekst** — `placeholder` prop edastatakse, kuid `SynthesisView` ei sea vaikeväärtust. Sisestusväli on tühi ilma vihjeta. Algaja ei pruugi aru saada, mida sisestada — sõna? lause? lõik?
+  **Mõju:** Keskmine — placeholder nagu "Nt: Tere, kuidas läheb?" aitaks orienteeruda.
+
+- [ ] **2.4. Puuduvad näited või kiirfraasid algajatele** — pärast wizardi näeb õppija tühja välja. Pole nuppu "Proovi näidislauset" ega soovitatud fraase harjutamiseks. Kogenud kasutaja kirjutab ise, kuid algaja võib takerduda.
+  **Mõju:** Kõrge — tühja ekraani esmamulje võib olla eemaletõukav. Demo laused seatakse ainult wizardi ajal (`setDemoSentences`), kuid pärast wizardi lõpetamist neid ei salvestata.
+
+- [x] **2.5. Play-nupul on laadimise olek** — `PlayButton` näitab laadimisel spinner'it ja `aria-live="polite"` tekstiga "Laadimine..." / "Esitamine". Hea UX ja ligipääsetavuse jaoks.
+
+- [ ] **2.6. Sünteesi vea korral puudub visuaalne tagasiside** — `useSynthesisOrchestrator` teeb vea korral `updateSentence(id, { isLoading: false, isPlaying: false })` ja `logger.error`. Kasutaja näeb, et spinner kadus, kuid ei saa ühtegi teadet — nupp lihtsalt pöördub algolekusse tagasi. Arusaamatu: kas ei tööta? sõna on vale? server kukkus?
+  **Mõju:** Kõrge — vaiksed vead on algajate jaoks üks halvimaid UX-mustreid. Vaja on toast-teadet: "Häälduse loomine ebaõnnestus. Proovi uuesti."
+
+- [ ] **2.7. Puudub sisestuspiirang ja viimase pikkuse vihje** — backend piirab teksti 1000 tähemärgiga (`MAX_TEXT_LENGTH`), kuid frontend ei näita tähemärgiloendust ega hoiatust limiidile lähenemisel. Õppija võib sisestada pika teksti, vajutada Play ja saada vaikse vea.
+  **Mõju:** Keskmine — lisada tähemärgiloendur ja/või hoiatus.
+
+### Etapp 3: Häälduse uurimine (Variandid)
+
+- [ ] **3.1. Lause menüü on algajale ülekoormatud** — `SentenceMenu` näitab 5 punkti: "Lisa ülesandesse", "Uuri häälduskuju", "Lae alla .wav fail", "Kopeeri tekst", "Eemalda". Algajale on "Uuri häälduskuju" ja ".wav fail" arusaamatud terminid. Puuduvad ikoonid visuaalseks navigatsiooniks (peale chevron ja add icon).
+  **Mõju:** Keskmine — menüü on funktsionaalne, kuid visuaalsed vihjed (ikoonid) aitaksid navigeerida.
+
+- [ ] **3.2. Veateade "Variante ei leitud" on algajale mitteinformatiivne** — `VARIANTS_STRINGS.NOT_FOUND_DESC`: "Sõna ei leidu eesti keeles või on valesti kirjutatud." Õppijale, kes sisestas sõna veaga, see ei aita — puudub vihje, kuidas parandada. Pole soovitust "Kas mõtlesid: [õige sõna]?"
+  **Mõju:** Keskmine — õppeplatvormil on õigekirjakontrolli soovituste puudumine kasutamata jäetud võimalus.
+
+- [x] **3.3. Sõnal klõpsamine avab variandid** — klõps sõnal lauses avab variantide paneeli. Hea muster — õppija saab iga sõna uurida.
+
+- [ ] **3.4. Puudub selgitus, mida hääldusvariantid tähendavad** — kui õppija näeb variantide nimekirja (VariantsList), pole selgitust, mille poolest need erinevad. Foneetiline märgistus on lingvistilise hariduseta inimesele arusaamatu.
+  **Mõju:** Keskmine — "Vali sobiv hääldusvariant" eeldab, et õppija teab, milline variant on "sobiv". Vaja oleks vähemalt Play-ikooni iga variandi juures kuulamiseks.
+
+### Etapp 4: Salvestamine ja organiseerimine
+
+- [x] **4.1. Nupp "Lisa ülesandesse" on arusaadav** — SynthesisPageHeader'is näitab lausete arvu. Õppijale on "ülesanne" tuttav sõna.
+
+- [ ] **4.2. Salvestamine nõuab autentimist, kuid seda pole eelnevalt selgitatud** — "Lisa ülesandesse" klõpsamisel ilma autentimiseta avaneb `LoginModal`. Enne klõpsu pole märget, et funktsioon nõuab sisselogimist. Õppija võib sisestada 10 lauset, vajutada "salvesta" ja saada teada, et on vaja kontot. Laused ei kao (salvestatud state'is), aga hetk on ebameeldiv.
+  **Mõju:** Keskmine — lisada tooltip või märge "Nõuab sisselogimist" salvestamisnupu juurde.
+
+- [ ] **4.3. Login modal ei selgita autentimise eeliseid** — tekst "Sisene oma Google kontoga, et luua ja hallata ülesandeid" on minimaalne. Õppijale pole ilmne: miks mul on ülesandeid vaja? mida konto annab? Puuduvad punktid: "✓ Salvesta harjutused ✓ Jaga õpetajaga ✓ Jätka hiljem".
+  **Mõju:** Madal — funktsionaalselt töötab, kuid conversion rate oleks kõrgem parema väärtuspakkumisega.
+
+- [x] **4.4. Kaks autentimisviisi** — TARA (ID-kaart/Mobiil-ID) ja Google. Eesti elanikule on mõlemad tuttavad. TARA — esmane, Google — teisene. Õige prioriteet.
+
+- [ ] **4.5. Pärast sisselogimist pole automaatset tagasipöördumist toiminguni** — kui õppija vajutas "Lisa ülesandesse" → avanes LoginModal → logis sisse → suunati "/" → õppija on sünteesi lehel, kuid kontekstimenüü (lisa ülesandesse) on juba suletud. Tuleb uuesti nuppu vajutada.
+  **Mõju:** Madal — laused säilivad state'is, kuid UX katkeb. `pendingTasksViewAccess` käsitleb suunamist `/tasks` lehele, kuid mitte "lisa ülesandesse" konteksti.
+
+### Etapp 5: Ülesande saamine õpetajalt (Jagatud ülesanne)
+
+- [x] **5.1. Jagatud ülesanne on saadaval ilma autentimiseta** — `SharedTaskPage` ei nõua sisselogimist. Õppija saab lingist õpetajalt ja näeb kohe ülesannet.
+
+- [x] **5.2. Banner selgitab konteksti** — "Jagatud ülesanne" kirjeldusega "Kopeeri laused, et neid muuta ja uusi versioone luua. Jagamislink kehtib 90 päeva." Arusaadav ja kasulik.
+
+- [x] **5.3. Nupp "Kopeeri" kopeerib laused sünteesi** — pärast klõpsu suunatakse `/synthesis` lehele eeltäidetud lausetega. Hea töövoog õppija jaoks.
+
+- [ ] **5.4. Vigase jagamistõendi viga on arusaamatu** — "Ülesannet ei leitud" selgitusega "Jagamislink võib olla aegunud, tühistatud või vigane." Hea kirjeldus, kuid puudub nupp "Tagasi avalehele" või muu toiming — õppija satub tupikusse.
+  **Mõju:** Keskmine — puudub navigatsioon jagatud ülesande vea olekust. Pole päist navigatsiooniga ega tagasinuppu.
+
+### Etapp 6: Korduv kasutamine
+
+- [x] **6.1. Olek salvestatakse localStorage'sse** — `useSentenceState` salvestab laused sessioonide vahel. Õppija sulges vahekaardi — avas uuesti — laused on paigas.
+
+- [ ] **6.2. Puudub ajalugu või progress** — pärast harjutamist pole ühtegi jälgimist: mitu sõna kuulati, kui palju aega kulus, millised sõnad olid rasked. Õppeplatvormil on see põhiline motivatsioonifunktsioon.
+  **Mõju:** Kõrge — ilma progressita on õppijal raske hinnata oma pingutusi ja end motiveerida jätkama.
+
+- [ ] **6.3. Puuduvad meeldetuletused või soovitused** — platvorm on passiivne: õppija peab ise otsustama, mida harjutada. Pole "Sõnad, mida peaksid harjutama", pole päevaeesmärke, pole järjepidavusloendust.
+  **Mõju:** Keskmine — MVP jaoks on see normaalne, kuid õppeplatvormil jääb retention madalaks.
+
+### Etapp 7: Ligipääsetavus ja mugavus
+
+- [x] **7.1. Skip link on olemas** — "Liigu põhisisu juurde" failis `App.tsx`. Standardne ligipääsetavuse praktika.
+
+- [x] **7.2. ARIA sildid eesti keeles** — "Sulge juhend", "Eelmine samm", "Järgmine samm", "Lohista järjestamiseks", "Rohkem valikuid". Õige keel sihtrühma jaoks.
+
+- [ ] **7.3. PlayButton aria-sildid inglise keeles** — `getAriaLabel()` tagastab "Loading", "Playing", "Play" — inglise keeles. Kõik teised sildid on eesti keeles. Ekraanilugeja kasutaja kuuleb keelte segu.
+  **Mõju:** Keskmine — peaks olema "Laadimine", "Esitamine", "Esita".
+
+- [ ] **7.4. Drag-and-drop ilma klaviatuurialternatiivita** — `SentenceSynthesisItem` atribuudiga `draggable` pole klaviatuuriga ligipääsetavat viisi lausete järjekorra muutmiseks. Piiratud motoorikaga õppija jaoks pole ümberjärjestamine võimalik.
+  **Mõju:** Keskmine — dokumenteeritud AccessibilityPage'is teadaoleva puudujäägina. Kuid avaliku sektori õppeplatvormi jaoks on see vastavusprobleem.
+
+### Etapp 8: Üldmulje kasutajaliidesest
+
+- [x] **8.1. Cookie consent nupuga "Keeldun"** — GDPR-ga vastavuses koos keeldumise võimalusega.
+
+- [x] **8.2. Privaatsuspoliitika ja ligipääsetavuse teatis on olemas** — `/privacy` ja `/accessibility` on jaluses saadaval. Professionaalselt vormistatud eesti keeles.
+
+- [ ] **8.3. Jalus sisaldab palju õppijale mitteasjakohast teavet** — EKI aadress, registrikood, keelenõu number. Välismaalasest õppijale A2 tasemel on see infomüra. Tagasiside link (eki@eki.ee) on kontaktide hulgas peidetud.
+  **Mõju:** Madal — standardne riigiasutuse jalus, kuid tagasiside link võiks olla silmapaistvam.
+
+- [ ] **8.4. Puudub liidese keel peale eesti keele** — kogu UI on ainult eesti keeles. A2-tasemel õppijale võivad mõned UI elemendid olla arusaamatud: "Uuri häälduskuju", "Hääldusabiline", "Ligipääsetavuse teatis". Puudub keelevahetaja vene/inglise keelele.
+  **Mõju:** Kõrge — sihtrühm (eesti keele õppijad) definitsiooni järgi ei valda eesti keelt täielikult. Liides õpitavas keeles on nii pedagoogiline võte (keelekümblus) kui barjäär. Miinimum: olulised veateated ja onboarding vene/inglise keeles.
+
+- [ ] **8.5. Puudub tume teema** — pikaajaliste harjutussessioonide jaoks (õhtul) pole dark mode'i. Pole kriitiline, aga kaasaegne ootus.
+  **Mõju:** Madal.
+
+---
+
+## Kokkuvõte
+
+| Kategooria | Kokku | ✅ Hea | ⚠️ Probleem |
+|------------|-------|--------|-------------|
+| Esimene külastus / Onboarding | 6 | 3 | 3 |
+| Põhiline süntees | 7 | 2 | 5 |
+| Hääldusvariantid | 4 | 1 | 3 |
+| Salvestamine / Auth | 5 | 2 | 3 |
+| Jagatud ülesanded | 4 | 3 | 1 |
+| Korduv kasutamine | 3 | 1 | 2 |
+| Ligipääsetavus / UI | 5 | 2 | 3 |
+| Üldine UI | 5 | 2 | 3 |
+| **Kokku** | **39** | **16** | **23** |
+
+## Top-5 probleemid (mõju õppijale)
+
+1. **Sünteesi vea korral puudub tagasiside** (#2.6) — õppija ei saa aru, mis juhtus
+2. **Puuduvad näited/kiirfraasid** (#2.4) — tühi ekraan pärast onboarding'ut tõukab eemale
+3. **UI ainult eesti keeles** (#8.4) — sihtrühm definitsiooni järgi ei valda keelt
+4. **Puudub progress/ajalugu** (#6.2) — motivatsioon jätkata puudub
+5. **Wizard sulgub juhusliku klõpsuga** (#1.5) — õppija kaotab onboarding'u
+
+## Mis on hästi tehtud
+
+- Süntees ilma autentimiseta — null sisenemisbarjäär
+- Rollipõhine onboarding wizard — õige lähenemine
+- Jagatud ülesanded töötavad ilma sisselogimiseta — õpetaja→õppija töövoog sujuv
+- Cookie consent keeldumise nupuga
+- Head ARIA sildid (välja arvatud PlayButton)
+- Olek säilib sessioonide vahel

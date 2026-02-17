@@ -1,177 +1,177 @@
-# Аудит: Учитель эстонского языка (Õpetaja)
+# Audit: Eesti keele õpetaja (Õpetaja)
 
-**Перспектива:** Учитель, который использует платформу для подготовки материалов и работы с учениками.
-**Аудитор:** Luna | **Дата:** 2026-02-17
-**Метод:** Анализ исходного кода — полный teacher flow от создания задания до шаринга ученикам.
-
----
-
-## Профиль пользователя
-
-Кайре, 42 года, учитель эстонского как второго языка в русскоязычной школе Нарвы. 25 учеников в классе, уровни A1–B1. Хочет задавать домашние задания по произношению и проверять, что ученики могут прослушать правильный вариант. Использует школьный ноутбук и личный телефон. Средний уровень digital literacy.
+**Vaatenurk:** Õpetaja, kes kasutab platvormi materjalide ettevalmistamiseks ja õpilastega töötamiseks.
+**Audiitor:** Luna | **Kuupäev:** 2026-02-17
+**Meetod:** Lähtekoodi analüüs — kogu õpetaja töövoog ülesande loomisest kuni õpilastega jagamiseni.
 
 ---
 
-## Путь учителя (Teacher Journey)
+## Kasutajaprofiil
 
-### Этап 1: Onboarding учителя
-
-- [x] **1.1. Роль "Õpetaja" доступна при первом визите** — `RoleSelectionPage` показывает карточку с описанием "Loo ja jaga õppijatega ülesandeid eesti keele häälduse harjutamiseks." Точно описывает use case учителя.
-
-- [x] **1.2. Wizard адаптирован для учителя** — 5 шагов: ввод текста → прослушивание → добавление предложений → варианты → создание задания. Последний шаг "Loo ülesanne" с описанием "Lisa laused ülesandesse, et jagada neid õppijatega" — правильный фокус.
-
-- [ ] **1.3. Onboarding не объясняет sharing flow** — wizard заканчивается на "Loo ülesanne", но не показывает, как поделиться заданием с учениками. Учитель не узнает о кнопке "Jaga" пока не создаст задание и не откроет его.
-  **Влияние:** Средний — ключевая функция для учителя (sharing) не покрыта onboarding.
-
-- [ ] **1.4. Нет mention о входе через TARA/Google** — wizard не упоминает, что для создания заданий нужна авторизация. Учитель проходит wizard, пытается создать задание → LoginModal. Момент surprize.
-  **Влияние:** Низкий — но лучше предупредить в wizard: "Ülesannete loomiseks logi sisse."
-
-### Этап 2: Создание материалов (Synthesis)
-
-- [x] **2.1. Множественный ввод предложений** — кнопка "Lisa lause" добавляет новые строки. Учитель может ввести 10–15 предложений для одного задания. `handleAddSentence` работает без ограничения на фронтенде.
-
-- [x] **2.2. Play All работает** — `usePlaylistControl` позволяет последовательно прослушать все предложения. Для учителя, проверяющего материал перед отправкой — необходимо.
-
-- [ ] **2.3. Нет bulk paste (вставка нескольких предложений сразу)** — учитель часто копирует текст из Word/Docs. Если вставить абзац с 5 предложениями в одно поле, всё окажется в одном предложении. Нет автоматического split по `.`, `!`, `?`.
-  **Влияние:** Высокий — типичный teacher workflow: скопировать список предложений из учебника. Ручной ввод по одному предложению — tedious при 15+ предложениях.
-
-- [ ] **2.4. Нет import из файла** — учитель не может загрузить `.txt` или `.docx` с предложениями. Всё только ручной ввод.
-  **Влияние:** Средний — для MVP нормально, но для регулярного использования учителем — серьёзное ограничение.
-
-- [x] **2.5. Drag-and-drop для переупорядочивания** — учитель может перетаскивать предложения для нужного порядка. Полезно при подготовке exercises.
-
-- [ ] **2.6. Нет нумерации предложений** — в synthesis view предложения не пронумерованы. Учитель с 10+ предложениями теряет ориентацию. В task view `texts.txt` нумерация есть (`001. ...`), но в UI — нет.
-  **Влияние:** Низкий — cosmetic, но полезно для reference: "Откройте предложение номер 5."
-
-### Этап 3: Создание заданий (Tasks)
-
-- [x] **3.1. Создание задания работает** — `handleAddTask` создаёт задание с именем, описанием и предложениями. Notification с кнопкой "Vaata ülesannet" — хороший feedback.
-
-- [x] **3.2. Два варианта добавления в задание** — через header кнопку "Lisa ülesandesse (N)" и через меню конкретного предложения. Оба path работают.
-
-- [x] **3.3. Append / Replace при добавлении** — `ConfirmPanel` в `AddToTaskDropdown` предлагает "Lisa juurde" или "Asenda olemasolevad". Для учителя, обновляющего задание — необходимая функция.
-
-- [ ] **3.4. Нет копирования задания (duplicate)** — учитель хочет создать варианты задания для разных групп (A1 и A2 класс). Нет кнопки "Kopeeri ülesanne". Нужно создавать каждое с нуля.
-  **Влияние:** Средний — частый teacher workflow: адаптировать задание под разные уровни.
-
-- [ ] **3.5. Нет групповых заданий (folders/categories)** — все задания в одном плоском списке. Учитель с 20+ заданиями (разные классы, темы) не может их организовать. Нет папок, тегов, категорий.
-  **Влияние:** Высокий — при регулярном использовании список становится неуправляемым. Search в `TasksView` отсутствует (есть только в dropdown).
-
-- [ ] **3.6. Task list не имеет поиска** — `TasksView` показывает все задания без фильтра. `TaskManager` рендерит tasks в порядке получения. Для учителя с 30+ заданиями — невозможно быстро найти нужное.
-  **Влияние:** Высокий — search есть в `AddToTaskDropdown` (при добавлении предложений), но не в основном task view.
-
-- [ ] **3.7. Task list не показывает дату последнего изменения** — `TaskRow` показывает "Loodud {date}", но не "Muudetud {date}". Учитель не видит, какое задание он недавно обновлял.
-  **Влияние:** Низкий — `updatedAt` доступен в `TaskSummary`, но не отображается.
-
-- [x] **3.8. Подтверждение удаления** — `ConfirmationModal` с "Kas oled kindel, et soovid ülesande kustutada?" Защита от случайного удаления.
-
-- [ ] **3.9. Pluralization bug в task count** — `TaskRow` показывает `[N] lauset` для всех N, но в эстонском "1 lause" vs "2 lauset". Код: `{task.entryCount === 1 ? "lauset" : "lauset"}` — обе ветки одинаковы!
-  **Влияние:** Низкий — bug: для 1 должно быть "lause", не "lauset". Правда, результат всё равно читаем.
-
-### Этап 4: Задание в деталях (Task Detail)
-
-- [x] **4.1. Task detail показывает все entry** — `TaskDetailView` рендерит предложения с кнопками Play. Учитель может прослушать каждое.
-
-- [x] **4.2. Play All для задания** — `useAudioPlayback` позволяет последовательно прослушать всё задание. Для финальной проверки перед отправкой ученикам.
-
-- [x] **4.3. ZIP экспорт** — `downloadTaskAsZip` создаёт ZIP с `manifest.json`, `texts.txt` и WAV файлами. Учитель может скачать и использовать offline (на уроке без интернета, например).
-
-- [ ] **4.4. ZIP экспорт не имеет progress bar** — `downloadTaskAsZip` принимает `onProgress` callback, но `TaskDetailView.handleDownloadZip` не использует его. При 50+ предложениях скачивание может занять минуту, а учитель видит только `isDownloading` boolean (кнопка "Laadin...").
-  **Влияние:** Средний — для больших заданий UX плохой: непонятно, сколько ещё ждать.
-
-- [x] **4.5. Delete entry с revert на ошибку** — `handleDeleteEntry` обновляет UI оптимистично, а при ошибке API — откатывает. Хороший UX pattern.
-
-- [x] **4.6. "Muuda ülesande lauseid" копирует в synthesis** — `handleCopyToSynthesis` через `CopiedEntriesContext` переносит предложения для редактирования. Учитель может модифицировать и сохранить обратно.
-
-- [ ] **4.7. Нет возможности добавить предложение прямо в task detail** — чтобы добавить 1 предложение, нужно: перейти в synthesis → ввести текст → "Lisa ülesandesse" → найти задание. Нет кнопки "Lisa lause" прямо в task detail.
-  **Влияние:** Средний — для мелких дополнений workflow слишком длинный.
-
-- [ ] **4.8. Нет inline editing предложений в задании** — учитель заметил опечатку в task entry → нужно: "Muuda ülesande lauseid" → synthesis → найти предложение → исправить → сохранить обратно (replace). Нет возможности кликнуть и исправить прямо в task detail.
-  **Влияние:** Средний — `updateTaskEntry` метод существует в `DataService`, но UI не использует его для inline editing текста.
-
-### Этап 5: Sharing с учениками
-
-- [x] **5.1. Share modal понятный** — "Kopeeri ja jaga seda linki, et teised saaksid ülesannet vaadata. Sisselogimine pole vajalik." Правильное описание.
-
-- [x] **5.2. Share link не требует авторизации от учеников** — `/shared/task/:token` работает anonymous. Критично для школьного контекста — ученики могут не иметь Google/TARA аккаунтов.
-
-- [x] **5.3. Revoke sharing** — `handleRevokeShare` позволяет тühistать jagamine. Учитель может отозвать доступ.
-
-- [ ] **5.4. Нет tracking просмотров shared task** — учитель не знает, открывал ли ученик ссылку, прослушивал ли аудио. Нет analytics: "15 из 25 учеников открыли задание".
-  **Влияние:** Высокий — для образовательного контекста отсутствие tracking homework completion — большой пробел.
-
-- [ ] **5.5. Один share link на задание** — нет возможности создать разные ссылки для разных учеников/классов с отслеживанием. Share token — один на задание.
-  **Влияние:** Средний — для продвинутого использования, но MVP достаточно.
-
-- [ ] **5.6. Share link expiry (90 дней) может быть недостаточно** — учебный год ~9 месяцев. Задание, созданное в сентябре, expire в декабре. Учитель должен пересоздавать ссылки.
-  **Влияние:** Средний — или увеличить TTL для edu use case, или добавить продление.
-
-- [ ] **5.7. Нет возможности share без создания задания** — учитель хочет быстро отправить 1 предложение ученику. Нужно: создать задание → добавить предложение → share. Нет "quick share" для synthesis view.
-  **Влияние:** Низкий — tasks как organizational unit — разумная абстракция, но quick share был бы полезен.
-
-### Этап 6: Класс-ориентированные функции
-
-- [ ] **6.1. Нет concept "класс" или "группа"** — учитель не может создать класс, добавить учеников, назначить задания группе. Всё через manual share links.
-  **Влияние:** Высокий — для систематического использования в школе необходима минимальная LMS-функциональность. Для MVP — acceptable, для production edu tool — blocker.
-
-- [ ] **6.2. Нет dashboard для учителя** — `/dashboard` роут есть, но `Dashboard` component (lazy loaded) не содержит teacher-specific информации. Нет overview: сколько заданий, сколько учеников пользуется, какие задания активны.
-  **Влияние:** Средний — dashboard route существует, но не наполнен teacher-relevant content.
-
-- [ ] **6.3. Нет export для отчётности** — учитель не может экспортировать список заданий, статистику использования, отчёт для директора. Только ZIP отдельного задания.
-  **Влияние:** Средний — школьная отчётность часто требует evidence of EdTech usage.
-
-### Этап 7: Качество и точность
-
-- [x] **7.1. Pronunciation variants для проверки** — учитель может кликнуть на слово и увидеть варианты произношения. Полезно для подготовки: проверить, какой вариант правильный для конкретного контекста.
-
-- [ ] **7.2. Нет пометки "правильный вариант"** — variants panel показывает все варианты без приоритетов. Учитель должен сам знать, какой вариант стандартный. Нет marking "soovituslik" / "kõnekeelne".
-  **Влияние:** Средний — для учителя с хорошим знанием эстонского — не проблема. Для молодого учителя или non-native — сложно.
-
-- [ ] **7.3. Нет teacher notes / comments на entry** — учитель не может добавить пометку: "Обратите внимание на ударение в 3-м слоге" рядом с предложением в задании. Entry имеет только `text` и `stressedText`.
-  **Влияние:** Средний — annotations были бы полезны для pedagogical context.
-
-### Этап 8: Безопасность и privacy
-
-- [x] **8.1. Задания привязаны к userId** — `Task.userId` обеспечивает, что учитель видит только свои задания.
-
-- [ ] **8.2. Shared task показывает имя учителя?** — `SharedTaskPage` не показывает автора задания. Это и хорошо (privacy), и плохо (ученик не знает, от кого задание). Нет attribution.
-  **Влияние:** Низкий — design decision. Но для edu context: "Ülesanne koostaja: Kaire Tamm" было бы полезно.
-
-- [x] **8.3. TARA auth для эстонских учителей** — TARA (ID-kaart / Mobiil-ID) как primary login — правильный выбор для учителей гос. школ.
+Kaire, 42-aastane, eesti keele kui teise keele õpetaja Narva venekeelses koolis. 25 õpilast klassis, tasemed A1–B1. Tahab anda häälduse kodutöid ja kontrollida, et õpilased kuulevad õiget varianti. Kasutab kooli sülearvutit ja isiklikku telefoni. Keskmine digitaalne kirjaoskus.
 
 ---
 
-## Сводка
+## Õpetaja teekond (Teacher Journey)
 
-| Категория | Всего | ✅ Хорошо | ⚠️ Проблема |
-|-----------|-------|-----------|-------------|
-| Onboarding учителя | 4 | 2 | 2 |
-| Создание материалов | 6 | 2 | 4 |
-| Управление заданиями | 9 | 4 | 5 |
-| Task detail | 8 | 5 | 3 |
-| Sharing | 7 | 3 | 4 |
-| Классовые функции | 3 | 0 | 3 |
-| Качество и точность | 3 | 1 | 2 |
-| Безопасность | 3 | 2 | 1 |
-| **Итого** | **43** | **19** | **24** |
+### Etapp 1: Õpetaja onboarding
 
-## Топ-5 проблем (по влиянию на учителя)
+- [x] **1.1. Roll "Õpetaja" on esimesel külastusel saadaval** — `RoleSelectionPage` näitab kaarti kirjeldusega "Loo ja jaga õppijatega ülesandeid eesti keele häälduse harjutamiseks." Kirjeldab täpselt õpetaja kasutusjuhtu.
 
-1. **Нет bulk paste / import** (#2.3, #2.4) — учитель не может быстро загрузить материалы из учебника
-2. **Нет поиска/организации заданий** (#3.5, #3.6) — плоский список без папок, тегов, поиска
-3. **Нет tracking использования** (#5.4) — учитель не знает, выполнил ли ученик задание
-4. **Нет class/group management** (#6.1) — всё через manual share links
-5. **Нет inline editing в task detail** (#4.7, #4.8) — исправление опечатки требует многошагового workflow
+- [x] **1.2. Wizard on õpetaja jaoks kohandatud** — 5 sammu: teksti sisestus → kuulamine → lausete lisamine → variandid → ülesande loomine. Viimane samm "Loo ülesanne" kirjeldusega "Lisa laused ülesandesse, et jagada neid õppijatega" — õige fookus.
 
-## Что сделано хорошо
+- [ ] **1.3. Onboarding ei selgita jagamise töövoogu** — wizard lõpeb "Loo ülesanne" juures, kuid ei näita, kuidas ülesannet õpilastega jagada. Õpetaja ei saa nupust "Jaga" teada enne, kui on ülesande loonud ja selle avanud.
+  **Mõju:** Keskmine — õpetaja jaoks võtmefunktsioon (jagamine) pole onboarding'uga kaetud.
 
-- Role-specific onboarding wizard с правильным фокусом на создании заданий
-- Sharing без авторизации для учеников — критично для школы
-- ZIP export с аудио файлами — для offline использования на уроке
-- Append/Replace при добавлении в задание
-- Optimistic UI updates с rollback при ошибках
-- TARA auth как primary — правильно для гос. сектора
+- [ ] **1.4. Puudub viide TARA/Google sisselogimisele** — wizard ei maini, et ülesannete loomiseks on vaja autentimist. Õpetaja läbib wizardi, proovib ülesannet luua → LoginModal. Üllatusmoment.
+  **Mõju:** Madal — aga parem oleks wizardis hoiatada: "Ülesannete loomiseks logi sisse."
 
-## Баг
+### Etapp 2: Materjalide loomine (Süntees)
 
-- **Pluralization:** `TaskManager.tsx` строка 89: `{task.entryCount === 1 ? "lauset" : "lauset"}` — обе ветки одинаковы. Должно быть `"lause" : "lauset"`.
+- [x] **2.1. Mitmekordne lausete sisestamine** — nupp "Lisa lause" lisab uusi ridu. Õpetaja saab sisestada 10–15 lauset ühe ülesande jaoks. `handleAddSentence` töötab ilma frontendi poolse piiranguta.
+
+- [x] **2.2. Esita kõik töötab** — `usePlaylistControl` võimaldab kõiki lauseid järjest kuulata. Õpetajale, kes kontrollib materjali enne saatmist — hädavajalik.
+
+- [ ] **2.3. Puudub hulgi-kleepimine (mitu lauset korraga)** — õpetaja kopeerib sageli teksti Wordist/Docsist. Kui kleepida 5 lausega lõik ühte välja, läheb kõik ühte lausesse. Puudub automaatne jagamine `.`, `!`, `?` järgi.
+  **Mõju:** Kõrge — tüüpiline õpetaja töövoog: kopeerida lausete nimekiri õpikust. Käsitsi sisestamine ühe lause kaupa on 15+ lause korral tüütu.
+
+- [ ] **2.4. Puudub failist importimine** — õpetaja ei saa laadida `.txt` või `.docx` faili lausetega. Kõik ainult käsitsi sisestus.
+  **Mõju:** Keskmine — MVP jaoks normaalne, kuid regulaarseks õpetaja kasutamiseks tõsine piirang.
+
+- [x] **2.5. Lohistamine ümberjärjestamiseks** — õpetaja saab lauseid soovitud järjekorda lohistada. Kasulik harjutuste ettevalmistamisel.
+
+- [ ] **2.6. Puudub lausete nummerdamine** — sünteesi vaates pole laused nummerdatud. 10+ lausega õpetaja kaotab orientatsiooni. Ülesande vaates `texts.txt` on nummerdamine olemas (`001. ...`), kuid kasutajaliideses mitte.
+  **Mõju:** Madal — kosmeetiline, kuid kasulik viitamiseks: "Avage lause number 5."
+
+### Etapp 3: Ülesannete loomine (Tasks)
+
+- [x] **3.1. Ülesande loomine töötab** — `handleAddTask` loob ülesande nime, kirjelduse ja lausetega. Teade nupuga "Vaata ülesannet" — hea tagasiside.
+
+- [x] **3.2. Kaks viisi ülesandesse lisamiseks** — päise nupu "Lisa ülesandesse (N)" kaudu ja konkreetse lause menüüst. Mõlemad teed töötavad.
+
+- [x] **3.3. Lisa juurde / Asenda lisamisel** — `ConfirmPanel` failis `AddToTaskDropdown` pakub "Lisa juurde" või "Asenda olemasolevad". Õpetajale, kes uuendab ülesannet — vajalik funktsioon.
+
+- [ ] **3.4. Puudub ülesande kopeerimine (dubleerimine)** — õpetaja tahab luua ülesande variante erinevatele gruppidele (A1 ja A2 klass). Puudub nupp "Kopeeri ülesanne". Tuleb iga kord nullist luua.
+  **Mõju:** Keskmine — tavaline õpetaja töövoog: kohandada ülesannet erinevatele tasemetele.
+
+- [ ] **3.5. Puuduvad grupiülesanded (kaustad/kategooriad)** — kõik ülesanded on ühes lamedas nimekirjas. 20+ ülesandega õpetaja (erinevad klassid, teemad) ei saa neid organiseerida. Puuduvad kaustad, sildid, kategooriad.
+  **Mõju:** Kõrge — regulaarsel kasutamisel muutub nimekiri haldamatuks. Otsing puudub `TasksView` vaates (on ainult dropdownis).
+
+- [ ] **3.6. Ülesannete nimekirjas puudub otsing** — `TasksView` näitab kõiki ülesandeid ilma filtrita. `TaskManager` renderdab ülesanded saabumise järjekorras. 30+ ülesandega õpetaja ei leia kiiresti õiget.
+  **Mõju:** Kõrge — otsing on olemas `AddToTaskDropdown` komponendis (lausete lisamisel), kuid mitte põhilises ülesannete vaates.
+
+- [ ] **3.7. Ülesannete nimekiri ei näita viimase muutmise kuupäeva** — `TaskRow` näitab "Loodud {kuupäev}", kuid mitte "Muudetud {kuupäev}". Õpetaja ei näe, millist ülesannet ta hiljuti uuendas.
+  **Mõju:** Madal — `updatedAt` on olemas `TaskSummary` tüübis, kuid ei kuvata.
+
+- [x] **3.8. Kustutamise kinnitus** — `ConfirmationModal` tekstiga "Kas oled kindel, et soovid ülesande kustutada?" Kaitse juhusliku kustutamise eest.
+
+- [ ] **3.9. Mitmuse viga lausete arvestuses** — `TaskRow` näitab `[N] lauset` kõigi N jaoks, kuid eesti keeles on "1 lause" vs "2 lauset". Kood: `{task.entryCount === 1 ? "lauset" : "lauset"}` — mõlemad harud on identsed!
+  **Mõju:** Madal — viga: 1 puhul peaks olema "lause", mitte "lauset". Tõsi, tulemus on siiski loetav.
+
+### Etapp 4: Ülesande detailvaade (Task Detail)
+
+- [x] **4.1. Ülesande detailvaade näitab kõiki kirjeid** — `TaskDetailView` renderdab laused Play-nuppudega. Õpetaja saab igaüht kuulata.
+
+- [x] **4.2. Esita kõik ülesande jaoks** — `useAudioPlayback` võimaldab järjest kogu ülesannet kuulata. Lõplikuks kontrolliks enne õpilastele saatmist.
+
+- [x] **4.3. ZIP eksport** — `downloadTaskAsZip` loob ZIP-faili koos `manifest.json`, `texts.txt` ja WAV failidega. Õpetaja saab alla laadida ja kasutada offline (tunnis ilma internetita, näiteks).
+
+- [ ] **4.4. ZIP ekspordil puudub edenemisriba** — `downloadTaskAsZip` võtab vastu `onProgress` callback'i, kuid `TaskDetailView.handleDownloadZip` ei kasuta seda. 50+ lause korral võib allalaadimine kesta minuti, aga õpetaja näeb ainult `isDownloading` boolean'i (nupp "Laadin...").
+  **Mõju:** Keskmine — suurte ülesannete puhul on UX halb: arusaamatu, kui kaua veel oodata.
+
+- [x] **4.5. Kirje kustutamine tagasipööramisega vea korral** — `handleDeleteEntry` uuendab UI-d optimistlikult ja API vea korral pöörab tagasi. Hea UX muster.
+
+- [x] **4.6. "Muuda ülesande lauseid" kopeerib sünteesi** — `handleCopyToSynthesis` viib `CopiedEntriesContext` kaudu laused redigeerimiseks üle. Õpetaja saab muuta ja tagasi salvestada.
+
+- [ ] **4.7. Puudub võimalus lisada lauset otse ülesande detailvaates** — 1 lause lisamiseks tuleb: minna sünteesi → sisestada tekst → "Lisa ülesandesse" → leida ülesanne. Puudub nupp "Lisa lause" otse ülesande detailvaates.
+  **Mõju:** Keskmine — väikeste täienduste jaoks on töövoog liiga pikk.
+
+- [ ] **4.8. Puudub lausete redigeerimine kohapeal ülesandes** — õpetaja märkas trükiviga ülesande kirjes → tuleb: "Muuda ülesande lauseid" → süntees → leida lause → parandada → salvestada tagasi (asenda). Puudub võimalus klõpsata ja parandada otse ülesande detailvaates.
+  **Mõju:** Keskmine — `updateTaskEntry` meetod on olemas `DataService` klassis, kuid UI ei kasuta seda teksti kohapeal redigeerimiseks.
+
+### Etapp 5: Jagamine õpilastega
+
+- [x] **5.1. Jagamise modaal on selge** — "Kopeeri ja jaga seda linki, et teised saaksid ülesannet vaadata. Sisselogimine pole vajalik." Õige kirjeldus.
+
+- [x] **5.2. Jagamislink ei nõua õpilastelt autentimist** — `/shared/task/:token` töötab anonüümselt. Kriitilise tähtsusega koolikontekstis — õpilastel ei pruugi olla Google/TARA kontosid.
+
+- [x] **5.3. Jagamise tühistamine** — `handleRevokeShare` võimaldab jagamist tühistada. Õpetaja saab ligipääsu tagasi võtta.
+
+- [ ] **5.4. Puudub jagatud ülesande vaatamiste jälgimine** — õpetaja ei tea, kas õpilane avas lingi, kas kuulas heli. Puudub analüütika: "15 õpilast 25-st avasid ülesande".
+  **Mõju:** Kõrge — hariduskontekstis on kodutöö sooritamise jälgimise puudumine suur lünk.
+
+- [ ] **5.5. Üks jagamislink ülesande kohta** — puudub võimalus luua erinevaid linke erinevatele õpilastele/klassidele jälgimisega. Jagamistõend on üks ülesande kohta.
+  **Mõju:** Keskmine — edasijõudnud kasutuse jaoks, kuid MVP-le piisav.
+
+- [ ] **5.6. Jagamislingi kehtivus (90 päeva) võib olla ebapiisav** — õppeaasta on ~9 kuud. Septembris loodud ülesanne aegub detsembris. Õpetaja peab linke uuesti looma.
+  **Mõju:** Keskmine — kas pikendada TTL-i hariduse kasutusjuhu jaoks või lisada pikendamise võimalus.
+
+- [ ] **5.7. Puudub jagamine ilma ülesannet loomata** — õpetaja tahab kiiresti saata 1 lauset õpilasele. Tuleb: luua ülesanne → lisada lause → jagada. Puudub "kiire jagamine" sünteesi vaates.
+  **Mõju:** Madal — ülesanded organisatsioonilise üksusena on mõistlik abstraktsioon, kuid kiire jagamine oleks kasulik.
+
+### Etapp 6: Klassile orienteeritud funktsioonid
+
+- [ ] **6.1. Puudub "klassi" või "grupi" mõiste** — õpetaja ei saa luua klassi, lisada õpilasi, määrata ülesandeid grupile. Kõik käsitsi jagamislinkide kaudu.
+  **Mõju:** Kõrge — süstemaatiliseks kasutamiseks koolis on vaja minimaalset LMS-funktsionaalsust. MVP jaoks vastuvõetav, tootmis-haridusvahendi jaoks blokeerija.
+
+- [ ] **6.2. Puudub õpetaja töölaud** — `/dashboard` marsruut on olemas, kuid `Dashboard` komponent (lazy loaded) ei sisalda õpetajaspetsiifilist teavet. Puudub ülevaade: mitu ülesannet, mitu õpilast kasutab, millised ülesanded on aktiivsed.
+  **Mõju:** Keskmine — dashboard marsruut on olemas, kuid pole õpetajale asjakohase sisuga täidetud.
+
+- [ ] **6.3. Puudub eksport aruandluseks** — õpetaja ei saa eksportida ülesannete nimekirja, kasutusstatistikat, aruannet direktorile. Ainult üksiku ülesande ZIP.
+  **Mõju:** Keskmine — kooliaruandlus nõuab sageli haridustehnoloogia kasutamise tõendeid.
+
+### Etapp 7: Kvaliteet ja täpsus
+
+- [x] **7.1. Hääldusvariantide kontroll** — õpetaja saab sõnal klõpsata ja näha häälduse variante. Kasulik ettevalmistuseks: kontrollida, milline variant on konkreetses kontekstis õige.
+
+- [ ] **7.2. Puudub "õige variandi" märgistus** — variantide paneel näitab kõiki variante ilma prioriteetideta. Õpetaja peab ise teadma, milline variant on standardne. Puudub märgistus "soovituslik" / "kõnekeelne".
+  **Mõju:** Keskmine — hea eesti keele tundmisega õpetajale pole probleem. Noorele õpetajale või mitte-emakeelekõnelejale on keeruline.
+
+- [ ] **7.3. Puuduvad õpetaja märkmed / kommentaarid kirjetel** — õpetaja ei saa lisada märget: "Pöörake tähelepanu rõhule 3. silbis" lause kõrvale ülesandes. Kirjel on ainult `text` ja `stressedText`.
+  **Mõju:** Keskmine — annotatsioonid oleksid pedagoogilises kontekstis kasulikud.
+
+### Etapp 8: Turvalisus ja privaatsus
+
+- [x] **8.1. Ülesanded on seotud userId-ga** — `Task.userId` tagab, et õpetaja näeb ainult oma ülesandeid.
+
+- [ ] **8.2. Kas jagatud ülesanne näitab õpetaja nime?** — `SharedTaskPage` ei näita ülesande autorit. See on nii hea (privaatsus) kui halb (õpilane ei tea, kellelt ülesanne tuli). Puudub omistamine.
+  **Mõju:** Madal — disainiotsus. Kuid hariduskontekstis: "Ülesande koostaja: Kaire Tamm" oleks kasulik.
+
+- [x] **8.3. TARA auth Eesti õpetajatele** — TARA (ID-kaart / Mobiil-ID) esmase sisselogimisviisina — õige valik riigikoolide õpetajatele.
+
+---
+
+## Kokkuvõte
+
+| Kategooria | Kokku | ✅ Hea | ⚠️ Probleem |
+|------------|-------|--------|-------------|
+| Õpetaja onboarding | 4 | 2 | 2 |
+| Materjalide loomine | 6 | 2 | 4 |
+| Ülesannete haldamine | 9 | 4 | 5 |
+| Ülesande detailvaade | 8 | 5 | 3 |
+| Jagamine | 7 | 3 | 4 |
+| Klassifunktsioonid | 3 | 0 | 3 |
+| Kvaliteet ja täpsus | 3 | 1 | 2 |
+| Turvalisus | 3 | 2 | 1 |
+| **Kokku** | **43** | **19** | **24** |
+
+## Top-5 probleemid (mõju õpetajale)
+
+1. **Puudub hulgi-kleepimine / import** (#2.3, #2.4) — õpetaja ei saa kiiresti materjale õpikust laadida
+2. **Puudub otsing/organiseerimine** (#3.5, #3.6) — lame nimekiri ilma kaustade, siltide, otsinguta
+3. **Puudub kasutuse jälgimine** (#5.4) — õpetaja ei tea, kas õpilane täitis ülesande
+4. **Puudub klassi/grupi haldamine** (#6.1) — kõik käsitsi jagamislinkide kaudu
+5. **Puudub kohapeal redigeerimine ülesande detailvaates** (#4.7, #4.8) — trükivea parandamine nõuab mitmeetapilist töövoogu
+
+## Mis on hästi tehtud
+
+- Rollispetsiifiline onboarding wizard õige fookusega ülesannete loomisele
+- Jagamine ilma autentimiseta õpilastele — kooli jaoks kriitilise tähtsusega
+- ZIP eksport helifailidega — offline kasutamiseks tunnis
+- Lisa juurde / Asenda ülesandesse lisamisel
+- Optimistlikud UI uuendused tagasipööramisega vigade korral
+- TARA auth esmasena — õige riigisektori jaoks
+
+## Viga
+
+- **Mitmuse käänamine:** `TaskManager.tsx` rida 89: `{task.entryCount === 1 ? "lauset" : "lauset"}` — mõlemad harud on identsed. Peaks olema `"lause" : "lauset"`.
