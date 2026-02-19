@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useSharedTaskAudio } from "./useSharedTaskAudio";
 import { TaskEntry } from "@/types/task";
@@ -30,6 +30,13 @@ const createEntry = (
 });
 
 describe("useSharedTaskAudio", () => {
+  afterEach(async () => {
+    // Flush pending MockAudio setTimeout callbacks before environment teardown
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 50));
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
 

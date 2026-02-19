@@ -195,14 +195,5 @@ $border-width-thick: var(--border-width-thick);  // 3px
 
 For detailed guidelines on when and how to add tokens, see [`styles/tokens/README.md`](../styles/tokens/README.md).
 
-**Quick Reference:**
-
-**Add a token when:**
-- Value used in 2+ places
-- Value has semantic meaning
-- Value may need theming
-
-**Don't add a token for:**
-- One-off values
-- Purely decorative values
-- Component-specific values
+**Add a token when:** value used in 2+ places, has semantic meaning, or may need theming.
+**Don't add a token for:** one-off, purely decorative, or component-specific values.
