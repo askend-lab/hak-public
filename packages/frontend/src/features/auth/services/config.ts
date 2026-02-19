@@ -13,8 +13,24 @@ function isLocalDev(): boolean {
   return hostname === "localhost" || hostname === "127.0.0.1";
 }
 
-export const TARA_LOGIN_URL = import.meta.env?.VITE_TARA_LOGIN_URL ?? (isLocalDev() ? "/auth/tara/start" : "");
-export const AUTH_API_URL = import.meta.env?.VITE_AUTH_API_URL ?? (isLocalDev() ? "/auth" : "");
+function getApiBaseUrl(): string {
+  if (import.meta.env?.VITE_AUTH_API_URL) return import.meta.env.VITE_AUTH_API_URL;
+  if (isLocalDev()) return "/auth";
+  // Runtime derivation: hak-dev.askend-lab.com → hak-api-dev.askend-lab.com
+  //                     hak.askend-lab.com → hak-api.askend-lab.com
+  const hostname = getHostname();
+  return `https://${hostname.replace(/^hak/, "hak-api")}/auth`;
+}
+
+export function getAuthApiUrl(): string {
+  return getApiBaseUrl();
+}
+
+export function getTaraLoginUrlValue(): string {
+  if (import.meta.env?.VITE_TARA_LOGIN_URL) return import.meta.env.VITE_TARA_LOGIN_URL;
+  if (isLocalDev()) return "/auth/tara/start";
+  return `${getApiBaseUrl()}/tara/start`;
+}
 export const PKCE_STORAGE_KEY = "pkce_code_verifier";
 export const OAUTH2_TOKEN_PATH = "/oauth2/token";
 export const AUTH_CALLBACK_PATH = "/auth/callback";
@@ -100,7 +116,7 @@ export function getLogoutUrl(): string {
 }
 
 export function getTaraLoginUrl(): string {
-  return TARA_LOGIN_URL;
+  return getTaraLoginUrlValue();
 }
 
 export async function exchangeCodeForTokens(code: string): Promise<{
@@ -131,7 +147,7 @@ export async function exchangeCodeForTokens(code: string): Promise<{
           }),
         })
       : await fetch(
-          `${AUTH_API_URL}/tara/exchange-code`,
+          `${getAuthApiUrl()}/tara/exchange-code`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

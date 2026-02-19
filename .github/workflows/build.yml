@@ -77,7 +77,15 @@ jobs:
 
       - name: Security audit
         if: steps.filter.outputs.code == 'true'
-        run: pnpm audit --audit-level=high --ignore-unfixable
+        run: |
+          if ! OUTPUT=$(pnpm audit --audit-level=high --ignore-unfixable 2>&1); then
+            if echo "$OUTPUT" | grep -q "ERR_PNPM_AUDIT_BAD_RESPONSE"; then
+              echo "::warning::npm audit endpoint is unreachable — skipping security audit"
+            else
+              echo "$OUTPUT"
+              exit 1
+            fi
+          fi
 
       - name: Configure AWS credentials
         if: steps.filter.outputs.code == 'true'
@@ -93,7 +101,6 @@ jobs:
           echo "COGNITO_CLIENT_ID=$(aws ssm get-parameter --name /hak/shared/cognito-client-id --query Parameter.Value --output text 2>/dev/null || aws ssm get-parameter --name /hak/dev/cognito-client-id --query Parameter.Value --output text)" >> $GITHUB_ENV
           echo "COGNITO_DOMAIN=$(aws ssm get-parameter --name /hak/shared/cognito-domain --query Parameter.Value --output text)" >> $GITHUB_ENV
           echo "ARTIFACTS_BUCKET=$(aws ssm get-parameter --name /hak/shared/artifacts-bucket --query Parameter.Value --output text)" >> $GITHUB_ENV
-          echo "API_DOMAIN_DEV=$(aws ssm get-parameter --name /hak/dev/api-domain --query Parameter.Value --output text)" >> $GITHUB_ENV
 
       - name: Detect changes and prepare build
         if: steps.filter.outputs.code == 'true'
@@ -194,8 +201,6 @@ jobs:
           VITE_COGNITO_USER_POOL_ID: ${{ env.COGNITO_USER_POOL_ID }}
           VITE_COGNITO_CLIENT_ID: ${{ env.COGNITO_CLIENT_ID }}
           VITE_COGNITO_DOMAIN: ${{ env.COGNITO_DOMAIN }}
-          VITE_AUTH_API_URL: https://${{ env.API_DOMAIN_DEV }}/auth
-          VITE_TARA_LOGIN_URL: https://${{ env.API_DOMAIN_DEV }}/auth/tara/start
         run: pnpm --filter @hak/frontend build
 
       - name: Build SimpleStore

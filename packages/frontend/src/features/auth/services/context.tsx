@@ -16,7 +16,7 @@ import {
   getLogoutUrl,
   getTaraLoginUrl,
   exchangeCodeForTokens,
-  AUTH_API_URL,
+  getAuthApiUrl,
   cognitoConfig,
 } from "./config";
 import type { AuthContextValue, AuthState } from "./types";
@@ -39,7 +39,7 @@ export async function refreshTokens(): Promise<boolean> {
   try {
     // Refresh token is in httpOnly cookie — backend reads it automatically
     const response = await fetch(
-      `${AUTH_API_URL}/tara/refresh`,
+      `${getAuthApiUrl()}/tara/refresh`,
       {
         method: "POST",
         credentials: "include",
