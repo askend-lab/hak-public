@@ -68,7 +68,7 @@
   min-height: 44px;
   font-family: $font-body;
   font-size: $font-size-md;
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   color: $color-primary;
   line-height: 140%;
   letter-spacing: 0;
@@ -102,10 +102,10 @@
   height: 84px;
   padding: $spacing-3;
   border: 1px solid $color-primary;
-  border-radius: 4px;
+  border-radius: $border-radius-sm;
   font-family: $font-body;
   font-size: $font-size-md;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   line-height: 150%;
   letter-spacing: 0;
   background: $color-white;
@@ -116,7 +116,7 @@
   &:focus-visible {
     outline: none;
     border-color: $color-outlined-primary;
-    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+    box-shadow: 0 0 0 2px $color-focus-ring-blue;
   }
 
   &:focus:not(:focus-visible) {
@@ -125,7 +125,7 @@
 
   &::placeholder {
     color: $color-gray;
-    font-weight: 400;
+    font-weight: $font-weight-regular;
   }
 }
 
@@ -143,11 +143,11 @@
   padding: 0;
   background: $color-white;
   border: 1px solid $color-outlined-neutral;
-  border-radius: 4px;
+  border-radius: $border-radius-sm;
   box-sizing: border-box;
   font-family: $font-body;
   font-size: $font-size-sm;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   line-height: 140%;
   letter-spacing: 0;
   color: $color-primary;
@@ -195,7 +195,7 @@
   h4 {
     flex: 1;
     font-family: $font-body;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     font-size: $font-size-lg;
     line-height: 28px;
     color: $color-primary;
@@ -213,7 +213,7 @@
   border-radius: $border-radius-sm;
   font-family: $font-body;
   font-size: $font-size-sm;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   color: $color-text-secondary;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -243,12 +243,12 @@
 
   &::-webkit-scrollbar-track {
     background: $color-soft-neutral-bg;
-    border-radius: 3px;
+    border-radius: $border-radius-sm;
   }
 
   &::-webkit-scrollbar-thumb {
     background: $color-outlined-neutral;
-    border-radius: 3px;
+    border-radius: $border-radius-sm;
 
     &:hover {
       background: $color-gray;
@@ -276,7 +276,7 @@
 
   &:hover {
     border-color: $color-gray;
-    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+    box-shadow: 0 1px 3px $color-shadow-focus;
   }
 
   &:last-child {
@@ -298,17 +298,26 @@
 .sentence-phonetic-panel__marker-name {
   font-family: $font-body;
   font-size: $font-size-sm;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   color: $color-primary;
 }
 
 .sentence-phonetic-panel__marker-rule {
   font-family: $font-body;
-  font-weight: $font-weight-medium;
-  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
   line-height: $line-height-normal;
   letter-spacing: $letter-spacing-normal;
   color: $color-primary;
+  margin-bottom: $spacing-2;
+}
+
+.sentence-phonetic-panel__marker-description {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  color: $color-text-secondary;
   margin-bottom: $spacing-3;
 }
 
@@ -322,7 +331,7 @@
   color: $color-text-secondary;
 
   strong {
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     color: $color-primary;
     width: 100%;
   }
@@ -351,10 +360,10 @@
 
       code {
         display: inline;
-        padding: 2px $spacing-1;
+        padding: $spacing-1 $spacing-1;
         background: $color-soft-neutral-bg;
         border: 1px solid $color-outlined-neutral;
-        border-radius: 4px;
+        border-radius: $border-radius-sm;
         font-family: $font-mono;
         font-size: $font-size-xs;
         color: $color-outlined-primary;
@@ -367,13 +376,13 @@
   height: 22px;
   background: $color-secondary;
   border: 1px solid $color-outlined-neutral;
-  border-radius: 4px;
+  border-radius: $border-radius-sm;
   padding: 0 $spacing-1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: $font-body;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   font-size: $font-size-sm;
   line-height: 100%;
   letter-spacing: 0.4%;

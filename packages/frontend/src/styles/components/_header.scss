@@ -37,12 +37,12 @@
   // Tablet: Show nav
   @include tablet {
     display: flex;
-    gap: 32px;
+    gap: $spacing-8;
   }
 
   // Desktop: Full spacing
   @include desktop {
-    gap: 40px;
+    gap: $spacing-10;
   }
 }
 
@@ -60,7 +60,7 @@
   height: 100%;
   position: relative;
   font-family: $font-body;
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   font-size: $font-size-sm;
   line-height: 100%;
   letter-spacing: 0.15px;
@@ -93,16 +93,16 @@
   justify-self: end;
 
   // Mobile: Compact spacing
-  gap: 12px;
+  gap: $spacing-3;
 
   // Tablet: Standard spacing
   @include tablet {
-    gap: 16px;
+    gap: $spacing-4;
   }
 
   // Desktop: Full spacing
   @include desktop {
-    gap: 24px;
+    gap: $spacing-6;
   }
 }
 

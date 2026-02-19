@@ -2,16 +2,17 @@
 
 ## Breakpoint Strategy
 
-The application uses a **mobile-first responsive approach** with 6 industry-standard breakpoints:
+The application uses a **mobile-first responsive approach** with 7 breakpoints:
 
 ```scss
 // Breakpoint values
-$breakpoint-xs: 375px;   // Small mobile (iPhone SE)
-$breakpoint-sm: 640px;   // Mobile landscape / Small tablet
-$breakpoint-md: 768px;   // Tablet portrait
-$breakpoint-lg: 1024px;  // Tablet landscape / Small desktop
-$breakpoint-xl: 1280px;  // Desktop
-$breakpoint-2xl: 1536px; // Large desktop
+$breakpoint-xs: 375px;      // Small mobile (iPhone SE)
+$breakpoint-mobile: 480px;  // Mobile portrait max
+$breakpoint-sm: 640px;      // Mobile landscape / Small tablet
+$breakpoint-md: 768px;      // Tablet portrait
+$breakpoint-lg: 1024px;     // Tablet landscape / Small desktop
+$breakpoint-xl: 1280px;     // Desktop
+$breakpoint-2xl: 1536px;    // Large desktop
 ```
 
 **Mobile-First Philosophy:**
@@ -43,7 +44,7 @@ $breakpoint-2xl: 1536px; // Large desktop
 
 ## Layout Architecture
 
-The system provides **4 layout types** for different page needs.
+The system provides **6 layout types** for different page needs.
 
 ## Page Structure
 
@@ -76,4 +77,4 @@ The system provides **4 layout types** for different page needs.
 ---
 
 **See also:**
-- [Layout Types](./05-Responsive-Layout-Types.md) - 4 layout type examples
+- [Layout Type Examples](./07-Layout-Types-Examples.md)

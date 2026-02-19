@@ -106,7 +106,6 @@ export default function TasksView({
             className="empty-state__icon"
             src="/icons/avatar_task_empty.png"
             alt=""
-            style={{ width: 213, height: 186, opacity: 1 }}
           />
           <h2 className="empty-state__title">Ülesanded puuduvad</h2>
           <p className="empty-state__description">

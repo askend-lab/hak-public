@@ -25,7 +25,14 @@ const MarkerItem = ({ m }: { m: (typeof markers)[0] }) => (
       <code>{m.symbol}</code>
       <span className="sentence-phonetic-panel__marker-name">{m.name}</span>
     </div>
-    <div className="sentence-phonetic-panel__marker-rule">{m.rule}</div>
+    <div className="sentence-phonetic-panel__marker-rule">
+      <strong>Hääldusmärgi kasutus: </strong>
+      {m.rule}
+    </div>
+    <div className="sentence-phonetic-panel__marker-description">
+      <strong>Selgitus: </strong>
+      {m.description}
+    </div>
     <div className="sentence-phonetic-panel__marker-examples">
       {m.examples.map((ex, i) => (
         <span key={i} className="sentence-phonetic-panel__marker-tag">

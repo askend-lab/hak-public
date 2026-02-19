@@ -75,14 +75,14 @@
   position: relative;
   width: 100%;
   min-height: 42px;
-  padding: 10px 36px 10px 12px;
+  padding: $spacing-2 $spacing-9 $spacing-2 $spacing-3;
   border-radius: $border-radius-sm;
   border: 1px solid $color-primary;
   background-color: $color-white;
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: $spacing-1;
   align-items: center;
   overflow: visible; // Allow dropdown to overflow
   transition:
@@ -105,18 +105,18 @@
   position: relative;
   width: auto;
   height: 22px;
-  padding: 0 8px 0 12px;
+  padding: 0 $spacing-2 0 $spacing-3;
   border-radius: $border-radius-sm;
   border: 1px solid $color-tag-border;
   background-color: $color-tag-bg;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: $spacing-1;
   box-sizing: border-box;
   flex-shrink: 0;
   font-family: $font-body;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   font-size: $font-size-sm;
   line-height: 140%;
   color: $color-primary;
@@ -132,7 +132,12 @@
   &-text {
     cursor: pointer;
 
-    &:focus {
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px $color-focus-ring-blue;
+    }
+
+    &:focus:not(:focus-visible) {
       outline: none;
     }
   }
@@ -154,7 +159,12 @@
       opacity: 0.7;
     }
 
-    &:focus {
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px $color-focus-ring-blue;
+    }
+
+    &:focus:not(:focus-visible) {
       outline: none;
     }
 
@@ -211,7 +221,7 @@
     background: $color-tag-selected-bg;
     border: 1px solid $color-tag-selected-border;
     color: $color-tag-selected-text;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
     box-shadow: 0px 2px 6px 0px $color-shadow-medium;
 
     &:hover {
@@ -232,21 +242,26 @@
 .sentence-synthesis-item__tag-edit-input {
   height: 22px;
   width: auto;
-  padding: 0 8px;
+  padding: 0 $spacing-2;
   border-radius: $border-radius-sm;
   border: 1px solid $color-outlined-neutral;
   background-color: $color-input-bg-soft;
   box-sizing: content-box;
   flex-shrink: 0;
   font-family: $font-body;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   font-size: $font-size-sm;
   line-height: 140%;
   color: $color-primary;
 
-  &:focus {
+  &:focus-visible {
     outline: none;
     border-color: $color-secondary;
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 }
 
@@ -263,7 +278,7 @@
   padding: 0;
   height: 22px;
   font-family: $font-body;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   font-size: $font-size-sm;
   line-height: 140%;
   color: $color-primary;
@@ -277,7 +292,7 @@
 
   &::placeholder {
     font-family: $font-body;
-    font-weight: 400;
+    font-weight: $font-weight-regular;
     font-size: $font-size-sm;
     line-height: 140%;
     color: $color-text-placeholder;
@@ -290,7 +305,7 @@
 
 .sentence-synthesis-item__clear-button {
   position: absolute;
-  right: 10px;
+  right: $spacing-2;
   top: 50%;
   transform: translateY(-50%);
   width: 18px;
@@ -325,7 +340,7 @@
   min-height: 42px;
   padding: $spacing-2 $spacing-3;
   font-family: $font-body;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   font-size: $font-size-sm;
   line-height: 140%;
   letter-spacing: 0;
@@ -436,18 +451,18 @@
 // Responsive Adjustments
 // =========================================================================
 
-@media (max-width: $breakpoint-md) {
+@include respond-below($breakpoint-md) {
   .sentence-synthesis-item {
     padding: $spacing-3;
     gap: $spacing-3;
 
     &__tags-group {
-      padding: 8px 32px 8px 10px;
+      padding: $spacing-2 $spacing-8 $spacing-2 $spacing-2;
     }
   }
 }
 
-@media (max-width: $breakpoint-mobile) {
+@include respond-below($breakpoint-mobile) {
   .sentence-synthesis-item {
     flex-wrap: wrap;
 

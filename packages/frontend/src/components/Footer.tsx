@@ -4,9 +4,9 @@
 import BuildInfo from "./BuildInfo";
 
 const FooterLogo = () => (
-  <div className="footer-section footer-logo">
-    <img src="/icons/logo.png" alt="EKI Logo" className="footer-logo-image" />
-    <div className="footer-contact">
+  <div className="footer-section footer__logo">
+    <img src="/icons/logo.png" alt="EKI Logo" className="footer__logo-image" />
+    <div className="footer__contact">
       <p>
         Roosikrantsi 6, 10119 Tallinn
         <br />
@@ -23,22 +23,31 @@ const FooterLogo = () => (
 );
 const FooterLinks = () => (
   <div className="footer-section">
-    <h2 className="footer-heading">Hääldusabiline</h2>
-    <ul className="footer-links">
+    <h2 className="footer__heading">Hääldusabiline</h2>
+    <ul className="footer__links">
       <li>
         <a href="/privacy">Kasutus- ja privaatsustingimused</a>
       </li>
       <li>
         <a href="/accessibility">Ligipääsetavuse teatis</a>
       </li>
+      <li>
+        <a
+          href="https://sonaveeb.ee/pronunciation-exercises/#/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Tutvu ka Eesti Keele Instituudi Hääldusharjutustega
+        </a>
+      </li>
     </ul>
   </div>
 );
 const SocialLinks = () => (
   <div className="footer-section">
-    <h2 className="footer-heading">Sotsiaalmeedia</h2>
-    <p className="footer-description">Hoia pilk peal.</p>
-    <ul className="footer-social">
+    <h2 className="footer__heading">Sotsiaalmeedia</h2>
+    <p className="footer__description">Hoia pilk peal.</p>
+    <ul className="footer__social">
       <li>
         <a
           href="https://www.facebook.com/eestikeeleinstituut"
@@ -46,8 +55,8 @@ const SocialLinks = () => (
           rel="noopener noreferrer"
           aria-label="Facebook (avaneb uues aknas)"
         >
-          <img src="/icons/facebook.svg" alt="" className="social-icon" />
-          <span>Facebook</span>
+          <img src="/icons/facebook.svg" alt="" className="footer__social-icon" />
+          <span className="footer__social-label">Facebook</span>
         </a>
       </li>
       <li>
@@ -57,8 +66,8 @@ const SocialLinks = () => (
           rel="noopener noreferrer"
           aria-label="Youtube (avaneb uues aknas)"
         >
-          <img src="/icons/youtube.svg" alt="" className="social-icon" />
-          <span>Youtube</span>
+          <img src="/icons/youtube.svg" alt="" className="footer__social-icon" />
+          <span className="footer__social-label">Youtube</span>
         </a>
       </li>
       <li>
@@ -68,8 +77,8 @@ const SocialLinks = () => (
           rel="noopener noreferrer"
           aria-label="LinkedIn (avaneb uues aknas)"
         >
-          <img src="/icons/linkedin.svg" alt="" className="social-icon" />
-          <span>LinkedIn</span>
+          <img src="/icons/linkedin.svg" alt="" className="footer__social-icon" />
+          <span className="footer__social-label">LinkedIn</span>
         </a>
       </li>
     </ul>
@@ -77,15 +86,15 @@ const SocialLinks = () => (
 );
 const FeedbackSection = () => (
   <div className="footer-section">
-    <h2 className="footer-heading">Tagasiside</h2>
-    <div className="footer-feedback-content">
-      <p className="footer-description">
+    <h2 className="footer__heading">Tagasiside</h2>
+    <div className="footer__feedback-content">
+      <p className="footer__description">
         Iga arvamus loeb ja aitab Hääldusabilist paremaks teha! Saada meile oma
         mõtted ja ettepanekud.
       </p>
-      <a href="mailto:eki@eki.ee" className="footer-feedback-link">
+      <a href="mailto:eki@eki.ee" className="footer__feedback-link">
         <svg
-          className="footer-feedback-icon"
+          className="footer__feedback-icon"
           viewBox="0 0 24 24"
           fill="currentColor"
           aria-hidden="true"
@@ -128,7 +137,7 @@ export default function Footer() {
         <FooterLinks />
         <SocialLinks />
         <FeedbackSection />
-        <div className="footer-build-info">
+        <div className="footer__build-info">
           <BuildInfo />
         </div>
       </div>

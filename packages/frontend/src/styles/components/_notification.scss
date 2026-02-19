@@ -12,18 +12,18 @@
 // Notification Container - fixed positioning for toast notifications
 .notification-container {
   position: fixed;
-  top: 68px; // Header height (60px) + 8px spacing
-  right: 1rem;
+  top: $spacing-17; // Header height (60px) + 8px spacing
+  right: $spacing-4;
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: $spacing-3;
   pointer-events: none;
 
-  @media (max-width: $breakpoint-sm) {
-    left: 1rem;
-    right: 1rem;
-    top: 68px;
+  @include respond-below($breakpoint-sm) {
+    left: $spacing-4;
+    right: $spacing-4;
+    top: $spacing-17;
   }
 }
 
@@ -36,7 +36,7 @@
   min-width: 320px;
   max-width: 420px;
 
-  @media (max-width: $breakpoint-sm) {
+  @include respond-below($breakpoint-sm) {
     max-width: 100%;
     min-width: auto;
   }
@@ -57,7 +57,7 @@
   padding: 0;
   font-family: inherit;
   font-size: inherit;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   color: $color-outlined-primary;
   text-decoration: underline;
   cursor: pointer;

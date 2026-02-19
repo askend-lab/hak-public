@@ -21,7 +21,7 @@
 
 .stressed-text__title {
   font-size: $font-size-lg;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   color: $color-primary;
   margin: 0 0 $spacing-4 0;
 }
@@ -37,7 +37,7 @@
   flex-direction: column;
   gap: $spacing-1;
 
-  @media (min-width: $breakpoint-md) {
+  @include tablet {
     flex-direction: row;
     align-items: flex-start;
     gap: $spacing-3;
@@ -50,7 +50,7 @@
   gap: $spacing-3;
   flex: 1;
 
-  @media (min-width: $breakpoint-md) {
+  @include tablet {
     flex-direction: row;
     align-items: center;
   }
@@ -70,7 +70,7 @@
   border: none;
   border-radius: $border-radius-round;
   font-size: $font-size-sm;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -143,7 +143,7 @@
 
 .stressed-text__label {
   font-size: $font-size-sm;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   color: $color-text-secondary;
   min-width: 140px;
 }
@@ -157,18 +157,18 @@
 
 .stressed-text__word {
   display: inline-block;
-  padding: 3px $spacing-2;
+  padding: $spacing-1 $spacing-2;
   background: $color-soft-primary-bg;
   border: 1px solid $color-outlined-neutral;
-  border-radius: 4px;
+  border-radius: $border-radius-sm;
   font-family: $font-body;
   font-size: $font-size-sm;
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   line-height: 140%;
   color: $color-primary;
   height: 22px;
   box-sizing: border-box;
-  box-shadow: 0px 2px 6px 0px rgba(0, 51, 153, 0.25);
+  box-shadow: 0px 2px 6px 0px $color-shadow-medium;
   transition: all 0.2s ease;
 
   &--clickable {
@@ -185,7 +185,7 @@
   }
 
   &--stressed {
-    font-weight: 500;
+    font-weight: $font-weight-medium;
     color: $color-primary;
     background: $color-soft-primary-bg;
     border: 1px solid $color-outlined-neutral;
@@ -194,13 +194,13 @@
   &--selected {
     background: $color-primary;
     border: 1px solid $color-primary;
-    border-radius: 4px;
+    border-radius: $border-radius-sm;
     color: $color-white;
     font-family: $font-body;
     font-size: $font-size-sm;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
     line-height: 140%;
-    box-shadow: 0px 2px 6px 0px rgba(0, 51, 153, 0.25);
+    box-shadow: 0px 2px 6px 0px $color-shadow-medium;
     letter-spacing: 0;
 
     &:hover {
@@ -221,7 +221,7 @@
   flex: 1;
 
   &--stressed {
-    font-weight: 400;
+    font-weight: $font-weight-regular;
     color: $color-text-secondary;
     background-color: $color-white;
     border-color: $color-outlined-neutral;

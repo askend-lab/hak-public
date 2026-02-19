@@ -30,7 +30,7 @@
 
 .task-manager__title {
   font-size: $font-size-xl;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   color: $color-primary;
   margin: 0;
 }
@@ -45,7 +45,7 @@
   border: none;
   border-radius: $border-radius;
   font-size: $font-size-sm;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.2s ease;
 

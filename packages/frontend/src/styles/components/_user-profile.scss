@@ -42,7 +42,7 @@
   align-items: center;
   justify-content: center;
   font-size: $font-size-xs;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   letter-spacing: 0.5px;
   flex-shrink: 0;
 }
@@ -217,7 +217,7 @@
   border-radius: $border-radius-round;
   font-family: $font-body;
   font-size: $font-size-sm;
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;

@@ -9,19 +9,19 @@
 .shared-task-info-banner {
   background: linear-gradient(
     135deg,
-    rgba(23, 49, 72, 0.02) 0%,
-    rgba(215, 229, 242, 0.12) 100%
+    $color-shadow-subtle 0%,
+    $color-shadow-focus 100%
   );
-  border-bottom: 1px solid rgba(23, 49, 72, 0.06);
-  padding: 0 24px; // Match page horizontal padding
+  border-bottom: 1px solid $color-shadow-subtle;
+  padding: 0 $spacing-6; // Match page horizontal padding
 
   .shared-task-info-banner-content {
     max-width: 1280px;
     margin: 0 auto;
     display: flex;
     align-items: center; // Better vertical centering
-    gap: 0.625rem;
-    padding: 0.75rem 0; // More compact vertical padding
+    gap: $spacing-2;
+    padding: $spacing-3 0; // More compact vertical padding
   }
 
   .shared-task-info-banner-icon {
@@ -43,7 +43,7 @@
     flex: 1;
     display: flex;
     align-items: baseline;
-    gap: 0.5rem;
+    gap: $spacing-2;
     min-width: 0;
     flex-wrap: wrap; // Allow wrapping on smaller screens
   }
@@ -51,7 +51,7 @@
   .shared-task-info-banner-title {
     font-family: $font-body;
     font-size: $font-size-xs;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     color: $color-primary;
     line-height: 1.4;
     white-space: nowrap;
@@ -60,14 +60,14 @@
   .shared-task-info-banner-description {
     font-family: $font-body;
     font-size: $font-size-xs;
-    font-weight: 400;
+    font-weight: $font-weight-regular;
     color: $color-text-secondary;
     line-height: 1.5;
     opacity: 0.85;
 
     &::before {
       content: "•";
-      margin-right: 0.5rem;
+      margin-right: $spacing-2;
       opacity: 0.4;
     }
   }
@@ -75,11 +75,11 @@
   // Button now uses storybook .button.button--secondary
 
   @include respond-below($breakpoint-md) {
-    padding: 0 16px;
+    padding: 0 $spacing-4;
 
     .shared-task-info-banner-content {
-      gap: 0.5rem;
-      padding: 0.625rem 0;
+      gap: $spacing-2;
+      padding: $spacing-2 0;
       align-items: flex-start; // Stack better on mobile
     }
 
@@ -94,7 +94,7 @@
 
     .shared-task-info-banner-text {
       flex-direction: column;
-      gap: 0.25rem;
+      gap: $spacing-1;
       align-items: flex-start;
     }
 
@@ -125,7 +125,7 @@
   .shared-task-info-banner-content {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: $spacing-2;
     padding: 0;
     max-width: none;
   }
@@ -138,7 +138,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: $spacing-2;
     align-items: flex-start;
   }
 
@@ -209,11 +209,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1.5rem;
+  padding: $spacing-12 $spacing-6;
   text-align: center;
 
   .shared-entries-empty-icon {
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-6;
     color: $color-gray;
     opacity: 0.6;
 
@@ -223,9 +223,9 @@
   }
 
   .shared-entries-empty-title {
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 $spacing-3 0;
     font-size: $font-size-lg;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     color: $color-primary;
   }
 
@@ -241,12 +241,12 @@
 .shared-entries-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: $spacing-3;
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
   min-height: 0;
-  padding-right: 4px; // Space for scrollbar
+  padding-right: $spacing-1; // Space for scrollbar
 
   // Scroll styling
   &::-webkit-scrollbar {
@@ -255,12 +255,12 @@
 
   &::-webkit-scrollbar-track {
     background: $color-soft-neutral-bg;
-    border-radius: 3px;
+    border-radius: $border-radius-sm;
   }
 
   &::-webkit-scrollbar-thumb {
     background: $color-outlined-neutral;
-    border-radius: 3px;
+    border-radius: $border-radius-sm;
 
     &:hover {
       background: $color-gray;
@@ -279,7 +279,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  padding: $spacing-16 $spacing-8;
   text-align: center;
   min-height: 400px;
 
@@ -288,9 +288,9 @@
     height: 32px;
     border: 3px solid $color-outlined-neutral;
     border-top: 3px solid $color-primary;
-    border-radius: 50%;
+    border-radius: $border-radius-round;
     animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-4;
   }
 
   p {
@@ -302,7 +302,7 @@
 
 .shared-task-error {
   .error-icon {
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-6;
     color: $color-soft-danger;
 
     svg {
@@ -312,24 +312,24 @@
 
   h2 {
     font-size: $font-size-xl;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     color: $color-primary;
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 $spacing-3 0;
   }
 
   p {
     color: $color-soft-danger;
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-6;
   }
 
   .error-home-button {
-    padding: 0.75rem 1.5rem;
+    padding: $spacing-3 $spacing-6;
     background: $color-primary;
     color: $color-white;
     border: none;
-    border-radius: 25px;
+    border-radius: $border-radius-round;
     font-size: $font-size-sm;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.2s ease;
 

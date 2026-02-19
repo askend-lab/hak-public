@@ -39,24 +39,24 @@
   box-sizing: border-box;
 
   // Mobile: 320px - 639px
-  padding: 0 16px;
+  padding: 0 $spacing-4;
   height: 56px;
 
   // Mobile landscape: 640px+
   @include mobile-landscape {
-    padding: 0 20px;
+    padding: 0 $spacing-5;
     height: 60px;
   }
 
   // Tablet: 768px+
   @include tablet {
-    padding: 0 24px;
+    padding: 0 $spacing-6;
     height: 60px;
   }
 
   // Desktop: 1024px+
   @include desktop {
-    padding: 0 32px;
+    padding: 0 $spacing-8;
   }
 
   .page-layout__header-content {
@@ -89,7 +89,7 @@
 .page-content--two-column {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 2rem;
+  gap: $spacing-8;
   align-items: start;
   min-height: 0; // Prevent grid overflow
 
@@ -99,7 +99,7 @@
 
   @include respond-below($breakpoint-lg) {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: $spacing-6;
   }
 }
 
@@ -114,7 +114,7 @@
 .page-content__secondary {
   min-width: 0; // Prevents grid overflow
   position: sticky;
-  top: 2rem;
+  top: $spacing-8;
 
   @include respond-below($breakpoint-lg) {
     order: 2; // Ensure secondary comes after primary on mobile

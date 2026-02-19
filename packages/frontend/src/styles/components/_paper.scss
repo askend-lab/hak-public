@@ -74,7 +74,7 @@
 
 @mixin paper-item {
   width: 100%;
-  padding: 6px $spacing-4;
+  padding: $spacing-1-5 $spacing-4;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -101,11 +101,11 @@
 
 @mixin paper-item-content {
   font-family: $font-body;
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   font-size: $font-size-sm;
   line-height: 150%;
   letter-spacing: 0.15px;
-  color: rgba(0, 0, 0, 0.87);
+  color: $color-text-dark;
   white-space: nowrap;
 }
 
@@ -167,7 +167,7 @@
 
   &::-webkit-scrollbar-thumb {
     background: $color-outlined-neutral;
-    border-radius: 2px;
+    border-radius: $border-radius-sm;
 
     &:hover {
       background: $color-gray;
@@ -245,7 +245,7 @@
 }
 
 .paper--raised {
-  box-shadow: 0 8px 32px rgba(23, 49, 72, 0.16);
+  box-shadow: 0 8px 32px $color-shadow-primary-sm;
 }
 
 .paper__item {
@@ -264,7 +264,7 @@
   background-color: $color-soft-primary-bg;
 
   .paper__item-content {
-    font-weight: 500;
+    font-weight: $font-weight-medium;
     color: $color-primary;
   }
 }
@@ -283,7 +283,7 @@
 
 .paper__header-title {
   font-family: $font-body;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   font-size: $font-size-sm;
   color: $color-primary;
   margin: 0;

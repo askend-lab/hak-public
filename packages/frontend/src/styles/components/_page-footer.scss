@@ -23,21 +23,21 @@
   position: relative;
 
   // Mobile
-  padding: 24px 16px 20px 16px;
+  padding: $spacing-6 $spacing-4 $spacing-5 $spacing-4;
 
   // Mobile landscape
   @include mobile-landscape {
-    padding: 28px 20px 24px 20px;
+    padding: $spacing-8 $spacing-5 $spacing-6 $spacing-5;
   }
 
   // Tablet
   @include tablet {
-    padding: 32px 24px 28px 24px;
+    padding: $spacing-8 $spacing-6 $spacing-8 $spacing-6;
   }
 
   // Desktop
   @include desktop {
-    padding: 36px 32px 24px 32px;
+    padding: $spacing-9 $spacing-8 $spacing-6 $spacing-8;
   }
 
   .page-footer__content {
@@ -47,18 +47,18 @@
     justify-content: space-between;
     align-items: flex-start;
     flex-direction: column;
-    gap: 32px;
+    gap: $spacing-8;
     overflow: hidden;
 
     @include tablet {
       flex-direction: row;
       flex-wrap: wrap;
-      gap: 24px;
+      gap: $spacing-6;
     }
 
     @include desktop {
       flex-wrap: nowrap;
-      gap: 40px;
+      gap: $spacing-10;
     }
   }
 
@@ -82,13 +82,13 @@
   }
 
   // BuildInfo positioned separately
-  .footer-build-info {
+  .footer__build-info {
     position: absolute;
-    bottom: 8px;
-    right: 16px;
+    bottom: $spacing-2;
+    right: $spacing-4;
 
     @include tablet {
-      right: 24px;
+      right: $spacing-6;
     }
 
     @include desktop {

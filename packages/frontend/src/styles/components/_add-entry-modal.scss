@@ -64,7 +64,7 @@
 }
 
 // Responsive design
-@media (max-width: $breakpoint-sm) {
+@include respond-below($breakpoint-sm) {
   .add-entry-modal__actions {
     button {
       width: 100%;

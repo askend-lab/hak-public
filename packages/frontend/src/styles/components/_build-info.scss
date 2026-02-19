@@ -100,7 +100,7 @@
 
   code {
     background: $color-soft-neutral-bg;
-    padding: 2px $spacing-1;
+    padding: $spacing-1 $spacing-1;
     border-radius: $border-radius-sm;
     font-family: monospace;
   }
@@ -117,7 +117,7 @@
   color: $color-gray;
 }
 
-.footer-build-info {
+.footer__build-info {
   position: absolute;
   bottom: $spacing-4;
   right: $spacing-4;
