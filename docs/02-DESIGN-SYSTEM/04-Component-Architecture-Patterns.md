@@ -150,4 +150,4 @@ These may be proposed to storybook in the future if they prove valuable for othe
 ---
 
 **See also:**
-- [BEM Methodology](./04-Component-Architecture-BEM.md) - BEM naming rules and examples
+- [BEM Methodology](./03-Component-Architecture-BEM.md)

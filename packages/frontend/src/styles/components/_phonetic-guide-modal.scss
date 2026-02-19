@@ -226,7 +226,7 @@
 }
 
 // Responsive design
-@media (max-width: $breakpoint-sm) {
+@include respond-below($breakpoint-sm) {
   .phonetic-guide-modal__symbol-item {
     flex-direction: column;
     align-items: stretch;

@@ -13,20 +13,20 @@
 
 .role-cards {
   display: flex;
-  gap: 24px;
+  gap: $spacing-6;
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
-  margin-bottom: 48px; // Match gap between title and cards
+  margin-bottom: $spacing-12; // Match gap between title and cards
 }
 
 .role-card {
   background: $color-white;
   border: 1px solid $color-outlined-neutral;
-  border-radius: 16px;
-  padding: 16px 24px;
+  border-radius: $border-radius-xl;
+  padding: $spacing-4 $spacing-6;
   width: 280px;
-  gap: 24px;
+  gap: $spacing-6;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,7 +49,7 @@
 
 .role-card-title {
   font-family: "Inter", sans-serif;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   font-size: $font-size-lg;
   line-height: 140%;
   letter-spacing: 0%;
@@ -60,7 +60,7 @@
 
 .role-card-description {
   font-family: "Inter", sans-serif;
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   font-size: $font-size-md;
   line-height: 140%;
   letter-spacing: 0%;
@@ -73,12 +73,12 @@
 // Responsive styles
 @include respond-below($breakpoint-lg) {
   .role-cards {
-    gap: 20px;
+    gap: $spacing-5;
   }
 
   .role-card {
     width: 280px;
-    padding: 16px 20px;
+    padding: $spacing-4 $spacing-5;
   }
 }
 
@@ -86,14 +86,14 @@
   .role-cards {
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 32px; // Match reduced title margin on mobile
+    gap: $spacing-4;
+    margin-bottom: $spacing-8; // Match reduced title margin on mobile
   }
 
   .role-card {
     width: 100%;
     max-width: 320px;
-    padding: 16px 20px;
+    padding: $spacing-4 $spacing-5;
   }
 
   .role-card-avatar {

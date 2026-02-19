@@ -184,6 +184,38 @@ Feature: US-035 Session persistence
     Then I see a single empty sentence row
 `,
 
+  'US-057-playlist-audio-controls 2': `@ready @playlist @audio @US-057
+Feature: Playlist audio playback controls (US-057)
+  As a language learner
+  I want to control audio playback for my playlist
+  So that I can practice listening at my own pace
+
+  Background:
+    Given I am on the synthesis page
+    And I have multiple sentences with text
+
+  Scenario: Stop current playback when playing another
+    Given sentence "Tere" is currently playing
+    When I click the play button for "Kuidas läheb"
+    Then "Tere" stops playing
+    And "Kuidas läheb" starts playing
+
+  Scenario: Stop sequential playback manually
+    Given sequential playback is in progress
+    When I click the play all button again
+    Then sequential playback stops
+
+  Scenario: Resume after playback completes
+    Given all sentences have finished playing
+    When I click the play all button
+    Then sequential playback starts from the beginning
+
+  Scenario: Play button shows loading state
+    When I click the play button for a sentence
+    Then the play button shows a loading spinner
+    And the spinner is replaced by pause icon when playing
+`,
+
   'US-057-playlist-audio-controls': `@ready @playlist @audio @US-057
 Feature: Playlist audio playback controls (US-057)
   As a language learner
@@ -216,6 +248,35 @@ Feature: Playlist audio playback controls (US-057)
     And the spinner is replaced by pause icon when playing
 `,
 
+  'US-063-local-storage-persistence 2': `@ready @playlist @storage @US-063
+Feature: Persist synthesis state in local storage (US-063)
+  As a language learner
+  I want my sentence data to be saved in local storage
+  So that I can resume my work after closing the browser
+
+  Scenario: Save sentences to local storage on change
+    Given I am on the synthesis page
+    When I enter text in a sentence row
+    Then the sentence state is saved to local storage
+
+  Scenario: Restore sentences from local storage on load
+    Given I have previously entered sentences
+    When I reload the application
+    Then my sentences are restored from local storage
+    And the text content matches what I entered
+
+  Scenario: Transient state is not persisted
+    Given a sentence is currently playing audio
+    When I reload the application
+    Then the restored sentence is not in playing state
+    And the restored sentence is not in loading state
+
+  Scenario: Clear sentences clears storage
+    Given I have sentences in local storage
+    When I remove all sentences
+    Then the local storage entry is cleared
+`,
+
   'US-063-local-storage-persistence': `@ready @playlist @storage @US-063
 Feature: Persist synthesis state in local storage (US-063)
   As a language learner
@@ -243,6 +304,31 @@ Feature: Persist synthesis state in local storage (US-063)
     Given I have sentences in local storage
     When I remove all sentences
     Then the local storage entry is cleared
+`,
+
+  'US-087-playlist-skip-empty 2': `@ready @playlist @playback @US-087
+Feature: Skip empty sentences during sequential playback (US-087)
+  As a language learner
+  I want empty sentences to be skipped during play all
+  So that playback is not interrupted by blank entries
+
+  Scenario: Skip empty rows during play all
+    Given I have 3 sentence rows
+    And the second row is empty
+    When I click "Mängi kõik"
+    Then only non-empty sentences are played
+    And the empty row is skipped
+
+  Scenario: No playback when all rows are empty
+    Given all sentence rows are empty
+    When I click "Mängi kõik"
+    Then nothing is played
+
+  Scenario: Play all with single non-empty sentence
+    Given I have 3 sentence rows
+    And only one has text
+    When I click "Mängi kõik"
+    Then only the sentence with text is played
 `,
 
   'US-087-playlist-skip-empty': `@ready @playlist @playback @US-087

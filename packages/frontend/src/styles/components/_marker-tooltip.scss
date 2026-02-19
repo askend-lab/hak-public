@@ -28,7 +28,7 @@
   background: $color-white;
   border: 1px solid $color-outlined-neutral;
   border-radius: $border-radius;
-  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.15);
+  box-shadow: 0 4px 12px $color-shadow-primary-sm;
   animation: marker-tooltip-fade-in 0.15s ease-out;
 }
 
@@ -53,7 +53,7 @@
   transform: none;
 
   .marker-tooltip__arrow {
-    left: 16px;
+    left: $spacing-4;
     transform: none;
   }
 }
@@ -65,7 +65,7 @@
   transform: none;
 
   .marker-tooltip__arrow {
-    right: 16px;
+    right: $spacing-4;
     left: auto;
     transform: none;
   }
@@ -151,7 +151,7 @@
   height: 24px;
   background: $color-soft-neutral-bg;
   border: 1px solid $color-outlined-neutral;
-  border-radius: 4px;
+  border-radius: $border-radius-sm;
   font-family: $font-body;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
@@ -189,7 +189,7 @@
   height: 20px;
   background: $color-secondary;
   border: 1px solid $color-outlined-neutral;
-  border-radius: 4px;
+  border-radius: $border-radius-sm;
   padding: 0 $spacing-1;
   display: inline-flex;
   align-items: center;

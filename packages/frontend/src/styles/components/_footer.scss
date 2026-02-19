@@ -3,6 +3,7 @@
 // =========================================================================
 // Component-specific styles for footer elements
 // Layout styles are in _page-layouts.scss (.page-footer--full)
+// BEM: .footer
 // =========================================================================
 
 @import "../tokens/breakpoints";
@@ -13,45 +14,42 @@
 @import "../tokens/borders";
 
 // Footer component-specific styles (used within .page-footer--full wrapper)
-// Logo section
-.footer-logo {
-  position: relative;
-  padding-top: 44px; // Space for absolute logo
 
-  // Desktop: Fixed width
+.footer__logo {
+  position: relative;
+  padding-top: $spacing-11;
+
+  @include desktop {
+    width: 305px;
+  }
+}
+
+.footer__logo-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer__contact {
   @include desktop {
     width: 305px;
   }
 
-  .footer-logo-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 40px;
-    width: auto;
-    object-fit: contain;
-  }
-
-  .footer-contact {
-    // Desktop: Fixed dimensions
-    @include desktop {
-      width: 305px;
-    }
-
-    p {
-      margin: 0;
-      font-size: $font-size-sm;
-      font-weight: $font-weight-medium;
-      line-height: $line-height-normal;
-      letter-spacing: $letter-spacing-normal;
-      color: $color-primary;
-      font-family: $font-body;
-    }
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    line-height: $line-height-normal;
+    letter-spacing: $letter-spacing-normal;
+    color: $color-primary;
+    font-family: $font-body;
   }
 }
 
-// Footer headings
-.footer-heading {
+.footer__heading {
   font-size: $heading-page-title-size-mobile;
   font-weight: $font-weight-medium;
   line-height: $line-height-none;
@@ -61,8 +59,7 @@
   font-family: $font-body;
 }
 
-// Links section
-.footer-links {
+.footer__links {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -86,8 +83,7 @@
   }
 }
 
-// Social media description
-.footer-description {
+.footer__description {
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   line-height: $line-height-normal;
@@ -103,14 +99,13 @@
   }
 }
 
-// Social media links
-.footer-social {
+.footer__social {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: $spacing-2;
   width: auto;
   height: auto;
 
@@ -123,7 +118,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: $spacing-2;
     text-decoration: none;
     transition: opacity 0.2s;
     width: auto;
@@ -132,29 +127,28 @@
     &:hover {
       opacity: 0.7;
     }
-
-    .social-icon {
-      width: 18px;
-      height: 18px;
-      display: block;
-      flex-shrink: 0;
-    }
-
-    span {
-      font-family: $font-body;
-      font-weight: $font-weight-medium;
-      font-size: $font-size-sm;
-      line-height: $line-height-normal;
-      letter-spacing: $letter-spacing-normal;
-      color: $color-primary;
-      width: 66px;
-      height: 20px;
-    }
   }
 }
 
-// Feedback email link with icon
-.footer-feedback-link {
+.footer__social-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.footer__social-label {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  width: 66px;
+  height: 20px;
+}
+
+.footer__feedback-link {
   display: inline-flex;
   align-items: center;
   gap: $spacing-2;
@@ -175,17 +169,16 @@
   }
 }
 
-.footer-feedback-icon {
+.footer__feedback-icon {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
 }
 
-// Feedback content wrapper (tighter gap between text and email)
-.footer-feedback-content {
+.footer__feedback-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: $spacing-2;
 }
 
 // =========================================================================
@@ -206,7 +199,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 60px;
+  gap: $spacing-15;
   padding: 0 $spacing-4;
 
   @include respond-below($breakpoint-md) {
@@ -223,7 +216,7 @@
 
   @include desktop {
     flex-wrap: nowrap;
-    gap: 60px;
+    gap: $spacing-15;
   }
 }
 

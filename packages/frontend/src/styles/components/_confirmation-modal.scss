@@ -32,7 +32,7 @@
 }
 
 // Responsive design
-@media (max-width: $breakpoint-sm) {
+@include respond-below($breakpoint-sm) {
   .confirmation-modal__actions {
     flex-direction: column-reverse;
     gap: $spacing-2;

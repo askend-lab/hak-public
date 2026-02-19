@@ -85,7 +85,7 @@
 
 @mixin panel-title {
   font-family: $font-body;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   font-size: $font-size-lg;
   line-height: 28px;
   color: $color-primary;
@@ -96,7 +96,7 @@
 }
 
 @mixin panel-title-secondary {
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   color: $color-gray;
 }
 
@@ -163,12 +163,12 @@
 
   &::-webkit-scrollbar-track {
     background: $color-soft-neutral-bg;
-    border-radius: 3px;
+    border-radius: $border-radius-sm;
   }
 
   &::-webkit-scrollbar-thumb {
     background: $color-outlined-neutral;
-    border-radius: 3px;
+    border-radius: $border-radius-sm;
 
     &:hover {
       background: $color-gray;

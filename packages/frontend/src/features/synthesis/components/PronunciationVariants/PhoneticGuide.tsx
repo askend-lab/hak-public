@@ -14,11 +14,13 @@ const MarkerItem = ({
   symbol,
   name,
   rule,
+  description,
   examples,
 }: {
   symbol: string;
   name: string;
   rule: string;
+  description: string;
   examples: string[];
 }) => (
   <div className="pronunciation-variants__marker-item">
@@ -26,7 +28,14 @@ const MarkerItem = ({
       <code>{symbol}</code>
       <span className="pronunciation-variants__marker-name">{name}</span>
     </div>
-    <div className="pronunciation-variants__marker-rule">{rule}</div>
+    <div className="pronunciation-variants__marker-rule">
+      <strong>Hääldusmärgi kasutus: </strong>
+      {rule}
+    </div>
+    <div className="pronunciation-variants__marker-description">
+      <strong>Selgitus: </strong>
+      {description}
+    </div>
     <div className="pronunciation-variants__marker-examples">
       {examples.map((ex, i) => (
         <span key={i} className="pronunciation-variants__item-tag">
@@ -61,7 +70,7 @@ export default function PhoneticGuide({ onBack, onClose }: PhoneticGuideProps) {
       </div>
       <div className="pronunciation-variants__guide-view-content">
         <p className="pronunciation-variants__guide-intro">
-          Hääldusmärgid aitavad täpsustada sõna hääldust. Klõpsa märgil, et
+          Hääldusmärgid aitavad täpsustada lause hääldust. Klõpsa märgil, et
           lisada see kursori asukohta.
         </p>
         {markers.map((m) => (

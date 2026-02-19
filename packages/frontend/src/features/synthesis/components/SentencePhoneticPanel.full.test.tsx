@@ -88,7 +88,7 @@ describe("SentencePhoneticPanel", () => {
         screen.getByRole("button", { name: "ebareeglipärase rõhu märk" }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "peenendus" }),
+        screen.getByRole("button", { name: "peenendus (palatalisatsioon)" }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole("button", { name: "liitsõnapiir" }),

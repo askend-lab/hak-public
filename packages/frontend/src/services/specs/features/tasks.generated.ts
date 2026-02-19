@@ -273,6 +273,37 @@ Feature: Add playlist entries to task (US-021)
     Then I see a success notification
 `,
 
+  'US-048-task-search 2': `@ready @tasks @search @US-048
+Feature: Search and filter tasks in sentence menu (US-048)
+  As a language learner with many tasks
+  I want to search for specific tasks in the sentence menu
+  So that I can quickly find and add sentences to the right task
+
+  Background:
+    Given I am authenticated
+    And I am on the synthesis page
+    And I have a sentence "Tere"
+
+  Scenario: See search input in task menu
+    When I click the three-dots menu on a sentence
+    Then I see a search input field for tasks
+
+  Scenario: Filter tasks by name
+    When I click the three-dots menu on a sentence
+    And I type "Harjutus" in the search input
+    Then I see only tasks matching "Harjutus"
+
+  Scenario: No results for search query
+    When I click the three-dots menu on a sentence
+    And I type "nonexistent" in the search input
+    Then I see no matching tasks
+
+  Scenario: Create new task from menu
+    When I click the three-dots menu on a sentence
+    And I click "Loo uus ülesanne"
+    Then a new task is created with the sentence
+`,
+
   'US-048-task-search': `@ready @tasks @search @US-048
 Feature: Search and filter tasks in sentence menu (US-048)
   As a language learner with many tasks
@@ -304,6 +335,34 @@ Feature: Search and filter tasks in sentence menu (US-048)
     Then a new task is created with the sentence
 `,
 
+  'US-050-task-entries-management 2': `@ready @tasks @entries @US-050
+Feature: Manage entries within a task (US-050)
+  As a language teacher
+  I want to manage individual entries within a task
+  So that I can curate the best pronunciation exercises
+
+  Background:
+    Given I am authenticated
+    And I am viewing a task with entries
+
+  Scenario: See task entries list
+    Then I see all entries in the task
+    And each entry shows its text content
+
+  Scenario: Play entry audio from task view
+    When I click the play button on an entry
+    Then the audio for that entry is synthesized and played
+
+  Scenario: Remove entry from task
+    When I click remove on an entry
+    Then the entry is removed from the task
+
+  Scenario: Empty task shows helpful message
+    Given I am viewing an empty task
+    Then I see a message suggesting to add entries
+    And I see a link to the synthesis page
+`,
+
   'US-050-task-entries-management': `@ready @tasks @entries @US-050
 Feature: Manage entries within a task (US-050)
   As a language teacher
@@ -330,6 +389,39 @@ Feature: Manage entries within a task (US-050)
     Given I am viewing an empty task
     Then I see a message suggesting to add entries
     And I see a link to the synthesis page
+`,
+
+  'US-054-task-edit-modal 2': `@ready @tasks @edit @US-054
+Feature: Edit task via modal form (US-054)
+  As a language teacher
+  I want to edit task name and description via a modal form
+  So that I can update task information without leaving the page
+
+  Background:
+    Given I am authenticated
+    And I have a task in the list
+
+  Scenario: Open task edit modal
+    When I click the edit button on a task
+    Then the task edit modal opens
+    And the fields are pre-filled with current values
+
+  Scenario: Save edited task name
+    Given the task edit modal is open
+    When I change the task name to "Updated Name"
+    And I click the "Salvesta" button
+    Then the task is updated with the new name
+
+  Scenario: Validation error for empty name in edit
+    Given the task edit modal is open
+    When I clear the task name field
+    And I click the "Salvesta" button
+    Then I see "Ülesande nimi on kohustuslik" error
+
+  Scenario: Cancel editing without saving
+    Given the task edit modal is open
+    When I close the modal without saving
+    Then the task remains unchanged
 `,
 
   'US-054-task-edit-modal': `@ready @tasks @edit @US-054
@@ -365,6 +457,38 @@ Feature: Edit task via modal form (US-054)
     Then the task remains unchanged
 `,
 
+  'US-065-add-entry-modal 2': `@ready @tasks @modal @US-065
+Feature: Add new task entry via modal (US-065)
+  As a language teacher
+  I want to add new entries to a task via a modal form
+  So that I can build exercise collections efficiently
+
+  Scenario: Open add entry modal
+    Given I am viewing a task detail
+    When I click the "Add entry" button
+    Then the add entry modal opens
+
+  Scenario: Add entry successfully
+    Given the add entry modal is open
+    When I enter "Tere tulemast" in the title field
+    And I enter a description
+    And I click "Lisa"
+    Then the entry is added to the task
+    And the modal closes
+
+  Scenario: Validation error for empty title
+    Given the add entry modal is open
+    When I leave the title field empty
+    And I click "Lisa"
+    Then I see "Pealkiri on kohustuslik" error
+
+  Scenario: Show loading state during submission
+    Given the add entry modal is open
+    When I submit the form
+    Then the button shows "Lisaan..." loading text
+    And the form fields are disabled
+`,
+
   'US-065-add-entry-modal': `@ready @tasks @modal @US-065
 Feature: Add new task entry via modal (US-065)
   As a language teacher
@@ -397,6 +521,38 @@ Feature: Add new task entry via modal (US-065)
     And the form fields are disabled
 `,
 
+  'US-067-task-data-operations 2': `@ready @tasks @data @US-067
+Feature: Task CRUD data operations (US-067)
+  As an authenticated user
+  I want the data service to handle task operations reliably
+  So that my tasks are created, read, updated, and deleted correctly
+
+  Background:
+    Given I am authenticated
+
+  Scenario: Create task with entries
+    When I create a task with name and description
+    Then the task is saved with a unique ID
+    And the task has a creation timestamp
+
+  Scenario: Retrieve user tasks list
+    Given I have multiple tasks
+    When I request my task list
+    Then I see all my tasks as summaries
+    And each summary shows entry count
+
+  Scenario: Update task metadata
+    Given I have an existing task
+    When I update the task name and description
+    Then the task is updated with new values
+    And the updated timestamp changes
+
+  Scenario: Delete task permanently
+    Given I have an existing task
+    When I delete the task
+    Then the task is no longer in my task list
+`,
+
   'US-067-task-data-operations': `@ready @tasks @data @US-067
 Feature: Task CRUD data operations (US-067)
   As an authenticated user
@@ -427,6 +583,40 @@ Feature: Task CRUD data operations (US-067)
     Given I have an existing task
     When I delete the task
     Then the task is no longer in my task list
+`,
+
+  'US-070-task-detail-header-menu 2': `@ready @tasks @detail @US-070
+Feature: Task detail header with actions menu (US-070)
+  As a language teacher viewing task details
+  I want to access edit, share, and delete actions from the header
+  So that I can manage the task without leaving the detail view
+
+  Background:
+    Given I am authenticated
+    And I am viewing a task with entries
+
+  Scenario: See task header with actions
+    Then I see the task name as the page title
+    And I see Share and Play All buttons
+    And I see a more options menu button
+
+  Scenario: Open header options menu
+    When I click the more options button
+    Then I see "Muuda" and "Kustuta" options
+
+  Scenario: Edit task from detail header
+    When I click the more options button
+    And I click "Muuda"
+    Then the task edit form opens
+
+  Scenario: Delete task from detail header
+    When I click the more options button
+    And I click "Kustuta"
+    Then a delete confirmation dialog appears
+
+  Scenario: Share task from detail header
+    When I click the "Jaga" button
+    Then the share task modal opens
 `,
 
   'US-070-task-detail-header-menu': `@ready @tasks @detail @US-070
@@ -463,6 +653,35 @@ Feature: Task detail header with actions menu (US-070)
     Then the share task modal opens
 `,
 
+  'US-071-task-entry-actions 2': `@ready @tasks @entries @US-071
+Feature: Task entry row actions (US-071)
+  As a language teacher viewing task details
+  I want to perform actions on individual entries via a row menu
+  So that I can manage each sentence in the task
+
+  Background:
+    Given I am authenticated
+    And I am viewing a task with entries
+
+  Scenario: Open entry row menu
+    When I click the menu button on an entry
+    Then I see options for the entry
+
+  Scenario: Copy entry text to clipboard
+    When I click "Kopeeri tekst" on an entry
+    Then the entry text is copied to clipboard
+    And I see a success notification
+
+  Scenario: Delete entry from task
+    When I click "Kustuta" on an entry
+    Then the entry is removed from the task
+    And I see a confirmation notification
+
+  Scenario: Explore phonetic form of entry
+    When I click "Uuri häälduskuju" on an entry
+    Then the phonetic panel opens for that entry
+`,
+
   'US-071-task-entry-actions': `@ready @tasks @entries @US-071
 Feature: Task entry row actions (US-071)
   As a language teacher viewing task details
@@ -490,6 +709,37 @@ Feature: Task entry row actions (US-071)
   Scenario: Explore phonetic form of entry
     When I click "Uuri häälduskuju" on an entry
     Then the phonetic panel opens for that entry
+`,
+
+  'US-072-task-entry-drag-drop 2': `@ready @tasks @drag-drop @US-072
+Feature: Reorder task entries via drag and drop (US-072)
+  As a language teacher
+  I want to reorder entries in a task by dragging them
+  So that I can arrange exercises in the optimal learning order
+
+  Background:
+    Given I am authenticated
+    And I am viewing a task with entries
+
+  Scenario: Start dragging an entry
+    When I start dragging an entry
+    Then the entry shows a dragging visual indicator
+
+  Scenario: See drop target while dragging
+    Given I am dragging an entry
+    When I hover over another entry
+    Then the target entry shows a drop indicator
+
+  Scenario: Drop entry to reorder
+    Given I am dragging an entry
+    When I drop it on another entry position
+    Then the entries are reordered
+    And the new order is persisted
+
+  Scenario: Cancel drag operation
+    Given I am dragging an entry
+    When I release outside a valid drop target
+    Then the entries return to their original order
 `,
 
   'US-072-task-entry-drag-drop': `@ready @tasks @drag-drop @US-072
@@ -523,6 +773,34 @@ Feature: Reorder task entries via drag and drop (US-072)
     Then the entries return to their original order
 `,
 
+  'US-073-task-entry-variants 2': `@ready @tasks @variants @US-073
+Feature: View pronunciation variants for task entries (US-073)
+  As a language teacher viewing task details
+  I want to see pronunciation variants for words in task entries
+  So that I can verify correct pronunciation is used
+
+  Background:
+    Given I am authenticated
+    And I am viewing a task with entries
+
+  Scenario: Click word tag to see variants
+    When I click on a word tag in a task entry
+    Then the pronunciation variants panel opens
+    And variants for that word are loaded
+
+  Scenario: Use variant to update entry
+    Given the variants panel is open for a task entry
+    When I select a variant to use
+    Then the word in the entry is updated
+    And the change is persisted to the task
+
+  Scenario: Close variants panel in task view
+    Given the variants panel is open for a task entry
+    When I close the variants panel
+    Then the panel closes
+    And the entry remains unchanged
+`,
+
   'US-073-task-entry-variants': `@ready @tasks @variants @US-073
 Feature: View pronunciation variants for task entries (US-073)
   As a language teacher viewing task details
@@ -549,6 +827,37 @@ Feature: View pronunciation variants for task entries (US-073)
     When I close the variants panel
     Then the panel closes
     And the entry remains unchanged
+`,
+
+  'US-074-task-detail-states 2': `@ready @tasks @detail @US-074
+Feature: Task detail view states (US-074)
+  As a language teacher
+  I want the task detail view to handle different states
+  So that I see appropriate feedback for loading, errors, and empty tasks
+
+  Background:
+    Given I am authenticated
+
+  Scenario: Show loading state while fetching task
+    When I navigate to a task detail page
+    Then I see a loading indicator
+    And I see a back button
+
+  Scenario: Show error when task not found
+    When I navigate to a non-existent task
+    Then I see "Ülesannet ei leitud" error message
+    And I see a back button
+
+  Scenario: Show empty state for task without entries
+    Given I am viewing an empty task
+    Then I see the empty state illustration
+    And I see a "Hakkan sisu looma" button
+    And I can navigate to synthesis from the empty state
+
+  Scenario: Show error when not authenticated
+    Given I am not authenticated
+    When I try to access a task detail
+    Then I see "Kasutaja pole sisse logitud" error
 `,
 
   'US-074-task-detail-states': `@ready @tasks @detail @US-074
@@ -580,6 +889,41 @@ Feature: Task detail view states (US-074)
     Given I am not authenticated
     When I try to access a task detail
     Then I see "Kasutaja pole sisse logitud" error
+`,
+
+  'US-076-task-list-row 2': `@ready @tasks @list @US-076
+Feature: Task list row with expandable description (US-076)
+  As a language teacher
+  I want to see task summaries in a list with expandable details
+  So that I can quickly scan and manage my tasks
+
+  Background:
+    Given I am authenticated
+    And I am on the tasks page
+    And I have multiple tasks
+
+  Scenario: See task row with name and meta
+    Then each task row shows the task name
+    And each row shows the entry count
+    And each row shows the creation date
+
+  Scenario: Expand truncated description
+    Given a task has a long description
+    When I click "Näita rohkem"
+    Then the full description is revealed
+
+  Scenario: Collapse expanded description
+    Given a task description is expanded
+    When I click "Näita vähem"
+    Then the description is truncated again
+
+  Scenario: Click task row to view details
+    When I click on a task row
+    Then I navigate to the task detail view
+
+  Scenario: Open task row context menu
+    When I click the more options button on a task row
+    Then I see options for "Muuda", "Jaga", and "Kustuta"
 `,
 
   'US-076-task-list-row': `@ready @tasks @list @US-076
@@ -617,6 +961,31 @@ Feature: Task list row with expandable description (US-076)
     Then I see options for "Muuda", "Jaga", and "Kustuta"
 `,
 
+  'US-077-tasks-empty-state 2': `@ready @tasks @empty @US-077
+Feature: Tasks page empty and error states (US-077)
+  As an authenticated user with no tasks
+  I want to see helpful guidance when my task list is empty
+  So that I know how to get started creating tasks
+
+  Background:
+    Given I am authenticated
+
+  Scenario: Show empty state when no tasks exist
+    Given I have no tasks
+    When I navigate to the tasks page
+    Then I see an empty state message
+    And I see a "Create new task" button
+
+  Scenario: Show loading while fetching tasks
+    When I navigate to the tasks page
+    Then I see a loading indicator while tasks are being fetched
+
+  Scenario: Show error when task loading fails
+    Given the task API is unavailable
+    When I navigate to the tasks page
+    Then I see an error message
+`,
+
   'US-077-tasks-empty-state': `@ready @tasks @empty @US-077
 Feature: Tasks page empty and error states (US-077)
   As an authenticated user with no tasks
@@ -640,6 +1009,37 @@ Feature: Tasks page empty and error states (US-077)
     Given the task API is unavailable
     When I navigate to the tasks page
     Then I see an error message
+`,
+
+  'US-083-add-all-sentences-to-task 2': `@ready @tasks @bulk @US-083
+Feature: Add all playlist sentences to a task (US-083)
+  As a language teacher
+  I want to add all current playlist sentences to a task at once
+  So that I can quickly save my work as a reusable exercise
+
+  Background:
+    Given I am authenticated
+    And I am on the synthesis page
+    And I have multiple sentences with text
+
+  Scenario: See add all to task button
+    Then I see a "Lisa ülesandesse" button
+
+  Scenario: Add all sentences to existing task
+    When I click "Lisa ülesandesse"
+    And I select an existing task from the dropdown
+    Then all sentences are added to that task
+    And I see a success notification
+
+  Scenario: Create new task from all sentences
+    When I click "Lisa ülesandesse"
+    And I click "Loo uus ülesanne"
+    Then a new task is created with all sentences
+    And I am redirected to the tasks view
+
+  Scenario: Button disabled when no text entered
+    Given all sentence inputs are empty
+    Then the "Lisa ülesandesse" button is disabled
 `,
 
   'US-083-add-all-sentences-to-task': `@ready @tasks @bulk @US-083
@@ -673,6 +1073,33 @@ Feature: Add all playlist sentences to a task (US-083)
     Then the "Lisa ülesandesse" button is disabled
 `,
 
+  'US-097-task-share-from-list 2': `@ready @tasks @sharing @US-097
+Feature: Share task from task list (US-097)
+  As a language teacher
+  I want to share a task directly from the task list
+  So that I can quickly distribute exercises without opening details
+
+  Background:
+    Given I am authenticated
+    And I am on the tasks page
+    And I have a task in the list
+
+  Scenario: Share from task row menu
+    When I click the more options button on a task
+    And I click "Jaga"
+    Then the share modal opens for that task
+
+  Scenario: Task gets a share token on first share
+    Given my task has no share token yet
+    When I share the task
+    Then a share token is generated and assigned
+
+  Scenario: Share token persists after first share
+    Given my task already has a share token
+    When I share the task again
+    Then the same share token is used
+`,
+
   'US-097-task-share-from-list': `@ready @tasks @sharing @US-097
 Feature: Share task from task list (US-097)
   As a language teacher
@@ -698,6 +1125,36 @@ Feature: Share task from task list (US-097)
     Given my task already has a share token
     When I share the task again
     Then the same share token is used
+`,
+
+  'US-099-task-entry-text-update 2': `@ready @tasks @entries @US-099
+Feature: Update task entry text and stressed text (US-099)
+  As a language teacher
+  I want to update the text of individual task entries
+  So that I can correct or improve exercise content
+
+  Background:
+    Given I am authenticated
+    And I am viewing a task with entries
+
+  Scenario: Update entry stressed text via phonetic panel
+    When I open the phonetic panel for an entry
+    And I edit the phonetic text
+    And I click "Rakenda"
+    Then the entry's stressed text is updated
+    And the change is persisted to storage
+
+  Scenario: Update entry via variant selection
+    When I click a word tag in an entry
+    And I select a pronunciation variant
+    Then the entry text reflects the chosen variant
+    And the task is saved with updated content
+
+  Scenario: Revert on save failure
+    Given I updated an entry locally
+    When the save to backend fails
+    Then the entry reverts to its previous value
+    And I see an error notification
 `,
 
   'US-099-task-entry-text-update': `@ready @tasks @entries @US-099

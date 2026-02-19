@@ -124,20 +124,35 @@ $font-weight-bold: var(--font-weight-bold);          // 700
 **4px grid system:**
 
 ```scss
-$spacing-0: var(--spacing-0);      // 0
-$spacing-1: var(--spacing-1);      // 4px
-$spacing-2: var(--spacing-2);      // 8px
-$spacing-3: var(--spacing-3);      // 12px
-$spacing-4: var(--spacing-4);      // 16px
-$spacing-6: var(--spacing-6);      // 24px
-$spacing-8: var(--spacing-8);      // 32px
+// Base spacing scale (4px grid + half-steps)
+$spacing-0: var(--spacing-0);        // 0
+$spacing-1: var(--spacing-1);        // 4px
+$spacing-1-5: var(--spacing-1-5);    // 6px
+$spacing-2: var(--spacing-2);        // 8px
+$spacing-3: var(--spacing-3);        // 12px
+$spacing-3-5: var(--spacing-3-5);    // 14px
+$spacing-4: var(--spacing-4);        // 16px
+$spacing-5: var(--spacing-5);        // 20px
+$spacing-6: var(--spacing-6);        // 24px
+$spacing-8: var(--spacing-8);        // 32px
+$spacing-9: var(--spacing-9);        // 36px
+$spacing-10: var(--spacing-10);      // 40px
+$spacing-11: var(--spacing-11);      // 44px
+$spacing-12: var(--spacing-12);      // 48px
+$spacing-15: var(--spacing-15);      // 60px
+$spacing-16: var(--spacing-16);      // 64px
+$spacing-17: var(--spacing-17);      // 68px
 
 // Semantic aliases
-$spacing-xs: var(--spacing-xs);    // 4px
-$spacing-sm: var(--spacing-sm);    // 8px
-$spacing-md: var(--spacing-md);    // 16px
-$spacing-lg: var(--spacing-lg);    // 24px
-$spacing-xl: var(--spacing-xl);    // 32px
+$spacing-xs: var(--spacing-xs);      // 4px
+$spacing-sm: var(--spacing-sm);      // 8px
+$spacing-md: var(--spacing-md);      // 16px
+$spacing-lg: var(--spacing-lg);      // 24px
+$spacing-xl: var(--spacing-xl);      // 32px
+$spacing-2xl: var(--spacing-2xl);    // 48px
+
+// Accessibility
+$spacing-touch-target: var(--spacing-touch-target); // 44px (WCAG 2.5.5)
 ```
 
 #### 4. Borders (`styles/tokens/_borders.scss`)
@@ -146,12 +161,16 @@ $spacing-xl: var(--spacing-xl);    // 32px
 // Border radii
 $border-radius-sm: var(--border-radius-sm);      // 6px
 $border-radius: var(--border-radius);            // 8px
+$border-radius-md: var(--border-radius-md);      // 8px
 $border-radius-lg: var(--border-radius-lg);      // 12px
+$border-radius-xl: var(--border-radius-xl);      // 16px
 $border-radius-round: var(--border-radius-round); // 10rem
+$border-radius-full: var(--border-radius-full);  // 9999px
 
 // Border widths
 $border-width-thin: var(--border-width-thin);    // 1px
 $border-width-medium: var(--border-width-medium); // 2px
+$border-width-thick: var(--border-width-thick);  // 3px
 ```
 
 ### Naming Convention
@@ -176,14 +195,5 @@ $border-width-medium: var(--border-width-medium); // 2px
 
 For detailed guidelines on when and how to add tokens, see [`styles/tokens/README.md`](../styles/tokens/README.md).
 
-**Quick Reference:**
-
-**Add a token when:**
-- Value used in 2+ places
-- Value has semantic meaning
-- Value may need theming
-
-**Don't add a token for:**
-- One-off values
-- Purely decorative values
-- Component-specific values
+**Add a token when:** value used in 2+ places, has semantic meaning, or may need theming.
+**Don't add a token for:** one-off, purely decorative, or component-specific values.

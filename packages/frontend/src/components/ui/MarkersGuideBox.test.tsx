@@ -65,7 +65,7 @@ describe("MarkersGuideBox", () => {
         screen.getByRole("button", { name: "ebareeglipärase rõhu märk" }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "peenendus" }),
+        screen.getByRole("button", { name: "peenendus (palatalisatsioon)" }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole("button", { name: "liitsõnapiir" }),
@@ -127,7 +127,7 @@ describe("MarkersGuideBox", () => {
       );
       expect(mockOnInsertMarker).toHaveBeenCalledWith("´");
 
-      await user.click(screen.getByRole("button", { name: "peenendus" }));
+      await user.click(screen.getByRole("button", { name: "peenendus (palatalisatsioon)" }));
       expect(mockOnInsertMarker).toHaveBeenCalledWith("'");
 
       await user.click(screen.getByRole("button", { name: "liitsõnapiir" }));
@@ -160,7 +160,7 @@ describe("MarkersGuideBox", () => {
       expect(
         screen.getByLabelText("ebareeglipärase rõhu märk"),
       ).toBeInTheDocument();
-      expect(screen.getByLabelText("peenendus")).toBeInTheDocument();
+      expect(screen.getByLabelText("peenendus (palatalisatsioon)")).toBeInTheDocument();
       expect(screen.getByLabelText("liitsõnapiir")).toBeInTheDocument();
     });
   });

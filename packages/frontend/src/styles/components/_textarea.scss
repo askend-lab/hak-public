@@ -1,5 +1,6 @@
 @import "../tokens/colors";
 @import "../tokens/typography";
+@import "../tokens/spacing";
 @import "../tokens/borders";
 
 .textarea-wrapper {
@@ -32,23 +33,23 @@
 }
 
 .textarea-label {
-  margin-bottom: 6px;
+  margin-bottom: $spacing-1-5;
   color: $color-primary;
 }
 
 .textarea-helper-text {
-  margin-top: 6px;
+  margin-top: $spacing-1-5;
   color: $color-trietary;
 }
 
 .textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: $spacing-3 $spacing-4;
   font-size: $font-size-sm;
   font-family: $font-body;
   border: 1px solid $color-primary;
   border-radius: 0.5rem;
-  box-shadow: 0px 1px 2px 0px rgba(21, 21, 21, 0.08);
+  box-shadow: 0px 1px 2px 0px $color-shadow-subtle;
   resize: vertical;
   min-height: 120px;
 
