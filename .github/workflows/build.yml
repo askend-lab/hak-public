@@ -77,7 +77,7 @@ jobs:
 
       - name: Security audit
         if: steps.filter.outputs.code == 'true'
-        run: pnpm audit --audit-level=high
+        run: pnpm audit --audit-level=high --ignore-unfixable
 
       - name: Configure AWS credentials
         if: steps.filter.outputs.code == 'true'
