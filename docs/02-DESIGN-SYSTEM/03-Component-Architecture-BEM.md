@@ -65,4 +65,4 @@ All components follow the **BEM (Block Element Modifier)** naming methodology fo
 ---
 
 **See also:**
-- [Component Patterns](./04-Component-Architecture-Patterns.md) - Base and standalone patterns
+- [Component Patterns](./04-Component-Architecture-Patterns.md)

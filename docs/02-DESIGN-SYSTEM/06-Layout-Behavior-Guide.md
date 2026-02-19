@@ -21,21 +21,22 @@
 
 **Content (.page-content):**
 
-| Breakpoint | Padding | Max Width | Behavior |
-|------------|---------|-----------|----------|
-| Mobile (< 640px) | 0 16px 24px | 100% | Full width |
-| Mobile landscape (640px+) | 0 20px 28px | 100% | Full width |
-| Tablet (768px+) | 0 24px 32px | 920px | Constrained |
-| Desktop (1024px+) | 0 32px 36px | 920px | Constrained |
+| Breakpoint | Padding (top right bottom left) | Max Width | Behavior |
+|------------|-------------------------------|-----------|----------|
+| Mobile (< 640px) | 0 16px 24px 16px | 100% | Full width |
+| Mobile landscape (640px+) | 0 20px 32px 20px | 100% | Full width |
+| Tablet (768px+) | 0 24px 32px 24px | 920px | Constrained |
+| Desktop (1024px+) | 0 32px 36px 32px | 920px | Constrained |
 | Large (920px + 64px) | 0 | 920px | No side padding |
 
 **Footer:**
 
-| Breakpoint | Layout | Padding |
-|------------|--------|---------|
-| Mobile (< 768px) | Stacked (vertical) | 24px 16px 20px |
-| Tablet (768px+) | 2 columns (wrapped) | 32px 24px 28px |
-| Desktop (1024px+) | Horizontal (no wrap) | 36px 32px 24px |
+| Breakpoint | Layout | Padding (top right bottom left) |
+|------------|--------|-------------------------------|
+| Mobile (< 640px) | Stacked (vertical) | 24px 16px 20px 16px |
+| Mobile landscape (640px+) | Stacked (vertical) | 32px 20px 24px 20px |
+| Tablet (768px+) | 2 columns (wrapped) | 32px 24px 32px 24px |
+| Desktop (1024px+) | Horizontal (no wrap) | 36px 32px 24px 32px |
 
 ## Layout Selection Guide
 
@@ -101,5 +102,5 @@ Does the page need a header with content?
 ---
 
 **See also:**
-- [Layout Type Examples](./05-Layout-Types-Examples.md) - 4 layout types with code
-- [Breakpoints & Structure](./05-Responsive-Layout-Breakpoints.md) - Breakpoint strategy
+- [Layout Type Examples](./07-Layout-Types-Examples.md)
+- [Breakpoints & Structure](./05-Responsive-Layout-Breakpoints.md)
