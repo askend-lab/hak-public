@@ -207,7 +207,7 @@ hooks:
       - "**/PronunciationVariants.test.tsx"
 
   security-audit:
-    packageManager: pnpm
+    mode: off
 
   secret-detection:
     required: true

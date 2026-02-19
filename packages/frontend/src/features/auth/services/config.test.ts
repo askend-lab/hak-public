@@ -128,14 +128,14 @@ describe("getTaraLoginUrl", () => {
 });
 
 describe("localhost auth defaults", () => {
-  it("should default AUTH_API_URL to /auth on localhost", async () => {
-    const { AUTH_API_URL } = await import("./config");
-    expect(AUTH_API_URL).toBe("/auth");
+  it("should default getAuthApiUrl to /auth on localhost", async () => {
+    const { getAuthApiUrl } = await import("./config");
+    expect(getAuthApiUrl()).toBe("/auth");
   });
 
-  it("should default TARA_LOGIN_URL to /auth/tara/start on localhost", async () => {
-    const { TARA_LOGIN_URL } = await import("./config");
-    expect(TARA_LOGIN_URL).toBe("/auth/tara/start");
+  it("should default getTaraLoginUrlValue to /auth/tara/start on localhost", async () => {
+    const { getTaraLoginUrlValue } = await import("./config");
+    expect(getTaraLoginUrlValue()).toBe("/auth/tara/start");
   });
 });
 
