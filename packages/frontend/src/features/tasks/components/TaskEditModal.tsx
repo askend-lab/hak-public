@@ -93,7 +93,7 @@ export default function TaskEditModal({
       size="medium"
       className="task-edit-modal"
     >
-      <form onSubmit={handleSubmit} className="task-edit-modal__form">
+      <form onSubmit={(e) => { void handleSubmit(e); }} className="task-edit-modal__form">
         <div className="task-edit-modal__field">
           <input
             id="edit-task-name"

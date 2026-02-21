@@ -72,8 +72,8 @@ export function useSynthesisOrchestrator(): ReturnType<
             updateSentence(id, { isPlaying: false });
             if (retryCount === 0 && sentence.audioUrl) {
               updateSentence(id, CACHE_INVALIDATION);
-              setTimeout(async () => {
-                await playSingleSentence(id, abortSignal, 1);
+              setTimeout(() => {
+                void playSingleSentence(id, abortSignal, 1);
               }, 100);
             }
           },
@@ -87,8 +87,8 @@ export function useSynthesisOrchestrator(): ReturnType<
           updateSentence(id, { isPlaying: false });
           if (retryCount === 0 && sentence.audioUrl) {
             updateSentence(id, CACHE_INVALIDATION);
-            setTimeout(async () => {
-              await playSingleSentence(id, abortSignal, 1);
+            setTimeout(() => {
+              void playSingleSentence(id, abortSignal, 1);
             }, 100);
           }
         },
@@ -119,7 +119,7 @@ export function useSynthesisOrchestrator(): ReturnType<
                 ...CACHE_INVALIDATION,
               });
               if (retryCount < MAX_RETRY_COUNT) {
-                setTimeout(() => synthesizeAndPlay(id, retryCount + 1), RETRY_DELAY_MS);
+                setTimeout(() => { void synthesizeAndPlay(id, retryCount + 1); }, RETRY_DELAY_MS);
               }
             },
           });
@@ -190,7 +190,7 @@ export function useSynthesisOrchestrator(): ReturnType<
                 ...CACHE_INVALIDATION,
               });
               if (retryCount < MAX_RETRY_COUNT) {
-                setTimeout(() => synthesizeWithText(id, text, retryCount + 1), RETRY_DELAY_MS);
+                setTimeout(() => { void synthesizeWithText(id, text, retryCount + 1); }, RETRY_DELAY_MS);
               }
             },
           });

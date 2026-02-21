@@ -26,7 +26,7 @@ export default function RoleSelectionContent() {
 
   const handleRoleSelect = (roleId: UserRole) => {
     selectRole(roleId);
-    navigate("/synthesis");
+    void navigate("/synthesis");
   };
 
   return (

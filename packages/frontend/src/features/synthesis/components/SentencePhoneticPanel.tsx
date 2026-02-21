@@ -249,7 +249,7 @@ export default function SentencePhoneticPanel({
             />
             <div className="sentence-phonetic-panel__actions">
               <button
-                onClick={handlePlay}
+                onClick={() => { void handlePlay(); }}
                 disabled={!editedText.trim() || isLoading}
                 className={`button button--primary ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
                 title={isLoading ? "Laen..." : isPlaying ? "Mängib" : "Kuula"}

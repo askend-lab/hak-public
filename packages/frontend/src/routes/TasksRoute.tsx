@@ -20,13 +20,13 @@ export default function TasksRoute() {
         <TasksView
           selectedTaskId={taskId ?? null}
           taskRefreshTrigger={taskHandlers.modals.taskRefreshTrigger}
-          onBack={() => navigate("/tasks")}
-          onViewTask={(id) => navigate(`/tasks/${id}`)}
+          onBack={() => { void navigate("/tasks"); }}
+          onViewTask={(id) => { void navigate(`/tasks/${id}`); }}
           onCreateTask={taskHandlers.crud.handleCreateTask}
-          onEditTask={taskHandlers.crud.handleEditTask}
-          onDeleteTask={taskHandlers.crud.handleDeleteTask}
-          onShareTask={taskHandlers.sharing.handleShareTask}
-          onNavigateToSynthesis={() => navigate("/synthesis")}
+          onEditTask={(...args) => { void taskHandlers.crud.handleEditTask(...args); }}
+          onDeleteTask={(...args) => { void taskHandlers.crud.handleDeleteTask(...args); }}
+          onShareTask={(...args) => { void taskHandlers.sharing.handleShareTask(...args); }}
+          onNavigateToSynthesis={() => { void navigate("/synthesis"); }}
         />
       </ErrorBoundary>
     </Suspense>

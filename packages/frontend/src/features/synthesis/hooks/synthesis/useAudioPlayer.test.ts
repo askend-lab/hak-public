@@ -276,7 +276,7 @@ describe("useAudioPlayer", () => {
       const { result } = renderHook(() => useAudioPlayer());
 
       await act(async () => {
-        result.current.playAudio("https://example.com/audio.mp3");
+        void result.current.playAudio("https://example.com/audio.mp3");
       });
 
       expect(result.current.currentAudio).not.toBeNull();

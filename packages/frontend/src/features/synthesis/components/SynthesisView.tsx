@@ -35,7 +35,7 @@ function SentenceItem({ sentence, sentenceIndex }: SentenceItemProps) {
   const tagMenuItems: TagMenuItem[] = [
     {
       label: SYNTHESIS_STRINGS.TAG_MENU_VARIANTS,
-      onClick: (sid, tidx, w) => variants.handleOpenVariantsFromMenu(sid, tidx, w),
+      onClick: (sid, tidx, w) => { void variants.handleOpenVariantsFromMenu(sid, tidx, w); },
     },
     {
       label: SYNTHESIS_STRINGS.TAG_MENU_EDIT,
@@ -67,7 +67,7 @@ function SentenceItem({ sentence, sentenceIndex }: SentenceItemProps) {
       isDragOver={dragDrop.dragOverId === sentence.id}
       isPlaying={sentence.isPlaying ?? false}
       isLoading={sentence.isLoading ?? false}
-      onPlay={synthesis.handlePlay}
+      onPlay={(...args: Parameters<typeof synthesis.handlePlay>) => { void synthesis.handlePlay(...args); }}
       onDragStart={dragDrop.handleDragStart}
       onDragEnd={dragDrop.handleDragEnd}
       onDragOver={dragDrop.handleDragOver}
@@ -100,7 +100,7 @@ function SentenceItem({ sentence, sentenceIndex }: SentenceItemProps) {
       onInputBlur={() => synthesis.handleInputBlur(sentence.id)}
       onClear={synthesis.handleClearSentence}
       sentenceIndex={sentenceIndex}
-      onMenuOpenLegacy={menu.handleMenuOpen}
+      onMenuOpenLegacy={(...args: Parameters<typeof menu.handleMenuOpen>) => { void menu.handleMenuOpen(...args); }}
       menuContent={
         isMenuOpen ? (
           <SentenceMenu
@@ -111,11 +111,11 @@ function SentenceItem({ sentence, sentenceIndex }: SentenceItemProps) {
             onSearchChange={menu.setMenuSearchQuery}
             isLoadingTasks={menu.isLoadingMenuTasks}
             tasks={menu.menuTasks}
-            onAddToTask={taskHandlers.entries.handleAddSentenceToExistingTask}
-            onCreateNewTask={taskHandlers.crud.handleCreateNewTaskFromMenu}
-            onExplorePhonetic={variants.handleExplorePhonetic}
-            onDownload={synthesis.handleDownload}
-            onCopyText={synthesis.handleCopyText}
+            onAddToTask={(...args: Parameters<typeof taskHandlers.entries.handleAddSentenceToExistingTask>) => { void taskHandlers.entries.handleAddSentenceToExistingTask(...args); }}
+            onCreateNewTask={(...args: Parameters<typeof taskHandlers.crud.handleCreateNewTaskFromMenu>) => { void taskHandlers.crud.handleCreateNewTaskFromMenu(...args); }}
+            onExplorePhonetic={(...args: Parameters<typeof variants.handleExplorePhonetic>) => { void variants.handleExplorePhonetic(...args); }}
+            onDownload={(...args: Parameters<typeof synthesis.handleDownload>) => { void synthesis.handleDownload(...args); }}
+            onCopyText={(...args: Parameters<typeof synthesis.handleCopyText>) => { void synthesis.handleCopyText(...args); }}
             onRemove={synthesis.handleRemoveSentence}
             onLogin={onLogin}
             onClose={menu.handleMenuClose}
@@ -136,12 +136,12 @@ export default function SynthesisView() {
         sentenceCount={synthesis.sentences.filter((s) => s.text.trim()).length}
         isPlayingAll={synthesis.isPlayingAll}
         isLoadingPlayAll={synthesis.isLoadingPlayAll}
-        onAddAllClick={taskHandlers.entries.handleAddAllSentencesToTask}
-        onPlayAllClick={synthesis.handlePlayAll}
+        onAddAllClick={(...args: Parameters<typeof taskHandlers.entries.handleAddAllSentencesToTask>) => { void taskHandlers.entries.handleAddAllSentencesToTask(...args); }}
+        onPlayAllClick={() => { void synthesis.handlePlayAll(); }}
         showDropdown={taskHandlers.modals.showAddToTaskDropdown}
         onDropdownClose={() => taskHandlers.modals.setShowAddToTaskDropdown(false)}
-        onSelectTask={taskHandlers.entries.handleSelectTaskFromDropdown}
-        onCreateNew={taskHandlers.entries.handleCreateNewFromDropdown}
+        onSelectTask={(...args: Parameters<typeof taskHandlers.entries.handleSelectTaskFromDropdown>) => { void taskHandlers.entries.handleSelectTaskFromDropdown(...args); }}
+        onCreateNew={() => { void taskHandlers.entries.handleCreateNewFromDropdown(); }}
       />
       <div className="page-content">
         <div className="sentences-section">

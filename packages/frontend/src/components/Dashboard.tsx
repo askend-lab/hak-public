@@ -111,7 +111,7 @@ function useDashboardData() {
     }
   }, [isAuthenticated, user, dataService]);
   useEffect(() => {
-    loadData();
+    void loadData();
   }, [loadData]);
   return { metrics, recentActivity, isLoading, isAuthenticated };
 }
@@ -141,7 +141,7 @@ export default function Dashboard() {
       </div>
       <div className="dashboard__sections">
         <ActivitySection recentActivity={recentActivity} />
-        <QuickLinks onNavigate={navigate} />
+        <QuickLinks onNavigate={(path: string) => { void navigate(path); }} />
       </div>
       {!isAuthenticated && (
         <div className="dashboard__auth-prompt">

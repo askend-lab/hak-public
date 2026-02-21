@@ -91,15 +91,15 @@ export function useSharedTaskAudio(): UseSharedTaskAudioReturn {
           };
           audio.onerror = (): void => {
             if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
-            synthesizeAndPlay(entry.stressedText, entry.text, id);
+            void synthesizeAndPlay(entry.stressedText, entry.text, id);
           };
           audio.play().catch(() => {
             if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
-            synthesizeAndPlay(entry.stressedText, entry.text, id);
+            void synthesizeAndPlay(entry.stressedText, entry.text, id);
           });
         }
       } else {
-        synthesizeAndPlay(entry.stressedText, entry.text, id);
+        void synthesizeAndPlay(entry.stressedText, entry.text, id);
       }
     },
     [synthesizeAndPlay],

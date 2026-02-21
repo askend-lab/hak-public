@@ -80,7 +80,7 @@ export default function TasksView({
         <TaskDetailView
           taskId={selectedTaskId}
           onBack={onBack}
-          onEditTask={handleEditTask}
+          onEditTask={(...args: Parameters<typeof handleEditTask>) => { void handleEditTask(...args); }}
           onDeleteTask={onDeleteTask}
           onNavigateToSynthesis={onNavigateToSynthesis}
         />
@@ -113,7 +113,7 @@ export default function TasksView({
           </p>
           <button
             className="empty-state__action button button--primary"
-            onClick={onCreateTask}
+            onClick={() => { void onCreateTask(); }}
           >
             <AddIcon size="2xl" />
             Loo esimene ülesanne
@@ -129,7 +129,7 @@ export default function TasksView({
       <div className="page-header page-header--with-actions">
         <h1 className="page-header__title">Ülesanded</h1>
         <div className="page-header__actions">
-          <button onClick={onCreateTask} className="button button--primary">
+          <button onClick={() => { void onCreateTask(); }} className="button button--primary">
             <AddIcon size="2xl" />
             Loo uus ülesanne
           </button>
@@ -143,10 +143,10 @@ export default function TasksView({
         )}
         <TaskManager
           tasks={tasks}
-          onEditTask={handleEditTask}
+          onEditTask={(...args: Parameters<typeof handleEditTask>) => { void handleEditTask(...args); }}
           onViewTask={onViewTask}
           onDeleteTask={onDeleteTask}
-          onShareTask={handleShareTask}
+          onShareTask={(...args: Parameters<typeof handleShareTask>) => { void handleShareTask(...args); }}
         />
       </div>
     </>

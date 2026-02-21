@@ -176,10 +176,10 @@ export default function TaskDetailView({
         isHeaderMenuOpen={isHeaderMenuOpen}
         setIsHeaderMenuOpen={setIsHeaderMenuOpen}
         onShare={() => setIsShareModalOpen(true)}
-        onPlayAll={audio.handlePlayAll}
-        onDownloadZip={handleDownloadZip}
+        onPlayAll={() => { void audio.handlePlayAll(); }}
+        onDownloadZip={() => { void handleDownloadZip(); }}
         isDownloading={isDownloading}
-        onCopyToSynthesis={handleCopyToSynthesis}
+        onCopyToSynthesis={() => { void handleCopyToSynthesis(); }}
         onEditTask={onEditTask}
         onDeleteTask={onDeleteTask}
       />
@@ -226,12 +226,12 @@ export default function TaskDetailView({
                 rowMenuItems={[
                   {
                     label: "Uuri häälduskuju",
-                    onClick: phonetic.handleExplorePhonetic,
+                    onClick: (...args: Parameters<typeof phonetic.handleExplorePhonetic>) => { void phonetic.handleExplorePhonetic(...args); },
                   },
-                  { label: "Kopeeri tekst", onClick: handleCopyText },
+                  { label: "Kopeeri tekst", onClick: (...args: Parameters<typeof handleCopyText>) => { void handleCopyText(...args); } },
                   {
                     label: "Kustuta",
-                    onClick: handleDeleteEntry,
+                    onClick: (...args: Parameters<typeof handleDeleteEntry>) => { void handleDeleteEntry(...args); },
                     danger: true,
                   },
                 ]}
@@ -252,7 +252,7 @@ export default function TaskDetailView({
         isOpen={variants.isVariantsPanelOpen}
         word={variants.variantsWord || ""}
         onClose={variants.handleCloseVariants}
-        onUseVariant={variants.handleUseVariant}
+        onUseVariant={(...args: Parameters<typeof variants.handleUseVariant>) => { void variants.handleUseVariant(...args); }}
         customPhoneticForm={variants.variantsCustomPhonetic}
       />
 
@@ -268,7 +268,7 @@ export default function TaskDetailView({
           }
           isOpen={phonetic.showPhoneticPanel}
           onClose={phonetic.handleClosePhoneticPanel}
-          onApply={phonetic.handlePhoneticApply}
+          onApply={(...args: Parameters<typeof phonetic.handlePhoneticApply>) => { void phonetic.handlePhoneticApply(...args); }}
         />
       )}
     </div>

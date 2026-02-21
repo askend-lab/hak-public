@@ -49,7 +49,7 @@ function createEvent(
 }
 
 const server = http.createServer(
-  async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  (req: http.IncomingMessage, res: http.ServerResponse): void => { void (async (): Promise<void> => {
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -70,7 +70,7 @@ const server = http.createServer(
     req.on("data", (chunk: Buffer) => {
       body += chunk.toString();
     });
-    req.on("end", async () => {
+    req.on("end", (): void => { void (async (): Promise<void> => {
       const event = createEvent(body, path, method);
       let result;
 
@@ -89,8 +89,8 @@ const server = http.createServer(
 
       res.writeHead(result.statusCode);
       res.end(result.body);
-    });
-  },
+    })(); });
+  })(); },
 );
 
 server.listen(PORT, () => {

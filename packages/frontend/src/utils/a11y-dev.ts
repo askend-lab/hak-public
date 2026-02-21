@@ -32,7 +32,7 @@ export async function initA11yDevMode(): Promise<void> {
     const axe = await import("@axe-core/react");
 
     // Run axe after React renders
-    axe.default(React.default, ReactDOM.default, 1000, {
+    void axe.default(React.default, ReactDOM.default, 1000, {
       rules: [
         // Focus on WCAG 2.1 AA critical issues
         { id: "color-contrast", enabled: true },

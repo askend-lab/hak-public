@@ -307,7 +307,8 @@ export default [
       parser: tsParser,
       parserOptions: {
         ecmaVersion: ECMA_VERSION,
-        sourceType: 'module'
+        sourceType: 'module',
+        project: true
       },
       globals: nodeGlobals
     },
@@ -329,6 +330,7 @@ export default [
       parserOptions: {
         ecmaVersion: ECMA_VERSION,
         sourceType: 'module',
+        project: true,
         ecmaFeatures: { jsx: true }
       },
       globals: browserGlobals
@@ -441,6 +443,24 @@ export default [
     rules: {
       'no-magic-numbers': 'off',
       'import/no-default-export': 'off'
+    }
+  },
+
+  // ===== FILES NOT IN ANY TSCONFIG (disable type-aware parsing) =====
+  {
+    files: [
+      '**/e2e/**/*.ts',
+      '**/*.config.ts',
+      '**/test/**/*.ts',
+      '**/aws-services.test.ts',
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: ECMA_VERSION,
+        sourceType: 'module',
+        project: null
+      }
     }
   }
 ];

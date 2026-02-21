@@ -157,7 +157,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </div>
           <button
             type="button"
-            onClick={handleGoogleLogin}
+            onClick={() => { void handleGoogleLogin(); }}
             className="button button--secondary login-modal__google-button login-modal__google-button--flex"
             disabled={isLoading}
           >

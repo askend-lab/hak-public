@@ -42,7 +42,7 @@ export function useUserTasks(refreshTrigger: number = 0): UseUserTasksResult {
       }
     };
 
-    loadTasks();
+    void loadTasks();
   }, [user, refreshTrigger, dataService]);
 
   return {

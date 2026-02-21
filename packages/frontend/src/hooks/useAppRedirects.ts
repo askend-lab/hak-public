@@ -30,7 +30,7 @@ export function useAppRedirects() {
   // Handle post-login redirect
   useEffect(() => {
     if (isAuthenticated && pendingTasksViewAccess) {
-      navigate("/tasks");
+      void navigate("/tasks");
       setPendingTasksViewAccess(false);
     }
   }, [isAuthenticated, pendingTasksViewAccess, navigate]);
@@ -49,7 +49,7 @@ export function useAppRedirects() {
         !onboardingState.selectedRole &&
         (pathname === "/" || pathname === "/synthesis")
       ) {
-        navigate("/role-selection", { replace: true });
+        void navigate("/role-selection", { replace: true });
       }
     }
   }, [

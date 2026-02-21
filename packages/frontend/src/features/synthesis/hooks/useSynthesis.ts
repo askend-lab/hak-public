@@ -50,14 +50,14 @@ export function useSynthesis() {
     sentences,
     getSentence,
     tagUpdater,
-    synthesizeWithText,
+    synthesizeWithText: (...args: Parameters<typeof synthesizeWithText>) => { void synthesizeWithText(...args); },
   });
 
   const actions = useSentenceActions({
     getSentence,
     updateSentence,
-    synthesizeAndPlay,
-    synthesizeWithText,
+    synthesizeAndPlay: (...args: Parameters<typeof synthesizeAndPlay>) => { void synthesizeAndPlay(...args); },
+    synthesizeWithText: (...args: Parameters<typeof synthesizeWithText>) => { void synthesizeWithText(...args); },
     handleRemoveSentence,
     currentAudio,
     playlist,
@@ -66,9 +66,9 @@ export function useSynthesis() {
   const handleKeyDown = (e: React.KeyboardEvent, id: string): void => {
     tagEditor.handleKeyDown(e, id, (id: string, text?: string): void => {
       if (text) {
-        synthesizeWithText(id, text);
+        void synthesizeWithText(id, text);
       } else {
-        synthesizeAndPlay(id);
+        void synthesizeAndPlay(id);
       }
     });
   };

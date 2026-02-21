@@ -108,7 +108,7 @@ describe("useSentenceMenu", () => {
       currentTarget: document.createElement("div"),
     } as unknown as React.MouseEvent;
     await act(async () => {
-      result.current.handleMenuOpen(mockEvent, "s1");
+      void result.current.handleMenuOpen(mockEvent, "s1");
     });
 
     await waitFor(() => {

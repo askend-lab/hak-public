@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import Dashboard from "./Dashboard";
@@ -157,5 +157,12 @@ describe("Dashboard", () => {
       expect(container.querySelector(".dashboard__metrics")).toBeTruthy();
       expect(container.querySelector(".dashboard__sections")).toBeTruthy();
     });
+  });
+
+  it("quick link buttons trigger navigation", async () => {
+    render(<Dashboard />, { wrapper: TestWrapper });
+    await waitFor(() => expect(screen.getByText("Uus süntees")).toBeTruthy());
+    fireEvent.click(screen.getByText("Uus süntees"));
+    fireEvent.click(screen.getByText("Loo ülesanne"));
   });
 });

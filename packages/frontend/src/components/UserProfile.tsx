@@ -37,7 +37,7 @@ export default function UserProfile({ user }: UserProfileProps) {
   }, []);
 
   const handleLogout = () => {
-    logout();
+    void logout();
     setIsDropdownOpen(false);
   };
 

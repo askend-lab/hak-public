@@ -45,8 +45,8 @@ initActivityListeners();
 
 // Enable accessibility checking in development mode
 if (import.meta.env.DEV) {
-  import("./utils/a11y-dev").then(({ initA11yDevMode }) => {
-    initA11yDevMode();
+  void import("./utils/a11y-dev").then(({ initA11yDevMode }) => {
+    void initA11yDevMode();
   });
 }
 

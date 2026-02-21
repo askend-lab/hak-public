@@ -126,7 +126,7 @@ export default function AddEntryModal({
         error={error}
         onTitleChange={setTitle}
         onDescChange={setDescription}
-        onSubmit={handleSubmit}
+        onSubmit={(e: React.FormEvent) => { void handleSubmit(e); }}
       />
     </BaseModal>
   );
