@@ -83,7 +83,7 @@ class TestSynthesisRequest:
                 "voice": "efm_s",
                 "speed": 1.5,
                 "pitch": 100,
-                "cacheKey": "abc123",
+                "cacheKey": "a" * 64,
             })
         }
         req = SynthesisRequest.from_message(msg)
@@ -91,7 +91,7 @@ class TestSynthesisRequest:
         assert req.voice == "efm_s"
         assert req.speed == 1.5
         assert req.pitch == 100
-        assert req.cache_key == "abc123"
+        assert req.cache_key == "a" * 64
 
     def test_from_message_defaults(self):
         msg = {"Body": json.dumps({"text": "tere"})}
@@ -279,7 +279,7 @@ class TestProcessMessage:
         sqs_client = MagicMock()
         s3_client = MagicMock()
         message = {
-            "Body": json.dumps({"text": "tere", "cacheKey": "abc"}),
+            "Body": json.dumps({"text": "tere", "cacheKey": "a" * 64}),
             "ReceiptHandle": "receipt-1",
         }
 

@@ -13,23 +13,12 @@ jest.mock("../src/sqs", () => ({
   sendToQueue: jest.fn().mockResolvedValue("msg-123"),
 }));
 
-jest.mock("../src/ecs", () => {
-  const actual = jest.requireActual("../src/ecs");
-  return {
-    ...actual,
-    describeService: jest.fn(),
-    scaleService: jest.fn().mockResolvedValue(undefined),
-  };
-});
-
-import { synthesize, status, warmup, warmupRateLimit, WARMUP_COOLDOWN_MS } from "../src/handler";
+import { synthesize, status } from "../src/handler";
 import { checkS3Cache } from "../src/s3";
 import { sendToQueue } from "../src/sqs";
-import { describeService, scaleService } from "../src/ecs";
 import { HTTP_STATUS } from "../src/response";
 import {
   setupTestEnv,
-  setupEcsEnv,
   createRequestEvent,
   createStatusEvent,
   TEST_BUCKET,
@@ -38,12 +27,9 @@ import {
 
 const mockCheckS3Cache = checkS3Cache as jest.MockedFunction<typeof checkS3Cache>;
 const mockSendToQueue = sendToQueue as jest.MockedFunction<typeof sendToQueue>;
-const mockDescribeService = describeService as jest.MockedFunction<typeof describeService>;
-const mockScaleService = scaleService as jest.MockedFunction<typeof scaleService>;
 
 beforeEach(() => {
   setupTestEnv();
-  warmupRateLimit.reset();
   jest.clearAllMocks();
   jest.spyOn(console, "error").mockImplementation();
 });
@@ -144,51 +130,3 @@ describe("status", () => {
   });
 });
 
-describe("warmup", () => {
-  it("should return 500 when ECS not configured", async () => {
-    const response = await warmup();
-    expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(JSON.parse(response.body).error).toBe("Missing ECS config");
-  });
-
-  it("should return already_warm when desired >= 1", async () => {
-    setupEcsEnv();
-    mockDescribeService.mockResolvedValue({ desired: 1, running: 1 });
-
-    const response = await warmup();
-    expect(response.statusCode).toBe(HTTP_STATUS.OK);
-    expect(JSON.parse(response.body).status).toBe("already_warm");
-  });
-
-  it("should scale up when desired is 0", async () => {
-    setupEcsEnv();
-    mockDescribeService.mockResolvedValue({ desired: 0, running: 0 });
-
-    const response = await warmup();
-    expect(response.statusCode).toBe(HTTP_STATUS.OK);
-    expect(JSON.parse(response.body).status).toBe("warming");
-    expect(mockScaleService).toHaveBeenCalledWith(1);
-  });
-
-  it("should return 500 on ECS error", async () => {
-    setupEcsEnv();
-    mockDescribeService.mockRejectedValue(new Error("ECS down"));
-
-    const response = await warmup();
-    expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-  });
-
-  it("should rate limit rapid calls", async () => {
-    setupEcsEnv();
-    mockDescribeService.mockResolvedValue({ desired: 0, running: 0 });
-
-    const first = await warmup();
-    expect(first.statusCode).toBe(HTTP_STATUS.OK);
-
-    const second = await warmup();
-    expect(second.statusCode).toBe(HTTP_STATUS.TOO_MANY_REQUESTS);
-    const body = JSON.parse(second.body);
-    expect(body.retryAfterMs).toBeGreaterThan(0);
-    expect(body.retryAfterMs).toBeLessThanOrEqual(WARMUP_COOLDOWN_MS);
-  });
-});

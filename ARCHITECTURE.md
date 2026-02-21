@@ -99,6 +99,63 @@ GitHub Actions workflows in `.github/workflows/`:
 
 **Manual deploy:** `deploy.yml` can be triggered manually with a build ID and target environment (dev/prod).
 
+**There is no manual deployment process.** All deployments go through CI/CD pipelines. Engineers push code to branches, create PRs, and merges to `main` trigger automated builds and deployments. Infrastructure changes in `infra/` trigger Terraform plan/apply.
+
+## Authentication & Authorization
+
+Two login methods via AWS Cognito: **TARA** (Estonian eID — ID-card, Mobile-ID, Smart-ID) and **Cognito Hosted UI** (email/password with PKCE). The `tara-auth` Lambda handles TARA OAuth2 flow. Tokens are exchanged at `/auth/callback`, access tokens sent as `Authorization: Bearer`, refresh tokens stored in httpOnly cookies.
+
+**Public endpoints (no auth):** `/api/synthesize`, `/api/status/*`, `/api/analyze`, `/api/variants`, `/api/get-shared`, `/api/get-public`
+**Authenticated endpoints (Cognito JWT):** `/api/save`, `/api/get`, `/api/delete`, `/api/query`
+
+See `docs/AUTHENTICATION.md` for full details.
+
+## Security Model
+
+**Network layer:**
+
+- All traffic goes through **CloudFront** — API Gateways have no public DNS
+- **AWS WAF** on CloudFront with two rules:
+  - Per-IP rate limiting: 100 requests / 5 minutes → BLOCK
+  - AWS Managed Common Rules: SQL injection, XSS, and other attack protection
+- WAF logs (BLOCK + COUNT) stored in CloudWatch (90-day retention)
+- **CORS** restricts browser-origin requests to the configured domain
+
+**Application layer:**
+
+- **PKCE** on all OAuth2 flows — prevents authorization code interception
+- **httpOnly cookies** for refresh tokens — not accessible to JavaScript
+- **CSRF protection** on tara-auth POST endpoints (Origin header validation)
+- **Input validation** — Zod schemas on API inputs, regex validation on cache keys (SHA-256 hex)
+- **No secrets on frontend** — all sensitive values are server-side environment variables
+- **Shell injection prevention** — Python worker uses `subprocess.run` with argument lists, no `shell=True`
+- **CodeQL** — GitHub security analysis runs on every push/PR
+
+**Data layer:**
+
+- S3 buckets are private, accessed via CloudFront signed URLs or IAM roles
+- DynamoDB access scoped to Lambda execution roles
+- Cognito client secrets stored in SSM/Secrets Manager
+
+## System Diagrams
+
+```
+Browser → CloudFront (WAF) → API Gateway → Lambda / ECS
+```
+
+### TTS Synthesis Pipeline
+
+```
+Frontend  POST /synthesize → merlin-api → SQS → merlin-worker (ECS Fargate)
+          GET /status/{key} → merlin-api → S3 ← merlin-worker (WAV upload)
+```
+
+### Authentication Flow
+
+```
+Frontend → TARA/Cognito → tara-auth Lambda → Cognito User Pool → Frontend (/auth/callback)
+```
+
 ## Quality System
 
 Pre-commit hooks (DevBox) enforce quality on every commit. The commit is rejected if any check fails.

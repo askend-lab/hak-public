@@ -29,11 +29,11 @@ Touches: `.md` files, `ARCHITECTURE.md`, READMEs, CI workflow docs. **No source 
 
 Touches: `packages/frontend/`, `packages/shared/`, `packages/simplestore/`, `packages/tara-auth/`. **No merlin/vabamorf changes.**
 
-- [ ] **2.2** (Low) Remove Jest, consolidate on Vitest (frontend + shared + simplestore)
-- [ ] **4.8** (Medium) Replace deprecated `execCommand` clipboard fallback with Clipboard API
-- [ ] **4.9** (Low) Merge duplicate CSS selectors (.marker-tooltip--align-center)
-- [ ] **7.1** (Low) Make simplestore use `extractErrorMessage` from shared
-- [ ] **8.2.1** (Medium) Remove test duplications in simplestore (handler vs routes tests)
+- [x] **2.2** (Low) Remove Jest, consolidate on Vitest (frontend + shared + simplestore)
+- [x] **4.8** (Medium) Replace deprecated `execCommand` clipboard fallback with Clipboard API
+- [x] **4.9** (Low) Merge duplicate CSS selectors (.marker-tooltip--align-center)
+- [x] **7.1** (Low) Make simplestore use `extractErrorMessage` from shared
+- [x] **8.2.1** (Medium) ~~Remove test duplications in simplestore~~ — complementary testing, not true duplication
 
 ---
 
@@ -41,18 +41,18 @@ Touches: `packages/frontend/`, `packages/shared/`, `packages/simplestore/`, `pac
 
 Touches: `packages/merlin-api/`, `packages/merlin-worker/`, `packages/vabamorf-api/`, `infra/merlin/`. **No frontend/shared/simplestore changes.**
 
-- [ ] **2.3** (Low) Fix bug in generate.py: ERB branch calls `bark_alpha` instead of `erb_alpha`
-- [ ] **4.2** (Medium) Fix getCorsOrigin behavior difference: shared returns `"null"`, merlin/vabamorf return `"*"`
-- [ ] **5.3** (Low) Remove `if True:` indentation hack in run_merlin.py
-- [ ] **7.2** (Low) Replace `console.error` with proper logger in merlin-api and vabamorf-api
-- [ ] **9.1** (Low) Replace `RUN cd` with `WORKDIR` in Dockerfile
-- [ ] **10.2** (Medium) Replace empty-string fallbacks in ECS env vars with throw/validation
-- [ ] **12.3** (Medium) Unify CORS behavior across all packages (consistent origin handling)
-- [ ] **12.7** (Medium) Add cacheKey validation in worker.py (match API-side regex)
-- [ ] **13.1** (Medium) Cache DNN model in memory instead of loading from disk every request
-- [ ] **15.1** (Medium) Remove /warmup endpoint entirely from merlin-api
-- [ ] **15.3** (Low) Apply shell injection fix (TDD tests already exist)
-- [ ] **15.4** (Medium) Remove /status/{cacheKey} from direct public access
+- [x] **2.3** (Low) Fix bug in generate.py: ERB branch calls `bark_alpha` instead of `erb_alpha`
+- [x] **4.2** (Medium) Fix getCorsOrigin behavior difference: shared returns `"null"`, merlin/vabamorf return `"*"`
+- [x] **5.3** (Low) Remove `if True:` indentation hack in run_merlin.py
+- [x] **7.2** (Low) Replace `console.error` with proper logger in merlin-api and vabamorf-api
+- [x] **9.1** (Low) Replace `RUN cd` with `WORKDIR` in Dockerfile
+- [x] **10.2** (Medium) Replace empty-string fallbacks in ECS env vars with throw/validation
+- [x] **12.3** (Medium) Unify CORS behavior across all packages (consistent origin handling)
+- [x] **12.7** (Medium) Add cacheKey validation in worker.py (match API-side regex)
+- [x] **13.1** (Medium) Cache DNN model in memory instead of loading from disk every request
+- [x] **15.1** (Medium) Remove /warmup endpoint entirely from merlin-api
+- [x] **15.3** (Low) Apply shell injection fix (TDD tests already exist)
+- [ ] **15.4** (Medium) Remove /status/{cacheKey} from direct public access — DEFERRED (needs architectural discussion)
 
 ---
 

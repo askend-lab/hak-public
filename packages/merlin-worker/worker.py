@@ -9,6 +9,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shlex
 import signal
 import subprocess
@@ -74,6 +75,7 @@ class WorkerConfig:
 SPEED_MIN, SPEED_MAX = 0.5, 2.0
 PITCH_MIN, PITCH_MAX = -500, 500
 MAX_TEXT_LENGTH = 1000
+VALID_CACHE_KEY = re.compile(r"^[a-f0-9]{64}$")
 
 
 @dataclass
@@ -107,12 +109,16 @@ class SynthesisRequest:
         if not (PITCH_MIN <= pitch <= PITCH_MAX):
             raise ValueError(f"Pitch {pitch} out of range [{PITCH_MIN}, {PITCH_MAX}]")
 
+        cache_key = body.get("cacheKey", hashlib.sha256(text.encode()).hexdigest())
+        if not VALID_CACHE_KEY.match(cache_key):
+            raise ValueError(f"Invalid cacheKey: must be 64-char hex string, got '{cache_key[:20]}...'")
+
         return SynthesisRequest(
             text=text,
             voice=body.get("voice", "efm_l"),
             speed=speed,
             pitch=pitch,
-            cache_key=body.get("cacheKey", hashlib.sha256(text.encode()).hexdigest()),
+            cache_key=cache_key,
         )
 
 

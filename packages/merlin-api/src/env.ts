@@ -6,7 +6,11 @@ export function getAwsRegion(): string {
 }
 
 export function getSqsQueueUrl(): string {
-  return process.env.SQS_QUEUE_URL ?? "";
+  const url = process.env.SQS_QUEUE_URL;
+  if (!url) {
+    throw new Error("Missing required environment variable: SQS_QUEUE_URL");
+  }
+  return url;
 }
 
 const VALID_BUCKET_NAME = /^[a-z0-9][a-z0-9.\-]{1,61}[a-z0-9]$/;
@@ -20,11 +24,19 @@ export function getS3Bucket(): string {
 }
 
 export function getEcsCluster(): string {
-  return process.env.ECS_CLUSTER ?? "";
+  const cluster = process.env.ECS_CLUSTER;
+  if (!cluster) {
+    throw new Error("Missing required environment variable: ECS_CLUSTER");
+  }
+  return cluster;
 }
 
 export function getEcsService(): string {
-  return process.env.ECS_SERVICE ?? "";
+  const service = process.env.ECS_SERVICE;
+  if (!service) {
+    throw new Error("Missing required environment variable: ECS_SERVICE");
+  }
+  return service;
 }
 
 export const VOICE_DEFAULTS = {

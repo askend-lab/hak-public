@@ -17,6 +17,7 @@ import {
   MAX_QUERY_ITEMS,
 } from "./types";
 import { parseTtl } from "./validation";
+import { extractErrorMessage } from "@hak/shared";
 
 /** Error message constants */
 export const ERRORS = {
@@ -193,7 +194,7 @@ export class Store {
       return await fn();
     } catch (error) {
       console.error("[SimpleStore] Operation failed:", error);
-      return { success: false, error: String(error) };
+      return { success: false, error: extractErrorMessage(error, "Unknown error") };
     }
   }
 

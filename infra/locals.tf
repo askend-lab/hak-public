@@ -40,7 +40,6 @@ locals {
     { path = "/api/variants",   origin = "vabamorf-api",    rewrite = true,  auth = false, query_string = true },
     { path = "/api/synthesize", origin = "merlin-api",      rewrite = true,  auth = false, query_string = true },
     { path = "/api/status/*",   origin = "merlin-api",      rewrite = true,  auth = false, query_string = true },
-    { path = "/api/warmup",     origin = "merlin-api",      rewrite = true,  auth = false, query_string = false },
     { path = "/api/save",       origin = "simplestore-api", rewrite = false, auth = true,  query_string = true },
     { path = "/api/get",        origin = "simplestore-api", rewrite = false, auth = true,  query_string = true },
     { path = "/api/delete",     origin = "simplestore-api", rewrite = false, auth = true,  query_string = true },

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+import { logger } from "./logger";
+
 export interface LambdaResponse {
   statusCode: number;
   headers: Record<string, string>;
@@ -9,7 +11,12 @@ export interface LambdaResponse {
 
 // Inlined from @hak/shared — merlin-api is a standalone Lambda without workspace packages
 function getCorsOrigin(): string {
-  return (typeof process !== "undefined" && process.env?.ALLOWED_ORIGIN) || "*";
+  const origin = typeof process !== "undefined" ? process.env?.ALLOWED_ORIGIN : undefined;
+  if (!origin) {
+    console.warn("ALLOWED_ORIGIN not set — defaulting to restrictive 'null' origin");
+    return "null";
+  }
+  return origin;
 }
 
 export const CORS_HEADERS: Record<string, string> = {
@@ -48,7 +55,7 @@ export function createBadRequest(error: string): LambdaResponse {
 }
 
 export function createInternalError(context: string, error: unknown): LambdaResponse {
-  console.error(`${context}:`, error instanceof Error ? error.message : 'Unknown error');
+  logger.error(`${context}:`, error instanceof Error ? error.message : 'Unknown error');
   return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: "Internal server error",
   });

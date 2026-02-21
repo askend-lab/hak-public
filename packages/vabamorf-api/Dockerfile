@@ -1,5 +1,5 @@
 # Use Debian-based Node.js with Lambda Web Adapter
-FROM node:20-slim
+FROM node:22-slim
 
 # Install Lambda Web Adapter and libjsoncpp
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter

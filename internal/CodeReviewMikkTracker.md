@@ -8,15 +8,15 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 1. Documentation
 
-- ✅ Accept  [x] Fixed  [x] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181
 - ❌ Reject (wrong)  —  — **1.1.2** (Low) Shared module doesn't list dependencies — finding incorrect, s3 client IS in package.json
-- ✅ Accept  [x] Fixed  [x] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty
-- ✅ Accept  [x] Fixed  [x] Closed — **1.2.1** (Low) No separate INSTALL.md — expanded Quick Start in root README
-- ✅ Accept  [x] Fixed  [x] Closed — **1.3.1** (Low) Duplicate architecture line in README — not real duplication (summary + link)
-- ✅ Accept  [x] Fixed  [x] Closed — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs — intentional for navigation
-- ✅ Accept  [x] Fixed  [x] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect)
-- ✅ Accept  [x] Fixed  [x] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading)
-- ✅ Accept  [x] Fixed  [x] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.2.1** (Low) No separate INSTALL.md — expanded Quick Start in root README
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.1** (Low) Duplicate architecture line in README — not real duplication (summary + link)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs — intentional for navigation
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1** (Medium) No deployment guide for engineers
@@ -26,8 +26,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 2. Technical Stack
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS
-- ✅ Accept  [ ] Fixed  [ ] Closed — **2.2** (Low) 5 testing frameworks — can remove Jest in favor of Vitest
-- ✅ Accept  [ ] Fixed  [ ] Closed — **2.3** (Low) Bug in generate.py: ERB uses bark_alpha — dead code but fix anyway
+- ✅ Accept  [✅] Fixed  [ ] Closed — **2.2** (Low) 5 testing frameworks — removed Jest from shared, simplestore, frontend
+- ✅ Accept  [✅] Fixed  [ ] Closed — **2.3** (Low) Bug in generate.py: ERB now uses erb_alpha
 
 ## 3. Project Structure
 
@@ -35,75 +35,75 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 4. Code Style
 
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.1** (Low) if statements without curly brackets — `curly: 'all'` ESLint rule
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.2** (Medium) getCorsOrigin duplication — fix behavior difference (*→null)
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.3** (Low) `as unknown as` double type assertions — `consistent-type-assertions` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.4** (Low) Nested ternary statements — `no-nested-ternary` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.5** (Low) Array indexes as React keys — `react/no-array-index-key` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python — knip dead-code hook + Ruff ERA001
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.7** (Low) Redundant `?` and `undefined` type specifiers — `no-unnecessary-type-arguments` ESLint rule (tool enabled, violations pending)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.8** (Medium) Deprecated APIs — execCommand fallback, np.random.RandomState (NOT React.FormEvent)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.9** (Low) Duplicate CSS selectors (.marker-tooltip--align-center)
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.1** (Low) if statements without curly brackets — `curly: 'all'` ESLint rule
+- ✅ Accept  [✅] Fixed  [ ] Closed — **4.2** (Medium) getCorsOrigin unified — merlin-api and vabamorf-api now return 'null' when ALLOWED_ORIGIN unset
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.3** (Low) `as unknown as` double type assertions — `consistent-type-assertions` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.4** (Low) Nested ternary statements — `no-nested-ternary` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.5** (Low) Array indexes as React keys — `react/no-array-index-key` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python — knip dead-code hook + Ruff ERA001
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.7** (Low) Redundant `?` and `undefined` type specifiers — `no-unnecessary-type-arguments` ESLint rule (tool enabled, violations pending)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **4.8** (Medium) Deprecated APIs — removed execCommand fallback, uses Clipboard API only
+- ✅ Accept  [✅] Fixed  [ ] Closed — **4.9** (Low) Duplicate CSS selectors — merged into single .marker-tooltip--align-center block
 - ❌ Reject (not found)  —  — **4.10** (Low) Redundant return None — not confirmed in code
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.11** (Low) TODO matches — 12 found (not 30 as claimed), resolve them — `no-warning-comments` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.12** (Low) Unnecessary list() calls on iterables in Python — Ruff PLW0117
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.11** (Low) TODO matches — 12 found (not 30 as claimed), resolve them — `no-warning-comments` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.12** (Low) Unnecessary list() calls on iterables in Python — Ruff PLW0117
 - ❌ Reject (not found)  —  — **4.13** (Low) Unnecessary awaits — not confirmed in source code
 - ❌ Reject (external lib)  —  — **4.14** (Medium) DeepRecurrentNetwork class — external Merlin library, not our code
 - ❌ Reject (ML convention)  —  — **4.15** (Low) Python naming case — ML math notation convention (W_value, Whx)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — install SonarQube and verify
 - ❌ Reject (external lib)  —  — **4.17** (Medium) Merlin NN Python style issues — external library code
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
 
 ## 5. Simplicity & Patterns
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.3** (Low) `if True:` block in run_merlin.py (indentation hack)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages
+- ✅ Accept  [ ] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — intentional for standalone packages
+- ✅ Accept  [✅] Fixed  [ ] Closed — **5.3** (Low) Removed `if True:` indentation hack in run_merlin.py
+- ✅ Accept  [ ] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — intentional for standalone packages
 
 ## 6. Maintainability
 
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **6.1** (High) pnpm test:all silently skips merlin-worker Python tests — DevBox `run-tests` hook + merlin-worker test script fix
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **6.1** (High) pnpm test:all silently skips merlin-worker Python tests — DevBox `run-tests` hook + merlin-worker test script fix
 
 ## 7. Error Handling
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **7.1** (Low) simplestore doesn't use extractErrorMessage from shared
-- ✅ Accept  [ ] Fixed  [ ] Closed — **7.2** (Low) merlin-api and vabamorf-api use console.error instead of shared logger
+- ✅ Accept  [✅] Fixed  [ ] Closed — **7.1** (Low) simplestore now uses extractErrorMessage from shared
+- ✅ Accept  [✅] Fixed  [ ] Closed — **7.2** (Low) merlin-api and vabamorf-api now use inlined structured logger
 
 ## 8. Testing
 
 - ❌ Reject (wrong)  —  — **8.1** (High) Python tests not in CI — WRONG, they ARE in build-merlin-worker.yml
-- ✅ Accept  [ ] Fixed  [ ] Closed — **8.2.1** (Medium) Test duplications in simplestore (handler vs routes tests)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **8.2.1** (Medium) Test duplications in simplestore — complementary testing, not true duplication
 - ❌ Reject (intentional)  —  — **8.2.2** (Low) Auth context 6 test files — intentional organization by concern
 
 ## 9. CI/CD
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **9.1** (Low) Dockerfile uses `RUN cd` instead of WORKDIR
+- ✅ Accept  [✅] Fixed  [ ] Closed — **9.1** (Low) Dockerfile now uses WORKDIR instead of RUN cd
 - ❌ Reject (by design)  —  — **9.2** (Low) Serverless v3/v4 mismatch — by design, documented in README (cost decision)
-- ✅ Accept  [x] Fixed  [x] Closed — **9.3** (Medium) Deploy workflows — added CI/CD section to ARCHITECTURE.md
+- ✅ Accept  [✅] Fixed  [ ] Closed — **9.3** (Medium) Deploy workflows — added CI/CD section to ARCHITECTURE.md
 
 ## 10. Configuration
 
-- ✅ Accept  [x] Fixed  [x] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **10.2** (Medium) Empty-string ECS env vars — replace with throw or proper validation
+- ✅ Accept  [✅] Fixed  [ ] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **10.2** (Medium) Empty-string ECS env vars — now throw with descriptive messages
 
 ## 11. Dependencies
 
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **11.1** (Medium) Unused dependencies — 7 of 10 confirmed unused — knip + DevBox `deps` hook
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **11.1** (Medium) Unused dependencies — 7 of 10 confirmed unused — knip + DevBox `deps` hook
 
 ## 12. Security
 
 - ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — improve per-user/per-IP limiting
-- ✅ Accept  [ ] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior differs: shared="null" vs merlin/vabamorf="*"
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
-- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
+- ✅ Accept  [✅] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior unified — all packages now return 'null' when ALLOWED_ORIGIN unset
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
+- ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
 - ❌ Reject (duplicate)  —  — **12.6** (Medium) CORS misconfiguration — duplicate of 12.3
-- ✅ Accept  [ ] Fixed  [ ] Closed — **12.7** (Medium) Missing cacheKey validation in worker.py
+- ✅ Accept  [✅] Fixed  [ ] Closed — **12.7** (Medium) Added cacheKey validation in worker.py (64-char hex, matching API-side regex)
 
 ## 13. Performance
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **13.1** (Medium) DNN model loaded from disk on every request
+- ✅ Accept  [✅] Fixed  [ ] Closed — **13.1** (Medium) DNN model now cached in memory via _model_cache dict
 - ❌ Reject (appropriate)  —  — **13.2** (Medium) SQS 1 message/cycle — sequential TTS processing, batching needs threading
 
 ## 14. Domain Logic
@@ -112,10 +112,10 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 15. Our Own Findings (not in Mikk's review)
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.1** (Medium) Remove /warmup endpoint entirely — not used, unnecessary complexity
-- ✅ Accept  [x] Fixed  [x] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.3** (Low) shell injection fix already has TDD tests but not yet applied to actual code
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — move behind CloudFront or require token
+- ✅ Accept  [✅] Fixed  [ ] Closed — **15.1** (Medium) Removed /warmup endpoint entirely (handler, serverless.yml, tests)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
+- ✅ Accept  [✅] Fixed  [ ] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — replaced run_process() with safe alternatives
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — DEFERRED, needs architectural discussion
 
 ---
 

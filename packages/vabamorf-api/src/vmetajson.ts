@@ -3,6 +3,7 @@
 
 import { spawn, ChildProcess } from "child_process";
 
+import { logger } from "./logger";
 import { VmetajsonInput, VmetajsonResponse } from "./types";
 
 interface QueuedRequest {
@@ -69,7 +70,7 @@ export class VmetajsonProcess {
 
     // Stryker disable next-line all: optional chaining is equivalent
     this.process.stderr?.on("data", (data: Buffer) => {
-      console.error("[vmetajson stderr]", data.toString());
+      logger.error("[vmetajson stderr]", data.toString());
     });
 
     // Stryker disable next-line all: optional chaining is equivalent

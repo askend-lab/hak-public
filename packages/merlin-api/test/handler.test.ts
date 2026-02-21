@@ -3,7 +3,6 @@
 
 import {
   generateCacheKey,
-  warmupRateLimit,
   parseRequestBody,
   applySynthesizeDefaults,
   validateText,
@@ -167,7 +166,7 @@ describe("createResponse", () => {
     const response = createResponse(HTTP_STATUS.OK, { status: "ok" });
 
     expect(response.statusCode).toBe(HTTP_STATUS.OK);
-    expect(response.headers).toStrictEqual({ ...CORS_HEADERS, "Access-Control-Allow-Origin": "*" });
+    expect(response.headers).toStrictEqual({ ...CORS_HEADERS, "Access-Control-Allow-Origin": "null" });
     expect(JSON.parse(response.body)).toStrictEqual({ status: "ok" });
   });
 });
@@ -179,7 +178,7 @@ describe("createInternalError", () => {
 
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(JSON.parse(response.body).error).toBe("Internal server error");
-    expect(spy).toHaveBeenCalledWith("Test context:", "fail");
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining("Test context:"), "fail");
     spy.mockRestore();
   });
 
@@ -188,7 +187,7 @@ describe("createInternalError", () => {
     const response = createInternalError("Context", "string error");
 
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(spy).toHaveBeenCalledWith("Context:", "Unknown error");
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining("Context:"), "Unknown error");
     spy.mockRestore();
   });
 });
@@ -274,17 +273,19 @@ describe("env functions", () => {
     expect(() => getS3Bucket()).toThrow("Invalid or missing S3_BUCKET");
   });
 
-  it("getSqsQueueUrl should return empty when unset", () => {
+  it("getSqsQueueUrl should throw when unset", () => {
     delete process.env.SQS_QUEUE_URL;
-    expect(getSqsQueueUrl()).toBe("");
+    expect(() => getSqsQueueUrl()).toThrow("Missing required environment variable: SQS_QUEUE_URL");
   });
 
-  it("getEcsCluster should return empty when unset", () => {
-    expect(getEcsCluster()).toBe("");
+  it("getEcsCluster should throw when unset", () => {
+    delete process.env.ECS_CLUSTER;
+    expect(() => getEcsCluster()).toThrow("Missing required environment variable: ECS_CLUSTER");
   });
 
-  it("getEcsService should return empty when unset", () => {
-    expect(getEcsService()).toBe("");
+  it("getEcsService should throw when unset", () => {
+    delete process.env.ECS_SERVICE;
+    expect(() => getEcsService()).toThrow("Missing required environment variable: ECS_SERVICE");
   });
 });
 
@@ -310,11 +311,6 @@ describe("isEcsConfigured", () => {
   });
 });
 
-describe("warmupRateLimit", () => {
-  it("should be resettable without error", () => {
-    expect(() => warmupRateLimit.reset()).not.toThrow();
-  });
-});
 
 describe("SynthesizeRequest", () => {
   it("should allow minimal request with just text", () => {
@@ -370,7 +366,7 @@ describe("health", () => {
 
   it("should include CORS headers", async () => {
     const response = await health();
-    expect(response.headers).toStrictEqual({ ...CORS_HEADERS, "Access-Control-Allow-Origin": "*" });
+    expect(response.headers).toStrictEqual({ ...CORS_HEADERS, "Access-Control-Allow-Origin": "null" });
   });
 });
 

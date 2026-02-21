@@ -5,7 +5,6 @@ export {
   synthesize,
   status,
   health,
-  warmup,
   generateCacheKey,
   parseRequestBody,
   applySynthesizeDefaults,

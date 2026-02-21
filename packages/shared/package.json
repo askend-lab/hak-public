@@ -7,19 +7,18 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
-    "test:full": "jest --coverage --json --outputFile=jest-results.json",
-    "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
+    "test": "vitest run --changed HEAD --reporter=json --outputFile=test-results.json",
+    "test:full": "vitest run --coverage --reporter=json --outputFile=test-results.json",
+    "test:coverage": "vitest run --coverage --reporter=json --outputFile=test-results.json"
   },
 
   "dependencies": {
     "@aws-sdk/client-s3": "^3.990.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
-    "jest": "^30.2.0",
-    "ts-jest": "^29.0.0",
-    "typescript": "^5.0.0"
+    "@vitest/coverage-v8": "^4.0.16",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.16"
   }
 }

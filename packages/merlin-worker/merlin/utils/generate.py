@@ -184,7 +184,7 @@ def wavgen_straight_type_vocoder(gen_dir, file_id_list, cfg_sptk, cfg_world):
         if cfg_fw_alpha=='Bark':
             fw_coef = bark_alpha(cfg_sr)
         elif cfg_fw_alpha=='ERB':
-            fw_coef = bark_alpha(cfg_sr)
+            fw_coef = erb_alpha(cfg_sr)
         else:
             raise ValueError('cfg_fw_alpha='+cfg_fw_alpha+' not implemented, the frequency warping coefficient "fw_coef" cannot be deduced.')
     else:

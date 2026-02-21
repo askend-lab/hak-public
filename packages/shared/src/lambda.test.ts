@@ -83,7 +83,7 @@ describe("lambda", () => {
 
   describe("createInternalErrorResponse", () => {
     it("should create a 500 response and log the error", () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const testError = new Error("db connection failed");
       const result = createInternalErrorResponse("UserService.get", testError);
 

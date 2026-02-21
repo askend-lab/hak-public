@@ -10,7 +10,7 @@ describe("validation", () => {
       expect(response.statusCode).toBe(200);
       expect(response.body).toBe(JSON.stringify({ success: true }));
       expect(response.headers?.["Content-Type"]).toBe("application/json");
-      expect(response.headers?.["Access-Control-Allow-Origin"]).toBe("*");
+      expect(response.headers?.["Access-Control-Allow-Origin"]).toBe("null");
     });
 
     it("should include all CORS headers", () => {
