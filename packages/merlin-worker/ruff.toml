@@ -13,6 +13,7 @@ select = [
   "PIE",    # flake8-pie
   "RUF",    # ruff-specific rules
   "ERA001", # commented-out code detection
+  "S",      # flake8-bandit security rules (shell injection, pickle, hardcoded secrets)
   "PLW",    # pylint warnings (includes PLW0117 unnecessary-list-call)
   "PLR2004", # magic-value-comparison (catches float equality like speed == 1.0)
 ]
@@ -27,4 +28,4 @@ ignore = [
 [lint.per-file-ignores]
 "merlin/**" = ["ALL"]
 "tools/**" = ["ALL"]
-"tests/**" = ["PLR2004", "E402"]  # magic values and import order are standard in tests
+"tests/**" = ["PLR2004", "E402", "S101", "S108", "S603"]  # magic values, import order, assert, temp dirs, subprocess are standard in tests
