@@ -1,0 +1,29 @@
+# Ruff configuration for merlin-worker Python code
+target-version = "py311"
+line-length = 120
+
+[lint]
+select = [
+  "E",      # pycodestyle errors
+  "W",      # pycodestyle warnings
+  "F",      # pyflakes
+  "B",      # flake8-bugbear
+  "SIM",    # flake8-simplify
+  "UP",     # pyupgrade
+  "PIE",    # flake8-pie
+  "RUF",    # ruff-specific rules
+  "PLW",    # pylint warnings (includes PLW0117 unnecessary-list-call)
+  "PLR2004", # magic-value-comparison (catches float equality like speed == 1.0)
+]
+
+# Ignore rules that conflict with legacy Merlin engine code
+ignore = [
+  "E501",    # line too long (handled by line-length setting)
+  "PLW0603", # global statement — needed for signal handlers in worker.py
+]
+
+# Exclude vendored/legacy Merlin engine code (external library)
+[lint.per-file-ignores]
+"merlin/**" = ["ALL"]
+"tools/**" = ["ALL"]
+"tests/**" = ["PLR2004", "E402"]  # magic values and import order are standard in tests

@@ -4,6 +4,7 @@ Merlin TTS SQS Worker
 Polls SQS queue, synthesizes audio with Merlin, uploads to S3
 """
 
+import contextlib
 import hashlib
 import json
 import logging
@@ -15,7 +16,7 @@ import sys
 import tempfile
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any
 
 import boto3
 
@@ -85,7 +86,7 @@ class SynthesisRequest:
     cache_key: str = ""
 
     @staticmethod
-    def from_message(message: Dict[str, Any]) -> "SynthesisRequest":
+    def from_message(message: dict[str, Any]) -> "SynthesisRequest":
         body = json.loads(message["Body"])
         text = body.get("text", "")
         if not isinstance(text, str) or not text.strip():
@@ -209,10 +210,8 @@ def _apply_sox_effects(
 def _cleanup_files(text_file: str, wav_file: str) -> None:
     """Remove temporary files, ignoring errors."""
     for path in [text_file, wav_file, wav_file.replace(".wav", "_proc.wav")]:
-        try:
+        with contextlib.suppress(OSError):
             os.remove(path)
-        except OSError:
-            pass
 
 
 def upload_to_s3(
@@ -227,7 +226,7 @@ def upload_to_s3(
 
 
 def process_message(
-    message: Dict[str, Any],
+    message: dict[str, Any],
     config: WorkerConfig,
     sqs_client: Any,
     s3_client: Any,

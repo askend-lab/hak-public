@@ -9,7 +9,6 @@ finishing the current message.
 Fix implemented: _shutdown_requested flag + signal.SIGTERM handler.
 """
 
-import json
 import os
 import signal
 import subprocess
