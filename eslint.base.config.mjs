@@ -55,6 +55,8 @@ const baseRules = {
   'no-unsafe-optional-chaining': 'error',
   'require-atomic-updates': 'error',
   // Code style
+  'curly': ['error', 'all'],
+  'no-nested-ternary': 'error',
   'no-eval': 'error',
   'no-implied-eval': 'error',
   'no-new-func': 'error',
@@ -202,7 +204,8 @@ const typescriptRules = {
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/explicit-function-return-type': 'error',
   '@typescript-eslint/explicit-module-boundary-types': 'error',
-  '@typescript-eslint/no-non-null-assertion': 'error'
+  '@typescript-eslint/no-non-null-assertion': 'error',
+  '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'never' }]
 };
 
 const nodeGlobals = {
@@ -415,6 +418,7 @@ export default [
     },
     rules: {
       ...jestRules,
+      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'allow' }],
       'complexity': ['error', 15],
       'max-depth': ['error', 4],
       'max-lines': ['error', 800],

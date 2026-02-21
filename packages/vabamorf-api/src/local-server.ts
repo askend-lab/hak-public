@@ -19,6 +19,19 @@ function createEvent(
   path: string,
   method: string,
 ): APIGatewayProxyEvent {
+  const identity: APIGatewayProxyEvent["requestContext"]["identity"] = {
+    accessKey: null, accountId: null, apiKey: null, apiKeyId: null,
+    caller: null, clientCert: null, cognitoAuthenticationProvider: null,
+    cognitoAuthenticationType: null, cognitoIdentityId: null,
+    cognitoIdentityPoolId: null, principalOrgId: null,
+    sourceIp: "127.0.0.1", user: null, userAgent: "local-server", userArn: null,
+  };
+  const requestContext: APIGatewayProxyEvent["requestContext"] = {
+    accountId: "", apiId: "", authorizer: null,
+    httpMethod: method, identity,
+    path, protocol: "HTTP/1.1", requestId: "local",
+    requestTimeEpoch: Date.now(), resourceId: "", resourcePath: path, stage: "local",
+  };
   return {
     body,
     headers: {},
@@ -30,7 +43,7 @@ function createEvent(
     queryStringParameters: null,
     multiValueQueryStringParameters: null,
     stageVariables: null,
-    requestContext: {} as APIGatewayProxyEvent["requestContext"],
+    requestContext,
     resource: "",
   };
 }

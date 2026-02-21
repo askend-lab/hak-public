@@ -31,7 +31,9 @@ function loadFeaturesFromDir(dir, groupName = null) {
       Object.assign(features, loadFeaturesFromDir(fullPath, entry.name));
     } else if (entry.isFile() && entry.name.endsWith(".feature")) {
       const group = groupName || "root";
-      if (!features[group]) features[group] = {};
+      if (!features[group]) {
+        features[group] = {};
+      }
       features[group][entry.name.replace(".feature", "")] = fs.readFileSync(
         fullPath,
         "utf-8",
