@@ -29,7 +29,8 @@ Current state: `eslint-plugin-security` is installed but many style rules are mi
 - [x] [tool] [x] [green] — **`no-nested-ternary`** — ban nested ternary expressions (fixes 4.4)
 - [x] [tool] [x] [green] — **`react/no-array-index-key`** — ban array index as React keys (fixes 4.5) — requires `eslint-plugin-react`
 - [x] [tool] [x] [green] — **`@typescript-eslint/consistent-type-assertions`** — ban `as unknown as X` double casts (fixes 4.3)
-- [ ] [tool] [ ] [green] — **`@typescript-eslint/no-unnecessary-type-arguments`** — catch redundant `?` and `| undefined` (fixes 4.7) — BLOCKED: requires `parserOptions.project` (type-aware linting), significant perf impact
+- [x] [tool] [ ] [green] — **`@typescript-eslint/no-unnecessary-type-arguments`** — catch redundant `?` and `| undefined` (fixes 4.7) — UNBLOCKED: `parserOptions.project: true` now enabled (+4s lint cost)
+- [x] [tool] [x] [green] — **`@typescript-eslint/no-floating-promises` + `no-misused-promises`** — catch unawaited promises and async callbacks passed where void expected. 97 violations fixed across frontend + vabamorf-api. DevBox hook was phantom (silently passing without type info) — now real
 - [x] [tool] [x] [green] — **`import/no-deprecated`** — verified: already `'error'` and active, 0 violations
 
 ### Python (Ruff)
@@ -63,7 +64,7 @@ Would have prevented: 12.4, 12.5, 12.7 (3 findings)
 Current state: `eslint-plugin-security` is configured and active for TypeScript. `security-audit` hook is now `mode: warning` (6 devDep transitive vulnerabilities need upstream fixes). No Python security scanner.
 
 - [x] [tool] [ ] [green] — **Enable `security-audit` hook** — changed to `mode: warning` + `packageManager: pnpm`. 6 devDep vulnerabilities remain (ajv, minimatch — transitive, need upstream updates)
-- [ ] [tool] [ ] [green] — **Add `bandit` for Python** — catches `shell=True` (B602), `pickle.load` (B301), `subprocess` without shell (B603) — BLOCKED: needs system install (ruff S rules as alternative?)
+- [x] [tool] [x] [green] — **Ruff `S` rules for Python** — catches `shell=True` (S602), `pickle.load` (S301), `subprocess` without shell (S603). Enabled as alternative to bandit — 0 violations
 - [x] [tool] [x] [green] — **Enable `iac-security` hook** — already configured and active in DevBox hooks (verified via `node devbox test`)
 - [ ] [tool] [ ] [green] — **Input validation consistency test:** test that API and Worker validate the same fields with same constraints (catches 12.7 — worker missing cacheKey regex)
 
