@@ -115,3 +115,4 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [ ] Fixed  [ ] Closed — **15.1** (Medium) Remove /warmup endpoint entirely — not used, unnecessary complexity
 - ✅ Accept  [ ] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
 - ✅ Accept  [ ] Fixed  [ ] Closed — **15.3** (Low) shell injection fix already has TDD tests but not yet applied to actual code
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — move behind CloudFront or require token
