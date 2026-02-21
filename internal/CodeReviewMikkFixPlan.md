@@ -10,18 +10,18 @@ Items marked ⏸️ DISCUSS are listed at the bottom — they need an architectu
 
 Touches: `.md` files, `ARCHITECTURE.md`, READMEs, CI workflow docs. **No source code changes.**
 
-- [ ] **1.1.1** (Low) Fix README inconsistencies: React version 18→19, dev port 5180→5181
-- [ ] **1.1.3** (Low) Sync vabamorf-api README deps with package.json (or vice versa)
-- [ ] **1.2.1** (Low) Create INSTALL.md (or merge install steps into README)
-- [ ] **1.3.1** (Low) Remove duplicate architecture line in README
-- [ ] **1.3.2** (Low) Remove tech stack duplication between ARCHITECTURE.md and module READMEs
-- [ ] **1.3.3** (Medium) Fix ARCHITECTURE.md: merlin-worker does NOT depend on shared
-- [ ] **1.3.4** (Medium) Fix ARCHITECTURE.md: vabamorf-api does NOT depend on shared at runtime
-- [ ] **1.3.5** (Medium) Fix ARCHITECTURE.md: merlin-worker is Python only, not Python + TypeScript
-- [ ] **1.5.1.2** (Low) Consolidate design docs that exist in two places
-- [ ] **9.3** (Medium) Document deploy workflows — what exists, what's manual
-- [ ] **10.1** (Low) Fix merlin-api README: remove wrong Cognito/auth references
-- [ ] **15.2** (Medium) Fix merlin-api README: says "Cognito JWT" but code has AuthorizationType: NONE
+- [x] **1.1.1** (Low) Fix README inconsistencies: React version 18→19, dev port 5180→5181
+- [x] **1.1.3** (Low) Sync vabamorf-api README deps with package.json (or vice versa)
+- [x] **1.2.1** (Low) Create INSTALL.md (or merge install steps into README)
+- [x] **1.3.1** (Low) ~~Remove duplicate architecture line in README~~ — not real duplication
+- [x] **1.3.2** (Low) ~~Remove tech stack duplication~~ — intentional for navigation
+- [x] **1.3.3** (Medium) Fix ARCHITECTURE.md: merlin-worker does NOT depend on shared
+- [x] **1.3.4** (Medium) Fix ARCHITECTURE.md: vabamorf-api does NOT depend on shared at runtime
+- [x] **1.3.5** (Medium) Fix ARCHITECTURE.md: merlin-worker is Python only, not Python + TypeScript
+- [x] **1.5.1.2** (Low) ~~Consolidate design docs~~ — no duplication found (docs/design-systems/ doesn't exist)
+- [x] **9.3** (Medium) Document deploy workflows — added CI/CD section to ARCHITECTURE.md
+- [x] **10.1** (Low) Fix merlin-api README: remove wrong Cognito/auth references
+- [x] **15.2** (Medium) Fix merlin-api README: says "Cognito JWT" but code has AuthorizationType: NONE
 
 ---
 

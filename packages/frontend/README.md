@@ -4,7 +4,7 @@ React SPA for the HAK Estonian language learning platform. Teachers create inter
 
 ## Stack
 
-- **React 18** + TypeScript (strict mode)
+- **React 19** + TypeScript (strict mode)
 - **Vite** — build tool and dev server
 - **SCSS/BEM** — styling with design tokens
 - **Vitest** — unit tests (co-located `*.test.ts` next to source)
@@ -14,7 +14,7 @@ React SPA for the HAK Estonian language learning platform. Teachers create inter
 ## Development
 
 ```bash
-pnpm start              # Dev server at http://localhost:5180
+pnpm start              # Dev server at http://localhost:5181
 pnpm test               # Run changed tests
 pnpm test:full          # Run all tests
 pnpm test:cucumber      # Run BDD/Cucumber tests

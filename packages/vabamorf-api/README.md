@@ -42,7 +42,9 @@ pnpm test
 serverless deploy --stage dev
 ```
 
-## Dependencies
+## Runtime Dependencies (non-npm)
 
-- `vmetajson` - Estonian morphological analyzer binary
-- `et.dct` - Estonian dictionary file
+These are native binaries bundled in the Docker image, not npm packages:
+
+- `vmetajson` — Estonian morphological analyzer binary
+- `et.dct` — Estonian dictionary file

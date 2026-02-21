@@ -10,14 +10,25 @@ and AWS Lambda.
 
 ## Quick Start
 
+**Prerequisites:** Node.js 20+ (see `.nvmrc`), pnpm 10+
+
 ```bash
+git clone https://github.com/askend-lab/hak.git
+cd hak
 pnpm install
 pnpm test          # Run all tests
 pnpm run dx        # Full quality check: tests + hooks
-pnpm start         # Start dev server (http://localhost:5180)
+pnpm start         # Start dev server (http://localhost:5181)
 ```
 
-**Prerequisites:** Node.js 20+, pnpm 10+
+**merlin-worker** (Python TTS engine) requires additional setup:
+
+```bash
+cd packages/merlin-worker
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-test.txt
+.venv/bin/pytest tests/ -v    # Run Python tests
+```
 
 ## Architecture
 

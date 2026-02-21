@@ -13,10 +13,12 @@ Frontend → GET /status/{key} → merlin-api → S3 (check cache)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `POST` | `/synthesize` | Cognito JWT | Submit text for synthesis |
-| `GET` | `/status/{cacheKey}` | Cognito JWT | Poll synthesis status |
-| `POST` | `/warmup` | Cognito JWT | Scale up ECS worker |
+| `POST` | `/synthesize` | None | Submit text for synthesis |
+| `GET` | `/status/{cacheKey}` | None | Poll synthesis status |
+| `POST` | `/warmup` | None | Scale up ECS worker |
 | `GET` | `/health` | None | Health check |
+
+All endpoints are public by design — protection is via API Gateway throttling and AWS WAF rate limiting. See root README Security section.
 
 ## Input Validation
 
@@ -46,8 +48,6 @@ Frontend → GET /status/{key} → merlin-api → S3 (check cache)
 | `ALLOWED_ORIGIN` | CORS allowed origin |
 | `ECS_CLUSTER` | ECS cluster name (for warmup) |
 | `ECS_SERVICE` | ECS service name (for warmup) |
-| `COGNITO_USER_POOL_ID` | Cognito user pool for JWT auth |
-| `COGNITO_CLIENT_ID` | Cognito client ID for JWT auth |
 
 ## Note on Shared Utilities
 
