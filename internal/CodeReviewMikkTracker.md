@@ -35,24 +35,24 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 4. Code Style
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.1** (Low) if statements without curly brackets — `curly: 'all'` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.1** (Low) if statements without curly brackets — `curly: 'all'` ESLint rule
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.2** (Medium) getCorsOrigin duplication — fix behavior difference (*→null)
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.3** (Low) `as unknown as` double type assertions — `consistent-type-assertions` ESLint rule
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.4** (Low) Nested ternary statements — `no-nested-ternary` ESLint rule
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.5** (Low) Array indexes as React keys — `react/no-array-index-key` ESLint rule
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python — knip dead-code hook + Ruff ERA001
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.7** (Low) Redundant `?` and `undefined` type specifiers — `no-unnecessary-type-arguments` ESLint rule (tool enabled, violations pending)
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.3** (Low) `as unknown as` double type assertions — `consistent-type-assertions` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.4** (Low) Nested ternary statements — `no-nested-ternary` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.5** (Low) Array indexes as React keys — `react/no-array-index-key` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python — knip dead-code hook + Ruff ERA001
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.7** (Low) Redundant `?` and `undefined` type specifiers — `no-unnecessary-type-arguments` ESLint rule (tool enabled, violations pending)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.8** (Medium) Deprecated APIs — execCommand fallback, np.random.RandomState (NOT React.FormEvent)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.9** (Low) Duplicate CSS selectors (.marker-tooltip--align-center)
 - ❌ Reject (not found)  —  — **4.10** (Low) Redundant return None — not confirmed in code
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.11** (Low) TODO matches — 12 found (not 30 as claimed), resolve them — `no-warning-comments` ESLint rule
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.12** (Low) Unnecessary list() calls on iterables in Python — Ruff PLW0117
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.11** (Low) TODO matches — 12 found (not 30 as claimed), resolve them — `no-warning-comments` ESLint rule
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.12** (Low) Unnecessary list() calls on iterables in Python — Ruff PLW0117
 - ❌ Reject (not found)  —  — **4.13** (Low) Unnecessary awaits — not confirmed in source code
 - ❌ Reject (external lib)  —  — **4.14** (Medium) DeepRecurrentNetwork class — external Merlin library, not our code
 - ❌ Reject (ML convention)  —  — **4.15** (Low) Python naming case — ML math notation convention (W_value, Whx)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — install SonarQube and verify
 - ❌ Reject (external lib)  —  — **4.17** (Medium) Merlin NN Python style issues — external library code
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
 
 ## 5. Simplicity & Patterns
 
@@ -63,7 +63,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 6. Maintainability
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **6.1** (High) pnpm test:all silently skips merlin-worker Python tests — DevBox `run-tests` hook + merlin-worker test script fix
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **6.1** (High) pnpm test:all silently skips merlin-worker Python tests — DevBox `run-tests` hook + merlin-worker test script fix
 
 ## 7. Error Handling
 
@@ -89,15 +89,15 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 11. Dependencies
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **11.1** (Medium) Unused dependencies — 7 of 10 confirmed unused — knip + DevBox `deps` hook
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **11.1** (Medium) Unused dependencies — 7 of 10 confirmed unused — knip + DevBox `deps` hook
 
 ## 12. Security
 
 - ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — improve per-user/per-IP limiting
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior differs: shared="null" vs merlin/vabamorf="*"
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
-- ✅ Accept  [ ] Fixed  [ ] Closed — 🛡️ **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
+- ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
 - ❌ Reject (duplicate)  —  — **12.6** (Medium) CORS misconfiguration — duplicate of 12.3
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.7** (Medium) Missing cacheKey validation in worker.py
 
