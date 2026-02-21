@@ -39,27 +39,27 @@ describe("buildS3Url", () => {
 
 describe("checkFileExists", () => {
   it("returns true when object exists", async () => {
-    const client: S3ClientLike = { send: jest.fn().mockResolvedValue({}) };
+    const client: S3ClientLike = { send: vi.fn().mockResolvedValue({}) };
     expect(await checkFileExists(client, "bucket", "key")).toBe(true);
   });
 
   it("returns false for NotFound error", async () => {
     const client: S3ClientLike = {
-      send: jest.fn().mockRejectedValue({ name: "NotFound" }),
+      send: vi.fn().mockRejectedValue({ name: "NotFound" }),
     };
     expect(await checkFileExists(client, "bucket", "key")).toBe(false);
   });
 
   it("returns false for NoSuchKey error", async () => {
     const client: S3ClientLike = {
-      send: jest.fn().mockRejectedValue({ name: "NoSuchKey" }),
+      send: vi.fn().mockRejectedValue({ name: "NoSuchKey" }),
     };
     expect(await checkFileExists(client, "bucket", "key")).toBe(false);
   });
 
   it("returns false for 404 status", async () => {
     const client: S3ClientLike = {
-      send: jest.fn().mockRejectedValue({
+      send: vi.fn().mockRejectedValue({
         $metadata: { httpStatusCode: 404 },
       }),
     };
@@ -68,7 +68,7 @@ describe("checkFileExists", () => {
 
   it("throws for unknown non-object errors", async () => {
     const client: S3ClientLike = {
-      send: jest.fn().mockRejectedValue("bad"),
+      send: vi.fn().mockRejectedValue("bad"),
     };
     await expect(checkFileExists(client, "bucket", "key")).rejects.toThrow(
       "Unknown S3 error",
@@ -77,7 +77,7 @@ describe("checkFileExists", () => {
 
   it("throws for other S3 errors with details", async () => {
     const client: S3ClientLike = {
-      send: jest.fn().mockRejectedValue({
+      send: vi.fn().mockRejectedValue({
         name: "AccessDenied",
         message: "forbidden",
         $metadata: { httpStatusCode: 403 },

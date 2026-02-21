@@ -15,7 +15,8 @@ global_excludes:
 test_modules:
   - name: simplestore
     path: packages/simplestore
-    type: jest
+    type: vitest
+    results_file: "test-results.json"
   - name: merlin-worker
     path: packages/merlin-worker
     type: pytest
@@ -37,7 +38,8 @@ test_modules:
     min_coverage_branches: 90
   - name: shared
     path: packages/shared
-    type: jest
+    type: vitest
+    results_file: "test-results.json"
   - name: frontend
     path: packages/frontend
     type: vitest

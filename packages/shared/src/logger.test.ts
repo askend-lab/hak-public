@@ -5,18 +5,18 @@ import { createLogger, logger } from "./logger";
 
 describe("logger", () => {
   const mockConsole = {
-    debug: jest.spyOn(console, "debug").mockImplementation(),
-    info: jest.spyOn(console, "info").mockImplementation(),
-    warn: jest.spyOn(console, "warn").mockImplementation(),
-    error: jest.spyOn(console, "error").mockImplementation(),
+    debug: vi.spyOn(console, "debug").mockImplementation(() => {}),
+    info: vi.spyOn(console, "info").mockImplementation(() => {}),
+    warn: vi.spyOn(console, "warn").mockImplementation(() => {}),
+    error: vi.spyOn(console, "error").mockImplementation(() => {}),
   };
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("createLogger", () => {
@@ -112,12 +112,12 @@ describe("logger", () => {
       } else {
         process.env.LOG_LEVEL = originalLogLevel;
       }
-      jest.resetModules();
+      vi.resetModules();
     });
 
     it("uses LOG_LEVEL env when set to valid level", async () => {
       process.env.LOG_LEVEL = "debug";
-      jest.resetModules();
+      vi.resetModules();
       const mod = await import("./logger");
       const log = mod.logger;
       log.debug("env-test");
@@ -126,7 +126,7 @@ describe("logger", () => {
 
     it("falls back to info when LOG_LEVEL is invalid", async () => {
       process.env.LOG_LEVEL = "verbose";
-      jest.resetModules();
+      vi.resetModules();
       const mod = await import("./logger");
       const log = mod.logger;
       log.debug("should-not-appear");
@@ -135,7 +135,7 @@ describe("logger", () => {
 
     it("uses warn level from env", async () => {
       process.env.LOG_LEVEL = "warn";
-      jest.resetModules();
+      vi.resetModules();
       const mod = await import("./logger");
       mod.logger.info("should-not-appear");
       mod.logger.warn("should-appear");
@@ -145,7 +145,7 @@ describe("logger", () => {
 
     it("uses error level from env", async () => {
       process.env.LOG_LEVEL = "error";
-      jest.resetModules();
+      vi.resetModules();
       const mod = await import("./logger");
       mod.logger.warn("should-not-appear");
       mod.logger.error("should-appear");

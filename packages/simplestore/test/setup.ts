@@ -34,9 +34,9 @@ export const mockContext: Context = {
   logGroupName: "test-group",
   logStreamName: "test-stream",
   getRemainingTimeInMillis: () => 1000,
-  done: jest.fn(),
-  fail: jest.fn(),
-  succeed: jest.fn(),
+  done: vi.fn(),
+  fail: vi.fn(),
+  succeed: vi.fn(),
 };
 
 const baseRequestContext = {

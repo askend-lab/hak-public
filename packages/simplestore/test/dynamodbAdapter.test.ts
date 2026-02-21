@@ -3,33 +3,45 @@
 
 import { StoreItem } from "../src/core/types";
 import { DynamoDBAdapter, VersionConflictError } from "../src/adapters/dynamodb";
+import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
+import type { Mock } from "vitest";
 
-// Mock the AWS SDK
-const mockSend = jest.fn();
+// Mock the AWS SDK — mockSend must be declared via vi.hoisted so it's available inside vi.mock factories
+const { mockSend } = vi.hoisted(() => ({ mockSend: vi.fn() }));
 
-jest.mock("@aws-sdk/client-dynamodb", () => {
+vi.mock("@aws-sdk/client-dynamodb", () => {
   class ConditionalCheckFailedException extends Error {
-    readonly name = "ConditionalCheckFailedException";
+    override readonly name = "ConditionalCheckFailedException" as const;
     readonly $metadata = {};
     constructor(opts: { message: string; $metadata: Record<string, unknown> }) {
       super(opts.message);
     }
   }
+  class DynamoDBClient {
+    send = mockSend;
+  }
+  return { DynamoDBClient, ConditionalCheckFailedException };
+});
+vi.mock("@aws-sdk/lib-dynamodb", () => {
+  function makeCmd(params: unknown): { input: unknown } {
+    return { input: params };
+  }
+  class PutCommand { input: unknown; constructor(p: unknown) { this.input = (makeCmd(p)).input; } }
+  class GetCommand { input: unknown; constructor(p: unknown) { this.input = (makeCmd(p)).input; } }
+  class DeleteCommand { input: unknown; constructor(p: unknown) { this.input = (makeCmd(p)).input; } }
+  class QueryCommand { input: unknown; constructor(p: unknown) { this.input = (makeCmd(p)).input; } }
+  class UpdateCommand { input: unknown; constructor(p: unknown) { this.input = (makeCmd(p)).input; } }
   return {
-    DynamoDBClient: jest.fn().mockImplementation(() => ({ send: mockSend })),
-    ConditionalCheckFailedException,
+    DynamoDBDocumentClient: {
+      from: (): { send: Mock } => ({ send: mockSend }),
+    },
+    PutCommand,
+    GetCommand,
+    DeleteCommand,
+    QueryCommand,
+    UpdateCommand,
   };
 });
-jest.mock("@aws-sdk/lib-dynamodb", () => ({
-  DynamoDBDocumentClient: {
-    from: (): { send: jest.Mock } => ({ send: mockSend }),
-  },
-  PutCommand: jest.fn().mockImplementation((params) => ({ input: params })),
-  GetCommand: jest.fn().mockImplementation((params) => ({ input: params })),
-  DeleteCommand: jest.fn().mockImplementation((params) => ({ input: params })),
-  QueryCommand: jest.fn().mockImplementation((params) => ({ input: params })),
-  UpdateCommand: jest.fn().mockImplementation((params) => ({ input: params })),
-}));
 
 function makeItem(pk: string, sk: string, version = 1): StoreItem {
   return {
@@ -49,7 +61,7 @@ describe("DynamoDBAdapter", () => {
   const TABLE = "test-table";
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     adapter = new DynamoDBAdapter(TABLE);
   });
 
@@ -88,9 +100,8 @@ describe("DynamoDBAdapter", () => {
     });
 
     it("should throw VersionConflictError on ConditionalCheckFailedException", async () => {
-      const { ConditionalCheckFailedException } = require("@aws-sdk/client-dynamodb");
       mockSend.mockRejectedValue(
-        new ConditionalCheckFailedException({ message: "condition", $metadata: {} }),
+        new (ConditionalCheckFailedException as unknown as new (opts: { message: string; $metadata: Record<string, unknown> }) => Error)({ message: "condition", $metadata: {} }),
       );
       const item = makeItem("user#1", "task#1", 2);
 
@@ -244,9 +255,9 @@ describe("DynamoDBAdapter", () => {
     });
 
     it("should return 'not_owner' when item exists but owner differs", async () => {
-      const { ConditionalCheckFailedException } = jest.requireMock("@aws-sdk/client-dynamodb");
+      const MockedError = ConditionalCheckFailedException as unknown as new (opts: { message: string; $metadata: Record<string, unknown> }) => Error;
       mockSend
-        .mockRejectedValueOnce(new ConditionalCheckFailedException({ message: "fail", $metadata: {} }))
+        .mockRejectedValueOnce(new MockedError({ message: "fail", $metadata: {} }))
         .mockResolvedValueOnce({ Item: makeItem("pk1", "sk1") });
 
       const result = await adapter.conditionalDelete("pk1", "sk1", "wrong-user");
@@ -254,9 +265,9 @@ describe("DynamoDBAdapter", () => {
     });
 
     it("should return 'not_found' when item does not exist", async () => {
-      const { ConditionalCheckFailedException } = jest.requireMock("@aws-sdk/client-dynamodb");
+      const MockedError = ConditionalCheckFailedException as unknown as new (opts: { message: string; $metadata: Record<string, unknown> }) => Error;
       mockSend
-        .mockRejectedValueOnce(new ConditionalCheckFailedException({ message: "fail", $metadata: {} }))
+        .mockRejectedValueOnce(new MockedError({ message: "fail", $metadata: {} }))
         .mockResolvedValueOnce({ Item: undefined });
 
       const result = await adapter.conditionalDelete("pk1", "sk1", "user1");

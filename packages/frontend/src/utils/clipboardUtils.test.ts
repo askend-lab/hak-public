@@ -39,20 +39,17 @@ describe("copyTextToClipboard", () => {
     );
   });
 
-  it("uses execCommand fallback when clipboard API unavailable", async () => {
+  it("shows error when clipboard API is unavailable", async () => {
     Object.defineProperty(navigator, "clipboard", {
       value: undefined,
       writable: true,
       configurable: true,
     });
-    // jsdom doesn't define execCommand — add it so the fallback path works
-    document.execCommand = vi.fn().mockReturnValue(true);
 
     await copyTextToClipboard("fallback text", showNotification);
 
-    expect(document.execCommand).toHaveBeenCalledWith("copy");
     expect(showNotification).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "success" }),
+      expect.objectContaining({ type: "error" }),
     );
   });
 

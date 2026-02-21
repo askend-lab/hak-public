@@ -45,6 +45,19 @@
     left: 50%;
     transform: translateX(-50%);
   }
+
+  // Override animation to preserve translateX(-50%) during fade-in
+  @keyframes marker-tooltip-fade-in-center {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+  animation: marker-tooltip-fade-in-center 0.15s ease-out;
 }
 
 // Left-aligned (for leftmost buttons)
@@ -84,21 +97,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-// Override animation for centered alignment
-.marker-tooltip--align-center {
-  @keyframes marker-tooltip-fade-in-center {
-    from {
-      opacity: 0;
-      transform: translateX(-50%) translateY(-4px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-  animation: marker-tooltip-fade-in-center 0.15s ease-out;
 }
 
 // ---------------------------------------------------------------------------

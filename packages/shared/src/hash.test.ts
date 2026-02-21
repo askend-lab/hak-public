@@ -55,7 +55,7 @@ describe("hash", () => {
     });
 
     it("should use browser crypto when window.crypto.subtle available", async () => {
-      const mockDigest = jest.fn().mockResolvedValue(
+      const mockDigest = vi.fn().mockResolvedValue(
         new Uint8Array([
           159, 134, 208, 129, 136, 76, 125, 101, 154, 47, 234, 160, 197, 90,
           208, 21, 163, 191, 79, 27, 43, 11, 130, 44, 209, 93, 108, 21, 176,
