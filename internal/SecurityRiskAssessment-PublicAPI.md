@@ -2,7 +2,9 @@
 
 ## Context
 
-The Mikk Merimaa code review flagged `/synthesize` and `/warmup` endpoints as HIGH severity — unauthenticated public endpoints. The client requires TTS to work without login. This document assesses the actual risk, catalogs existing mitigations, and proposes additional hardening.
+The Mikk Merimaa code review flagged `/synthesize` endpoint as HIGH severity — unauthenticated public endpoint. The client requires TTS to work without login. This document assesses the actual risk, catalogs existing mitigations, and proposes additional hardening.
+
+Note: The `/warmup` endpoint is being removed entirely (Finding 15.1) and is not covered in this assessment.
 
 ---
 
@@ -61,15 +63,7 @@ cors:
 
 **Assessment:** Good. Double validation (API + Worker) prevents malformed requests from consuming compute resources. Text limit caps the per-request cost.
 
-### 1.6 Warmup Endpoint Rate Limiting (handler.ts)
-
-```typescript
-export const WARMUP_COOLDOWN_MS = 60_000; // 1 call per 60 seconds
-```
-
-**Assessment:** In-Lambda rate limit prevents spamming the warmup endpoint. However, the warmup endpoint itself is a risk — it scales ECS from 0 to 1, incurring Fargate costs (~$0.05/hour). See recommendation to remove it entirely (Finding 15.1).
-
-### 1.7 SQS Dead Letter Queue (infra/merlin/main.tf)
+### 1.6 SQS Dead Letter Queue (infra/merlin/main.tf)
 
 - Failed messages go to DLQ after 3 retries
 - 14-day retention on DLQ
@@ -77,12 +71,12 @@ export const WARMUP_COOLDOWN_MS = 60_000; // 1 call per 60 seconds
 
 **Assessment:** Good. Failed requests don't loop infinitely, and DLQ provides audit trail.
 
-### 1.8 S3 Audio Lifecycle (infra/merlin/main.tf)
+### 1.7 S3 Audio Lifecycle (infra/merlin/main.tf)
 
 - Audio files have lifecycle expiration policy
 - Limits storage cost growth over time
 
-### 1.9 Cache-First Architecture (handler.ts)
+### 1.8 Cache-First Architecture (handler.ts)
 
 ```typescript
 const cached = await checkS3Cache(cacheKey);
@@ -132,13 +126,7 @@ if (cached) {
 
 **Risk: LOW.** The TTS engine generates Estonian speech from text. There's no user-facing content storage — audio files are cached with SHA-256 keys and auto-expire. No user-generated content is publicly listed or discoverable.
 
-### 2.4 Warmup Endpoint Abuse
-
-**Risk: MEDIUM → WILL BE REMOVED (Finding 15.1).**
-
-The `/warmup` endpoint scales ECS from 0 to 1, costing ~$0.05/hour of Fargate time. With the 60-second cooldown, an attacker can keep ECS warm indefinitely. Since we've already accepted removing this endpoint entirely, this risk will be eliminated.
-
-### 2.5 S3 Audio Scraping
+### 2.4 S3 Audio Scraping
 
 **Risk: LOW.** S3 bucket is publicly readable, but audio files are keyed by SHA-256 hash. An attacker would need to know the exact hash to retrieve a file — there's no directory listing. The audio content (Estonian TTS) has no commercial value.
 
@@ -150,10 +138,9 @@ The `/warmup` endpoint scales ECS from 0 to 1, costing ~$0.05/hour of Fargate ti
 
 | # | Improvement | Effort | Impact |
 |---|-------------|--------|--------|
-| A | **Remove /warmup endpoint** (already accepted as 15.1) | Low | Eliminates ECS cost abuse vector |
-| B | **Add CloudWatch billing alarm** | Low | Alert on unexpected cost spikes |
-| C | **Add API key for /synthesize** (AWS API Gateway API Keys) | Low | Blocks casual abuse without user login |
-| D | **Reduce WAF rate limit** for /api/synthesize specifically | Low | Tighter limit on expensive endpoint |
+| A | **Add CloudWatch billing alarm** | Low | Alert on unexpected cost spikes |
+| B | **Add API key for /synthesize** (AWS API Gateway API Keys) | Low | Blocks casual abuse without user login |
+| C | **Reduce WAF rate limit** for /api/synthesize specifically | Low | Tighter limit on expensive endpoint |
 
 ### 3.2 Optional (medium effort, medium impact)
 
@@ -182,15 +169,14 @@ The existing security posture (WAF + API Gateway throttling + CloudFront + input
 
 ### Recommended Next Steps
 
-1. **Remove /warmup endpoint** — already planned (15.1). Eliminates the most exploitable vector.
-2. **Add billing alerts** — CloudWatch alarm at $50/month threshold. Zero code change, pure infrastructure.
-3. **Consider API keys** — API Gateway supports usage plans with per-key throttling. This adds a friction layer without requiring user accounts. The frontend can request a key on page load (or embed one). Not true security, but blocks casual curl abuse.
+1. **Add billing alerts** — CloudWatch alarm at $50/month threshold. Zero code change, pure infrastructure.
+2. **Consider API keys** — API Gateway supports usage plans with per-key throttling. This adds a friction layer without requiring user accounts. The frontend can request a key on page load (or embed one). Not true security, but blocks casual curl abuse.
 
 ### Question for Client
 
 > We currently have WAF rate limiting (100 req/5min per IP), API Gateway throttling (2 req/s), and cache-first architecture protecting the public TTS endpoint. Monthly abuse ceiling is ~$37.
 >
-> **Option A (recommended):** Keep current setup + remove warmup + add billing alerts. Accept the ~$37/month risk ceiling.
+> **Option A (recommended):** Keep current setup + add billing alerts. Accept the ~$37/month risk ceiling.
 >
 > **Option B:** Add API keys (no user login required, but requires a page-load handshake). Reduces abuse further.
 >
