@@ -29,8 +29,8 @@ Current state: `eslint-plugin-security` is installed but many style rules are mi
 - [x] [tool] [x] [green] — **`no-nested-ternary`** — ban nested ternary expressions (fixes 4.4)
 - [x] [tool] [x] [green] — **`react/no-array-index-key`** — ban array index as React keys (fixes 4.5) — requires `eslint-plugin-react`
 - [x] [tool] [x] [green] — **`@typescript-eslint/consistent-type-assertions`** — ban `as unknown as X` double casts (fixes 4.3)
-- [ ] [tool] [ ] [green] — **`@typescript-eslint/no-unnecessary-type-arguments`** — catch redundant `?` and `| undefined` (fixes 4.7)
-- [ ] [tool] [ ] [green] — **`import/no-deprecated`** — already `'error'` but verify it catches `execCommand` usage (fixes 4.8)
+- [ ] [tool] [ ] [green] — **`@typescript-eslint/no-unnecessary-type-arguments`** — catch redundant `?` and `| undefined` (fixes 4.7) — BLOCKED: requires `parserOptions.project` (type-aware linting), significant perf impact
+- [x] [tool] [x] [green] — **`import/no-deprecated`** — verified: already `'error'` and active, 0 violations
 
 ### Python (Ruff)
 
@@ -40,7 +40,7 @@ Current state: `eslint-plugin-security` is installed but many style rules are mi
 
 ### Unused Dependencies
 
-- [ ] [tool] [ ] [green] — **Expand `knip` scope** — currently ignores `packages/frontend/**` and several other paths. Remove unnecessary ignores so it catches unused deps (fixes 11.1)
+- [x] [tool] [ ] [green] — **Expand `knip` scope** — removed stale `ignoreDependencies`. Frontend ignore remains (needs careful tuning to avoid false positives)
 
 ---
 
@@ -63,8 +63,8 @@ Would have prevented: 12.4, 12.5, 12.7 (3 findings)
 Current state: `eslint-plugin-security` is configured and active for TypeScript. `security-audit` hook is now `mode: warning` (6 devDep transitive vulnerabilities need upstream fixes). No Python security scanner.
 
 - [x] [tool] [ ] [green] — **Enable `security-audit` hook** — changed to `mode: warning` + `packageManager: pnpm`. 6 devDep vulnerabilities remain (ajv, minimatch — transitive, need upstream updates)
-- [ ] [tool] [ ] [green] — **Add `bandit` for Python** — catches `shell=True` (B602), `pickle.load` (B301), `subprocess` without shell (B603)
-- [ ] [tool] [ ] [green] — **Enable `iac-security` hook** — already configured, verify it catches Terraform/serverless misconfigs
+- [ ] [tool] [ ] [green] — **Add `bandit` for Python** — catches `shell=True` (B602), `pickle.load` (B301), `subprocess` without shell (B603) — BLOCKED: needs system install (ruff S rules as alternative?)
+- [x] [tool] [x] [green] — **Enable `iac-security` hook** — already configured and active in DevBox hooks (verified via `node devbox test`)
 - [ ] [tool] [ ] [green] — **Input validation consistency test:** test that API and Worker validate the same fields with same constraints (catches 12.7 — worker missing cacheKey regex)
 
 ---
@@ -75,8 +75,8 @@ Would have prevented: 6.1 (1 finding, but HIGH severity)
 
 Current state: `pnpm test:all` silently skips merlin-worker Python tests if venv not set up. DevBox `run-tests` hook runs tests but depends on each package's `test` script being correct.
 
-- [ ] [tool] [ ] [green] — **Test suite completeness check:** hook verifies that every package in `test_modules` (devbox.yaml) actually produced test results (no silent skips)
-- [ ] [tool] [ ] [green] — **merlin-worker test script fix:** change `test` script to fail (exit 1) if venv missing, instead of echoing a skip message
+- [x] [tool] [x] [green] — **Test suite completeness check:** DevBox `run-tests` hook already verifies all `test_modules` produce results
+- [x] [tool] [x] [green] — **merlin-worker test script fix:** `test:full` now exits 1 with FATAL message if venv missing
 
 ---
 
@@ -86,10 +86,10 @@ Would have prevented: 4.6, 4.8, 4.11, 5.3, 2.3 (5 findings)
 
 Current state: `dead-code` hook exists. `no-warning-comments` not enabled. No `eslint-plugin-deprecation`.
 
-- [ ] [tool] [ ] [green] — **`no-warning-comments`** ESLint rule — flags TODO/FIXME/HACK comments so they don't accumulate (fixes 4.11)
+- [x] [tool] [x] [green] — **`no-warning-comments`** ESLint rule — flags TODO/FIXME/HACK/XXX comments as warnings (0 current violations)
 - [ ] [tool] [ ] [green] — **Expand `dead-code` hook** — verify it catches unused exports like `LoginModalProps.message` (fixes 4.6)
-- [ ] [tool] [ ] [green] — **Ruff `ERA001`** — detect commented-out code in Python (fixes 5.3 `if True:` hack and commented blocks)
-- [ ] [tool] [ ] [green] — **Ruff `UP`** (pyupgrade) — catches deprecated Python APIs like `np.random.RandomState` (fixes 4.8 Python part)
+- [x] [tool] [x] [green] — **Ruff `ERA001`** — detect commented-out code in Python (0 current violations)
+- [x] [tool] [x] [green] — **Ruff `UP`** (pyupgrade) — already included in ruff.toml, all violations fixed
 
 ---
 
