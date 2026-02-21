@@ -25,18 +25,18 @@ Current state: `eslint-plugin-security` is installed but many style rules are mi
 
 ### TypeScript (ESLint)
 
-- [ ] [tool] [ ] [green] — **`curly: 'all'`** — require curly brackets on all if/else/for/while (fixes 4.1)
-- [ ] [tool] [ ] [green] — **`no-nested-ternary`** — ban nested ternary expressions (fixes 4.4)
-- [ ] [tool] [ ] [green] — **`react/no-array-index-key`** — ban array index as React keys (fixes 4.5) — requires `eslint-plugin-react`
-- [ ] [tool] [ ] [green] — **`@typescript-eslint/consistent-type-assertions`** — ban `as unknown as X` double casts (fixes 4.3)
+- [x] [tool] [x] [green] — **`curly: 'all'`** — require curly brackets on all if/else/for/while (fixes 4.1)
+- [x] [tool] [x] [green] — **`no-nested-ternary`** — ban nested ternary expressions (fixes 4.4)
+- [x] [tool] [x] [green] — **`react/no-array-index-key`** — ban array index as React keys (fixes 4.5) — requires `eslint-plugin-react`
+- [x] [tool] [x] [green] — **`@typescript-eslint/consistent-type-assertions`** — ban `as unknown as X` double casts (fixes 4.3)
 - [ ] [tool] [ ] [green] — **`@typescript-eslint/no-unnecessary-type-arguments`** — catch redundant `?` and `| undefined` (fixes 4.7)
 - [ ] [tool] [ ] [green] — **`import/no-deprecated`** — already `'error'` but verify it catches `execCommand` usage (fixes 4.8)
 
 ### Python (Ruff)
 
-- [ ] [tool] [ ] [green] — **Add `ruff` to DevBox** with rules: `UP` (pyupgrade), `B` (bugbear), `SIM` (simplify), `PIE` (misc), `RUF` (ruff-specific)
-- [ ] [tool] [ ] [green] — **`PLW0117`** (unnecessary-list-call) — fixes 4.12
-- [ ] [tool] [ ] [green] — **`PLR2004`** (magic-value-comparison) — catches float equality like `speed == 1.0` (fixes 4.18)
+- [x] [tool] [x] [green] — **Add `ruff` to DevBox** with rules: `UP` (pyupgrade), `B` (bugbear), `SIM` (simplify), `PIE` (misc), `RUF` (ruff-specific)
+- [x] [tool] [x] [green] — **`PLW0117`** (unnecessary-list-call) — fixes 4.12
+- [x] [tool] [x] [green] — **`PLR2004`** (magic-value-comparison) — catches float equality like `speed == 1.0` (fixes 4.18)
 
 ### Unused Dependencies
 
@@ -60,9 +60,9 @@ Current state: `jscpd` hook exists (detects copy-paste) but doesn't enforce "use
 
 Would have prevented: 12.4, 12.5, 12.7 (3 findings)
 
-Current state: `eslint-plugin-security` is configured and active for TypeScript. `security-audit` hook is `mode: off`. No Python security scanner.
+Current state: `eslint-plugin-security` is configured and active for TypeScript. `security-audit` hook is now `mode: warning` (6 devDep transitive vulnerabilities need upstream fixes). No Python security scanner.
 
-- [ ] [tool] [ ] [green] — **Enable `security-audit` hook** — change from `mode: off` to `mode: error` in devbox.yaml (already exists, just disabled)
+- [x] [tool] [ ] [green] — **Enable `security-audit` hook** — changed to `mode: warning` + `packageManager: pnpm`. 6 devDep vulnerabilities remain (ajv, minimatch — transitive, need upstream updates)
 - [ ] [tool] [ ] [green] — **Add `bandit` for Python** — catches `shell=True` (B602), `pickle.load` (B301), `subprocess` without shell (B603)
 - [ ] [tool] [ ] [green] — **Enable `iac-security` hook** — already configured, verify it catches Terraform/serverless misconfigs
 - [ ] [tool] [ ] [green] — **Input validation consistency test:** test that API and Worker validate the same fields with same constraints (catches 12.7 — worker missing cacheKey regex)
