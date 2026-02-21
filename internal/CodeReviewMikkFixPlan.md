@@ -30,18 +30,10 @@ Touches: `.md` files, `ARCHITECTURE.md`, READMEs, CI workflow docs. **No source 
 Touches: `packages/frontend/`, `packages/shared/`, `packages/simplestore/`, `packages/tara-auth/`. **No merlin/vabamorf changes.**
 
 - [ ] **2.2** (Low) Remove Jest, consolidate on Vitest (frontend + shared + simplestore)
-- [ ] **4.1** (Low) Add curly brackets to single-line if statements
-- [ ] **4.3** (Low) Remove `as unknown as` double type assertions — use proper types
-- [ ] **4.4** (Low) Refactor nested ternary statements into if/else or helper functions
-- [ ] **4.5** (Low) Replace array index React keys with stable identifiers
-- [ ] **4.6** (Low) Remove unused `LoginModalProps.message` and dead code in frontend
-- [ ] **4.7** (Low) Remove redundant `?` and `| undefined` type specifiers
 - [ ] **4.8** (Medium) Replace deprecated `execCommand` clipboard fallback with Clipboard API
 - [ ] **4.9** (Low) Merge duplicate CSS selectors (.marker-tooltip--align-center)
-- [ ] **4.11** (Low) Resolve TODO comments (12 found across codebase — frontend/shared portion)
 - [ ] **7.1** (Low) Make simplestore use `extractErrorMessage` from shared
 - [ ] **8.2.1** (Medium) Remove test duplications in simplestore (handler vs routes tests)
-- [ ] **11.1** (Medium) Remove unused dependencies (frontend/shared/simplestore portion)
 
 ---
 
@@ -51,16 +43,11 @@ Touches: `packages/merlin-api/`, `packages/merlin-worker/`, `packages/vabamorf-a
 
 - [ ] **2.3** (Low) Fix bug in generate.py: ERB branch calls `bark_alpha` instead of `erb_alpha`
 - [ ] **4.2** (Medium) Fix getCorsOrigin behavior difference: shared returns `"null"`, merlin/vabamorf return `"*"`
-- [ ] **4.12** (Low) Remove unnecessary `list()` calls on iterables in Python
-- [ ] **4.18** (Medium) Fix floating point equality checks in worker.py (`speed == 1.0`)
 - [ ] **5.3** (Low) Remove `if True:` indentation hack in run_merlin.py
-- [ ] **6.1** (High) Fix `pnpm test:all` so it fails when merlin-worker Python tests fail
 - [ ] **7.2** (Low) Replace `console.error` with proper logger in merlin-api and vabamorf-api
 - [ ] **9.1** (Low) Replace `RUN cd` with `WORKDIR` in Dockerfile
 - [ ] **10.2** (Medium) Replace empty-string fallbacks in ECS env vars with throw/validation
 - [ ] **12.3** (Medium) Unify CORS behavior across all packages (consistent origin handling)
-- [ ] **12.4** (Medium) Fix OS Command Injection: remove `shell=True` from subprocess.Popen
-- [ ] **12.5** (Medium) Add SHA-256 checksum verification for pickle model files
 - [ ] **12.7** (Medium) Add cacheKey validation in worker.py (match API-side regex)
 - [ ] **13.1** (Medium) Cache DNN model in memory instead of loading from disk every request
 - [ ] **15.1** (Medium) Remove /warmup endpoint entirely from merlin-api
@@ -94,17 +81,16 @@ These items require an architectural or product decision:
 **Group 1:** Start top-to-bottom — all are independent.
 
 **Group 2:** Fix in this order:
-1. **11.1** (remove unused deps — clean slate)
-2. **2.2** (Jest → Vitest — changes test infrastructure)
-3. **4.x** items (code style — bulk pass)
-4. **7.1, 8.2.1** (logic changes)
+1. **2.2** (Jest → Vitest — changes test infrastructure)
+2. **4.8, 4.9** (code style)
+3. **7.1, 8.2.1** (logic changes)
 
 **Group 3:** Fix in this order:
 1. **15.1** (remove /warmup — reduces code surface)
-2. **12.4 + 15.3** (shell injection — security fix, tests ready)
+2. **15.3** (shell injection — tests ready)
 3. **12.3 + 4.2** (CORS unification — related fixes)
-4. **12.5, 12.7** (security hardening)
-5. **4.18, 4.12, 5.3** (code quality)
-6. **6.1, 9.1, 10.2, 7.2** (infra/config)
+4. **12.7** (security hardening)
+5. **5.3** (code quality)
+6. **9.1, 10.2, 7.2** (infra/config)
 7. **2.3, 13.1** (merlin engine fixes)
 8. **15.4** (status endpoint — may depend on 12.2 discussion)
