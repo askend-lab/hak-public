@@ -84,6 +84,7 @@ hooks:
       - "docs/internal/design-system/07-Quality-Standards.md"
       - "audits/**"
       - "internal/Audit*"
+      - "internal/CodeReview*"
 
   language-check:
     excludePaths:
