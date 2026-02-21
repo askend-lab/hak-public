@@ -12,6 +12,7 @@ select = [
   "UP",     # pyupgrade
   "PIE",    # flake8-pie
   "RUF",    # ruff-specific rules
+  "ERA001", # commented-out code detection
   "PLW",    # pylint warnings (includes PLW0117 unnecessary-list-call)
   "PLR2004", # magic-value-comparison (catches float equality like speed == 1.0)
 ]

@@ -55,6 +55,8 @@ const baseRules = {
   'no-promise-executor-return': 'error',
   'no-unsafe-optional-chaining': 'error',
   'require-atomic-updates': 'error',
+  // Tech debt detection
+  'no-warning-comments': ['warn', { terms: ['TODO', 'FIXME', 'HACK', 'XXX'], location: 'start' }],
   // Code style
   'curly': ['error', 'all'],
   'no-nested-ternary': 'error',
