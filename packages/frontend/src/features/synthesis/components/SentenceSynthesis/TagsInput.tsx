@@ -101,9 +101,8 @@ export function TagsInput({
             onEditTagCommit
           ) {
             return (
-              <input
-                key={index}
-                type="text"
+              // eslint-disable-next-line react/no-array-index-key -- tag identity is its position in the sentence
+              <input key={index} type="text"
                 className="sentence-synthesis-item__tag-edit-input"
                 aria-label="Muuda silti"
                 value={editingTag.value}
@@ -118,9 +117,8 @@ export function TagsInput({
           }
 
           return (
-            <div
-              key={index}
-              className={`sentence-synthesis-item__tag sentence-synthesis-item__tag--clickable ${isSelected ? "sentence-synthesis-item__tag--selected" : ""}`}
+            // eslint-disable-next-line react/no-array-index-key -- tag identity is its position in the sentence
+            <div key={index} className={`sentence-synthesis-item__tag sentence-synthesis-item__tag--clickable ${isSelected ? "sentence-synthesis-item__tag--selected" : ""}`}
               onClick={() => onTagMenuOpen && onTagMenuOpen(id, index)}
               role="button"
               tabIndex={0}
@@ -204,9 +202,9 @@ export function TagsInput({
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {tagMenuItems.map((item, itemIndex) => (
+                    {tagMenuItems.map((item) => (
                       <button
-                        key={itemIndex}
+                        key={item.label}
                         className={`sentence-synthesis-item__tag-menu-item ${item.danger ? "sentence-synthesis-item__tag-menu-item--danger" : ""}`}
                         role="menuitem"
                         onClick={() => {

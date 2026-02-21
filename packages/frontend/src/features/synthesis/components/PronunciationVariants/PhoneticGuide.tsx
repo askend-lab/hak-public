@@ -37,8 +37,8 @@ const MarkerItem = ({
       {description}
     </div>
     <div className="pronunciation-variants__marker-examples">
-      {examples.map((ex, i) => (
-        <span key={i} className="pronunciation-variants__item-tag">
+      {examples.map((ex) => (
+        <span key={ex} className="pronunciation-variants__item-tag">
           {ex}
         </span>
       ))}

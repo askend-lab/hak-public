@@ -59,8 +59,8 @@ vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
         </button>
       )}
       {onInputBlur && <button onClick={() => onInputBlur()}>Blur {id}</button>}
-      {tagMenuItems?.map((item: { label: string; onClick: (id: string, idx: number, word: string) => void }, i: number) => (
-        <button key={i} onClick={() => item.onClick(id, 0, "word")}>
+      {tagMenuItems?.map((item: { label: string; onClick: (id: string, idx: number, word: string) => void }) => (
+        <button key={item.label} onClick={() => item.onClick(id, 0, "word")}>
           TagMenu-{item.label}
         </button>
       ))}

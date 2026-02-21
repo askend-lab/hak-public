@@ -150,8 +150,8 @@ export default function MarkerTooltip({
             </div>
             <p className="marker-tooltip__rule">{marker.rule}</p>
             <div className="marker-tooltip__examples">
-              {marker.examples.map((ex, i) => (
-                <span key={i} className="marker-tooltip__example-tag">
+              {marker.examples.map((ex) => (
+                <span key={ex} className="marker-tooltip__example-tag">
                   {ex}
                 </span>
               ))}

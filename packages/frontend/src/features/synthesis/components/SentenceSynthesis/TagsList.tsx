@@ -31,8 +31,8 @@ export function TagsList({
             (isPronunciationPanelOpen && selectedTagIndex === index) ||
             (isPronunciationPanelOpen && allTagsSelected);
           return (
-            <div
-              key={index}
+            // eslint-disable-next-line react/no-array-index-key -- tag identity is its position in the sentence
+            <div key={index}
               className={`sentence-synthesis-item__tag ${onTagClick ? "sentence-synthesis-item__tag--clickable" : ""} ${isSelected ? "sentence-synthesis-item__tag--selected" : ""}`}
               onClick={
                 onTagClick ? () => onTagClick(id, index, tag) : undefined

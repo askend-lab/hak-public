@@ -229,9 +229,9 @@ export default function PronunciationVariants({
               )}
               {!isLoading && !error && variants.length > 0 && (
                 <div className="pronunciation-variants__list">
-                  {variants.map((variant, index) => (
+                  {variants.map((variant) => (
                     <VariantItem
-                      key={index}
+                      key={variant.text}
                       variant={variant}
                       isSelected={customPhoneticForm === variant.text}
                       isPlaying={playingVariant === variant.text}

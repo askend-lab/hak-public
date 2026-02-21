@@ -42,7 +42,7 @@ export default function SpecsContent({
         <p className="specs-page__feature-desc">{feature.description}</p>
       )}
 
-      {feature.scenarios.map((scenario, sIdx) => {
+      {feature.scenarios.map((scenario) => {
         const result = getTestResult(testSuites, scenario.name);
         const status = feature.tags.includes("@skip")
           ? "skipped"
@@ -50,7 +50,7 @@ export default function SpecsContent({
             ? "passed"
             : "pending";
         return (
-          <div key={sIdx} className="specs-scenario__card">
+          <div key={scenario.name} className="specs-scenario__card">
             <div className="specs-scenario__header">
               <strong className="specs-scenario__title">{scenario.name}</strong>
               <span className={getBadgeClass(status)}>
@@ -62,8 +62,8 @@ export default function SpecsContent({
                 {result && ` ${result.duration.toFixed(0)}ms`}
               </span>
             </div>
-            {scenario.steps.map((step, stepIdx) => (
-              <div key={stepIdx} className="specs-step">
+            {scenario.steps.map((step) => (
+              <div key={`${step.keyword}${step.text}`} className="specs-step">
                 <span className="specs-step__keyword">
                   {step.keyword}
                 </span>
