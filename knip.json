@@ -10,9 +10,5 @@
     "**/stryker.config.mjs",
     "bundlesize.config.json"
   ],
-  "ignoreDependencies": [
-    "@babel/*",
-    "babel-jest",
-    "ts-jest"
-  ]
+  "ignoreDependencies": []
 }
