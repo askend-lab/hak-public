@@ -3,7 +3,12 @@
 
 // Inlined from @hak/shared — vabamorf-api runs in standalone Docker without workspace packages
 function getCorsOrigin(): string {
-  return (typeof process !== "undefined" && process.env?.ALLOWED_ORIGIN) || "*";
+  const origin = typeof process !== "undefined" ? process.env?.ALLOWED_ORIGIN : undefined;
+  if (!origin) {
+    console.warn("ALLOWED_ORIGIN not set — defaulting to restrictive 'null' origin");
+    return "null";
+  }
+  return origin;
 }
 
 const CORS_HEADERS: Record<string, string> = {

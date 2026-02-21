@@ -225,7 +225,7 @@ describe("vmetajson", () => {
       mockProcess.stderr.emit("data", Buffer.from("warning message"));
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        "[vmetajson stderr]",
+        expect.stringContaining("[vmetajson stderr]"),
         "warning message",
       );
       consoleSpy.mockRestore();

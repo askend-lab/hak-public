@@ -3,6 +3,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { extractStressedText, extractVariants } from "./parser";
+import { logger } from "./logger";
 import { LambdaResponse } from "./types";
 import { createResponse, parseJsonBody, validateField } from "./validation";
 import { analyze, isInitialized, initVmetajson } from "./vmetajson";
@@ -85,7 +86,7 @@ function parseAndValidate(
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
-  console.error(PROCESSING_ERROR_PREFIX, error);
+  logger.error(PROCESSING_ERROR_PREFIX, error);
   return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: `${PROCESSING_ERROR_PREFIX}${ERRORS.UNKNOWN}`,
   });

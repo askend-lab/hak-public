@@ -17,7 +17,7 @@ function getEcsClient(): ECSClient {
 }
 
 export function isEcsConfigured(): boolean {
-  return getEcsCluster() !== "" && getEcsService() !== "";
+  return Boolean(process.env.ECS_CLUSTER) && Boolean(process.env.ECS_SERVICE);
 }
 
 export interface EcsServiceState {

@@ -87,17 +87,6 @@ describe("serverless.yml — public endpoint guarantees", () => {
     expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
-  it("should not have authorizer on POST /warmup route", () => {
-    const fn = config.functions.warmup;
-    expect(fn).toBeDefined();
-
-    const httpEvent = fn?.events?.find((e) => e.httpApi);
-    expect(httpEvent).toBeDefined();
-    expect(httpEvent?.httpApi?.path).toBe("/warmup");
-    expect(httpEvent?.httpApi?.method).toBe("POST");
-    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
-  });
-
   it("should not have authorizer on GET /status/{cacheKey} route", () => {
     const fn = config.functions.status;
     expect(fn).toBeDefined();
@@ -132,17 +121,13 @@ describe("serverless.yml — public endpoint guarantees", () => {
     }
   });
 
-  it("should have explicit AuthorizationType NONE overrides for synthesize and warmup routes", () => {
+  it("should have explicit AuthorizationType NONE override for synthesize route", () => {
     const resources = config.resources?.Resources;
     expect(resources).toBeDefined();
 
     const synthRoute = resources?.["HttpApiRoutePostSynthesize"];
     expect(synthRoute).toBeDefined();
     expect(synthRoute?.Properties?.AuthorizationType).toBe("NONE");
-
-    const warmupRoute = resources?.["HttpApiRoutePostWarmup"];
-    expect(warmupRoute).toBeDefined();
-    expect(warmupRoute?.Properties?.AuthorizationType).toBe("NONE");
   });
 
   it("should not include Authorization in CORS allowedHeaders", () => {

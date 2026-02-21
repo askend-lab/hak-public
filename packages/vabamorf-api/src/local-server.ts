@@ -3,6 +3,7 @@
 
 import * as http from "http";
 import { analyzeHandler, variantsHandler, healthHandler } from "./handler";
+import { logger } from "./logger";
 import { createResponse } from "./validation";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
@@ -83,7 +84,7 @@ const server = http.createServer(
           result = createResponse(404, { error: "Not found", path, method: req.method });
         }
       } catch (error) {
-        console.error(`[ERROR] ${error}`);
+        logger.error(`${error}`);
         result = createResponse(500, { error: String(error) });
       }
 

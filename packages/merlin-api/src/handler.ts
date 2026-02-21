@@ -13,7 +13,6 @@ import {
 import { VOICE_DEFAULTS } from "./env";
 import { checkS3Cache, buildAudioUrl, isValidCacheKey } from "./s3";
 import { sendToQueue } from "./sqs";
-import { describeService, scaleService, isEcsConfigured } from "./ecs";
 
 // Read version from package.json (same pattern as vabamorf-api)
 function loadVersion(): string {
@@ -105,26 +104,6 @@ export function validateParams(params: SynthesizeParams): string | null {
   return null;
 }
 
-export const WARMUP_COOLDOWN_MS = 60_000;
-
-export const warmupRateLimit = {
-  _lastTime: 0,
-  reset(): void {
-    this._lastTime = 0;
-  },
-  check(): LambdaResponse | null {
-    const now = Date.now();
-    const elapsed = now - this._lastTime;
-    if (elapsed < WARMUP_COOLDOWN_MS) {
-      return createResponse(HTTP_STATUS.TOO_MANY_REQUESTS, {
-        error: "Rate limited. Try again later.",
-        retryAfterMs: WARMUP_COOLDOWN_MS - elapsed,
-      });
-    }
-    this._lastTime = now;
-    return null;
-  },
-};
 
 export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> {
   try {
@@ -198,35 +177,3 @@ export async function health(): Promise<LambdaResponse> {
   return createResponse(HTTP_STATUS.OK, { status: "ok", version: VERSION });
 }
 
-export async function warmup(): Promise<LambdaResponse> {
-  const rateLimited = warmupRateLimit.check();
-  if (rateLimited) return rateLimited;
-
-  if (!isEcsConfigured()) {
-    return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
-      error: "Missing ECS config",
-    });
-  }
-
-  try {
-    const { desired: currentDesired, running } = await describeService();
-
-    if (currentDesired >= 1) {
-      return createResponse(HTTP_STATUS.OK, {
-        status: "already_warm",
-        running,
-        desired: currentDesired,
-      });
-    }
-
-    await scaleService(1);
-
-    return createResponse(HTTP_STATUS.OK, {
-      status: "warming",
-      running: 0,
-      desired: 1,
-    });
-  } catch (error) {
-    return createInternalError("Warmup error", error);
-  }
-}
