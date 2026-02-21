@@ -29,11 +29,11 @@ Touches: `.md` files, `ARCHITECTURE.md`, READMEs, CI workflow docs. **No source 
 
 Touches: `packages/frontend/`, `packages/shared/`, `packages/simplestore/`, `packages/tara-auth/`. **No merlin/vabamorf changes.**
 
-- [ ] **2.2** (Low) Remove Jest, consolidate on Vitest (frontend + shared + simplestore)
-- [ ] **4.8** (Medium) Replace deprecated `execCommand` clipboard fallback with Clipboard API
-- [ ] **4.9** (Low) Merge duplicate CSS selectors (.marker-tooltip--align-center)
-- [ ] **7.1** (Low) Make simplestore use `extractErrorMessage` from shared
-- [ ] **8.2.1** (Medium) Remove test duplications in simplestore (handler vs routes tests)
+- [x] **2.2** (Low) Remove Jest, consolidate on Vitest (frontend + shared + simplestore)
+- [x] **4.8** (Medium) Replace deprecated `execCommand` clipboard fallback with Clipboard API
+- [x] **4.9** (Low) Merge duplicate CSS selectors (.marker-tooltip--align-center)
+- [x] **7.1** (Low) Make simplestore use `extractErrorMessage` from shared
+- [x] **8.2.1** (Medium) ~~Remove test duplications in simplestore~~ — complementary testing, not true duplication
 
 ---
 

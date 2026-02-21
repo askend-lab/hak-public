@@ -26,7 +26,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 2. Technical Stack
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS
-- ✅ Accept  [ ] Fixed  [ ] Closed — **2.2** (Low) 5 testing frameworks — can remove Jest in favor of Vitest
+- ✅ Accept  [x] Fixed  [x] Closed — **2.2** (Low) 5 testing frameworks — removed Jest from shared, simplestore, frontend
 - ✅ Accept  [ ] Fixed  [ ] Closed — **2.3** (Low) Bug in generate.py: ERB uses bark_alpha — dead code but fix anyway
 
 ## 3. Project Structure
@@ -42,8 +42,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.5** (Low) Array indexes as React keys — `react/no-array-index-key` ESLint rule
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python — knip dead-code hook + Ruff ERA001
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.7** (Low) Redundant `?` and `undefined` type specifiers — `no-unnecessary-type-arguments` ESLint rule (tool enabled, violations pending)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.8** (Medium) Deprecated APIs — execCommand fallback, np.random.RandomState (NOT React.FormEvent)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.9** (Low) Duplicate CSS selectors (.marker-tooltip--align-center)
+- ✅ Accept  [x] Fixed  [x] Closed — **4.8** (Medium) Deprecated APIs — removed execCommand fallback, uses Clipboard API only
+- ✅ Accept  [x] Fixed  [x] Closed — **4.9** (Low) Duplicate CSS selectors — merged into single .marker-tooltip--align-center block
 - ❌ Reject (not found)  —  — **4.10** (Low) Redundant return None — not confirmed in code
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.11** (Low) TODO matches — 12 found (not 30 as claimed), resolve them — `no-warning-comments` ESLint rule
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.12** (Low) Unnecessary list() calls on iterables in Python — Ruff PLW0117
@@ -67,13 +67,13 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 7. Error Handling
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **7.1** (Low) simplestore doesn't use extractErrorMessage from shared
+- ✅ Accept  [x] Fixed  [x] Closed — **7.1** (Low) simplestore now uses extractErrorMessage from shared
 - ✅ Accept  [ ] Fixed  [ ] Closed — **7.2** (Low) merlin-api and vabamorf-api use console.error instead of shared logger
 
 ## 8. Testing
 
 - ❌ Reject (wrong)  —  — **8.1** (High) Python tests not in CI — WRONG, they ARE in build-merlin-worker.yml
-- ✅ Accept  [ ] Fixed  [ ] Closed — **8.2.1** (Medium) Test duplications in simplestore (handler vs routes tests)
+- ✅ Accept  [x] Fixed  [x] Closed — **8.2.1** (Medium) Test duplications in simplestore — complementary testing, not true duplication
 - ❌ Reject (intentional)  —  — **8.2.2** (Low) Auth context 6 test files — intentional organization by concern
 
 ## 9. CI/CD
