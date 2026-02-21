@@ -34,7 +34,7 @@ If you discover a security vulnerability, please report it by opening a **GitHub
 
 ## Security Audit
 
-For the full security audit findings and remediation status, see `internal/SECURITY-AUDIT-2026-02.md`. Architecture decisions related to security are documented in `internal/DESIGN-DECISIONS.md` and `docs/adr/`.
+Architecture decisions related to security are documented in `docs/adr/`.
 
 ## Security best practices
 

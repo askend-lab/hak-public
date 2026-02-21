@@ -51,7 +51,7 @@ Frontend → GET /status/{key} → merlin-api → S3 (check cache)
 
 ## Note on Shared Utilities
 
-merlin-api inlines utility functions from `@hak/shared` (e.g., `getCorsOrigin`) because Lambda bundling does not support workspace package imports. This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.
+merlin-api inlines utility functions from `@hak/shared` (e.g., `getCorsOrigin`) because Lambda bundling does not support workspace package imports.This is an intentional trade-off — see `docs/adr/` for architecture decisions.
 
 ## Testing
 

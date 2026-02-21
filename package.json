@@ -6,27 +6,24 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/askend-lab/hak.git"
+    "url": "https://github.com/askend-lab/hak-public.git"
   },
   "bugs": {
-    "url": "https://github.com/askend-lab/hak/issues"
+    "url": "https://github.com/askend-lab/hak-public/issues"
   },
-  "homepage": "https://github.com/askend-lab/hak#readme",
+  "homepage": "https://github.com/askend-lab/hak-public#readme",
   "scripts": {
-    "dx": "node devbox dx",
-    "dx:cli": "node devbox",
-    "test": "node devbox test",
-    "test:full": "node devbox test --full",
+    "test": "pnpm -r --workspace-concurrency=4 run test:full",
+    "test:full": "pnpm -r --workspace-concurrency=4 run test:full",
     "test:all": "pnpm -r --workspace-concurrency=4 run test:full",
-    "test:coverage": "jest --coverage --json --outputFile=tmp/jest-results.json",
-    "typecheck": "pnpm -r exec tsc --noEmit",
-    "lint": "eslint --cache --ext .js,.ts,.tsx . --max-warnings=0 && npx gherkin-lint 'packages/specifications/**/*.feature'",
+    "test:coverage": "pnpm -r --filter=@hak/frontend run test:coverage",
+    "typecheck": "pnpm --filter @hak/frontend --filter @hak/shared exec tsc --noEmit",
+    "lint": "eslint --max-warnings=0 .",
     "check": "pnpm lint && pnpm typecheck && pnpm test:all",
-    "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
-    "kill-ports": "lsof -ti:5181 | xargs -r kill -9 2>/dev/null; sleep 0.5; true",
     "start:frontend": "pnpm --filter @hak/frontend dev",
-    "start:backend": "pnpm exec tsc --noEmit && pnpm --filter @hak/simplestore dev",
-    "start": "pnpm run kill-ports && pnpm run start:frontend"
+    "start": "pnpm --filter @hak/frontend dev",
+    "prepare": "husky",
+    "build": "pnpm --filter @hak/frontend build"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -84,14 +81,10 @@
     "eslint-plugin-sonarjs": "^3.0.5",
     "eslint-plugin-unicorn": "^62.0.0",
     "fast-check": "^4.5.3",
-    "gherkin-lint": "^4.2.4",
-    "gitleaks": "^1.0.0",
     "husky": "^9.1.7",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
-    "knip": "^5.83.1",
     "lint-staged": "^16.1.0",
-    "madge": "^8.0.0",
     "typescript": "^5.9.3"
   },
   "lint-staged": {
