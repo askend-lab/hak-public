@@ -40,4 +40,4 @@ jobs:
         run: pnpm typecheck
 
       - name: Test
-        run: pnpm test:all
+        run: pnpm -r --filter '!@hak/merlin-worker' --workspace-concurrency=4 run test:full
