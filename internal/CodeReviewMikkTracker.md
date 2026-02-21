@@ -11,21 +11,21 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181
 - ❌ Reject (wrong)  —  — **1.1.2** (Low) Shared module doesn't list dependencies — finding incorrect, s3 client IS in package.json
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty
-- ❌ Reject (not needed)  —  — **1.2.1** (Low) No separate INSTALL.md — DevBox handles setup, README has Quick Start
-- ❌ Reject (normal)  —  — **1.3.1** (Low) Duplicate architecture line in README — it's a summary + link, standard practice
-- ❌ Reject (intentional)  —  — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs — intentional navigation aid
+- ✅ Accept  [ ] Fixed  [ ] Closed — **1.2.1** (Low) No separate INSTALL.md
+- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.1** (Low) Duplicate architecture line in README
+- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams)
-- ❌ Reject (deferred)  —  — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger — overkill for Lambda project now
+- ✅ Accept  [ ] Fixed  [ ] Closed — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1** (Medium) No deployment guide for engineers
 - ❌ Reject (needed)  —  — **1.5.1.1** (Low) Too many markdown files (~46) — needed for LLM integration
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1.2** (Low) Design documentation in two places
 
 ## 2. Technical Stack
 
-- ❌ Reject (not now)  —  — **2.1** (Low) Node.js 20 → 24 — Node 20 is fine, upgrade not needed now
+- ✅ Accept  [ ] Fixed  [ ] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS
 - ✅ Accept  [ ] Fixed  [ ] Closed — **2.2** (Low) 5 testing frameworks — can remove Jest in favor of Vitest
 - ✅ Accept  [ ] Fixed  [ ] Closed — **2.3** (Low) Bug in generate.py: ERB uses bark_alpha — dead code but fix anyway
 
@@ -37,7 +37,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.1** (Low) if statements without curly brackets
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.2** (Medium) getCorsOrigin duplication — fix behavior difference (*→null)
-- ❌ Reject (tests only)  —  — **4.3** (Low) `as unknown as` — almost all in test files, acceptable for mocking
+- ✅ Accept  [ ] Fixed  [ ] Closed — **4.3** (Low) `as unknown as` double type assertions
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.4** (Low) Nested ternary statements
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.5** (Low) Array indexes as React keys
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python
@@ -50,7 +50,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ❌ Reject (not found)  —  — **4.13** (Low) Unnecessary awaits — not confirmed in source code
 - ❌ Reject (external lib)  —  — **4.14** (Medium) DeepRecurrentNetwork class — external Merlin library, not our code
 - ❌ Reject (ML convention)  —  — **4.15** (Low) Python naming case — ML math notation convention (W_value, Whx)
-- ❌ Reject (unverifiable)  —  — **4.16** (Medium) 1000+ SonarQube issues — can't verify, too broad
+- ✅ Accept  [ ] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — install SonarQube and verify
 - ❌ Reject (external lib)  —  — **4.17** (Medium) Merlin NN Python style issues — external library code
 - ✅ Accept  [ ] Fixed  [ ] Closed — **4.18** (Medium) Floating point equality checks in worker.py
 
@@ -94,7 +94,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 12. Security
 
 - ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
-- ❌ Reject (mitigated)  —  — **12.2** (Medium) Shared throttling — WAF already provides per-IP rate limiting
+- ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — improve per-user/per-IP limiting
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior differs: shared="null" vs merlin/vabamorf="*"
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress)
 - ❌ Reject (low risk)  —  — **12.5** (Medium) pickle.load — fixed path set at Docker build, not user-controllable
@@ -109,3 +109,9 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 14. Domain Logic
 
 - ❌ Reject (high effort)  —  — **14.1** (Low) Rename modules by domain — high effort, low value at current stage
+
+## 15. Our Own Findings (not in Mikk's review)
+
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.1** (Medium) Remove /warmup endpoint entirely — not used, unnecessary complexity
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.3** (Low) shell injection fix already has TDD tests but not yet applied to actual code
