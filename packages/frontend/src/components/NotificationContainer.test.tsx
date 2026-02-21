@@ -90,12 +90,13 @@ describe("NotificationContainer", () => {
       expect(screen.getByText("Removable")).toBeInTheDocument();
 
       // Click the close button on the notification
-      const closeBtn = document.querySelector(".notification__close");
-      if (closeBtn) {
-        act(() => {
-          (closeBtn as HTMLElement).click();
-        });
-      }
+      const closeBtn = document.querySelector("[aria-label='Sulge teade']");
+      expect(closeBtn).toBeTruthy();
+      act(() => {
+        (closeBtn as HTMLElement).click();
+      });
+
+      expect(screen.queryByText("Removable")).not.toBeInTheDocument();
     });
   });
 

@@ -39,7 +39,7 @@ describe("handleCodeCallback return values", () => {
     let result: boolean | undefined;
     function Comp() {
       const { handleCodeCallback } = useAuth();
-      return <button onClick={async () => { result = await handleCodeCallback("code"); }}>go</button>;
+      return <button onClick={() => { void handleCodeCallback("code").then(v => { result = v; }); }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);
     await waitFor(() => expect(screen.getByText("go")).toBeInTheDocument());
@@ -53,7 +53,7 @@ describe("handleCodeCallback return values", () => {
     let result: boolean | undefined;
     function Comp() {
       const { handleCodeCallback } = useAuth();
-      return <button onClick={async () => { result = await handleCodeCallback("bad"); }}>go</button>;
+      return <button onClick={() => { void handleCodeCallback("bad").then(v => { result = v; }); }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);
     await waitFor(() => expect(screen.getByText("go")).toBeInTheDocument());
@@ -69,7 +69,7 @@ describe("handleCodeCallback return values", () => {
     let result: boolean | undefined;
     function Comp() {
       const { handleCodeCallback } = useAuth();
-      return <button onClick={async () => { result = await handleCodeCallback("c"); }}>go</button>;
+      return <button onClick={() => { void handleCodeCallback("c").then(v => { result = v; }); }}>go</button>;
     }
     render(<AuthProvider><Comp /></AuthProvider>);
     await waitFor(() => expect(screen.getByText("go")).toBeInTheDocument());

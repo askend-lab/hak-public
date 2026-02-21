@@ -61,7 +61,7 @@ export function SharedTaskPage() {
       }
     }
 
-    loadTask();
+    void loadTask();
   }, [token, dataService]);
 
   const entries = task?.entries || [];
@@ -82,7 +82,7 @@ export function SharedTaskPage() {
 
     setCopiedEntries(task.entries);
     showNotification({ type: "success", message: "Laused kopeeritud!" });
-    navigate("/synthesis");
+    void navigate("/synthesis");
   };
 
   // Loading state
@@ -111,7 +111,7 @@ export function SharedTaskPage() {
         onTasksClick={() => {}}
         onHelpClick={() => {}}
         onLoginClick={() => {
-          navigate("/");
+          void navigate("/");
         }}
       />
 
@@ -131,7 +131,7 @@ export function SharedTaskPage() {
               isPlaying={isPlayingAll}
               isLoading={isLoadingPlayAll}
               disabled={entries.length === 0}
-              onClick={onPlayAll}
+              onClick={() => { void onPlayAll(); }}
             />
           </div>
         </div>

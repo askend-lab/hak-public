@@ -72,9 +72,9 @@ export function RowMenu({
             aria-label="Lausungi valikud"
             onKeyDown={handleKeyDown}
           >
-            {items.map((item, index) => (
+            {items.map((item) => (
               <button
-                key={index}
+                key={item.label}
                 className={`sentence-synthesis-item__menu-item ${item.danger ? "sentence-synthesis-item__menu-item--danger" : ""}`}
                 role="menuitem"
                 onClick={() => {

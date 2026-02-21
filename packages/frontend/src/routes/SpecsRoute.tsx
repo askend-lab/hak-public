@@ -14,7 +14,7 @@ export default function SpecsRoute() {
   return (
     <Suspense fallback={<PageLoadingState />}>
       <ErrorBoundary>
-        <SpecsPage onBack={() => navigate("/synthesis")} />
+        <SpecsPage onBack={() => { void navigate("/synthesis"); }} />
       </ErrorBoundary>
     </Suspense>
   );

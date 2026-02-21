@@ -71,7 +71,7 @@ export default function ShareTaskModal({
       </p>
       <div className="share-task-modal__actions">
         <button
-          onClick={handleCopyLink}
+          onClick={() => { void handleCopyLink(); }}
           disabled={isCopying}
           className="button button--primary"
           type="button"
@@ -80,7 +80,7 @@ export default function ShareTaskModal({
         </button>
         {onRevoke && (
           <button
-            onClick={async () => {
+            onClick={() => { void (async () => {
               setIsRevoking(true);
               try {
                 await onRevoke();
@@ -92,7 +92,7 @@ export default function ShareTaskModal({
               } finally {
                 setIsRevoking(false);
               }
-            }}
+            })(); }}
             disabled={isRevoking}
             className="button button--danger"
             type="button"

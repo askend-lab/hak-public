@@ -85,7 +85,7 @@ describe("useAudioPlayback handlePlayAll", () => {
     const entries = [mockEntry("1", "test")];
     const { result } = renderHook(() => useAudioPlayback(entries));
     act(() => {
-      result.current.handlePlayAll();
+      void result.current.handlePlayAll();
     });
     await waitFor(() => {
       expect(result.current.isLoadingPlayAll).toBe(true);
@@ -168,7 +168,7 @@ describe("useAudioPlayback with existing audio", () => {
     const entries = [mockEntry("1", "test")];
     const { result } = renderHook(() => useAudioPlayback(entries));
     act(() => {
-      result.current.handlePlayAll();
+      void result.current.handlePlayAll();
     });
     expect(result.current.isLoadingPlayAll).toBe(true);
     await act(async () => {
@@ -262,7 +262,7 @@ describe("useAudioPlayback with existing audio", () => {
     const { waitFor } = await import("@testing-library/react");
     const entries = [mockEntry("1", "test", "http://a.mp3")];
     const { result } = renderHook(() => useAudioPlayback(entries));
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     await waitFor(() => {
       expect(result.current.isLoadingPlayAll || result.current.isPlayingAll).toBe(true);
     });
@@ -283,7 +283,7 @@ describe("useAudioPlayback with existing audio", () => {
     const { waitFor } = await import("@testing-library/react");
     const entries = [mockEntry("1", "test", "http://a.mp3")];
     const { result } = renderHook(() => useAudioPlayback(entries));
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     await waitFor(() => {
       expect(result.current.isLoadingPlayAll || result.current.isPlayingAll).toBe(true);
     });

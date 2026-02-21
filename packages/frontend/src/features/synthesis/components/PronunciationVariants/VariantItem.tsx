@@ -42,8 +42,8 @@ export function VariantItem({
         <div className="pronunciation-variants__item-info">
           <div className="pronunciation-variants__item-text">{displayText}</div>
           <div className="pronunciation-variants__item-tags">
-            {markers.map((tagObj, i) => (
-              <span key={i} className="pronunciation-variants__item-tag">
+            {markers.map((tagObj) => (
+              <span key={tagObj.tag} className="pronunciation-variants__item-tag">
                 {tagObj.tag}
               </span>
             ))}

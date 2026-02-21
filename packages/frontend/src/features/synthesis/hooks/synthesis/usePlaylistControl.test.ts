@@ -80,7 +80,7 @@ describe("usePlaylistControl", () => {
     );
 
     act(() => {
-      result.current.handlePlayAll();
+      void result.current.handlePlayAll();
     });
     expect(result.current.isLoadingPlayAll).toBe(true);
 
@@ -141,7 +141,7 @@ describe("usePlaylistControl", () => {
     const { result } = renderHook(() =>
       usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
     );
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     await act(async () => {
       await result.current.handlePlayAll();
     });
@@ -218,7 +218,7 @@ describe("usePlaylistControl", () => {
     const { result } = renderHook(() =>
       usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
     );
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     await act(async () => { await result.current.handlePlayAll(); });
     expect(mockStopAudio).toHaveBeenCalledTimes(1);
   });
@@ -244,7 +244,7 @@ describe("usePlaylistControl mutation kills", () => {
       usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
     );
 
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     expect(result.current.isLoadingPlayAll).toBe(true);
 
     await act(async () => { await result.current.handlePlayAll(); });
@@ -264,7 +264,7 @@ describe("usePlaylistControl mutation kills", () => {
       usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
     );
 
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     expect(result.current.isLoadingPlayAll).toBe(true);
 
     await act(async () => { await result.current.handlePlayAll(); });
@@ -287,7 +287,7 @@ describe("usePlaylistControl mutation kills", () => {
     const { result } = renderHook(() =>
       usePlaylistControl(sentences, neverResolve, mockStopAudio, mockUpdateAll),
     );
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     expect(result.current.isLoadingPlayAll).toBe(true);
     expect(result.current.isPlayingAll).toBe(false);
   });
@@ -326,7 +326,7 @@ describe("usePlaylistControl mutation kills", () => {
       usePlaylistControl(sentences, controlledPlay, mockStopAudio, mockUpdateAll),
     );
 
-    act(() => { result.current.handlePlayAll(); });
+    act(() => { void result.current.handlePlayAll(); });
     expect(result.current.isLoadingPlayAll).toBe(true);
     expect(result.current.isPlayingAll).toBe(false);
 

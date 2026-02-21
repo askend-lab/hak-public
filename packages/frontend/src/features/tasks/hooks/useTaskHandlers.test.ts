@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useTaskHandlers } from "./useTaskHandlers";
+import { useAuth } from "@/features/auth/services";
 import { SentenceState } from "@/types/synthesis";
 import { createElement } from "react";
 import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
@@ -590,5 +591,37 @@ describe("useTaskHandlers edge cases", () => {
         ],
       }),
     );
+  });
+
+  it("requireAuth blocks action when not authenticated", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      setShowLoginModal: mockSetShowLoginModal,
+    } as unknown as ReturnType<typeof useAuth>);
+    const { result } = renderHook(() =>
+      useTaskHandlers(sentences, setView, setTaskId),
+      { wrapper: dsWrapper },
+    );
+    act(() => {
+      result.current.entries.handleAddAllSentencesToTask();
+    });
+    expect(mockSetShowLoginModal).toHaveBeenCalledWith(true);
+  });
+
+  it("viewTaskAction navigates to task", async () => {
+    const { result } = renderHook(() =>
+      useTaskHandlers(sentences, setView, setTaskId),
+      { wrapper: dsWrapper },
+    );
+    await act(async () => {
+      await result.current.entries.handleSelectTaskFromDropdown("task-1", "Task 1", "append");
+    });
+    const call = mockShowNotification.mock.calls[0]?.[0];
+    if (call?.action) {
+      call.action.onClick();
+      expect(setTaskId).toHaveBeenCalledWith("task-1");
+      expect(setView).toHaveBeenCalled();
+    }
   });
 });

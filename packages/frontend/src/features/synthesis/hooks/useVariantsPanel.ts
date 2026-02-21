@@ -137,7 +137,7 @@ export function useVariantsPanel(
           return;
         }
 
-        handleTagClick(sentenceId, tagIndex, word);
+        void handleTagClick(sentenceId, tagIndex, word);
       } catch (error) {
         clearTimeout(timeoutId);
         // Ensure minimum display time even on error
@@ -202,7 +202,7 @@ export function useVariantsPanel(
     handleTagClick,
     handleCloseVariants,
     handleOpenVariantsFromMenu,
-    handleExplorePhonetic,
+    handleExplorePhonetic: (...args: Parameters<typeof handleExplorePhonetic>) => { void handleExplorePhonetic(...args); },
     handleCloseSentencePhonetic,
   };
 }

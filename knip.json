@@ -5,14 +5,15 @@
     "**/.stryker-tmp/**",
     "packages/vabamorf-api/src/local-server.ts",
     "packages/merlin-api/src/handler.ts",
-    "packages/frontend/**",
     "packages/simplestore/test/**",
     "**/stryker.config.mjs",
     "bundlesize.config.json"
   ],
-  "ignoreDependencies": [
-    "@babel/*",
-    "babel-jest",
-    "ts-jest"
-  ]
+  "ignoreDependencies": [],
+  "workspaces": {
+    "packages/frontend": {
+      "entry": ["src/main.tsx", "src/**/*.test.{ts,tsx}", "src/features/steps-ts/**/*.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  }
 }

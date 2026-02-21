@@ -59,7 +59,7 @@ export default function PronunciationVariants({
 
   useEffect(() => {
     if (word && isOpen) {
-      fetchVariants(word);
+      void fetchVariants(word);
       setCustomVariant("");
     }
   }, [word, isOpen]);
@@ -229,14 +229,14 @@ export default function PronunciationVariants({
               )}
               {!isLoading && !error && variants.length > 0 && (
                 <div className="pronunciation-variants__list">
-                  {variants.map((variant, index) => (
+                  {variants.map((variant) => (
                     <VariantItem
-                      key={index}
+                      key={variant.text}
                       variant={variant}
                       isSelected={customPhoneticForm === variant.text}
                       isPlaying={playingVariant === variant.text}
                       isLoading={loadingVariant === variant.text}
-                      onPlay={handlePlayVariant}
+                      onPlay={(...args: Parameters<typeof handlePlayVariant>) => { void handlePlayVariant(...args); }}
                       onUse={handleUseVariant}
                     />
                   ))}
@@ -253,7 +253,7 @@ export default function PronunciationVariants({
                       <CustomVariantForm
                         value={customVariant}
                         onChange={setCustomVariant}
-                        onPlay={handlePlayCustomVariant}
+                        onPlay={() => { void handlePlayCustomVariant(); }}
                         onUse={handleUseCustomVariant}
                         onClose={handleCloseCustomForm}
                         onShowGuide={() => setShowGuide(true)}

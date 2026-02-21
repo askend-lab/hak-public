@@ -14,6 +14,7 @@ import regexpPlugin from 'eslint-plugin-regexp';
 import securityPlugin from 'eslint-plugin-security';
 import sonarjsPlugin from 'eslint-plugin-sonarjs';
 import unicornPlugin from 'eslint-plugin-unicorn';
+import reactPlugin from 'eslint-plugin-react';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 
@@ -54,7 +55,11 @@ const baseRules = {
   'no-promise-executor-return': 'error',
   'no-unsafe-optional-chaining': 'error',
   'require-atomic-updates': 'error',
+  // Tech debt detection
+  'no-warning-comments': ['warn', { terms: ['TODO', 'FIXME', 'HACK', 'XXX'], location: 'start' }],
   // Code style
+  'curly': ['error', 'all'],
+  'no-nested-ternary': 'error',
   'no-eval': 'error',
   'no-implied-eval': 'error',
   'no-new-func': 'error',
@@ -202,7 +207,8 @@ const typescriptRules = {
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/explicit-function-return-type': 'error',
   '@typescript-eslint/explicit-module-boundary-types': 'error',
-  '@typescript-eslint/no-non-null-assertion': 'error'
+  '@typescript-eslint/no-non-null-assertion': 'error',
+  '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'never' }]
 };
 
 const nodeGlobals = {
@@ -301,7 +307,8 @@ export default [
       parser: tsParser,
       parserOptions: {
         ecmaVersion: ECMA_VERSION,
-        sourceType: 'module'
+        sourceType: 'module',
+        project: true
       },
       globals: nodeGlobals
     },
@@ -323,17 +330,20 @@ export default [
       parserOptions: {
         ecmaVersion: ECMA_VERSION,
         sourceType: 'module',
+        project: true,
         ecmaFeatures: { jsx: true }
       },
       globals: browserGlobals
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
-      'jsx-a11y': jsxA11yPlugin
+      'jsx-a11y': jsxA11yPlugin,
+      'react': reactPlugin
     },
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'error',
+      'react/no-array-index-key': 'error',
       // React components are typically larger than utility functions
       'complexity': ['error', 20],
       'max-depth': ['error', 4],
@@ -415,6 +425,7 @@ export default [
     },
     rules: {
       ...jestRules,
+      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'allow' }],
       'complexity': ['error', 15],
       'max-depth': ['error', 4],
       'max-lines': ['error', 800],
@@ -432,6 +443,24 @@ export default [
     rules: {
       'no-magic-numbers': 'off',
       'import/no-default-export': 'off'
+    }
+  },
+
+  // ===== FILES NOT IN ANY TSCONFIG (disable type-aware parsing) =====
+  {
+    files: [
+      '**/e2e/**/*.ts',
+      '**/*.config.ts',
+      '**/test/**/*.ts',
+      '**/aws-services.test.ts',
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: ECMA_VERSION,
+        sourceType: 'module',
+        project: null
+      }
     }
   }
 ];

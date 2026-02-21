@@ -162,4 +162,34 @@ describe("TaskDetailHeader menu actions", () => {
     if (bd) await userEvent.click(bd);
     expect(setMenu).toHaveBeenCalledWith(false);
   });
+
+  it("closes on Escape keydown on backdrop", async () => {
+    const setMenu = vi.fn();
+    render(
+      <TaskDetailHeader
+        {...defaultProps}
+        isHeaderMenuOpen={true}
+        setIsHeaderMenuOpen={setMenu}
+      />,
+    );
+    const bd = document.querySelector(".task-detail__menu-backdrop");
+    if (bd) await userEvent.type(bd as HTMLElement, "{Escape}");
+    expect(setMenu).toHaveBeenCalledWith(false);
+  });
+
+  it("handles copy to synthesis click", async () => {
+    const onCopy = vi.fn();
+    const setMenu = vi.fn();
+    render(
+      <TaskDetailHeader
+        {...defaultProps}
+        isHeaderMenuOpen={true}
+        onCopyToSynthesis={onCopy}
+        setIsHeaderMenuOpen={setMenu}
+      />,
+    );
+    await userEvent.click(screen.getByText("Muuda ülesande lauseid"));
+    expect(onCopy).toHaveBeenCalled();
+    expect(setMenu).toHaveBeenCalledWith(false);
+  });
 });

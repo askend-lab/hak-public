@@ -33,7 +33,7 @@ export default function AppLayout() {
   useDocumentTitle();
 
   const synthesis = useSynthesis();
-  const navigateToTasks = useCallback((): void => { navigate("/tasks"); }, [navigate]);
+  const navigateToTasks = useCallback((): void => { void navigate("/tasks"); }, [navigate]);
   const taskHandlers = useTaskHandlers(
     synthesis.sentences,
     navigateToTasks,
@@ -86,7 +86,7 @@ export default function AppLayout() {
         isAuthenticated={isAuthenticated}
         user={user}
         onTasksClick={handleTasksClick}
-        onHelpClick={() => navigate("/role-selection")}
+        onHelpClick={() => { void navigate("/role-selection"); }}
         onLoginClick={() => setShowLoginModal(true)}
       />
 

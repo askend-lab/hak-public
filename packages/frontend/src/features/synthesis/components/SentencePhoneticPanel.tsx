@@ -34,8 +34,8 @@ const MarkerItem = ({ m }: { m: (typeof markers)[0] }) => (
       {m.description}
     </div>
     <div className="sentence-phonetic-panel__marker-examples">
-      {m.examples.map((ex, i) => (
-        <span key={i} className="sentence-phonetic-panel__marker-tag">
+      {m.examples.map((ex) => (
+        <span key={ex} className="sentence-phonetic-panel__marker-tag">
           {ex}
         </span>
       ))}
@@ -75,8 +75,8 @@ const GuideView = ({
         Hääldusmärgid aitavad täpsustada lause hääldust. Klõpsa märgil, et
         lisada see kursori asukohta.
       </p>
-      {markers.map((m, i) => (
-        <MarkerItem key={i} m={m} />
+      {markers.map((m) => (
+        <MarkerItem key={m.symbol} m={m} />
       ))}
     </div>
   </div>
@@ -249,7 +249,7 @@ export default function SentencePhoneticPanel({
             />
             <div className="sentence-phonetic-panel__actions">
               <button
-                onClick={handlePlay}
+                onClick={() => { void handlePlay(); }}
                 disabled={!editedText.trim() || isLoading}
                 className={`button button--primary ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
                 title={isLoading ? "Laen..." : isPlaying ? "Mängib" : "Kuula"}

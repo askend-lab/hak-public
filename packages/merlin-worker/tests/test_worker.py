@@ -3,9 +3,8 @@
 import hashlib
 import json
 import os
-import tempfile
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -24,10 +23,6 @@ from worker import (
     run_worker,
     _apply_sox_effects,
     _cleanup_files,
-    TEXT_PREVIEW_LENGTH,
-    CONDA_PREFIX,
-    SYNTHESIS_TIMEOUT,
-    SOX_TIMEOUT,
 )
 
 
@@ -376,7 +371,8 @@ class TestRunWorker:
         sqs = MagicMock()
         calls = 0
         def recv(**kw):
-            nonlocal calls; calls += 1
+            nonlocal calls
+            calls += 1
             if calls == 1:
                 worker._sigterm_handler(None, None)
                 return {"Messages": []}

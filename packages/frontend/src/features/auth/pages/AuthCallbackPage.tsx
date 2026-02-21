@@ -39,7 +39,7 @@ export function AuthCallbackPage() {
         if (accessToken && idToken) {
           const success = handleTaraTokens({ accessToken, idToken });
           if (success) {
-            navigate("/", { replace: true });
+            void navigate("/", { replace: true });
             return;
           }
         }
@@ -52,7 +52,7 @@ export function AuthCallbackPage() {
       if (code) {
         const success = await handleCodeCallback(code);
         if (success) {
-          navigate("/", { replace: true });
+          void navigate("/", { replace: true });
           return;
         } else {
           setError("Autentimise viga. Palun proovi uuesti.");
@@ -68,7 +68,7 @@ export function AuthCallbackPage() {
         return;
       }
 
-      navigate("/", { replace: true });
+      void navigate("/", { replace: true });
     }
 
     void processCallback();
@@ -90,7 +90,7 @@ export function AuthCallbackPage() {
           Sisselogimine ebaõnnestus: {error}
         </p>
         <button
-          onClick={() => navigate("/", { replace: true })}
+          onClick={() => { void navigate("/", { replace: true }); }}
           className="button button--primary"
         >
           Tagasi avalehele

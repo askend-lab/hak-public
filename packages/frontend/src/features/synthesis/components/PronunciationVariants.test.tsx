@@ -79,8 +79,8 @@ describe("PronunciationVariants", () => {
 
   describe("loading state", () => {
     it("shows loading message while fetching", () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
-        () => new Promise(() => {}), // Never resolves
+      (global.fetch as ReturnType<typeof vi.fn>).mockReturnValue(
+        new Promise(() => {}), // Never resolves
       );
 
       render(<PronunciationVariants {...defaultProps} />);

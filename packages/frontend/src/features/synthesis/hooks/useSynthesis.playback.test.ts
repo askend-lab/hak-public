@@ -82,7 +82,7 @@ describe("useSynthesis playback", () => {
       result.current.setDemoSentences();
     });
     await act(async () => {
-      result.current.handlePlayAll();
+      void result.current.handlePlayAll();
     });
     expect(
       result.current.isPlayingAll || result.current.isLoadingPlayAll,

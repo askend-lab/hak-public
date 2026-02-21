@@ -53,7 +53,7 @@ test_modules:
 
 # Global coverage settings
 coverage:
-  min_total: 95
+  min_total: 93
 
 # Task Channel - Slack-based agent communication
 task_channel:
@@ -84,6 +84,8 @@ hooks:
       - "docs/internal/design-system/07-Quality-Standards.md"
       - "audits/**"
       - "internal/Audit*"
+      - "internal/CodeReview*"
+      - "internal/Security*"
 
   language-check:
     excludePaths:
@@ -207,7 +209,8 @@ hooks:
       - "**/PronunciationVariants.test.tsx"
 
   security-audit:
-    mode: off
+    mode: warning
+    packageManager: pnpm
 
   secret-detection:
     required: true

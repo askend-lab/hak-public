@@ -26,7 +26,7 @@ vi.mock("@/features/sharing/components/ShareTaskModal", () => ({
     isOpen ? (
       <div data-testid="share-modal">
         <button onClick={onClose}>Close Share</button>
-        {onRevoke && <button onClick={() => onRevoke()}>Revoke</button>}
+        {onRevoke && <button onClick={() => { void onRevoke(); }}>Revoke</button>}
       </div>
     ) : null,
 }));

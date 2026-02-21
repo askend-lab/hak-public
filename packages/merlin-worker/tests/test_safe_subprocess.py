@@ -18,7 +18,6 @@ These tests verify the wrapper handles:
 import glob
 import os
 import subprocess
-import tempfile
 
 import pytest
 
@@ -208,7 +207,7 @@ class TestRunMerlinCommands:
         assert len(wav_files) == 2
 
         # Safe argument list for sox:
-        args = ["sox"] + wav_files + [out_wav]
+        args = ["sox", *wav_files, out_wav]
         assert args[0] == "sox"
         assert args[-1] == out_wav
         assert len(args) == 4  # sox + 2 wav files + output

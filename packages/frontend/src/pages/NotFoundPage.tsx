@@ -12,7 +12,7 @@ export default function NotFoundPage() {
       <p>Lehekülge ei leitud</p>
       <button
         className="btn btn--primary"
-        onClick={() => navigate("/synthesis")}
+        onClick={() => { void navigate("/synthesis"); }}
       >
         Tagasi avalehele
       </button>

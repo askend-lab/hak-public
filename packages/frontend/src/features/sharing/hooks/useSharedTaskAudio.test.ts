@@ -151,7 +151,7 @@ describe("useSharedTaskAudio", () => {
     ];
 
     act(() => {
-      result.current.handlePlayAll(entries);
+      void result.current.handlePlayAll(entries);
     });
 
     expect(result.current.isLoadingPlayAll).toBe(true);
@@ -169,7 +169,7 @@ describe("useSharedTaskAudio", () => {
     ];
 
     act(() => {
-      result.current.handlePlayAll(entries);
+      void result.current.handlePlayAll(entries);
     });
 
     await waitFor(() => {
@@ -273,7 +273,7 @@ describe("useSharedTaskAudio", () => {
     ];
 
     act(() => {
-      result.current.handlePlayAll(entries);
+      void result.current.handlePlayAll(entries);
     });
 
     expect(result.current.isLoadingPlayAll).toBe(true);
@@ -300,7 +300,7 @@ describe("useSharedTaskAudio", () => {
     ];
 
     act(() => {
-      result.current.handlePlayAll(entries);
+      void result.current.handlePlayAll(entries);
     });
 
     // Stop immediately
