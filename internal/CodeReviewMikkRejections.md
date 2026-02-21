@@ -108,24 +108,6 @@ Our own code (`worker.py`, `tests/`) follows our project's style conventions.
 
 ---
 
-## 7.2 (Low) — "merlin-api and vabamorf-api use console.error instead of shared logger"
-
-**Reason: Standalone Lambda architecture constraint.**
-
-Both `merlin-api` and `vabamorf-api` are standalone AWS Lambda functions that intentionally do not import `@hak/shared` at runtime. This is documented in `packages/merlin-api/README.md` line 54:
-
-> "merlin-api inlines utility functions from @hak/shared (e.g., getCorsOrigin) because Lambda bundling does not support workspace package imports."
-
-Using the shared `createLogger` / `logger` module would require either:
-1. Adding `@hak/shared` as a runtime dependency — which conflicts with the standalone Lambda architecture and increases cold start time.
-2. Inlining the logger too — which would add more duplicated code, contradicting the reviewer's own finding about code duplication (5.1, 5.2).
-
-In AWS Lambda, `console.error()` output goes directly to CloudWatch Logs with timestamps, request IDs, and log levels. The shared logger adds structured JSON formatting — a nice-to-have but not essential for Lambda functions where CloudWatch provides native log aggregation.
-
-The current approach is a pragmatic trade-off, not an oversight.
-
----
-
 ## 8.1 (High) — "merlin-worker Python tests not executed by CI"
 
 **Reason: Reviewer error — tests ARE in CI.**
@@ -220,32 +202,6 @@ Additionally:
 The reviewer's concern about abuse is valid in principle, but the risk is mitigated by infrastructure-level rate limiting, and the design choice is a product requirement, not a security oversight.
 
 Note: The `merlin-api/README.md` incorrectly lists "Cognito JWT" as the auth method for these endpoints — this is a documentation bug (accepted as finding 15.2), not a code bug.
-
----
-
-## 12.5 (Medium) — "pickle.load without integrity verification"
-
-**Reason: Low risk in current architecture.**
-
-The `pickle.load` call at `merlin/run_merlin.py` line 93 loads DNN model files:
-
-```python
-dnn_model = pickle.load(open(nnets_file_name, 'rb'))
-```
-
-The model file path (`nnets_file_name`) is:
-1. Set at Docker image build time from S3 voice models
-2. Stored inside the Docker image layer at a fixed filesystem path
-3. Not user-controllable — no HTTP request or SQS message can influence which file is loaded
-4. The Docker image is built in CI with verified S3 sources and pushed to a private ECR registry
-
-For `pickle.load` to be exploitable, an attacker would need to either:
-- Compromise the Docker image build pipeline and inject a malicious model file
-- Gain write access to the ECS container filesystem at runtime
-
-Both scenarios require infrastructure-level compromise that would have far more severe consequences than pickle deserialization.
-
-Migrating away from pickle would require converting all voice models to a safe format (e.g., ONNX, SavedModel), revalidating synthesis quality, and modifying the Merlin engine — a multi-week effort for minimal security gain given the threat model.
 
 ---
 
