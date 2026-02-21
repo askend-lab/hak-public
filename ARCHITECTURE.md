@@ -25,8 +25,8 @@ pnpm workspaces monorepo. Packages and their dependencies:
 - **frontend** — depends on `shared`, `specifications`, `simplestore` (dev)
 - **simplestore** — depends on `shared`
 - **merlin-api** — standalone (inlines shared utilities for Lambda bundling)
-- **merlin-worker** — depends on `shared`
-- **vabamorf-api** — depends on `shared`
+- **merlin-worker** — standalone (Python, no npm dependencies)
+- **vabamorf-api** — standalone (inlines shared utilities for Docker Lambda bundling)
 - **tara-auth** — standalone
 - **shared** — shared types, utilities, constants (no dependencies)
 - **specifications** — Gherkin BDD feature specs, depends on `gherkin-parser`
@@ -37,7 +37,7 @@ pnpm workspaces monorepo. Packages and their dependencies:
 - **frontend** — React, Vite, SCSS/BEM, Vitest. Runs on S3 + CloudFront. Teacher and student UI.
 - **simplestore** — TypeScript, DynamoDB SDK. Lambda. Lessons, users, progress CRUD.
 - **merlin-api** — TypeScript, ECS SDK, S3 SDK, SQS SDK. Lambda. TTS request gateway.
-- **merlin-worker** — Python + TypeScript, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis.
+- **merlin-worker** — Python, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis.
 - **vabamorf-api** — TypeScript, native binary (vmetajson). Lambda (Docker). Estonian morphological analysis.
 - **tara-auth** — TypeScript, Cognito SDK, JOSE. Lambda. Estonian eID (TARA) authentication.
 - **shared** — TypeScript. Shared types, utilities, constants.
@@ -79,6 +79,25 @@ All infrastructure is managed with Terraform in `infra/`.
 - **cloudwatch-dashboard.tf** — Monitoring dashboard
 - **slack-notifications.tf** — Alert notifications to Slack
 - **merlin/** — Merlin-specific infra: ECS cluster, Fargate service, SQS queue, S3 bucket, IAM roles, auto-scaling
+
+## CI/CD & Deployment
+
+GitHub Actions workflows in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| **build.yml** | Push/PR to main | Lint, typecheck, test per-package, build artifacts, upload to S3 |
+| **deploy.yml** | Called by build.yml or manual | Smart-diff deploy to dev/prod (only changed modules) |
+| **build-merlin-worker.yml** | Push to `packages/merlin-worker/**` | Python tests, Docker build, push to ECR |
+| **terraform.yml** | Push to `infra/**` | Terraform plan (PR) / apply (main) |
+| **e2e.yml** | Push to `packages/frontend/**` | Playwright E2E browser tests |
+| **release.yml** | Manual | Version bump, changelog, GitHub release |
+| **build.public.yml** | Push/PR to main | Lint, typecheck, test (public repo CI) |
+| **codeql.yml** | Push/PR to main | CodeQL security analysis |
+
+**Deploy flow:** `build.yml` creates a build artifact per module → `deploy.yml` compares with current deployment state → deploys only changed modules (Serverless for Lambdas, S3 sync for frontend, CloudFront invalidation).
+
+**Manual deploy:** `deploy.yml` can be triggered manually with a build ID and target environment (dev/prod).
 
 ## Quality System
 

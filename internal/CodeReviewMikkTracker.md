@@ -8,15 +8,15 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 1. Documentation
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181
+- ✅ Accept  [x] Fixed  [x] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181
 - ❌ Reject (wrong)  —  — **1.1.2** (Low) Shared module doesn't list dependencies — finding incorrect, s3 client IS in package.json
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.2.1** (Low) No separate INSTALL.md
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.1** (Low) Duplicate architecture line in README
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate)
+- ✅ Accept  [x] Fixed  [x] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty
+- ✅ Accept  [x] Fixed  [x] Closed — **1.2.1** (Low) No separate INSTALL.md — expanded Quick Start in root README
+- ✅ Accept  [x] Fixed  [x] Closed — **1.3.1** (Low) Duplicate architecture line in README — not real duplication (summary + link)
+- ✅ Accept  [x] Fixed  [x] Closed — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs — intentional for navigation
+- ✅ Accept  [x] Fixed  [x] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect)
+- ✅ Accept  [x] Fixed  [x] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading)
+- ✅ Accept  [x] Fixed  [x] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1** (Medium) No deployment guide for engineers
@@ -80,11 +80,11 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **9.1** (Low) Dockerfile uses `RUN cd` instead of WORKDIR
 - ❌ Reject (by design)  —  — **9.2** (Low) Serverless v3/v4 mismatch — by design, documented in README (cost decision)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **9.3** (Medium) Deploy workflows — document properly what exists and fill gaps
+- ✅ Accept  [x] Fixed  [x] Closed — **9.3** (Medium) Deploy workflows — added CI/CD section to ARCHITECTURE.md
 
 ## 10. Configuration
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused)
+- ✅ Accept  [x] Fixed  [x] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **10.2** (Medium) Empty-string ECS env vars — replace with throw or proper validation
 
 ## 11. Dependencies
@@ -113,7 +113,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 15. Our Own Findings (not in Mikk's review)
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **15.1** (Medium) Remove /warmup endpoint entirely — not used, unnecessary complexity
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
+- ✅ Accept  [x] Fixed  [x] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
 - ✅ Accept  [ ] Fixed  [ ] Closed — **15.3** (Low) shell injection fix already has TDD tests but not yet applied to actual code
 - ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — move behind CloudFront or require token
 
