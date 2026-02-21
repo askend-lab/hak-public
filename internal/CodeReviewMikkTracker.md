@@ -20,7 +20,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams)
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1** (Medium) No deployment guide for engineers
-- ❌ Reject (needed)  —  — **1.5.1.1** (Low) Too many markdown files (~46) — needed for LLM integration
+- ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1.1** (Low) Too many markdown files (~46) — organize/consolidate
 - ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1.2** (Low) Design documentation in two places
 
 ## 2. Technical Stack
@@ -80,12 +80,12 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **9.1** (Low) Dockerfile uses `RUN cd` instead of WORKDIR
 - ❌ Reject (by design)  —  — **9.2** (Low) Serverless v3/v4 mismatch — by design, documented in README (cost decision)
-- ❌ Reject (wrong)  —  — **9.3** (Medium) Missing deploy workflows — cross-check: most already exist
+- ✅ Accept  [ ] Fixed  [ ] Closed — **9.3** (Medium) Deploy workflows — document properly what exists and fill gaps
 
 ## 10. Configuration
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused)
-- ❌ Reject (guarded)  —  — **10.2** (Medium) Empty-string ECS env vars — already guarded by isEcsConfigured()
+- ✅ Accept  [ ] Fixed  [ ] Closed — **10.2** (Medium) Empty-string ECS env vars — replace with throw or proper validation
 
 ## 11. Dependencies
 
