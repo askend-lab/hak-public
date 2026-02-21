@@ -75,7 +75,7 @@
     "i18next": "^25.7.3",
     "jest": "^30.2.0",
     "jest-axe": "^10.0.0",
-    "jest-cucumber": "^3.0.2",
+    "jest-cucumber": "^4.5.0",
     "jest-environment-jsdom": "^30.2.0",
     "jsdom": "^27.3.0",
     "nyc": "^17.1.0",
