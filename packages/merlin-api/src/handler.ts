@@ -11,8 +11,13 @@ import {
   type LambdaResponse,
 } from "./response";
 import { VOICE_DEFAULTS } from "./env";
-import { checkS3Cache, buildAudioUrl, isValidCacheKey } from "./s3";
+import { checkS3Cache, buildAudioUrl } from "./s3";
 import { sendToQueue } from "./sqs";
+import {
+  SynthesizeRequestSchema,
+  CacheKeySchema,
+  type SynthesizeRequest,
+} from "./schemas";
 
 // Read version from package.json (same pattern as vabamorf-api)
 function loadVersion(): string {
@@ -28,12 +33,9 @@ function loadVersion(): string {
 }
 export const VERSION = loadVersion();
 
-export interface SynthesizeRequest {
-  text: string;
-  voice?: string;
-  speed?: number;
-  pitch?: number;
-}
+export type { SynthesizeRequest } from "./schemas";
+export { MAX_TEXT_LENGTH, SPEED_RANGE, PITCH_RANGE } from "./schemas";
+export { SynthesizeRequestSchema, CacheKeySchema } from "./schemas";
 
 export interface SynthesizeEvent {
   body?: string;
@@ -86,44 +88,23 @@ export function applySynthesizeDefaults(body: SynthesizeRequest): SynthesizePara
   };
 }
 
-export const MAX_TEXT_LENGTH = 1000;
-export const SPEED_RANGE = { min: 0.5, max: 2.0 } as const;
-export const PITCH_RANGE = { min: -500, max: 500 } as const;
-
-export function validateText(text: unknown): text is string {
-  return typeof text === "string" && text !== "" && text.length <= MAX_TEXT_LENGTH;
-}
-
-export function validateParams(params: SynthesizeParams): string | null {
-  if (params.speed < SPEED_RANGE.min || params.speed > SPEED_RANGE.max) {
-    return `Speed must be between ${SPEED_RANGE.min} and ${SPEED_RANGE.max}`;
-  }
-  if (params.pitch < PITCH_RANGE.min || params.pitch > PITCH_RANGE.max) {
-    return `Pitch must be between ${PITCH_RANGE.min} and ${PITCH_RANGE.max}`;
-  }
-  return null;
-}
-
-
 export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> {
   try {
     const parsed = parseRequestBody(event.body);
     if (!parsed.ok) {
       return createBadRequest(parsed.error);
     }
-    const body = parsed.data;
 
-    if (!validateText(body.text)) {
-      return createBadRequest("Missing or invalid text field");
+    const validated = SynthesizeRequestSchema.safeParse(parsed.data);
+    if (!validated.success) {
+      const firstError = validated.error.errors[0];
+      return createBadRequest(firstError?.message ?? "Invalid request");
     }
 
-    const params = applySynthesizeDefaults(body);
-    const paramsError = validateParams(params);
-    if (paramsError) {
-      return createBadRequest(paramsError);
-    }
-
-    const { text, voice, speed, pitch } = params;
+    const text = validated.data.text;
+    const voice = validated.data.voice ?? VOICE_DEFAULTS.voice;
+    const speed = validated.data.speed ?? VOICE_DEFAULTS.speed;
+    const pitch = validated.data.pitch ?? VOICE_DEFAULTS.pitch;
     const cacheKey = generateCacheKey(text, voice, speed, pitch);
 
     const cached = await checkS3Cache(cacheKey);
@@ -155,11 +136,13 @@ export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse
 
 export async function status(event: StatusEvent): Promise<LambdaResponse> {
   try {
-    const cacheKey = event.pathParameters?.cacheKey;
+    const rawCacheKey = event.pathParameters?.cacheKey;
+    const cacheKeyResult = CacheKeySchema.safeParse(rawCacheKey);
 
-    if (!cacheKey || !isValidCacheKey(cacheKey)) {
+    if (!cacheKeyResult.success) {
       return createBadRequest("Missing or invalid cacheKey");
     }
+    const cacheKey = cacheKeyResult.data;
 
     const ready = await checkS3Cache(cacheKey);
 

@@ -8,13 +8,20 @@ export {
   generateCacheKey,
   parseRequestBody,
   applySynthesizeDefaults,
-  validateText,
-  validateParams,
   VERSION,
   MAX_TEXT_LENGTH,
   SPEED_RANGE,
   PITCH_RANGE,
 } from "./handler";
+
+export {
+  SynthesizeRequestSchema,
+  CacheKeySchema,
+  SynthesizeResponseSchema,
+  StatusResponseSchema,
+  HealthResponseSchema,
+  ErrorResponseSchema,
+} from "./schemas";
 
 export type {
   SynthesizeRequest,
@@ -42,8 +49,7 @@ export {
   VOICE_DEFAULTS,
 } from "./env";
 
-export { buildAudioUrl, buildCacheKey, checkS3Cache } from "./s3";
-export { isNotFoundError } from "./s3";
+export { buildAudioUrl, buildCacheKey, checkS3Cache, isNotFoundError } from "./s3";
 export { sendToQueue } from "./sqs";
 export { describeService, scaleService, isEcsConfigured } from "./ecs";
 export type { EcsServiceState } from "./ecs";
