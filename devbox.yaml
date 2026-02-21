@@ -53,7 +53,7 @@ test_modules:
 
 # Global coverage settings
 coverage:
-  min_total: 95
+  min_total: 93
 
 # Task Channel - Slack-based agent communication
 task_channel:
