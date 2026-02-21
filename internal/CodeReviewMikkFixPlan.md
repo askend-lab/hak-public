@@ -41,18 +41,18 @@ Touches: `packages/frontend/`, `packages/shared/`, `packages/simplestore/`, `pac
 
 Touches: `packages/merlin-api/`, `packages/merlin-worker/`, `packages/vabamorf-api/`, `infra/merlin/`. **No frontend/shared/simplestore changes.**
 
-- [ ] **2.3** (Low) Fix bug in generate.py: ERB branch calls `bark_alpha` instead of `erb_alpha`
-- [ ] **4.2** (Medium) Fix getCorsOrigin behavior difference: shared returns `"null"`, merlin/vabamorf return `"*"`
-- [ ] **5.3** (Low) Remove `if True:` indentation hack in run_merlin.py
-- [ ] **7.2** (Low) Replace `console.error` with proper logger in merlin-api and vabamorf-api
-- [ ] **9.1** (Low) Replace `RUN cd` with `WORKDIR` in Dockerfile
-- [ ] **10.2** (Medium) Replace empty-string fallbacks in ECS env vars with throw/validation
-- [ ] **12.3** (Medium) Unify CORS behavior across all packages (consistent origin handling)
-- [ ] **12.7** (Medium) Add cacheKey validation in worker.py (match API-side regex)
-- [ ] **13.1** (Medium) Cache DNN model in memory instead of loading from disk every request
-- [ ] **15.1** (Medium) Remove /warmup endpoint entirely from merlin-api
-- [ ] **15.3** (Low) Apply shell injection fix (TDD tests already exist)
-- [ ] **15.4** (Medium) Remove /status/{cacheKey} from direct public access
+- [x] **2.3** (Low) Fix bug in generate.py: ERB branch calls `bark_alpha` instead of `erb_alpha`
+- [x] **4.2** (Medium) Fix getCorsOrigin behavior difference: shared returns `"null"`, merlin/vabamorf return `"*"`
+- [x] **5.3** (Low) Remove `if True:` indentation hack in run_merlin.py
+- [x] **7.2** (Low) Replace `console.error` with proper logger in merlin-api and vabamorf-api
+- [x] **9.1** (Low) Replace `RUN cd` with `WORKDIR` in Dockerfile
+- [x] **10.2** (Medium) Replace empty-string fallbacks in ECS env vars with throw/validation
+- [x] **12.3** (Medium) Unify CORS behavior across all packages (consistent origin handling)
+- [x] **12.7** (Medium) Add cacheKey validation in worker.py (match API-side regex)
+- [x] **13.1** (Medium) Cache DNN model in memory instead of loading from disk every request
+- [x] **15.1** (Medium) Remove /warmup endpoint entirely from merlin-api
+- [x] **15.3** (Low) Apply shell injection fix (TDD tests already exist)
+- [ ] **15.4** (Medium) Remove /status/{cacheKey} from direct public access — DEFERRED (needs architectural discussion)
 
 ---
 

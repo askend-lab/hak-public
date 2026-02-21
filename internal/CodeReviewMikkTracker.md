@@ -27,7 +27,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS
 - ✅ Accept  [x] Fixed  [x] Closed — **2.2** (Low) 5 testing frameworks — removed Jest from shared, simplestore, frontend
-- ✅ Accept  [ ] Fixed  [ ] Closed — **2.3** (Low) Bug in generate.py: ERB uses bark_alpha — dead code but fix anyway
+- ✅ Accept  [x] Fixed  [x] Closed — **2.3** (Low) Bug in generate.py: ERB now uses erb_alpha
 
 ## 3. Project Structure
 
@@ -36,7 +36,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 4. Code Style
 
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.1** (Low) if statements without curly brackets — `curly: 'all'` ESLint rule
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.2** (Medium) getCorsOrigin duplication — fix behavior difference (*→null)
+- ✅ Accept  [x] Fixed  [x] Closed — **4.2** (Medium) getCorsOrigin unified — merlin-api and vabamorf-api now return 'null' when ALLOWED_ORIGIN unset
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.3** (Low) `as unknown as` double type assertions — `consistent-type-assertions` ESLint rule
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.4** (Low) Nested ternary statements — `no-nested-ternary` ESLint rule
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **4.5** (Low) Array indexes as React keys — `react/no-array-index-key` ESLint rule
@@ -57,9 +57,9 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 5. Simplicity & Patterns
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.3** (Low) `if True:` block in run_merlin.py (indentation hack)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages
+- ✅ Accept  [ ] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — intentional for standalone packages
+- ✅ Accept  [x] Fixed  [x] Closed — **5.3** (Low) Removed `if True:` indentation hack in run_merlin.py
+- ✅ Accept  [ ] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — intentional for standalone packages
 
 ## 6. Maintainability
 
@@ -68,7 +68,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 7. Error Handling
 
 - ✅ Accept  [x] Fixed  [x] Closed — **7.1** (Low) simplestore now uses extractErrorMessage from shared
-- ✅ Accept  [ ] Fixed  [ ] Closed — **7.2** (Low) merlin-api and vabamorf-api use console.error instead of shared logger
+- ✅ Accept  [x] Fixed  [x] Closed — **7.2** (Low) merlin-api and vabamorf-api now use inlined structured logger
 
 ## 8. Testing
 
@@ -78,14 +78,14 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 9. CI/CD
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **9.1** (Low) Dockerfile uses `RUN cd` instead of WORKDIR
+- ✅ Accept  [x] Fixed  [x] Closed — **9.1** (Low) Dockerfile now uses WORKDIR instead of RUN cd
 - ❌ Reject (by design)  —  — **9.2** (Low) Serverless v3/v4 mismatch — by design, documented in README (cost decision)
 - ✅ Accept  [x] Fixed  [x] Closed — **9.3** (Medium) Deploy workflows — added CI/CD section to ARCHITECTURE.md
 
 ## 10. Configuration
 
 - ✅ Accept  [x] Fixed  [x] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **10.2** (Medium) Empty-string ECS env vars — replace with throw or proper validation
+- ✅ Accept  [x] Fixed  [x] Closed — **10.2** (Medium) Empty-string ECS env vars — now throw with descriptive messages
 
 ## 11. Dependencies
 
@@ -95,15 +95,15 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 - ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — improve per-user/per-IP limiting
-- ✅ Accept  [ ] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior differs: shared="null" vs merlin/vabamorf="*"
+- ✅ Accept  [x] Fixed  [x] Closed — **12.3** (Medium) CORS behavior unified — all packages now return 'null' when ALLOWED_ORIGIN unset
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
 - ✅ Accept  [🛡️] Fixed  [🛡️] Closed — **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
 - ❌ Reject (duplicate)  —  — **12.6** (Medium) CORS misconfiguration — duplicate of 12.3
-- ✅ Accept  [ ] Fixed  [ ] Closed — **12.7** (Medium) Missing cacheKey validation in worker.py
+- ✅ Accept  [x] Fixed  [x] Closed — **12.7** (Medium) Added cacheKey validation in worker.py (64-char hex, matching API-side regex)
 
 ## 13. Performance
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **13.1** (Medium) DNN model loaded from disk on every request
+- ✅ Accept  [x] Fixed  [x] Closed — **13.1** (Medium) DNN model now cached in memory via _model_cache dict
 - ❌ Reject (appropriate)  —  — **13.2** (Medium) SQS 1 message/cycle — sequential TTS processing, batching needs threading
 
 ## 14. Domain Logic
@@ -112,10 +112,10 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 15. Our Own Findings (not in Mikk's review)
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.1** (Medium) Remove /warmup endpoint entirely — not used, unnecessary complexity
+- ✅ Accept  [x] Fixed  [x] Closed — **15.1** (Medium) Removed /warmup endpoint entirely (handler, serverless.yml, tests)
 - ✅ Accept  [x] Fixed  [x] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.3** (Low) shell injection fix already has TDD tests but not yet applied to actual code
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — move behind CloudFront or require token
+- ✅ Accept  [x] Fixed  [x] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — replaced run_process() with safe alternatives
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — DEFERRED, needs architectural discussion
 
 ---
 
