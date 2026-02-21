@@ -37,7 +37,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   memorySize: 512
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}

@@ -12,7 +12,7 @@ Items that require work. Sorted by priority.
 - [x] **1.5.1** (Medium) Add "all deploys via CI/CD" section to ARCHITECTURE.md
 - [x] **1.5.1.2** (Low) Consolidate design docs — move `frontend/src/styles/*.md` → `docs/02-DESIGN-SYSTEM/`
 - [x] **infra** Remove orphaned `/api/warmup` from `infra/locals.tf`
-- [ ] **2.1** (Medium) Upgrade Node.js 20 → 22 — affects package.json, Dockerfile, CI, .nvmrc
+- [x] **2.1** (Medium) Upgrade Node.js 20 → 22 — affects package.json, Dockerfile, CI, .nvmrc
 - [ ] **1.4.1** (Medium) Zod → OpenAPI — auto-generate API specs from Zod schemas (`zod-to-openapi`)
 - [ ] **4.16** (Medium) Run SonarQube once locally, review findings (no CI integration)
 - [ ] **14.1** (Medium) Rename modules to domain names — try in separate PR, defer if too complex
