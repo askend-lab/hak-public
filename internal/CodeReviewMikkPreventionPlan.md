@@ -8,12 +8,12 @@
 
 Would have prevented: 1.1.1, 1.1.3, 1.3.1–1.3.5, 10.1, 15.2 (10 findings)
 
-Current state: no automated checks — docs drift silently from code.
+**Decision: WON'T IMPLEMENT as hooks.** Docs will be synced manually once. Custom hook development too complex for the value.
 
-- [ ] [tool] [ ] [green] — **React version sync:** hook checks that version in `packages/frontend/README.md` matches `react` in `packages/frontend/package.json`
-- [ ] [tool] [ ] [green] — **ARCHITECTURE.md dependency claims:** hook verifies "depends on shared" claims against actual `import` statements and `package.json` dependencies
-- [ ] [tool] [ ] [green] — **README env var lists:** hook checks that env vars documented in READMEs match actual `process.env` / `os.environ` references in source
-- [ ] [tool] [ ] [green] — **Package description sync:** hook checks that tech stack claims (e.g. "Python + TypeScript") match actual file extensions in each package
+- [~] — **React version sync:** synced manually
+- [~] — **ARCHITECTURE.md dependency claims:** synced manually
+- [~] — **README env var lists:** synced manually
+- [~] — **Package description sync:** synced manually
 
 ---
 
@@ -49,11 +49,11 @@ Current state: `eslint-plugin-security` is installed but many style rules are mi
 
 Would have prevented: 4.2, 5.1, 5.2, 5.4, 7.1, 7.2, 12.3 (7 findings)
 
-Current state: `jscpd` hook exists (detects copy-paste) but doesn't enforce "use shared instead of local copy." No cross-package import rules.
+**Decision: WON'T IMPLEMENT as hooks.** Findings will be fixed manually. Custom hook/rule development too complex for the value.
 
-- [ ] [tool] [ ] [green] — **Duplicate utility detection:** hook that greps for function names exported from `@hak/shared` and flags if they're re-defined in other packages (catches getCorsOrigin, createResponse, HTTP_STATUS duplication)
-- [ ] [tool] [ ] [green] — **CORS consistency test:** integration test that verifies all packages return same CORS headers for same origin scenarios (fixes 12.3)
-- [ ] [tool] [ ] [green] — **Error handling pattern:** lint rule or hook requiring `extractErrorMessage` usage in catch blocks instead of raw `console.error` (fixes 7.1, 7.2)
+- [~] — **Duplicate utility detection:** fix manually — consolidate shared utilities
+- [~] — **CORS consistency test:** fix manually — align CORS headers across packages
+- [~] — **Error handling pattern:** fix manually — adopt extractErrorMessage in catch blocks
 
 ---
 
@@ -66,7 +66,7 @@ Current state: `eslint-plugin-security` is configured and active for TypeScript.
 - [x] [tool] [ ] [green] — **Enable `security-audit` hook** — changed to `mode: warning` + `packageManager: pnpm`. 6 devDep vulnerabilities remain (ajv, minimatch — transitive, need upstream updates)
 - [x] [tool] [x] [green] — **Ruff `S` rules for Python** — catches `shell=True` (S602), `pickle.load` (S301), `subprocess` without shell (S603). Enabled as alternative to bandit — 0 violations
 - [x] [tool] [x] [green] — **Enable `iac-security` hook** — already configured and active in DevBox hooks (verified via `node devbox test`)
-- [ ] [tool] [ ] [green] — **Input validation consistency test:** test that API and Worker validate the same fields with same constraints (catches 12.7 — worker missing cacheKey regex)
+- [~] — **Input validation consistency test:** fix manually — align API and Worker validation (won't implement as automated test)
 
 ---
 
@@ -88,7 +88,7 @@ Would have prevented: 4.6, 4.8, 4.11, 5.3, 2.3 (5 findings)
 Current state: `dead-code` hook exists. `no-warning-comments` not enabled. No `eslint-plugin-deprecation`.
 
 - [x] [tool] [x] [green] — **`no-warning-comments`** ESLint rule — flags TODO/FIXME/HACK/XXX comments as warnings (0 current violations)
-- [ ] [tool] [ ] [green] — **Expand `dead-code` hook** — verify it catches unused exports like `LoginModalProps.message` (fixes 4.6)
+- [x] [tool] [x] [green] — **Expand `dead-code` hook** — frontend included in knip (was fully ignored). 5 dead files removed (unused barrel files + test helpers). Catches unused exports now (fixes 4.6)
 - [x] [tool] [x] [green] — **Ruff `ERA001`** — detect commented-out code in Python (0 current violations)
 - [x] [tool] [x] [green] — **Ruff `UP`** (pyupgrade) — already included in ruff.toml, all violations fixed
 
