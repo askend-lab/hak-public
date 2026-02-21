@@ -108,7 +108,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 14. Domain Logic
 
-- ❌ Reject (high effort)  —  — **14.1** (Low) Rename modules by domain — high effort, low value at current stage
+- ✅ Accept  [ ] Fixed  [ ] Closed — **14.1** (Low) Rename modules to reflect domain, not technology
 
 ## 15. Our Own Findings (not in Mikk's review)
 
