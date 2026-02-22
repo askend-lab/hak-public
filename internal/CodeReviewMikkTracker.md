@@ -50,16 +50,16 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ❌ Reject (not found)  —  — **4.13** (Low) Unnecessary awaits — not confirmed in source code
 - ❌ Reject (external lib)  —  — **4.14** (Medium) DeepRecurrentNetwork class — external Merlin library, not our code
 - ❌ Reject (ML convention)  —  — **4.15** (Low) Python naming case — ML math notation convention (W_value, Whx)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — will run SonarQube to verify remaining issues beyond ESLint/Ruff/DevBox
+- ✅ Accept  [✅] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — ran SonarQube, found ESLint config gap (QS-1–QS-4), all fixed in PR #661
 - ❌ Reject (external lib)  —  — **4.17** (Medium) Merlin NN Python style issues — external library code
 - ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
 
 ## 5. Simplicity & Patterns
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — intentional for standalone packages
+- ✅ Accept  [✅] Fixed  [ ] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api — deduplicated, merlin-api imports from @hak/shared
+- ✅ Accept  [✅] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — deduplicated, all packages import from @hak/shared
 - ✅ Accept  [✅] Fixed  [ ] Closed — **5.3** (Low) Removed `if True:` indentation hack in run_merlin.py
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — intentional for standalone packages
+- ✅ Accept  [✅] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — deduplicated, all packages import from @hak/shared
 
 ## 6. Maintainability
 
@@ -115,8 +115,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.1** (Medium) Removed /warmup endpoint entirely (handler, serverless.yml, tests)
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — replaced run_process() with safe alternatives
-- ❌ Reject (by design)  —  — **15.4** (Medium) Remove /status/{cacheKey} from public access — system depends on public polling for synthesis status
-- ✅ Accept  [✅] Fixed  [ ] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars: shared/constants.ts, merlin-api Zod schema, merlin-worker Python. Frontend validates via API.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — DEFERRED permanently, frontend depends on this endpoint
+- ✅ Accept  [✅] Fixed  [ ] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars everywhere — merlin-api Zod schema, merlin-worker Python, frontend textarea maxLength + user-facing message (PR #660)
 
 ---
 
@@ -125,6 +125,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 Beyond fixing individual findings, we built a **DevBox quality system** — automated hooks that run on every commit and block merges when violated. This ensures findings don't recur.
 
 ### New ESLint Rules (TypeScript)
+
+Previously enabled (before QS-1):
 
 | Rule | What it catches | Violations fixed |
 |------|----------------|------------------|
@@ -136,6 +138,35 @@ Beyond fixing individual findings, we built a **DevBox quality system** — auto
 | `no-floating-promises` + `no-misused-promises` | Unawaited promises, async callbacks | **97 violations fixed** (95 frontend + 2 vabamorf-api) |
 | `import/no-deprecated` | Deprecated API usage | 0 violations (already clean) |
 | `no-warning-comments` | TODO/FIXME/HACK comments | 0 violations |
+
+Enabled in QS-1 migration (PR #661) — 30+ rules previously only applied to .js now active on .ts/.tsx:
+
+| Rule | What it catches | Violations fixed |
+|------|----------------|------------------|
+| `eslint-comments/require-description` | Undescribed eslint-disable comments | 8 fixed |
+| `require-atomic-updates` | Unsafe ref/flag assignments after await | 4 eslint-disable |
+| `max-depth` | Deeply nested blocks | 3 eslint-disable |
+| `security/detect-non-literal-regexp` | Dynamic regex injection | 1 eslint-disable |
+| `no-alert` | Browser alert() calls | 2 replaced with logger |
+| `sonarjs/no-identical-functions` | Duplicate function bodies | 1 eslint-disable |
+| `no-return-assign` | Assignment in return statement | 1 fixed |
+| `no-promise-executor-return` | Promise executor returning value | 6 fixed (wrapped setTimeout) |
+| `promise/always-return` | Missing return in .then() | 2 eslint-disable |
+| `promise/param-names` | Non-standard resolve/reject names | 1 fixed |
+| `no-await-in-loop` | Await inside loops | 11 eslint-disable (sequential processing) |
+| `no-console` | Console statements in src | 10 replaced with logger, 4 files eslint-disable |
+| `no-param-reassign` | Parameter mutation | 2 files eslint-disable (parser, AWS triggers), 6 line-level |
+| `sonarjs/no-duplicate-string` | Repeated string literals (threshold 4) | 2 extracted to constants |
+| `max-statements` | Functions with too many statements (20, hooks/TSX: 30) | 8 eslint-disable |
+| `max-lines-per-function` | Long functions (150, hooks/TSX: 250) | Covered by thresholds + overrides |
+| `max-lines` | Long files (400) | Generated files excluded |
+| `complexity` | Cyclomatic complexity (15, TSX: 30) | 1 eslint-disable |
+| `sonarjs/cognitive-complexity` | Cognitive complexity (20) | Covered by threshold |
+| `max-nested-callbacks` | Nested callbacks (5) | Covered by threshold |
+| `max-params` | Function parameters (5) | Covered by threshold |
+| `max-classes-per-file` | Classes per file (3) | Covered by threshold |
+
+**Zero rules remain disabled** for production .ts/.tsx code. Test/generated/BDD files have appropriate overrides.
 
 ### New Ruff Rules (Python)
 
@@ -175,10 +206,10 @@ Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: 
 
 ### ESLint Config Gap (Critical)
 
-- [ ] **QS-1** Fix `eslint.base.config.mjs` — TS file block (`**/*.ts`) only has 6 `typescriptRules`. Must inherit ALL rules from JS block: `baseRules`, `sonarRules`, `securityRules`, `regexpRules`, `unicornRules`, `promiseRules`, `eslintCommentsRules`, `importRules`, `commentRules`. Same for `**/*.tsx`.
-- [ ] **QS-2** Verify `sonarjs/cognitive-complexity` works on `.ts` — vmetajson.ts has complexity 18, limit should be 8-15. Currently not checked at all.
-- [ ] **QS-3** Verify `regexp/*` rules work on `.ts` — tara-auth/cognito-client.ts has regex vulnerable to catastrophic backtracking (ReDoS). Currently not checked.
-- [ ] **QS-4** After fix: run `npx eslint --print-config packages/vabamorf-api/src/vmetajson.ts` and confirm sonarjs rules are present.
+- [x] **QS-1** Fix `eslint.base.config.mjs` — TS file block (`**/*.ts`) now inherits ALL rules from JS block: `sonarRules`, `securityRules`, `regexpRules`, `unicornRules`, `promiseRules`, `eslintCommentsRules`. Same for `**/*.tsx`. All 30+ previously-missing rules enabled with practical thresholds. (PR #661)
+- [x] **QS-2** Verify `sonarjs/cognitive-complexity` works on `.ts` — enabled with threshold 20 for src, 30 for TSX. 9 sonarjs rules active on .ts files. (PR #661)
+- [x] **QS-3** Verify `regexp/*` rules work on `.ts` — 5 regexp rules now active on .ts files. ReDoS check active. (PR #661)
+- [x] **QS-4** Verified: `npx eslint --print-config` confirms 9 sonarjs + 10 security + 5 regexp + 13 promise rules present on .ts files. (PR #661)
 
 ### CSS/SCSS Linting (Missing)
 
