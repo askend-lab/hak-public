@@ -206,35 +206,35 @@ Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: 
 
 ### ESLint Config Gap (Critical)
 
-- [x] **QS-1** Fix `eslint.base.config.mjs` — TS file block (`**/*.ts`) now inherits ALL rules from JS block: `sonarRules`, `securityRules`, `regexpRules`, `unicornRules`, `promiseRules`, `eslintCommentsRules`. Same for `**/*.tsx`. All 30+ previously-missing rules enabled with practical thresholds. (PR #661)
-- [x] **QS-2** Verify `sonarjs/cognitive-complexity` works on `.ts` — enabled with threshold 20 for src, 30 for TSX. 9 sonarjs rules active on .ts files. (PR #661)
-- [x] **QS-3** Verify `regexp/*` rules work on `.ts` — 5 regexp rules now active on .ts files. ReDoS check active. (PR #661)
-- [x] **QS-4** Verified: `npx eslint --print-config` confirms 9 sonarjs + 10 security + 5 regexp + 13 promise rules present on .ts files. (PR #661)
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **QS-1** (Critical) Fix `eslint.base.config.mjs` — TS file block inherits ALL rules — *Verified: `eslint.base.config.mjs` spreads `sonarRules`, `securityRules`, `regexpRules`, `unicornRules`, `promiseRules`, `eslintCommentsRules` into both `**/*.ts` and `**/*.tsx` blocks. 30+ rules active. PR #661.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **QS-2** (Critical) Verify `sonarjs/cognitive-complexity` works on `.ts` — *Verified: `sonarjs/cognitive-complexity: ['error', 20]` in `sonarRules` object, spread into TS blocks. 9 sonarjs rules active. PR #661.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **QS-3** (Critical) Verify `regexp/*` rules work on `.ts` — *Verified: `regexpRules` with 5 rules (`no-unused-capturing-group`, `no-useless-flag`, `prefer-d`, `prefer-w`, `no-super-linear-backtracking`) spread into TS blocks. ReDoS check active. PR #661.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **QS-4** (Critical) Verify via `npx eslint --print-config` — *Verified: One-time manual check confirmed 9 sonarjs + 10 security + 5 regexp + 13 promise rules present on .ts files. PR #661.*
 
 ### CSS/SCSS Linting (Missing)
 
-- [x] **QS-5** Add Stylelint — installed `stylelint` + `stylelint-config-standard-scss`, added to `pnpm lint` script (enforced by DevBox `run-lint` hook). Minimal config: `no-duplicate-selectors`, `declaration-block-no-duplicate-properties`.
-- [x] **QS-6** Configured `.stylelintrc.json` with `postcss-scss` syntax and target rules. All SCSS files pass clean.
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **QS-5** (Medium) Add Stylelint — *Verified: `stylelint: ^17.3.0` + `stylelint-config-standard-scss: ^17.0.0` in root `package.json:95-96`. `pnpm lint` runs `npx stylelint 'packages/frontend/src/styles/**/*.scss'`. Enforced by DevBox `run-lint` hook.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **QS-6** (Medium) Configure `.stylelintrc.json` — *Verified: `.stylelintrc.json` has `customSyntax: "postcss-scss"`, rules `no-duplicate-selectors: true`, `declaration-block-no-duplicate-properties: [true, ...]`. All SCSS files pass clean.*
 
 ### Python Type Checking (Missing)
 
-- [x] **QS-7** Add mypy to merlin-worker — installed, added to `requirements-test.txt`. Runs on `worker.py` + `tests/` (external `merlin/` library excluded). All 5 files pass clean.
-- [x] **QS-8** mypy integrated into `pnpm lint` script — enforced by DevBox `run-lint` hook on every commit.
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **QS-7** (Medium) Add mypy to merlin-worker — *Verified: `mypy>=1.10` in `tts-worker/requirements-test.txt:5`. External `merlin/` library excluded.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **QS-8** (Medium) mypy integrated into `pnpm lint` — *Verified: `package.json:23` lint script includes `cd packages/tts-worker && .venv/bin/mypy worker.py tests/ --ignore-missing-imports`. Enforced by DevBox `run-lint` hook.*
 
 ### SonarQube False Positives (No Action)
 
-- ~~shared/src/logger.ts:27 empty arrow function~~ — intentional NO_OP for filtered log levels
-- ~~api-client/src/generated/*.ts interface names~~ — auto-generated from OpenAPI, lowercase by spec
-- ~~merlin-worker /tmp paths in tests~~ — test fixtures only
+- ❌ Reject (false positive) — ~~shared/src/logger.ts:27 empty arrow function~~ — intentional NO_OP for filtered log levels
+- ❌ Reject (false positive) — ~~api-client/src/generated/*.ts interface names~~ — auto-generated from OpenAPI, lowercase by spec
+- ❌ Reject (false positive) — ~~merlin-worker /tmp paths in tests~~ — test fixtures only
 
 ### SonarQube Valid but Low Priority
 
-- [x] **QS-9** Refactor vmetajson.ts:62 — extracted `handleStdoutData()` and `handleProcessExit()` methods from `init()`, reducing cognitive complexity
-- [x] **QS-10** ~~Fix duplicate CSS `monospace`~~ — FALSE POSITIVE: `monospace, monospace` is an intentional normalize.css hack for browser font rendering
-- [x] **QS-11** Fix duplicate `.eki-results-section` selector — merged nested styles from line 470 into first block at line 165
-- [x] **QS-12** Fix `api-client/scripts/generate.mjs:52` — replaced `execSync` with `execFileSync` (no shell interpolation, eliminates OS command injection risk)
-- [x] **QS-13** Fix Docker root user in `vabamorf-api/Dockerfile.local` — added `USER appuser` directive matching production Dockerfile
-- [x] **QS-14** Fix regex ReDoS in `tara-auth/cognito-client.ts:66` — added `.` to excluded chars in middle group, eliminating backtracking ambiguity
+- ✅ Accept  [✅] Fixed  [✅] Closed — **QS-9** (Low) Refactor vmetajson.ts cognitive complexity — *Verified: `vmetajson.ts` has `handleStdoutData()` (line 45) and `handleProcessExit()` (line 68) extracted as private methods from `init()`. Reduces cognitive complexity.*
+- ❌ Reject (false positive) — **QS-10** ~~Fix duplicate CSS `monospace`~~ — `monospace, monospace` is intentional normalize.css hack for browser font rendering
+- ✅ Accept  [✅] Fixed  [✅] Closed — **QS-11** (Low) Fix duplicate `.eki-results-section` selector — *Verified: Only one `.eki-results-section` block in `_eki-app.scss:165`. No duplicate.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **QS-12** (Medium) Fix `generate.mjs` command injection — *Verified: `generate.mjs:12` imports `execFileSync` (not `execSync`). Line 51 uses `execFileSync("npx", [...])` — no shell interpolation.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **QS-13** (Medium) Fix Docker root user in vabamorf-api/Dockerfile.local — *Verified: `morphology-api/Dockerfile.local:24-27` has `adduser appuser` + `USER appuser`. Matches production `Dockerfile:21-24`.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **QS-14** (Medium) Fix regex ReDoS in tara-auth/cognito-client.ts:66 — *Verified: Regex `^[^\s"\\@]+@[^\s"\\@.]+\.[^\s"\\@]+$` at `auth/src/cognito-client.ts:66` — `.` added to excluded chars in middle group `[^\s"\\@.]`, preventing backtracking ambiguity.*
 
 ---
 
