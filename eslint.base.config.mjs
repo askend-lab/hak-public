@@ -208,7 +208,8 @@ const typescriptRules = {
   '@typescript-eslint/explicit-function-return-type': 'error',
   '@typescript-eslint/explicit-module-boundary-types': 'error',
   '@typescript-eslint/no-non-null-assertion': 'error',
-  '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'never' }]
+  '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'as', objectLiteralTypeAssertions: 'never' }],
+  '@typescript-eslint/no-unnecessary-type-arguments': 'error'
 };
 
 const nodeGlobals = {
@@ -496,6 +497,9 @@ export default [
         sourceType: 'module',
         project: null
       }
+    },
+    rules: {
+      '@typescript-eslint/no-unnecessary-type-arguments': 'off'
     }
   }
 ];

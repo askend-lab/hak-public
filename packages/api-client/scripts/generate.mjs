@@ -25,13 +25,13 @@ const DOCS_DIR = resolve(MONO_ROOT, "docs");
 const SPECS = [
   {
     name: "merlin",
-    source: resolve(MONO_ROOT, "packages/merlin-api/openapi.yaml"),
+    source: resolve(MONO_ROOT, "packages/tts-api/openapi.yaml"),
     output: resolve(ROOT, "src/generated/merlin.ts"),
     docsCopy: resolve(DOCS_DIR, "merlin-api.openapi.yaml"),
   },
   {
     name: "vabamorf",
-    source: resolve(MONO_ROOT, "packages/vabamorf-api/openapi.yaml"),
+    source: resolve(MONO_ROOT, "packages/morphology-api/openapi.yaml"),
     output: resolve(ROOT, "src/generated/vabamorf.ts"),
     docsCopy: resolve(DOCS_DIR, "vabamorf-api.openapi.yaml"),
   },

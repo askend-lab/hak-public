@@ -240,6 +240,7 @@ export default function SentencePhoneticPanel({
                 aria-label="Häälduskuju"
                 placeholder="Kirjuta oma hääldusvariant"
                 rows={4}
+                maxLength={100}
               />
             </div>
             <MarkersGuideBox

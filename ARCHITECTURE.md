@@ -8,26 +8,26 @@ HAK is an Estonian language learning platform. Teachers create lessons with text
 
 **Backend:** Four Lambda functions behind API Gateway, plus one Docker service on ECS:
 
-- **simplestore** — REST API for lessons, users, and progress. Reads/writes DynamoDB.
-- **merlin-api** — TTS gateway. Accepts synthesis requests, sends them to SQS, checks results in S3.
-- **merlin-worker** — Estonian speech synthesis engine (Merlin). Runs as a Docker container on ECS Fargate. Polls SQS for jobs, runs Merlin TTS, uploads WAV files to S3.
-- **vabamorf-api** — Estonian morphological analysis. Lambda with a native binary (vmetajson) in a Docker container.
-- **tara-auth** — Estonian eID (TARA) authentication via Cognito.
+- **store** — REST API for lessons, users, and progress. Reads/writes DynamoDB.
+- **tts-api** — TTS gateway. Accepts synthesis requests, sends them to SQS, checks results in S3.
+- **tts-worker** — Estonian speech synthesis engine (Merlin). Runs as a Docker container on ECS Fargate. Polls SQS for jobs, runs Merlin TTS, uploads WAV files to S3.
+- **morphology-api** — Estonian morphological analysis. Lambda with a native binary (vmetajson) in a Docker container.
+- **auth** — Estonian eID (TARA) authentication via Cognito.
 
 **Storage:** DynamoDB for application data, S3 for audio files and frontend assets.
 
-**Queuing:** SQS connects merlin-api (producer) to merlin-worker (consumer).
+**Queuing:** SQS connects tts-api (producer) to tts-worker (consumer).
 
 ## Monorepo Structure
 
 pnpm workspaces monorepo. Packages and their dependencies:
 
-- **frontend** — depends on `shared`, `specifications`, `simplestore` (dev)
-- **simplestore** — depends on `shared`
-- **merlin-api** — standalone (inlines shared utilities for Lambda bundling)
-- **merlin-worker** — standalone (Python, no npm dependencies)
-- **vabamorf-api** — standalone (inlines shared utilities for Docker Lambda bundling)
-- **tara-auth** — standalone
+- **frontend** — depends on `shared`, `specifications`, `store` (dev)
+- **store** — depends on `shared`
+- **tts-api** — standalone (inlines shared utilities for Lambda bundling)
+- **tts-worker** — standalone (Python, no npm dependencies)
+- **morphology-api** — standalone (inlines shared utilities for Docker Lambda bundling)
+- **auth** — standalone
 - **shared** — shared types, utilities, constants (no dependencies)
 - **specifications** — Gherkin BDD feature specs, depends on `gherkin-parser`
 - **gherkin-parser** — Gherkin-to-test mapping (no dependencies)
@@ -35,11 +35,11 @@ pnpm workspaces monorepo. Packages and their dependencies:
 ## Packages
 
 - **frontend** — React, Vite, SCSS/BEM, Vitest. Runs on S3 + CloudFront. Teacher and student UI.
-- **simplestore** — TypeScript, DynamoDB SDK. Lambda. Lessons, users, progress CRUD.
-- **merlin-api** — TypeScript, ECS SDK, S3 SDK, SQS SDK. Lambda. TTS request gateway.
-- **merlin-worker** — Python, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis.
-- **vabamorf-api** — TypeScript, native binary (vmetajson). Lambda (Docker). Estonian morphological analysis.
-- **tara-auth** — TypeScript, Cognito SDK, JOSE. Lambda. Estonian eID (TARA) authentication.
+- **store** — TypeScript, DynamoDB SDK. Lambda. Lessons, users, progress CRUD.
+- **tts-api** — TypeScript, ECS SDK, S3 SDK, SQS SDK. Lambda. TTS request gateway.
+- **tts-worker** — Python, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis.
+- **morphology-api** — TypeScript, native binary (vmetajson). Lambda (Docker). Estonian morphological analysis.
+- **auth** — TypeScript, Cognito SDK, JOSE. Lambda. Estonian eID (TARA) authentication.
 - **shared** — TypeScript. Shared types, utilities, constants.
 - **specifications** — Gherkin. BDD feature specifications.
 - **gherkin-parser** — TypeScript. Gherkin-to-test mapping.
@@ -48,15 +48,15 @@ pnpm workspaces monorepo. Packages and their dependencies:
 
 1. Student opens the app. CloudFront serves the React SPA from S3.
 2. Student navigates to a lesson. Frontend calls `GET /get?pk=...&sk=...&type=...` via API Gateway.
-3. API Gateway routes to simplestore. Simplestore queries DynamoDB, returns lesson JSON.
+3. API Gateway routes to store. Store queries DynamoDB, returns lesson JSON.
 4. Frontend renders the lesson. Audio files are served directly from S3 via content-hash URLs.
 
 ## Data Flow — TTS Synthesis
 
 1. Teacher enters text and clicks synthesize. Frontend calls `POST /synthesize {text, voice}`.
-2. API Gateway routes to merlin-api. Merlin-api sends a message to SQS and returns `202 Accepted` with a cache key.
-3. merlin-worker picks up the message from SQS, runs Merlin TTS engine, uploads the resulting WAV to S3.
-4. Frontend polls `GET /status/:cacheKey`. When merlin-api finds the file in S3, it returns `{status: ready, url}`.
+2. API Gateway routes to tts-api. tts-api sends a message to SQS and returns `202 Accepted` with a cache key.
+3. tts-worker picks up the message from SQS, runs Merlin TTS engine, uploads the resulting WAV to S3.
+4. Frontend polls `GET /status/:cacheKey`. When tts-api finds the file in S3, it returns `{status: ready, url}`.
 5. Frontend plays the audio from the S3 URL.
 
 ## Infrastructure
@@ -88,7 +88,7 @@ GitHub Actions workflows in `.github/workflows/`:
 |----------|---------|--------------|
 | **build.yml** | Push/PR to main | Lint, typecheck, test per-package, build artifacts, upload to S3 |
 | **deploy.yml** | Called by build.yml or manual | Smart-diff deploy to dev/prod (only changed modules) |
-| **build-merlin-worker.yml** | Push to `packages/merlin-worker/**` | Python tests, Docker build, push to ECR |
+| **build-merlin-worker.yml** | Push to `packages/tts-worker/**` | Python tests, Docker build, push to ECR |
 | **terraform.yml** | Push to `infra/**` | Terraform plan (PR) / apply (main) |
 | **e2e.yml** | Push to `packages/frontend/**` | Playwright E2E browser tests |
 | **release.yml** | Manual | Version bump, changelog, GitHub release |
@@ -103,7 +103,7 @@ GitHub Actions workflows in `.github/workflows/`:
 
 ## Authentication & Authorization
 
-Two login methods via AWS Cognito: **TARA** (Estonian eID — ID-card, Mobile-ID, Smart-ID) and **Cognito Hosted UI** (email/password with PKCE). The `tara-auth` Lambda handles TARA OAuth2 flow. Tokens are exchanged at `/auth/callback`, access tokens sent as `Authorization: Bearer`, refresh tokens stored in httpOnly cookies.
+Two login methods via AWS Cognito: **TARA** (Estonian eID — ID-card, Mobile-ID, Smart-ID) and **Cognito Hosted UI** (email/password with PKCE). The `auth` Lambda handles TARA OAuth2 flow. Tokens are exchanged at `/auth/callback`, access tokens sent as `Authorization: Bearer`, refresh tokens stored in httpOnly cookies.
 
 **Public endpoints (no auth):** `/api/synthesize`, `/api/status/*`, `/api/analyze`, `/api/variants`, `/api/get-shared`, `/api/get-public`
 **Authenticated endpoints (Cognito JWT):** `/api/save`, `/api/get`, `/api/delete`, `/api/query`
@@ -125,7 +125,7 @@ See `docs/AUTHENTICATION.md` for full details.
 
 - **PKCE** on all OAuth2 flows — prevents authorization code interception
 - **httpOnly cookies** for refresh tokens — not accessible to JavaScript
-- **CSRF protection** on tara-auth POST endpoints (Origin header validation)
+- **CSRF protection** on auth POST endpoints (Origin header validation)
 - **Input validation** — Zod schemas on API inputs, regex validation on cache keys (SHA-256 hex)
 - **No secrets on frontend** — all sensitive values are server-side environment variables
 - **Shell injection prevention** — Python worker uses `subprocess.run` with argument lists, no `shell=True`
@@ -146,14 +146,14 @@ Browser → CloudFront (WAF) → API Gateway → Lambda / ECS
 ### TTS Synthesis Pipeline
 
 ```
-Frontend  POST /synthesize → merlin-api → SQS → merlin-worker (ECS Fargate)
-          GET /status/{key} → merlin-api → S3 ← merlin-worker (WAV upload)
+Frontend  POST /synthesize → tts-api → SQS → tts-worker (ECS Fargate)
+          GET /status/{key} → tts-api → S3 ← tts-worker (WAV upload)
 ```
 
 ### Authentication Flow
 
 ```
-Frontend → TARA/Cognito → tara-auth Lambda → Cognito User Pool → Frontend (/auth/callback)
+Frontend → TARA/Cognito → auth Lambda → Cognito User Pool → Frontend (/auth/callback)
 ```
 
 ## Quality System

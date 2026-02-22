@@ -41,11 +41,6 @@ provider:
   runtime: nodejs22.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
-  apiGateway:
-    throttle:
-      rateLimit: 10
-      burstLimit: 20
-  
   environment:
     TARA_ISSUER: ${self:custom.taraConfig.${self:provider.stage}.issuer}
     TARA_SECRETS_ARN: ${ssm:/hak/${self:provider.stage}/tara-secrets-arn}
