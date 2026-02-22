@@ -14,7 +14,7 @@ export function AuthCallbackPage() {
   const processedRef = useRef(false);
 
   useEffect(() => {
-    async function processCallback() {
+    async function processCallback() { // eslint-disable-line max-statements -- auth callback has many sequential steps
       if (processedRef.current) {return;}
       processedRef.current = true;
 

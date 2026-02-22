@@ -186,7 +186,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
     [],
   );
 
-  const handlePlayAll = useCallback(async () => {
+  const handlePlayAll = useCallback(async () => { // eslint-disable-line max-statements -- playback orchestration has many state transitions
     if (isPlayingAllRef.current || isLoadingPlayAllRef.current) {
       playAllAbortControllerRef.current?.abort();
       setPlayAllAbortController(null);

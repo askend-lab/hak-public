@@ -97,7 +97,7 @@ export async function startHandler(
   }
 }
 
-export async function callbackHandler(
+export async function callbackHandler( // eslint-disable-line max-statements -- auth callback has many sequential steps
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const frontendUrl = getFrontendUrl();
@@ -263,7 +263,7 @@ export async function refreshHandler(
   }
 }
 
-export async function exchangeCodeHandler(
+export async function exchangeCodeHandler( // eslint-disable-line max-statements -- code exchange has many sequential steps
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   if (event.httpMethod === 'OPTIONS') {

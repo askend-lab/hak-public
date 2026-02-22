@@ -25,7 +25,7 @@ export interface ParseIdTokenOptions {
  *
  * When expectedIssuer/expectedAudience are provided, rejects tokens from other pools/apps.
  */
-export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): User | null {
+export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): User | null { // eslint-disable-line complexity -- token validation has many conditional checks
   const payload = decodeJwtPayload(idToken);
   if (!payload) {return null;}
 

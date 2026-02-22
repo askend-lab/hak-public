@@ -187,7 +187,7 @@ export function useSharedTaskAudio(): UseSharedTaskAudioReturn {
   );
 
   const handlePlayAll = useCallback(
-    async (entries: TaskEntry[]) => {
+    async (entries: TaskEntry[]) => { // eslint-disable-line max-statements -- playback orchestration has many state transitions
       if (isPlayingAllRef.current || isLoadingPlayAllRef.current) {
         abortControllerRef.current?.abort();
         setPlayAllAbortController(null);

@@ -48,7 +48,7 @@ export default function WizardTooltip({
   const [targetElement, setTargetElement] = useState<Element | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const calculatePosition = useCallback(() => {
+  const calculatePosition = useCallback(() => { // eslint-disable-line max-statements -- position calculation has many DOM measurements
     const target = document.querySelector(step.targetSelector);
     if (!target || !tooltipRef.current) {return false;} // Return false if can't calculate
 

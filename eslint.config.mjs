@@ -11,11 +11,20 @@ const TEST_FILE_PATTERNS = [
   "**/test/**/*.ts",
   "**/tests/**/*.js",
   "**/__tests__/**/*.js",
+  "**/__mocks__/**/*.ts",
+  "**/e2e/**/*.ts",
   "**/*.test.ts",
   "**/*.spec.ts",
   "**/*.test.tsx",
   "**/*.spec.tsx",
 ];
+
+const GENERATED_FILE_PATTERNS = [
+  "**/*.generated.ts",
+  "**/*.generated.tsx",
+];
+
+const HOOKS_FILE_PATTERNS = ["**/hooks/**/*.ts"];
 
 export default [
   ...baseConfig,
@@ -45,6 +54,16 @@ export default [
     },
   },
 
+  // Generated files — auto-generated code, skip quality rules
+  {
+    files: GENERATED_FILE_PATTERNS,
+    rules: {
+      "max-lines": "off",
+      "max-statements": "off",
+      "max-lines-per-function": "off",
+    },
+  },
+
   // Fix jest rules for test files
   {
     files: TEST_FILE_PATTERNS,
@@ -71,7 +90,7 @@ export default [
 
   // React hooks return complex inferred objects — explicit return types add noise
   {
-    files: ["**/hooks/**/*.ts"],
+    files: HOOKS_FILE_PATTERNS,
     rules: {
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
@@ -87,12 +106,14 @@ export default [
     },
   },
 
-  // TSX components have higher cyclomatic complexity due to conditional rendering
+  // TSX components have higher complexity and size due to conditional rendering + hooks
   {
     files: ["**/*.tsx"],
     ignores: TEST_FILE_PATTERNS,
     rules: {
       "complexity": ["error", 30],
+      "max-lines-per-function": ["error", 250], // components with hooks are naturally larger
+      "max-statements": ["error", 30],          // JSX + state + effects add statements
     },
   },
 
@@ -121,26 +142,66 @@ export default [
       "max-params": ["error", 5],    // hooks/handlers take 4-5 dependency params
       "max-classes-per-file": ["error", 3], // adapter files may co-locate related classes
 
-      // --- STILL DISABLED (high violation count, fix incrementally) ---
-      "max-statements": "off",       // src:101
-      "max-lines-per-function": "off", // src:69
-      "sonarjs/no-duplicate-string": "off", // src:63
-      "no-console": "off",           // src:40
-      "no-param-reassign": "off",    // src:38
-      "max-nested-callbacks": "off", // src:30
-      "max-lines": "off",            // src:25
-      "complexity": "off",           // src:25
-      "sonarjs/cognitive-complexity": "off", // src:22
+      // --- THRESHOLD RULES (raised to practical limits, outliers use eslint-disable) ---
+      "max-statements": ["error", 20],         // default 10 → 20
+      "max-lines-per-function": ["error", 150], // default 50 → 150
+      "max-nested-callbacks": ["error", 5],     // default 4 → 5
+      "max-lines": ["error", 400],              // default 300 → 400
+      "complexity": ["error", 15],              // default 10 → 15
+      "sonarjs/cognitive-complexity": ["error", 20], // default 15 → 20
+
+      // --- STILL DISABLED (need code changes, fix incrementally) ---
+      "sonarjs/no-duplicate-string": "off", // src:63 — extract to constants
+      "no-console": "off",           // src:40 — replace with logger
+      "no-param-reassign": "off",    // src:38 — refactor reducers/handlers
     },
   },
 
-  // Re-assert test overrides after QS-1 migration block (which applies to all .ts/.tsx)
+  // --- Post-QS-1 overrides (must come AFTER QS-1 block which applies to all .ts/.tsx) ---
+
+  // Generated files — skip size rules
+  {
+    files: GENERATED_FILE_PATTERNS,
+    rules: {
+      "max-lines": "off",
+      "max-statements": "off",
+      "max-lines-per-function": "off",
+    },
+  },
+
+  // TSX components — higher thresholds due to hooks + JSX + conditional rendering
+  {
+    files: ["**/*.tsx"],
+    ignores: TEST_FILE_PATTERNS,
+    rules: {
+      "complexity": ["error", 30],
+      "max-lines-per-function": ["error", 250],
+      "max-statements": ["error", 30],
+    },
+  },
+
+  // Hooks — aggregate multiple concerns, naturally larger
+  {
+    files: HOOKS_FILE_PATTERNS,
+    ignores: TEST_FILE_PATTERNS,
+    rules: {
+      "max-lines-per-function": ["error", 250],
+      "max-statements": ["error", 30],
+    },
+  },
+
+  // Test overrides
   {
     files: TEST_FILE_PATTERNS,
     rules: {
       "max-classes-per-file": "off",
-      "no-await-in-loop": "off", // test loops are intentional
+      "no-await-in-loop": "off",
       "promise/always-return": "off",
+      "max-lines-per-function": "off",
+      "max-lines": "off",
+      "max-statements": "off",
+      "complexity": "off",
+      "sonarjs/cognitive-complexity": "off",
     },
   },
 

@@ -13,7 +13,7 @@ function sanitizeFilename(text: string): string {
     .join("");
 }
 
-async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
+async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> { // eslint-disable-line max-statements -- audio fetch has many validation steps
   if (entry.audioBlob && entry.audioBlob.size > 0) {
     return entry.audioBlob;
   }
@@ -55,7 +55,7 @@ export interface ZipProgress {
   total: number;
 }
 
-export async function downloadTaskAsZip(
+export async function downloadTaskAsZip( // eslint-disable-line max-statements -- zip creation orchestrates many steps
   task: Task,
   onProgress?: (progress: ZipProgress) => void,
 ): Promise<void> {
