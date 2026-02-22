@@ -95,7 +95,7 @@ export function usePhoneticPanel(
         );
       } catch (error) {
         logger.error("Failed to update entry:", error);
-        alert("Viga: häälduskuju salvestamine ebaõnnestus");
+        logger.error("Viga: häälduskuju salvestamine ebaõnnestus");
       }
     },
     [phoneticPanelEntryId, task, userId, setEntries, handleClosePhoneticPanel, dataService],

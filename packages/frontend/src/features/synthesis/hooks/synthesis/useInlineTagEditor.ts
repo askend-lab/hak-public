@@ -78,6 +78,7 @@ export function useInlineTagEditor({
             (s) => s.id === sentenceId,
           );
           let newText = "";
+          /* eslint-disable max-depth -- tag edit logic requires nesting inside sentence lookup */
           if (sentence) {
             if (trimmedValue === "") {
               const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
@@ -92,6 +93,7 @@ export function useInlineTagEditor({
               newText = newTags.join(" ");
             }
           }
+          /* eslint-enable max-depth -- end nested tag edit block */
           handleEditTagCommit();
           // Use synthesizeWithText to pass the correct text directly, bypassing stale ref
           if (newText) {

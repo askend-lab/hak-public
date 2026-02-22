@@ -33,6 +33,7 @@ async function loadTaraSecrets(): Promise<TaraSecrets> {
     const client = new SecretsManagerClient({ region: process.env.AWS_REGION || 'eu-west-1' });
     const result = await client.send(new GetSecretValueCommand({ SecretId: secretsArn }));
     const secret = JSON.parse(result.SecretString || '{}') as Record<string, string>;
+    // eslint-disable-next-line require-atomic-updates -- singleton cache, no concurrent writes
     cachedSecrets = {
       clientId: secret.TARA_CLIENT_ID || '',
       clientSecret: secret.TARA_CLIENT_SECRET || '',
@@ -44,6 +45,7 @@ async function loadTaraSecrets(): Promise<TaraSecrets> {
       throw new Error('TARA_SECRETS_ARN must be set in non-dev environments');
     }
     // Fallback to env vars for local development only
+     
     cachedSecrets = {
       clientId: process.env.TARA_CLIENT_ID || '',
       clientSecret: process.env.TARA_CLIENT_SECRET || '',

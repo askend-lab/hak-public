@@ -5,6 +5,7 @@ import { useState, useCallback } from "react";
 import { Task, TaskEntry } from "@/types/task";
 import { useDataService } from "@/contexts/DataServiceContext";
 import { convertTextToTags } from "@/types/synthesis";
+import { logger } from "@hak/shared";
 
 interface UsePronunciationVariantsReturn {
   variantsWord: string | null;
@@ -113,7 +114,7 @@ export function usePronunciationVariants(
               entry.id === selectedEntryId ? entryToUpdate : entry,
             ),
           );
-          alert("Viga: variandi salvestamine ebaõnnestus");
+          logger.error("Viga: variandi salvestamine ebaõnnestus");
         }
       } else {
         handleCloseVariants();

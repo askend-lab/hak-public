@@ -176,7 +176,7 @@ export default function SentencePhoneticPanel({
           audioRef.current = null;
         },
       });
-      audioRef.current = audio;
+      audioRef.current = audio; // eslint-disable-line require-atomic-updates -- ref assignment is safe here, no race
       await audio.play();
     } catch (e) {
       logger.error("Failed to play:", e);

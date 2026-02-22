@@ -96,7 +96,7 @@ registry.registerPath({
 
 const generator = new OpenApiGeneratorV3(registry.definitions);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- OpenAPI doc is untyped JSON
 export const openApiDocument: any = generator.generateDocument({
   openapi: "3.0.3",
   info: {

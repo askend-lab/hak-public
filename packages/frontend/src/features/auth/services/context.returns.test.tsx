@@ -200,6 +200,7 @@ describe("parseIdToken expiration boundary", () => {
     const now = Math.floor(Date.now() / 1000);
     const idToken = createJwt({ sub: "u1", email: "a@b.com", exp: now });
     let result: boolean | undefined;
+    // eslint-disable-next-line sonarjs/no-identical-functions -- test component reused with different token setup
     function Comp() {
       const { handleTaraTokens } = useAuth();
       return <button onClick={() => {
@@ -214,6 +215,7 @@ describe("parseIdToken expiration boundary", () => {
   it("rejects token with no email claim", () => {
     const idToken = createJwt({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 3600 });
     let result: boolean | undefined;
+     
     function Comp() {
       const { handleTaraTokens } = useAuth();
       return (

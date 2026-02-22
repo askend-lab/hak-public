@@ -19,7 +19,7 @@ export async function warmAudioWorker(): Promise<void> {
       headers: { "Content-Type": CONTENT_TYPE_JSON },
     });
     if (res.ok) {
-      warmed = true;
+      warmed = true; // eslint-disable-line require-atomic-updates -- single-threaded warm-up, no concurrent writes
       lastActivity = Date.now();
       logger.info("[Audio] Merlin warm-up triggered");
     }

@@ -119,6 +119,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
           shouldRevokeUrl = cachedAudio.shouldRevoke;
         } else {
           setCurrentLoadingId(entry.id);
+          /* eslint-disable max-depth -- synthesis polling requires try inside cache-miss branch */
           try {
             audioUrl = await synthesizeWithPolling(
               entry.stressedText,
@@ -132,6 +133,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
             setCurrentLoadingId(null);
             return false;
           }
+          /* eslint-enable max-depth -- end nested synthesis block */
         }
 
         if (!audioUrl || abortSignal.aborted) {return false;}

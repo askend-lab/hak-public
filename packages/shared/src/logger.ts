@@ -51,20 +51,20 @@ function isValidLogLevel(level: string): level is LogLevel {
 }
 
 function isNodeEnv(): boolean {
-  // eslint-disable-next-line no-restricted-globals
+  // eslint-disable-next-line no-restricted-globals -- env detection needs process global
   return typeof process !== "undefined";
 }
 
 function getLogLevel(): LogLevel {
   try {
-    /* eslint-disable no-restricted-globals */
+    /* eslint-disable no-restricted-globals -- reading LOG_LEVEL from process.env */
     if (isNodeEnv() && process.env?.[LOG_LEVEL_ENV]) {
       const envLevel = process.env[LOG_LEVEL_ENV];
       if (envLevel && isValidLogLevel(envLevel)) {
         return envLevel;
       }
     }
-    /* eslint-enable no-restricted-globals */
+    /* eslint-enable no-restricted-globals -- end process.env access */
   } catch {
     // Ignore errors in environment detection
   }

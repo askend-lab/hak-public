@@ -12,14 +12,17 @@ export const KEYWORDS = {
 
 export const STEP_KEYWORDS = ["Given", "When", "Then", "And", "But"] as const;
 export type StepKeyword = (typeof STEP_KEYWORDS)[number];
+// eslint-disable-next-line security/detect-non-literal-regexp -- built from compile-time constants
 export const STEP_PATTERN = new RegExp(`^(${STEP_KEYWORDS.join("|")})\\b\\s*(.*)`);
 
 // #2 Name patterns derived from KEYWORDS — single source of truth
 function namePattern(keyword: string): RegExp {
+  // eslint-disable-next-line security/detect-non-literal-regexp -- built from compile-time constants
   return new RegExp(`^${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*`);
 }
 
 // #5 Scenario pattern derived from both SCENARIO and SCENARIO_OUTLINE keywords
+// eslint-disable-next-line security/detect-non-literal-regexp -- built from compile-time constants
 export const SCENARIO_NAME_PATTERN = new RegExp(
   `^(?:${[KEYWORDS.SCENARIO_OUTLINE, KEYWORDS.SCENARIO].map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\s*`,
 );

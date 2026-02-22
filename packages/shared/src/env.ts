@@ -6,7 +6,7 @@
  */
 
 export function getAwsRegion(): string {
-  /* eslint-disable no-restricted-globals */
+  /* eslint-disable no-restricted-globals -- env detection needs process global */
   return process.env.AWS_REGION ?? "eu-west-1";
-  /* eslint-enable no-restricted-globals */
+  /* eslint-enable no-restricted-globals -- end process global access */
 }
