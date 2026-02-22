@@ -27,7 +27,7 @@ export function AuthCallbackPage() {
           (acc, c) => {
             const parts = c.trim().split("=");
             const k = parts[0] ?? "";
-            acc[k] = parts.slice(1).join("=");
+            acc[k] = parts.slice(1).join("="); // eslint-disable-line no-param-reassign -- reduce accumulator pattern
             return acc;
           },
           {} as Record<string, string>,

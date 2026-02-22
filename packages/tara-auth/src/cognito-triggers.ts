@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign -- Cognito triggers must mutate event.response per AWS SDK design */
+
 import {
   DefineAuthChallengeTriggerEvent,
   CreateAuthChallengeTriggerEvent,
@@ -70,3 +72,4 @@ export const handler = async (
       throw new Error(`Unknown trigger source: ${triggerSource}`);
   }
 };
+/* eslint-enable no-param-reassign -- end Cognito triggers */

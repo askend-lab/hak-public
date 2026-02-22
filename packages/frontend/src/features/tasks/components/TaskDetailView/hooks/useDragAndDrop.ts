@@ -22,7 +22,7 @@ export function useDragAndDrop(
 
   const handleDragStart = useCallback((e: React.DragEvent, id: string) => {
     setDraggedId(id);
-    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.effectAllowed = "move"; // eslint-disable-line no-param-reassign -- Web DragEvent API
     e.dataTransfer.setData("text/html", id);
   }, []);
 
@@ -34,7 +34,7 @@ export function useDragAndDrop(
   const handleDragOver = useCallback(
     (e: React.DragEvent, id: string) => {
       e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
+      e.dataTransfer.dropEffect = "move"; // eslint-disable-line no-param-reassign -- Web DragEvent API
       if (draggedId && draggedId !== id) {
         setDragOverId(id);
       }

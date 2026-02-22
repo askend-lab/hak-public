@@ -53,7 +53,7 @@ export function useSentenceActions({
           // Stop individual playback
           if (currentAudio) {
             currentAudio.pause();
-            currentAudio.src = "";
+            currentAudio.src = ""; // eslint-disable-line no-param-reassign -- clearing audio source to stop playback
           }
           updateSentence(id, { isPlaying: false });
         }

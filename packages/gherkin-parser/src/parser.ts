@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+/* eslint-disable no-param-reassign -- parser mutates state/tags objects by design */
+
 import type {
   ParsedStep,
   ParsedBackground,
@@ -317,3 +319,4 @@ export function parseFeatureContent(content: string): ParsedFeature | null {
   finalizeState(state);
   return state.feature.name ? state.feature : null;
 }
+/* eslint-enable no-param-reassign -- end parser */

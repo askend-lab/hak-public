@@ -152,7 +152,6 @@ export default [
 
       // --- STILL DISABLED (need code changes, fix incrementally) ---
       "sonarjs/no-duplicate-string": "off", // src:63 — extract to constants
-      "no-param-reassign": "off",    // src:38 — refactor reducers/handlers
     },
   },
 
