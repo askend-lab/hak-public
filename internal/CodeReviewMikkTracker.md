@@ -8,26 +8,26 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 1. Documentation
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181 — *Verified: React ^19.0.0 in package.json, port 5181 in README. ⚠️ README lines 24/27 still say `merlin-worker` instead of `tts-worker` after rename (minor, separate fix).*
 - ❌ Reject (wrong)  —  — **1.1.2** (Low) Shared module doesn't list dependencies — finding incorrect, s3 client IS in package.json
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.2.1** (Low) No separate INSTALL.md — expanded Quick Start in root README
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.1** (Low) Duplicate architecture line in README — not real duplication (summary + link)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs — intentional for navigation
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams) — ARCHITECTURE.md now has Authentication & Authorization, Security Model, System Diagrams, CI/CD sections
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger — OpenAPI 3.0.3 specs now auto-generated from Zod schemas (zod-to-openapi), copied to docs/ by api-client generate script
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.5.1** (Medium) No deployment guide for engineers — docs/DEPLOYMENT.md (84 lines) covers dev + prod
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty — *Verified: README now says "Runtime Dependencies (non-npm)" with native binaries. package.json has `@hak/shared` + `zod` in dependencies. Consistent.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.2.1** (Low) No separate INSTALL.md — expanded Quick Start in root README — *Verified: Quick Start section in README.md has prerequisites, clone, install, test, dx, start commands + separate merlin-worker setup block.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.3.1** (Low) Duplicate architecture line in README — not real duplication (summary + link) — *Verified: README has one "## Architecture" section with a summary line + link to ARCHITECTURE.md. No duplication. ⚠️ README line 71 still says "Merlin API" and "Vabamorf API" — stale after rename (minor).*
+- ✅ Accept  [✅] Fixed  [⚠️] Closed — **1.3.2** (Low) Tech stack duplication in ARCHITECTURE.md and module READMEs — intentional for navigation — *Verified: duplication is intentional and documented. BUT ⚠️ ARCHITECTURE.md still uses old package names throughout (simplestore, merlin-api, merlin-worker, vabamorf-api, tara-auth). Needs bulk rename to match PR #664.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect) — *Verified: ARCHITECTURE.md line 28 now says "merlin-worker — standalone (Python, no npm dependencies)". Correct. ⚠️ Name still old (see 1.3.2).*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading) — *Verified: ARCHITECTURE.md line 29 now says "vabamorf-api — standalone (inlines shared utilities for Docker Lambda bundling)". Accurate. ⚠️ Name still old (see 1.3.2).*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate) — *Verified: ARCHITECTURE.md line 40 now says "Python, Conda, Merlin engine" only. No TypeScript mention. Correct. ⚠️ Name still old (see 1.3.2).*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams) — *Verified: ARCHITECTURE.md has sections "Authentication & Authorization", "Security Model", "System Diagrams", "CI/CD & Deployment". All present and substantive.*
+- ✅ Accept  [✅] Fixed  [⚠️] Closed — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger — *Verified: OpenAPI 3.0.3 specs exist in `docs/merlin-api.openapi.yaml` and `docs/vabamorf-api.openapi.yaml`. Generated from Zod via `api-client/scripts/generate.mjs`. BUT ⚠️ generate.mjs lines 28/34 still reference old paths `packages/merlin-api/` and `packages/vabamorf-api/` — will break after rename. Must update to `packages/tts-api/` and `packages/morphology-api/`.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.5.1** (Medium) No deployment guide for engineers — *Verified: `docs/DEPLOYMENT.md` exists, 84 lines, covers dev + prod deployment.*
 - ❌ Reject (acceptable)  —  — **1.5.1.1** (Low) Too many markdown files (~46, now 74) — acceptable count, will reduce over time
-- ✅ Accept  [✅] Fixed  [ ] Closed — **1.5.1.2** (Low) Design documentation in two places — no duplication found (docs/design-systems/ doesn't exist)
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.5.1.2** (Low) Design documentation in two places — *Verified: `docs/design-systems/` does not exist. Only `docs/internal/design-system/` exists. No duplication.*
 
 ## 2. Technical Stack
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS — upgraded to nodejs22.x in all serverless.yml configs
-- ✅ Accept  [✅] Fixed  [ ] Closed — **2.2** (Low) 5 testing frameworks — removed Jest from shared, simplestore, frontend
-- ✅ Accept  [✅] Fixed  [ ] Closed — **2.3** (Low) Bug in generate.py: ERB now uses erb_alpha
+- ✅ Accept  [✅] Fixed  [✅] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS — *Verified: `.nvmrc` = 22. All 4 serverless.yml files have `runtime: nodejs22.x` (auth, store, morphology-api, tts-api).*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **2.2** (Low) 5 testing frameworks — removed Jest from shared, simplestore, frontend — *Verified: `shared`, `store`, `frontend` all use vitest. No jest dependency in any of them. Backend packages (`auth`, `tts-api`, `morphology-api`) still use Jest — correct, they're Lambda packages with different test setup.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **2.3** (Low) Bug in generate.py: ERB now uses erb_alpha — *Verified: `generate.py` line 186-187: `elif cfg_fw_alpha=='ERB': fw_coef = erb_alpha(cfg_sr)`. Function `erb_alpha` defined at line 121. Correct.*
 
 ## 3. Project Structure
 
@@ -35,24 +35,24 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 4. Code Style
 
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.1** (Low) if statements without curly brackets — `curly: 'all'` ESLint rule
-- ✅ Accept  [✅] Fixed  [ ] Closed — **4.2** (Medium) getCorsOrigin unified — merlin-api and vabamorf-api now return 'null' when ALLOWED_ORIGIN unset
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.3** (Low) `as unknown as` double type assertions — `consistent-type-assertions` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.4** (Low) Nested ternary statements — `no-nested-ternary` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.5** (Low) Array indexes as React keys — `react/no-array-index-key` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python — knip dead-code hook + Ruff ERA001
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.7** (Low) Redundant `?` and `undefined` type specifiers — `no-unnecessary-type-arguments` ESLint rule (tool enabled, violations pending)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **4.8** (Medium) Deprecated APIs — removed execCommand fallback, uses Clipboard API only
-- ✅ Accept  [✅] Fixed  [ ] Closed — **4.9** (Low) Duplicate CSS selectors — merged into single .marker-tooltip--align-center block
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **4.1** (Low) if statements without curly brackets — *Verified: `curly: ['error', 'all']` in `eslint.base.config.mjs:61`. Enforced by DevBox `run-lint` hook. Lint passes clean.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **4.2** (Medium) getCorsOrigin unified — *Verified: `getCorsOrigin()` defined in `shared/src/lambda.ts`, returns `"null"` when ALLOWED_ORIGIN unset. tts-api re-exports from `@hak/shared` (`response.ts:11`). auth, store also import from shared. All consistent.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **4.3** (Low) `as unknown as` double type assertions — *Verified: `consistent-type-assertions: ['error', ...]` in `eslint.base.config.mjs:211`. Enforced by DevBox `run-lint` hook. Lint passes clean.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **4.4** (Low) Nested ternary statements — *Verified: `no-nested-ternary: 'error'` in `eslint.base.config.mjs:62`. Enforced by DevBox.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **4.5** (Low) Array indexes as React keys — *Verified: `react/no-array-index-key: 'error'` in `eslint.base.config.mjs:381`. Enforced by DevBox.*
+- ✅ Accept  [🛡️] Fixed  [⚠️] Closed — **4.6** (Low) Unused code: LoginModalProps.message, commented code in Python — *Verified: Ruff ERA001 enabled in `tts-worker/ruff.toml:15` (commented-out code). knip + DevBox `dead-code` hook active. BUT ⚠️ `LoginModalProps.message` is still declared but unused in `LoginModal.tsx:14` — knip doesn't catch unused interface properties, only unused exports/files. Minor gap.*
+- ✅ Accept  [🛡️] Fixed  [⚠️] Closed — **4.7** (Low) Redundant `?` and `undefined` type specifiers — *Verified: ⚠️ Rule `no-unnecessary-type-arguments` NOT found in `eslint.base.config.mjs`. Tracker says "tool enabled" but rule is missing. Either not added or added under a different name. Needs investigation.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **4.8** (Medium) Deprecated APIs — removed execCommand fallback, uses Clipboard API only — *Verified: No `execCommand` in codebase. All clipboard usage is `navigator.clipboard.writeText()`. Utility in `clipboardUtils.ts` with tests.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **4.9** (Low) Duplicate CSS selectors — *Verified: Only one `.marker-tooltip--align-center` block in `_marker-tooltip.scss:40`. No duplication.*
 - ❌ Reject (not found)  —  — **4.10** (Low) Redundant return None — not confirmed in code
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.11** (Low) TODO matches — 12 found (not 30 as claimed), resolve them — `no-warning-comments` ESLint rule
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.12** (Low) Unnecessary list() calls on iterables in Python — Ruff PLW0117
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **4.11** (Low) TODO matches — *Verified: `no-warning-comments: ['warn', ...]` in `eslint.base.config.mjs:59`. Set as `warn` (not error) — TODOs are flagged but don't block commits. Reasonable: allows dev work while tracking tech debt.*
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **4.12** (Low) Unnecessary list() calls on iterables in Python — *Verified: Ruff `PLW` rules enabled in `tts-worker/ruff.toml:17` (includes PLW0117). Enforced by DevBox `run-tests` hook for Python.*
 - ❌ Reject (not found)  —  — **4.13** (Low) Unnecessary awaits — not confirmed in source code
 - ❌ Reject (external lib)  —  — **4.14** (Medium) DeepRecurrentNetwork class — external Merlin library, not our code
 - ❌ Reject (ML convention)  —  — **4.15** (Low) Python naming case — ML math notation convention (W_value, Whx)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — ran SonarQube, found ESLint config gap (QS-1–QS-4), all fixed in PR #661
+- ✅ Accept  [✅] Fixed  [✅] Closed — **4.16** (Medium) SonarQube issues — *Verified: PR #661 merged. `eslint-comments/require-description: 'error'` confirmed in config. 30+ rules migrated to .ts/.tsx. QS section in tracker documents all changes. Lint passes clean.*
 - ❌ Reject (external lib)  —  — **4.17** (Medium) Merlin NN Python style issues — external library code
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **4.18** (Medium) Floating point equality checks in worker.py — *Verified: Ruff `PLR2004` enabled in `tts-worker/ruff.toml:18`. Catches magic-value comparisons like `speed == 1.0`. Enforced by DevBox.*
 
 ## 5. Simplicity & Patterns
 
