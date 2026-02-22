@@ -245,30 +245,30 @@ Ref: `internal/PROPOSAL-Auth-Public-Endpoints.md`
 Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are public. Authentication proposal sent to client (pending decision). Below: what we must do regardless to harden the public setup.
 
 ### Cost & Scaling Limits
-- [ ] **PUB-1** (CRITICAL) AWS Budgets + automatic shutdown — warning at 70%, reduce ECS at 90%, disable at 100%
-- [ ] **PUB-2** (CRITICAL) ECS max_capacity hard cap — limit to 2-3 concurrent workers + CloudWatch alarm
-- [ ] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrentExecutions: 10-20` for merlin-api and vabamorf-api
-- [ ] **PUB-4** (HIGH) SQS queue depth cap — reject with 503 if queue > 50 messages
+- [ ] **PUB-1** (CRITICAL) AWS Budgets + automatic shutdown — warning at 70%, reduce ECS at 90%, disable at 100%. **How:** account-level repo (separate project), `aws_budgets_budget` Terraform resource + SNS → Lambda for auto-action.
+- [ ] **PUB-2** (CRITICAL) ECS max_capacity hard cap — limit to 2-3 concurrent workers + CloudWatch alarm. **How:** Terraform `aws_appautoscaling_target.max_capacity` in `infra/`. Check current value, cap at 2-3.
+- [ ] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrentExecutions: 10-20` for merlin-api and vabamorf-api. **How:** Terraform `reserved_concurrent_executions` on Lambda resources.
+- [ ] **PUB-4** (HIGH) SQS queue depth cap — reject with 503 if queue > 50 messages. **How:** code change in merlin-api handler.ts — check `ApproximateNumberOfMessagesVisible` before `sendMessage`.
 - [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — DONE in 15.5 (1000 → 100 chars)
 
 ### Monitoring & Detection
-- [ ] **PUB-6** (HIGH) CloudWatch alerts — anomalous request growth, SQS depth, ECS task count, cost/day dashboard + Slack
-- [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection Lambda + EventBridge cron
-- [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries
+- [ ] **PUB-6** (HIGH) CloudWatch alerts — anomalous request growth, SQS depth, ECS task count, cost/day dashboard + Slack. **How:** Terraform `aws_cloudwatch_metric_alarm` + `aws_sns_topic` → Slack webhook.
+- [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection. **How:** new Lambda + EventBridge cron (every 5 min), reads CloudWatch logs, adds IPs to WAF IP set. Separate development effort.
+- [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries. **How:** manual setup in AWS Console, save Top-10 IPs, hourly distribution, atypical User-Agents.
 
 ### Attack Surface Reduction
-- [ ] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP (separate from general 100/5min)
-- [ ] **PUB-10** (MEDIUM) Geo-blocking — restrict `/synthesize` to EE, LV, LT, FI, SE
-- [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work
-- [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token
+- [ ] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP (separate from general 100/5min). **How:** Terraform `aws_wafv2_rate_based_statement` with `scope_down_statement` filtering on URI path.
+- [ ] **PUB-10** (MEDIUM) Geo-blocking — restrict `/synthesize` to EE, LV, LT, FI, SE. **How:** Terraform `aws_wafv2_geo_match_statement` in WAF config.
+- [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work. **How:** AWS WAF Bot Control (~$10/month) or custom proof-of-work header in frontend. Separate evaluation needed.
+- [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. **How:** frontend code change (canvas/screen/timezone hash as header) + backend validation. Separate development effort.
 
 ### Storage
-- [ ] **PUB-13** (LOW) S3 audio lifecycle — auto-delete after 30-90 days
+- ~~**PUB-13**~~ (LOW) S3 audio lifecycle — not worth the complexity, audio files are small. Skip.
 
 ### Testing & Verification
-- [ ] **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts
-- [ ] **TEST-2** (CRITICAL) Auto-scaling testing — verify ECS max_capacity behavior
-- [ ] **TEST-3** (CRITICAL) Lambda concurrency testing — verify limits and 429 responses
-- [ ] **TEST-4** (HIGH) Alert testing — simulate each alert, verify Slack delivery < 5 min
-- [ ] **TEST-5** (HIGH) Budget limit testing — verify AWS Budget alarm + auto-action
-- [ ] **TEST-6** (HIGH) SQS queue depth testing — fill to threshold, verify 503 + recovery
+- [ ] **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/` directory.
+- [ ] **TEST-2** (CRITICAL) Auto-scaling testing — verify ECS max_capacity behavior. **How:** run TEST-1 attack script, observe ECS task count in CloudWatch.
+- [ ] **TEST-3** (CRITICAL) Lambda concurrency testing — verify limits and 429 responses. **How:** concurrent requests via k6, check for 429 (not 500).
+- [ ] **TEST-4** (HIGH) Alert testing — simulate each alert, verify Slack delivery < 5 min. **How:** manual trigger of CloudWatch alarms.
+- [ ] **TEST-5** (HIGH) Budget limit testing — verify AWS Budget alarm + auto-action. **How:** set test budget to $0.01 in staging, verify trigger.
+- [ ] **TEST-6** (HIGH) SQS queue depth testing — fill queue to threshold, verify 503 + recovery. **How:** send burst of synthesis requests, verify PUB-4 cap works.
