@@ -44,7 +44,7 @@
     "@axe-core/react": "^4.11.0",
     "@cucumber/cucumber": "^12.4.0",
     "@eslint/js": "^9.15.0",
-    "@hak/simplestore": "workspace:*",
+    "@hak/store": "workspace:*",
     "@playwright/test": "^1.58.2",
     "@sentry/react": "^10.38.0",
     "@stryker-mutator/core": "^9.5.1",

@@ -13,27 +13,27 @@ global_excludes:
 
 # Test modules with coverage requirements
 test_modules:
-  - name: simplestore
-    path: packages/simplestore
+  - name: store
+    path: packages/store
     type: vitest
     results_file: "test-results.json"
-  - name: merlin-worker
-    path: packages/merlin-worker
+  - name: tts-worker
+    path: packages/tts-worker
     type: pytest
     command: ".venv/bin/pytest tests/ -v --json-report --json-report-file=pytest-results.json"
     command_full: ".venv/bin/pytest tests/ -v --json-report --json-report-file=pytest-results.json --cov=worker --cov-report=json:coverage/coverage.json"
     results_file: "pytest-results.json"
-  - name: merlin-api
-    path: packages/merlin-api
+  - name: tts-api
+    path: packages/tts-api
     type: jest
-  - name: vabamorf-api
-    path: packages/vabamorf-api
+  - name: morphology-api
+    path: packages/morphology-api
     type: jest
   - name: gherkin-parser
     path: packages/gherkin-parser
     type: jest
-  - name: tara-auth
-    path: packages/tara-auth
+  - name: auth
+    path: packages/auth
     type: jest
     min_coverage_branches: 90
   - name: shared
@@ -192,8 +192,9 @@ hooks:
       - "**/coverage-summary.json"
       - "**/.nyc_output/**"
       - "**/cucumber-report.json"
-      - "**/merlin/**/*.py"
-      - "**/merlin-worker/tools/**/*"
+      - "**/tts-worker/**/*.py"
+      - "**/tts-worker/tools/**/*"
+      - "**/tts-worker/merlin/**/*"
       - "**/styles/**/*.scss"
       - "**/styles/*.scss"
       # Test files still over 400L (TODO: split these)

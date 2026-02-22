@@ -131,7 +131,7 @@ jobs:
 
           if [ -z "$CHANGED" ]; then
             echo "No diff available (initial commit, workflow_dispatch, or same SHA) - building all"
-            for pkg in frontend simplestore merlin-api vabamorf-api shared tara-auth gherkin-parser; do
+            for pkg in frontend store tts-api morphology-api shared auth gherkin-parser; do
               echo "$pkg=true" >> $GITHUB_OUTPUT
             done
           else
@@ -146,7 +146,7 @@ jobs:
               SHARED_CHANGED=true
             fi
 
-            for pkg in frontend simplestore merlin-api vabamorf-api tara-auth gherkin-parser; do
+            for pkg in frontend store tts-api morphology-api auth gherkin-parser; do
               PKG_DIR=$(echo $pkg | tr '-' '-')
               echo "$pkg=$( (echo "$CHANGED" | grep -q "^packages/$PKG_DIR/" || [ "$SHARED_CHANGED" == "true" ]) && echo true || echo false)" >> $GITHUB_OUTPUT
             done
@@ -173,21 +173,21 @@ jobs:
         if: steps.detect.outputs.frontend == 'true'
         run: pnpm --filter @hak/frontend test:full
 
-      - name: Test simplestore
-        if: steps.detect.outputs.simplestore == 'true'
-        run: pnpm --filter @hak/simplestore test:full
+      - name: Test store
+        if: steps.detect.outputs.store == 'true'
+        run: pnpm --filter @hak/store test:full
 
-      - name: Test merlin-api
-        if: steps.detect.outputs.merlin-api == 'true'
-        run: pnpm --filter @hak/merlin-api test:full
+      - name: Test tts-api
+        if: steps.detect.outputs.tts-api == 'true'
+        run: pnpm --filter @hak/tts-api test:full
 
-      - name: Test vabamorf-api
-        if: steps.detect.outputs.vabamorf-api == 'true'
-        run: pnpm --filter @hak/vabamorf-api test:full
+      - name: Test morphology-api
+        if: steps.detect.outputs.morphology-api == 'true'
+        run: pnpm --filter @hak/morphology-api test:full
 
-      - name: Test tara-auth
-        if: steps.detect.outputs.tara-auth == 'true'
-        run: pnpm --filter @hak/tara-auth test:full
+      - name: Test auth
+        if: steps.detect.outputs.auth == 'true'
+        run: pnpm --filter @hak/auth test:full
 
       - name: Test gherkin-parser
         if: steps.detect.outputs.gherkin-parser == 'true'
@@ -203,32 +203,32 @@ jobs:
           VITE_COGNITO_DOMAIN: ${{ env.COGNITO_DOMAIN }}
         run: pnpm --filter @hak/frontend build
 
-      - name: Build SimpleStore
-        if: steps.detect.outputs.simplestore == 'true'
-        run: pnpm --filter @hak/simplestore build
+      - name: Build Store
+        if: steps.detect.outputs.store == 'true'
+        run: pnpm --filter @hak/store build
 
-      - name: Build Merlin API
-        if: steps.detect.outputs.merlin-api == 'true'
-        run: pnpm --filter @hak/merlin-api build
+      - name: Build TTS API
+        if: steps.detect.outputs.tts-api == 'true'
+        run: pnpm --filter @hak/tts-api build
 
-      - name: Build Vabamorf API
-        if: steps.detect.outputs.vabamorf-api == 'true'
-        run: pnpm --filter @hak/vabamorf-api build
+      - name: Build Morphology API
+        if: steps.detect.outputs.morphology-api == 'true'
+        run: pnpm --filter @hak/morphology-api build
 
       - name: Login to ECR
-        if: steps.detect.outputs.vabamorf-api == 'true'
+        if: steps.detect.outputs.morphology-api == 'true'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
       - name: Set up Docker Buildx
-        if: steps.detect.outputs.vabamorf-api == 'true'
+        if: steps.detect.outputs.morphology-api == 'true'
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3
 
-      - name: Build Vabamorf Docker image
-        if: steps.detect.outputs.vabamorf-api == 'true'
+      - name: Build Morphology Docker image
+        if: steps.detect.outputs.morphology-api == 'true'
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
         with:
-          context: packages/vabamorf-api
+          context: packages/morphology-api
           load: true
           tags: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ github.sha }}
           cache-from: type=gha,scope=vabamorf-api
@@ -236,7 +236,7 @@ jobs:
           provenance: false
 
       - name: Scan Docker image with Trivy
-        if: steps.detect.outputs.vabamorf-api == 'true'
+        if: steps.detect.outputs.morphology-api == 'true'
         uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # master
         with:
           image-ref: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ github.sha }}
@@ -246,8 +246,8 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-      - name: Push Vabamorf Docker image
-        if: steps.detect.outputs.vabamorf-api == 'true'
+      - name: Push Morphology Docker image
+        if: steps.detect.outputs.morphology-api == 'true'
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
@@ -258,10 +258,10 @@ jobs:
         id: build
         env:
           FRONTEND_CHANGED: ${{ steps.detect.outputs.frontend }}
-          SIMPLESTORE_CHANGED: ${{ steps.detect.outputs.simplestore }}
-          MERLIN_API_CHANGED: ${{ steps.detect.outputs.merlin-api }}
-          VABAMORF_API_CHANGED: ${{ steps.detect.outputs.vabamorf-api }}
-          TARA_AUTH_CHANGED: ${{ steps.detect.outputs.tara-auth }}
+          STORE_CHANGED: ${{ steps.detect.outputs.store }}
+          TTS_API_CHANGED: ${{ steps.detect.outputs.tts-api }}
+          MORPHOLOGY_API_CHANGED: ${{ steps.detect.outputs.morphology-api }}
+          AUTH_CHANGED: ${{ steps.detect.outputs.auth }}
         run: |
           BUILD_ID="BUILD-$(date +%Y%m%d%H%M%S)"
           echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
@@ -291,9 +291,9 @@ jobs:
           }
 
           upload_module "frontend" "packages/frontend/dist" "$FRONTEND_CHANGED"
-          upload_module "simplestore" "packages/simplestore/dist" "$SIMPLESTORE_CHANGED"
-          upload_module "merlin-api" "packages/merlin-api/dist" "$MERLIN_API_CHANGED"
-          upload_module "vabamorf-api" "packages/vabamorf-api/dist" "$VABAMORF_API_CHANGED"
+          upload_module "store" "packages/store/dist" "$STORE_CHANGED"
+          upload_module "tts-api" "packages/tts-api/dist" "$TTS_API_CHANGED"
+          upload_module "morphology-api" "packages/morphology-api/dist" "$MORPHOLOGY_API_CHANGED"
 
           # Build manifest using jq
           jq -n \
@@ -301,26 +301,26 @@ jobs:
             --arg sha "${{ github.sha }}" \
             --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg frontend "$( [ "$FRONTEND_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha frontend )" \
-            --arg simplestore "$( [ "$SIMPLESTORE_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha simplestore )" \
-            --arg merlin "$( [ "$MERLIN_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha merlin-api )" \
-            --arg vabamorf "$( [ "$VABAMORF_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha vabamorf-api )" \
-            --arg taraauth "$( [ "$TARA_AUTH_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha tara-auth )" \
+            --arg store "$( [ "$STORE_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha store )" \
+            --arg ttsapi "$( [ "$TTS_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha tts-api )" \
+            --arg morphology "$( [ "$MORPHOLOGY_API_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha morphology-api )" \
+            --arg auth "$( [ "$AUTH_CHANGED" == "true" ] && echo '${{ github.sha }}' || get_last_sha auth )" \
             '{
               build_id: $id,
               git_sha: $sha,
               timestamp: $time,
               modules: {
                 frontend: $frontend,
-                simplestore: $simplestore,
-                "merlin-api": $merlin,
-                "vabamorf-api": $vabamorf,
-                "tara-auth": $taraauth
+                store: $store,
+                "tts-api": $ttsapi,
+                "morphology-api": $morphology,
+                auth: $auth
               }
             }' > /tmp/manifest.json
 
           aws s3 cp /tmp/manifest.json ${S3_PATH}/manifest.json --sse AES256
           # Check if any deployable module actually changed
-          if [ "$FRONTEND_CHANGED" == "true" ] || [ "$SIMPLESTORE_CHANGED" == "true" ] || [ "$MERLIN_API_CHANGED" == "true" ] || [ "$VABAMORF_API_CHANGED" == "true" ] || [ "$TARA_AUTH_CHANGED" == "true" ]; then
+          if [ "$FRONTEND_CHANGED" == "true" ] || [ "$STORE_CHANGED" == "true" ] || [ "$TTS_API_CHANGED" == "true" ] || [ "$MORPHOLOGY_API_CHANGED" == "true" ] || [ "$AUTH_CHANGED" == "true" ]; then
             echo "has_deploy_changes=true" >> $GITHUB_OUTPUT
           else
             echo "has_deploy_changes=false" >> $GITHUB_OUTPUT

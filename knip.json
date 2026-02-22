@@ -3,9 +3,9 @@
   "ignore": [
     "infra/**",
     "**/.stryker-tmp/**",
-    "packages/vabamorf-api/src/local-server.ts",
-    "packages/merlin-api/src/handler.ts",
-    "packages/simplestore/test/**",
+    "packages/morphology-api/src/local-server.ts",
+    "packages/tts-api/src/handler.ts",
+    "packages/store/test/**",
     "**/stryker.config.mjs",
     "bundlesize.config.json"
   ],

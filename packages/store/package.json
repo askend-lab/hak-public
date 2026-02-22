@@ -1,5 +1,5 @@
 {
-  "name": "@hak/simplestore",
+  "name": "@hak/store",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
