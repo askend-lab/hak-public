@@ -31,8 +31,8 @@ describe("SentenceMenu unauthenticated", () => {
   });
 
   it("calls onLogin on click", async () => {
-    const onLogin = vi.fn(),
-      onClose = vi.fn();
+    const onLogin = vi.fn();
+      const onClose = vi.fn();
     render(
       <SentenceMenu {...defaultProps} onLogin={onLogin} onClose={onClose} />,
     );
@@ -84,8 +84,8 @@ describe("SentenceMenu authenticated", () => {
   });
 
   it("calls onAddToTask when task clicked", async () => {
-    const onAddToTask = vi.fn(),
-      onClose = vi.fn();
+    const onAddToTask = vi.fn();
+      const onClose = vi.fn();
     render(
       <SentenceMenu
         {...defaultProps}
@@ -148,7 +148,7 @@ describe("SentenceMenu actions", () => {
     const fn = vi.fn();
     render(<SentenceMenu {...defaultProps} onClose={fn} />);
     const bd = document.querySelector(".synthesis__menu-backdrop");
-    if (bd) await userEvent.click(bd);
+    if (bd) {await userEvent.click(bd);}
     expect(fn).toHaveBeenCalled();
   });
 });
@@ -307,7 +307,7 @@ describe("SentenceMenu structure and classes", () => {
     await userEvent.click(screen.getByText("Lisa ülesandesse"));
     const { fireEvent } = await import("@testing-library/react");
     const menuEl = container.querySelector(".synthesis__dropdown-menu");
-    if (menuEl) fireEvent.keyDown(menuEl, { key: "Escape" });
+    if (menuEl) {fireEvent.keyDown(menuEl, { key: "Escape" });}
     expect(screen.getByText("Uuri häälduskuju")).toBeInTheDocument();
   });
 
@@ -318,7 +318,7 @@ describe("SentenceMenu structure and classes", () => {
     );
     const { fireEvent } = await import("@testing-library/react");
     const menuEl = container.querySelector(".synthesis__dropdown-menu");
-    if (menuEl) fireEvent.keyDown(menuEl, { key: "Escape" });
+    if (menuEl) {fireEvent.keyDown(menuEl, { key: "Escape" });}
     expect(onClose).toHaveBeenCalled();
   });
 });

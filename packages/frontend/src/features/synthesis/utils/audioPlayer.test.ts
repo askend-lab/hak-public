@@ -28,7 +28,7 @@ describe("audioPlayer", () => {
       play = vi.fn().mockResolvedValue(undefined);
 
       constructor(url?: string) {
-        if (url) this.src = url;
+        if (url) {this.src = url;}
         mockAudio = this;
       }
     }
@@ -138,7 +138,7 @@ describe("audioPlayer", () => {
         play = vi.fn().mockRejectedValue(new Error("Play failed"));
 
         constructor(url?: string) {
-          if (url) this.src = url;
+          if (url) {this.src = url;}
           mockAudio = this;
         }
       }

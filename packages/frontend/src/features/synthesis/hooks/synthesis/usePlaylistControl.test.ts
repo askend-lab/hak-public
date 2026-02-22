@@ -299,7 +299,7 @@ describe("usePlaylistControl mutation kills", () => {
       callCount++;
       if (callCount === 1) {
         // Simulate external abort after first call succeeds
-        setTimeout(() => (signal as { aborted: boolean }).aborted = true, 0);
+        setTimeout(() => { (signal as { aborted: boolean }).aborted = true; }, 0);
         return Promise.resolve(true);
       }
       return Promise.resolve(true);

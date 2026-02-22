@@ -35,7 +35,7 @@ export function useInlineTagEditor({
   const handleEditTag = useCallback(
     (sentenceId: string, tagIndex: number) => {
       const sentence = getSentence(sentenceId);
-      if (!sentence) return;
+      if (!sentence) {return;}
       const word = sentence.tags[tagIndex] ?? "";
       setEditingTag({ sentenceId, tagIndex, value: word });
       setOpenTagMenu(null);
@@ -45,14 +45,14 @@ export function useInlineTagEditor({
 
   const handleEditTagChange = useCallback(
     (value: string) => {
-      if (!editingTag) return;
+      if (!editingTag) {return;}
       setEditingTag({ ...editingTag, value });
     },
     [editingTag],
   );
 
   const handleEditTagCommit = useCallback(() => {
-    if (!editingTag) return;
+    if (!editingTag) {return;}
     const { sentenceId, tagIndex, value } = editingTag;
     const trimmedValue = value.trim();
 
@@ -78,6 +78,7 @@ export function useInlineTagEditor({
             (s) => s.id === sentenceId,
           );
           let newText = "";
+          /* eslint-disable max-depth -- tag edit logic requires nesting inside sentence lookup */
           if (sentence) {
             if (trimmedValue === "") {
               const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
@@ -92,6 +93,7 @@ export function useInlineTagEditor({
               newText = newTags.join(" ");
             }
           }
+          /* eslint-enable max-depth -- end nested tag edit block */
           handleEditTagCommit();
           // Use synthesizeWithText to pass the correct text directly, bypassing stale ref
           if (newText) {

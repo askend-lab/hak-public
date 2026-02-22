@@ -44,7 +44,7 @@ export default function TaskEditModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!task) return;
+    if (!task) {return;}
 
     if (!name.trim()) {
       setError("Ülesande nimi on kohustuslik");
@@ -83,7 +83,7 @@ export default function TaskEditModal({
     }
   };
 
-  if (!isOpen || !task) return null;
+  if (!isOpen || !task) {return null;}
 
   return (
     <BaseModal

@@ -3,6 +3,8 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { DataService } from "../dataService";
+
 vi.mock("@hak/shared", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
@@ -44,8 +46,6 @@ vi.mock("../repository/TaskRepository", () => ({
     updateTaskEntry = mockRepo.updateTaskEntry;
   },
 }));
-
-import { DataService } from "../dataService";
 
 describe("DataService", () => {
   let service: DataService;

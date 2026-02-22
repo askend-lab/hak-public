@@ -6,14 +6,14 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LoginModal from "./LoginModal";
 
+import { useAuth } from "@/features/auth/services";
+
 vi.mock("@/features/auth/services", () => ({
   useAuth: vi.fn(() => ({
     login: vi.fn().mockResolvedValue(undefined),
     loginWithTara: vi.fn(),
   })),
 }));
-
-import { useAuth } from "@/features/auth/services";
 
 describe("LoginModal", () => {
   const mockOnClose = vi.fn();
@@ -169,7 +169,7 @@ describe("LoginModal", () => {
       mockOnClose.mockClear();
       // The BaseModal's onClose triggers handleClose via close button
       const closeBtn = document.querySelector(".modal__close");
-      if (closeBtn) await user.click(closeBtn);
+      if (closeBtn) {await user.click(closeBtn);}
       expect(mockOnClose).not.toHaveBeenCalled();
     });
 

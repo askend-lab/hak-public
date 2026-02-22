@@ -32,18 +32,18 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
   } = deps;
 
   const handleAddAllSentencesToTask = useCallback(() => {
-    if (requireAuth()) return;
+    if (requireAuth()) {return;}
     setShowAddToTaskDropdown((prev) => !prev);
   }, [requireAuth]);
 
   const handleSelectTaskFromDropdown = useCallback(
     async (taskId: string, taskName: string, _mode: "append" | "replace") => {
-      if (!user) return;
+      if (!user) {return;}
       const entries = filterNonEmptySentences(sentences).map((s) => ({
         text: s.text,
         stressedText: s.phoneticText || s.text,
       }));
-      if (entries.length === 0) return;
+      if (entries.length === 0) {return;}
 
       try {
         await dataService.addTextEntriesToTask(taskId, entries, _mode);
@@ -69,9 +69,9 @@ export function useTaskEntries(deps: UseTaskEntriesDeps) {
 
   const handleAddSentenceToExistingTask = useCallback(
     async (sentenceId: string, taskId: string, taskName: string) => {
-      if (!user) return;
+      if (!user) {return;}
       const sentence = sentences.find((s) => s.id === sentenceId);
-      if (!sentence || !sentence.text.trim()) return;
+      if (!sentence || !sentence.text.trim()) {return;}
 
       try {
         await dataService.addTextEntriesToTask(taskId, [

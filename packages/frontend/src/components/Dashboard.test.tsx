@@ -7,6 +7,8 @@ import { MemoryRouter } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import { DataServiceTestWrapper } from "../test/dataServiceMock";
 
+import { useAuth } from "../features/auth/services/context";
+
 function TestWrapper({ children }: { children?: React.ReactNode }) {
   return <MemoryRouter><DataServiceTestWrapper>{children}</DataServiceTestWrapper></MemoryRouter>;
 }
@@ -27,8 +29,6 @@ vi.mock("../features/auth/services/context", () => ({
     handleTaraTokens: vi.fn(),
   })),
 }));
-
-import { useAuth } from "../features/auth/services/context";
 
 describe("Dashboard", () => {
   beforeEach(() => {

@@ -97,7 +97,7 @@ export class SimpleStoreAdapter {
     });
 
     if (!response.ok) {
-      if (response.status === 404) return null;
+      if (response.status === 404) {return null;}
       const error = await response.text();
       logger.error("SimpleStore get failed:", error);
       throw new Error(`Failed to get: ${error}`);
@@ -145,7 +145,7 @@ export class SimpleStoreAdapter {
     });
 
     if (!response.ok) {
-      if (response.status === 404) return [];
+      if (response.status === 404) {return [];}
       const error = await response.text();
       logger.error("SimpleStore query failed:", error);
       throw new Error(`Failed to query: ${error}`);

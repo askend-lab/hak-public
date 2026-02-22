@@ -25,7 +25,7 @@ export default function ConfirmationModal({
   onCancel,
   variant = "danger",
 }: ConfirmationModalProps) {
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
   return (
     <BaseModal
       isOpen={isOpen}

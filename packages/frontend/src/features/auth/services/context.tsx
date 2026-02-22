@@ -159,7 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const handleCodeCallback = useCallback(
     async (code: string): Promise<boolean> => {
       const tokens = await exchangeCodeForTokens(code);
-      if (!tokens) return false;
+      if (!tokens) {return false;}
       return storeTokensAndSetAuth(tokens, setState);
     },
     [],

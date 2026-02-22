@@ -21,6 +21,11 @@ COPY dist/ ./
 ENV VMETAJSON_PATH=/app/vmetajson
 ENV DICT_PATH=/app
 
+# Run as non-root user (matches production Dockerfile)
+RUN adduser --disabled-password --gecos '' --home /app appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
 # For local testing - expose port and run simple server
 EXPOSE 8080
 CMD ["node", "src/local-server.js"]

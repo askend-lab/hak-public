@@ -69,13 +69,13 @@ function getUserId(event: APIGatewayProxyEvent): string | null {
   const cognitoId = event.requestContext.authorizer?.claims?.sub as
     | string
     | undefined;
-  if (cognitoId) return cognitoId;
+  if (cognitoId) {return cognitoId;}
 
   // In offline/test mode, allow X-User-Id header for testing
   if (isOfflineMode()) {
     const localUserId =
       event.headers["X-User-Id"] ?? event.headers["x-user-id"];
-    if (localUserId) return localUserId;
+    if (localUserId) {return localUserId;}
   }
 
   return null;
@@ -121,8 +121,8 @@ const PUBLIC_READABLE_TYPES = new Set(["shared", "unlisted", "public"]);
  * Check if request is for publicly readable data (read-only access allowed without auth)
  */
 function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
-  if (event.httpMethod !== "GET") return false;
-  if (event.resource === "/get-public") return true;
+  if (event.httpMethod !== "GET") {return false;}
+  if (event.resource === "/get-public") {return true;}
 
   const type = event.queryStringParameters?.type;
   return type !== undefined && PUBLIC_READABLE_TYPES.has(type);

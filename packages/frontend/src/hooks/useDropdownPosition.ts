@@ -51,7 +51,7 @@ export function useDropdownPosition({
 
   const recalcPosition = useCallback(() => {
     const anchor = getAnchorElement();
-    if (!anchor || !menuRef.current) return;
+    if (!anchor || !menuRef.current) {return;}
     const anchorRect = anchor.getBoundingClientRect();
     const menuRect = menuRef.current.getBoundingClientRect();
     const menuHeight = menuRect.height;
@@ -108,13 +108,13 @@ export function useDropdownPosition({
   // Adjust position after menu renders and when content changes
   const contentKey = useMemo(() => JSON.stringify(contentDeps), [contentDeps]);
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {return;}
     recalcPosition();
   }, [isOpen, recalcPosition, contentKey]);
 
   // Keep position updated on scroll/resize
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {return;}
 
     const handleUpdate = (): void => recalcPosition();
     window.addEventListener("scroll", handleUpdate, true);

@@ -125,7 +125,7 @@ export default function SentencePhoneticPanel({
 
   const insertMarkerAtCursor = (marker: string) => {
     const ta = inputRef.current;
-    if (!ta) return;
+    if (!ta) {return;}
     const s = ta.selectionStart || 0;
     const e = ta.selectionEnd || 0;
     setEditedText(
@@ -138,7 +138,7 @@ export default function SentencePhoneticPanel({
   };
 
   const handlePlay = async () => {
-    if (!editedText.trim()) return;
+    if (!editedText.trim()) {return;}
 
     // If already playing, pause it
     if (isPlaying) {
@@ -176,7 +176,7 @@ export default function SentencePhoneticPanel({
           audioRef.current = null;
         },
       });
-      audioRef.current = audio;
+      audioRef.current = audio; // eslint-disable-line require-atomic-updates -- ref assignment is safe here, no race
       await audio.play();
     } catch (e) {
       logger.error("Failed to play:", e);
@@ -186,7 +186,7 @@ export default function SentencePhoneticPanel({
   };
 
   const handleApply = () => {
-    if (!editedText.trim()) return;
+    if (!editedText.trim()) {return;}
     onApply(transformToVabamorf(editedText) || "");
     onClose();
   };
@@ -201,7 +201,7 @@ export default function SentencePhoneticPanel({
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <div className="sentence-phonetic-panel">

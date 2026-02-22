@@ -25,12 +25,12 @@ export function createStateCookie(state: AuthState): string {
 }
 
 export function parseStateCookie(cookieHeader: string | undefined): AuthState | null {
-  if (!cookieHeader) return null;
+  if (!cookieHeader) {return null;}
 
   const cookies = cookieHeader.split(';').map(c => c.trim());
   const stateCookie = cookies.find(c => c.startsWith(`${STATE_COOKIE_NAME}=`));
   
-  if (!stateCookie) return null;
+  if (!stateCookie) {return null;}
 
   try {
     const encoded = stateCookie.split('=')[1];
@@ -56,10 +56,10 @@ export function clearRefreshCookie(): string {
 }
 
 export function parseRefreshCookie(cookieHeader: string | undefined): string | null {
-  if (!cookieHeader) return null;
+  if (!cookieHeader) {return null;}
   const cookies = cookieHeader.split(';').map(c => c.trim());
   const found = cookies.find(c => c.startsWith(`${REFRESH_COOKIE_NAME}=`));
-  if (!found) return null;
+  if (!found) {return null;}
   const value = found.substring(REFRESH_COOKIE_NAME.length + 1);
   return value || null;
 }

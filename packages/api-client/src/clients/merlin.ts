@@ -42,7 +42,7 @@ export class MerlinClient {
     maxAttempts = MAX_POLL_ATTEMPTS,
   ): Promise<ApiResult<StatusResponse>> {
     const synthResult = await this.synthesize(request);
-    if (!synthResult.data) return { status: synthResult.status, error: synthResult.error };
+    if (!synthResult.data) {return { status: synthResult.status, error: synthResult.error };}
 
     if (synthResult.data.status === "ready") {
       return {
@@ -58,10 +58,10 @@ export class MerlinClient {
     const cacheKey = synthResult.data.cacheKey;
 
     for (let i = 0; i < maxAttempts; i++) {
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-      const statusResult = await this.status(cacheKey);
-      if (!statusResult.data) continue;
-      if (statusResult.data.status === "ready") return statusResult;
+      await new Promise((resolve) => { setTimeout(resolve, POLL_INTERVAL_MS); }); // eslint-disable-line no-await-in-loop -- sequential polling is intentional
+      const statusResult = await this.status(cacheKey); // eslint-disable-line no-await-in-loop -- sequential polling
+      if (!statusResult.data) {continue;}
+      if (statusResult.data.status === "ready") {return statusResult;}
     }
 
     return { status: 408, error: "Synthesis timed out" };
@@ -70,7 +70,7 @@ export class MerlinClient {
   private async get<T>(path: string): Promise<ApiResult<T>> {
     const res = await fetch(`${this.baseUrl}${path}`);
     const body = await res.json();
-    if (!res.ok) return { status: res.status, error: body.error ?? "Unknown error" };
+    if (!res.ok) {return { status: res.status, error: body.error ?? "Unknown error" };}
     return { status: res.status, data: body as T };
   }
 
@@ -81,7 +81,7 @@ export class MerlinClient {
       body: JSON.stringify(payload),
     });
     const body = await res.json();
-    if (!res.ok) return { status: res.status, error: body.error ?? "Unknown error" };
+    if (!res.ok) {return { status: res.status, error: body.error ?? "Unknown error" };}
     return { status: res.status, data: body as T };
   }
 }

@@ -246,8 +246,7 @@ describe("useDragAndDrop", () => {
       const sentences = createMockSentences();
       mockSetSentences.mockImplementation(
         (updater: (prev: SentenceState[]) => SentenceState[]) => {
-          const result = updater(sentences);
-          return result;
+          return updater(sentences);
         },
       );
 

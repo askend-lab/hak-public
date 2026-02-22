@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
+/* eslint-disable no-console -- build config uses console for dev server output */
 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -67,7 +68,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       onwarn(warning, defaultHandler) {
-        if (warning.message.includes("sourcemap for reporting an error")) return;
+        if (warning.message.includes("sourcemap for reporting an error")) {return;}
         defaultHandler(warning);
       },
       output: {
@@ -137,3 +138,4 @@ export default defineConfig({
     },
   },
 });
+/* eslint-enable no-console -- end build config */

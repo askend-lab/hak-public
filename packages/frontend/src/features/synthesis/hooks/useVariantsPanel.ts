@@ -62,7 +62,7 @@ export function useVariantsPanel(
           const stressedWords = convertTextToTags(stressedText);
           setSentences((prev) =>
             prev.map((s) => {
-              if (s.id !== sentenceId) return s;
+              if (s.id !== sentenceId) {return s;}
               return {
                 ...s,
                 stressedTags:
@@ -112,7 +112,7 @@ export function useVariantsPanel(
       const timeoutId = setTimeout(() => controller.abort(), VARIANTS_API_TIMEOUT_MS);
 
       // Minimum spinner display time for better UX
-      const minDisplayTime = new Promise((resolve) => setTimeout(resolve, MIN_SPINNER_DISPLAY_MS));
+      const minDisplayTime = new Promise((resolve) => { setTimeout(resolve, MIN_SPINNER_DISPLAY_MS); });
 
       // Strip punctuation for API lookup (preserve dashes for compound words)
       const lookupWord = stripPunctuationForLookup(word);
@@ -124,7 +124,7 @@ export function useVariantsPanel(
         ]);
         clearTimeout(timeoutId);
 
-        if (!response.ok) throw new Error("API error");
+        if (!response.ok) {throw new Error("API error");}
 
         const data = await response.json();
 
@@ -165,7 +165,7 @@ export function useVariantsPanel(
   const handleExplorePhonetic = useCallback(
     async (sentenceId: string) => {
       const sentence = sentences.find((s) => s.id === sentenceId);
-      if (!sentence || !sentence.text.trim()) return;
+      if (!sentence || !sentence.text.trim()) {return;}
 
       if (!sentence.phoneticText) {
         const stressedText = await analyzeText(sentence.text);

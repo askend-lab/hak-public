@@ -55,7 +55,7 @@ function isWordToken(token: string): boolean {
  *   ["(", "tere", ")"]     → ["(tere)"]
  */
 export function normalizeTags(tags: string[]): string[] {
-  if (tags.length === 0) return [];
+  if (tags.length === 0) {return [];}
 
   const result: string[] = [];
 

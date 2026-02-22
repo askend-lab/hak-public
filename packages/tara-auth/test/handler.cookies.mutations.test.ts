@@ -1,5 +1,7 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
+import { callbackHandler } from '../src/handler';
+
 const mockBuildAuthorizationUrl = jest.fn();
 const mockExchangeCodeForTokens = jest.fn();
 const mockVerifyIdToken = jest.fn();
@@ -20,8 +22,6 @@ jest.mock('../src/cognito-client', () => ({
     generateTokens: (...args: unknown[]) => mockGenerateTokens(...args),
   }),
 }));
-
-import { callbackHandler } from '../src/handler';
 
 describe('handler.ts cookie mutation kills', () => {
   const originalEnv = process.env;
@@ -168,7 +168,7 @@ describe('handler.ts cookie mutation kills', () => {
       mockGenerateTokens.mockResolvedValue({ accessToken: 'a', idToken: 'i', refreshToken: 'r', expiresIn: 3600 });
       const result = await callbackHandler(event);
       expect(result.headers?.Location).not.toContain('error=');
-      Date.now = realDateNow;
+      Date.now = realDateNow; // eslint-disable-line require-atomic-updates -- test cleanup restores Date.now
     });
 
     it('session at 10min + 1ms should be expired', async () => {
@@ -183,7 +183,7 @@ describe('handler.ts cookie mutation kills', () => {
       });
       const result = await callbackHandler(event);
       expect(result.headers?.Location).toContain('Session+expired');
-      Date.now = realDateNow;
+      Date.now = realDateNow; // eslint-disable-line require-atomic-updates -- test cleanup restores Date.now
     });
   });
 

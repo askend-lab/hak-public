@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse, getCorsOrigin } from '@hak/shared';
+import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse, getCorsOrigin, logger } from '@hak/shared';
 import { createTaraClient } from './tara-client';
 import { createCognitoClient } from './cognito-client';
 import { AuthState } from './types';
@@ -26,6 +26,8 @@ import {
   validateCsrfOrigin,
   requireCognitoConfig,
 } from './middleware';
+
+const UNKNOWN_ERROR = 'Unknown error';
 
 // Re-export everything from cookies and middleware for backward compatibility
 export {
@@ -88,7 +90,7 @@ export async function startHandler(
       body: '',
     };
   } catch (error) {
-    console.error('TARA start error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('TARA start error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return createLambdaResponse(
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       { error: 'Failed to start TARA authentication' },
@@ -97,7 +99,7 @@ export async function startHandler(
   }
 }
 
-export async function callbackHandler(
+export async function callbackHandler( // eslint-disable-line max-statements -- auth callback has many sequential steps
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const frontendUrl = getFrontendUrl();
@@ -107,7 +109,7 @@ export async function callbackHandler(
 
     // Handle TARA errors
     if (error) {
-      console.error('TARA error:', error, error_description);
+      logger.error('TARA error:', error, error_description);
       return redirectToFrontend(frontendUrl, { error: error_description || error });
     }
 
@@ -137,7 +139,7 @@ export async function callbackHandler(
     // Verify and decode ID token
     const taraIdToken = await taraClient.verifyIdToken(taraTokens.id_token, savedState.nonce);
 
-    console.info('TARA authentication successful');
+    logger.info('TARA authentication successful');
 
     // Find or create Cognito user
     const cognitoClient = createCognitoClient();
@@ -150,7 +152,7 @@ export async function callbackHandler(
     return redirectToFrontendWithCookies(frontendUrl, cognitoTokens);
 
   } catch (error) {
-    console.error('TARA callback error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('TARA callback error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return redirectToFrontend(frontendUrl, { 
       error: 'Authentication failed - please try again' 
     }, clearStateCookie());
@@ -253,7 +255,7 @@ export async function refreshHandler(
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token }),
     };
   } catch (error) {
-    console.error('Refresh error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('Refresh error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return {
       statusCode: 401,
       headers: corsResponseHeaders(),
@@ -263,7 +265,7 @@ export async function refreshHandler(
   }
 }
 
-export async function exchangeCodeHandler(
+export async function exchangeCodeHandler( // eslint-disable-line max-statements -- code exchange has many sequential steps
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   if (event.httpMethod === 'OPTIONS') {
@@ -304,7 +306,7 @@ export async function exchangeCodeHandler(
     });
 
     if (!response.ok) {
-      console.error('Code exchange failed:', response.status);
+      logger.error('Code exchange failed:', response.status);
       return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Code exchange failed' }, corsResponseHeaders());
     }
 
@@ -321,7 +323,7 @@ export async function exchangeCodeHandler(
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
     };
   } catch (error) {
-    console.error('Exchange code error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('Exchange code error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
   }
 }

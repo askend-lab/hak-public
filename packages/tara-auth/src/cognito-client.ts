@@ -63,7 +63,7 @@ export class CognitoClient {
   }
 
   private async findUserByEmail(email: string): Promise<string | null> {
-    if (!/^[^\s"\\@]+@[^\s"\\@]+\.[^\s"\\@]+$/.test(email)) {
+    if (!/^[^\s"\\@]+@[^\s"\\@.]+\.[^\s"\\@]+$/.test(email)) {
       return null;
     }
     try {

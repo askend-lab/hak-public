@@ -43,7 +43,7 @@ export function useSentenceActions({
   const handlePlay = useCallback(
     (id: string): void => {
       const sentence = getSentence(id);
-      if (!sentence) return;
+      if (!sentence) {return;}
       // If sentence is already playing, stop it (pause behavior)
       if (sentence.isPlaying) {
         if (playlist.isPlayingAll || playlist.isLoadingPlayAll) {
@@ -53,7 +53,7 @@ export function useSentenceActions({
           // Stop individual playback
           if (currentAudio) {
             currentAudio.pause();
-            currentAudio.src = "";
+            currentAudio.src = ""; // eslint-disable-line no-param-reassign -- clearing audio source to stop playback
           }
           updateSentence(id, { isPlaying: false });
         }
@@ -81,7 +81,7 @@ export function useSentenceActions({
   const handleDownload = useCallback(
     async (id: string) => {
       const sentence = getSentence(id);
-      if (!sentence) return;
+      if (!sentence) {return;}
       let audioUrl = sentence.audioUrl;
 
       if (!audioUrl) {
@@ -94,7 +94,7 @@ export function useSentenceActions({
         }
       }
 
-      if (!audioUrl) return;
+      if (!audioUrl) {return;}
 
       try {
         const audioResponse = await fetch(audioUrl);
@@ -118,7 +118,7 @@ export function useSentenceActions({
   const handleCopyText = useCallback(
     async (id: string) => {
       const sentence = getSentence(id);
-      if (!sentence || !sentence.text.trim()) return;
+      if (!sentence || !sentence.text.trim()) {return;}
 
       await copyTextToClipboard(sentence.text, showNotification);
     },

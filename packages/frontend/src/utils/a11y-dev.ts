@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+/* eslint-disable no-console -- dev-only a11y checker outputs to browser console */
+
 /**
  * Development-only Accessibility Checker
  *
@@ -24,7 +26,7 @@
  * ```
  */
 export async function initA11yDevMode(): Promise<void> {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") {return;}
 
   try {
     const React = await import("react");
@@ -95,3 +97,4 @@ function exposeToWindow(): void {
       runPageAudit;
   }
 }
+/* eslint-enable no-console -- end dev-only a11y checker */

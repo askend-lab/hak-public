@@ -41,11 +41,13 @@ class TestSigtermGracefulShutdown:
     def test_sigterm_stops_worker_subprocess(self):
         """
         Run worker in a subprocess, send SIGTERM, verify clean exit.
-        This tests the actual signal handling without killing pytest.
+        Uses a temp file as a ready-signal to avoid pipe deadlocks.
         """
-        # Script that starts worker with mocked SQS (infinite empty polling)
-        script = '''
-import signal, sys, json, time
+        import tempfile
+        ready_file = os.path.join(tempfile.gettempdir(), f"sigterm_ready_{os.getpid()}")
+
+        script = f'''
+import sys, time, os
 sys.path.insert(0, ".")
 from unittest.mock import MagicMock, patch
 
@@ -53,38 +55,66 @@ from worker import WorkerConfig, run_worker
 
 config = WorkerConfig("https://sqs.example.com/q", "bucket", "eu-west-1", "/tmp/m", "/tmp/t")
 sqs = MagicMock()
-# Slow polling to give us time to send SIGTERM
-sqs.receive_message.return_value = {"Messages": []}
+call_count = 0
+
+def fake_receive(**kwargs):
+    global call_count
+    call_count += 1
+    if call_count == 1:
+        open("{ready_file}", "w").close()  # signal ready
+    time.sleep(0.1)
+    return {{"Messages": []}}
+
+sqs.receive_message.side_effect = fake_receive
 
 with patch("worker.check_tools"):
     run_worker(config, sqs, MagicMock())
 
-# If we get here, worker exited cleanly
 print("CLEAN_EXIT")
 '''
-        proc = subprocess.Popen(
-            [sys.executable, "-c", script],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        )
-
-        # Give worker time to start and enter poll loop
-        time.sleep(0.5)
-
-        # Send SIGTERM (simulating Fargate Spot interruption)
-        proc.send_signal(signal.SIGTERM)
-
-        # Wait for clean exit
         try:
-            stdout, stderr = proc.communicate(timeout=5)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            pytest.fail("Worker did not exit within 5s after SIGTERM")
+            # Clean up stale ready file
+            if os.path.exists(ready_file):
+                os.unlink(ready_file)
 
-        # After fix: worker should exit cleanly (code 0) with "CLEAN_EXIT"
-        assert proc.returncode == 0, f"Worker should exit 0 on SIGTERM, got {proc.returncode}. stderr: {stderr.decode()}"
-        assert b"CLEAN_EXIT" in stdout, f"Worker should print CLEAN_EXIT. stdout: {stdout.decode()}"
+            proc = subprocess.Popen(
+                [sys.executable, "-c", script],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            )
+
+            # Wait for ready file (worker is in poll loop, handler installed)
+            deadline = time.monotonic() + 10
+            while time.monotonic() < deadline:
+                if os.path.exists(ready_file):
+                    break
+                if proc.poll() is not None:
+                    out, err = proc.communicate()
+                    pytest.fail(f"Worker exited early (rc={proc.returncode}). stderr: {err.decode()}")
+                time.sleep(0.05)
+            else:
+                proc.kill()
+                pytest.fail("Worker did not become ready within 10s")
+
+            # Send SIGTERM (simulating Fargate Spot interruption)
+            proc.send_signal(signal.SIGTERM)
+
+            # Wait for clean exit
+            try:
+                stdout, stderr = proc.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.communicate()
+                pytest.fail("Worker did not exit within 5s after SIGTERM")
+
+            assert proc.returncode == 0, \
+                f"Worker should exit 0 on SIGTERM, got {proc.returncode}. stderr: {stderr.decode()}"
+            assert b"CLEAN_EXIT" in stdout, \
+                f"Worker should print CLEAN_EXIT. stdout: {stdout.decode()}"
+        finally:
+            if os.path.exists(ready_file):
+                os.unlink(ready_file)
 
     def test_keyboard_interrupt_still_works(self, config):
         """Existing KeyboardInterrupt handling should not be broken by SIGTERM fix."""

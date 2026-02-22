@@ -170,7 +170,7 @@ export class DynamoDBAdapter implements StorageAdapter {
     let lastEvaluatedKey: Record<string, unknown> | undefined;
 
     do {
-      const result = await this.docClient.send(
+      const result = await this.docClient.send( // eslint-disable-line no-await-in-loop -- DynamoDB pagination requires sequential requests
         new QueryCommand({
           TableName: this.tableName,
           KeyConditionExpression: SK_PREFIX_CONDITION,

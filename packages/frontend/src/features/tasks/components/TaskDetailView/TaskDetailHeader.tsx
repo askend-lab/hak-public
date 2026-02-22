@@ -41,7 +41,7 @@ export function TaskDetailHeader({
     isOpen: isHeaderMenuOpen,
   });
 
-  if (entriesCount === 0) return null;
+  if (entriesCount === 0) {return null;}
 
   return (
     <div className="page-header page-header--full">
@@ -105,7 +105,7 @@ export function TaskDetailHeader({
               <div
                 className="task-detail__menu-backdrop"
                 onClick={() => setIsHeaderMenuOpen(false)}
-                onKeyDown={(e) => { if (e.key === "Escape") setIsHeaderMenuOpen(false); }}
+                onKeyDown={(e) => { if (e.key === "Escape") {setIsHeaderMenuOpen(false);} }}
                 role="presentation"
               />
               <div

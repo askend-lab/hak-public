@@ -20,7 +20,7 @@ function getTestResult(testSuites: TestSuite[], scenarioName: string) {
     const test = suite.tests.find(
       (t) => t.name.includes(scenarioName) || t.fullName.includes(scenarioName),
     );
-    if (test) return test;
+    if (test) {return test;}
   }
   return null;
 }

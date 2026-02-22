@@ -16,7 +16,7 @@ interface MockAudioInstance {
 
 function getAudioAt(arr: (MockAudioInstance | null)[], i: number): MockAudioInstance {
   const inst = arr[i];
-  if (!inst) throw new Error(`audioInstances[${i}] is null/undefined`);
+  if (!inst) {throw new Error(`audioInstances[${i}] is null/undefined`);}
   return inst;
 }
 
@@ -36,7 +36,7 @@ describe("useAudioPlayer", () => {
       play = vi.fn().mockResolvedValue(undefined);
 
       constructor(url?: string) {
-        if (url) this.src = url;
+        if (url) {this.src = url;}
         audioInstances.push(this);
       }
     }
@@ -115,7 +115,7 @@ describe("useAudioPlayer", () => {
         play = vi.fn().mockRejectedValue(new Error("Play failed"));
 
         constructor(url?: string) {
-          if (url) this.src = url;
+          if (url) {this.src = url;}
           audioInstances[0] = this;
         }
       }
@@ -252,7 +252,7 @@ describe("useAudioPlayer", () => {
         play = vi.fn().mockRejectedValue(new Error("Play failed"));
 
         constructor(url?: string) {
-          if (url) this.src = url;
+          if (url) {this.src = url;}
           audioInstances[0] = this;
         }
       }

@@ -250,7 +250,7 @@ describe("useVariantsPanel", () => {
         });
       }
       await vi.advanceTimersByTimeAsync(500);
-      if (promise !== undefined) await promise;
+      if (promise !== undefined) {await promise;}
     });
 
     // Loading state should be cleared

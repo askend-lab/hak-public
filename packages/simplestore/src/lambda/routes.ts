@@ -60,7 +60,7 @@ function getQueryParams(event: APIGatewayProxyEvent): Record<string, string> {
   const raw = event.queryStringParameters ?? {};
   const result: Record<string, string> = {};
   for (const [key, value] of Object.entries(raw)) {
-    if (value !== undefined) result[key] = value;
+    if (value !== undefined) {result[key] = value;}
   }
   return result;
 }
@@ -79,7 +79,7 @@ function validateOrError(
 function parseBody(
   event: APIGatewayProxyEvent,
 ): Record<string, unknown> | null {
-  if (!event.body) return null;
+  if (!event.body) {return null;}
   try {
     return JSON.parse(event.body) as Record<string, unknown>;
   } catch {
@@ -101,7 +101,7 @@ export async function handleSave(
   const validationError = validateOrError(
     validateStoreRequest(body as Partial<StoreRequest>),
   );
-  if (validationError) return validationError;
+  if (validationError) {return validationError;}
 
   const request: StoreRequest = {
     pk: body.pk as string,
@@ -126,7 +126,7 @@ export async function handleGet(
   const { pk, sk, type } = getQueryParams(event);
 
   const validationError = validateOrError(validateGetRequest(pk, sk, type));
-  if (validationError) return validationError;
+  if (validationError) {return validationError;}
 
   const result = await store.get(pk as string, sk as string, type as DataType);
 
@@ -150,7 +150,7 @@ export async function handleDelete(
   const { pk, sk, type } = getQueryParams(event);
 
   const validationError = validateOrError(validateGetRequest(pk, sk, type));
-  if (validationError) return validationError;
+  if (validationError) {return validationError;}
 
   const result = await store.delete(
     pk as string,
@@ -169,7 +169,7 @@ export async function handleQuery(
   const { prefix, type } = getQueryParams(event);
 
   const validationError = validateOrError(validateQueryRequest(prefix, type));
-  if (validationError) return validationError;
+  if (validationError) {return validationError;}
 
   const result = await store.query(prefix as string, type as DataType);
   return result.success

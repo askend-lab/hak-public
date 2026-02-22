@@ -14,7 +14,7 @@ describe("PKCE code verifier and challenge generation", () => {
     const verifier = sessionStorage.getItem("pkce_code_verifier") ?? "";
     expect(verifier).not.toContain("+");
     // Verify it's URL-safe base64
-    expect(/^[A-Za-z0-9_-]+$/.test(verifier)).toBe(true);
+    expect(/^[\w-]+$/.test(verifier)).toBe(true);
   });
 
   it("code verifier replaces / with _", async () => {
@@ -38,7 +38,7 @@ describe("PKCE code verifier and challenge generation", () => {
     expect(challenge).not.toContain("+");
     expect(challenge).not.toContain("/");
     expect(challenge).not.toMatch(/=+$/);
-    expect(/^[A-Za-z0-9_-]+$/.test(challenge)).toBe(true);
+    expect(/^[\w-]+$/.test(challenge)).toBe(true);
   });
 
   it("code verifier has sufficient length", async () => {

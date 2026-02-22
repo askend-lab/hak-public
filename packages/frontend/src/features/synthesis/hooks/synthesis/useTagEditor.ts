@@ -25,7 +25,7 @@ export function useTagEditor(
         !sentence.currentInput.trim() ||
         sentence.tags.length === 0
       )
-        return;
+        {return;}
 
       const inputWords = convertTextToTags(sentence.currentInput);
       const allTags = normalizeTags([...sentence.tags, ...inputWords]);
@@ -44,7 +44,7 @@ export function useTagEditor(
   const addTagsToSentence = useCallback(
     (id: string, currentInput: string) => {
       const sentence = getSentence(id);
-      if (!sentence) return null;
+      if (!sentence) {return null;}
 
       const inputWords = convertTextToTags(currentInput);
       const allTags = normalizeTags([...sentence.tags, ...inputWords]);
@@ -71,7 +71,7 @@ export function useTagEditor(
   const removeLastTag = useCallback(
     (id: string) => {
       const sentence = getSentence(id);
-      if (!sentence || sentence.tags.length === 0) return;
+      if (!sentence || sentence.tags.length === 0) {return;}
 
       const newTags = sentence.tags.slice(0, -1);
       const removedTag = sentence.tags[sentence.tags.length - 1] ?? "";
@@ -93,7 +93,7 @@ export function useTagEditor(
       onSynthesize: (id: string, text?: string) => void,
     ) => {
       const sentence = getSentence(id);
-      if (!sentence) return;
+      if (!sentence) {return;}
 
       if (
         e.key === " " &&

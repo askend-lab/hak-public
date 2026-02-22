@@ -52,7 +52,7 @@ export default function AppLayout() {
 
   useEffect(() => {
     if (isWizardActive && onboardingState.selectedRole)
-      synthesis.setDemoSentences();
+      {synthesis.setDemoSentences();}
   }, [
     isWizardActive,
     onboardingState.selectedRole,

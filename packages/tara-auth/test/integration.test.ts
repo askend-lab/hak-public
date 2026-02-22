@@ -1,5 +1,10 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
+// Import handlers after mocks are set up
+import { callbackHandler, startHandler, STATE_COOKIE_NAME, AUTH_CALLBACK_PATH } from '../src/handler';
+import { createTaraClient } from '../src/tara-client';
+import { createCognitoClient } from '../src/cognito-client';
+
 // Mock TARA client - factory avoids loading real module (no TDZ references)
 jest.mock('../src/tara-client', () => ({
   createTaraClient: jest.fn(),
@@ -9,11 +14,6 @@ jest.mock('../src/tara-client', () => ({
 jest.mock('../src/cognito-client', () => ({
   createCognitoClient: jest.fn(),
 }));
-
-// Import handlers after mocks are set up
-import { callbackHandler, startHandler, STATE_COOKIE_NAME, AUTH_CALLBACK_PATH } from '../src/handler';
-import { createTaraClient } from '../src/tara-client';
-import { createCognitoClient } from '../src/cognito-client';
 
 const mockBuildAuthorizationUrl = jest.fn();
 const mockExchangeCodeForTokens = jest.fn();

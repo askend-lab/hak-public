@@ -248,7 +248,7 @@ When("I click on the task", async function (this: TestWorld) {
   const task = this.container?.querySelector(
     '.task-item, [data-testid="task-item"]',
   );
-  if (task) this.click(task);
+  if (task) {this.click(task);}
 });
 
 Then("I see the task detail view", async function (this: TestWorld) {
@@ -322,7 +322,7 @@ When(
     const input = this.container?.querySelector(
       'input[name="name"], input[type="text"]',
     );
-    if (input) this.type(input, name);
+    if (input) {this.type(input, name);}
   },
 );
 
@@ -339,7 +339,7 @@ Then("the original task name is preserved", async function (this: TestWorld) {
 
 When("I clear the task name field", async function (this: TestWorld) {
   const input = this.container?.querySelector('input[name="name"]');
-  if (input) this.type(input, "");
+  if (input) {this.type(input, "");}
 });
 
 Then("I see a validation error", async function (this: TestWorld) {

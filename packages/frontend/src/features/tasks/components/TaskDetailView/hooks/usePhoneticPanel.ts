@@ -32,7 +32,7 @@ export function usePhoneticPanel(
   const handleExplorePhonetic = useCallback(
     async (entryId: string) => {
       const entry = entries.find((e) => e.id === entryId);
-      if (!entry || !entry.text.trim()) return;
+      if (!entry || !entry.text.trim()) {return;}
 
       onMenuClose();
 
@@ -95,7 +95,7 @@ export function usePhoneticPanel(
         );
       } catch (error) {
         logger.error("Failed to update entry:", error);
-        alert("Viga: häälduskuju salvestamine ebaõnnestus");
+        logger.error("Viga: häälduskuju salvestamine ebaõnnestus");
       }
     },
     [phoneticPanelEntryId, task, userId, setEntries, handleClosePhoneticPanel, dataService],

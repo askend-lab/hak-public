@@ -27,7 +27,7 @@ describe("BaseModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     onClose.mockClear();
     const backdrop = container.querySelector(".base-modal__backdrop");
-    if (backdrop) fireEvent.click(backdrop);
+    if (backdrop) {fireEvent.click(backdrop);}
     expect(onClose).toHaveBeenCalledTimes(1);
     onClose.mockClear();
     fireEvent.click(screen.getByText("Modal content"));
@@ -42,7 +42,7 @@ describe("BaseModal", () => {
       </BaseModal>,
     );
     const backdrop = container.querySelector(".base-modal__backdrop");
-    if (backdrop) fireEvent.click(backdrop);
+    if (backdrop) {fireEvent.click(backdrop);}
     expect(onClose).not.toHaveBeenCalled();
   });
 

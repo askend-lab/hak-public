@@ -50,16 +50,16 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ❌ Reject (not found)  —  — **4.13** (Low) Unnecessary awaits — not confirmed in source code
 - ❌ Reject (external lib)  —  — **4.14** (Medium) DeepRecurrentNetwork class — external Merlin library, not our code
 - ❌ Reject (ML convention)  —  — **4.15** (Low) Python naming case — ML math notation convention (W_value, Whx)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — will run SonarQube to verify remaining issues beyond ESLint/Ruff/DevBox
+- ✅ Accept  [✅] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — ran SonarQube, found ESLint config gap (QS-1–QS-4), all fixed in PR #661
 - ❌ Reject (external lib)  —  — **4.17** (Medium) Merlin NN Python style issues — external library code
 - ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
 
 ## 5. Simplicity & Patterns
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — intentional for standalone packages
+- ✅ Accept  [✅] Fixed  [ ] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api — deduplicated, merlin-api imports from @hak/shared
+- ✅ Accept  [✅] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — deduplicated, all packages import from @hak/shared
 - ✅ Accept  [✅] Fixed  [ ] Closed — **5.3** (Low) Removed `if True:` indentation hack in run_merlin.py
-- ✅ Accept  [ ] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — intentional for standalone packages
+- ✅ Accept  [✅] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — deduplicated, all packages import from @hak/shared
 
 ## 6. Maintainability
 
@@ -94,7 +94,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 12. Security
 
 - ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
-- ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — improve per-user/per-IP limiting
+- ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — DEFERRED, requires client decision on authentication first
 - ✅ Accept  [✅] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior unified — all packages now return 'null' when ALLOWED_ORIGIN unset
 - ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
 - ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
@@ -115,8 +115,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.1** (Medium) Removed /warmup endpoint entirely (handler, serverless.yml, tests)
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — replaced run_process() with safe alternatives
-- ❌ Reject (by design)  —  — **15.4** (Medium) Remove /status/{cacheKey} from public access — system depends on public polling for synthesis status
-- ✅ Accept  [✅] Fixed  [ ] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars: shared/constants.ts, merlin-api Zod schema, merlin-worker Python. Frontend validates via API.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — DEFERRED permanently, frontend depends on this endpoint
+- ✅ Accept  [✅] Fixed  [ ] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars everywhere — merlin-api Zod schema, merlin-worker Python, frontend textarea maxLength + user-facing message (PR #660)
 
 ---
 
@@ -125,6 +125,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 Beyond fixing individual findings, we built a **DevBox quality system** — automated hooks that run on every commit and block merges when violated. This ensures findings don't recur.
 
 ### New ESLint Rules (TypeScript)
+
+Previously enabled (before QS-1):
 
 | Rule | What it catches | Violations fixed |
 |------|----------------|------------------|
@@ -136,6 +138,35 @@ Beyond fixing individual findings, we built a **DevBox quality system** — auto
 | `no-floating-promises` + `no-misused-promises` | Unawaited promises, async callbacks | **97 violations fixed** (95 frontend + 2 vabamorf-api) |
 | `import/no-deprecated` | Deprecated API usage | 0 violations (already clean) |
 | `no-warning-comments` | TODO/FIXME/HACK comments | 0 violations |
+
+Enabled in QS-1 migration (PR #661) — 30+ rules previously only applied to .js now active on .ts/.tsx:
+
+| Rule | What it catches | Violations fixed |
+|------|----------------|------------------|
+| `eslint-comments/require-description` | Undescribed eslint-disable comments | 8 fixed |
+| `require-atomic-updates` | Unsafe ref/flag assignments after await | 4 eslint-disable |
+| `max-depth` | Deeply nested blocks | 3 eslint-disable |
+| `security/detect-non-literal-regexp` | Dynamic regex injection | 1 eslint-disable |
+| `no-alert` | Browser alert() calls | 2 replaced with logger |
+| `sonarjs/no-identical-functions` | Duplicate function bodies | 1 eslint-disable |
+| `no-return-assign` | Assignment in return statement | 1 fixed |
+| `no-promise-executor-return` | Promise executor returning value | 6 fixed (wrapped setTimeout) |
+| `promise/always-return` | Missing return in .then() | 2 eslint-disable |
+| `promise/param-names` | Non-standard resolve/reject names | 1 fixed |
+| `no-await-in-loop` | Await inside loops | 11 eslint-disable (sequential processing) |
+| `no-console` | Console statements in src | 10 replaced with logger, 4 files eslint-disable |
+| `no-param-reassign` | Parameter mutation | 2 files eslint-disable (parser, AWS triggers), 6 line-level |
+| `sonarjs/no-duplicate-string` | Repeated string literals (threshold 4) | 2 extracted to constants |
+| `max-statements` | Functions with too many statements (20, hooks/TSX: 30) | 8 eslint-disable |
+| `max-lines-per-function` | Long functions (150, hooks/TSX: 250) | Covered by thresholds + overrides |
+| `max-lines` | Long files (400) | Generated files excluded |
+| `complexity` | Cyclomatic complexity (15, TSX: 30) | 1 eslint-disable |
+| `sonarjs/cognitive-complexity` | Cognitive complexity (20) | Covered by threshold |
+| `max-nested-callbacks` | Nested callbacks (5) | Covered by threshold |
+| `max-params` | Function parameters (5) | Covered by threshold |
+| `max-classes-per-file` | Classes per file (3) | Covered by threshold |
+
+**Zero rules remain disabled** for production .ts/.tsx code. Test/generated/BDD files have appropriate overrides.
 
 ### New Ruff Rules (Python)
 
@@ -166,3 +197,78 @@ Beyond fixing individual findings, we built a **DevBox quality system** — auto
 ### Impact Summary
 
 Of the **47 accepted findings**, **14 are now enforced by DevBox hooks** (marked with 🛡️). These findings cannot recur — any new violation will block the commit. The remaining findings require manual fixes but no automated enforcement (doc sync, cross-package consolidation, etc.).
+
+---
+
+## Quality System Improvements (SonarQube Audit, 2026-02-22)
+
+Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: ESLint rules not applied to TypeScript files. Action items:
+
+### ESLint Config Gap (Critical)
+
+- [x] **QS-1** Fix `eslint.base.config.mjs` — TS file block (`**/*.ts`) now inherits ALL rules from JS block: `sonarRules`, `securityRules`, `regexpRules`, `unicornRules`, `promiseRules`, `eslintCommentsRules`. Same for `**/*.tsx`. All 30+ previously-missing rules enabled with practical thresholds. (PR #661)
+- [x] **QS-2** Verify `sonarjs/cognitive-complexity` works on `.ts` — enabled with threshold 20 for src, 30 for TSX. 9 sonarjs rules active on .ts files. (PR #661)
+- [x] **QS-3** Verify `regexp/*` rules work on `.ts` — 5 regexp rules now active on .ts files. ReDoS check active. (PR #661)
+- [x] **QS-4** Verified: `npx eslint --print-config` confirms 9 sonarjs + 10 security + 5 regexp + 13 promise rules present on .ts files. (PR #661)
+
+### CSS/SCSS Linting (Missing)
+
+- [x] **QS-5** Add Stylelint — installed `stylelint` + `stylelint-config-standard-scss`, added to `pnpm lint` script (enforced by DevBox `run-lint` hook). Minimal config: `no-duplicate-selectors`, `declaration-block-no-duplicate-properties`.
+- [x] **QS-6** Configured `.stylelintrc.json` with `postcss-scss` syntax and target rules. All SCSS files pass clean.
+
+### Python Type Checking (Missing)
+
+- [x] **QS-7** Add mypy to merlin-worker — installed, added to `requirements-test.txt`. Runs on `worker.py` + `tests/` (external `merlin/` library excluded). All 5 files pass clean.
+- [x] **QS-8** mypy integrated into `pnpm lint` script — enforced by DevBox `run-lint` hook on every commit.
+
+### SonarQube False Positives (No Action)
+
+- ~~shared/src/logger.ts:27 empty arrow function~~ — intentional NO_OP for filtered log levels
+- ~~api-client/src/generated/*.ts interface names~~ — auto-generated from OpenAPI, lowercase by spec
+- ~~merlin-worker /tmp paths in tests~~ — test fixtures only
+
+### SonarQube Valid but Low Priority
+
+- [x] **QS-9** Refactor vmetajson.ts:62 — extracted `handleStdoutData()` and `handleProcessExit()` methods from `init()`, reducing cognitive complexity
+- [x] **QS-10** ~~Fix duplicate CSS `monospace`~~ — FALSE POSITIVE: `monospace, monospace` is an intentional normalize.css hack for browser font rendering
+- [x] **QS-11** Fix duplicate `.eki-results-section` selector — merged nested styles from line 470 into first block at line 165
+- [x] **QS-12** Fix `api-client/scripts/generate.mjs:52` — replaced `execSync` with `execFileSync` (no shell interpolation, eliminates OS command injection risk)
+- [x] **QS-13** Fix Docker root user in `vabamorf-api/Dockerfile.local` — added `USER appuser` directive matching production Dockerfile
+- [x] **QS-14** Fix regex ReDoS in `tara-auth/cognito-client.ts:66` — added `.` to excluded chars in middle group, eliminating backtracking ambiguity
+
+---
+
+## Public API Security Hardening
+
+Ref: `internal/PROPOSAL-Auth-Public-Endpoints.md`
+
+Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are public. Authentication proposal sent to client (pending decision). Below: what we must do regardless to harden the public setup.
+
+### Cost & Scaling Limits
+- [ ] **PUB-1** (CRITICAL) AWS Budgets + automatic shutdown — warning at 70%, reduce ECS at 90%, disable at 100%. **How:** account-level repo (separate project), `aws_budgets_budget` Terraform resource + SNS → Lambda for auto-action.
+- [ ] **PUB-2** (CRITICAL) ECS max_capacity hard cap — limit to 2-3 concurrent workers + CloudWatch alarm. **How:** Terraform `aws_appautoscaling_target.max_capacity` in `infra/`. Check current value, cap at 2-3.
+- [ ] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrentExecutions: 10-20` for merlin-api and vabamorf-api. **How:** Terraform `reserved_concurrent_executions` on Lambda resources.
+- [ ] **PUB-4** (HIGH) SQS queue depth cap — reject with 503 if queue > 50 messages. **How:** code change in merlin-api handler.ts — check `ApproximateNumberOfMessagesVisible` before `sendMessage`.
+- [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — DONE in 15.5 (1000 → 100 chars)
+
+### Monitoring & Detection
+- [ ] **PUB-6** (HIGH) CloudWatch alerts — anomalous request growth, SQS depth, ECS task count, cost/day dashboard + Slack. **How:** Terraform `aws_cloudwatch_metric_alarm` + `aws_sns_topic` → Slack webhook.
+- [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection. **How:** new Lambda + EventBridge cron (every 5 min), reads CloudWatch logs, adds IPs to WAF IP set. Separate development effort.
+- [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries. **How:** manual setup in AWS Console, save Top-10 IPs, hourly distribution, atypical User-Agents.
+
+### Attack Surface Reduction
+- [ ] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP (separate from general 100/5min). **How:** Terraform `aws_wafv2_rate_based_statement` with `scope_down_statement` filtering on URI path.
+- [ ] **PUB-10** (MEDIUM) Geo-blocking — restrict `/synthesize` to EE, LV, LT, FI, SE. **How:** Terraform `aws_wafv2_geo_match_statement` in WAF config.
+- [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work. **How:** AWS WAF Bot Control (~$10/month) or custom proof-of-work header in frontend. Separate evaluation needed.
+- [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. **How:** frontend code change (canvas/screen/timezone hash as header) + backend validation. Separate development effort.
+
+### Storage
+- ~~**PUB-13**~~ (LOW) S3 audio lifecycle — not worth the complexity, audio files are small. Skip.
+
+### Testing & Verification
+- [ ] **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/` directory.
+- [ ] **TEST-2** (CRITICAL) Auto-scaling testing — verify ECS max_capacity behavior. **How:** run TEST-1 attack script, observe ECS task count in CloudWatch.
+- [ ] **TEST-3** (CRITICAL) Lambda concurrency testing — verify limits and 429 responses. **How:** concurrent requests via k6, check for 429 (not 500).
+- [ ] **TEST-4** (HIGH) Alert testing — simulate each alert, verify Slack delivery < 5 min. **How:** manual trigger of CloudWatch alarms.
+- [ ] **TEST-5** (HIGH) Budget limit testing — verify AWS Budget alarm + auto-action. **How:** set test budget to $0.01 in staging, verify trigger.
+- [ ] **TEST-6** (HIGH) SQS queue depth testing — fill queue to threshold, verify 503 + recovery. **How:** send burst of synthesis requests, verify PUB-4 cap works.

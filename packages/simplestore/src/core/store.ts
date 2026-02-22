@@ -5,6 +5,7 @@
  * Core Store - pure business logic, no AWS dependencies
  */
 
+import { logger, extractErrorMessage } from "@hak/shared";
 import {
   ServerContext,
   StoreRequest,
@@ -17,7 +18,6 @@ import {
   MAX_QUERY_ITEMS,
 } from "./types";
 import { parseTtl } from "./validation";
-import { extractErrorMessage } from "@hak/shared";
 
 /** Error message constants */
 export const ERRORS = {
@@ -143,8 +143,8 @@ export class Store {
     return this.wrapAsync(async () => {
       if (this.adapter.conditionalDelete) {
         const result = await this.adapter.conditionalDelete(keys.pk, keys.sk, this.context.userId);
-        if (result === "not_found") return { success: false, error: ERRORS.NOT_FOUND };
-        if (result === "not_owner") return { success: false, error: ERRORS.ACCESS_DENIED };
+        if (result === "not_found") {return { success: false, error: ERRORS.NOT_FOUND };}
+        if (result === "not_owner") {return { success: false, error: ERRORS.ACCESS_DENIED };}
         return { success: true };
       }
 
@@ -193,7 +193,7 @@ export class Store {
     try {
       return await fn();
     } catch (error) {
-      console.error("[SimpleStore] Operation failed:", error);
+      logger.error("[SimpleStore] Operation failed:", error);
       return { success: false, error: extractErrorMessage(error, "Unknown error") };
     }
   }

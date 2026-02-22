@@ -99,7 +99,7 @@ export function useAudioPlayer(): {
         onError?: () => void;
       } = {},
     ): Promise<boolean> => {
-      if (abortSignal.aborted) return Promise.resolve(false);
+      if (abortSignal.aborted) {return Promise.resolve(false);}
 
       return new Promise((resolve): void => {
         const audio = new Audio(audioUrl);

@@ -97,7 +97,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
   const nextStep = useCallback(() => {
     setState((prev) => {
-      if (!prev.selectedRole) return prev;
+      if (!prev.selectedRole) {return prev;}
 
       const totalSteps = ROLE_CONFIGS[prev.selectedRole].steps.length;
       if (prev.currentStep >= totalSteps - 1) {

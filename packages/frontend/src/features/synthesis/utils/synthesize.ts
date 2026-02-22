@@ -27,19 +27,19 @@ interface StatusResponse {
 
 async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
-    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+    if (signal?.aborted) {throw new DOMException("Aborted", "AbortError");}
     const delay = Math.min(POLL_INTERVAL_MS * Math.pow(2, Math.min(i, 3)), 8000);
     let response: Response;
     try {
-      response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
+      response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {}); // eslint-disable-line no-await-in-loop -- sequential polling
     } catch (err) {
-      if (signal?.aborted) throw err;
+      if (signal?.aborted) {throw err;}
       // Transient network error — continue polling
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await new Promise((resolve) => { setTimeout(resolve, delay); }); // eslint-disable-line no-await-in-loop -- sequential polling delay
       continue;
     }
-    if (!response.ok) throw new Error("Status check failed");
-    const data: StatusResponse = await response.json();
+    if (!response.ok) {throw new Error("Status check failed");}
+    const data: StatusResponse = await response.json(); // eslint-disable-line no-await-in-loop -- sequential polling
 
     if (data.status === "ready" && data.audioUrl) {
       return data.audioUrl;
@@ -47,7 +47,7 @@ async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<str
     if (data.status === "error") {
       throw new Error(data.error ?? "Synthesis failed");
     }
-    await new Promise((resolve) => setTimeout(resolve, delay));
+    await new Promise((resolve) => { setTimeout(resolve, delay); }); // eslint-disable-line no-await-in-loop -- sequential polling delay
   }
   throw new Error("Synthesis timed out");
 }
@@ -70,7 +70,7 @@ export async function synthesizeWithPolling(
     ...(signal && { signal }),
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   });
-  if (!response.ok) throw new Error("Synthesis request failed");
+  if (!response.ok) {throw new Error("Synthesis request failed");}
 
   const data: SynthesizeResponse = await response.json();
 

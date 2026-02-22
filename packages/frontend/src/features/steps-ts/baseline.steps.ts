@@ -53,7 +53,7 @@ When("I refresh the page", async function (this: TestWorld) {
 When(
   "I wait for {int} seconds",
   async function (this: TestWorld, seconds: number) {
-    await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+    await new Promise((resolve) => { setTimeout(resolve, seconds * 1000); });
   },
 );
 

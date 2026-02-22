@@ -41,7 +41,7 @@ export function useTaskCreate(deps: UseTaskCreateDeps) {
 
   const handleCreateNewTaskFromMenu = useCallback(
     (sentenceId: string) => {
-      if (requireAuth()) return;
+      if (requireAuth()) {return;}
       setPendingSentenceId(sentenceId);
       setShowAddTaskModal(true);
     },
@@ -49,14 +49,14 @@ export function useTaskCreate(deps: UseTaskCreateDeps) {
   );
 
   const handleCreateTask = useCallback(() => {
-    if (requireAuth()) return;
+    if (requireAuth()) {return;}
     setIsTaskCreationFromTasksView(true);
     setShowAddTaskModal(true);
   }, [requireAuth]);
 
   const handleAddTask = useCallback(
     async (title: string, description: string) => {
-      if (!user) return;
+      if (!user) {return;}
       try {
         const entriesToAdd = isTaskCreationFromTasksView
           ? []

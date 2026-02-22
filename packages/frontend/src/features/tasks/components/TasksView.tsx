@@ -45,12 +45,12 @@ export default function TasksView({
   const { tasks, isLoading, error, isEmpty } = useUserTasks(taskRefreshTrigger);
 
   const handleEditTask = async (taskId: string) => {
-    if (!user) return;
+    if (!user) {return;}
     try {
       const task = await dataService.getTask(taskId);
       if (task) {
         const taskData: Task = { id: task.id, name: task.name };
-        if (task.description) taskData.description = task.description;
+        if (task.description) {taskData.description = task.description;}
         onEditTask(taskData);
       }
     } catch (error) {
@@ -59,13 +59,13 @@ export default function TasksView({
   };
 
   const handleShareTask = async (taskId: string) => {
-    if (!user) return;
+    if (!user) {return;}
     try {
       const task = await dataService.getTask(taskId);
       if (task) {
         const taskData: Task = { id: task.id, name: task.name };
-        if (task.description) taskData.description = task.description;
-        if (task.shareToken) taskData.shareToken = task.shareToken;
+        if (task.description) {taskData.description = task.description;}
+        if (task.shareToken) {taskData.shareToken = task.shareToken;}
         onShareTask(taskData);
       }
     } catch (error) {

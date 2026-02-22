@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import React from "react";
+import React, { createElement } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePhoneticPanel } from "./usePhoneticPanel";
 import type { TaskEntry, Task } from "@/types/task";
 import { logger } from "@hak/shared";
-import { createElement } from "react";
 import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockUpdateTaskEntry = vi.fn();
@@ -150,7 +149,7 @@ describe("usePhoneticPanel", () => {
     const invokingSetEntries = vi
       .fn()
       .mockImplementation((updater: (prev: TaskEntry[]) => TaskEntry[]) => {
-        if (typeof updater === "function") updater([mockEntry]);
+        if (typeof updater === "function") {updater([mockEntry]);}
       }) as unknown as React.Dispatch<React.SetStateAction<TaskEntry[]>>;
 
     const { result } = renderHook(() =>

@@ -155,7 +155,7 @@ export function TagsInput({
                   <div
                     className="sentence-synthesis-item__tag-menu-backdrop"
                     onClick={() => onTagMenuClose && onTagMenuClose()}
-                    onKeyDown={(e) => { if (e.key === "Escape") onTagMenuClose?.(); }}
+                    onKeyDown={(e) => { if (e.key === "Escape") {onTagMenuClose?.();} }}
                     role="presentation"
                   />
                   <div
@@ -190,7 +190,7 @@ export function TagsInput({
                           e.currentTarget.querySelectorAll<HTMLElement>(
                             '[role="menuitem"]',
                           );
-                        const currentIndex = Array.from(items).indexOf(
+                        const currentIndex = [...items].indexOf(
                           document.activeElement as HTMLElement,
                         );
                         const nextIndex =

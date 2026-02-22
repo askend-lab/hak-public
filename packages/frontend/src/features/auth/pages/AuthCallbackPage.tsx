@@ -14,8 +14,8 @@ export function AuthCallbackPage() {
   const processedRef = useRef(false);
 
   useEffect(() => {
-    async function processCallback() {
-      if (processedRef.current) return;
+    async function processCallback() { // eslint-disable-line max-statements -- auth callback has many sequential steps
+      if (processedRef.current) {return;}
       processedRef.current = true;
 
       const queryParams = new URLSearchParams(window.location.search);
@@ -27,7 +27,7 @@ export function AuthCallbackPage() {
           (acc, c) => {
             const parts = c.trim().split("=");
             const k = parts[0] ?? "";
-            acc[k] = parts.slice(1).join("=");
+            acc[k] = parts.slice(1).join("="); // eslint-disable-line no-param-reassign -- reduce accumulator pattern
             return acc;
           },
           {} as Record<string, string>,

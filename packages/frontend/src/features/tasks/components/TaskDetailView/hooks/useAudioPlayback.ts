@@ -77,7 +77,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
   const handlePlayEntry = useCallback(
     (id: string) => {
       const entry = entries.find((e) => e.id === id);
-      if (!entry) return;
+      if (!entry) {return;}
 
       if (hasAudioSource(entry)) {
         setCurrentPlayingId(id);
@@ -87,14 +87,14 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
           const audio = new Audio(playUrl);
           audio.onended = () => {
             setCurrentPlayingId(null);
-            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
           };
           audio.onerror = () => {
-            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
             void synthesizeAndPlay(entry.stressedText, entry.text, id);
           };
           audio.play().catch(() => {
-            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
             void synthesizeAndPlay(entry.stressedText, entry.text, id);
           });
         }
@@ -107,7 +107,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
 
   const playSingleEntry = useCallback(
     async (entry: TaskEntry, abortSignal: AbortSignal): Promise<boolean> => {
-      if (abortSignal.aborted) return false;
+      if (abortSignal.aborted) {return false;}
 
       let audioUrl: string | null = null;
       let shouldRevokeUrl = false;
@@ -119,6 +119,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
           shouldRevokeUrl = cachedAudio.shouldRevoke;
         } else {
           setCurrentLoadingId(entry.id);
+          /* eslint-disable max-depth -- synthesis polling requires try inside cache-miss branch */
           try {
             audioUrl = await synthesizeWithPolling(
               entry.stressedText,
@@ -132,9 +133,10 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
             setCurrentLoadingId(null);
             return false;
           }
+          /* eslint-enable max-depth -- end nested synthesis block */
         }
 
-        if (!audioUrl || abortSignal.aborted) return false;
+        if (!audioUrl || abortSignal.aborted) {return false;}
 
         return new Promise((resolve) => {
           const validUrl = audioUrl ?? "";
@@ -145,7 +147,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
             setCurrentPlayingId(null);
             setCurrentLoadingId(null);
             setCurrentAudio(null);
-            if (shouldRevokeUrl && audioUrl) URL.revokeObjectURL(audioUrl);
+            if (shouldRevokeUrl && audioUrl) {URL.revokeObjectURL(audioUrl);}
           };
 
           audio.onloadeddata = () => {
@@ -177,14 +179,14 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
       } catch {
         setCurrentLoadingId(null);
         setCurrentPlayingId(null);
-        if (shouldRevokeUrl && audioUrl) URL.revokeObjectURL(audioUrl);
+        if (shouldRevokeUrl && audioUrl) {URL.revokeObjectURL(audioUrl);}
         return false;
       }
     },
     [],
   );
 
-  const handlePlayAll = useCallback(async () => {
+  const handlePlayAll = useCallback(async () => { // eslint-disable-line max-statements -- playback orchestration has many state transitions
     if (isPlayingAllRef.current || isLoadingPlayAllRef.current) {
       playAllAbortControllerRef.current?.abort();
       setPlayAllAbortController(null);
@@ -200,7 +202,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
       return;
     }
 
-    if (entries.length === 0) return;
+    if (entries.length === 0) {return;}
 
     const abortController = new AbortController();
     setPlayAllAbortController(abortController);
@@ -208,9 +210,9 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
 
     let isFirstEntry = true;
     for (const entry of entries) {
-      if (abortController.signal.aborted) break;
+      if (abortController.signal.aborted) {break;}
 
-      const success = await playSingleEntry(entry, abortController.signal);
+      const success = await playSingleEntry(entry, abortController.signal); // eslint-disable-line no-await-in-loop -- sequential playback
 
       if (isFirstEntry && success) {
         setIsLoadingPlayAll(false);
@@ -218,7 +220,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
         isFirstEntry = false;
       }
 
-      if (!success || abortController.signal.aborted) break;
+      if (!success || abortController.signal.aborted) {break;}
     }
 
     setIsPlayingAll(false);

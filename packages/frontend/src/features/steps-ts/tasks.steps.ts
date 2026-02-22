@@ -13,7 +13,7 @@ Given("I am on the tasks page", async function (this: TestWorld) {
   const tasksButton = this.container?.querySelector(
     '[data-testid="tasks-nav"], .nav-tasks, nav a[href*="task"]',
   );
-  if (tasksButton) this.click(tasksButton);
+  if (tasksButton) {this.click(tasksButton);}
 });
 
 Given(
@@ -85,7 +85,7 @@ When("I enter only whitespace in task name", async function (this: TestWorld) {
   const input =
     this.getByPlaceholder("Ülesande nimi") ||
     this.container?.querySelector('input[name="name"]');
-  if (input) this.type(input, "   ");
+  if (input) {this.type(input, "   ");}
 });
 
 When(
@@ -107,7 +107,7 @@ When("I delete the task", async function (this: TestWorld) {
     this.queryByText("Kustuta") ||
     this.queryByText("Delete") ||
     this.container?.querySelector('[data-testid="delete-task"]');
-  if (deleteButton) this.click(deleteButton);
+  if (deleteButton) {this.click(deleteButton);}
 });
 
 When("I confirm the deletion", async function (this: TestWorld) {

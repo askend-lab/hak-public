@@ -70,10 +70,10 @@ test.describe("Accessibility - Extended Checks", () => {
         elements.forEach((el) => {
           const rect = el.getBoundingClientRect();
           // Skip hidden elements
-          if (rect.width === 0 || rect.height === 0) return;
+          if (rect.width === 0 || rect.height === 0) {return;}
           // Skip elements that are visually hidden (skip links, etc.)
           const styles = window.getComputedStyle(el);
-          if (styles.position === "absolute" && styles.clip !== "auto") return;
+          if (styles.position === "absolute" && styles.clip !== "auto") {return;}
 
           if (rect.width < MIN_SIZE || rect.height < MIN_SIZE) {
             fails.push({
@@ -133,7 +133,7 @@ test.describe("Accessibility - Extended Checks", () => {
 
         buttons.forEach((el) => {
           const rect = el.getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return;
+          if (rect.width === 0 || rect.height === 0) {return;}
 
           if (rect.width < MIN_SIZE || rect.height < MIN_SIZE) {
             fails.push({
@@ -192,7 +192,7 @@ test.describe("Accessibility - Extended Checks", () => {
 
       const headings = await page.evaluate(() => {
         const hs = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-        return Array.from(hs).map((h) => ({
+        return [...hs].map((h) => ({
           level: parseInt(h.tagName[1]),
           text: h.textContent?.trim().substring(0, 50) || "",
           visible:
@@ -222,7 +222,7 @@ test.describe("Accessibility - Extended Checks", () => {
 
         buttons.forEach((btn) => {
           const rect = btn.getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return; // Skip hidden
+          if (rect.width === 0 || rect.height === 0) {return;} // Skip hidden
 
           const hasText = btn.textContent?.trim();
           const hasAriaLabel = btn.getAttribute("aria-label");
@@ -259,7 +259,7 @@ test.describe("Accessibility - Extended Checks", () => {
 
         inputs.forEach((input) => {
           const rect = (input as HTMLElement).getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return; // Skip hidden
+          if (rect.width === 0 || rect.height === 0) {return;} // Skip hidden
 
           const hasAriaLabel = input.getAttribute("aria-label");
           const hasAriaLabelledBy = input.getAttribute("aria-labelledby");

@@ -94,7 +94,7 @@ export function useSynthesis() {
     (sentenceId: string, newPhoneticText: string) => {
       setSentences((prev) =>
         prev.map((s) => {
-          if (s.id !== sentenceId) return s;
+          if (s.id !== sentenceId) {return s;}
           const newPlainText = stripPhoneticMarkers(newPhoneticText) || "";
           const newTags = convertTextToTags(newPlainText);
           const newStressedTags = convertTextToTags(newPhoneticText);

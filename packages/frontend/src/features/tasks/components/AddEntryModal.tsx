@@ -110,7 +110,7 @@ export default function AddEntryModal({
       setIsSubmitting(false);
     }
   };
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
   return (
     <BaseModal
       isOpen={isOpen}

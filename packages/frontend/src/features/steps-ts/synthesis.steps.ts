@@ -66,7 +66,7 @@ Then(
   async function (this: TestWorld) {
     await this.waitFor(() => {
       const container = this.container;
-      if (!container) return false;
+      if (!container) {return false;}
       // Look for stress markers in the rendered text
       const text = container.textContent || "";
       return text.includes("`") || text.includes("´") || text.includes("'");
@@ -79,7 +79,7 @@ Then(
   async function (this: TestWorld) {
     await this.waitFor(() => {
       const container = this.container;
-      if (!container) return false;
+      if (!container) {return false;}
       // Check for stress-related CSS classes or styling
       const stressedElements = container.querySelectorAll(
         '[class*="stress"], [class*="accent"]',
@@ -94,7 +94,7 @@ Then(
   async function (this: TestWorld) {
     await this.waitFor(() => {
       const container = this.container;
-      if (!container) return false;
+      if (!container) {return false;}
       const text = container.textContent || "";
       // Check for Estonian phonetic markers
       return /[`´'+]/.test(text);
@@ -107,7 +107,7 @@ Then(
   async function (this: TestWorld, marker: string) {
     await this.waitFor(() => {
       const container = this.container;
-      if (!container) return false;
+      if (!container) {return false;}
       const text = container.textContent || "";
       return text.includes(marker);
     });
@@ -119,7 +119,7 @@ Then(
   async function (this: TestWorld) {
     await this.waitFor(() => {
       const container = this.container;
-      if (!container) return false;
+      if (!container) {return false;}
       // Both original and phonetic should be present
       const hasOriginal = container.querySelector(
         '.original-text, [data-testid="original-text"]',
@@ -139,7 +139,7 @@ Then(
 Then("the differences are highlighted", async function (this: TestWorld) {
   await this.waitFor(() => {
     const container = this.container;
-    if (!container) return false;
+    if (!container) {return false;}
     // Check for highlighting elements
     const highlighted = container.querySelectorAll(
       '[class*="highlight"], [class*="diff"], .tag',

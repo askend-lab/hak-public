@@ -42,15 +42,15 @@ export default function UserProfile({ user }: UserProfileProps) {
   };
 
   useEffect(() => {
-    if (!isDropdownOpen || !dropdownRef.current) return;
+    if (!isDropdownOpen || !dropdownRef.current) {return;}
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") { closeDropdown(); return; }
       /* c8 ignore start -- focus trap requires real browser */
-      if (e.key !== "Tab") return;
+      if (e.key !== "Tab") {return;}
       const focusable = dropdownRef.current?.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
-      if (!focusable?.length) return;
+      if (!focusable?.length) {return;}
       const first = focusable[0]!;
       const last = focusable[focusable.length - 1]!;
       if (e.shiftKey && document.activeElement === first) {

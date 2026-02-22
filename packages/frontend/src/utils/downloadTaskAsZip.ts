@@ -8,14 +8,12 @@ import { formatDateTime } from "@/utils/formatDate";
 import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
 
 function sanitizeFilename(text: string): string {
-  return Array.from(
-    text.replace(/[<>:"/\\|?*\x00-\x1f]/g, "").replace(/\s+/g, "_"),
-  )
+  return [...text.replace(/[<>:"/\\|?*\x00-\x1f]/g, "").replace(/\s+/g, "_")]
     .slice(0, 80)
     .join("");
 }
 
-async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
+async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> { // eslint-disable-line max-statements -- audio fetch has many validation steps
   if (entry.audioBlob && entry.audioBlob.size > 0) {
     return entry.audioBlob;
   }
@@ -32,7 +30,7 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
     }
   }
 
-  if (!audioUrl) return null;
+  if (!audioUrl) {return null;}
 
   try {
     const response = await fetch(audioUrl);
@@ -57,17 +55,17 @@ export interface ZipProgress {
   total: number;
 }
 
-export async function downloadTaskAsZip(
+export async function downloadTaskAsZip( // eslint-disable-line max-statements -- zip creation orchestrates many steps
   task: Task,
   onProgress?: (progress: ZipProgress) => void,
 ): Promise<void> {
   const zip = new JSZip();
   const folderName = sanitizeFilename(task.name) || "task";
   const folder = zip.folder(folderName);
-  if (!folder) throw new Error("Failed to create ZIP folder");
+  if (!folder) {throw new Error("Failed to create ZIP folder");}
 
   const audioFolder = folder.folder("audio");
-  if (!audioFolder) throw new Error("Failed to create audio folder");
+  if (!audioFolder) {throw new Error("Failed to create audio folder");}
 
   // manifest.json
   folder.file(
@@ -100,7 +98,7 @@ export async function downloadTaskAsZip(
 
   for (let i = 0; i < task.entries.length; i += BATCH_SIZE) {
     const batch = task.entries.slice(i, i + BATCH_SIZE);
-    const results = await Promise.all(
+    const results = await Promise.all( // eslint-disable-line no-await-in-loop -- batched sequential processing to limit memory
       batch.map((entry) => fetchAudioBlob(entry)),
     );
 

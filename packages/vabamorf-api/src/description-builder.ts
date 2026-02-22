@@ -23,8 +23,8 @@ export function buildDescription(
   word: string,
 ): string {
   const parts: string[] = [];
-  if (lemma && lemma.toLowerCase() !== word.toLowerCase()) parts.push(`lemma: ${lemma}`);
-  if (pos && POS_MAP[pos]) parts.push(POS_MAP[pos]);
-  if (fs) parts.push(fs);
+  if (lemma && lemma.toLowerCase() !== word.toLowerCase()) {parts.push(`lemma: ${lemma}`);}
+  if (pos && POS_MAP[pos]) {parts.push(POS_MAP[pos]);}
+  if (fs) {parts.push(fs);}
   return parts.length > 0 ? parts.join(PARTS_SEPARATOR) : DEFAULT_DESCRIPTION;
 }

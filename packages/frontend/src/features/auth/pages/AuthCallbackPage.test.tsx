@@ -5,6 +5,8 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import { logger } from "@hak/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 
+import { AuthCallbackPage } from "./AuthCallbackPage";
+
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", () => ({ useNavigate: () => mockNavigate }));
 
@@ -16,8 +18,6 @@ vi.mock("../services", () => ({
     handleTaraTokens: mockHandleTaraTokens,
   }),
 }));
-
-import { AuthCallbackPage } from "./AuthCallbackPage";
 
 describe("AuthCallbackPage", () => {
   beforeEach(() => {

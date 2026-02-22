@@ -3,7 +3,7 @@
 
 import { openApiDocument } from "../src/openapi";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- OpenAPI doc is untyped JSON
 const doc = openApiDocument as Record<string, any>;
 
 describe("OpenAPI spec", () => {

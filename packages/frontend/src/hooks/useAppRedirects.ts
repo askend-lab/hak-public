@@ -37,7 +37,7 @@ export function useAppRedirects() {
 
   // Redirect first-time users to role selection on initial app load only
   useEffect(() => {
-    if (isOnboardingLoading) return;
+    if (isOnboardingLoading) {return;}
 
     // Only check on initial app load, not on subsequent navigation
     if (!hasCheckedInitialRedirect.current) {

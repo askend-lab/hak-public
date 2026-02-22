@@ -314,12 +314,31 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
-      import: importPlugin
+      import: importPlugin,
+      sonarjs: sonarjsPlugin,
+      security: securityPlugin,
+      unicorn: unicornPlugin,
+      promise: promisePlugin,
+      n: nPlugin,
+      'eslint-comments': eslintCommentsPlugin,
+      regexp: regexpPlugin
     },
     settings: {
       'import/resolver': { node: true }
     },
-    rules: typescriptRules
+    rules: {
+      ...baseRules,
+      ...securityRules,
+      ...unicornRules,
+      ...sonarRules,
+      ...promiseRules,
+      ...nodeRules,
+      ...eslintCommentsRules,
+      ...regexpRules,
+      ...importRules,
+      ...commentRules,
+      ...typescriptRules
+    }
   },
 
   // ===== REACT/TSX FILES =====
@@ -338,9 +357,25 @@ export default [
     plugins: {
       '@typescript-eslint': tsPlugin,
       'jsx-a11y': jsxA11yPlugin,
-      'react': reactPlugin
+      'react': reactPlugin,
+      import: importPlugin,
+      sonarjs: sonarjsPlugin,
+      security: securityPlugin,
+      unicorn: unicornPlugin,
+      promise: promisePlugin,
+      'eslint-comments': eslintCommentsPlugin,
+      regexp: regexpPlugin
     },
     rules: {
+      ...baseRules,
+      ...securityRules,
+      ...unicornRules,
+      ...sonarRules,
+      ...promiseRules,
+      ...eslintCommentsRules,
+      ...regexpRules,
+      ...importRules,
+      ...commentRules,
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'error',
       'react/no-array-index-key': 'error',
