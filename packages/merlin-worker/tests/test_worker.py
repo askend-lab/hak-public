@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import signal
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -374,7 +375,7 @@ class TestRunWorker:
             nonlocal calls
             calls += 1
             if calls == 1:
-                worker._sigterm_handler(None, None)
+                worker._sigterm_handler(signal.SIGTERM, None)
                 return {"Messages": []}
             raise AssertionError("Should not poll after SIGTERM")
         sqs.receive_message.side_effect = recv

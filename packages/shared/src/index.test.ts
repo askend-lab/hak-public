@@ -3,7 +3,6 @@
 
 import {
   calculateHash,
-  calculateHashSync,
   createLogger,
   logger,
   TEXT_LIMITS,
@@ -20,10 +19,6 @@ import {
 describe("Index exports", () => {
   it("should export calculateHash", () => {
     expect(typeof calculateHash).toBe("function");
-  });
-
-  it("should export calculateHashSync", () => {
-    expect(typeof calculateHashSync).toBe("function");
   });
 
   it("should export createLogger", () => {

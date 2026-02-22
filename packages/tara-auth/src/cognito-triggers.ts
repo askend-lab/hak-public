@@ -63,11 +63,11 @@ export const handler = async (
   
   switch (triggerSource) {
     case 'DefineAuthChallenge_Authentication':
-      return handleDefineAuthChallenge(event as DefineAuthChallengeTriggerEvent);
+      return handleDefineAuthChallenge(event);
     case 'CreateAuthChallenge_Authentication':
-      return handleCreateAuthChallenge(event as CreateAuthChallengeTriggerEvent);
+      return handleCreateAuthChallenge(event);
     case 'VerifyAuthChallengeResponse_Authentication':
-      return handleVerifyAuthChallengeResponse(event as VerifyAuthChallengeResponseTriggerEvent);
+      return handleVerifyAuthChallengeResponse(event);
     default:
       throw new Error(`Unknown trigger source: ${triggerSource}`);
   }
