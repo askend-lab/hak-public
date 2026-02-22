@@ -219,16 +219,17 @@ describe("vmetajson", () => {
     });
 
     it("should handle stderr output", () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const { logger } = require("../src/logger");
+      const loggerSpy = jest.spyOn(logger, "error").mockImplementation();
       initVmetajson("./vmetajson", ".");
 
       mockProcess.stderr.emit("data", Buffer.from("warning message"));
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[vmetajson stderr]"),
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "[vmetajson stderr]",
         "warning message",
       );
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
 
     it("should handle timeout for queued and current requests", async () => {

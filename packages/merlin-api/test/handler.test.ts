@@ -167,7 +167,7 @@ describe("createInternalError", () => {
     const response = createInternalError("Context", "string error");
 
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(spy).toHaveBeenCalledWith(expect.stringContaining("Context:"), "Unknown error");
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining("Context:"), "string error");
     spy.mockRestore();
   });
 });

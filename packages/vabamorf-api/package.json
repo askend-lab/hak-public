@@ -27,6 +27,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@hak/shared": "workspace:*",
     "zod": "^3.25.76"
   }
 }
