@@ -5,8 +5,10 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { extractStressedText, extractVariants } from "./parser";
 import { logger } from "./logger";
 import { LambdaResponse } from "./types";
-import { createResponse, parseJsonBody, validateField } from "./validation";
+import { createResponse, parseJsonBody } from "./validation";
 import { analyze, isInitialized, initVmetajson } from "./vmetajson";
+import { AnalyzeRequestSchema, VariantsRequestSchema } from "./schemas";
+import type { ZodObject, ZodRawShape } from "zod";
 
 // Stryker disable next-line all: env defaults are equivalent
 const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
@@ -37,9 +39,6 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
-// Kept in sync with @hak/shared TEXT_LIMITS.MAX_MORPHOLOGY_TEXT_LENGTH
-const MAX_TEXT_LENGTH = 10_000;
-
 const ERRORS = {
   MISSING_BODY: "Missing request body",
   INVALID_JSON: "Invalid JSON",
@@ -63,10 +62,10 @@ function badRequest(error: string): ParseError {
   return { success: false, response: createResponse(HTTP_STATUS.BAD_REQUEST, { error }) };
 }
 
-function parseAndValidate(
+function parseAndValidateWithSchema(
   event: APIGatewayProxyEvent,
+  schema: ZodObject<ZodRawShape>,
   fieldName: string,
-  maxLength?: number,
 ): ParseResult {
   ensureInitialized();
 
@@ -75,14 +74,16 @@ function parseAndValidate(
   const body = parseJsonBody(event.body);
   if (body === null) return badRequest(ERRORS.INVALID_JSON);
 
-  const fieldResult = validateField(
-    body as Record<string, unknown>,
-    fieldName,
-    maxLength,
-  );
-  if ("error" in fieldResult) return badRequest(fieldResult.error);
+  const result = schema.safeParse(body);
+  if (!result.success) {
+    const firstError = result.error.errors[0];
+    return badRequest(firstError?.message ?? "Invalid request");
+  }
 
-  return { success: true, value: fieldResult.value };
+  const value = (result.data as Record<string, string>)[fieldName];
+  if (!value) return badRequest(`Missing '${fieldName}' field in request body`);
+
+  return { success: true, value };
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
@@ -96,10 +97,10 @@ export async function analyzeHandler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
   try {
-    const parsed = parseAndValidate(
+    const parsed = parseAndValidateWithSchema(
       event,
+      AnalyzeRequestSchema,
       "text",
-      MAX_TEXT_LENGTH,
     );
     if (!parsed.success) return parsed.response;
 
@@ -117,7 +118,7 @@ export async function variantsHandler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
   try {
-    const parsed = parseAndValidate(event, "word");
+    const parsed = parseAndValidateWithSchema(event, VariantsRequestSchema, "word");
     if (!parsed.success) return parsed.response;
 
     const response = await analyze(parsed.value);

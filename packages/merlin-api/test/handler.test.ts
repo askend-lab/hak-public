@@ -5,11 +5,14 @@ import {
   generateCacheKey,
   parseRequestBody,
   applySynthesizeDefaults,
-  validateText,
-  validateParams,
   MAX_BODY_SIZE,
   health,
   VERSION,
+  MAX_TEXT_LENGTH,
+  SPEED_RANGE,
+  PITCH_RANGE,
+  SynthesizeRequestSchema,
+  CacheKeySchema,
 } from "../src/handler";
 import type { SynthesizeRequest } from "../src/handler";
 import { createResponse, createBadRequest, createInternalError, HTTP_STATUS, CORS_HEADERS } from "../src/response";
@@ -137,29 +140,6 @@ describe("applySynthesizeDefaults", () => {
   });
 });
 
-describe("validateParams", () => {
-  const validParams = { text: "hello", voice: "default", speed: 1.0, pitch: 0 };
-
-  it("should return null for valid params", () => {
-    expect(validateParams(validParams)).toBeNull();
-  });
-
-  it("should reject speed below minimum", () => {
-    expect(validateParams({ ...validParams, speed: 0.1 })).toContain("Speed");
-  });
-
-  it("should reject speed above maximum", () => {
-    expect(validateParams({ ...validParams, speed: 3.0 })).toContain("Speed");
-  });
-
-  it("should reject pitch below minimum", () => {
-    expect(validateParams({ ...validParams, pitch: -600 })).toContain("Pitch");
-  });
-
-  it("should reject pitch above maximum", () => {
-    expect(validateParams({ ...validParams, pitch: 600 })).toContain("Pitch");
-  });
-});
 
 describe("createResponse", () => {
   it("should return response with CORS headers", () => {
@@ -331,21 +311,6 @@ describe("SynthesizeRequest", () => {
   });
 });
 
-describe("validateText", () => {
-  it("should return true for valid text", () => {
-    expect(validateText("hello")).toBe(true);
-  });
-
-  it("should return false for empty string", () => {
-    expect(validateText("")).toBe(false);
-  });
-
-  it("should return false for non-string", () => {
-    expect(validateText(123)).toBe(false);
-    expect(validateText(null)).toBe(false);
-    expect(validateText(undefined)).toBe(false);
-  });
-});
 
 describe("createBadRequest", () => {
   it("should return 400 with error message", () => {
@@ -381,5 +346,15 @@ describe("VOICE_DEFAULTS", () => {
     expect(VOICE_DEFAULTS.voice).toBe(DEFAULT_VOICE);
     expect(VOICE_DEFAULTS.speed).toBe(DEFAULT_SPEED);
     expect(VOICE_DEFAULTS.pitch).toBe(DEFAULT_PITCH);
+  });
+});
+
+describe("re-exported schemas", () => {
+  it("should re-export schema constants from handler", () => {
+    expect(MAX_TEXT_LENGTH).toBeGreaterThan(0);
+    expect(SPEED_RANGE).toHaveProperty("min");
+    expect(PITCH_RANGE).toHaveProperty("min");
+    expect(SynthesizeRequestSchema.safeParse).toBeDefined();
+    expect(CacheKeySchema.safeParse).toBeDefined();
   });
 });

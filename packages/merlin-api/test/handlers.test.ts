@@ -53,7 +53,7 @@ describe("synthesize", () => {
     const longText = "a".repeat(1001);
     const response = await synthesize(createRequestEvent(longText));
     expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(JSON.parse(response.body).error).toContain("Missing or invalid text");
+    expect(JSON.parse(response.body).error).toContain("1000 characters");
   });
 
   it("should return ready when cached", async () => {

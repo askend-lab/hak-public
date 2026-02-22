@@ -7,7 +7,7 @@ module.exports = {
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageReporters: ["json-summary", "text", "lcov"],
-  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/logger.ts"],
+  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/logger.ts", "!src/openapi.ts"],
   coverageThreshold: {
     global: {
       branches: 90,

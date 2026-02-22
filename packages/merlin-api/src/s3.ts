@@ -69,12 +69,6 @@ function getS3Client(): S3Client {
   return _s3Client;
 }
 
-const VALID_CACHE_KEY = /^[a-f0-9]{64}$/;
-
-export function isValidCacheKey(cacheKey: string): boolean {
-  return VALID_CACHE_KEY.test(cacheKey);
-}
-
 export function buildCacheKey(cacheKey: string): string {
   return `cache/${cacheKey}.wav`;
 }
