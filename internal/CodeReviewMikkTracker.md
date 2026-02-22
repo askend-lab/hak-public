@@ -247,23 +247,28 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are publi
 ### Cost & Scaling Limits
 - [x] **PUB-1** (CRITICAL) AWS Budgets — `aws_budgets_budget` with Project=HAK tag filter, 4 notifications (70%, 90%, 100% actual + 100% forecasted) → SNS alerts topic. In `infra/budgets.tf`.
 - [x] **PUB-2** (CRITICAL) ECS max_capacity hard cap — `ecs_max_capacity` variable (default 2), SQS-based auto-scaling policy added. In `infra/merlin/main.tf`.
-- [x] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrency: 10` for merlin-api synthesize, `reservedConcurrency: 20` for vabamorf-api. In `serverless.yml` files.
+- [x] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrency: 3` for tts-api synthesize, `reservedConcurrency: 3` for morphology-api. In `serverless.yml` files. (Reduced from 10/20 — account pool too small, PR #666).
 - [x] **PUB-4** (HIGH) SQS queue depth cap — `checkQueueDepth()` in `sqs.ts`, throws `QueueFullError` at >= 50 messages → handler returns 503. Tests added. `sqs:GetQueueAttributes` IAM permission added.
 - [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — DONE in 15.5 (1000 → 100 chars)
 
 ### Monitoring & Detection
 - [x] **PUB-6** (HIGH) CloudWatch alerts — SQS queue depth (>50), ECS task count (at max), WAF blocked requests (>100/5min). All → SNS alerts topic. In `infra/cloudwatch-alarms.tf`.
-- [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection. **How:** new Lambda + EventBridge cron (every 5 min), reads CloudWatch logs, adds IPs to WAF IP set. Separate development effort.
-- [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries. **How:** manual setup in AWS Console, save Top-10 IPs, hourly distribution, atypical User-Agents.
+- [x] **PUB-14** (CRITICAL) Account-level budget + alerts — $200/month, SNS alerts every 10% (ACTUAL) + 100% FORECASTED. Email: aleksei.bljahhin@gmail.com (expandable via `budget_alert_emails` variable). In infra repo `terraform/budget.tf` (PR #27).
+- [x] **PUB-15** (HIGH) Daily Cost Digest Lambda — Python Lambda sends daily email at 08:00 UTC: yesterday's spend, MTD, forecast, top services. In infra repo `lambdas/cost-digest/index.py` + `terraform/cost-digest.tf` (PR #27).
+- ~~**PUB-16**~~ (MEDIUM) WAF kill switch (auto-block all traffic on budget breach) — discussed and rejected. With concurrency limits, geo-blocking, and rate limits already in place, automatic WAF block is unnecessary and risks false positives.
 
 ### Attack Surface Reduction
 - [x] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP, `rate_based_statement` with `scope_down_statement` on URI path. In `infra/waf.tf`.
 - [x] **PUB-10** (MEDIUM) Geo-blocking — `/synthesize` restricted to EE, LV, LT, FI, SE, DE, PL, NO, DK. WAF `geo_match_statement` with `and_statement`. In `infra/waf.tf`.
-- [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work. **How:** AWS WAF Bot Control (~$10/month) or custom proof-of-work header in frontend. Separate evaluation needed.
-- [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. **How:** frontend code change (canvas/screen/timezone hash as header) + backend validation. Separate development effort.
 
 ### Storage
 - ~~**PUB-13**~~ (LOW) S3 audio lifecycle — not worth the complexity, audio files are small. Skip.
+
+### Deferred (decided not to do now)
+- [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection. **How:** new Lambda + EventBridge cron (every 5 min), reads CloudWatch logs, adds IPs to WAF IP set. Separate development effort.
+- [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries. **How:** manual setup in AWS Console, save Top-10 IPs, hourly distribution, atypical User-Agents.
+- [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work. **How:** AWS WAF Bot Control (~$10/month) or custom proof-of-work header in frontend. Separate evaluation needed.
+- [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. **How:** frontend code change (canvas/screen/timezone hash as header) + backend validation. Separate development effort.
 
 ### Testing & Verification
 - [ ] **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/` directory.
