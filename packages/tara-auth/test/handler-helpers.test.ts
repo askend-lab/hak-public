@@ -4,8 +4,27 @@ import {
   clearStateCookie,
   getFrontendUrl,
   STATE_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
+  ACCESS_TOKEN_COOKIE_NAME,
+  ID_TOKEN_COOKIE_NAME,
+  STATE_TTL_MS,
+  REFRESH_TOKEN_MAX_AGE_S,
+  SHORT_TOKEN_MAX_AGE_S,
+  TOKEN_COOKIE_OPTIONS,
   DEFAULT_FRONTEND_URL_PROD,
   DEFAULT_FRONTEND_URL_DEV,
+  getCookieDomain,
+  createRefreshCookie,
+  clearRefreshCookie,
+  parseRefreshCookie,
+  createAccessTokenCookie,
+  createIdTokenCookie,
+  AUTH_CALLBACK_PATH,
+  RANDOM_STRING_LENGTH,
+  MAX_BODY_SIZE,
+  generateRandomString,
+  corsResponseHeaders,
+  validateCsrfOrigin,
 } from '../src/handler';
 import { AuthState } from '../src/types';
 
@@ -85,6 +104,36 @@ describe('clearStateCookie', () => {
     const cookie = clearStateCookie();
     expect(cookie).toContain('HttpOnly');
     expect(cookie).toContain('Secure');
+  });
+});
+
+describe('re-exported constants from handler', () => {
+  it('should re-export cookie constants', () => {
+    expect(typeof REFRESH_COOKIE_NAME).toBe('string');
+    expect(typeof ACCESS_TOKEN_COOKIE_NAME).toBe('string');
+    expect(typeof ID_TOKEN_COOKIE_NAME).toBe('string');
+    expect(typeof STATE_TTL_MS).toBe('number');
+    expect(typeof REFRESH_TOKEN_MAX_AGE_S).toBe('number');
+    expect(typeof SHORT_TOKEN_MAX_AGE_S).toBe('number');
+    expect(TOKEN_COOKIE_OPTIONS).toBeDefined();
+    expect(typeof getCookieDomain).toBe('function');
+  });
+
+  it('should re-export cookie functions', () => {
+    expect(typeof createRefreshCookie).toBe('function');
+    expect(typeof clearRefreshCookie).toBe('function');
+    expect(typeof parseRefreshCookie).toBe('function');
+    expect(typeof createAccessTokenCookie).toBe('function');
+    expect(typeof createIdTokenCookie).toBe('function');
+  });
+
+  it('should re-export middleware constants and functions', () => {
+    expect(typeof AUTH_CALLBACK_PATH).toBe('string');
+    expect(typeof RANDOM_STRING_LENGTH).toBe('number');
+    expect(typeof MAX_BODY_SIZE).toBe('number');
+    expect(typeof generateRandomString).toBe('function');
+    expect(typeof corsResponseHeaders).toBe('function');
+    expect(typeof validateCsrfOrigin).toBe('function');
   });
 });
 
