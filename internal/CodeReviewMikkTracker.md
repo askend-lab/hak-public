@@ -247,8 +247,8 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are publi
 ### Cost & Scaling Limits
 - [x] **PUB-1** (CRITICAL) AWS Budgets — `aws_budgets_budget` with Project=HAK tag filter, 4 notifications (70%, 90%, 100% actual + 100% forecasted) → SNS alerts topic. In `infra/budgets.tf`.
 - [x] **PUB-2** (CRITICAL) ECS max_capacity hard cap — `ecs_max_capacity` variable (default 2), SQS-based auto-scaling policy added. In `infra/merlin/main.tf`.
-- [ ] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrentExecutions: 10-20` for merlin-api and vabamorf-api. **How:** Terraform `reserved_concurrent_executions` on Lambda resources.
-- [ ] **PUB-4** (HIGH) SQS queue depth cap — reject with 503 if queue > 50 messages. **How:** code change in merlin-api handler.ts — check `ApproximateNumberOfMessagesVisible` before `sendMessage`.
+- [x] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrency: 10` for merlin-api synthesize, `reservedConcurrency: 20` for vabamorf-api. In `serverless.yml` files.
+- [x] **PUB-4** (HIGH) SQS queue depth cap — `checkQueueDepth()` in `sqs.ts`, throws `QueueFullError` at >= 50 messages → handler returns 503. Tests added. `sqs:GetQueueAttributes` IAM permission added.
 - [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — DONE in 15.5 (1000 → 100 chars)
 
 ### Monitoring & Detection

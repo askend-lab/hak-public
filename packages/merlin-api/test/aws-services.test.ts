@@ -24,6 +24,7 @@ jest.mock("@aws-sdk/client-sqs", () => {
   return {
     SQSClient: jest.fn().mockImplementation(() => ({ send: mockSend })),
     SendMessageCommand: jest.fn().mockImplementation((input) => ({ input, _type: "SendMessage" })),
+    GetQueueAttributesCommand: jest.fn().mockImplementation((input) => ({ input, _type: "GetQueueAttributes" })),
   };
 });
 
@@ -170,23 +171,34 @@ describe("s3", () => {
 });
 
 describe("sqs", () => {
-  const { sendToQueue } = require("../src/sqs");
+  const { sendToQueue, QueueFullError } = require("../src/sqs");
 
   describe("sendToQueue", () => {
     it("should send message and return MessageId", async () => {
-      mockSend.mockResolvedValue({ MessageId: "msg-456" });
+      mockSend
+        .mockResolvedValueOnce({ Attributes: { ApproximateNumberOfMessages: "5" } })
+        .mockResolvedValueOnce({ MessageId: "msg-456" });
 
       const result = await sendToQueue({ text: "hello" });
       expect(result).toBe("msg-456");
-      expect(mockSend).toHaveBeenCalledTimes(1);
+      expect(mockSend).toHaveBeenCalledTimes(2);
     });
 
     it("should throw when MessageId is undefined", async () => {
-      mockSend.mockResolvedValue({});
+      mockSend
+        .mockResolvedValueOnce({ Attributes: { ApproximateNumberOfMessages: "0" } })
+        .mockResolvedValueOnce({});
 
       await expect(sendToQueue({ text: "hello" })).rejects.toThrow(
         "SQS SendMessage did not return a MessageId",
       );
+    });
+
+    it("should throw QueueFullError when queue depth >= 50", async () => {
+      mockSend.mockResolvedValueOnce({ Attributes: { ApproximateNumberOfMessages: "55" } });
+
+      await expect(sendToQueue({ text: "hello" })).rejects.toThrow(QueueFullError);
+      expect(mockSend).toHaveBeenCalledTimes(1);
     });
   });
 });
