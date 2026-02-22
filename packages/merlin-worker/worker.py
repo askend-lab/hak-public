@@ -74,7 +74,7 @@ class WorkerConfig:
 
 SPEED_MIN, SPEED_MAX = 0.5, 2.0
 PITCH_MIN, PITCH_MAX = -500, 500
-MAX_TEXT_LENGTH = 1000
+MAX_TEXT_LENGTH = 100
 VALID_CACHE_KEY = re.compile(r"^[a-f0-9]{64}$")
 
 

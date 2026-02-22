@@ -115,8 +115,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.1** (Medium) Removed /warmup endpoint entirely (handler, serverless.yml, tests)
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
 - ✅ Accept  [✅] Fixed  [ ] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — replaced run_process() with safe alternatives
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — DEFERRED, needs architectural discussion
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars everywhere: merlin-api Zod schema, merlin-worker Python, frontend textarea maxLength + user-facing message. Current limit (1000) is excessive for TTS use case.
+- ❌ Reject (by design)  —  — **15.4** (Medium) Remove /status/{cacheKey} from public access — system depends on public polling for synthesis status
+- ✅ Accept  [✅] Fixed  [ ] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars: shared/constants.ts, merlin-api Zod schema, merlin-worker Python. Frontend validates via API.
 
 ---
 

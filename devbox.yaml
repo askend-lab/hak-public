@@ -84,9 +84,7 @@ hooks:
       - "**/ACCESSIBILITY_REMEDIATION_BACKLOG.md"
       - "docs/internal/design-system/07-Quality-Standards.md"
       - "audits/**"
-      - "internal/Audit*"
-      - "internal/CodeReview*"
-      - "internal/Security*"
+      - "internal/**"
 
   language-check:
     excludePaths:

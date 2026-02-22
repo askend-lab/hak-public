@@ -37,7 +37,7 @@ describe("Index exports", () => {
 
   it("should export TEXT_LIMITS", () => {
     expect(TEXT_LIMITS).toBeDefined();
-    expect(TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH).toBe(1000);
+    expect(TEXT_LIMITS.MAX_AUDIO_TEXT_LENGTH).toBe(100);
   });
 
   it("should export TIMING", () => {

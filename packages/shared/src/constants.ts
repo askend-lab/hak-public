@@ -3,7 +3,7 @@
 
 /** Maximum text length limits for various API endpoints */
 export const TEXT_LIMITS = {
-  MAX_AUDIO_TEXT_LENGTH: 1000,
+  MAX_AUDIO_TEXT_LENGTH: 100,
   MAX_MORPHOLOGY_TEXT_LENGTH: 10000,
 } as const;
 
