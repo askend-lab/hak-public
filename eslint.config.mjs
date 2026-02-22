@@ -54,6 +54,18 @@ export default [
       "jest/require-top-level-describe": "off",
       "max-lines": "off",
       "max-lines-per-function": "off",
+      "max-nested-callbacks": ["error", 10], // describe > describe > it > callback nesting is normal
+      "max-statements": ["error", 30], // test setup + assertions need more statements
+      "sonarjs/no-duplicate-string": "off", // repeated test strings are idiomatic
+      "no-console": "off", // test debugging output is acceptable
+      "no-param-reassign": "off", // test mocks often reassign params
+      "max-classes-per-file": "off", // test mock classes are co-located
+      "no-promise-executor-return": "off", // test Promise executors often return for brevity
+      "promise/param-names": "off", // test mocks use non-standard param names
+      "promise/prefer-await-to-callbacks": "off", // test patterns use callbacks
+      "promise/prefer-await-to-then": "off", // test assertions chain with .then
+      "promise/always-return": "off", // test promise chains don't always return
+      "max-params": ["error", 6], // test helpers take more params (mock deps)
     },
   },
 
@@ -99,27 +111,36 @@ export default [
       // --- FIXED: no-return-await, prefer-promise-reject-errors
       // --- FIXED: unicorn/prefer-spread, unicorn/explicit-length-check, regexp/prefer-w
 
-      // --- TO FIX (disabled until violations resolved) ---
-      "max-statements": "off",
-      "max-lines-per-function": "off",
-      "max-lines": "off",
-      "max-nested-callbacks": "off",
-      "max-params": "off",
-      "max-classes-per-file": "off",
-      "complexity": "off",
-      "no-console": "off",
-      "no-param-reassign": "off",
-      "no-nested-ternary": "off",
-      "no-await-in-loop": "off",
-      "no-promise-executor-return": "off",
-      "one-var": "off",
-      "sonarjs/cognitive-complexity": "off",
-      "sonarjs/no-duplicate-string": "off",
-      "promise/prefer-await-to-then": "off",
-      "promise/prefer-await-to-callbacks": "off",
-      "promise/param-names": "off",
-      "promise/always-return": "off",
+      // --- STYLE-ONLY: disabled for TS (intentional patterns) ---
+      "no-nested-ternary": "off",    // TSX conditional rendering uses nested ternaries
+      "promise/prefer-await-to-then": "off", // .then() chains in event handlers are idiomatic
+      "promise/prefer-await-to-callbacks": "off", // callback patterns in event handlers
       "unicorn/no-useless-undefined": "off", // conflicts with TS strict params
+
+      // --- THRESHOLD ADJUSTMENTS ---
+      "max-params": ["error", 5],    // hooks/handlers take 4-5 dependency params
+      "max-classes-per-file": ["error", 3], // adapter files may co-locate related classes
+
+      // --- STILL DISABLED (high violation count, fix incrementally) ---
+      "max-statements": "off",       // src:101
+      "max-lines-per-function": "off", // src:69
+      "sonarjs/no-duplicate-string": "off", // src:63
+      "no-console": "off",           // src:40
+      "no-param-reassign": "off",    // src:38
+      "max-nested-callbacks": "off", // src:30
+      "max-lines": "off",            // src:25
+      "complexity": "off",           // src:25
+      "sonarjs/cognitive-complexity": "off", // src:22
+    },
+  },
+
+  // Re-assert test overrides after QS-1 migration block (which applies to all .ts/.tsx)
+  {
+    files: TEST_FILE_PATTERNS,
+    rules: {
+      "max-classes-per-file": "off",
+      "no-await-in-loop": "off", // test loops are intentional
+      "promise/always-return": "off",
     },
   },
 

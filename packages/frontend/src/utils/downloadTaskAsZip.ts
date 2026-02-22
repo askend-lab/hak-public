@@ -98,7 +98,7 @@ export async function downloadTaskAsZip(
 
   for (let i = 0; i < task.entries.length; i += BATCH_SIZE) {
     const batch = task.entries.slice(i, i + BATCH_SIZE);
-    const results = await Promise.all(
+    const results = await Promise.all( // eslint-disable-line no-await-in-loop -- batched sequential processing to limit memory
       batch.map((entry) => fetchAudioBlob(entry)),
     );
 

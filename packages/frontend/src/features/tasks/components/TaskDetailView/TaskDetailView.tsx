@@ -112,6 +112,7 @@ export default function TaskDetailView({
     dataService
       .getTask(taskId)
       .then((taskData) => {
+        // eslint-disable-next-line promise/always-return -- fire-and-forget state update in useEffect
         if (taskData) {
           setTask(taskData);
           setEntries(taskData.entries || []);

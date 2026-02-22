@@ -112,7 +112,7 @@ export function useVariantsPanel(
       const timeoutId = setTimeout(() => controller.abort(), VARIANTS_API_TIMEOUT_MS);
 
       // Minimum spinner display time for better UX
-      const minDisplayTime = new Promise((resolve) => setTimeout(resolve, MIN_SPINNER_DISPLAY_MS));
+      const minDisplayTime = new Promise((resolve) => { setTimeout(resolve, MIN_SPINNER_DISPLAY_MS); });
 
       // Strip punctuation for API lookup (preserve dashes for compound words)
       const lookupWord = stripPunctuationForLookup(word);

@@ -58,8 +58,8 @@ export class MerlinClient {
     const cacheKey = synthResult.data.cacheKey;
 
     for (let i = 0; i < maxAttempts; i++) {
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-      const statusResult = await this.status(cacheKey);
+      await new Promise((resolve) => { setTimeout(resolve, POLL_INTERVAL_MS); }); // eslint-disable-line no-await-in-loop -- sequential polling is intentional
+      const statusResult = await this.status(cacheKey); // eslint-disable-line no-await-in-loop -- sequential polling
       if (!statusResult.data) {continue;}
       if (statusResult.data.status === "ready") {return statusResult;}
     }

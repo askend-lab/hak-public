@@ -45,7 +45,7 @@ initActivityListeners();
 
 // Enable accessibility checking in development mode
 if (import.meta.env.DEV) {
-  void import("./utils/a11y-dev").then(({ initA11yDevMode }) => {
+  void import("./utils/a11y-dev").then(({ initA11yDevMode }) => { // eslint-disable-line promise/always-return -- fire-and-forget dev-only init
     void initA11yDevMode();
   });
 }

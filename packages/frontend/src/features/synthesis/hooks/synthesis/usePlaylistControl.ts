@@ -41,7 +41,7 @@ export function usePlaylistControl(
     for (const sentence of sentencesWithText) {
       if (abortController.signal.aborted) {break;}
 
-      const success = await playSingle(sentence.id, abortController.signal);
+      const success = await playSingle(sentence.id, abortController.signal); // eslint-disable-line no-await-in-loop -- sequential playback
 
       if (isFirstSentence && success) {
         setIsLoadingPlayAll(false);

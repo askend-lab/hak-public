@@ -213,7 +213,7 @@ export function useSharedTaskAudio(): UseSharedTaskAudioReturn {
       for (const entry of entries) {
         if (abortController.signal.aborted) {break;}
 
-        const success = await playSingleEntry(entry, abortController.signal);
+        const success = await playSingleEntry(entry, abortController.signal); // eslint-disable-line no-await-in-loop -- sequential playback is intentional
 
         if (isFirstEntry && success) {
           setIsLoadingPlayAll(false);
