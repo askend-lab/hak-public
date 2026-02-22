@@ -10,7 +10,7 @@
  */
 
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -20,16 +20,20 @@ const MONO_ROOT = resolve(ROOT, "../..");
 
 const checkMode = process.argv.includes("--check");
 
+const DOCS_DIR = resolve(MONO_ROOT, "docs");
+
 const SPECS = [
   {
     name: "merlin",
     source: resolve(MONO_ROOT, "packages/merlin-api/openapi.yaml"),
     output: resolve(ROOT, "src/generated/merlin.ts"),
+    docsCopy: resolve(DOCS_DIR, "merlin-api.openapi.yaml"),
   },
   {
     name: "vabamorf",
     source: resolve(MONO_ROOT, "packages/vabamorf-api/openapi.yaml"),
     output: resolve(ROOT, "src/generated/vabamorf.ts"),
+    docsCopy: resolve(DOCS_DIR, "vabamorf-api.openapi.yaml"),
   },
 ];
 
@@ -63,6 +67,9 @@ for (const spec of SPECS) {
   } else {
     writeFileSync(spec.output, generated, "utf-8");
     process.stdout.write(`✅ ${spec.name} → ${spec.output}\n`);
+
+    copyFileSync(spec.source, spec.docsCopy);
+    process.stdout.write(`📄 ${spec.name} spec → ${spec.docsCopy}\n`);
   }
 }
 

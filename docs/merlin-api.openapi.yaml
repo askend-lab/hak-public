@@ -1,0 +1,154 @@
+openapi: 3.0.3
+info:
+  title: Merlin API — Text-to-Speech
+  version: 0.1.0
+  description: >-
+    Estonian text-to-speech synthesis API. Accepts text, queues synthesis via SQS to an ECS Fargate worker, and serves
+    cached audio from S3.
+servers:
+  - url: https://hak.example.com
+    description: Production
+components:
+  schemas:
+    SynthesizeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - ready
+            - processing
+        cacheKey:
+          type: string
+        audioUrl:
+          type: string
+      required:
+        - status
+        - cacheKey
+        - audioUrl
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    SynthesizeRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        voice:
+          type: string
+        speed:
+          type: number
+          minimum: 0.5
+          maximum: 2
+        pitch:
+          type: integer
+          minimum: -500
+          maximum: 500
+      required:
+        - text
+    StatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - ready
+            - processing
+        cacheKey:
+          type: string
+        audioUrl:
+          type: string
+          nullable: true
+      required:
+        - status
+        - cacheKey
+        - audioUrl
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+        version:
+          type: string
+      required:
+        - status
+        - version
+  parameters: {}
+paths:
+  /api/synthesize:
+    post:
+      summary: Start text-to-speech synthesis
+      description: >-
+        Submit text for synthesis. Returns immediately with a cacheKey. If audio is already cached, returns status
+        'ready' with audioUrl. Otherwise returns status 'processing' and the client should poll /api/status/{cacheKey}.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SynthesizeRequest'
+      responses:
+        '200':
+          description: Audio already cached and ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SynthesizeResponse'
+        '202':
+          description: Synthesis started, poll for status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SynthesizeResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/status/{cacheKey}:
+    get:
+      summary: Check synthesis status
+      description: >-
+        Poll this endpoint to check if audio synthesis is complete. Returns 'ready' with audioUrl when done, or
+        'processing' while still in progress.
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[a-f0-9]{64}$
+            description: 64-character SHA-256 hex cache key
+            example: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          required: true
+          name: cacheKey
+          in: path
+      responses:
+        '200':
+          description: Current synthesis status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '400':
+          description: Invalid cacheKey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/health:
+    get:
+      summary: Health check
+      description: Returns API health status and version.
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
