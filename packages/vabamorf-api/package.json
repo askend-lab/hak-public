@@ -4,7 +4,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild src/local-server.ts --bundle --platform=node --target=node22 --outdir=dist/src --sourcemap --external:aws-lambda",
+    "typecheck": "tsc --noEmit",
     "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
     "test:full": "jest --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
@@ -12,19 +13,20 @@
     "generate:openapi": "ts-node src/openapi.ts > openapi.yaml"
   },
   "devDependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
     "@types/aws-lambda": "^8.10.160",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.10.6",
+    "esbuild": "^0.25.0",
     "jest": "^30.2.0",
+    "js-yaml": "^4.1.1",
     "serverless": "^4.32.0",
     "serverless-domain-manager": "^9.1.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.4",
-    "js-yaml": "^4.1.1",
     "zod": "^3.25.76"
   }
 }
