@@ -63,7 +63,7 @@ These items require an architectural or product decision:
 | # | Finding | Question |
 |---|---------|----------|
 | **1.3.6** | Architecture doc missing auth, security, diagrams | What sections to add? How detailed? |
-| **1.4.1** | No OpenAPI/Swagger | Which tool? Auto-generate or manual? |
+| **1.4.1** | ~~No OpenAPI/Swagger~~ | ✅ RESOLVED: zod-to-openapi + api-client generate script, specs in docs/ |
 | **1.5.1** | No deployment guide | What level of detail? Which environments? |
 | **1.5.1.1** | Too many markdown files (~46) | Which to consolidate? What structure? |
 | **2.1** | Node.js 20 → latest LTS | Upgrade to 22? Affects all packages + Docker + CI |
