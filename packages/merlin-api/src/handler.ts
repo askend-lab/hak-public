@@ -12,7 +12,7 @@ import {
 } from "./response";
 import { VOICE_DEFAULTS } from "./env";
 import { checkS3Cache, buildAudioUrl } from "./s3";
-import { sendToQueue } from "./sqs";
+import { sendToQueue, QueueFullError } from "./sqs";
 import {
   SynthesizeRequestSchema,
   CacheKeySchema,
@@ -101,10 +101,7 @@ export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse
       return createBadRequest(firstError?.message ?? "Invalid request");
     }
 
-    const text = validated.data.text;
-    const voice = validated.data.voice ?? VOICE_DEFAULTS.voice;
-    const speed = validated.data.speed ?? VOICE_DEFAULTS.speed;
-    const pitch = validated.data.pitch ?? VOICE_DEFAULTS.pitch;
+    const { text, voice, speed, pitch } = applySynthesizeDefaults(validated.data);
     const cacheKey = generateCacheKey(text, voice, speed, pitch);
 
     const cached = await checkS3Cache(cacheKey);
@@ -130,6 +127,11 @@ export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse
       audioUrl: buildAudioUrl(cacheKey),
     });
   } catch (error) {
+    if (error instanceof QueueFullError) {
+      return createResponse(HTTP_STATUS.SERVICE_UNAVAILABLE, {
+        error: "Service temporarily unavailable — too many pending requests",
+      });
+    }
     return createInternalError("Synthesize error", error);
   }
 }

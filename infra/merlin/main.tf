@@ -370,11 +370,40 @@ resource "aws_ecs_service" "merlin_worker" {
 # =============================================================================
 
 resource "aws_appautoscaling_target" "merlin_worker" {
-  max_capacity       = var.env == "dev" ? 0 : 1
+  max_capacity       = var.env == "dev" ? 0 : var.ecs_max_capacity  # PUB-2: hard cap on workers
   min_capacity       = var.env == "dev" ? 0 : 1  # Dev disabled, prod 24x7
   resource_id        = "service/${aws_ecs_cluster.merlin.name}/${aws_ecs_service.merlin_worker.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+}
+
+# PUB-2: SQS-based auto-scaling policy — scale up when queue has messages
+resource "aws_appautoscaling_policy" "merlin_sqs_scaling" {
+  count = var.env == "prod" ? 1 : 0
+
+  name               = "${local.name_prefix}-sqs-scaling"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.merlin_worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.merlin_worker.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = 5  # Target: 5 messages per worker
+
+    customized_metric_specification {
+      metric_name = "ApproximateNumberOfMessagesVisible"
+      namespace   = "AWS/SQS"
+      statistic   = "Average"
+
+      dimensions {
+        name  = "QueueName"
+        value = aws_sqs_queue.merlin.name
+      }
+    }
+
+    scale_in_cooldown  = 300  # 5 min before scaling down
+    scale_out_cooldown = 60   # 1 min before scaling up
+  }
 }
 
 # =============================================================================

@@ -27,6 +27,12 @@ variable "merlin_image_tag" {
   default     = "latest"
 }
 
+variable "ecs_max_capacity" {
+  description = "Maximum number of ECS workers (PUB-2: hard cap to prevent runaway scaling)"
+  type        = number
+  default     = 2
+}
+
 variable "merlin_cpu" {
   description = "CPU units for Fargate task (1024 = 1 vCPU)"
   type        = number

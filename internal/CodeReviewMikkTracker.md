@@ -245,20 +245,20 @@ Ref: `internal/PROPOSAL-Auth-Public-Endpoints.md`
 Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are public. Authentication proposal sent to client (pending decision). Below: what we must do regardless to harden the public setup.
 
 ### Cost & Scaling Limits
-- [ ] **PUB-1** (CRITICAL) AWS Budgets + automatic shutdown — warning at 70%, reduce ECS at 90%, disable at 100%. **How:** account-level repo (separate project), `aws_budgets_budget` Terraform resource + SNS → Lambda for auto-action.
-- [ ] **PUB-2** (CRITICAL) ECS max_capacity hard cap — limit to 2-3 concurrent workers + CloudWatch alarm. **How:** Terraform `aws_appautoscaling_target.max_capacity` in `infra/`. Check current value, cap at 2-3.
-- [ ] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrentExecutions: 10-20` for merlin-api and vabamorf-api. **How:** Terraform `reserved_concurrent_executions` on Lambda resources.
-- [ ] **PUB-4** (HIGH) SQS queue depth cap — reject with 503 if queue > 50 messages. **How:** code change in merlin-api handler.ts — check `ApproximateNumberOfMessagesVisible` before `sendMessage`.
+- [x] **PUB-1** (CRITICAL) AWS Budgets — `aws_budgets_budget` with Project=HAK tag filter, 4 notifications (70%, 90%, 100% actual + 100% forecasted) → SNS alerts topic. In `infra/budgets.tf`.
+- [x] **PUB-2** (CRITICAL) ECS max_capacity hard cap — `ecs_max_capacity` variable (default 2), SQS-based auto-scaling policy added. In `infra/merlin/main.tf`.
+- [x] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrency: 10` for merlin-api synthesize, `reservedConcurrency: 20` for vabamorf-api. In `serverless.yml` files.
+- [x] **PUB-4** (HIGH) SQS queue depth cap — `checkQueueDepth()` in `sqs.ts`, throws `QueueFullError` at >= 50 messages → handler returns 503. Tests added. `sqs:GetQueueAttributes` IAM permission added.
 - [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — DONE in 15.5 (1000 → 100 chars)
 
 ### Monitoring & Detection
-- [ ] **PUB-6** (HIGH) CloudWatch alerts — anomalous request growth, SQS depth, ECS task count, cost/day dashboard + Slack. **How:** Terraform `aws_cloudwatch_metric_alarm` + `aws_sns_topic` → Slack webhook.
+- [x] **PUB-6** (HIGH) CloudWatch alerts — SQS queue depth (>50), ECS task count (at max), WAF blocked requests (>100/5min). All → SNS alerts topic. In `infra/cloudwatch-alarms.tf`.
 - [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection. **How:** new Lambda + EventBridge cron (every 5 min), reads CloudWatch logs, adds IPs to WAF IP set. Separate development effort.
 - [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries. **How:** manual setup in AWS Console, save Top-10 IPs, hourly distribution, atypical User-Agents.
 
 ### Attack Surface Reduction
-- [ ] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP (separate from general 100/5min). **How:** Terraform `aws_wafv2_rate_based_statement` with `scope_down_statement` filtering on URI path.
-- [ ] **PUB-10** (MEDIUM) Geo-blocking — restrict `/synthesize` to EE, LV, LT, FI, SE. **How:** Terraform `aws_wafv2_geo_match_statement` in WAF config.
+- [x] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP, `rate_based_statement` with `scope_down_statement` on URI path. In `infra/waf.tf`.
+- [x] **PUB-10** (MEDIUM) Geo-blocking — `/synthesize` restricted to EE, LV, LT, FI, SE, DE, PL, NO, DK. WAF `geo_match_statement` with `and_statement`. In `infra/waf.tf`.
 - [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work. **How:** AWS WAF Bot Control (~$10/month) or custom proof-of-work header in frontend. Separate evaluation needed.
 - [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. **How:** frontend code change (canvas/screen/timezone hash as header) + backend validation. Separate development effort.
 

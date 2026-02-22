@@ -3,7 +3,7 @@
 
 import { synthesize, status } from "../src/handler";
 import { checkS3Cache } from "../src/s3";
-import { sendToQueue } from "../src/sqs";
+import { sendToQueue, QueueFullError } from "../src/sqs";
 import { HTTP_STATUS } from "../src/response";
 import {
   setupTestEnv,
@@ -21,9 +21,13 @@ jest.mock("../src/s3", () => {
   };
 });
 
-jest.mock("../src/sqs", () => ({
-  sendToQueue: jest.fn().mockResolvedValue("msg-123"),
-}));
+jest.mock("../src/sqs", () => {
+  const actual = jest.requireActual("../src/sqs");
+  return {
+    ...actual,
+    sendToQueue: jest.fn().mockResolvedValue("msg-123"),
+  };
+});
 
 const mockCheckS3Cache = checkS3Cache as jest.MockedFunction<typeof checkS3Cache>;
 const mockSendToQueue = sendToQueue as jest.MockedFunction<typeof sendToQueue>;
@@ -79,6 +83,15 @@ describe("synthesize", () => {
     expect(body.status).toBe("processing");
     expect(body.cacheKey).toBeDefined();
     expect(mockSendToQueue).toHaveBeenCalledTimes(1);
+  });
+
+  it("should return 503 when queue is full", async () => {
+    mockCheckS3Cache.mockResolvedValue(false);
+    mockSendToQueue.mockRejectedValue(new QueueFullError(55));
+
+    const response = await synthesize(createRequestEvent("hello"));
+    expect(response.statusCode).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+    expect(JSON.parse(response.body).error).toContain("temporarily unavailable");
   });
 
   it("should return 500 on error", async () => {

@@ -127,6 +127,79 @@ resource "aws_cloudwatch_metric_alarm" "api_high_latency" {
 }
 
 # =============================================================================
+# Public API Hardening Alarms (PUB-6)
+# =============================================================================
+
+# SQS Queue Depth — warns when synthesis queue is backing up
+resource "aws_cloudwatch_metric_alarm" "merlin_sqs_depth" {
+  alarm_name          = "hak-${var.env}-merlin-sqs-depth"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  period              = 60
+  statistic           = "Maximum"
+  threshold           = 50
+  alarm_description   = "CRITICAL: Merlin SQS queue depth > 50 — possible abuse or stuck workers"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    QueueName = "hak-merlin-${var.env}-queue"
+  }
+
+  tags = local.common_tags
+}
+
+# ECS Running Task Count — warns when at max capacity
+resource "aws_cloudwatch_metric_alarm" "merlin_ecs_high_tasks" {
+  alarm_name          = "hak-${var.env}-merlin-ecs-high-tasks"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "RunningTaskCount"
+  namespace           = "ECS/ContainerInsights"
+  period              = 300
+  statistic           = "Maximum"
+  threshold           = 2
+  alarm_description   = "WARNING: Merlin ECS at max capacity — all workers busy"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    ClusterName = "hak-merlin-${var.env}"
+    ServiceName = "merlin-worker"
+  }
+
+  tags = local.common_tags
+}
+
+# WAF Blocked Requests — monitors attack attempts
+resource "aws_cloudwatch_metric_alarm" "waf_blocked_requests" {
+  alarm_name          = "hak-${var.env}-waf-blocked-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "BlockedRequests"
+  namespace           = "AWS/WAFV2"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 100
+  alarm_description   = "WARNING: High rate of WAF blocked requests — possible attack"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    WebACL = "hak-${var.env}-waf"
+    Region = "us-east-1"
+    Rule   = "ALL"
+  }
+
+  tags = local.common_tags
+}
+
+# =============================================================================
 # Outputs
 # =============================================================================
 

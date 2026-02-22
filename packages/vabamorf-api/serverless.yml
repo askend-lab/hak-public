@@ -45,6 +45,7 @@ functions:
       name: vabamorf
     timeout: 30
     memorySize: 1024
+    reservedConcurrency: 20  # PUB-3: prevent Lambda from consuming account-wide concurrency
     events:
       - httpApi:
           path: /{proxy+}

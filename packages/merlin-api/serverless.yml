@@ -52,6 +52,7 @@ provider:
           Action:
             - sqs:SendMessage
             - sqs:GetQueueUrl
+            - sqs:GetQueueAttributes
           Resource: arn:aws:sqs:${self:provider.region}:${env:AWS_ACCOUNT_ID, '000000000000'}:hak-merlin-${self:provider.stage}-queue
         - Effect: Allow
           Action:
@@ -72,6 +73,7 @@ functions:
   synthesize:
     handler: src/handler.synthesize
     timeout: 30
+    reservedConcurrency: 10  # PUB-3: prevent Lambda from consuming account-wide concurrency
     events:
       - httpApi:
           path: /synthesize
