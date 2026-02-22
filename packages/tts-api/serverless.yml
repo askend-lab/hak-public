@@ -73,7 +73,7 @@ functions:
   synthesize:
     handler: src/handler.synthesize
     timeout: 30
-    reservedConcurrency: 10  # PUB-3: prevent Lambda from consuming account-wide concurrency
+    reservedConcurrency: 5  # PUB-3: prevent Lambda from consuming account-wide concurrency
     events:
       - httpApi:
           path: /synthesize
