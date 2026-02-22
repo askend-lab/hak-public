@@ -38,11 +38,94 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     }
   }
 
-  # Rule 2: AWS Managed Rules — Common Rule Set
+  # Rule 2: Per-path rate limit for /synthesize (PUB-9)
+  # Stricter than general rate limit: 20 requests / 5 min per IP for the most expensive endpoint
+  rule {
+    name     = "rate-limit-synthesize"
+    priority = 2
+
+    action {
+      block {}
+    }
+
+    statement {
+      rate_based_statement {
+        limit              = 20
+        aggregate_key_type = "IP"
+
+        scope_down_statement {
+          byte_match_statement {
+            search_string         = "/api/synthesize"
+            positional_constraint = "STARTS_WITH"
+            field_to_match {
+              uri_path {}
+            }
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.app_name}-${var.env}-rate-limit-synthesize"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rule 3: Geo-blocking for /synthesize (PUB-10)
+  # Only allow speech synthesis from Baltic/Nordic region
+  rule {
+    name     = "geo-restrict-synthesize"
+    priority = 3
+
+    action {
+      block {}
+    }
+
+    statement {
+      and_statement {
+        statement {
+          byte_match_statement {
+            search_string         = "/api/synthesize"
+            positional_constraint = "STARTS_WITH"
+            field_to_match {
+              uri_path {}
+            }
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+
+        statement {
+          not_statement {
+            statement {
+              geo_match_statement {
+                country_codes = ["EE", "LV", "LT", "FI", "SE", "DE", "PL", "NO", "DK"]
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.app_name}-${var.env}-geo-restrict-synthesize"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rule 4: AWS Managed Rules — Common Rule Set
   # Protects against SQL injection, XSS, and other common attack vectors
   rule {
     name     = "aws-managed-common-rules"
-    priority = 2
+    priority = 10
 
     override_action {
       none {}

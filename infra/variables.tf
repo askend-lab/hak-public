@@ -45,6 +45,12 @@ variable "manage_dns" {
   default     = true
 }
 
+variable "monthly_budget_limit" {
+  description = "Monthly budget limit in USD for HAK application resources (PUB-1)"
+  type        = string
+  default     = "100"
+}
+
 variable "slack_webhook_url" {
   description = "Slack webhook URL for CloudWatch alerts (create at https://api.slack.com/apps)"
   type        = string
