@@ -20,18 +20,8 @@ tmp/
 **/.coverage
 
 # Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfplan
-*.tfplan.*
-tfplan-*.out
-packages/frontend/cucumber-results.json
-.agent-channel
 test-results
 playwright-report
-.lhci
-.stryker-tmp
 
 # Generated test/mutation reports
 **/reports/mutation/
