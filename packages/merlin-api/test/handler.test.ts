@@ -8,6 +8,11 @@ import {
   MAX_BODY_SIZE,
   health,
   VERSION,
+  MAX_TEXT_LENGTH,
+  SPEED_RANGE,
+  PITCH_RANGE,
+  SynthesizeRequestSchema,
+  CacheKeySchema,
 } from "../src/handler";
 import type { SynthesizeRequest } from "../src/handler";
 import { createResponse, createBadRequest, createInternalError, HTTP_STATUS, CORS_HEADERS } from "../src/response";
@@ -341,5 +346,15 @@ describe("VOICE_DEFAULTS", () => {
     expect(VOICE_DEFAULTS.voice).toBe(DEFAULT_VOICE);
     expect(VOICE_DEFAULTS.speed).toBe(DEFAULT_SPEED);
     expect(VOICE_DEFAULTS.pitch).toBe(DEFAULT_PITCH);
+  });
+});
+
+describe("re-exported schemas", () => {
+  it("should re-export schema constants from handler", () => {
+    expect(MAX_TEXT_LENGTH).toBeGreaterThan(0);
+    expect(SPEED_RANGE).toHaveProperty("min");
+    expect(PITCH_RANGE).toHaveProperty("min");
+    expect(SynthesizeRequestSchema.safeParse).toBeDefined();
+    expect(CacheKeySchema.safeParse).toBeDefined();
   });
 });
