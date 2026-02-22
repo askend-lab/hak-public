@@ -21,10 +21,10 @@ pnpm run dx        # Full quality check: tests + hooks
 pnpm start         # Start dev server (http://localhost:5181)
 ```
 
-**merlin-worker** (Python TTS engine) requires additional setup:
+**tts-worker** (Python TTS engine) requires additional setup:
 
 ```bash
-cd packages/merlin-worker
+cd packages/tts-worker
 python3 -m venv .venv
 .venv/bin/pip install -r requirements-test.txt
 .venv/bin/pytest tests/ -v    # Run Python tests

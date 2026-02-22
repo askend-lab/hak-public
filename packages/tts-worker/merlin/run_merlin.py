@@ -50,7 +50,6 @@ from frontend.mean_variance_norm import MeanVarianceNorm
 from frontend.label_modifier import HTSLabelModification
 
 from utils.generate import generate_wav
-from utils.generate import run_process #vajalik labelite genereerimiseks
 
 
 def Read_file_list(file_name):

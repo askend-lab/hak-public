@@ -59,6 +59,7 @@ export function CustomVariantForm({
               placeholder="Kirjuta oma hääldusmärkidega variant"
               aria-label="Kohandatud hääldusvariant"
               className="pronunciation-variants__input"
+              maxLength={100}
             />
             {value && (
               <button
