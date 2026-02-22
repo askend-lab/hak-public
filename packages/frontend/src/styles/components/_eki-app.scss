@@ -166,6 +166,38 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-6;
+
+  // Enhanced visual hierarchy and interaction design
+  .section-indicator {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-3;
+
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: $color-primary;
+      color: $color-white;
+      border-radius: $border-radius-round;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+    }
+
+    &.completed .step-number {
+      background: $color-success;
+    }
+
+    &.loading .step-number {
+      background: $color-warning;
+      animation: pulse 1.5s infinite;
+    }
+  }
 }
 
 .eki-playlist-section {
@@ -463,40 +495,6 @@
     font-weight: $font-weight-semibold;
     color: $color-primary;
     margin: 0 0 $spacing-4 0;
-  }
-}
-
-// Enhanced visual hierarchy and interaction design
-.eki-results-section {
-  .section-indicator {
-    display: flex;
-    align-items: center;
-    gap: $spacing-2;
-    font-size: $font-size-sm;
-    color: $color-text-secondary;
-    margin-bottom: $spacing-3;
-
-    .step-number {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      background: $color-primary;
-      color: $color-white;
-      border-radius: $border-radius-round;
-      font-size: $font-size-xs;
-      font-weight: $font-weight-semibold;
-    }
-
-    &.completed .step-number {
-      background: $color-success;
-    }
-
-    &.loading .step-number {
-      background: $color-warning;
-      animation: pulse 1.5s infinite;
-    }
   }
 }
 

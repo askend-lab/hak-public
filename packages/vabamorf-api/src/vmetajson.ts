@@ -42,6 +42,42 @@ export class VmetajsonProcess {
     this.process.stdin.write(`${JSON.stringify(this.currentRequest.input)}\n`);
   }
 
+  private handleStdoutData(data: Buffer): void {
+    this.buffer += data.toString();
+    const lines = this.buffer.split("\n");
+
+    // Stryker disable next-line all: boundary condition is equivalent
+    while (lines.length > 1) {
+      const line = lines.shift();
+      // Stryker disable next-line all: guard conditions are equivalent
+      if (line !== undefined && line.trim() !== "" && this.currentRequest) {
+        try {
+          const response = JSON.parse(line) as VmetajsonResponse;
+          this.completeCurrentRequest(response);
+        } catch {
+          this.failCurrentRequest(
+            new Error(`${PARSE_ERROR_PREFIX}${line}`),
+          );
+        }
+      }
+    }
+    // Stryker disable next-line all: empty string default is equivalent
+    this.buffer = lines[0] || "";
+  }
+
+  private handleProcessExit(code: number | null): void {
+    const exitError = new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`);
+    this.failCurrentRequest(exitError);
+    while (this.requestQueue.length > 0) {
+      const queued = this.requestQueue.shift();
+      if (queued) {
+        clearTimeout(queued.timeoutId);
+        queued.reject(exitError);
+      }
+    }
+    this.process = null;
+  }
+
   private finishCurrentRequest(action: (req: QueuedRequest) => void): void {
     if (this.currentRequest) {
       clearTimeout(this.currentRequest.timeoutId);
@@ -74,45 +110,13 @@ export class VmetajsonProcess {
     });
 
     // Stryker disable next-line all: optional chaining is equivalent
-    this.process.stdout?.on("data", (data: Buffer) => {
-      this.buffer += data.toString();
-      const lines = this.buffer.split("\n");
-
-      // Stryker disable next-line all: boundary condition is equivalent
-      while (lines.length > 1) {
-        const line = lines.shift();
-        // Stryker disable next-line all: guard conditions are equivalent
-        if (line !== undefined && line.trim() !== "" && this.currentRequest) {
-          try {
-            const response = JSON.parse(line) as VmetajsonResponse;
-            this.completeCurrentRequest(response);
-          } catch {
-            this.failCurrentRequest(
-              new Error(`${PARSE_ERROR_PREFIX}${line}`),
-            );
-          }
-        }
-      }
-      // Stryker disable next-line all: empty string default is equivalent
-      this.buffer = lines[0] || "";
-    });
+    this.process.stdout?.on("data", (data: Buffer) => this.handleStdoutData(data));
 
     this.process.on("error", (err: Error) => {
       this.failCurrentRequest(err);
     });
 
-    this.process.on("exit", (code: number | null) => {
-      const exitError = new Error(`${EXIT_ERROR_PREFIX}${code ?? "unknown"}`);
-      this.failCurrentRequest(exitError);
-      while (this.requestQueue.length > 0) {
-        const queued = this.requestQueue.shift();
-        if (queued) {
-          clearTimeout(queued.timeoutId);
-          queued.reject(exitError);
-        }
-      }
-      this.process = null;
-    });
+    this.process.on("exit", (code: number | null) => this.handleProcessExit(code));
   }
 
   async analyze(text: string): Promise<VmetajsonResponse> {

@@ -9,7 +9,7 @@
  *   node scripts/generate.mjs --check  # verify generated files match
  */
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,8 +48,7 @@ for (const spec of SPECS) {
 
   process.stdout.write(`Generating ${spec.name} types from ${spec.source}...\n`);
 
-  const cmd = `npx openapi-typescript "${spec.source}"`;
-  const generated = execSync(cmd, { encoding: "utf-8", cwd: MONO_ROOT });
+  const generated = execFileSync("npx", ["openapi-typescript", spec.source], { encoding: "utf-8", cwd: MONO_ROOT });
 
   if (checkMode) {
     if (!existsSync(spec.output)) {

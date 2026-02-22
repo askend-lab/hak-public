@@ -229,9 +229,9 @@ Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: 
 
 ### SonarQube Valid but Low Priority
 
-- [ ] **QS-9** Refactor vmetajson.ts:62 to reduce cognitive complexity (18 → ≤15) — extract helper functions
-- [ ] **QS-10** Fix duplicate CSS `monospace` in `_reset.scss:124,173`
-- [ ] **QS-11** Fix duplicate `.eki-results-section` selector in `_eki-app.scss:470` (first at line 165)
-- [ ] **QS-12** Review `api-client/scripts/generate.mjs:52` OS command execution — ensure input is sanitized
-- [ ] **QS-13** Review Docker root user in `vabamorf-api/Dockerfile.local` — add USER directive for local dev
-- [ ] **QS-14** Review regex ReDoS in `tara-auth/cognito-client.ts:66` — simplify or use atomic group
+- [x] **QS-9** Refactor vmetajson.ts:62 — extracted `handleStdoutData()` and `handleProcessExit()` methods from `init()`, reducing cognitive complexity
+- [x] **QS-10** ~~Fix duplicate CSS `monospace`~~ — FALSE POSITIVE: `monospace, monospace` is an intentional normalize.css hack for browser font rendering
+- [x] **QS-11** Fix duplicate `.eki-results-section` selector — merged nested styles from line 470 into first block at line 165
+- [x] **QS-12** Fix `api-client/scripts/generate.mjs:52` — replaced `execSync` with `execFileSync` (no shell interpolation, eliminates OS command injection risk)
+- [x] **QS-13** Fix Docker root user in `vabamorf-api/Dockerfile.local` — added `USER appuser` directive matching production Dockerfile
+- [x] **QS-14** Fix regex ReDoS in `tara-auth/cognito-client.ts:66` — added `.` to excluded chars in middle group, eliminating backtracking ambiguity
