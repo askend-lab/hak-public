@@ -27,6 +27,8 @@ import {
   requireCognitoConfig,
 } from './middleware';
 
+const UNKNOWN_ERROR = 'Unknown error';
+
 // Re-export everything from cookies and middleware for backward compatibility
 export {
   STATE_COOKIE_NAME,
@@ -88,7 +90,7 @@ export async function startHandler(
       body: '',
     };
   } catch (error) {
-    logger.error('TARA start error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('TARA start error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return createLambdaResponse(
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       { error: 'Failed to start TARA authentication' },
@@ -150,7 +152,7 @@ export async function callbackHandler( // eslint-disable-line max-statements -- 
     return redirectToFrontendWithCookies(frontendUrl, cognitoTokens);
 
   } catch (error) {
-    logger.error('TARA callback error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('TARA callback error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return redirectToFrontend(frontendUrl, { 
       error: 'Authentication failed - please try again' 
     }, clearStateCookie());
@@ -253,7 +255,7 @@ export async function refreshHandler(
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token }),
     };
   } catch (error) {
-    logger.error('Refresh error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('Refresh error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return {
       statusCode: 401,
       headers: corsResponseHeaders(),
@@ -321,7 +323,7 @@ export async function exchangeCodeHandler( // eslint-disable-line max-statements
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
     };
   } catch (error) {
-    logger.error('Exchange code error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('Exchange code error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
   }
 }

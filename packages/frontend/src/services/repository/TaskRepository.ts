@@ -9,6 +9,7 @@ function generateId(prefix: string): string {
   return `${prefix}_${crypto.randomUUID()}`;
 }
 
+const TASK_NOT_FOUND = "Task not found";
 const MAX_TASK_NAME_LENGTH = 200;
 const MAX_TASK_DESCRIPTION_LENGTH = 2000;
 const MAX_ENTRIES_PER_TASK = 500;
@@ -109,7 +110,7 @@ export class TaskRepository {
   ): Promise<Task | null> {
     const existingTask = await this.storage.getTask(taskId);
     if (!existingTask) {
-      throw new Error("Task not found");
+      throw new Error(TASK_NOT_FOUND);
     }
 
     return this.applyTaskUpdate(existingTask, updates);
@@ -135,7 +136,7 @@ export class TaskRepository {
   async deleteTask(taskId: string): Promise<boolean> {
     const existingTask = await this.storage.getTask(taskId);
     if (!existingTask) {
-      throw new Error("Task not found");
+      throw new Error(TASK_NOT_FOUND);
     }
 
     await this.storage.deleteTask(taskId);
@@ -155,7 +156,7 @@ export class TaskRepository {
   ): Promise<TaskEntry[]> {
     const task = await this.storage.getTask(taskId);
     if (!task) {
-      throw new Error("Task not found");
+      throw new Error(TASK_NOT_FOUND);
     }
 
     const currentCount = mode === "replace" ? 0 : (task.entries?.length ?? 0);
@@ -210,7 +211,7 @@ export class TaskRepository {
   ): Promise<TaskEntry | null> {
     const task = await this.storage.getTask(taskId);
     if (!task) {
-      throw new Error("Task not found");
+      throw new Error(TASK_NOT_FOUND);
     }
 
     const entryIndex = task.entries?.findIndex((entry) => entry.id === entryId);

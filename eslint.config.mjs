@@ -13,6 +13,7 @@ const TEST_FILE_PATTERNS = [
   "**/__tests__/**/*.js",
   "**/__mocks__/**/*.ts",
   "**/e2e/**/*.ts",
+  "**/steps-ts/**/*.ts",
   "**/*.test.ts",
   "**/*.spec.ts",
   "**/*.test.tsx",
@@ -150,8 +151,8 @@ export default [
       "complexity": ["error", 15],              // default 10 → 15
       "sonarjs/cognitive-complexity": ["error", 20], // default 15 → 20
 
-      // --- STILL DISABLED (need code changes, fix incrementally) ---
-      "sonarjs/no-duplicate-string": "off", // src:63 — extract to constants
+      // --- THRESHOLD: raised to 4 (default 3), steps-ts/test files excluded ---
+      "sonarjs/no-duplicate-string": ["error", { "threshold": 4 }],
     },
   },
 
@@ -200,6 +201,8 @@ export default [
       "max-statements": "off",
       "complexity": "off",
       "sonarjs/cognitive-complexity": "off",
+      "sonarjs/no-duplicate-string": "off",
+      "no-param-reassign": "off",
     },
   },
 
