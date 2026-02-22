@@ -213,13 +213,13 @@ Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: 
 
 ### CSS/SCSS Linting (Missing)
 
-- [ ] **QS-5** Add Stylelint to DevBox hooks — SonarQube found duplicate CSS selectors in `_reset.scss` and `_eki-app.scss`. No SCSS linting exists today.
-- [ ] **QS-6** Configure Stylelint rules: `no-duplicate-selectors`, `font-family-no-duplicate-names`, `declaration-block-no-duplicate-properties`.
+- [x] **QS-5** Add Stylelint — installed `stylelint` + `stylelint-config-standard-scss`, added to `pnpm lint` script (enforced by DevBox `run-lint` hook). Minimal config: `no-duplicate-selectors`, `declaration-block-no-duplicate-properties`.
+- [x] **QS-6** Configured `.stylelintrc.json` with `postcss-scss` syntax and target rules. All SCSS files pass clean.
 
 ### Python Type Checking (Missing)
 
-- [ ] **QS-7** Add mypy to merlin-worker — SonarQube found wrong argument type in test_worker.py:377 (`_sigterm_handler` call). Ruff doesn't check types.
-- [ ] **QS-8** Add mypy to DevBox hooks for Python modules (mode: warning initially).
+- [x] **QS-7** Add mypy to merlin-worker — installed, added to `requirements-test.txt`. Runs on `worker.py` + `tests/` (external `merlin/` library excluded). All 5 files pass clean.
+- [x] **QS-8** mypy integrated into `pnpm lint` script — enforced by DevBox `run-lint` hook on every commit.
 
 ### SonarQube False Positives (No Action)
 

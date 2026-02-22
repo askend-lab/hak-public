@@ -20,7 +20,7 @@
     "test:all": "pnpm -r --workspace-concurrency=4 run test:full",
     "test:coverage": "jest --coverage --json --outputFile=tmp/jest-results.json",
     "typecheck": "pnpm -r exec tsc --noEmit",
-    "lint": "eslint --cache --ext .js,.ts,.tsx . --max-warnings=0 && npx gherkin-lint 'packages/specifications/**/*.feature'",
+    "lint": "eslint --cache --ext .js,.ts,.tsx . --max-warnings=0 && npx gherkin-lint 'packages/specifications/**/*.feature' && npx stylelint 'packages/frontend/src/styles/**/*.scss' && (cd packages/merlin-worker && .venv/bin/mypy worker.py tests/ --ignore-missing-imports)",
     "check": "pnpm lint && pnpm typecheck && pnpm test:all",
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
     "kill-ports": "lsof -ti:5181 | xargs -r kill -9 2>/dev/null; sleep 0.5; true",
@@ -92,6 +92,8 @@
     "knip": "^5.83.1",
     "lint-staged": "^16.1.0",
     "madge": "^8.0.0",
+    "stylelint": "^17.3.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "typescript": "^5.9.3"
   },
   "lint-staged": {
