@@ -60,19 +60,17 @@ Touches: `packages/merlin-api/`, `packages/merlin-worker/`, `packages/vabamorf-a
 
 These items require an architectural or product decision:
 
-| # | Finding | Question |
-|---|---------|----------|
-| **1.3.6** | Architecture doc missing auth, security, diagrams | What sections to add? How detailed? |
-| **1.4.1** | ~~No OpenAPI/Swagger~~ | ✅ RESOLVED: zod-to-openapi + api-client generate script, specs in docs/ |
-| **1.5.1** | No deployment guide | What level of detail? Which environments? |
-| **1.5.1.1** | Too many markdown files (~46) | Which to consolidate? What structure? |
-| **2.1** | Node.js 20 → latest LTS | Upgrade to 22? Affects all packages + Docker + CI |
-| **4.16** | SonarQube issues | Install SonarQube? Or use existing linters? |
-| **5.1** | S3 utils duplicated (shared ↔ merlin-api) | Who owns the canonical version? Import strategy? |
-| **5.2** | LambdaResponse duplicated (shared ↔ merlin/vabamorf) | Same question — consolidate where? |
-| **5.4** | HTTP_STATUS duplicated | Same — single source of truth location? |
-| **12.2** | Shared API Gateway throttling | Per-route WAF rules? Per-user limiting? |
-| **14.1** | Rename modules to reflect domain | What names? Breaking change for CI/infra |
+- [x] **1.3.6** Architecture doc missing auth, security, diagrams — ✅ RESOLVED: ARCHITECTURE.md now has "Authentication & Authorization", "Security Model", "System Diagrams" (text-based), "CI/CD & Deployment" sections
+- [x] **1.4.1** ~~No OpenAPI/Swagger~~ — ✅ RESOLVED: zod-to-openapi + api-client generate script, specs in docs/
+- [x] **1.5.1** No deployment guide — ✅ RESOLVED: docs/DEPLOYMENT.md (84 lines) covers dev + prod environments
+- [x] **1.5.1.1** ~~Too many markdown files (~46, now 74)~~ — REJECTED: acceptable count, will reduce over time but not critical
+- [x] **2.1** ~~Node.js 20 → latest LTS~~ — ✅ RESOLVED: upgraded to nodejs22.x in all serverless.yml + esbuild bundling (PR #657)
+- [ ] **4.16** SonarQube issues — will run SonarQube to verify remaining issues beyond ESLint/Ruff/DevBox coverage
+- [ ] **5.1** S3 utils duplicated (shared ↔ merlin-api) — intentionally inlined ("standalone Lambda"), but esbuild bundling (PR #657) now makes importing from @hak/shared possible
+- [ ] **5.2** LambdaResponse duplicated (shared ↔ merlin/vabamorf) — same: intentionally inlined, esbuild could now resolve this
+- [ ] **5.4** HTTP_STATUS duplicated — same: intentionally inlined, esbuild could now resolve this
+- [ ] **12.2** Shared API Gateway throttling — still shared token-bucket, no per-user/per-IP limiting
+- [ ] **14.1** Rename modules to reflect domain — not started, breaking change for CI/infra
 
 ---
 
