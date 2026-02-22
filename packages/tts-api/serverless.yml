@@ -36,9 +36,6 @@ provider:
         - OPTIONS
       allowedHeaders:
         - Content-Type
-    throttle:
-      rateLimit: 2
-      burstLimit: 4
 
   environment:
     SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID, '000000000000'}/hak-merlin-${self:provider.stage}-queue
@@ -73,7 +70,6 @@ functions:
   synthesize:
     handler: src/handler.synthesize
     timeout: 30
-    reservedConcurrency: 3  # PUB-3: cap concurrent executions (WAF rate limits handle abuse)
     events:
       - httpApi:
           path: /synthesize

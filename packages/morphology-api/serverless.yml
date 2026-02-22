@@ -23,9 +23,6 @@ provider:
       allowedHeaders:
         - Content-Type
         - Authorization
-    throttle:
-      rateLimit: 20
-      burstLimit: 50
 
   environment:
     VMETAJSON_PATH: /var/task/vmetajson.bin
@@ -45,7 +42,6 @@ functions:
       name: vabamorf
     timeout: 30
     memorySize: 1024
-    reservedConcurrency: 3  # PUB-3: cap concurrent executions (WAF rate limits handle abuse)
     events:
       - httpApi:
           path: /{proxy+}
