@@ -2,21 +2,14 @@
 
 ## Infrastructure
 
-### Upgrade Lambda Node.js runtime to 20.x
+### ~~Upgrade Lambda Node.js runtime to 20.x~~ ✅ DONE
 
 **Priority:** HIGH
-**Added:** 2026-02-15
+**Added:** 2026-02-15 | **Completed:** 2026-02-22
 **Context:** Infrastructure audit (see `internal/INFRA_AUDIT_PLAN.md`, item 3.4)
 
-Lambda functions `merlin-api` and `simplestore` are running on `nodejs18.x` which reaches EOL. Need to upgrade to `nodejs20.x` (or `nodejs22.x` when available).
-
-**Scope:**
-- `packages/merlin-api/serverless.yml` — update `runtime: nodejs18.x` → `nodejs20.x`
-- `packages/simplestore/serverless.yml` — update `runtime: nodejs18.x` → `nodejs20.x`
-- Run full test suite after upgrade
-- Deploy to dev first, verify, then prod
-
-**Risk:** Low — Node.js 20.x is backward-compatible, but needs testing window to verify no regressions.
+All Lambda functions upgraded to `nodejs22.x` — merlin-api, simplestore, vabamorf-api, tara-auth.
+Also added esbuild bundling (PR #657) to properly package runtime dependencies.
 
 ---
 

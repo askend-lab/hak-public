@@ -61,4 +61,4 @@ export interface VmetajsonResponse {
   };
 }
 
-export type { LambdaResponse } from "./validation";
+export type { LambdaResponse } from "@hak/shared";

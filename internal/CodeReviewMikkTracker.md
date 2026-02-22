@@ -17,15 +17,15 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.3** (Medium) ARCHITECTURE.md says merlin-worker depends on shared (incorrect)
 - ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.4** (Medium) ARCHITECTURE.md says vabamorf-api depends on shared (misleading)
 - ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.5** (Medium) merlin-worker described as Python + TypeScript (inaccurate)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams)
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.3.6** (High?) Architecture doc missing key sections (auth, security, diagrams) — ARCHITECTURE.md now has Authentication & Authorization, Security Model, System Diagrams, CI/CD sections
 - ✅ Accept  [✅] Fixed  [ ] Closed — **1.4.1** (Medium) API docs are manual, no OpenAPI/Swagger — OpenAPI 3.0.3 specs now auto-generated from Zod schemas (zod-to-openapi), copied to docs/ by api-client generate script
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1** (Medium) No deployment guide for engineers
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1.1** (Low) Too many markdown files (~46) — organize/consolidate
-- ✅ Accept  [ ] Fixed  [ ] Closed — **1.5.1.2** (Low) Design documentation in two places
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.5.1** (Medium) No deployment guide for engineers — docs/DEPLOYMENT.md (84 lines) covers dev + prod
+- ❌ Reject (acceptable)  —  — **1.5.1.1** (Low) Too many markdown files (~46, now 74) — acceptable count, will reduce over time
+- ✅ Accept  [✅] Fixed  [ ] Closed — **1.5.1.2** (Low) Design documentation in two places — no duplication found (docs/design-systems/ doesn't exist)
 
 ## 2. Technical Stack
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS
+- ✅ Accept  [✅] Fixed  [ ] Closed — **2.1** (Low) Node.js 20, upgrade to latest LTS — upgraded to nodejs22.x in all serverless.yml configs
 - ✅ Accept  [✅] Fixed  [ ] Closed — **2.2** (Low) 5 testing frameworks — removed Jest from shared, simplestore, frontend
 - ✅ Accept  [✅] Fixed  [ ] Closed — **2.3** (Low) Bug in generate.py: ERB now uses erb_alpha
 
@@ -50,7 +50,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ❌ Reject (not found)  —  — **4.13** (Low) Unnecessary awaits — not confirmed in source code
 - ❌ Reject (external lib)  —  — **4.14** (Medium) DeepRecurrentNetwork class — external Merlin library, not our code
 - ❌ Reject (ML convention)  —  — **4.15** (Low) Python naming case — ML math notation convention (W_value, Whx)
-- ✅ Accept  [ ] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — install SonarQube and verify
+- ✅ Accept  [ ] Fixed  [ ] Closed — **4.16** (Medium) SonarQube issues — will run SonarQube to verify remaining issues beyond ESLint/Ruff/DevBox
 - ❌ Reject (external lib)  —  — **4.17** (Medium) Merlin NN Python style issues — external library code
 - ✅ Accept  [🛡️] Fixed  [ ] Closed — **4.18** (Medium) Floating point equality checks in worker.py — Ruff PLR2004
 

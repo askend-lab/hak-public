@@ -45,7 +45,7 @@ Audited all Terraform files, Serverless configs, Dockerfiles, GitHub Actions wor
 | 3.1 | No CloudTrail | CRITICAL | ✅ `infra/cloudtrail.tf` — multi-region trail, S3 bucket (365-day retention, IA after 90 days) | #559 |
 | 3.2 | No GuardDuty | CRITICAL | ✅ `infra/guardduty.tf` — detector with S3 monitoring (dev only, per-account) | #559, #563 |
 | 3.3 | ECS Fargate in default VPC | MEDIUM | ⏸️ Deferred — private subnets + NAT = ~$30/mo |
-| 3.4 | Lambda nodejs18.x runtime | HIGH | 📋 Backlog — see `internal/BACKLOG.md` |
+| 3.4 | Lambda nodejs18.x runtime | HIGH | ✅ Upgraded to nodejs22.x in all serverless.yml (merlin-api, simplestore, vabamorf-api, tara-auth) |
 
 ---
 
