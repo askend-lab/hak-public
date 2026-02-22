@@ -34,7 +34,7 @@ export class VabamorfClient {
   private async get<T>(path: string): Promise<ApiResult<T>> {
     const res = await fetch(`${this.baseUrl}${path}`);
     const body = await res.json();
-    if (!res.ok) return { status: res.status, error: body.error ?? "Unknown error" };
+    if (!res.ok) {return { status: res.status, error: body.error ?? "Unknown error" };}
     return { status: res.status, data: body as T };
   }
 
@@ -45,7 +45,7 @@ export class VabamorfClient {
       body: JSON.stringify(payload),
     });
     const body = await res.json();
-    if (!res.ok) return { status: res.status, error: body.error ?? "Unknown error" };
+    if (!res.ok) {return { status: res.status, error: body.error ?? "Unknown error" };}
     return { status: res.status, data: body as T };
   }
 }

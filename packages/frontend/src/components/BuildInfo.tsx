@@ -32,7 +32,7 @@ const buildTimeInfo =
       };
 
 function formatDateTime(dateString: string): string {
-  if (!dateString) return "";
+  if (!dateString) {return "";}
   const date = new Date(dateString);
   return date.toLocaleString("et-EE", {
     day: "2-digit",
@@ -65,7 +65,7 @@ function useBuildInfo(): RuntimeBuildInfo {
   const [runtimeInfo, setRuntimeInfo] = useState<RuntimeBuildInfo | null>(null);
 
   useEffect(() => {
-    if (isLocalDev()) return;
+    if (isLocalDev()) {return;}
     fetch("/build-info.json")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => data && setRuntimeInfo(data))
@@ -100,7 +100,7 @@ const BuildInfoModal = ({
   info: RuntimeBuildInfo;
   onClose: () => void;
 }) => (
-  <div className="build-info-overlay" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }} role="presentation" tabIndex={-1}>
+  <div className="build-info-overlay" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") {onClose();} }} role="presentation" tabIndex={-1}>
     <div role="dialog" aria-modal="true" aria-labelledby="build-info-title">
       <div className="build-info-modal" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
       <div className="build-info-modal__header">

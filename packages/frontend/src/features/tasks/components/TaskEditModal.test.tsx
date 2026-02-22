@@ -219,7 +219,7 @@ describe("TaskEditModal mutation kills", () => {
     expect(screen.getByPlaceholderText("Ülesande nimi (Kohustuslik)")).toHaveValue("My Task");
     // Trigger handleClose via BaseModal's onClose
     const closeBtn = document.querySelector(".base-modal__close, [aria-label='Sulge']");
-    if (closeBtn) await user.click(closeBtn as HTMLElement);
+    if (closeBtn) {await user.click(closeBtn as HTMLElement);}
     // After close, onClose should be called and fields reset
     await waitFor(() => expect(mockOnClose).toHaveBeenCalled());
   });
@@ -291,7 +291,7 @@ describe("TaskEditModal mutation kills", () => {
     await user.click(screen.getByRole("button", { name: "Salvesta" }));
     // While submitting, try to close
     const closeBtn = document.querySelector(".base-modal__close, [aria-label='Sulge']");
-    if (closeBtn) await user.click(closeBtn as HTMLElement);
+    if (closeBtn) {await user.click(closeBtn as HTMLElement);}
     // onClose should NOT be called during submit
     expect(mockOnClose).not.toHaveBeenCalled();
     resolveSave!();

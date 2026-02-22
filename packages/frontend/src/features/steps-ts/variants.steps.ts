@@ -196,10 +196,10 @@ Then("each variant shows its phonetic form", async function (this: TestWorld) {
     const variants = this.container?.querySelectorAll(
       '.variant-item, [class*="variant"]',
     );
-    if (!variants || variants.length === 0) return false;
+    if (!variants || variants.length === 0) {return false;}
     // Check that variants have phonetic content
     for (const variant of variants) {
-      if (!variant.textContent) return false;
+      if (!variant.textContent) {return false;}
     }
     return true;
   });

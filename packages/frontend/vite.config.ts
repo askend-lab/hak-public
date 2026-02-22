@@ -67,7 +67,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       onwarn(warning, defaultHandler) {
-        if (warning.message.includes("sourcemap for reporting an error")) return;
+        if (warning.message.includes("sourcemap for reporting an error")) {return;}
         defaultHandler(warning);
       },
       output: {

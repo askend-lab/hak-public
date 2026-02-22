@@ -16,6 +16,10 @@ import {
   mockSentenceMenu,
 } from "./test/mocks/appMocks";
 
+import SynthesisRoute from "./routes/SynthesisRoute";
+import TasksRoute from "./routes/TasksRoute";
+import SpecsRoute from "./routes/SpecsRoute";
+
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/CopiedEntriesContext", () => ({
   useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
@@ -90,10 +94,6 @@ vi.mock("./features/onboarding/components", () => ({
   ),
   OnboardingWizard: () => null,
 }));
-
-import SynthesisRoute from "./routes/SynthesisRoute";
-import TasksRoute from "./routes/TasksRoute";
-import SpecsRoute from "./routes/SpecsRoute";
 
 function renderWithRoutes(initialPath: string) {
   const Dashboard = vi.fn(() => <div data-testid="dashboard">Dashboard</div>);

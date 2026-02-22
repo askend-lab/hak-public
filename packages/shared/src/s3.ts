@@ -31,7 +31,7 @@ function isS3Error(error: unknown): error is S3Error {
 }
 
 export function isNotFoundError(error: unknown): boolean {
-  if (!isS3Error(error)) return false;
+  if (!isS3Error(error)) {return false;}
   return (
     error.name === "NotFound" ||
     error.name === "NoSuchKey" ||

@@ -8,8 +8,6 @@ import {
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
 
-extendZodWithOpenApi(z);
-
 import {
   AnalyzeRequestSchema,
   AnalyzeResponseSchema,
@@ -18,6 +16,8 @@ import {
   HealthResponseSchema,
   ErrorResponseSchema,
 } from "./schemas";
+
+extendZodWithOpenApi(z);
 
 const registry = new OpenAPIRegistry();
 

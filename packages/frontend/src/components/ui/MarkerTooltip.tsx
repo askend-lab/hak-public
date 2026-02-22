@@ -48,7 +48,7 @@ export default function MarkerTooltip({
 
   // Handle click outside for touch devices
   useEffect(() => {
-    if (!isTouchDevice || !isVisible) return;
+    if (!isTouchDevice || !isVisible) {return;}
 
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (

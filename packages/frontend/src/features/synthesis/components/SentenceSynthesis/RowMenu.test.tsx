@@ -67,7 +67,7 @@ describe("RowMenu", () => {
     const backdrop = container.querySelector(
       ".sentence-synthesis-item__menu-backdrop",
     );
-    if (backdrop) fireEvent.click(backdrop);
+    if (backdrop) {fireEvent.click(backdrop);}
     expect(onClose).toHaveBeenCalled();
   });
 

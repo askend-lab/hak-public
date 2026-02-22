@@ -49,16 +49,16 @@ export function useDragAndDrop(
   const handleDrop = useCallback(
     (e: React.DragEvent, targetId: string) => {
       e.preventDefault();
-      if (!draggedId || draggedId === targetId) return;
+      if (!draggedId || draggedId === targetId) {return;}
 
       setEntries((prev) => {
         const draggedIndex = prev.findIndex((entry) => entry.id === draggedId);
         const targetIndex = prev.findIndex((entry) => entry.id === targetId);
-        if (draggedIndex === -1 || targetIndex === -1) return prev;
+        if (draggedIndex === -1 || targetIndex === -1) {return prev;}
 
         const newEntries = [...prev];
         const [draggedItem] = newEntries.splice(draggedIndex, 1);
-        if (draggedItem) newEntries.splice(targetIndex, 0, draggedItem);
+        if (draggedItem) {newEntries.splice(targetIndex, 0, draggedItem);}
         return newEntries;
       });
 

@@ -35,8 +35,8 @@ export function useTaskDelete(deps: UseTaskDeleteDeps) {
 
   const handleDeleteTask = useCallback(
     async (taskId: string) => {
-      if (requireAuth()) return;
-      if (!user) return;
+      if (requireAuth()) {return;}
+      if (!user) {return;}
       try {
         const fullTask = await dataService.getTask(taskId);
         if (fullTask) {
@@ -51,7 +51,7 @@ export function useTaskDelete(deps: UseTaskDeleteDeps) {
   );
 
   const handleConfirmDelete = useCallback(async () => {
-    if (!user || !taskToDelete) return;
+    if (!user || !taskToDelete) {return;}
     setIsDeleting(true);
     const taskName = taskToDelete.name;
     try {

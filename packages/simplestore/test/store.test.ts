@@ -49,7 +49,7 @@ describe("Store", () => {
     ])("should handle %s", async (_name, ttl, expectedSuccess) => {
       const result = await store.save({ pk: "entity1", sk: "sort1", type: "private", ttl, data: {} });
       expect(result.success).toBe(expectedSuccess);
-      if (!expectedSuccess) expect(result.error).toContain("TTL");
+      if (!expectedSuccess) {expect(result.error).toContain("TTL");}
     });
 
     it("should set owner and timestamps from context", async () => {

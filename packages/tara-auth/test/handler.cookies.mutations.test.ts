@@ -1,5 +1,7 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
+import { callbackHandler } from '../src/handler';
+
 const mockBuildAuthorizationUrl = jest.fn();
 const mockExchangeCodeForTokens = jest.fn();
 const mockVerifyIdToken = jest.fn();
@@ -20,8 +22,6 @@ jest.mock('../src/cognito-client', () => ({
     generateTokens: (...args: unknown[]) => mockGenerateTokens(...args),
   }),
 }));
-
-import { callbackHandler } from '../src/handler';
 
 describe('handler.ts cookie mutation kills', () => {
   const originalEnv = process.env;

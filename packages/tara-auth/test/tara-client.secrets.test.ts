@@ -1,5 +1,7 @@
 // Tests for Secrets Manager integration in tara-client
 
+import { createTaraClient, _resetSecretsCache, DEFAULT_CALLBACK_URL } from '../src/tara-client';
+
 const mockSend = jest.fn();
 
 jest.mock('@aws-sdk/client-secrets-manager', () => ({
@@ -11,8 +13,6 @@ jest.mock('jose', () => ({
   createRemoteJWKSet: jest.fn().mockReturnValue('mock-jwks'),
   jwtVerify: jest.fn(),
 }));
-
-import { createTaraClient, _resetSecretsCache, DEFAULT_CALLBACK_URL } from '../src/tara-client';
 
 const originalEnv = process.env;
 

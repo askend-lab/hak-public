@@ -6,7 +6,7 @@ import type { User } from "./types";
 export function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");
-    if (parts.length !== 3 || !parts[1]) return null;
+    if (parts.length !== 3 || !parts[1]) {return null;}
     return JSON.parse(atob(parts[1]));
   } catch {
     return null;
@@ -27,20 +27,20 @@ export interface ParseIdTokenOptions {
  */
 export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): User | null {
   const payload = decodeJwtPayload(idToken);
-  if (!payload) return null;
+  if (!payload) {return null;}
 
   // Validate required claims
-  if (!payload.sub || typeof payload.sub !== "string") return null;
-  if (payload.exp && Date.now() / 1000 > (payload.exp as number)) return null;
+  if (!payload.sub || typeof payload.sub !== "string") {return null;}
+  if (payload.exp && Date.now() / 1000 > (payload.exp as number)) {return null;}
 
   // Validate issuer (Cognito User Pool URL)
-  if (options?.expectedIssuer && payload.iss !== options.expectedIssuer) return null;
+  if (options?.expectedIssuer && payload.iss !== options.expectedIssuer) {return null;}
 
   // Validate audience (Cognito Client ID)
-  if (options?.expectedAudience && payload.aud !== options.expectedAudience) return null;
+  if (options?.expectedAudience && payload.aud !== options.expectedAudience) {return null;}
 
   const email = typeof payload.email === "string" ? payload.email : undefined;
-  if (!email) return null;
+  if (!email) {return null;}
 
   return {
     id: payload.sub,
@@ -56,8 +56,8 @@ export function isTokenExpired(
   bufferSeconds = TOKEN_EXPIRY_BUFFER_SECONDS,
 ): boolean {
   const payload = decodeJwtPayload(token);
-  if (!payload) return true;
+  if (!payload) {return true;}
   const exp = payload.exp as number | undefined;
-  if (!exp) return true;
+  if (!exp) {return true;}
   return Date.now() / 1000 > exp - bufferSeconds;
 }

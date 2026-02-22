@@ -10,12 +10,12 @@ export const parsePhoneticMarkers = (text: string): MarkerTag[] => {
   const markers: MarkerTag[] = [];
 
   if (text.includes("<"))
-    markers.push({ tag: "kolmas välde", type: "phonetic" });
+    {markers.push({ tag: "kolmas välde", type: "phonetic" });}
   if (text.includes("?"))
-    markers.push({ tag: "ebareeglipärane rõhk", type: "phonetic" });
-  if (text.includes("]")) markers.push({ tag: "peenendus", type: "phonetic" });
+    {markers.push({ tag: "ebareeglipärane rõhk", type: "phonetic" });}
+  if (text.includes("]")) {markers.push({ tag: "peenendus", type: "phonetic" });}
   if (text.includes("_"))
-    markers.push({ tag: "liitsõna piir", type: "boundary" });
+    {markers.push({ tag: "liitsõna piir", type: "boundary" });}
 
   if (markers.length === 0) {
     markers.push({ tag: "rõhk esimesel silbil", type: "default" });

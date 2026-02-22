@@ -22,8 +22,8 @@ export function PlayButton({
   "data-onboarding-target": onboardingTarget,
 }: PlayButtonProps): React.ReactElement {
   const getAriaLabel = (): string => {
-    if (isLoading) return "Loading";
-    if (isPlaying) return "Playing";
+    if (isLoading) {return "Loading";}
+    if (isPlaying) {return "Playing";}
     return "Play";
   };
 

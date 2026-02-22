@@ -43,7 +43,7 @@ describe("generateCodeVerifier", () => {
 
   it("produces deterministic output with mocked random", () => {
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = i;
+      for (let i = 0; i < arr.length; i++) {arr[i] = i;}
       return arr;
     }) as typeof crypto.getRandomValues;
     const a = generateCodeVerifier();
@@ -53,7 +53,7 @@ describe("generateCodeVerifier", () => {
 
   it("replaces + with - when random bytes produce +", () => {
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0xF8;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0xF8;}
       return arr;
     }) as typeof crypto.getRandomValues;
     const result = generateCodeVerifier();
@@ -63,7 +63,7 @@ describe("generateCodeVerifier", () => {
 
   it("replaces / with _ when random bytes produce /", () => {
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0xFF;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0xFF;}
       return arr;
     }) as typeof crypto.getRandomValues;
     const result = generateCodeVerifier();
@@ -85,7 +85,7 @@ describe("generateCodeChallenge", () => {
   it("replaces + with - in challenge output", async () => {
     crypto.subtle.digest = vi.fn(async () => {
       const arr = new Uint8Array(32);
-      for (let i = 0; i < 32; i++) arr[i] = 0xF8;
+      for (let i = 0; i < 32; i++) {arr[i] = 0xF8;}
       return arr.buffer;
     });
     const result = await generateCodeChallenge("v");
@@ -96,7 +96,7 @@ describe("generateCodeChallenge", () => {
   it("replaces / with _ in challenge output", async () => {
     crypto.subtle.digest = vi.fn(async () => {
       const arr = new Uint8Array(32);
-      for (let i = 0; i < 32; i++) arr[i] = 0xFF;
+      for (let i = 0; i < 32; i++) {arr[i] = 0xFF;}
       return arr.buffer;
     });
     const result = await generateCodeChallenge("v");

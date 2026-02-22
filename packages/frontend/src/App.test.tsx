@@ -17,6 +17,8 @@ import {
   mockVariantsPanel,
   mockSentenceMenu,
 } from "./test/mocks/appMocks";
+import SynthesisRoute from "./routes/SynthesisRoute";
+import TasksRoute from "./routes/TasksRoute";
 
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/CopiedEntriesContext", () => ({
@@ -91,8 +93,6 @@ vi.mock("./features/onboarding/components", () => ({
     <div data-testid="onboarding-wizard">OnboardingWizard</div>
   ),
 }));
-import SynthesisRoute from "./routes/SynthesisRoute";
-import TasksRoute from "./routes/TasksRoute";
 
 function AppWrapper({ children }: { children: React.ReactNode }) {
   return <DataServiceTestWrapper>{children}</DataServiceTestWrapper>;

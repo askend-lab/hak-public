@@ -31,7 +31,7 @@ export function CustomVariantForm({
 
   const insertMarkerAtCursor = (marker: string): void => {
     const input = inputRef.current;
-    if (!input) return;
+    if (!input) {return;}
     const start = input.selectionStart || 0;
     const end = input.selectionEnd || 0;
     const newValue = value.substring(0, start) + marker + value.substring(end);

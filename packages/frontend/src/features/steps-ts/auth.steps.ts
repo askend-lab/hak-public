@@ -101,18 +101,15 @@ Then("I am logged in successfully", async function (this: TestWorld) {
 
 Then("I see my profile information", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const profile = this.container?.querySelector(
+    return this.container?.querySelector(
       '.user-profile, [data-testid="user-profile"]',
     );
-    return profile;
   });
 });
 
 Then("I am logged out", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const loginButton =
-      this.queryByText("Logi sisse") || this.queryByText("Login");
-    return loginButton;
+    return this.queryByText("Logi sisse") || this.queryByText("Login");
   });
 });
 

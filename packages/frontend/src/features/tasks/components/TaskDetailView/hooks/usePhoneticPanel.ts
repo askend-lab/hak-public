@@ -32,7 +32,7 @@ export function usePhoneticPanel(
   const handleExplorePhonetic = useCallback(
     async (entryId: string) => {
       const entry = entries.find((e) => e.id === entryId);
-      if (!entry || !entry.text.trim()) return;
+      if (!entry || !entry.text.trim()) {return;}
 
       onMenuClose();
 

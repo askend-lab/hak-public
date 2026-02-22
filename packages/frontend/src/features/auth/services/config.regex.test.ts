@@ -21,7 +21,7 @@ describe("PKCE regex replacement precision", () => {
     // Mock getRandomValues to produce bytes that generate + in base64
     // 0xF8 = 11111000, groups of 6 bits: 111110 = index 62 = '+'
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0xF8;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0xF8;}
       return arr;
     }) as typeof crypto.getRandomValues;
 
@@ -36,7 +36,7 @@ describe("PKCE regex replacement precision", () => {
   it("replaces / with _ (not empty string) in code verifier", async () => {
     // 0xFF bytes produce / in base64 (6-bit group 111111 = index 63 = '/')
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0xFF;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0xFF;}
       return arr;
     }) as typeof crypto.getRandomValues;
 
@@ -49,7 +49,7 @@ describe("PKCE regex replacement precision", () => {
   it("strips trailing = padding from code verifier", async () => {
     // Ensure we get padding: 32 bytes → base64 has 44 chars with ==
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0x00;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0x00;}
       return arr;
     }) as typeof crypto.getRandomValues;
 
@@ -62,14 +62,14 @@ describe("PKCE regex replacement precision", () => {
 
   it("replaces + with - in code challenge", async () => {
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0x42;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0x42;}
       return arr;
     }) as typeof crypto.getRandomValues;
 
     // Mock SHA-256 to return bytes that produce + in base64
     crypto.subtle.digest = vi.fn(async () => {
       const result = new Uint8Array(32);
-      for (let i = 0; i < 32; i++) result[i] = 0xF8;
+      for (let i = 0; i < 32; i++) {result[i] = 0xF8;}
       return result.buffer;
     });
 
@@ -82,13 +82,13 @@ describe("PKCE regex replacement precision", () => {
 
   it("replaces / with _ in code challenge", async () => {
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0x42;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0x42;}
       return arr;
     }) as typeof crypto.getRandomValues;
 
     crypto.subtle.digest = vi.fn(async () => {
       const result = new Uint8Array(32);
-      for (let i = 0; i < 32; i++) result[i] = 0xFF;
+      for (let i = 0; i < 32; i++) {result[i] = 0xFF;}
       return result.buffer;
     });
 
@@ -101,13 +101,13 @@ describe("PKCE regex replacement precision", () => {
 
   it("strips = from code challenge", async () => {
     crypto.getRandomValues = vi.fn((arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) arr[i] = 0x42;
+      for (let i = 0; i < arr.length; i++) {arr[i] = 0x42;}
       return arr;
     }) as typeof crypto.getRandomValues;
 
     crypto.subtle.digest = vi.fn(async () => {
       const result = new Uint8Array(32);
-      for (let i = 0; i < 32; i++) result[i] = 0x00;
+      for (let i = 0; i < 32; i++) {result[i] = 0x00;}
       return result.buffer;
     });
 

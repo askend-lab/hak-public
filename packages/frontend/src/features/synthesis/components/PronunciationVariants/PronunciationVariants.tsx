@@ -17,7 +17,7 @@ import { CustomVariantForm } from "./CustomVariantForm";
 function deduplicateByText(variants: Variant[]): Variant[] {
   const seen = new Set<string>();
   return variants.filter((v) => {
-    if (seen.has(v.text)) return false;
+    if (seen.has(v.text)) {return false;}
     seen.add(v.text);
     return true;
   });
@@ -69,7 +69,7 @@ export default function PronunciationVariants({
     setError(null);
     try {
       const response = await postJSON(VARIANTS_API_PATH, { word: selectedWord });
-      if (!response.ok) throw new Error("Failed to fetch variants");
+      if (!response.ok) {throw new Error("Failed to fetch variants");}
       const data = await response.json();
       setVariants(deduplicateByText(data.variants || []));
     } catch (err) {
@@ -134,7 +134,7 @@ export default function PronunciationVariants({
   };
 
   const handlePlayCustomVariant = async () => {
-    if (!customVariant.trim()) return;
+    if (!customVariant.trim()) {return;}
 
     // If custom variant is already playing, pause it
     if (isCustomPlaying) {
@@ -179,7 +179,7 @@ export default function PronunciationVariants({
   };
 
   const handleUseCustomVariant = () => {
-    if (!customVariant.trim()) return;
+    if (!customVariant.trim()) {return;}
     const vabamorfText = transformToVabamorf(customVariant);
     onUseVariant?.(vabamorfText || "");
   };
@@ -189,7 +189,7 @@ export default function PronunciationVariants({
     setCustomVariant("");
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <>

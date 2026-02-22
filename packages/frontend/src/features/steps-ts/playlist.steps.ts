@@ -118,8 +118,7 @@ When("I download the playlist", async function (this: TestWorld) {
 
 Then("the playlist starts playing", async function (this: TestWorld) {
   await this.waitFor(() => {
-    const audioElement = this.container?.querySelector("audio");
-    return audioElement;
+    return this.container?.querySelector("audio");
   });
 });
 

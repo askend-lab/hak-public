@@ -32,7 +32,7 @@ export function useTagUpdater(setSentences: SentenceSetter): {
     (sentenceId: string, transformer: TagTransformer) => {
       setSentences((prev) =>
         prev.map((s) => {
-          if (s.id !== sentenceId) return s;
+          if (s.id !== sentenceId) {return s;}
           const updates = transformer(s);
           return { ...s, ...updates };
         }),

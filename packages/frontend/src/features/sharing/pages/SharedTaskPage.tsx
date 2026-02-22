@@ -78,7 +78,7 @@ export function SharedTaskPage() {
   }, [handlePlayAll, entries]);
 
   const handleCopyToPlaylist = (): void => {
-    if (!task?.entries) return;
+    if (!task?.entries) {return;}
 
     setCopiedEntries(task.entries);
     showNotification({ type: "success", message: "Laused kopeeritud!" });

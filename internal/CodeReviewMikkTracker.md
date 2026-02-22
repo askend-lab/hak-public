@@ -166,3 +166,41 @@ Beyond fixing individual findings, we built a **DevBox quality system** — auto
 ### Impact Summary
 
 Of the **47 accepted findings**, **14 are now enforced by DevBox hooks** (marked with 🛡️). These findings cannot recur — any new violation will block the commit. The remaining findings require manual fixes but no automated enforcement (doc sync, cross-package consolidation, etc.).
+
+---
+
+## Quality System Improvements (SonarQube Audit, 2026-02-22)
+
+Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: ESLint rules not applied to TypeScript files. Action items:
+
+### ESLint Config Gap (Critical)
+
+- [ ] **QS-1** Fix `eslint.base.config.mjs` — TS file block (`**/*.ts`) only has 6 `typescriptRules`. Must inherit ALL rules from JS block: `baseRules`, `sonarRules`, `securityRules`, `regexpRules`, `unicornRules`, `promiseRules`, `eslintCommentsRules`, `importRules`, `commentRules`. Same for `**/*.tsx`.
+- [ ] **QS-2** Verify `sonarjs/cognitive-complexity` works on `.ts` — vmetajson.ts has complexity 18, limit should be 8-15. Currently not checked at all.
+- [ ] **QS-3** Verify `regexp/*` rules work on `.ts` — tara-auth/cognito-client.ts has regex vulnerable to catastrophic backtracking (ReDoS). Currently not checked.
+- [ ] **QS-4** After fix: run `npx eslint --print-config packages/vabamorf-api/src/vmetajson.ts` and confirm sonarjs rules are present.
+
+### CSS/SCSS Linting (Missing)
+
+- [ ] **QS-5** Add Stylelint to DevBox hooks — SonarQube found duplicate CSS selectors in `_reset.scss` and `_eki-app.scss`. No SCSS linting exists today.
+- [ ] **QS-6** Configure Stylelint rules: `no-duplicate-selectors`, `font-family-no-duplicate-names`, `declaration-block-no-duplicate-properties`.
+
+### Python Type Checking (Missing)
+
+- [ ] **QS-7** Add mypy to merlin-worker — SonarQube found wrong argument type in test_worker.py:377 (`_sigterm_handler` call). Ruff doesn't check types.
+- [ ] **QS-8** Add mypy to DevBox hooks for Python modules (mode: warning initially).
+
+### SonarQube False Positives (No Action)
+
+- ~~shared/src/logger.ts:27 empty arrow function~~ — intentional NO_OP for filtered log levels
+- ~~api-client/src/generated/*.ts interface names~~ — auto-generated from OpenAPI, lowercase by spec
+- ~~merlin-worker /tmp paths in tests~~ — test fixtures only
+
+### SonarQube Valid but Low Priority
+
+- [ ] **QS-9** Refactor vmetajson.ts:62 to reduce cognitive complexity (18 → ≤15) — extract helper functions
+- [ ] **QS-10** Fix duplicate CSS `monospace` in `_reset.scss:124,173`
+- [ ] **QS-11** Fix duplicate `.eki-results-section` selector in `_eki-app.scss:470` (first at line 165)
+- [ ] **QS-12** Review `api-client/scripts/generate.mjs:52` OS command execution — ensure input is sanitized
+- [ ] **QS-13** Review Docker root user in `vabamorf-api/Dockerfile.local` — add USER directive for local dev
+- [ ] **QS-14** Review regex ReDoS in `tara-auth/cognito-client.ts:66` — simplify or use atomic group

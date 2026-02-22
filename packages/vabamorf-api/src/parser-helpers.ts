@@ -14,14 +14,14 @@ function getFirstMrfStem(
   mrf: VmetajsonMrf[] | undefined,
 ): { stem: string; ending: string } | null {
   const first = mrf?.[0];
-  if (first == null || first.stem == null) return null;
+  if (first == null || first.stem == null) {return null;}
 
   return { stem: first.stem, ending: first.ending ?? "" };
 }
 
 export function extractTokenText(tokenData: VmetajsonToken): string | null {
   const first = getFirstMrfStem(tokenData.features?.mrf);
-  if (first) return formatPhoneticText(first.stem, first.ending);
+  if (first) {return formatPhoneticText(first.stem, first.ending);}
 
   return tokenData.features?.token ?? null;
 }
@@ -30,7 +30,7 @@ export function createVariantFromMrf(
   mrfVariant: VmetajsonMrf,
   word: string,
 ): Variant | null {
-  if (mrfVariant.stem == null) return null;
+  if (mrfVariant.stem == null) {return null;}
 
   const { stem, ending = "", pos = "", lemma = "", fs = "" } = mrfVariant;
   const text = formatPhoneticText(stem, ending);

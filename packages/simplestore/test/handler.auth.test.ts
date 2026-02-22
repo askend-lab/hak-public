@@ -101,8 +101,8 @@ describe("Lambda Handler Auth", () => {
       ["whitespace-only env var", { APP_NAME: "  \t  " }],
     ])("should handle %s correctly", async (_name, envVars) => {
       Object.entries(envVars).forEach(([key, value]) => {
-        if (value === undefined) delete process.env[key];
-        else process.env[key] = value;
+        if (value === undefined) {delete process.env[key];}
+        else {process.env[key] = value;}
       });
       const event = createPostEvent("/save", { pk: "env-test", sk: "sort", type: "private", ttl: 3600 });
       const result = await handler(event);

@@ -1,18 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-jest.mock("../src/s3", () => {
-  const actual = jest.requireActual("../src/s3");
-  return {
-    ...actual,
-    checkS3Cache: jest.fn(),
-  };
-});
-
-jest.mock("../src/sqs", () => ({
-  sendToQueue: jest.fn().mockResolvedValue("msg-123"),
-}));
-
 import { synthesize, status } from "../src/handler";
 import { checkS3Cache } from "../src/s3";
 import { sendToQueue } from "../src/sqs";
@@ -24,6 +12,18 @@ import {
   TEST_BUCKET,
   TEST_REGION,
 } from "./setup";
+
+jest.mock("../src/s3", () => {
+  const actual = jest.requireActual("../src/s3");
+  return {
+    ...actual,
+    checkS3Cache: jest.fn(),
+  };
+});
+
+jest.mock("../src/sqs", () => ({
+  sendToQueue: jest.fn().mockResolvedValue("msg-123"),
+}));
 
 const mockCheckS3Cache = checkS3Cache as jest.MockedFunction<typeof checkS3Cache>;
 const mockSendToQueue = sendToQueue as jest.MockedFunction<typeof sendToQueue>;

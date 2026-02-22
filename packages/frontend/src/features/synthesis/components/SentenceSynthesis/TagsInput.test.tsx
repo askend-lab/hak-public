@@ -85,7 +85,7 @@ describe("TagsInput", () => {
     const backdrop = container.querySelector(
       ".sentence-synthesis-item__tag-menu-backdrop",
     );
-    if (backdrop) fireEvent.click(backdrop);
+    if (backdrop) {fireEvent.click(backdrop);}
     expect(onTagMenuClose).toHaveBeenCalled();
   });
 
@@ -238,7 +238,7 @@ describe("TagsInput", () => {
       />,
     );
     const backdrop = container.querySelector(".sentence-synthesis-item__tag-menu-backdrop");
-    if (backdrop) fireEvent.keyDown(backdrop, { key: "Escape" });
+    if (backdrop) {fireEvent.keyDown(backdrop, { key: "Escape" });}
     expect(onTagMenuClose).toHaveBeenCalled();
   });
 
@@ -253,7 +253,7 @@ describe("TagsInput", () => {
       />,
     );
     const dropdown = container.querySelector(".sentence-synthesis-item__tag-dropdown");
-    if (dropdown) fireEvent.keyDown(dropdown, { key: "Escape" });
+    if (dropdown) {fireEvent.keyDown(dropdown, { key: "Escape" });}
     expect(onTagMenuClose).toHaveBeenCalled();
   });
 
@@ -288,7 +288,7 @@ describe("TagsInput", () => {
       />,
     );
     const dropdown = container.querySelector(".sentence-synthesis-item__tag-dropdown");
-    if (dropdown) fireEvent.click(dropdown);
+    if (dropdown) {fireEvent.click(dropdown);}
   });
 
   it("shows selected style when allTagsSelected is true", () => {

@@ -50,7 +50,7 @@ export default function WizardTooltip({
 
   const calculatePosition = useCallback(() => {
     const target = document.querySelector(step.targetSelector);
-    if (!target || !tooltipRef.current) return false; // Return false if can't calculate
+    if (!target || !tooltipRef.current) {return false;} // Return false if can't calculate
 
     setTargetElement(target);
 
@@ -90,11 +90,11 @@ export default function WizardTooltip({
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    if (left < padding) left = padding;
+    if (left < padding) {left = padding;}
     if (left + tooltipRect.width > viewportWidth - padding) {
       left = viewportWidth - tooltipRect.width - padding;
     }
-    if (top < padding) top = padding;
+    if (top < padding) {top = padding;}
     if (top + tooltipRect.height > viewportHeight - padding) {
       top = viewportHeight - tooltipRect.height - padding;
     }
@@ -170,7 +170,7 @@ export default function WizardTooltip({
   return (
     <>
       {/* Overlay that dims the rest of the page */}
-      <div className="wizard__overlay" onClick={onSkip} onKeyDown={(e) => { if (e.key === "Escape") onSkip(); }} role="presentation" />
+      <div className="wizard__overlay" onClick={onSkip} onKeyDown={(e) => { if (e.key === "Escape") {onSkip();} }} role="presentation" />
 
       {/* Tooltip */}
       <div

@@ -62,19 +62,19 @@ describe("KeyBuilder", () => {
     it("should accept TTL of zero (no expiration)", () => {
       const result = parseTtl(0);
       expect(result.valid).toBe(true);
-      if (result.valid) expect(result.value).toBe(0);
+      if (result.valid) {expect(result.value).toBe(0);}
     });
 
     it("should reject negative TTL", () => {
       const result = parseTtl(-100);
       expect(result.valid).toBe(false);
-      if (!result.valid) expect(result.error).toContain("TTL must be 0");
+      if (!result.valid) {expect(result.error).toContain("TTL must be 0");}
     });
 
     it("should reject TTL exceeding max limit", () => {
       const result = parseTtl(config.maxTtlSeconds + 1);
       expect(result.valid).toBe(false);
-      if (!result.valid) expect(result.error).toContain("exceeds maximum");
+      if (!result.valid) {expect(result.error).toContain("exceeds maximum");}
     });
 
     it("should accept TTL at max limit", () => {

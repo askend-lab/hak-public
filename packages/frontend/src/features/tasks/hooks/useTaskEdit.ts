@@ -28,8 +28,8 @@ export function useTaskEdit(deps: UseTaskEditDeps) {
 
   const handleEditTask = useCallback(
     async (task: { id: string; name: string; description?: string | null }) => {
-      if (requireAuth()) return;
-      if (!user) return;
+      if (requireAuth()) {return;}
+      if (!user) {return;}
       try {
         const fullTask = await dataService.getTask(task.id);
         if (fullTask) {
@@ -53,7 +53,7 @@ export function useTaskEdit(deps: UseTaskEditDeps) {
       name: string;
       description?: string | null;
     }): Promise<void> => {
-      if (!user) return;
+      if (!user) {return;}
       try {
         await dataService.updateTask(updatedTask.id, {
           name: updatedTask.name,

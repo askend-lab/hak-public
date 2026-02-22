@@ -77,7 +77,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
   const handlePlayEntry = useCallback(
     (id: string) => {
       const entry = entries.find((e) => e.id === id);
-      if (!entry) return;
+      if (!entry) {return;}
 
       if (hasAudioSource(entry)) {
         setCurrentPlayingId(id);
@@ -87,14 +87,14 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
           const audio = new Audio(playUrl);
           audio.onended = () => {
             setCurrentPlayingId(null);
-            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
           };
           audio.onerror = () => {
-            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
             void synthesizeAndPlay(entry.stressedText, entry.text, id);
           };
           audio.play().catch(() => {
-            if (playResult.shouldRevoke) URL.revokeObjectURL(playUrl);
+            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
             void synthesizeAndPlay(entry.stressedText, entry.text, id);
           });
         }
@@ -107,7 +107,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
 
   const playSingleEntry = useCallback(
     async (entry: TaskEntry, abortSignal: AbortSignal): Promise<boolean> => {
-      if (abortSignal.aborted) return false;
+      if (abortSignal.aborted) {return false;}
 
       let audioUrl: string | null = null;
       let shouldRevokeUrl = false;
@@ -134,7 +134,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
           }
         }
 
-        if (!audioUrl || abortSignal.aborted) return false;
+        if (!audioUrl || abortSignal.aborted) {return false;}
 
         return new Promise((resolve) => {
           const validUrl = audioUrl ?? "";
@@ -145,7 +145,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
             setCurrentPlayingId(null);
             setCurrentLoadingId(null);
             setCurrentAudio(null);
-            if (shouldRevokeUrl && audioUrl) URL.revokeObjectURL(audioUrl);
+            if (shouldRevokeUrl && audioUrl) {URL.revokeObjectURL(audioUrl);}
           };
 
           audio.onloadeddata = () => {
@@ -177,7 +177,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
       } catch {
         setCurrentLoadingId(null);
         setCurrentPlayingId(null);
-        if (shouldRevokeUrl && audioUrl) URL.revokeObjectURL(audioUrl);
+        if (shouldRevokeUrl && audioUrl) {URL.revokeObjectURL(audioUrl);}
         return false;
       }
     },
@@ -200,7 +200,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
       return;
     }
 
-    if (entries.length === 0) return;
+    if (entries.length === 0) {return;}
 
     const abortController = new AbortController();
     setPlayAllAbortController(abortController);
@@ -208,7 +208,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
 
     let isFirstEntry = true;
     for (const entry of entries) {
-      if (abortController.signal.aborted) break;
+      if (abortController.signal.aborted) {break;}
 
       const success = await playSingleEntry(entry, abortController.signal);
 
@@ -218,7 +218,7 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
         isFirstEntry = false;
       }
 
-      if (!success || abortController.signal.aborted) break;
+      if (!success || abortController.signal.aborted) {break;}
     }
 
     setIsPlayingAll(false);

@@ -35,7 +35,7 @@ export function useInlineTagEditor({
   const handleEditTag = useCallback(
     (sentenceId: string, tagIndex: number) => {
       const sentence = getSentence(sentenceId);
-      if (!sentence) return;
+      if (!sentence) {return;}
       const word = sentence.tags[tagIndex] ?? "";
       setEditingTag({ sentenceId, tagIndex, value: word });
       setOpenTagMenu(null);
@@ -45,14 +45,14 @@ export function useInlineTagEditor({
 
   const handleEditTagChange = useCallback(
     (value: string) => {
-      if (!editingTag) return;
+      if (!editingTag) {return;}
       setEditingTag({ ...editingTag, value });
     },
     [editingTag],
   );
 
   const handleEditTagCommit = useCallback(() => {
-    if (!editingTag) return;
+    if (!editingTag) {return;}
     const { sentenceId, tagIndex, value } = editingTag;
     const trimmedValue = value.trim();
 

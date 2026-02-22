@@ -127,7 +127,7 @@ describe("TaskDetailView Full", () => {
       fireEvent.click(menuButton);
       await waitFor(() => {
         const shareButton = screen.queryByText(/jaga/i);
-        if (shareButton) fireEvent.click(shareButton);
+        if (shareButton) {fireEvent.click(shareButton);}
       });
     }
   });

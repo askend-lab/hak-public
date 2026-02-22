@@ -51,8 +51,8 @@ export class InMemoryAdapter implements StorageAdapter {
   async conditionalDelete(pk: string, sk: string, expectedOwner: string): Promise<"deleted" | "not_found" | "not_owner"> {
     const key = this.buildKey(pk, sk);
     const existing = this.data.get(key);
-    if (!existing) return "not_found";
-    if (existing.owner !== expectedOwner) return "not_owner";
+    if (!existing) {return "not_found";}
+    if (existing.owner !== expectedOwner) {return "not_owner";}
     this.data.delete(key);
     return "deleted";
   }

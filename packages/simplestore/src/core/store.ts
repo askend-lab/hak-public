@@ -143,8 +143,8 @@ export class Store {
     return this.wrapAsync(async () => {
       if (this.adapter.conditionalDelete) {
         const result = await this.adapter.conditionalDelete(keys.pk, keys.sk, this.context.userId);
-        if (result === "not_found") return { success: false, error: ERRORS.NOT_FOUND };
-        if (result === "not_owner") return { success: false, error: ERRORS.ACCESS_DENIED };
+        if (result === "not_found") {return { success: false, error: ERRORS.NOT_FOUND };}
+        if (result === "not_owner") {return { success: false, error: ERRORS.ACCESS_DENIED };}
         return { success: true };
       }
 

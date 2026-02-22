@@ -37,7 +37,7 @@ export class VmetajsonProcess {
     }
 
     const next = this.requestQueue.shift();
-    if (!next) return;
+    if (!next) {return;}
     this.currentRequest = next;
     this.process.stdin.write(`${JSON.stringify(this.currentRequest.input)}\n`);
   }

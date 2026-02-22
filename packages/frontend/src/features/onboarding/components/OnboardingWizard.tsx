@@ -16,7 +16,7 @@ export default function OnboardingWizard() {
     useOnboarding();
 
   // Don't render if no steps or wizard is not active
-  if (!currentSteps.length || state.completed) {
+  if (currentSteps.length === 0 || state.completed) {
     return null;
   }
 

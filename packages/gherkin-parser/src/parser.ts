@@ -55,13 +55,13 @@ type Handler = (ctx: LineContext, state: ParserState) => void;
 // --- Pure utility functions ---
 
 function classifyLine(line: string): LineType {
-  if (line.startsWith("@")) return "tag";
+  if (line.startsWith("@")) {return "tag";}
   for (const entry of KEYWORD_PREFIXES) {
-    if (line.startsWith(entry.prefix)) return entry.type;
+    if (line.startsWith(entry.prefix)) {return entry.type;}
   }
-  if (STEP_PATTERN.test(line)) return "step";
-  if (TABLE_ROW_PATTERN.test(line)) return "table_row";
-  if (line.startsWith(DOCSTRING_FENCE)) return "docstring_fence";
+  if (STEP_PATTERN.test(line)) {return "step";}
+  if (TABLE_ROW_PATTERN.test(line)) {return "table_row";}
+  if (line.startsWith(DOCSTRING_FENCE)) {return "docstring_fence";}
   return "other";
 }
 
@@ -87,7 +87,7 @@ function extractName(line: string, pattern: RegExp): string {
 
 function parseStep(line: string): ParsedStep | null {
   const match = STEP_PATTERN.exec(line);
-  if (!match || !match[1] || !match[2]) return null;
+  if (!match || !match[1] || !match[2]) {return null;}
   return { keyword: match[1] as StepKeyword, text: match[2] };
 }
 
@@ -140,7 +140,7 @@ function createInitialState(): ParserState {
 }
 
 function finalizeExamples(state: ParserState): void {
-  if (!state.currentExamples) return;
+  if (!state.currentExamples) {return;}
   if (state.currentScenario) {
     state.currentScenario.examples.push(state.currentExamples);
   }
@@ -149,13 +149,13 @@ function finalizeExamples(state: ParserState): void {
 
 function finalizeScenario(state: ParserState): void {
   finalizeExamples(state);
-  if (!state.currentScenario) return;
+  if (!state.currentScenario) {return;}
   getTargetContainer(state).scenarios.push(state.currentScenario);
   state.currentScenario = null;
 }
 
 function finalizeBackground(state: ParserState): void {
-  if (!state.currentBackground) return;
+  if (!state.currentBackground) {return;}
   getTargetContainer(state).background = state.currentBackground;
   state.currentBackground = null;
 }
@@ -163,7 +163,7 @@ function finalizeBackground(state: ParserState): void {
 function finalizeRule(state: ParserState): void {
   finalizeScenario(state);
   finalizeBackground(state);
-  if (!state.currentRule) return;
+  if (!state.currentRule) {return;}
   state.feature.rules.push(state.currentRule);
   state.currentRule = null;
 }
@@ -184,7 +184,7 @@ function getLastStep(state: ParserState): ParsedStep | undefined {
 }
 
 function handleExamplesRow(state: ParserState, cells: string[]): void {
-  if (!state.currentExamples) return;
+  if (!state.currentExamples) {return;}
   if (state.currentExamples.headers.length === 0) {
     state.currentExamples.headers = cells;
   } else {
@@ -194,8 +194,8 @@ function handleExamplesRow(state: ParserState, cells: string[]): void {
 
 function handleStepDataRow(state: ParserState, cells: string[]): void {
   const lastStep = getLastStep(state);
-  if (!lastStep) return;
-  if (!lastStep.dataTable) lastStep.dataTable = [];
+  if (!lastStep) {return;}
+  if (!lastStep.dataTable) {lastStep.dataTable = [];}
   lastStep.dataTable.push(cells);
 }
 
@@ -257,7 +257,7 @@ const HANDLERS: Record<LineType, Handler> = {
 
   step: (ctx, state): void => {
     const step = parseStep(ctx.trimmed);
-    if (!step) return;
+    if (!step) {return;}
     if (state.section === "background" && state.currentBackground) {
       state.currentBackground.steps.push(step);
     } else if (state.currentScenario) {
@@ -268,7 +268,7 @@ const HANDLERS: Record<LineType, Handler> = {
   // #8 Skips malformed table rows
   table_row: (ctx, state): void => {
     const cells = parseTableRow(ctx.trimmed);
-    if (!cells) return;
+    if (!cells) {return;}
     if (state.section === "examples" && state.currentExamples) {
       handleExamplesRow(state, cells);
     } else {

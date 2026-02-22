@@ -25,8 +25,8 @@ describe("lambda", () => {
   describe("getCorsOrigin", () => {
     const originalEnv = process.env.ALLOWED_ORIGIN;
     afterEach(() => {
-      if (originalEnv === undefined) delete process.env.ALLOWED_ORIGIN;
-      else process.env.ALLOWED_ORIGIN = originalEnv;
+      if (originalEnv === undefined) {delete process.env.ALLOWED_ORIGIN;}
+      else {process.env.ALLOWED_ORIGIN = originalEnv;}
     });
 
     it("should return null when ALLOWED_ORIGIN is not set", () => {
@@ -43,8 +43,8 @@ describe("lambda", () => {
   describe("createApiResponse", () => {
     const originalEnv = process.env.ALLOWED_ORIGIN;
     afterEach(() => {
-      if (originalEnv === undefined) delete process.env.ALLOWED_ORIGIN;
-      else process.env.ALLOWED_ORIGIN = originalEnv;
+      if (originalEnv === undefined) {delete process.env.ALLOWED_ORIGIN;}
+      else {process.env.ALLOWED_ORIGIN = originalEnv;}
     });
 
     it("should create a response with CORS headers", () => {

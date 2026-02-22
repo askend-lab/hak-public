@@ -24,7 +24,7 @@ export default function ShareTaskModal({
   const { showNotification } = useNotification();
   const [isCopying, setIsCopying] = useState(false);
   const [isRevoking, setIsRevoking] = useState(false);
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
   const shareUrl = `${window.location.origin}/shared/task/${shareToken}`;
   const handleCopyLink = async () => {
     setIsCopying(true);

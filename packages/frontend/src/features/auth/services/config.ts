@@ -14,8 +14,8 @@ function isLocalDev(): boolean {
 }
 
 function getApiBaseUrl(): string {
-  if (import.meta.env?.VITE_AUTH_API_URL) return import.meta.env.VITE_AUTH_API_URL;
-  if (isLocalDev()) return "/auth";
+  if (import.meta.env?.VITE_AUTH_API_URL) {return import.meta.env.VITE_AUTH_API_URL;}
+  if (isLocalDev()) {return "/auth";}
   // Runtime derivation: hak-dev.askend-lab.com → hak-api-dev.askend-lab.com
   //                     hak.askend-lab.com → hak-api.askend-lab.com
   const hostname = getHostname();
@@ -27,8 +27,8 @@ export function getAuthApiUrl(): string {
 }
 
 export function getTaraLoginUrlValue(): string {
-  if (import.meta.env?.VITE_TARA_LOGIN_URL) return import.meta.env.VITE_TARA_LOGIN_URL;
-  if (isLocalDev()) return "/auth/tara/start";
+  if (import.meta.env?.VITE_TARA_LOGIN_URL) {return import.meta.env.VITE_TARA_LOGIN_URL;}
+  if (isLocalDev()) {return "/auth/tara/start";}
   return `${getApiBaseUrl()}/tara/start`;
 }
 export const PKCE_STORAGE_KEY = "pkce_code_verifier";
@@ -69,8 +69,8 @@ export function getLogoutUri(hostname: string = getHostname()): string {
  */
 function requireEnv(key: string, localDefault: string): string {
   const value = import.meta.env?.[key];
-  if (value) return value;
-  if (isLocalDev()) return localDefault;
+  if (value) {return value;}
+  if (isLocalDev()) {return localDefault;}
   throw new Error(`[Auth] Missing required env var: ${key}. Set it in .env.local or CI environment.`);
 }
 

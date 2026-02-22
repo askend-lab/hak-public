@@ -41,7 +41,7 @@ describe("WizardTooltip", () => {
 
   afterEach(() => {
     const el = document.querySelector('[data-onboarding-target="test"]');
-    if (el) document.body.removeChild(el);
+    if (el) {document.body.removeChild(el);}
     vi.restoreAllMocks();
   });
 

@@ -41,20 +41,20 @@ export function useSynthesisOrchestrator(): ReturnType<
       retryCount = 0,
     ): Promise<boolean> => {
       const sentence = getSentence(id);
-      if (!sentence?.text.trim()) return false;
+      if (!sentence?.text.trim()) {return false;}
 
       let audioUrl = sentence.audioUrl;
 
       if (!audioUrl) {
         try {
-          if (abortSignal?.aborted) return false;
+          if (abortSignal?.aborted) {return false;}
           const result = await synthesisAPI.synthesizeWithCache(
             sentence.text,
             sentence.phoneticText,
             null,
           );
           audioUrl = result.audioUrl;
-          if (abortSignal?.aborted) return false;
+          if (abortSignal?.aborted) {return false;}
           updateSentence(id, { audioUrl: result.audioUrl });
         } catch (error) {
           logger.error("Failed to synthesize audio:", error);
@@ -62,7 +62,7 @@ export function useSynthesisOrchestrator(): ReturnType<
         }
       }
 
-      if (abortSignal?.aborted) return false;
+      if (abortSignal?.aborted) {return false;}
 
       if (abortSignal) {
         return playWithAbort(audioUrl, abortSignal, {
@@ -100,7 +100,7 @@ export function useSynthesisOrchestrator(): ReturnType<
   const synthesizeAndPlay = useCallback(
     async (id: string, retryCount = 0) => {
       const sentence = sentencesRef.current.find((s) => s.id === id);
-      if (!sentence?.text.trim()) return;
+      if (!sentence?.text.trim()) {return;}
 
       stopCurrentAudio();
       const tags = convertTextToTags(sentence.text);

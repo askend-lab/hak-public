@@ -124,7 +124,7 @@ describe("TaskManager", () => {
     });
 
     const backdrop = container.querySelector(".task-manager__menu-backdrop");
-    if (backdrop) await user.click(backdrop);
+    if (backdrop) {await user.click(backdrop);}
 
     await waitFor(() => {
       expect(screen.queryByText("Muuda")).not.toBeInTheDocument();

@@ -10,8 +10,8 @@ const ACTIVITY_THROTTLE = 60000; // 1 min between pings
 const WARMUP_API_PATH = "/api/warmup";
 
 export async function warmAudioWorker(): Promise<void> {
-  if (warmed) return;
-  if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
+  if (warmed) {return;}
+  if (typeof window === "undefined" || import.meta.env?.MODE === "test") {return;}
 
   try {
     const res = await fetch(WARMUP_API_PATH, {
@@ -29,10 +29,10 @@ export async function warmAudioWorker(): Promise<void> {
 }
 
 export function pingMerlinOnActivity(): void {
-  if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
+  if (typeof window === "undefined" || import.meta.env?.MODE === "test") {return;}
 
   const now = Date.now();
-  if (now - lastActivity < ACTIVITY_THROTTLE) return;
+  if (now - lastActivity < ACTIVITY_THROTTLE) {return;}
   lastActivity = now;
 
   fetch(WARMUP_API_PATH, { method: "POST" }).catch((err) => {
@@ -44,8 +44,8 @@ let initialized = false;
 
 // Initialize auto-ping on user activity (mouse, keyboard, touch)
 export function initActivityListeners(): (() => void) | undefined {
-  if (initialized) return;
-  if (typeof window === "undefined" || import.meta.env?.MODE === "test") return;
+  if (initialized) {return;}
+  if (typeof window === "undefined" || import.meta.env?.MODE === "test") {return;}
 
   const handler = (): void => pingMerlinOnActivity();
   const events = ["mouseenter", "keydown", "touchstart"];

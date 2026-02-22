@@ -40,7 +40,7 @@ interface CucumberResult {
 export async function loadCucumberResults(): Promise<CucumberResult[] | null> {
   try {
     const response = await fetch("/cucumber-results.json");
-    if (!response.ok) return null;
+    if (!response.ok) {return null;}
     return (await response.json()) as CucumberResult[];
   } catch {
     return null;

@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import React from "react";
+import React, { createElement } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePronunciationVariants } from "./usePronunciationVariants";
 import type { TaskEntry, Task } from "@/types/task";
-import { createElement } from "react";
 import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
 
 const mockUpdateTaskEntry = vi.fn();
@@ -126,7 +125,7 @@ describe("usePronunciationVariants", () => {
     const invokingSetEntries = vi
       .fn()
       .mockImplementation((updater: (prev: TaskEntry[]) => TaskEntry[]) => {
-        if (typeof updater === "function") updater([mockEntry]);
+        if (typeof updater === "function") {updater([mockEntry]);}
       }) as unknown as React.Dispatch<React.SetStateAction<TaskEntry[]>>;
 
     const { result } = renderHook(() =>

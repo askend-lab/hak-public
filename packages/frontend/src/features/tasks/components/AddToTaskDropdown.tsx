@@ -36,13 +36,13 @@ const TaskList = ({
   onSelect: (task: TaskSummary) => void;
 }) => {
   if (isLoading)
-    return (
+    {return (
       <div className="add-to-task-loading">
         <div className="loader-spinner"></div>
       </div>
-    );
+    );}
   if (filteredTasks.length === 0 && searchQuery)
-    return <div className="add-to-task-empty">Ülesandeid ei leitud</div>;
+    {return <div className="add-to-task-empty">Ülesandeid ei leitud</div>;}
   return (
     <>
       {filteredTasks.map((task) => (
@@ -124,7 +124,7 @@ export default function AddToTaskDropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (!isOpen || !user) return;
+    if (!isOpen || !user) {return;}
     setIsLoading(true);
     dataService
       .getUserTasks()
@@ -134,7 +134,7 @@ export default function AddToTaskDropdown({
   }, [isOpen, user, dataService]);
   useEffect(() => {
     if (isOpen && !selectedTask && searchInputRef.current)
-      setTimeout(() => searchInputRef.current?.focus(), 100);
+      {setTimeout(() => searchInputRef.current?.focus(), 100);}
   }, [isOpen, selectedTask]);
   useEffect(() => {
     if (!isOpen) {
@@ -154,7 +154,7 @@ export default function AddToTaskDropdown({
     }
   };
   const handleConfirm = (mode: AddToTaskMode) => {
-    if (!selectedTask) return;
+    if (!selectedTask) {return;}
     onSelectTask(selectedTask.id, selectedTask.name, mode);
     onClose();
   };
@@ -165,10 +165,10 @@ export default function AddToTaskDropdown({
     onCreateNew();
     onClose();
   };
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
   return (
     <>
-      <div className="add-to-task-backdrop" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") onClose(); }} role="presentation" tabIndex={-1} />
+      <div className="add-to-task-backdrop" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") {onClose();} }} role="presentation" tabIndex={-1} />
       <div className="add-to-task-dropdown" ref={dropdownRef}>
         {selectedTask ? (
           <ConfirmPanel

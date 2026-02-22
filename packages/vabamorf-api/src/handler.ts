@@ -16,7 +16,7 @@ const VMETAJSON_PATH = process.env.VMETAJSON_PATH ?? "./vmetajson";
 const DICT_PATH = process.env.DICT_PATH ?? ".";
 
 function ensureInitialized(): void {
-  if (!isInitialized()) initVmetajson(VMETAJSON_PATH, DICT_PATH);
+  if (!isInitialized()) {initVmetajson(VMETAJSON_PATH, DICT_PATH);}
 }
 
 // Docker: both files in /var/task/, Dev: package.json is one level up from src/
@@ -69,10 +69,10 @@ function parseAndValidateWithSchema(
 ): ParseResult {
   ensureInitialized();
 
-  if (event.body === null) return badRequest(ERRORS.MISSING_BODY);
+  if (event.body === null) {return badRequest(ERRORS.MISSING_BODY);}
 
   const body = parseJsonBody(event.body);
-  if (body === null) return badRequest(ERRORS.INVALID_JSON);
+  if (body === null) {return badRequest(ERRORS.INVALID_JSON);}
 
   const result = schema.safeParse(body);
   if (!result.success) {
@@ -81,7 +81,7 @@ function parseAndValidateWithSchema(
   }
 
   const value = (result.data as Record<string, string>)[fieldName];
-  if (!value) return badRequest(`Missing '${fieldName}' field in request body`);
+  if (!value) {return badRequest(`Missing '${fieldName}' field in request body`);}
 
   return { success: true, value };
 }
@@ -102,7 +102,7 @@ export async function analyzeHandler(
       AnalyzeRequestSchema,
       "text",
     );
-    if (!parsed.success) return parsed.response;
+    if (!parsed.success) {return parsed.response;}
 
     const response = await analyze(parsed.value);
     return createResponse(HTTP_STATUS.OK, {
@@ -119,7 +119,7 @@ export async function variantsHandler(
 ): Promise<APIGatewayProxyResult> {
   try {
     const parsed = parseAndValidateWithSchema(event, VariantsRequestSchema, "word");
-    if (!parsed.success) return parsed.response;
+    if (!parsed.success) {return parsed.response;}
 
     const response = await analyze(parsed.value);
     const variants = extractVariants(response, parsed.value);

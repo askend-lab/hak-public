@@ -1,5 +1,7 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
+import { callbackHandler, startHandler } from '../src/handler';
+
 // Mock dependencies
 const mockBuildAuthorizationUrl = jest.fn();
 const mockExchangeCodeForTokens = jest.fn();
@@ -21,8 +23,6 @@ jest.mock('../src/cognito-client', () => ({
     generateTokens: (...args: unknown[]) => mockGenerateTokens(...args),
   }),
 }));
-
-import { callbackHandler, startHandler } from '../src/handler';
 
 /**
  * Mutation-killing tests for handler.ts

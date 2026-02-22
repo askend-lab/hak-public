@@ -276,7 +276,7 @@ describe("SpecsNav badge classes and icons", () => {
     render(<SpecsNav {...defaultProps} onToggleGroup={onToggleGroup} />);
     const { fireEvent } = await import("@testing-library/react");
     const groupHeader = screen.getByText(/Group 1/).closest("[role='button']");
-    if (groupHeader) fireEvent.keyDown(groupHeader, { key: "Enter" });
+    if (groupHeader) {fireEvent.keyDown(groupHeader, { key: "Enter" });}
     expect(onToggleGroup).toHaveBeenCalledWith("Group 1");
   });
 
@@ -293,7 +293,7 @@ describe("SpecsNav badge classes and icons", () => {
     );
     const { fireEvent } = await import("@testing-library/react");
     const featureItem = screen.getByText(/Feature 1/).closest("[role='button']");
-    if (featureItem) fireEvent.keyDown(featureItem, { key: "Enter" });
+    if (featureItem) {fireEvent.keyDown(featureItem, { key: "Enter" });}
     expect(onToggleFeature).toHaveBeenCalledWith("Feature 1");
   });
 
@@ -309,7 +309,7 @@ describe("SpecsNav badge classes and icons", () => {
     );
     const { fireEvent } = await import("@testing-library/react");
     const scenarioItem = container.querySelector(".specs-scenario__item");
-    if (scenarioItem) fireEvent.keyDown(scenarioItem, { key: "Enter" });
+    if (scenarioItem) {fireEvent.keyDown(scenarioItem, { key: "Enter" });}
     expect(onSelectFeature).toHaveBeenCalledWith("Feature 1");
   });
 });

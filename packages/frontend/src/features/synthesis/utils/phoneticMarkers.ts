@@ -49,7 +49,7 @@ const VABAMORF_MARKERS_TO_KEEP = new Set(Object.keys(MARKER_MAPPING));
  * transformToUI('k?uu]l') // returns 'kuu´l'
  */
 export function transformToUI(vabamorfText: string | null): string | null {
-  if (!vabamorfText) return vabamorfText;
+  if (!vabamorfText) {return vabamorfText;}
 
   const parts: string[] = [];
 
@@ -80,7 +80,7 @@ export function transformToUI(vabamorfText: string | null): string | null {
  * transformToVabamorf('m`ee+s') // returns 'm<ee_s'
  */
 export function transformToVabamorf(uiText: string | null): string | null {
-  if (!uiText) return uiText;
+  if (!uiText) {return uiText;}
 
   const parts: string[] = [];
 
@@ -137,7 +137,7 @@ export function isVabamorfMarker(char: string): boolean {
 export function stripPhoneticMarkers(
   phoneticText: string | null,
 ): string | null {
-  if (!phoneticText) return phoneticText;
+  if (!phoneticText) {return phoneticText;}
 
   const parts: string[] = [];
 

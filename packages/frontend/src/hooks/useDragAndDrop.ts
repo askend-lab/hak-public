@@ -47,16 +47,16 @@ export function useDragAndDrop(
   const handleDrop = useCallback(
     (e: React.DragEvent, targetId: string) => {
       e.preventDefault();
-      if (!draggedId || draggedId === targetId) return;
+      if (!draggedId || draggedId === targetId) {return;}
 
       setSentences((prev) => {
         const draggedIndex = prev.findIndex((s) => s.id === draggedId);
         const targetIndex = prev.findIndex((s) => s.id === targetId);
-        if (draggedIndex === -1 || targetIndex === -1) return prev;
+        if (draggedIndex === -1 || targetIndex === -1) {return prev;}
 
         const newSentences = [...prev];
         const [draggedItem] = newSentences.splice(draggedIndex, 1);
-        if (draggedItem) newSentences.splice(targetIndex, 0, draggedItem);
+        if (draggedItem) {newSentences.splice(targetIndex, 0, draggedItem);}
         return newSentences;
       });
 

@@ -219,7 +219,7 @@ export class TaskRepository {
     }
 
     const existingEntry = task.entries?.[entryIndex];
-    if (!existingEntry) throw new Error("Entry not found");
+    if (!existingEntry) {throw new Error("Entry not found");}
     const updatedEntry: TaskEntry = {
       ...existingEntry,
       ...updates,

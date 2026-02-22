@@ -15,7 +15,7 @@ export function AuthCallbackPage() {
 
   useEffect(() => {
     async function processCallback() {
-      if (processedRef.current) return;
+      if (processedRef.current) {return;}
       processedRef.current = true;
 
       const queryParams = new URLSearchParams(window.location.search);

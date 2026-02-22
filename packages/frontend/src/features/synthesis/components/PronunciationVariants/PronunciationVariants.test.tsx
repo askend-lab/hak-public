@@ -189,7 +189,7 @@ describe("PronunciationVariants", () => {
       expect(screen.getByText("Variant 1")).toBeInTheDocument(),
     );
     const playBtns = screen.getAllByLabelText("play");
-    if (playBtns[0]) await user.click(playBtns[0]);
+    if (playBtns[0]) {await user.click(playBtns[0]);}
   });
 
   it("handles play variant error", async () => {
@@ -205,7 +205,7 @@ describe("PronunciationVariants", () => {
       expect(screen.getByText("Variant 1")).toBeInTheDocument(),
     );
     const playBtns = screen.getAllByLabelText("play");
-    if (playBtns[0]) await user.click(playBtns[0]);
+    if (playBtns[0]) {await user.click(playBtns[0]);}
     await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
     consoleSpy.mockRestore();
   });
@@ -220,7 +220,7 @@ describe("PronunciationVariants", () => {
       expect(screen.getByText("Variant 1")).toBeInTheDocument(),
     );
     const useBtns = screen.getAllByText("Kasuta");
-    if (useBtns[0]) await user.click(useBtns[0]);
+    if (useBtns[0]) {await user.click(useBtns[0]);}
     expect(onUseVariant).toHaveBeenCalledWith("te`re");
   });
 

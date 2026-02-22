@@ -34,7 +34,7 @@ function useSpecsData() {
       const parsedGroups = parseGroups(featureGroups);
       setGroups(parsedGroups);
       const cucumberResults = await loadCucumberResults();
-      if (cucumberResults) setTestSuites(parseCucumberResults(cucumberResults));
+      if (cucumberResults) {setTestSuites(parseCucumberResults(cucumberResults));}
     } catch {
       /* silent */
     } finally {
@@ -48,9 +48,9 @@ function useSpecsData() {
       const features: ParsedFeature[] = [];
       for (const [, content] of Object.entries(featureFiles)) {
         const parsed = parseFeatureContent(content);
-        if (parsed) features.push(parsed);
+        if (parsed) {features.push(parsed);}
       }
-      if (features.length > 0) result.push({ name: groupName, features });
+      if (features.length > 0) {result.push({ name: groupName, features });}
     }
     return result;
   }
@@ -79,8 +79,8 @@ export default function SpecsPage({ onBack }: SpecsPageProps) {
 
   const toggleSet = (set: Set<string>, name: string) => {
     const next = new Set(set);
-    if (next.has(name)) next.delete(name);
-    else next.add(name);
+    if (next.has(name)) {next.delete(name);}
+    else {next.add(name);}
     return next;
   };
 

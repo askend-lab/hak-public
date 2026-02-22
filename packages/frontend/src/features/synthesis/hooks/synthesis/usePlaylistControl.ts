@@ -31,7 +31,7 @@ export function usePlaylistControl(
     }
 
     const sentencesWithText = filterNonEmptySentences(sentences);
-    if (sentencesWithText.length === 0) return;
+    if (sentencesWithText.length === 0) {return;}
 
     const abortController = new AbortController();
     setPlayAllAbortController(abortController);
@@ -39,7 +39,7 @@ export function usePlaylistControl(
 
     let isFirstSentence = true;
     for (const sentence of sentencesWithText) {
-      if (abortController.signal.aborted) break;
+      if (abortController.signal.aborted) {break;}
 
       const success = await playSingle(sentence.id, abortController.signal);
 
@@ -49,7 +49,7 @@ export function usePlaylistControl(
         isFirstSentence = false;
       }
 
-      if (!success || abortController.signal.aborted) break;
+      if (!success || abortController.signal.aborted) {break;}
     }
 
     setIsPlayingAll(false);

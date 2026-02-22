@@ -29,7 +29,7 @@ export default function CookieConsent() {
     setVisible(false);
   };
 
-  if (!visible) return null;
+  if (!visible) {return null;}
 
   return (
     <div className="cookie-consent" role="status">

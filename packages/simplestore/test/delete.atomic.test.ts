@@ -11,9 +11,8 @@
  * and the store uses it correctly.
  */
 
-import { StorageAdapter, StoreItem, UpsertFields } from "../src/core/types";
+import { StorageAdapter, StoreItem, UpsertFields , ServerContext } from "../src/core/types";
 import { Store, ERRORS } from "../src/core/store";
-import { ServerContext } from "../src/core/types";
 
 /**
  * Spy adapter that records operation order to detect TOCTOU patterns.
@@ -47,8 +46,8 @@ class OperationSpyAdapter implements StorageAdapter {
     this.operations.push("conditionalDelete");
     const key = this.key(pk, sk);
     const existing = this.data.get(key);
-    if (!existing) return "not_found";
-    if (existing.owner !== expectedOwner) return "not_owner";
+    if (!existing) {return "not_found";}
+    if (existing.owner !== expectedOwner) {return "not_owner";}
     this.data.delete(key);
     return "deleted";
   }

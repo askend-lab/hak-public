@@ -26,7 +26,7 @@ interface TaraSecrets {
 let cachedSecrets: TaraSecrets | null = null;
 
 async function loadTaraSecrets(): Promise<TaraSecrets> {
-  if (cachedSecrets) return cachedSecrets;
+  if (cachedSecrets) {return cachedSecrets;}
 
   const secretsArn = process.env.TARA_SECRETS_ARN;
   if (secretsArn) {

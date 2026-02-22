@@ -79,7 +79,7 @@ export default function TaskDetailView({
   );
 
   const handleDownloadZip = useCallback(async () => {
-    if (!task || isDownloading) return;
+    if (!task || isDownloading) {return;}
     setIsDownloading(true);
     try {
       await downloadTaskAsZip({ ...task, entries });
@@ -93,7 +93,7 @@ export default function TaskDetailView({
   }, [task, entries, isDownloading, showNotification]);
 
   const handleCopyToSynthesis = useCallback(() => {
-    if (!entries || entries.length === 0) return;
+    if (!entries || entries.length === 0) {return;}
 
     setCopiedEntries(entries);
     showNotification({ type: "success", message: "Laused kopeeritud!" });
@@ -103,7 +103,7 @@ export default function TaskDetailView({
   // Load task data (skip if initialTask provided)
   useEffect(() => {
     if (initialTask || !user) {
-      if (!initialTask && !user) setError("Kasutaja pole sisse logitud");
+      if (!initialTask && !user) {setError("Kasutaja pole sisse logitud");}
       setIsLoading(false);
       return;
     }
@@ -129,13 +129,13 @@ export default function TaskDetailView({
 
   const handleCopyText = async (id: string) => {
     const entry = entries.find((e) => e.id === id);
-    if (!entry || !entry.text.trim()) return;
+    if (!entry || !entry.text.trim()) {return;}
 
     await copyTextToClipboard(entry.text, showNotification);
   };
 
   const handleDeleteEntry = async (id: string) => {
-    if (!user) return;
+    if (!user) {return;}
 
     const entryToDelete = entries.find((e) => e.id === id);
     const updatedEntries = entries.filter((e) => e.id !== id);
@@ -162,9 +162,9 @@ export default function TaskDetailView({
     }
   };
 
-  if (isLoading) return <TaskDetailLoading />;
-  if (error) return <TaskDetailError onBack={onBack} error={error} />;
-  if (!task) return null;
+  if (isLoading) {return <TaskDetailLoading />;}
+  if (error) {return <TaskDetailError onBack={onBack} error={error} />;}
+  if (!task) {return null;}
 
   return (
     <div className="task-detail-view">

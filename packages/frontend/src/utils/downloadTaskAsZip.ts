@@ -8,9 +8,7 @@ import { formatDateTime } from "@/utils/formatDate";
 import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
 
 function sanitizeFilename(text: string): string {
-  return Array.from(
-    text.replace(/[<>:"/\\|?*\x00-\x1f]/g, "").replace(/\s+/g, "_"),
-  )
+  return [...text.replace(/[<>:"/\\|?*\x00-\x1f]/g, "").replace(/\s+/g, "_")]
     .slice(0, 80)
     .join("");
 }
@@ -32,7 +30,7 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> {
     }
   }
 
-  if (!audioUrl) return null;
+  if (!audioUrl) {return null;}
 
   try {
     const response = await fetch(audioUrl);
@@ -64,10 +62,10 @@ export async function downloadTaskAsZip(
   const zip = new JSZip();
   const folderName = sanitizeFilename(task.name) || "task";
   const folder = zip.folder(folderName);
-  if (!folder) throw new Error("Failed to create ZIP folder");
+  if (!folder) {throw new Error("Failed to create ZIP folder");}
 
   const audioFolder = folder.folder("audio");
-  if (!audioFolder) throw new Error("Failed to create audio folder");
+  if (!audioFolder) {throw new Error("Failed to create audio folder");}
 
   // manifest.json
   folder.file(

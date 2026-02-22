@@ -73,29 +73,29 @@ export default function BaseModal({
   }, [onClose]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {return;}
 
     // Store the previously focused element
     previousFocusRef.current = document.activeElement as HTMLElement;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseRef.current();
+      if (e.key === "Escape") {onCloseRef.current();}
     };
 
     // Focus trap - keep focus within modal
     const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== "Tab" || !modalRef.current) return;
+      if (e.key !== "Tab" || !modalRef.current) {return;}
 
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
 
-      if (focusableElements.length === 0) return;
+      if (focusableElements.length === 0) {return;}
 
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
 
-      if (!firstElement || !lastElement) return;
+      if (!firstElement || !lastElement) {return;}
 
       if (e.shiftKey && document.activeElement === firstElement) {
         e.preventDefault();
@@ -129,9 +129,9 @@ export default function BaseModal({
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (!preventBackdropClose && e.target === e.currentTarget) onClose();
+    if (!preventBackdropClose && e.target === e.currentTarget) {onClose();}
   };
   const modalClasses = `base-modal base-modal--${size} ${className}`.trim();
 

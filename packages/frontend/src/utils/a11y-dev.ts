@@ -24,7 +24,7 @@
  * ```
  */
 export async function initA11yDevMode(): Promise<void> {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") {return;}
 
   try {
     const React = await import("react");

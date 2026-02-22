@@ -31,18 +31,18 @@ function getTestResult(testSuites: TestSuite[], scenarioName: string) {
     const test = suite.tests.find(
       (t) => t.name.includes(scenarioName) || t.fullName.includes(scenarioName),
     );
-    if (test) return test;
+    if (test) {return test;}
   }
   return null;
 }
 
 function getFeatureStats(feature: ParsedFeature, testSuites: TestSuite[]) {
-  let passed = 0,
-    total = 0;
+  let passed = 0;
+    let total = 0;
   for (const scenario of feature.scenarios) {
     total++;
     const result = getTestResult(testSuites, scenario.name);
-    if (result?.status === "passed") passed++;
+    if (result?.status === "passed") {passed++;}
   }
   return { passed, total };
 }
@@ -85,7 +85,7 @@ export default function SpecsNav({
             <div
               className={`specs-group__header ${isGroupExpanded ? "specs-group__header--expanded" : ""}`}
               onClick={() => onToggleGroup(group.name)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onToggleGroup(group.name); }}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") {onToggleGroup(group.name);} }}
               role="button"
               tabIndex={0}
             >
@@ -149,7 +149,7 @@ export default function SpecsNav({
                             key={scenario.name}
                             className="specs-scenario__item"
                             onClick={() => onSelectFeature(feature.name)}
-                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelectFeature(feature.name); }}
+                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") {onSelectFeature(feature.name);} }}
                             role="button"
                             tabIndex={0}
                           >

@@ -24,7 +24,7 @@ export function corsResponseHeaders(): Record<string, string> {
 
 export function validateCsrfOrigin(event: APIGatewayProxyEvent): boolean {
   const origin = event.headers.Origin || event.headers.origin;
-  if (!origin) return false;
+  if (!origin) {return false;}
   const expected = getFrontendUrl();
   return origin === expected;
 }

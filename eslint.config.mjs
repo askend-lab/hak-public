@@ -84,6 +84,57 @@ export default [
     },
   },
 
+  // === QS-1 MIGRATION: newly active rules on .ts/.tsx ===
+  // These rules were previously only applied to .js files.
+  // Enable one at a time: fix violations → remove "off" → commit.
+  // Track progress in CodeReviewMikkTracker.md § Quality System Improvements.
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    rules: {
+      // --- ALREADY FIXED (auto-fix applied, keep as error) ---
+      // "curly" — already error from base, auto-fixed
+      // "import/first" — already error from base, auto-fixed
+      // "import/newline-after-import" — already error from base, auto-fixed
+      // "sonarjs/no-redundant-jump" — already error from base, manually fixed
+
+      // --- TO FIX (disabled until violations resolved) ---
+      "max-statements": "off",
+      "max-lines-per-function": "off",
+      "max-lines": "off",
+      "max-nested-callbacks": "off",
+      "max-params": "off",
+      "max-depth": "off",
+      "max-classes-per-file": "off",
+      "complexity": "off",
+      "no-console": "off",
+      "no-param-reassign": "off",
+      "no-nested-ternary": "off",
+      "no-await-in-loop": "off",
+      "no-promise-executor-return": "off",
+      "no-return-await": "off",
+      "no-alert": "off",
+      "one-var": "off",
+      "require-atomic-updates": "off",
+      "no-return-assign": "off",
+      "prefer-promise-reject-errors": "off",
+      "sonarjs/cognitive-complexity": "off",
+      "sonarjs/no-duplicate-string": "off",
+      "sonarjs/no-identical-functions": "off",
+      "sonarjs/prefer-immediate-return": "off",
+      "promise/prefer-await-to-then": "off",
+      "promise/prefer-await-to-callbacks": "off",
+      "promise/param-names": "off",
+      "promise/always-return": "off",
+      "unicorn/no-useless-undefined": "off", // conflicts with TS strict params
+      "unicorn/prefer-spread": "off",
+      "unicorn/explicit-length-check": "off",
+      "import/no-duplicates": "off",
+      "eslint-comments/require-description": "off",
+      "security/detect-non-literal-regexp": "off",
+      "regexp/prefer-w": "off",
+    },
+  },
+
   // Browser code: disallow Node.js globals
   {
     files: [

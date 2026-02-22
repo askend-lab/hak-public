@@ -94,8 +94,8 @@ function useDashboardData() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      let taskCount = 0,
-        entryCount = 0;
+      let taskCount = 0;
+        let entryCount = 0;
       if (isAuthenticated && user) {
         const tasks = await dataService.getUserTasks();
         taskCount = tasks.length;
@@ -121,13 +121,13 @@ export default function Dashboard() {
     useDashboardData();
   const navigate = useNavigate();
   if (isLoading)
-    return (
+    {return (
       <div className="dashboard">
         <div className="dashboard__loading">
           <div className="loader-spinner loader-spinner--lg"></div>
         </div>
       </div>
-    );
+    );}
   return (
     <div className="dashboard">
       <div className="dashboard__header">

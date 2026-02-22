@@ -19,8 +19,8 @@ export function useTaskSharing(deps: UseTaskSharingDeps) {
 
   const handleShareTask = useCallback(
     async (task: { id: string; name: string; shareToken?: string }) => {
-      if (requireAuth()) return;
-      if (!user) return;
+      if (requireAuth()) {return;}
+      if (!user) {return;}
       try {
         await dataService.shareUserTask(task.id);
         const fullTask = await dataService.getTask(task.id);
@@ -41,7 +41,7 @@ export function useTaskSharing(deps: UseTaskSharingDeps) {
 
   const handleRevokeShare = useCallback(
     async (shareToken: string) => {
-      if (!user) return;
+      if (!user) {return;}
       try {
         await dataService.revokeShare(shareToken);
       } catch (error) {

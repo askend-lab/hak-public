@@ -159,7 +159,7 @@ describe("TaskDetailHeader menu actions", () => {
       />,
     );
     const bd = document.querySelector(".task-detail__menu-backdrop");
-    if (bd) await userEvent.click(bd);
+    if (bd) {await userEvent.click(bd);}
     expect(setMenu).toHaveBeenCalledWith(false);
   });
 
@@ -173,7 +173,7 @@ describe("TaskDetailHeader menu actions", () => {
       />,
     );
     const bd = document.querySelector(".task-detail__menu-backdrop");
-    if (bd) await userEvent.type(bd as HTMLElement, "{Escape}");
+    if (bd) {await userEvent.type(bd as HTMLElement, "{Escape}");}
     expect(setMenu).toHaveBeenCalledWith(false);
   });
 

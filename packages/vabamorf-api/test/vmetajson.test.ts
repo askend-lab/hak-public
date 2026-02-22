@@ -27,13 +27,12 @@ function createMockProcess(): MockProcess {
   const stdin = Object.assign(new EventEmitter(), { write: jest.fn() });
   const stdout = new EventEmitter();
   const stderr = new EventEmitter();
-  const proc = Object.assign(new EventEmitter(), {
+  return Object.assign(new EventEmitter(), {
     stdin,
     stdout,
     stderr,
     kill: jest.fn(),
   }) as MockProcess;
-  return proc;
 }
 
 describe("vmetajson", () => {
