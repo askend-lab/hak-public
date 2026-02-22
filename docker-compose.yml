@@ -12,9 +12,9 @@ services:
     volumes:
       - dynamodb-data:/home/dynamodblocal/data
 
-  vabamorf-api:
+  morphology-api:
     build:
-      context: packages/vabamorf-api
+      context: packages/morphology-api
       dockerfile: Dockerfile.local
     container_name: hak-vabamorf
     ports:

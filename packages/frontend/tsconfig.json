@@ -5,7 +5,7 @@
     "paths": {
       "@hak/shared": ["../shared/src"],
       "@hak/specifications": ["../specifications"],
-      "@hak/simplestore": ["../simplestore/src"],
+      "@hak/store": ["../store/src"],
       "@/*": ["./src/*"]
     },
     "useDefineForClassFields": true,

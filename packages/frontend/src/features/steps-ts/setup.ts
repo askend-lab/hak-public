@@ -13,7 +13,7 @@
 
 import { setWorldConstructor, World, Before, After } from "@cucumber/cucumber";
 import { JSDOM } from "jsdom";
-import { InMemoryAdapter, setAdapter } from "@hak/simplestore";
+import { InMemoryAdapter, setAdapter } from "@hak/store";
 import {
   render,
   cleanup,
