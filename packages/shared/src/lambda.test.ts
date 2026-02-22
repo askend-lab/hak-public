@@ -11,6 +11,7 @@ import {
   createInternalErrorResponse,
   extractErrorMessage,
 } from "./lambda";
+import { logger } from "./logger";
 
 describe("lambda", () => {
   describe("createLambdaResponse", () => {
@@ -83,14 +84,14 @@ describe("lambda", () => {
 
   describe("createInternalErrorResponse", () => {
     it("should create a 500 response and log the error", () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
       const testError = new Error("db connection failed");
       const result = createInternalErrorResponse("UserService.get", testError);
 
       expect(result.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
       expect(JSON.parse(result.body)).toStrictEqual({ error: "Internal server error" });
-      expect(consoleSpy).toHaveBeenCalledWith("UserService.get:", "db connection failed");
-      consoleSpy.mockRestore();
+      expect(loggerSpy).toHaveBeenCalledWith("UserService.get:", "db connection failed");
+      loggerSpy.mockRestore();
     });
   });
 

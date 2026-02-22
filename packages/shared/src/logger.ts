@@ -34,7 +34,7 @@ function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
   if (LOG_LEVELS[level] < LOG_LEVELS[minLevel]) {
     return NO_OP;
   }
-  const consoleFn = console[level].bind(console);
+  const consoleFn = console[level].bind(console); // eslint-disable-line no-console -- logger implementation binds to console
   return (message: string, ...args: unknown[]): void => {
     consoleFn(formatMessage(level, message), ...args);
   };

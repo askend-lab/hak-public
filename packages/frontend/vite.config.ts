@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
+/* eslint-disable no-console -- build config uses console for dev server output */
 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -137,3 +138,4 @@ export default defineConfig({
     },
   },
 });
+/* eslint-enable no-console -- end build config */

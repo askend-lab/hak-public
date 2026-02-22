@@ -16,6 +16,7 @@ import {
 } from "../src/handler";
 import type { SynthesizeRequest } from "../src/handler";
 import { createResponse, createBadRequest, createInternalError, HTTP_STATUS, CORS_HEADERS } from "../src/response";
+import { logger } from "@hak/shared";
 import { buildAudioUrl, buildCacheKey , isNotFoundError } from "../src/s3";
 import { VOICE_DEFAULTS, getAwsRegion, getS3Bucket, getSqsQueueUrl, getEcsCluster, getEcsService } from "../src/env";
 import { isEcsConfigured } from "../src/ecs";
@@ -152,7 +153,7 @@ describe("createResponse", () => {
 
 describe("createInternalError", () => {
   it("should return 500 with generic error message", () => {
-    const spy = jest.spyOn(console, "error").mockImplementation();
+    const spy = jest.spyOn(logger, "error").mockImplementation();
     const response = createInternalError("Test context", new Error("fail"));
 
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
@@ -162,7 +163,7 @@ describe("createInternalError", () => {
   });
 
   it("should handle non-Error values", () => {
-    const spy = jest.spyOn(console, "error").mockImplementation();
+    const spy = jest.spyOn(logger, "error").mockImplementation();
     const response = createInternalError("Context", "string error");
 
     expect(response.statusCode).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);

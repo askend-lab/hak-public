@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
+/* eslint-disable no-console -- local dev server uses console for startup/request logging */
 
 import * as http from "http";
 import { analyzeHandler, variantsHandler, healthHandler } from "./handler";
@@ -98,3 +99,4 @@ server.listen(PORT, () => {
   console.info(`Vabamorf API running on http://localhost:${PORT}`);
   console.info("Endpoints: POST /analyze, POST /variants, GET /health");
 });
+/* eslint-enable no-console -- end local dev server */

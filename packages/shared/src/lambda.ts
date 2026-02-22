@@ -6,6 +6,8 @@
  * Shared utilities used by merlin-api, vabamorf-api, simplestore.
  */
 
+import { logger } from "./logger";
+
 export interface LambdaResponse {
   statusCode: number;
   headers: Record<string, string>;
@@ -20,7 +22,7 @@ export function getCorsOrigin(): string {
   // eslint-disable-next-line no-restricted-globals -- Lambda-only: safe in Node.js runtime
   const origin = typeof process !== "undefined" ? process.env?.ALLOWED_ORIGIN : undefined;
   if (!origin) {
-    console.warn("ALLOWED_ORIGIN not set — defaulting to restrictive 'null' origin");
+    logger.warn("ALLOWED_ORIGIN not set — defaulting to restrictive 'null' origin");
     return "null";
   }
   return origin;
@@ -97,7 +99,7 @@ export function createInternalErrorResponse(
   context: string,
   error: unknown,
 ): LambdaResponse {
-  console.error(`${context}:`, error instanceof Error ? error.message : String(error));
+  logger.error(`${context}:`, error instanceof Error ? error.message : String(error));
   return createApiResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: "Internal server error",
   });
