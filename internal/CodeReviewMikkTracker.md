@@ -56,67 +56,67 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 5. Simplicity & Patterns
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api — deduplicated, merlin-api imports from @hak/shared
-- ✅ Accept  [✅] Fixed  [ ] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — deduplicated, all packages import from @hak/shared
-- ✅ Accept  [✅] Fixed  [ ] Closed — **5.3** (Low) Removed `if True:` indentation hack in run_merlin.py
-- ✅ Accept  [✅] Fixed  [ ] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — deduplicated, all packages import from @hak/shared
+- ✅ Accept  [✅] Fixed  [✅] Closed — **5.1** (Low) S3 utilities duplicated between shared and merlin-api — *Verified: `tts-api/src/s3.ts` imports `buildS3Url`, `checkFileExists`, `isNotFoundError` from `@hak/shared`. No local S3 utility duplication.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **5.2** (Low) LambdaResponse and createResponse duplicated across packages — *Verified: `auth`, `store`, `morphology-api` all import from `@hak/shared`. `tts-api` re-exports via `response.ts`. No local duplication of LambdaResponse/createResponse.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **5.3** (Low) Removed `if True:` indentation hack in run_merlin.py — *Verified: No `if True:` found anywhere in `tts-worker/*.py`. Removed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **5.4** (Low) HTTP_STATUS duplicated across packages — *Verified: `auth`, `store` import `HTTP_STATUS` from `@hak/shared`. `tts-api` re-exports via `response.ts`. No local HTTP_STATUS definitions.*
 
 ## 6. Maintainability
 
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **6.1** (High) pnpm test:all silently skips merlin-worker Python tests — DevBox `run-tests` hook + merlin-worker test script fix
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **6.1** (High) pnpm test:all silently skips merlin-worker Python tests — *Verified: DevBox `run-tests` hook in `devbox.yaml:163` runs `node devbox test`. tts-worker listed as `type: pytest` module at line 20-25 with `.venv/bin/pytest` command. Python tests now included in every commit.*
 
 ## 7. Error Handling
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **7.1** (Low) simplestore now uses extractErrorMessage from shared
-- ✅ Accept  [✅] Fixed  [ ] Closed — **7.2** (Low) merlin-api and vabamorf-api now use inlined structured logger
+- ✅ Accept  [✅] Fixed  [✅] Closed — **7.1** (Low) simplestore now uses extractErrorMessage from shared — *Verified: `store/src/core/store.ts:8` imports `extractErrorMessage` from `@hak/shared`. Used at line 197. No local error extraction logic.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **7.2** (Low) merlin-api and vabamorf-api now use inlined structured logger — *Verified: morphology-api re-exports `logger` from `@hak/shared` via `logger.ts`. tts-api uses `createInternalError()` from shared (handles logging internally). `console.log` only in `local-server.ts` (dev-only, eslint-disabled).*
 
 ## 8. Testing
 
 - ❌ Reject (wrong)  —  — **8.1** (High) Python tests not in CI — WRONG, they ARE in build-merlin-worker.yml
-- ✅ Accept  [✅] Fixed  [ ] Closed — **8.2.1** (Medium) Test duplications in simplestore — complementary testing, not true duplication
+- ✅ Accept  [✅] Fixed  [✅] Closed — **8.2.1** (Medium) Test duplications in simplestore — *Verified: 20 test files in `store/test/`, organized by concern (handler, routes, validation, integration, adapters, etc.). No true duplication — complementary layers.*
 - ❌ Reject (intentional)  —  — **8.2.2** (Low) Auth context 6 test files — intentional organization by concern
 
 ## 9. CI/CD
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **9.1** (Low) Dockerfile now uses WORKDIR instead of RUN cd
+- ✅ Accept  [✅] Fixed  [✅] Closed — **9.1** (Low) Dockerfile now uses WORKDIR instead of RUN cd — *Verified: `tts-worker/Dockerfile` uses `WORKDIR` at lines 19, 66, 69. No `RUN cd` found.*
 - ❌ Reject (by design)  —  — **9.2** (Low) Serverless v3/v4 mismatch — by design, documented in README (cost decision)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **9.3** (Medium) Deploy workflows — added CI/CD section to ARCHITECTURE.md
+- ✅ Accept  [✅] Fixed  [✅] Closed — **9.3** (Medium) Deploy workflows — *Verified: ARCHITECTURE.md has "## CI/CD & Deployment" section with workflow table (build.yml, deploy.yml, build-merlin-worker.yml, terraform.yml, e2e.yml, release.yml). Substantive.*
 
 ## 10. Configuration
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **10.2** (Medium) Empty-string ECS env vars — now throw with descriptive messages
+- ✅ Accept  [✅] Fixed  [✅] Closed — **10.1** (Low) merlin-api README lists wrong auth info (COGNITO vars unused) — *Verified: `tts-api/README.md` endpoint table shows "Auth: None" for both endpoints. No COGNITO references.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **10.2** (Medium) Empty-string ECS env vars — *Verified: `tts-api/src/env.ts` has strict validation for all env vars: SQS_QUEUE_URL, S3_BUCKET (regex), ECS_CLUSTER, ECS_SERVICE — all throw descriptive errors on empty/missing.*
 
 ## 11. Dependencies
 
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **11.1** (Medium) Unused dependencies — 7 of 10 confirmed unused — knip + DevBox `deps` hook
+- ✅ Accept  [🛡️] Fixed  [✅] Closed — **11.1** (Medium) Unused dependencies — *Verified: `knip.json` configured at repo root. DevBox `dead-code` hook at `devbox.yaml:257` runs on every commit. knip detects unused exports/files/dependencies.*
 
 ## 12. Security
 
 - ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
 - ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — DEFERRED, requires client decision on authentication first
-- ✅ Accept  [✅] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior unified — all packages now return 'null' when ALLOWED_ORIGIN unset
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
-- ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
+- ✅ Accept  [✅] Fixed  [✅] Closed — **12.3** (Medium) CORS behavior unified — *Verified: Same as 4.2. `getCorsOrigin()` in `@hak/shared` returns `"null"` when ALLOWED_ORIGIN unset. All packages use it.*
+- ✅ Accept  [🛡️] Fixed  [⚠️] Closed — **12.4** (Medium) OS Command Injection via shell=True — *Verified: Ruff S602 enabled in `ruff.toml`. TDD tests exist in `test_safe_subprocess.py`. BUT ⚠️ `generate.py:73` still uses `shell=True` in `subprocess.Popen()`. Fix NOT applied to production code — only tests written. Needs actual fix.*
+- ✅ Accept  [🛡️] Fixed  [⚠️] Closed — **12.5** (Medium) pickle.load — Ruff S301 — *Verified: Ruff S301 (pickle) enabled in `ruff.toml`. BUT ⚠️ `run_merlin.py:100` still uses `pickle.load()` without checksum verification, AND file is in `merlin/` dir which is excluded from ALL ruff rules (`per-file-ignores: "merlin/**" = ["ALL"]`). Rule doesn't protect this file. No SHA-256 verification added.*
 - ❌ Reject (duplicate)  —  — **12.6** (Medium) CORS misconfiguration — duplicate of 12.3
-- ✅ Accept  [✅] Fixed  [ ] Closed — **12.7** (Medium) Added cacheKey validation in worker.py (64-char hex, matching API-side regex)
+- ✅ Accept  [✅] Fixed  [✅] Closed — **12.7** (Medium) Added cacheKey validation in worker.py — *Verified: `worker.py:78` has `VALID_CACHE_KEY = re.compile(r"^[a-f0-9]{64}$")`. Line 113: `VALID_CACHE_KEY.match(cache_key)` with descriptive ValueError. Tests in `test_worker.py` cover valid/invalid cacheKeys.*
 
 ## 13. Performance
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **13.1** (Medium) DNN model now cached in memory via _model_cache dict
+- ✅ Accept  [✅] Fixed  [✅] Closed — **13.1** (Medium) DNN model now cached in memory via _model_cache dict — *Verified: `run_merlin.py:92` has `_model_cache = {}`. Lines 97-101: check cache before `pickle.load`, store after load. Avoids redundant disk I/O.*
 - ❌ Reject (appropriate)  —  — **13.2** (Medium) SQS 1 message/cycle — sequential TTS processing, batching needs threading
 
 ## 14. Domain Logic
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **14.1** (Low) Rename modules to reflect domain, not technology
+- ✅ Accept  [✅] Fixed  [✅] Closed — **14.1** (Low) Rename modules to reflect domain, not technology — *Verified: Folders renamed in PR #664: `simplestore`→`store`, `tara-auth`→`auth`, `merlin-api`→`tts-api`, `merlin-worker`→`tts-worker`, `vabamorf-api`→`morphology-api`. All present in `packages/`. ⚠️ Docs (ARCHITECTURE.md, README.md) still use old names (see 1.3.2).*
 
 ## 15. Our Own Findings (not in Mikk's review)
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **15.1** (Medium) Removed /warmup endpoint entirely (handler, serverless.yml, tests)
-- ✅ Accept  [✅] Fixed  [ ] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — README is wrong
-- ✅ Accept  [✅] Fixed  [ ] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — replaced run_process() with safe alternatives
+- ✅ Accept  [✅] Fixed  [⚠️] Closed — **15.1** (Medium) Removed /warmup endpoint entirely — *Verified: No `warmup` in `tts-api/src/` or `serverless.yml`. Handler and config clean. BUT ⚠️ `tts-api/README.md` still lists `/warmup` endpoint (line 18), warmup rate limit (line 39), and ECS_CLUSTER/ECS_SERVICE env vars "for warmup" (lines 49-50). README not updated.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — *Verified: `tts-api/README.md` now says "Auth: None" for all endpoints + "All endpoints are public by design". No Cognito/JWT references.*
+- ✅ Accept  [✅] Fixed  [⚠️] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — *Verified: `run_merlin.py` lines 337/351 use `subprocess.run(args, check=True)` with argument lists (safe). BUT ⚠️ `run_process` still imported at line 53 (dead import). And `generate.py:73` still has `shell=True` in `subprocess.Popen` (see 12.4). Partial fix.*
 - ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — DEFERRED permanently, frontend depends on this endpoint
-- ✅ Accept  [✅] Fixed  [ ] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars everywhere — merlin-api Zod schema, merlin-worker Python, frontend textarea maxLength + user-facing message (PR #660)
+- ✅ Accept  [✅] Fixed  [⚠️] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars — *Verified: `tts-api/src/schemas.ts:6` has `MAX_TEXT_LENGTH = 100` with Zod `.max()`. `worker.py:77` has `MAX_TEXT_LENGTH = 100`. BUT ⚠️ Frontend textarea has NO `maxLength` attribute and no user-facing character limit message. Tracker claims "frontend textarea maxLength + user-facing message" — not implemented. Users will only see an error after submit.*
 
 ---
 
@@ -245,21 +245,21 @@ Ref: `internal/PROPOSAL-Auth-Public-Endpoints.md`
 Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are public. Authentication proposal sent to client (pending decision). Below: what we must do regardless to harden the public setup.
 
 ### Cost & Scaling Limits
-- [x] **PUB-1** (CRITICAL) AWS Budgets — `aws_budgets_budget` with Project=HAK tag filter, 4 notifications (70%, 90%, 100% actual + 100% forecasted) → SNS alerts topic. In `infra/budgets.tf`.
-- [x] **PUB-2** (CRITICAL) ECS max_capacity hard cap — `ecs_max_capacity` variable (default 2), SQS-based auto-scaling policy added. In `infra/merlin/main.tf`.
-- [x] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrency: 3` for tts-api synthesize, `reservedConcurrency: 3` for morphology-api. In `serverless.yml` files. (Reduced from 10/20 — account pool too small, PR #666).
-- [x] **PUB-4** (HIGH) SQS queue depth cap — `checkQueueDepth()` in `sqs.ts`, throws `QueueFullError` at >= 50 messages → handler returns 503. Tests added. `sqs:GetQueueAttributes` IAM permission added.
-- [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — DONE in 15.5 (1000 → 100 chars)
+- [x] **PUB-1** (CRITICAL) AWS Budgets — *Verified: `infra/budgets.tf` has `aws_budgets_budget` with Project=HAK tag filter, 4 notifications (70%, 90%, 100% actual + 100% forecasted) → SNS alerts. ✅ Code matches description. 🧪 Needs functional test (TEST-5).*
+- [x] **PUB-2** (CRITICAL) ECS max_capacity hard cap — *Verified: `infra/merlin/main.tf:373` has `max_capacity = var.ecs_max_capacity` (dev=0, prod=cap). ✅ Code matches. 🧪 Needs functional test (TEST-2).*
+- [x] **PUB-3** (CRITICAL) Lambda concurrency limits — *Verified: `tts-api/serverless.yml:76` has `reservedConcurrency: 3`. `morphology-api/serverless.yml:48` has `reservedConcurrency: 3`. ✅ Code matches (PR #666). 🧪 Needs functional test (TEST-3).*
+- [x] **PUB-4** (HIGH) SQS queue depth cap — *Verified: `tts-api/src/sqs.ts` has `checkQueueDepth()` with `GetQueueAttributesCommand`, `MAX_QUEUE_DEPTH = 50`, `QueueFullError`. Handler catches it → 503. ✅ Code matches. 🧪 Needs functional test (TEST-6).*
+- [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — *Verified: See 15.5. Backend enforced (100 chars). ⚠️ Frontend missing `maxLength` attribute (see 15.5).*
 
 ### Monitoring & Detection
-- [x] **PUB-6** (HIGH) CloudWatch alerts — SQS queue depth (>50), ECS task count (at max), WAF blocked requests (>100/5min). All → SNS alerts topic. In `infra/cloudwatch-alarms.tf`.
-- [x] **PUB-14** (CRITICAL) Account-level budget + alerts — $200/month, SNS alerts every 10% (ACTUAL) + 100% FORECASTED. Email: aleksei.bljahhin@gmail.com (expandable via `budget_alert_emails` variable). In infra repo `terraform/budget.tf` (PR #27).
-- [x] **PUB-15** (HIGH) Daily Cost Digest Lambda — Python Lambda sends daily email at 08:00 UTC: yesterday's spend, MTD, forecast, top services. In infra repo `lambdas/cost-digest/index.py` + `terraform/cost-digest.tf` (PR #27).
+- [x] **PUB-6** (HIGH) CloudWatch alerts — *Verified: `infra/cloudwatch-alarms.tf` has alarms for SQS depth (`merlin_sqs_depth`), ECS tasks (`merlin_ecs_high_tasks`), WAF blocked (`waf_blocked_requests`), plus API 5xx/4xx, Lambda errors, DynamoDB throttling, latency. All → SNS. ✅ Code matches. 🧪 Needs functional test (TEST-4).*
+- [x] **PUB-14** (CRITICAL) Account-level budget + alerts — *Cannot verify locally: in separate infra repo (`terraform/budget.tf`, PR #27). Description says $200/month, SNS every 10% + 100% forecasted. 🧪 Needs manual verification in infra repo.*
+- [x] **PUB-15** (HIGH) Daily Cost Digest Lambda — *Cannot verify locally: in separate infra repo (`lambdas/cost-digest/index.py` + `terraform/cost-digest.tf`, PR #27). 🧪 Needs manual verification in infra repo.*
 - ~~**PUB-16**~~ (MEDIUM) WAF kill switch (auto-block all traffic on budget breach) — discussed and rejected. With concurrency limits, geo-blocking, and rate limits already in place, automatic WAF block is unnecessary and risks false positives.
 
 ### Attack Surface Reduction
-- [x] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP, `rate_based_statement` with `scope_down_statement` on URI path. In `infra/waf.tf`.
-- [x] **PUB-10** (MEDIUM) Geo-blocking — `/synthesize` restricted to EE, LV, LT, FI, SE, DE, PL, NO, DK. WAF `geo_match_statement` with `and_statement`. In `infra/waf.tf`.
+- [x] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — *Verified: `infra/waf.tf` rule "rate-limit-synthesize" (priority 2): `rate_based_statement` limit=20, `scope_down_statement` on `/api/synthesize`. ✅ Code matches.*
+- [x] **PUB-10** (MEDIUM) Geo-blocking — *Verified: `infra/waf.tf` rule "geo-restrict-synthesize" (priority 3): `and_statement` with `/api/synthesize` path match + `not_statement { geo_match_statement { country_codes = ["EE", "LV", "LT", "FI", "SE", "DE", "PL", "NO", "DK"] } }`. ✅ Code matches.*
 
 ### Storage
 - ~~**PUB-13**~~ (LOW) S3 audio lifecycle — not worth the complexity, audio files are small. Skip.
