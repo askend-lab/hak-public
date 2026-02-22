@@ -3,9 +3,13 @@
 
 import { z } from "zod";
 import {
+  extendZodWithOpenApi,
   OpenAPIRegistry,
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
+
+extendZodWithOpenApi(z);
+
 import {
   SynthesizeRequestSchema,
   SynthesizeResponseSchema,
@@ -25,7 +29,7 @@ registry.registerPath({
   request: {
     body: {
       content: {
-        "application/json": { schema: SynthesizeRequestSchema },
+        "application/json": { schema: SynthesizeRequestSchema.openapi("SynthesizeRequest") },
       },
     },
   },
@@ -33,19 +37,19 @@ registry.registerPath({
     "200": {
       description: "Audio already cached and ready",
       content: {
-        "application/json": { schema: SynthesizeResponseSchema },
+        "application/json": { schema: SynthesizeResponseSchema.openapi("SynthesizeResponse") },
       },
     },
     "202": {
       description: "Synthesis started, poll for status",
       content: {
-        "application/json": { schema: SynthesizeResponseSchema },
+        "application/json": { schema: SynthesizeResponseSchema.openapi("SynthesizeResponse") },
       },
     },
     "400": {
       description: "Invalid request",
       content: {
-        "application/json": { schema: ErrorResponseSchema },
+        "application/json": { schema: ErrorResponseSchema.openapi("ErrorResponse") },
       },
     },
   },
@@ -69,13 +73,13 @@ registry.registerPath({
     "200": {
       description: "Current synthesis status",
       content: {
-        "application/json": { schema: StatusResponseSchema },
+        "application/json": { schema: StatusResponseSchema.openapi("StatusResponse") },
       },
     },
     "400": {
       description: "Invalid cacheKey",
       content: {
-        "application/json": { schema: ErrorResponseSchema },
+        "application/json": { schema: ErrorResponseSchema.openapi("ErrorResponse") },
       },
     },
   },
@@ -90,7 +94,7 @@ registry.registerPath({
     "200": {
       description: "API is healthy",
       content: {
-        "application/json": { schema: HealthResponseSchema },
+        "application/json": { schema: HealthResponseSchema.openapi("HealthResponse") },
       },
     },
   },
