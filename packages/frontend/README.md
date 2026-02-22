@@ -62,4 +62,4 @@ pnpm test:full          # All tests with coverage
 pnpm test:cucumber      # BDD tests
 ```
 
-Tests are co-located: `Component.test.tsx` sits next to `Component.tsx`.
+Tests are co-located: `Component.test.tsx` sits next to `Component.tsx`. Coverage thresholds are enforced by Jest and CI.

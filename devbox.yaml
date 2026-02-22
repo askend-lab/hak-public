@@ -47,11 +47,10 @@ test_modules:
     command: "pnpm test"
     command_full: "pnpm test:coverage"
     results_file: "test-results.json"
-  - name: cucumber
-    path: packages/frontend
-    type: cucumber
-    min_coverage_lines: 0
-    min_coverage_branches: 0
+  # cucumber excluded from coverage — runs separately via pnpm test:cucumber
+  # - name: cucumber
+  #   path: packages/frontend
+  #   type: cucumber
 
 # Global coverage settings
 coverage:
