@@ -18,6 +18,21 @@ describe("validation", () => {
       expect(response.headers?.["Access-Control-Allow-Headers"]).toBe("Content-Type,Authorization");
       expect(response.headers?.["Access-Control-Allow-Methods"]).toBe("GET,POST,DELETE,OPTIONS");
     });
+
+    it("should use ALLOWED_ORIGIN when set", () => {
+      const original = process.env.ALLOWED_ORIGIN;
+      process.env.ALLOWED_ORIGIN = "https://example.com";
+      try {
+        const response = createResponse(200, { ok: true });
+        expect(response.headers?.["Access-Control-Allow-Origin"]).toBe("https://example.com");
+      } finally {
+        if (original === undefined) {
+          delete process.env.ALLOWED_ORIGIN;
+        } else {
+          process.env.ALLOWED_ORIGIN = original;
+        }
+      }
+    });
   });
 
   describe("parseJsonBody", () => {
