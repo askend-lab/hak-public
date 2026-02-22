@@ -2,7 +2,20 @@ service: merlin-api
 
 frameworkVersion: "3"
 
+plugins:
+  - serverless-esbuild
+
 custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    platform: "node"
+    target: "node20"
+    packager: "pnpm"
+    external:
+      - "@aws-sdk/*"
+
   allowedOrigin:
     dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
     prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
@@ -57,7 +70,7 @@ provider:
 
 functions:
   synthesize:
-    handler: dist/handler.synthesize
+    handler: src/handler.synthesize
     timeout: 30
     events:
       - httpApi:
@@ -65,7 +78,7 @@ functions:
           method: POST
 
   status:
-    handler: dist/handler.status
+    handler: src/handler.status
     timeout: 10
     events:
       - httpApi:
@@ -73,7 +86,7 @@ functions:
           method: GET
 
   health:
-    handler: dist/handler.health
+    handler: src/handler.health
     timeout: 5
     events:
       - httpApi:
@@ -94,11 +107,3 @@ resources:
     HttpApiId:
       Description: HTTP API ID (used by Terraform for CloudFront origin)
       Value: !Ref HttpApi
-
-package:
-  individually: true
-  patterns:
-    - "!node_modules/**"
-    - "!src/**"
-    - "!test/**"
-    - "dist/**"

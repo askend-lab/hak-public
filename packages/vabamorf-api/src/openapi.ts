@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+import { z } from "zod";
 import {
+  extendZodWithOpenApi,
   OpenAPIRegistry,
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
+
+extendZodWithOpenApi(z);
+
 import {
   AnalyzeRequestSchema,
   AnalyzeResponseSchema,
@@ -25,7 +30,7 @@ registry.registerPath({
   request: {
     body: {
       content: {
-        "application/json": { schema: AnalyzeRequestSchema },
+        "application/json": { schema: AnalyzeRequestSchema.openapi("AnalyzeRequest") },
       },
     },
   },
@@ -33,13 +38,13 @@ registry.registerPath({
     "200": {
       description: "Analyzed text with stress marks",
       content: {
-        "application/json": { schema: AnalyzeResponseSchema },
+        "application/json": { schema: AnalyzeResponseSchema.openapi("AnalyzeResponse") },
       },
     },
     "400": {
       description: "Invalid request",
       content: {
-        "application/json": { schema: ErrorResponseSchema },
+        "application/json": { schema: ErrorResponseSchema.openapi("ErrorResponse") },
       },
     },
   },
@@ -54,7 +59,7 @@ registry.registerPath({
   request: {
     body: {
       content: {
-        "application/json": { schema: VariantsRequestSchema },
+        "application/json": { schema: VariantsRequestSchema.openapi("VariantsRequest") },
       },
     },
   },
@@ -62,13 +67,13 @@ registry.registerPath({
     "200": {
       description: "Word variants with morphological info",
       content: {
-        "application/json": { schema: VariantsResponseSchema },
+        "application/json": { schema: VariantsResponseSchema.openapi("VariantsResponse") },
       },
     },
     "400": {
       description: "Invalid request",
       content: {
-        "application/json": { schema: ErrorResponseSchema },
+        "application/json": { schema: ErrorResponseSchema.openapi("ErrorResponse") },
       },
     },
   },
@@ -83,7 +88,7 @@ registry.registerPath({
     "200": {
       description: "API is healthy",
       content: {
-        "application/json": { schema: HealthResponseSchema },
+        "application/json": { schema: HealthResponseSchema.openapi("HealthResponse") },
       },
     },
   },
