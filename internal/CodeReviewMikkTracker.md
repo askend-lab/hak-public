@@ -94,7 +94,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 ## 12. Security
 
 - ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
-- ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — improve per-user/per-IP limiting
+- ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — DEFERRED, requires client decision on authentication first
 - ✅ Accept  [✅] Fixed  [ ] Closed — **12.3** (Medium) CORS behavior unified — all packages now return 'null' when ALLOWED_ORIGIN unset
 - ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.4** (Medium) OS Command Injection via shell=True (TDD tests exist, fix in progress) — Ruff S602
 - ✅ Accept  [🛡️] Fixed  [ ] Closed — **12.5** (Medium) pickle.load — add SHA-256 checksum verification for model files — Ruff S301
@@ -235,3 +235,60 @@ Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: 
 - [x] **QS-12** Fix `api-client/scripts/generate.mjs:52` — replaced `execSync` with `execFileSync` (no shell interpolation, eliminates OS command injection risk)
 - [x] **QS-13** Fix Docker root user in `vabamorf-api/Dockerfile.local` — added `USER appuser` directive matching production Dockerfile
 - [x] **QS-14** Fix regex ReDoS in `tara-auth/cognito-client.ts:66` — added `.` to excluded chars in middle group, eliminating backtracking ambiguity
+
+---
+
+## Public API Security Hardening (from PROPOSAL-Auth-Public-Endpoints)
+
+Ref: `internal/PROPOSAL-Auth-Public-Endpoints.md`
+
+Status: **Awaiting client decision** on whether to add authentication to `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants`.
+
+### Option A: Add Authentication (Recommended)
+
+All infrastructure already exists (Cognito, TARA, JWT, API Gateway authorizer). Minimal code changes.
+
+- [ ] **AUTH-1** (CRITICAL) Add `AuthorizationType: JWT` to merlin-api `serverless.yml` for `/synthesize` and `/status/{cacheKey}`
+- [ ] **AUTH-2** (CRITICAL) Add `AuthorizationType: JWT` to vabamorf-api `serverless.yml` for `/analyze` and `/variants`
+- [ ] **AUTH-3** (Medium) Verify frontend sends `Authorization: Bearer` header with synthesis/morphology requests (code already exists, backend ignores it)
+- [ ] **AUTH-4** (Medium) Add per-user rate limits in API Gateway (e.g., 10 req/min per user for `/synthesize`)
+- [ ] **AUTH-5** (Low) Add user attribution to CloudWatch logs (who requested what)
+
+### Option B: Keep Public + Harden (if client rejects auth)
+
+Extensive list of required measures from Appendix A of the proposal.
+
+#### Cost & Scaling Limits
+- [ ] **PUB-1** (CRITICAL) AWS Budgets + automatic shutdown — warning at 70%, reduce ECS at 90%, disable at 100%
+- [ ] **PUB-2** (CRITICAL) ECS max_capacity hard cap — limit to 2-3 concurrent workers + CloudWatch alarm
+- [ ] **PUB-3** (CRITICAL) Lambda concurrency limits — `reservedConcurrentExecutions: 10-20` for merlin-api and vabamorf-api
+- [ ] **PUB-4** (HIGH) SQS queue depth cap — reject with 503 if queue > 50 messages
+- [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — DONE in 15.5 (1000 → 100 chars)
+
+#### Monitoring & Detection
+- [ ] **PUB-6** (HIGH) CloudWatch alerts — anomalous request growth, SQS depth, ECS task count, cost/day dashboard + Slack
+- [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection Lambda + EventBridge cron
+- [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries
+
+#### Attack Surface Reduction
+- [ ] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — 20 req/5min per IP (separate from general 100/5min)
+- [ ] **PUB-10** (MEDIUM) Geo-blocking — restrict `/synthesize` to EE, LV, LT, FI, SE
+- [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work
+- [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token
+
+#### Storage
+- [ ] **PUB-13** (LOW) S3 audio lifecycle — auto-delete after 30-90 days
+
+#### Testing (required for either option)
+- [ ] **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts
+- [ ] **TEST-2** (CRITICAL) Auto-scaling testing — verify ECS max_capacity behavior
+- [ ] **TEST-3** (CRITICAL) Lambda concurrency testing — verify limits and 429 responses
+- [ ] **TEST-4** (HIGH) Alert testing — simulate each alert, verify Slack delivery < 5 min
+- [ ] **TEST-5** (HIGH) Budget limit testing — verify AWS Budget alarm + auto-action
+- [ ] **TEST-6** (HIGH) SQS queue depth testing — fill to threshold, verify 503 + recovery
+
+### Useful Regardless of Decision
+- [ ] **INFRA-1** (HIGH) AWS Budgets alerts (even with auth, budget monitoring is good practice)
+- [ ] **INFRA-2** (HIGH) ECS max_capacity (prevents runaway scaling)
+- [ ] **INFRA-3** (MEDIUM) S3 audio lifecycle (limits storage cost growth)
+- [ ] **INFRA-4** (MEDIUM) CloudWatch dashboard (visibility into system health)
