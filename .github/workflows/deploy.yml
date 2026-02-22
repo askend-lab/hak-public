@@ -278,10 +278,18 @@ jobs:
           echo "✅ Deployment state updated:"
           cat /tmp/deployment-state.json
 
-      - name: Smoke test
+      - name: Smoke test (bash)
         run: |
           chmod +x scripts/smoke-test.sh
           ./scripts/smoke-test.sh ${{ inputs.environment }}
+
+      - name: Smoke test (api-client)
+        working-directory: packages/api-client
+        env:
+          SMOKE_ENV: ${{ inputs.environment }}
+        run: |
+          npx jest --no-coverage --testPathPatterns=smoke 2>&1
+          echo "✅ API client smoke tests passed (${{ inputs.environment }})"
 
       - name: Summary
         run: |

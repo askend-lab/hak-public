@@ -5,10 +5,10 @@ import { MerlinClient } from "../../src/clients/merlin";
 import { getUrls } from "../../src/config";
 import { randomBytes } from "node:crypto";
 
-const urls = getUrls("dev");
+const urls = getUrls();
 const client = new MerlinClient(urls.merlin);
 
-describe("Merlin API smoke tests (dev)", () => {
+describe("Merlin API smoke tests", () => {
   it("GET /health — returns ok", async () => {
     const result = await client.health();
     expect(result.status).toBe(200);

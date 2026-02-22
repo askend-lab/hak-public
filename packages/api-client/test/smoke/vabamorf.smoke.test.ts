@@ -4,10 +4,10 @@
 import { VabamorfClient } from "../../src/clients/vabamorf";
 import { getUrls } from "../../src/config";
 
-const urls = getUrls("dev");
+const urls = getUrls();
 const client = new VabamorfClient(urls.vabamorf);
 
-describe("Vabamorf API smoke tests (dev)", () => {
+describe("Vabamorf API smoke tests", () => {
   it("GET /api/health — returns ok", async () => {
     const result = await client.health();
     expect(result.status).toBe(200);

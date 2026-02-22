@@ -25,6 +25,7 @@ const URLS: Record<Environment, ApiUrls> = {
   },
 };
 
-export function getUrls(env: Environment = "dev"): ApiUrls {
-  return URLS[env];
+export function getUrls(env?: Environment): ApiUrls {
+  const resolved = env ?? (process.env.SMOKE_ENV as Environment) ?? "dev";
+  return URLS[resolved];
 }

@@ -8,8 +8,8 @@
     "generate:check": "node scripts/generate.mjs --check",
     "build": "tsc",
     "test": "jest --no-coverage",
-    "test:smoke": "jest --no-coverage --testPathPattern=smoke",
-    "test:unit": "jest --no-coverage --testPathPattern=unit"
+    "test:smoke": "jest --no-coverage --testPathPatterns=smoke",
+    "test:unit": "jest --no-coverage --testPathPatterns=unit"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
