@@ -50,10 +50,10 @@ describe("synthesize", () => {
   });
 
   it("should return 400 for text exceeding max length", async () => {
-    const longText = "a".repeat(1001);
+    const longText = "a".repeat(101);
     const response = await synthesize(createRequestEvent(longText));
     expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(JSON.parse(response.body).error).toContain("1000 characters");
+    expect(JSON.parse(response.body).error).toContain("100 characters");
   });
 
   it("should return ready when cached", async () => {

@@ -52,7 +52,7 @@ Touches: `packages/merlin-api/`, `packages/merlin-worker/`, `packages/vabamorf-a
 - [x] **13.1** (Medium) Cache DNN model in memory instead of loading from disk every request
 - [x] **15.1** (Medium) Remove /warmup endpoint entirely from merlin-api
 - [x] **15.3** (Low) Apply shell injection fix (TDD tests already exist)
-- [ ] **15.4** (Medium) Remove /status/{cacheKey} from direct public access — DEFERRED (needs architectural discussion)
+- [x] **15.4** (Medium) ~~Remove /status/{cacheKey} from direct public access~~ — REJECTED: system depends on public polling for synthesis status
 
 ---
 
