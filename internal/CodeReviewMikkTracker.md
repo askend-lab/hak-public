@@ -245,35 +245,41 @@ Ref: `internal/PROPOSAL-Auth-Public-Endpoints.md`
 Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are public. Authentication proposal sent to client (pending decision). Below: what we must do regardless to harden the public setup.
 
 ### Cost & Scaling Limits
-- [x] **PUB-1** (CRITICAL) AWS Budgets — *Verified: `infra/budgets.tf` has `aws_budgets_budget` with Project=HAK tag filter, 4 notifications (70%, 90%, 100% actual + 100% forecasted) → SNS alerts. ✅ Code matches description. 🧪 Needs functional test (TEST-5).*
-- [x] **PUB-2** (CRITICAL) ECS max_capacity hard cap — *Verified: `infra/merlin/main.tf:373` has `max_capacity = var.ecs_max_capacity` (dev=0, prod=cap). ✅ Code matches. 🧪 Needs functional test (TEST-2).*
-- [x] **PUB-3** (CRITICAL) Lambda concurrency limits — *Verified: `tts-api/serverless.yml:76` has `reservedConcurrency: 3`. `morphology-api/serverless.yml:48` has `reservedConcurrency: 3`. ✅ Code matches (PR #666). 🧪 Needs functional test (TEST-3).*
-- [x] **PUB-4** (HIGH) SQS queue depth cap — *Verified: `tts-api/src/sqs.ts` has `checkQueueDepth()` with `GetQueueAttributesCommand`, `MAX_QUEUE_DEPTH = 50`, `QueueFullError`. Handler catches it → 503. ✅ Code matches. 🧪 Needs functional test (TEST-6).*
-- [x] **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — *Verified: See 15.5. Backend enforced (100 chars). ⚠️ Frontend missing `maxLength` attribute (see 15.5).*
+
+- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-1** (CRITICAL) AWS Budgets — *Verified: `infra/budgets.tf` has `aws_budgets_budget` with Project=HAK tag filter, 4 notifications (70%, 90%, 100% actual + 100% forecasted) → SNS alerts. Code matches. 🧪 Needs penetration test TEST-5: set budget to $0.01 in staging, verify alert fires.*
+- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-2** (CRITICAL) ECS max_capacity hard cap — *Verified: `infra/merlin/main.tf:373` has `max_capacity = var.ecs_max_capacity` (dev=0, prod=cap). Code matches. 🧪 Needs penetration test TEST-2: flood `/synthesize`, verify ECS doesn't scale beyond cap.*
+- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-3** (CRITICAL) Lambda concurrency limits — *Verified: `tts-api/serverless.yml:76` has `reservedConcurrency: 3`. `morphology-api/serverless.yml:48` has `reservedConcurrency: 3`. Code matches (PR #666). 🧪 Needs penetration test TEST-3: send 50+ concurrent requests, verify 429 responses (not 500).*
+- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-4** (HIGH) SQS queue depth cap — *Verified: `tts-api/src/sqs.ts` has `checkQueueDepth()` with `MAX_QUEUE_DEPTH = 50`, `QueueFullError` → handler returns 503. Code matches. 🧪 Needs penetration test TEST-6: burst 60+ synthesis requests, verify 503 at queue depth 50 + recovery after drain.*
+- ✅ Accept  [✅] Fixed  [⚠️] Closed — **PUB-5** (HIGH) Reduce MAX_TEXT_LENGTH — *Verified: See 15.5. Backend enforced (100 chars in Zod + Python). ⚠️ Frontend missing `maxLength` attribute — users see error only after submit.*
 
 ### Monitoring & Detection
-- [x] **PUB-6** (HIGH) CloudWatch alerts — *Verified: `infra/cloudwatch-alarms.tf` has alarms for SQS depth (`merlin_sqs_depth`), ECS tasks (`merlin_ecs_high_tasks`), WAF blocked (`waf_blocked_requests`), plus API 5xx/4xx, Lambda errors, DynamoDB throttling, latency. All → SNS. ✅ Code matches. 🧪 Needs functional test (TEST-4).*
-- [x] **PUB-14** (CRITICAL) Account-level budget + alerts — *Cannot verify locally: in separate infra repo (`terraform/budget.tf`, PR #27). Description says $200/month, SNS every 10% + 100% forecasted. 🧪 Needs manual verification in infra repo.*
-- [x] **PUB-15** (HIGH) Daily Cost Digest Lambda — *Cannot verify locally: in separate infra repo (`lambdas/cost-digest/index.py` + `terraform/cost-digest.tf`, PR #27). 🧪 Needs manual verification in infra repo.*
-- ~~**PUB-16**~~ (MEDIUM) WAF kill switch (auto-block all traffic on budget breach) — discussed and rejected. With concurrency limits, geo-blocking, and rate limits already in place, automatic WAF block is unnecessary and risks false positives.
+
+- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-6** (HIGH) CloudWatch alerts — *Verified: `infra/cloudwatch-alarms.tf` has alarms for SQS depth, ECS tasks, WAF blocked, API 5xx/4xx, Lambda errors, DynamoDB throttling, latency. All → SNS. Code matches. 🧪 Needs penetration test TEST-4: trigger each alarm manually, verify Slack delivery < 5 min.*
+- ✅ Accept  [❓] Fixed  [🧪] Closed — **PUB-14** (CRITICAL) Account-level budget + alerts — *Cannot verify locally: in separate infra repo (`terraform/budget.tf`, PR #27). 🧪 Needs manual verification in infra repo + TEST-5.*
+- ✅ Accept  [❓] Fixed  [🧪] Closed — **PUB-15** (HIGH) Daily Cost Digest Lambda — *Cannot verify locally: in separate infra repo (`lambdas/cost-digest/index.py` + `terraform/cost-digest.tf`, PR #27). 🧪 Needs manual verification in infra repo.*
+- ❌ Reject (rejected) — ~~**PUB-16**~~ (MEDIUM) WAF kill switch — discussed and rejected. Concurrency limits + geo-blocking + rate limits already sufficient. Auto-block risks false positives.
 
 ### Attack Surface Reduction
-- [x] **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — *Verified: `infra/waf.tf` rule "rate-limit-synthesize" (priority 2): `rate_based_statement` limit=20, `scope_down_statement` on `/api/synthesize`. ✅ Code matches.*
-- [x] **PUB-10** (MEDIUM) Geo-blocking — *Verified: `infra/waf.tf` rule "geo-restrict-synthesize" (priority 3): `and_statement` with `/api/synthesize` path match + `not_statement { geo_match_statement { country_codes = ["EE", "LV", "LT", "FI", "SE", "DE", "PL", "NO", "DK"] } }`. ✅ Code matches.*
+
+- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — *Verified: `infra/waf.tf` rule "rate-limit-synthesize" (priority 2): `rate_based_statement` limit=20, `scope_down_statement` on `/api/synthesize`. Code matches. 🧪 Needs penetration test TEST-1: 100+ req/min from single IP, verify WAF blocks after 20.*
+- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-10** (MEDIUM) Geo-blocking — *Verified: `infra/waf.tf` rule "geo-restrict-synthesize" (priority 3): `geo_match_statement` allows only EE, LV, LT, FI, SE, DE, PL, NO, DK for `/api/synthesize`. Code matches. 🧪 Needs penetration test: request from non-allowed country (VPN), verify block.*
 
 ### Storage
-- ~~**PUB-13**~~ (LOW) S3 audio lifecycle — not worth the complexity, audio files are small. Skip.
+
+- ❌ Reject (not worth it) — ~~**PUB-13**~~ (LOW) S3 audio lifecycle — audio files are small, complexity not justified.
 
 ### Deferred (decided not to do now)
-- [ ] **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection. **How:** new Lambda + EventBridge cron (every 5 min), reads CloudWatch logs, adds IPs to WAF IP set. Separate development effort.
-- [ ] **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries. **How:** manual setup in AWS Console, save Top-10 IPs, hourly distribution, atypical User-Agents.
-- [ ] **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work. **How:** AWS WAF Bot Control (~$10/month) or custom proof-of-work header in frontend. Separate evaluation needed.
-- [ ] **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. **How:** frontend code change (canvas/screen/timezone hash as header) + backend validation. Separate development effort.
 
-### Testing & Verification
-- [ ] **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/` directory.
-- [ ] **TEST-2** (CRITICAL) Auto-scaling testing — verify ECS max_capacity behavior. **How:** run TEST-1 attack script, observe ECS task count in CloudWatch.
-- [ ] **TEST-3** (CRITICAL) Lambda concurrency testing — verify limits and 429 responses. **How:** concurrent requests via k6, check for 429 (not 500).
-- [ ] **TEST-4** (HIGH) Alert testing — simulate each alert, verify Slack delivery < 5 min. **How:** manual trigger of CloudWatch alarms.
-- [ ] **TEST-5** (HIGH) Budget limit testing — verify AWS Budget alarm + auto-action. **How:** set test budget to $0.01 in staging, verify trigger.
-- [ ] **TEST-6** (HIGH) SQS queue depth testing — fill queue to threshold, verify 503 + recovery. **How:** send burst of synthesis requests, verify PUB-4 cap works.
+- ⏸️ Deferred  [ ] Fixed  [ ] Closed — **PUB-7** (HIGH) Anomaly detection + auto-ban — bot pattern detection. New Lambda + EventBridge cron needed. Separate dev effort.
+- ⏸️ Deferred  [ ] Fixed  [ ] Closed — **PUB-8** (MEDIUM) Audit and forensics — CloudWatch Logs Insights saved queries. Manual AWS Console setup.
+- ⏸️ Deferred  [ ] Fixed  [ ] Closed — **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work — AWS WAF Bot Control (~$10/month) or custom PoW header. Separate evaluation.
+- ⏸️ Deferred  [ ] Fixed  [ ] Closed — **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. Frontend + backend changes needed.
+
+### Testing & Verification (Penetration Tests)
+
+- ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/`. **Verifies:** PUB-9 WAF rate limit.
+- ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-2** (CRITICAL) Auto-scaling testing — verify ECS max_capacity behavior. **How:** run TEST-1 attack, observe ECS task count in CloudWatch. **Verifies:** PUB-2.
+- ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-3** (CRITICAL) Lambda concurrency testing — verify limits and 429 responses. **How:** 50+ concurrent requests via k6, check for 429 (not 500). **Verifies:** PUB-3.
+- ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-4** (HIGH) Alert testing — simulate each alert, verify Slack delivery < 5 min. **How:** manual trigger of CloudWatch alarms. **Verifies:** PUB-6.
+- ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-5** (HIGH) Budget limit testing — verify AWS Budget alarm fires. **How:** set test budget to $0.01 in staging. **Verifies:** PUB-1, PUB-14.
+- ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-6** (HIGH) SQS queue depth testing — fill queue to threshold, verify 503 + recovery. **How:** burst 60+ synthesis requests. **Verifies:** PUB-4.
