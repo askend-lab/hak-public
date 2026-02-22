@@ -41,11 +41,6 @@ provider:
   memorySize: 512
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
-  apiGateway:
-    throttle:
-      rateLimit: 10
-      burstLimit: 20
-
   environment:
     TABLE_NAME: ${self:service}-${self:provider.stage}
     APP_NAME: ${self:service}
