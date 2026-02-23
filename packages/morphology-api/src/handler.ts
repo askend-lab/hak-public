@@ -87,7 +87,7 @@ function parseAndValidateWithSchema(
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
-  logger.error(PROCESSING_ERROR_PREFIX, error);
+  logger.error(PROCESSING_ERROR_PREFIX, error instanceof Error ? error.message : String(error));
   return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: `${PROCESSING_ERROR_PREFIX}${ERRORS.UNKNOWN}`,
   });

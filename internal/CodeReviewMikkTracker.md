@@ -364,26 +364,27 @@ Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
 ### Phase 3: Infrastructure & Observability
 
 - ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-9** (HIGH) Add `logRetentionInDays: 30` to all 4 serverless.yml — currently Lambda log groups default to never-expire (unbounded cost). **How:** add `logRetentionInDays: 30` to `provider` block in auth, store, tts-api, morphology-api. **PR #674**
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-10** (MEDIUM) Add CloudWatch Logs Insights saved queries — common debug queries for error analysis, request tracing, latency. **How:** document in LOGGING-ANALYSIS.md or add to infra.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-11** (MEDIUM) Standardize error logging format — currently inconsistent: some log `error.message`, some log full error, some log neither. **How:** use `logger.error(context, { error: extractErrorMessage(error) })` everywhere.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-10** (MEDIUM) Add CloudWatch Logs Insights saved queries — common debug queries for error analysis, request tracing, latency. **How:** document in LOGGING-ANALYSIS.md or add to infra. **PR #676**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-11** (MEDIUM) Standardize error logging format — currently inconsistent: some log `error.message`, some log full error, some log neither. **How:** use `error instanceof Error ? error.message : String(error)` pattern. **PR #676**
 
 ### Phase 4: Business Observability
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-12** (MEDIUM) Add info-level business event logging — successful synthesis, auth, store operations. **How:** `logger.info("synthesis.cache_hit", { cacheKey })`, `logger.info("auth.success", { userId })`.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-13** (LOW) Add debug-level development logging — state transitions, config loading, adapter selection. **How:** `logger.debug(...)` calls, filtered out in production by default LOG_LEVEL=info.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-14** (LOW) Add tts-api → tts-worker correlation — include cacheKey in tts-api logs to enable tracing synthesis flow across tts-api → SQS → tts-worker → S3. **How:** log cacheKey in both synthesize handler and worker.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-12** (MEDIUM) Add info-level business event logging — successful synthesis, auth, store operations. Already implemented: tts-api cache hit/miss/queue, auth TARA success. **PR #674, #676**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-13** (LOW) Add debug-level development logging — state transitions, config loading, adapter selection. Already implemented: cognito-triggers challenge flow, tts-api status check. **PR #674, #675**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-14** (LOW) Add tts-api → tts-worker correlation — include cacheKey in tts-api logs to enable tracing synthesis flow across tts-api → SQS → tts-worker → S3. Already implemented: cacheKey in synthesize/status logs. **PR #674**
 
 ### Statistics
 
 | Metric | Current | Target |
 |--------|---------|--------|
 | Backend files with logging | 6/32 → 11/32 (34%) | 20+/32 (60%+) |
-| Structured/JSON logging | ✅ Lambda JSON | ✅ All Lambda |
+| Structured/JSON logging | ✅ All Lambda | ✅ All Lambda |
 | Request correlation | ✅ All Lambda handlers | ✅ All Lambda |
 | Log retention configured | ✅ 30 days (all 4) | ✅ 30 days |
 | Error-only calls | 16/27 (59%) | <50% |
 | Info-level calls | 5 | 15+ |
 | Debug-level calls | 5 | 10+ |
+| CloudWatch queries | ✅ 5 saved queries | ✅ Documented |
 
 ---
 
