@@ -11,7 +11,7 @@ export const OIDC_JWKS_PATH = '/oidc/jwks';
 export const CONTENT_TYPE_FORM_URLENCODED = 'application/x-www-form-urlencoded';
 export const UI_LOCALE = 'et';
 
-export interface TaraClient {
+interface TaraClient {
   buildAuthorizationUrl(state: string, nonce: string): string;
   exchangeCodeForTokens(code: string): Promise<TaraTokens>;
   verifyIdToken(idToken: string, expectedNonce: string): Promise<TaraIdToken>;

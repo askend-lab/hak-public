@@ -60,7 +60,3 @@ export const ErrorResponseSchema = z
     error: z.string(),
   });
 
-export type AnalyzeRequest = z.infer<typeof AnalyzeRequestSchema>;
-export type VariantsRequest = z.infer<typeof VariantsRequestSchema>;
-export type AnalyzeResponse = z.infer<typeof AnalyzeResponseSchema>;
-export type VariantsResponse = z.infer<typeof VariantsResponseSchema>;

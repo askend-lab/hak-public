@@ -7,7 +7,7 @@ import { SimpleStoreAdapter } from "./storage/SimpleStoreAdapter";
 import { ShareService } from "@/features/sharing/services/ShareService";
 import { TaskRepository } from "./repository/TaskRepository";
 
-export interface DataServiceDeps {
+interface DataServiceDeps {
   storage?: SimpleStoreAdapter;
 }
 

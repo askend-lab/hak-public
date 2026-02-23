@@ -15,7 +15,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
-export interface ParseIdTokenOptions {
+interface ParseIdTokenOptions {
   expectedIssuer?: string;
   expectedAudience?: string;
 }

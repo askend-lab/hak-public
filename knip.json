@@ -12,7 +12,7 @@
   "ignoreDependencies": [],
   "workspaces": {
     "packages/frontend": {
-      "entry": ["src/main.tsx", "src/**/*.test.{ts,tsx}", "src/features/steps-ts/**/*.ts"],
+      "entry": ["src/**/*.test.{ts,tsx}", "src/features/steps-ts/**/*.ts"],
       "project": ["src/**/*.{ts,tsx}"]
     }
   }

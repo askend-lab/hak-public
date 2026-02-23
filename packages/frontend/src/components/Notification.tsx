@@ -16,7 +16,7 @@ export interface NotificationAction {
   label: string;
   onClick: () => void;
 }
-export interface NotificationProps {
+interface NotificationProps {
   type: NotificationType;
   color?: NotificationColor | undefined;
   message: string;

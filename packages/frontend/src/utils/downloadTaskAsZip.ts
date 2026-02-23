@@ -50,7 +50,7 @@ async function fetchAudioBlob(entry: TaskEntry): Promise<Blob | null> { // eslin
   }
 }
 
-export interface ZipProgress {
+interface ZipProgress {
   current: number;
   total: number;
 }

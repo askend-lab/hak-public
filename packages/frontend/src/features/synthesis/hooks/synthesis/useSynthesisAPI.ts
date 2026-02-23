@@ -6,7 +6,7 @@ import { convertTextToTags } from "@/types/synthesis";
 import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
 import { postJSON, ANALYZE_API_PATH } from "@/features/synthesis/utils/analyzeApi";
 
-export interface SynthesisResult {
+interface SynthesisResult {
   audioUrl: string;
   phoneticText: string;
   stressedTags?: string[] | undefined;

@@ -3,7 +3,6 @@
 
 import { createApiResponse } from "@hak/shared";
 
-export type { LambdaResponse } from "@hak/shared";
 export { CORS_HEADERS, HTTP_STATUS } from "@hak/shared";
 
 export const createResponse = createApiResponse;

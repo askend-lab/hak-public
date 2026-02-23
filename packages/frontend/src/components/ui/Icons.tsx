@@ -89,5 +89,3 @@ export const TaskIcon = (props: IconComponentProps) => (
   <Icon name="assignment" {...props} />
 );
 
-// Re-export types for convenience
-export type { IconSize, IconWeight } from "./Icon";
