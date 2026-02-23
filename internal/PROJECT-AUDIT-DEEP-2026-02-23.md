@@ -19,9 +19,11 @@ zustand
 
 Removed in PR #681. Also cleaned up corresponding `manualChunks` entries in `vite.config.ts`.
 
-### DEP-2 (MEDIUM) 37 unused devDependencies across packages
+### DEP-2 ~~(MEDIUM)~~ ✅ PARTIALLY FIXED — 6 unused devDependencies removed
 
-Notable: `serverless-domain-manager` in 3 packages, `serverless-esbuild` in 2, `serverless-offline` in 2, many old ESLint plugins in frontend. Full list in knip output.
+Removed `i18next`, `react-i18next`, `chai`, `@types/chai`, `nyc`, `ts-node` from frontend devDependencies (PR #684).
+
+Remaining 31 are false positives: Serverless Framework plugins (`serverless-domain-manager`, `serverless-esbuild`, `serverless-offline`), ESLint plugins (used by DevBox base config), `@playwright/test` (e2e), `@types/react` (TS types), DevBox tools (`gitleaks`, `husky`, `madge`, `stylelint`).
 
 ### DEP-3 (LOW) 1 unlisted dependency
 
@@ -31,25 +33,24 @@ Notable: `serverless-domain-manager` in 3 packages, `serverless-esbuild` in 2, `
 
 ## 2. Dead Code / Unused Exports (knip)
 
-### DEAD-1 (HIGH) 32 unused exports across the monorepo
+### DEAD-1 ~~(HIGH)~~ ✅ FIXED — 32 unused exports cleaned up (PR #684)
 
-**Backend:**
-- `healthHandler` in `auth/src/handler.ts` — just added but serverless.yml references it, knip false positive (serverless entry not in knip config)
-- `LambdaResponse` type in `morphology-api/src/validation.ts` — only re-exported, never imported
-- `AnalyzeRequest/Response`, `VariantsRequest/Response` types in morphology-api schemas
-- `SynthesizeResponse`, `StatusResponse`, `HealthResponse` types in tts-api schemas
-- `UpsertFields` type in store core
+**Removed (dead code):**
+- 5 unused icon components, `warmAudioWorker` function, `getMarkerBySymbol` function
+- Unused `Icon` re-export, `CONTENT_TYPE_JSON` re-export
 
-**Frontend (24 unused exports):**
-- 6 unused icon components: `DownloadIcon`, `ChevronUpIcon`, `ChevronLeftIcon`, `ShareIcon`, `CheckIcon`, `Icon`
-- `refreshTokens` function in auth context
-- `CONSENT_KEY` in CookieConsent
-- `warmAudioWorker`, `pingMerlinOnActivity` — exported but only used internally
-- `decodeJwtPayload`, `TOKEN_EXPIRY_BUFFER_SECONDS` in auth token utils
-- `CONTENT_TYPE_JSON` in analyzeApi
-- `useUserId`, `useDropdownPosition` hooks
-- `runPageAudit` in a11y-dev utils
-- Multiple unused type exports
+**Un-exported (used internally only):**
+- `CONSENT_KEY`, `refreshTokens`, `decodeJwtPayload`, `TOKEN_EXPIRY_BUFFER_SECONDS`, `LOCALE_ET`
+- `pingMerlinOnActivity`, `runPageAudit`
+- `MorphologyInfoSchema`, `VariantSchema`, `MAX_TTL_SECONDS`, `MAX_DATA_SIZE_BYTES`, `adapterManager`
+- `TEST_ECS_CLUSTER`, `TEST_ECS_SERVICE`
+
+**Removed unused barrel re-exports:**
+- `auth/services/index.ts`: `AuthStorage`, `cognitoConfig`, `getLoginUrl`, `getLogoutUrl`, `exchangeCodeForTokens`
+- `onboarding/components/index.ts`: `WizardTooltip`
+- `hooks/index.ts`: `useUserId`, `useDropdownPosition`
+
+Only `healthHandler` remains — knip false positive (referenced by serverless.yml).
 
 ### DEAD-2 ~~(MEDIUM)~~ ✅ FIXED — Auth package entry file
 
@@ -136,18 +137,30 @@ These two hooks share ~90% identical logic (audio playback, abort control, synth
 
 ---
 
+## 8. Code Quality Observations (positive)
+
+- Zero `any` types in production frontend code
+- Zero `@ts-ignore` / `@ts-expect-error` in production code
+- Zero `dangerouslySetInnerHTML` usage
+- Only 4 `eslint-disable-next-line` comments in production frontend (all justified)
+- All `fetch()` calls check `response.ok`
+- All `addEventListener` calls have matching `removeEventListener` cleanup
+- All backend silent catches are intentional JSON parse guards
+
+---
+
 ## Summary Table
 
 | Category | HIGH | MEDIUM | LOW | Fixed |
 |----------|------|--------|-----|-------|
-| Dependencies | ~~1~~ | 1 | 1 | ✅ DEP-1 |
-| Dead Code | 1 | ~~1~~ | 0 | ✅ DEAD-2 |
+| Dependencies | ~~1~~ | ~~1~~ | 1 | ✅ DEP-1, DEP-2 |
+| Dead Code | ~~1~~ | ~~1~~ | 0 | ✅ DEAD-1, DEAD-2 |
 | Serverless Config | 0 | ~~1~~+1 | 1 | ✅ SLS-1 |
 | Silent Catches | ~~1~~ | 0 | 0 | ✅ SILENT-1 |
 | React Patterns | 0 | 1 | 1 | |
 | Audio Resources | 0 | 1 | 0 | |
 | Code Duplication | 0 | 1 | 0 | |
-| **Total** | **1** | **5** | **2** | **4 fixed** |
+| **Total** | **0** | **4** | **2** | **6 fixed** |
 
 ---
 
@@ -155,17 +168,18 @@ These two hooks share ~90% identical logic (audio playback, abort control, synth
 
 | Finding | PR | Status |
 |---------|-----|--------|
-| DEP-1 — Remove 7 unused deps | #681 | ✅ merged |
+| DEP-1 — Remove 7 unused prod deps | #681 | ✅ merged |
 | SLS-1 — Explicit Lambda timeouts | #681 | ✅ merged |
 | DEAD-2 — Fix auth package.json | #681 | ✅ merged |
 | SILENT-1 — Log 12 silent catches | #682 | ✅ merged |
+| DEAD-1 — Remove/un-export 32 unused exports | #684 | ✅ merged |
+| DEP-2 — Remove 6 unused devDependencies | #684 | ✅ merged |
 
 ## Remaining Priority Order
 
-1. **DEAD-1** — Remove 32 unused exports (reduces confusion, improves tree-shaking)
-2. **DUP-1** — Extract shared audio playback hook (~250 lines dedup)
-3. **DEP-2** — Clean up 37 unused devDependencies
-4. **REACT-1** — Fix array index keys in TagsInput/TagsList
-5. **SLS-2** — Enable X-Ray tracing
-6. **SLS-3** — Set reserved concurrency limits
-7. **AUDIO-1** — Audio cleanup observability
+1. **DUP-1** — Extract shared audio playback hook (~250 lines dedup)
+2. **REACT-1** — Fix array index keys in TagsInput/TagsList
+3. **SLS-2** — Enable X-Ray tracing
+4. **SLS-3** — Set reserved concurrency limits
+5. **AUDIO-1** — Audio cleanup observability
+6. **DEP-3** — Add `@testing-library/jest-dom` to root package.json
