@@ -341,6 +341,52 @@ Identified ~60 weak/useless tests across 12 files in 6 packages. Replaced with m
 
 ---
 
+## Logging System Audit (2026-02-23)
+
+Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
+
+**Current state:** No systematic logging. Backend has 13 total `logger.*` calls across 6/32 files (19%). 92% are error-only. Zero structured logging, zero request correlation, zero debug calls.
+
+### Phase 1: Structured JSON Logging (foundation)
+
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-1** (CRITICAL) Upgrade `shared/src/logger.ts` — output JSON in Lambda/production, plain text in dev/browser. Fields: `timestamp`, `level`, `message`, `package`. **How:** detect `AWS_LAMBDA_FUNCTION_NAME` env var → switch to JSON format.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-2** (CRITICAL) Add `withContext(fields)` method to logger — returns child logger that includes metadata (requestId, userId, package) in every log line. **How:** extend `createLogger` to accept default fields.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-3** (HIGH) Add request correlation — pass `event.requestContext.requestId` into logger context in every Lambda handler (auth, store, tts-api, morphology-api). **How:** `const log = logger.withContext({ requestId: event.requestContext.requestId })`.
+
+### Phase 2: Add Logging to Silent Handlers
+
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-4** (CRITICAL) Add logging to tts-api — currently ZERO logging across 9 source files. Add info-level to `synthesize()` (cache hit/miss, queue send, validation fail) and `status()`. **How:** import logger, add ~8 log calls.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-5** (HIGH) Fix store handler silent error swallowing — `handler.ts:162` has bare `catch {}` returning 500 without logging. **How:** add `logger.error()` with error details in catch block.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-6** (HIGH) Add logging to auth Cognito triggers — `cognito-triggers.ts` has zero logging for security-critical challenge flow. **How:** add debug-level logging for challenge state transitions.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-7** (MEDIUM) Add logging to store routes — `routes.ts` handles save/get/delete/query with no logging. **How:** add info-level for operations, error-level for failures.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-8** (MEDIUM) Add logging to auth supporting modules — `tara-client.ts`, `cognito-client.ts`, `cookies.ts` have zero logging. **How:** add error + debug level for OIDC exchange, Cognito calls, cookie operations.
+
+### Phase 3: Infrastructure & Observability
+
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-9** (HIGH) Add `logRetentionInDays: 30` to all 4 serverless.yml — currently Lambda log groups default to never-expire (unbounded cost). **How:** add `logRetentionInDays: 30` to `provider` block in auth, store, tts-api, morphology-api.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-10** (MEDIUM) Add CloudWatch Logs Insights saved queries — common debug queries for error analysis, request tracing, latency. **How:** document in LOGGING-ANALYSIS.md or add to infra.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-11** (MEDIUM) Standardize error logging format — currently inconsistent: some log `error.message`, some log full error, some log neither. **How:** use `logger.error(context, { error: extractErrorMessage(error) })` everywhere.
+
+### Phase 4: Business Observability
+
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-12** (MEDIUM) Add info-level business event logging — successful synthesis, auth, store operations. **How:** `logger.info("synthesis.cache_hit", { cacheKey })`, `logger.info("auth.success", { userId })`.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-13** (LOW) Add debug-level development logging — state transitions, config loading, adapter selection. **How:** `logger.debug(...)` calls, filtered out in production by default LOG_LEVEL=info.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-14** (LOW) Add tts-api → tts-worker correlation — include cacheKey in tts-api logs to enable tracing synthesis flow across tts-api → SQS → tts-worker → S3. **How:** log cacheKey in both synthesize handler and worker.
+
+### Statistics
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Backend files with logging | 6/32 (19%) | 20+/32 (60%+) |
+| Structured/JSON logging | ❌ None | ✅ All Lambda |
+| Request correlation | ❌ None | ✅ All Lambda |
+| Log retention configured | ❌ None | ✅ 30 days |
+| Error-only calls | 12/13 (92%) | <50% |
+| Info-level calls | 1 | 15+ |
+| Debug-level calls | 0 | 10+ |
+
+---
+
 ### Testing & Verification (Penetration Tests)
 
 - ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/`. **Verifies:** PUB-9 WAF rate limit.
