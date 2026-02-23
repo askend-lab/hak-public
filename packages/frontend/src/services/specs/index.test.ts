@@ -43,16 +43,26 @@ describe("specs service", () => {
   });
 
   describe("getFeatures", () => {
-    it("returns features object", () => {
+    it("returns a non-empty record of feature files", () => {
       const features = getFeatures();
       expect(typeof features).toBe("object");
+      const keys = Object.keys(features);
+      expect(keys.length).toBeGreaterThan(0);
+      keys.forEach((key) => {
+        expect(typeof features[key]).toBe("string");
+      });
     });
   });
 
   describe("getFeatureGroups", () => {
-    it("returns feature groups object", () => {
+    it("returns a non-empty record of grouped feature files", () => {
       const groups = getFeatureGroups();
       expect(typeof groups).toBe("object");
+      const groupNames = Object.keys(groups);
+      expect(groupNames.length).toBeGreaterThan(0);
+      groupNames.forEach((name) => {
+        expect(typeof groups[name]).toBe("object");
+      });
     });
   });
 

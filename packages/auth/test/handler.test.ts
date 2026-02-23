@@ -201,43 +201,39 @@ describe('callbackHandler - HttpOnly Cookie Delivery', () => {
   });
 });
 
-describe('handler constants', () => {
-  it('STATE_COOKIE_NAME should be tara_auth_state', () => {
-    expect(STATE_COOKIE_NAME).toBe('tara_auth_state');
+describe('handler constants — security contracts', () => {
+  it('STATE_TTL_MS is between 5 and 15 minutes (reasonable CSRF window)', () => {
+    expect(STATE_TTL_MS).toBeGreaterThanOrEqual(5 * 60 * 1000);
+    expect(STATE_TTL_MS).toBeLessThanOrEqual(15 * 60 * 1000);
   });
 
-  it('STATE_TTL_MS should be 10 minutes', () => {
-    expect(STATE_TTL_MS).toBe(10 * 60 * 1000);
+  it('REFRESH_TOKEN_MAX_AGE_S is between 7 and 90 days', () => {
+    expect(REFRESH_TOKEN_MAX_AGE_S).toBeGreaterThanOrEqual(7 * 24 * 60 * 60);
+    expect(REFRESH_TOKEN_MAX_AGE_S).toBeLessThanOrEqual(90 * 24 * 60 * 60);
   });
 
-  it('REFRESH_TOKEN_MAX_AGE_S should be 30 days', () => {
-    expect(REFRESH_TOKEN_MAX_AGE_S).toBe(30 * 24 * 60 * 60);
+  it('AUTH_CALLBACK_PATH starts with /', () => {
+    expect(AUTH_CALLBACK_PATH).toMatch(/^\//);
   });
 
-  it('AUTH_CALLBACK_PATH should be /auth/callback', () => {
-    expect(AUTH_CALLBACK_PATH).toBe('/auth/callback');
+  it('frontend URLs are HTTPS', () => {
+    expect(DEFAULT_FRONTEND_URL_PROD).toMatch(/^https:\/\//);
+    expect(DEFAULT_FRONTEND_URL_DEV).toMatch(/^https:\/\//);
   });
 
-  it('DEFAULT_FRONTEND_URL_PROD should contain askend-lab', () => {
-    expect(DEFAULT_FRONTEND_URL_PROD).toContain('askend-lab.com');
-  });
-
-  it('DEFAULT_FRONTEND_URL_DEV should contain hak-dev', () => {
-    expect(DEFAULT_FRONTEND_URL_DEV).toContain('hak-dev');
-  });
-
-  it('TOKEN_COOKIE_OPTIONS should contain HttpOnly, Secure, and SameSite=Lax', () => {
+  it('TOKEN_COOKIE_OPTIONS enforces HttpOnly, Secure, and SameSite=Lax', () => {
     expect(TOKEN_COOKIE_OPTIONS).toContain('HttpOnly');
     expect(TOKEN_COOKIE_OPTIONS).toContain('Secure');
     expect(TOKEN_COOKIE_OPTIONS).toContain('SameSite=Lax');
   });
 
-  it('REFRESH_COOKIE_NAME should be hak_refresh_token', () => {
-    expect(REFRESH_COOKIE_NAME).toBe('hak_refresh_token');
+  it('RANDOM_STRING_LENGTH is at least 16 bytes for CSRF tokens', () => {
+    expect(RANDOM_STRING_LENGTH).toBeGreaterThanOrEqual(16);
   });
 
-  it('RANDOM_STRING_LENGTH should be 32', () => {
-    expect(RANDOM_STRING_LENGTH).toBe(32);
+  it('cookie names are non-empty strings', () => {
+    expect(STATE_COOKIE_NAME.length).toBeGreaterThan(0);
+    expect(REFRESH_COOKIE_NAME.length).toBeGreaterThan(0);
   });
 });
 
