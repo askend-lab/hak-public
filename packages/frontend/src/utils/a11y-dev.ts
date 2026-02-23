@@ -58,7 +58,7 @@ export async function initA11yDevMode(): Promise<void> {
  * Run a one-time accessibility audit on the current page
  * Useful for debugging specific components
  */
-export async function runPageAudit(): Promise<void> {
+async function runPageAudit(): Promise<void> {
   try {
     const axeCore = await import("axe-core");
 
