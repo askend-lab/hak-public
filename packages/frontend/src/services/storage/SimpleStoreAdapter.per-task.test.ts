@@ -51,7 +51,7 @@ describe("SimpleStoreAdapter per-task storage", () => {
       expect(call[1].method).toBe("POST");
       const body = JSON.parse(call[1].body as string);
       expect(body.key).toBe("task");
-      expect(body.sortKey).toBe("task_abc");
+      expect(body.id).toBe("task_abc");
       expect(body.type).toBe("private");
       expect(body.data.id).toBe("task_abc");
       expect(body.data.name).toBe("Test Task");
@@ -80,7 +80,7 @@ describe("SimpleStoreAdapter per-task storage", () => {
       const result = await adapter.getTask("task_abc");
 
       expect(mockFetch).toHaveBeenCalledWith(
-        "/api/get?key=task&sortKey=task_abc&type=private",
+        "/api/get?key=task&id=task_abc&type=private",
         { headers: authHeaders },
       );
       expect(result).toEqual(task);
@@ -113,7 +113,7 @@ describe("SimpleStoreAdapter per-task storage", () => {
       await adapter.deleteTask("task_abc");
 
       expect(mockFetch).toHaveBeenCalledWith(
-        "/api/delete?key=task&sortKey=task_abc&type=private",
+        "/api/delete?key=task&id=task_abc&type=private",
         { method: "DELETE", headers: authHeaders },
       );
     });

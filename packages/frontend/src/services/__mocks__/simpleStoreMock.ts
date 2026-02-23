@@ -22,13 +22,13 @@ export function setupSimpleStoreMock(): void {
 
     if (path === "/api/save" && options?.method === "POST") {
       const body = JSON.parse(options.body as string);
-      const { key, sortKey, data } = body;
+      const { key, id, data } = body;
       const type = body.type;
 
       if (type === "unlisted" && key === "tasks") {
-        unlistedTasks[sortKey] = data;
+        unlistedTasks[id] = data;
       } else if (key === "task") {
-        tasks[sortKey] = data;
+        tasks[id] = data;
       }
 
       return {
@@ -39,12 +39,12 @@ export function setupSimpleStoreMock(): void {
 
     if (path === "/api/delete" && options?.method === "DELETE") {
       const key = urlObj.searchParams.get("key");
-      const sortKey = urlObj.searchParams.get("sortKey");
-      if (key === "task" && sortKey) {
-        delete tasks[sortKey];
+      const id = urlObj.searchParams.get("id");
+      if (key === "task" && id) {
+        delete tasks[id];
       }
-      if (key === "tasks" && sortKey) {
-        delete unlistedTasks[sortKey];
+      if (key === "tasks" && id) {
+        delete unlistedTasks[id];
       }
       return { ok: true, json: async (): Promise<{ success: boolean }> => ({ success: true }) };
     }
@@ -64,11 +64,11 @@ export function setupSimpleStoreMock(): void {
 
     if (path === "/api/get" || path === "/api/get-public") {
       const key = urlObj.searchParams.get("key");
-      const sortKey = urlObj.searchParams.get("sortKey");
+      const id = urlObj.searchParams.get("id");
       const type = urlObj.searchParams.get("type");
 
-      if (type === "unlisted" && key === "tasks" && sortKey) {
-        const task = unlistedTasks[sortKey];
+      if (type === "unlisted" && key === "tasks" && id) {
+        const task = unlistedTasks[id];
         if (!task) {
           return {
             ok: true,
@@ -87,8 +87,8 @@ export function setupSimpleStoreMock(): void {
         };
       }
 
-      if (key === "task" && sortKey) {
-        const task = tasks[sortKey];
+      if (key === "task" && id) {
+        const task = tasks[id];
         if (!task) {
           return {
             ok: true,

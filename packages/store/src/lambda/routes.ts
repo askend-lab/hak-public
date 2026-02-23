@@ -120,7 +120,7 @@ export async function handleSave(
 
   const request: StoreRequest = {
     key: body.key as string,
-    sortKey: body.sortKey as string,
+    id: body.id as string,
     type: body.type as DataType,
     ttl: body.ttl as number,
     ...(body.data !== undefined && {
@@ -139,12 +139,12 @@ export async function handleGet(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
-  const { key, sortKey, type } = getQueryParams(event);
+  const { key, id, type } = getQueryParams(event);
 
-  const validationError = validateOrError(validateGetRequest(key, sortKey, type));
+  const validationError = validateOrError(validateGetRequest(key, id, type));
   if (validationError) {return validationError;}
 
-  const result = await store.get(key as string, sortKey as string, type as DataType);
+  const result = await store.get(key as string, id as string, type as DataType);
 
   if (result.success && result.item) {
     return createResponse(HTTP_STATUS.OK, { item: toClientItem(result.item) });
@@ -163,14 +163,14 @@ export async function handleDelete(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
-  const { key, sortKey, type } = getQueryParams(event);
+  const { key, id, type } = getQueryParams(event);
 
-  const validationError = validateOrError(validateGetRequest(key, sortKey, type));
+  const validationError = validateOrError(validateGetRequest(key, id, type));
   if (validationError) {return validationError;}
 
   const result = await store.delete(
     key as string,
-    sortKey as string,
+    id as string,
     type as DataType,
   );
   return result.success

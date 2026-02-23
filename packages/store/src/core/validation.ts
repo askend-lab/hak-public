@@ -115,7 +115,7 @@ export function validateStoreRequest(
 ): ValidationResult {
   return collectErrors((errors) => {
     validateKeyString(request.key, "key", errors);
-    validateKeyString(request.sortKey, "sortKey", errors);
+    validateKeyString(request.id, "id", errors);
     validateType(request.type, errors);
 
     if (typeof request.ttl !== "number") {
@@ -143,12 +143,12 @@ export function validateStoreRequest(
  */
 export function validateGetRequest(
   key: unknown,
-  sortKey: unknown,
+  id: unknown,
   type: unknown,
 ): ValidationResult {
   return collectErrors((errors) => {
     validateKeyString(key, "key", errors);
-    validateKeyString(sortKey, "sortKey", errors);
+    validateKeyString(id, "id", errors);
     validateType(type, errors);
   });
 }

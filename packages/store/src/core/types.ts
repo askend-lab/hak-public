@@ -38,7 +38,7 @@ export interface ServerContext {
  */
 export interface StoreRequest {
   readonly key: string;
-  readonly sortKey: string;
+  readonly id: string;
   readonly type: DataType;
   readonly ttl: number;
   readonly data?: Record<string, unknown>;

@@ -40,7 +40,7 @@ describe("/get-public endpoint", () => {
         undefined,
         {
           key: "tasks",
-          sortKey: "share_token_123",
+          id: "share_token_123",
           type: "unlisted",
           ttl: 3600,
           data: { id: "task-1", name: "Unlisted Task" },
@@ -52,7 +52,7 @@ describe("/get-public endpoint", () => {
       // GET via /get-public without auth
       const getEvent = createEvent("GET", "/get-public", {
         key: "tasks",
-        sortKey: "share_token_123",
+        id: "share_token_123",
         type: "unlisted",
       }); // No userId - anonymous
 
@@ -70,7 +70,7 @@ describe("/get-public endpoint", () => {
         undefined,
         {
           key: "announcements",
-          sortKey: "latest",
+          id: "latest",
           type: "public",
           ttl: 3600,
           data: { message: "Public announcement" },
@@ -81,7 +81,7 @@ describe("/get-public endpoint", () => {
 
       const getEvent = createEvent("GET", "/get-public", {
         key: "announcements",
-        sortKey: "latest",
+        id: "latest",
         type: "public",
       });
 
@@ -99,7 +99,7 @@ describe("/get-public endpoint", () => {
         undefined,
         {
           key: "shared",
-          sortKey: "tasks",
+          id: "tasks",
           type: "shared",
           ttl: 3600,
           data: { tasks: [{ id: "task-1", name: "Shared Task" }] },
@@ -110,7 +110,7 @@ describe("/get-public endpoint", () => {
 
       const getEvent = createEvent("GET", "/get-public", {
         key: "shared",
-        sortKey: "tasks",
+        id: "tasks",
         type: "shared",
       });
 
@@ -131,7 +131,7 @@ describe("/get-public endpoint", () => {
         undefined,
         {
           key: "tasks",
-          sortKey: "user-1",
+          id: "user-1",
           type: "private",
           ttl: 3600,
           data: { tasks: [{ id: "task-1", name: "Private Task" }] },
@@ -146,7 +146,7 @@ describe("/get-public endpoint", () => {
         "/get-public",
         {
           key: "tasks",
-          sortKey: "user-1",
+          id: "user-1",
           type: "private",
         },
         undefined,
@@ -167,7 +167,7 @@ describe("/get-public endpoint", () => {
         undefined,
         {
           key: "tasks",
-          sortKey: "user-1",
+          id: "user-1",
           type: "private",
           ttl: 3600,
           data: { tasks: [{ id: "task-1", name: "Private Task" }] },
@@ -178,7 +178,7 @@ describe("/get-public endpoint", () => {
 
       const getEvent = createEvent("GET", "/get-public", {
         key: "tasks",
-        sortKey: "user-1",
+        id: "user-1",
         type: "private",
       }); // No auth
 
@@ -191,7 +191,7 @@ describe("/get-public endpoint", () => {
     it("should reject missing type parameter", async () => {
       const getEvent = createEvent("GET", "/get-public", {
         key: "tasks",
-        sortKey: "some-key",
+        id: "some-key",
         // No type
       });
 
@@ -202,7 +202,7 @@ describe("/get-public endpoint", () => {
     it("should return null for non-existent data", async () => {
       const getEvent = createEvent("GET", "/get-public", {
         key: "tasks",
-        sortKey: "non-existent",
+        id: "non-existent",
         type: "unlisted",
       });
 

@@ -39,7 +39,7 @@ describe("Data Types Access Control", () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
         key: "my-data",
-        sortKey: "key1",
+        id: "key1",
         type: "private",
         ttl: 3600,
         data: { secret: "value" },
@@ -51,7 +51,7 @@ describe("Data Types Access Control", () => {
       const store = new Store(db, ownerContext);
       await store.save({
         key: "my-data",
-        sortKey: "key1",
+        id: "key1",
         type: "private",
         ttl: 3600,
         data: { secret: "value" },
@@ -66,7 +66,7 @@ describe("Data Types Access Control", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "my-data",
-        sortKey: "key1",
+        id: "key1",
         type: "private",
         ttl: 3600,
         data: { secret: "value" },
@@ -81,7 +81,7 @@ describe("Data Types Access Control", () => {
       const store = new Store(db, ownerContext);
       await store.save({
         key: "my-data",
-        sortKey: "key1",
+        id: "key1",
         type: "private",
         ttl: 3600,
         data: {},
@@ -95,14 +95,14 @@ describe("Data Types Access Control", () => {
       const store = new Store(db, ownerContext);
       await store.save({
         key: "settings",
-        sortKey: "theme",
+        id: "theme",
         type: "private",
         ttl: 3600,
         data: {},
       });
       await store.save({
         key: "settings",
-        sortKey: "lang",
+        id: "lang",
         type: "private",
         ttl: 3600,
         data: {},
@@ -119,7 +119,7 @@ describe("Data Types Access Control", () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
         key: "shared-doc",
-        sortKey: "doc1",
+        id: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -131,7 +131,7 @@ describe("Data Types Access Control", () => {
       const store = new Store(db, ownerContext);
       await store.save({
         key: "shared-doc",
-        sortKey: "doc1",
+        id: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -149,7 +149,7 @@ describe("Data Types Access Control", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "shared-doc",
-        sortKey: "doc1",
+        id: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -169,7 +169,7 @@ describe("Data Types Access Control", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "shared-doc",
-        sortKey: "doc1",
+        id: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -189,7 +189,7 @@ describe("Data Types Access Control", () => {
       const store = new Store(db, ownerContext);
       await store.save({
         key: "shared-doc",
-        sortKey: "doc1",
+        id: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: {},

@@ -117,7 +117,7 @@ describe("Lambda Handler", () => {
     it("should return 404 when deleting non-existent item", async () => {
       const event = createDeleteEvent("/delete", {
         key: "test",
-        sortKey: "sort",
+        id: "sort",
         type: "public",
       });
       const result = await handler(event);
@@ -138,7 +138,7 @@ describe("Lambda Handler", () => {
     it("should return 200 with valid params", async () => {
       const event = createGetEvent("/get", {
         key: "test",
-        sortKey: "sort",
+        id: "sort",
         type: "public",
       });
       const result = await handler(event);
@@ -148,7 +148,7 @@ describe("Lambda Handler", () => {
     it("should return 200 with null item when item not found", async () => {
       const event = createGetEvent("/get", {
         key: "nonexistent",
-        sortKey: "nothere",
+        id: "nothere",
         type: "private",
       });
       const result = await handler(event);
@@ -193,7 +193,7 @@ describe("Lambda Handler", () => {
     it("should return 200 for valid save request", async () => {
       const event = createPostEvent("/save", {
         key: "test",
-        sortKey: "sort",
+        id: "sort",
         type: "public",
         ttl: 3600,
         data: { key: "value" },
@@ -235,7 +235,7 @@ describe("Lambda Handler", () => {
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { key: "test", sortKey: "sort", type: "private" },
+        queryStringParameters: { key: "test", id: "sort", type: "private" },
         headers,
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
@@ -249,7 +249,7 @@ describe("Lambda Handler", () => {
         httpMethod: "POST",
         path: "/save",
         resource: "/save",
-        body: JSON.stringify({ key: "test", sortKey: "sort", type: "private", ttl: 3600, data: {} }),
+        body: JSON.stringify({ key: "test", id: "sort", type: "private", ttl: 3600, data: {} }),
         headers: { "X-User-Id": "header-user" },
       });
       const result = await handler(event);
@@ -266,7 +266,7 @@ describe("Lambda Handler", () => {
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { key: "test", sortKey: "sort", type: "private" },
+        queryStringParameters: { key: "test", id: "sort", type: "private" },
         requestContext: {
           ...createEvent({}).requestContext,
           authorizer: { claims: { sub: "" } },
@@ -284,7 +284,7 @@ describe("Lambda Handler", () => {
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { key: "test", sortKey: "sort", type: "private" },
+        queryStringParameters: { key: "test", id: "sort", type: "private" },
         headers: { "X-User-Id": "fallback-user" },
         requestContext: {
           ...createEvent({}).requestContext,
@@ -303,7 +303,7 @@ describe("Lambda Handler", () => {
       process.env.ENVIRONMENT = "";
       const event = createPostEvent("/save", {
         key: "env-test",
-        sortKey: "sort",
+        id: "sort",
         type: "private",
         ttl: 3600,
       });
@@ -317,7 +317,7 @@ describe("Lambda Handler", () => {
       process.env.ENVIRONMENT = "prod";
       const event = createPostEvent("/save", {
         key: "env-test2",
-        sortKey: "sort",
+        id: "sort",
         type: "private",
         ttl: 3600,
       });
@@ -333,7 +333,7 @@ describe("Lambda Handler", () => {
       setAdapter(null); // Reset adapter
       const event = createPostEvent("/save", {
         key: "adapter-test",
-        sortKey: "sort",
+        id: "sort",
         type: "private",
         ttl: 3600,
       });
@@ -347,7 +347,7 @@ describe("Lambda Handler", () => {
       setAdapter(null);
       const event = createPostEvent("/save", {
         key: "adapter-test2",
-        sortKey: "sort",
+        id: "sort",
         type: "private",
         ttl: 3600,
       });

@@ -31,7 +31,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "user#123",
-        sortKey: "settings",
+        id: "settings",
         type: "private",
         ttl: 3600,
         data: { value: "test" },
@@ -48,7 +48,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "entity",
-        sortKey: "version#1.0.0",
+        id: "version#1.0.0",
         type: "public",
         ttl: 3600,
         data: {},
@@ -61,7 +61,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "user#456",
-        sortKey: "doc#rev#2",
+        id: "doc#rev#2",
         type: "shared",
         ttl: 3600,
         data: { complex: true },
@@ -78,7 +78,7 @@ describe("Boundary Conditions", () => {
     it("should reject empty pk in validation", () => {
       const result = validateStoreRequest({
         key: "",
-        sortKey: "valid",
+        id: "valid",
         type: "public",
         ttl: 3600,
       });
@@ -90,19 +90,19 @@ describe("Boundary Conditions", () => {
     it("should reject empty sk in validation", () => {
       const result = validateStoreRequest({
         key: "valid",
-        sortKey: "",
+        id: "",
         type: "public",
         ttl: 3600,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("sortKey"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("id"))).toBe(true);
     });
 
     it("should reject whitespace-only pk", () => {
       const result = validateStoreRequest({
         key: "   ",
-        sortKey: "valid",
+        id: "valid",
         type: "public",
         ttl: 3600,
       });
@@ -113,7 +113,7 @@ describe("Boundary Conditions", () => {
     it("should reject whitespace-only sk", () => {
       const result = validateStoreRequest({
         key: "valid",
-        sortKey: "\t\n",
+        id: "\t\n",
         type: "public",
         ttl: 3600,
       });
@@ -129,7 +129,7 @@ describe("Boundary Conditions", () => {
 
       const result = await store.save({
         key: longPk,
-        sortKey: "short",
+        id: "short",
         type: "private",
         ttl: 3600,
         data: {},
@@ -147,7 +147,7 @@ describe("Boundary Conditions", () => {
 
       const result = await store.save({
         key: "short",
-        sortKey: longSk,
+        id: longSk,
         type: "private",
         ttl: 3600,
         data: {},
@@ -162,7 +162,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "töötaja-ülesanne",
-        sortKey: "öösäälane-õppetöö",
+        id: "öösäälane-õppetöö",
         type: "public",
         ttl: 3600,
         data: { eestiKeel: "Tere päevast! Õhtu on käes." },
@@ -185,7 +185,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "用户-日本語-émojis-🎉",
-        sortKey: "data",
+        id: "data",
         type: "public",
         ttl: 3600,
         data: { unicode: true },
@@ -205,7 +205,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "entity",
-        sortKey: "Привет-мир-🌍",
+        id: "Привет-мир-🌍",
         type: "private",
         ttl: 3600,
         data: {},
@@ -218,7 +218,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "entity",
-        sortKey: "data",
+        id: "data",
         type: "public",
         ttl: 3600,
         data: {
@@ -239,7 +239,7 @@ describe("Boundary Conditions", () => {
     it("should accept TTL of 1 second", () => {
       const result = validateStoreRequest({
         key: "test",
-        sortKey: "test",
+        id: "test",
         type: "public",
         ttl: 1,
       });
@@ -250,7 +250,7 @@ describe("Boundary Conditions", () => {
     it("should accept TTL at exactly max limit", () => {
       const result = validateStoreRequest({
         key: "test",
-        sortKey: "test",
+        id: "test",
         type: "public",
         ttl: 31536000, // exactly 1 year
       });
@@ -261,7 +261,7 @@ describe("Boundary Conditions", () => {
     it("should reject negative TTL", () => {
       const result = validateStoreRequest({
         key: "test",
-        sortKey: "test",
+        id: "test",
         type: "public",
         ttl: -1,
       });
@@ -272,7 +272,7 @@ describe("Boundary Conditions", () => {
     it("should reject TTL just over max limit", () => {
       const result = validateStoreRequest({
         key: "test",
-        sortKey: "test",
+        id: "test",
         type: "public",
         ttl: 31536001, // 1 year + 1 second
       });
@@ -343,7 +343,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "test",
-        sortKey: "nulls",
+        id: "nulls",
         type: "public",
         ttl: 3600,
         data: { nullField: null, valid: "value" },
@@ -366,7 +366,7 @@ describe("Boundary Conditions", () => {
 
       const result = await store.save({
         key: "test",
-        sortKey: "nested",
+        id: "nested",
         type: "public",
         ttl: 3600,
         data: nestedData,
@@ -382,7 +382,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "test",
-        sortKey: "arrays",
+        id: "arrays",
         type: "public",
         ttl: 3600,
         data: {
@@ -399,7 +399,7 @@ describe("Boundary Conditions", () => {
       const store = new Store(db, context);
       const result = await store.save({
         key: "test",
-        sortKey: "empty",
+        id: "empty",
         type: "public",
         ttl: 3600,
         data: {},

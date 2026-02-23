@@ -39,7 +39,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
         key: "article",
-        sortKey: "post1",
+        id: "post1",
         type: "public",
         ttl: 3600,
         data: { title: "Hello World" },
@@ -51,7 +51,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "article",
-        sortKey: "post1",
+        id: "post1",
         type: "public",
         ttl: 3600,
         data: { title: "Hello World" },
@@ -67,14 +67,14 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "article",
-        sortKey: "post1",
+        id: "post1",
         type: "public",
         ttl: 3600,
         data: {},
       });
       await ownerStore.save({
         key: "article",
-        sortKey: "post2",
+        id: "post2",
         type: "public",
         ttl: 3600,
         data: {},
@@ -90,7 +90,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "article",
-        sortKey: "post1",
+        id: "post1",
         type: "public",
         ttl: 3600,
         data: {},
@@ -106,7 +106,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const store = new Store(db, ownerContext);
       await store.save({
         key: "article",
-        sortKey: "post1",
+        id: "post1",
         type: "public",
         ttl: 3600,
         data: {},
@@ -122,7 +122,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
         key: "wiki",
-        sortKey: "page1",
+        id: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { content: "Initial content" },
@@ -134,7 +134,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "wiki",
-        sortKey: "page1",
+        id: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { content: "Hello" },
@@ -154,14 +154,14 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "wiki",
-        sortKey: "page1",
+        id: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
       });
       await ownerStore.save({
         key: "wiki",
-        sortKey: "page2",
+        id: "page2",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
@@ -177,7 +177,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "wiki",
-        sortKey: "page1",
+        id: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
@@ -197,7 +197,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "wiki",
-        sortKey: "page1",
+        id: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
@@ -215,7 +215,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
         key: "wiki",
-        sortKey: "page1",
+        id: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { v: 1 },
@@ -224,7 +224,7 @@ describe("Data Types Access Control - Public & Shared", () => {
       const otherStore = new Store(db, otherUserContext);
       const saveResult = await otherStore.save({
         key: "wiki",
-        sortKey: "page1",
+        id: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { v: 2 },
@@ -246,28 +246,28 @@ describe("Data Types Access Control - Public & Shared", () => {
 
       await store.save({
         key: "data",
-        sortKey: "key1",
+        id: "key1",
         type: "private",
         ttl: 3600,
         data: { type: "private" },
       });
       await store.save({
         key: "data",
-        sortKey: "key1",
+        id: "key1",
         type: "public",
         ttl: 3600,
         data: { type: "public" },
       });
       await store.save({
         key: "data",
-        sortKey: "key1",
+        id: "key1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { type: "unlisted" },
       });
       await store.save({
         key: "data",
-        sortKey: "key1",
+        id: "key1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { type: "shared" },

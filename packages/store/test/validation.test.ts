@@ -15,7 +15,7 @@ describe("Validation", () => {
     it("should accept valid request", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
         data: { key: "value" },
@@ -26,12 +26,12 @@ describe("Validation", () => {
     });
 
     it.each([
-      ["missing pk", { sortKey: "sort1", type: "private", ttl: 3600 }, "key is required"],
-      ["missing sk", { key: "entity1", type: "private", ttl: 3600 }, "sortKey is required"],
-      ["invalid type", { key: "entity1", sortKey: "sort1", type: "invalid", ttl: 3600 }, "type must be one of"],
-      ["negative ttl", { key: "entity1", sortKey: "sort1", type: "private", ttl: -1 }, "TTL must be 0"],
-      ["ttl exceeding max", { key: "entity1", sortKey: "sort1", type: "private", ttl: 31536001 }, "exceeds maximum"],
-      ["invalid data type", { key: "entity1", sortKey: "sort1", type: "private", ttl: 3600, data: "string" }, "data must be an object"],
+      ["missing pk", { id: "sort1", type: "private", ttl: 3600 }, "key is required"],
+      ["missing sk", { key: "entity1", type: "private", ttl: 3600 }, "id is required"],
+      ["invalid type", { key: "entity1", id: "sort1", type: "invalid", ttl: 3600 }, "type must be one of"],
+      ["negative ttl", { key: "entity1", id: "sort1", type: "private", ttl: -1 }, "TTL must be 0"],
+      ["ttl exceeding max", { key: "entity1", id: "sort1", type: "private", ttl: 31536001 }, "exceeds maximum"],
+      ["invalid data type", { key: "entity1", id: "sort1", type: "private", ttl: 3600, data: "string" }, "data must be an object"],
     ])("should reject %s", (_name, input, expectedError) => {
       const result = validateStoreRequest(input as unknown as Partial<StoreRequest>);
       expect(result.valid).toBe(false);
@@ -39,8 +39,8 @@ describe("Validation", () => {
     });
 
     it.each([
-      ["zero ttl", { key: "entity1", sortKey: "sort1", type: "private", ttl: 0 }],
-      ["without data", { key: "entity1", sortKey: "sort1", type: "public", ttl: 3600 }],
+      ["zero ttl", { key: "entity1", id: "sort1", type: "private", ttl: 0 }],
+      ["without data", { key: "entity1", id: "sort1", type: "public", ttl: 3600 }],
     ])("should accept %s", (_name, input) => {
       const result = validateStoreRequest(input as unknown as Partial<StoreRequest>);
       expect(result.valid).toBe(true);
@@ -103,7 +103,7 @@ describe("Validation", () => {
     it("should reject null pk", () => {
       const result = validateStoreRequest({
         key: null as unknown as string,
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
@@ -114,7 +114,7 @@ describe("Validation", () => {
     it("should reject undefined pk", () => {
       const result = validateStoreRequest({
         key: undefined as unknown as string,
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
@@ -125,7 +125,7 @@ describe("Validation", () => {
     it("should reject non-string pk (number)", () => {
       const result = validateStoreRequest({
         key: 123 as unknown as string,
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
@@ -136,19 +136,19 @@ describe("Validation", () => {
     it("should reject null sk in get request", () => {
       const result = validateGetRequest("entity1", null, "private");
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain("sortKey is required and must be a string");
+      expect(result.errors).toContain("id is required and must be a string");
     });
 
     it("should reject undefined sk in get request", () => {
       const result = validateGetRequest("entity1", undefined, "private");
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain("sortKey is required and must be a string");
+      expect(result.errors).toContain("id is required and must be a string");
     });
 
     it("should reject empty string pk", () => {
       const result = validateStoreRequest({
         key: "",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
@@ -159,7 +159,7 @@ describe("Validation", () => {
     it("should reject whitespace-only pk", () => {
       const result = validateStoreRequest({
         key: "   ",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
@@ -170,18 +170,18 @@ describe("Validation", () => {
     it("should reject empty string sk", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "",
+        id: "",
         type: "private",
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain("sortKey cannot be empty");
+      expect(result.errors).toContain("id cannot be empty");
     });
 
     it("should reject null type", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "sort1",
+        id: "sort1",
         type: null as unknown as DataType,
         ttl: 3600,
       });
@@ -192,7 +192,7 @@ describe("Validation", () => {
     it("should reject undefined type", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "sort1",
+        id: "sort1",
         type: undefined as unknown as DataType,
         ttl: 3600,
       });
@@ -203,7 +203,7 @@ describe("Validation", () => {
     it("should reject string ttl", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: "3600" as unknown as number,
       });
@@ -214,7 +214,7 @@ describe("Validation", () => {
     it("should reject null ttl", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: null as unknown as number,
       });
@@ -225,7 +225,7 @@ describe("Validation", () => {
     it("should reject undefined ttl", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: undefined as unknown as number,
       });
@@ -236,7 +236,7 @@ describe("Validation", () => {
     it("should accept ttl of exactly 0", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 0,
       });
@@ -258,7 +258,7 @@ describe("Validation", () => {
     it("should accept pk at exactly max length (1024)", () => {
       const result = validateStoreRequest({
         key: "a".repeat(1024),
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
@@ -268,7 +268,7 @@ describe("Validation", () => {
     it("should reject pk exceeding max length (1025)", () => {
       const result = validateStoreRequest({
         key: "a".repeat(1025),
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
@@ -279,22 +279,22 @@ describe("Validation", () => {
     it("should reject sk exceeding max length (1025)", () => {
       const result = validateStoreRequest({
         key: "entity1",
-        sortKey: "b".repeat(1025),
+        id: "b".repeat(1025),
         type: "private",
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
-      expect(result.errors[0]).toContain("sortKey exceeds maximum length");
+      expect(result.errors[0]).toContain("id exceeds maximum length");
     });
   });
 
   describe("validateRequiredString edge cases", () => {
     it.each([
-      ["number pk", { key: 123, sortKey: "sort1" }, "key"],
-      ["number sk", { key: "entity1", sortKey: 456 }, "sortKey"],
-      ["object pk", { key: { key: "value" }, sortKey: "sort1" }, "key"],
-      ["array sk", { key: "entity1", sortKey: ["a", "b"] }, "sortKey"],
-      ["boolean pk", { key: true, sortKey: "sort1" }, "key"],
+      ["number pk", { key: 123, id: "sort1" }, "key"],
+      ["number sk", { key: "entity1", id: 456 }, "id"],
+      ["object pk", { key: { key: "value" }, id: "sort1" }, "key"],
+      ["array sk", { key: "entity1", id: ["a", "b"] }, "id"],
+      ["boolean pk", { key: true, id: "sort1" }, "key"],
     ])("should reject %s (not a string)", (_name, fields, expectedField) => {
       const result = validateStoreRequest({
         ...fields,

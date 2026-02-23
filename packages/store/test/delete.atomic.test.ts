@@ -105,7 +105,7 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
     const spy = new OperationSpyAdapter();
     const store = new Store(spy, ownerContext);
 
-    await store.save({ key: "doc", sortKey: "1", type: "public", ttl: 3600, data: {} });
+    await store.save({ key: "doc", id: "1", type: "public", ttl: 3600, data: {} });
     spy.resetOps();
 
     const result = await store.delete("doc", "1", "public");
@@ -117,7 +117,7 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
     const ownerStore = new Store(spy, ownerContext);
     const otherStore = new Store(spy, otherContext);
 
-    await ownerStore.save({ key: "doc", sortKey: "1", type: "public", ttl: 3600, data: {} });
+    await ownerStore.save({ key: "doc", id: "1", type: "public", ttl: 3600, data: {} });
     spy.resetOps();
 
     const result = await otherStore.delete("doc", "1", "public");
@@ -138,7 +138,7 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
     const spy = new OperationSpyAdapter();
     const store = new Store(spy, ownerContext);
 
-    await store.save({ key: "doc", sortKey: "1", type: "public", ttl: 3600, data: {} });
+    await store.save({ key: "doc", id: "1", type: "public", ttl: 3600, data: {} });
     spy.resetOps();
 
     await store.delete("doc", "1", "public");

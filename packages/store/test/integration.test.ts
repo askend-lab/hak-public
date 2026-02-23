@@ -24,7 +24,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
           key: "integration-test",
-          sortKey: "private-item",
+          id: "private-item",
           type: "private",
           ttl: 3600,
           data: { secret: "value" },
@@ -38,7 +38,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const getEvent = addUserHeader(
         createGetEvent("/get", {
           key: "integration-test",
-          sortKey: "private-item",
+          id: "private-item",
           type: "private",
         }),
         "user-owner",
@@ -55,7 +55,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const event = addUserHeader(
         createPostEvent("/save", {
           key: "test",
-          sortKey: "test",
+          id: "test",
           type: "invalid-type",
           ttl: 3600,
         }),
@@ -73,7 +73,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
           key: "shared-doc",
-          sortKey: "doc1",
+          id: "doc1",
           type: "unlisted",
           ttl: 3600,
           data: { content: "hello" },
@@ -89,7 +89,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const getEvent = addUserHeader(
         createGetEvent("/get", {
           key: "shared-doc",
-          sortKey: "doc1",
+          id: "doc1",
           type: "unlisted",
         }),
         "any-user",
@@ -106,7 +106,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
           key: "article",
-          sortKey: "post1",
+          id: "post1",
           type: "public",
           ttl: 3600,
           data: { title: "Hello" },
@@ -137,7 +137,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
           key: "wiki",
-          sortKey: "page1",
+          id: "page1",
           type: "shared",
           ttl: 3600,
           data: { content: "Initial" },
@@ -153,7 +153,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const getEvent = addUserHeader(
         createGetEvent("/get", {
           key: "wiki",
-          sortKey: "page1",
+          id: "page1",
           type: "shared",
         }),
         "user2",
@@ -169,7 +169,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const event = addUserHeader(
         createPostEvent("/save", {
           key: "",
-          sortKey: "test",
+          id: "test",
           type: "public",
           ttl: 3600,
         }),
@@ -184,7 +184,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const event = addUserHeader(
         createPostEvent("/save", {
           key: "test",
-          sortKey: "",
+          id: "",
           type: "public",
           ttl: 3600,
         }),
@@ -199,7 +199,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const event = addUserHeader(
         createPostEvent("/save", {
           key: "test-zero-ttl",
-          sortKey: "test",
+          id: "test",
           type: "public",
           ttl: 0,
         }),
@@ -214,7 +214,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const event = addUserHeader(
         createPostEvent("/save", {
           key: "test",
-          sortKey: "test",
+          id: "test",
           type: "public",
           ttl: -1,
         }),
@@ -229,7 +229,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const event = addUserHeader(
         createPostEvent("/save", {
           key: "test",
-          sortKey: "test",
+          id: "test",
           type: "public",
           ttl: 31536001, // 1 year + 1 second
         }),

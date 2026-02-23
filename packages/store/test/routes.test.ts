@@ -127,7 +127,7 @@ describe("Routes", () => {
       const event = createMockEvent({
         body: JSON.stringify({
           key: "entity1",
-          sortKey: "sort1",
+          id: "sort1",
           type: "private",
           ttl: 3600,
           data: { key: "value" },
@@ -150,7 +150,7 @@ describe("Routes", () => {
       const event = createMockEvent({
         body: JSON.stringify({
           key: "entity2",
-          sortKey: "sort2",
+          id: "sort2",
           type: "private",
           ttl: 3600,
         }),
@@ -165,7 +165,7 @@ describe("Routes", () => {
       const event = createMockEvent({
         body: JSON.stringify({
           key: "entity3",
-          sortKey: "sort3",
+          id: "sort3",
           type: "public",
           ttl: 0,
           data: undefined,
@@ -187,7 +187,7 @@ describe("Routes", () => {
 
     it("should return BAD_REQUEST for validation errors", async () => {
       const event = createMockEvent({
-        queryStringParameters: { key: "test", sortKey: "", type: "invalid" },
+        queryStringParameters: { key: "test", id: "", type: "invalid" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
@@ -195,7 +195,7 @@ describe("Routes", () => {
 
     it("should return OK with null item for not found", async () => {
       const event = createMockEvent({
-        queryStringParameters: { key: "nonexistent", sortKey: "sort", type: "private" },
+        queryStringParameters: { key: "nonexistent", id: "sort", type: "private" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -207,14 +207,14 @@ describe("Routes", () => {
       // First save an item
       await store.save({
         key: "get-test",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
         data: { key: "value" },
       });
 
       const event = createMockEvent({
-        queryStringParameters: { key: "get-test", sortKey: "sort1", type: "private" },
+        queryStringParameters: { key: "get-test", id: "sort1", type: "private" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -230,7 +230,7 @@ describe("Routes", () => {
   describe("handleDelete", () => {
     it("should return BAD_REQUEST for validation errors", async () => {
       const event = createMockEvent({
-        queryStringParameters: { key: "", sortKey: "", type: "private" },
+        queryStringParameters: { key: "", id: "", type: "private" },
       });
       const response = await handleDelete(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
@@ -240,13 +240,13 @@ describe("Routes", () => {
       // First save an item
       await store.save({
         key: "delete-test",
-        sortKey: "sort1",
+        id: "sort1",
         type: "private",
         ttl: 3600,
       });
 
       const event = createMockEvent({
-        queryStringParameters: { key: "delete-test", sortKey: "sort1", type: "private" },
+        queryStringParameters: { key: "delete-test", id: "sort1", type: "private" },
       });
       const response = await handleDelete(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -256,7 +256,7 @@ describe("Routes", () => {
 
     it("should return NOT_FOUND for nonexistent item", async () => {
       const event = createMockEvent({
-        queryStringParameters: { key: "nonexistent", sortKey: "sort", type: "private" },
+        queryStringParameters: { key: "nonexistent", id: "sort", type: "private" },
       });
       const response = await handleDelete(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.NOT_FOUND);
@@ -284,8 +284,8 @@ describe("Routes", () => {
 
     it("should return OK with items", async () => {
       // Save some items
-      await store.save({ key: "query-prefix", sortKey: "sort1", type: "private", ttl: 3600 });
-      await store.save({ key: "query-prefix", sortKey: "sort2", type: "private", ttl: 3600 });
+      await store.save({ key: "query-prefix", id: "sort1", type: "private", ttl: 3600 });
+      await store.save({ key: "query-prefix", id: "sort2", type: "private", ttl: 3600 });
 
       const event = createMockEvent({
         queryStringParameters: { prefix: "query-", type: "private" },
@@ -313,7 +313,7 @@ describe("Routes", () => {
       const event = createMockEvent({
         body: JSON.stringify({
           key: "data-test",
-          sortKey: "sort1",
+          id: "sort1",
           type: "private",
           ttl: 3600,
           data: { field: "value" },
@@ -329,7 +329,7 @@ describe("Routes", () => {
       const event = createMockEvent({
         body: JSON.stringify({
           key: "no-data-test",
-          sortKey: "sort1",
+          id: "sort1",
           type: "private",
           ttl: 3600,
         }),
@@ -342,7 +342,7 @@ describe("Routes", () => {
   describe("ERROR_STATUS_MAP usage", () => {
     it("should return OK with null item for not found (private)", async () => {
       const event = createMockEvent({
-        queryStringParameters: { key: "nonexistent-private", sortKey: "sort1", type: "private" },
+        queryStringParameters: { key: "nonexistent-private", id: "sort1", type: "private" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
