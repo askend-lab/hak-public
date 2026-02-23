@@ -74,8 +74,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           react: ["react", "react-dom", "react-router-dom"],
-          query: ["@tanstack/react-query"],
-          vendor: ["zod", "zustand", "jszip", "@dnd-kit/core", "@dnd-kit/sortable", "@dnd-kit/utilities"],
+          vendor: ["jszip"],
           sentry: ["@sentry/react"],
         },
       },
