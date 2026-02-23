@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useCallback, useRef } from "react";
+import { logger } from "@hak/shared";
 import { TaskEntry, hasAudioSource, getEntryPlayUrl } from "@/types/task";
 import { synthesizeWithPolling } from "@/features/synthesis/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
@@ -66,7 +67,8 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
         };
 
         await audio.play();
-      } catch {
+      } catch (error) {
+        logger.warn("Audio playback failed:", error);
         setCurrentPlayingId(null);
         setCurrentLoadingId(null);
       }
@@ -129,7 +131,8 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
               setCurrentLoadingId(null);
               return false;
             }
-          } catch {
+          } catch (error) {
+            logger.warn("Synthesis polling failed:", error);
             setCurrentLoadingId(null);
             return false;
           }
@@ -176,7 +179,8 @@ export function useAudioPlayback(entries: TaskEntry[]): UseAudioPlaybackReturn {
             resolve(false);
           });
         });
-      } catch {
+      } catch (error) {
+        logger.warn("Task audio playback error:", error);
         setCurrentLoadingId(null);
         setCurrentPlayingId(null);
         if (shouldRevokeUrl && audioUrl) {URL.revokeObjectURL(audioUrl);}

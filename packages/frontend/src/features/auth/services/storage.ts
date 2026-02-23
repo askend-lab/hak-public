@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+import { logger } from "@hak/shared";
 import type { User } from "./types";
 
 const STORAGE_KEYS = {
@@ -28,7 +29,8 @@ export const AuthStorage = {
     if (!stored) {return null;}
     try {
       return JSON.parse(stored) as User;
-    } catch {
+    } catch (error) {
+      logger.warn("Failed to parse stored user:", error);
       localStorage.removeItem(STORAGE_KEYS.USER);
       return null;
     }

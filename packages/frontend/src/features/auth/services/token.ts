@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+import { logger } from "@hak/shared";
 import type { User } from "./types";
 
 export function decodeJwtPayload(token: string): Record<string, unknown> | null {
@@ -8,7 +9,8 @@ export function decodeJwtPayload(token: string): Record<string, unknown> | null 
     const parts = token.split(".");
     if (parts.length !== 3 || !parts[1]) {return null;}
     return JSON.parse(atob(parts[1]));
-  } catch {
+  } catch (error) {
+    logger.warn("Failed to decode JWT payload:", error);
     return null;
   }
 }

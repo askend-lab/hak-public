@@ -2,6 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useState, useEffect } from "react";
+import { logger } from "@hak/shared";
 import { parseFeatureContent, ParsedFeature } from "@hak/specifications";
 import {
   loadCucumberResults,
@@ -35,8 +36,8 @@ function useSpecsData() {
       setGroups(parsedGroups);
       const cucumberResults = await loadCucumberResults();
       if (cucumberResults) {setTestSuites(parseCucumberResults(cucumberResults));}
-    } catch {
-      /* silent */
+    } catch (error) {
+      logger.warn("Failed to load specs:", error);
     } finally {
       setLoading(false);
     }
