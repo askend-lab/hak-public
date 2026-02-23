@@ -21,7 +21,7 @@ export const VariantsRequestSchema = z
       .min(1, "word must be a non-empty string"),
   });
 
-export const MorphologyInfoSchema = z
+const MorphologyInfoSchema = z
   .object({
     lemma: z.string(),
     pos: z.string(),
@@ -30,7 +30,7 @@ export const MorphologyInfoSchema = z
     ending: z.string(),
   });
 
-export const VariantSchema = z
+const VariantSchema = z
   .object({
     text: z.string(),
     description: z.string(),

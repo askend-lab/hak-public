@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 
-export const CONSENT_KEY = "hak_cookie_consent";
+const CONSENT_KEY = "hak_cookie_consent";
 
 export function hasTrackingConsent(): boolean {
   return localStorage.getItem(CONSENT_KEY) === "accepted";

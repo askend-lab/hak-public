@@ -25,29 +25,14 @@ export const EditIcon = (props: IconComponentProps) => (
 export const TrashIcon = (props: IconComponentProps) => (
   <Icon name="delete" {...props} />
 );
-export const DownloadIcon = (props: IconComponentProps) => (
-  <Icon name="download" {...props} />
-);
 export const SearchIcon = (props: IconComponentProps) => (
   <Icon name="search" {...props} />
 );
 export const ChevronDownIcon = (props: IconComponentProps) => (
   <Icon name="expand_more" {...props} />
 );
-export const ChevronUpIcon = (props: IconComponentProps) => (
-  <Icon name="expand_less" {...props} />
-);
-export const ChevronLeftIcon = (props: IconComponentProps) => (
-  <Icon name="chevron_left" {...props} />
-);
 export const ChevronRightIcon = (props: IconComponentProps) => (
   <Icon name="chevron_right" {...props} />
-);
-export const ShareIcon = (props: IconComponentProps) => (
-  <Icon name="share" {...props} />
-);
-export const CheckIcon = (props: IconComponentProps) => (
-  <Icon name="check" {...props} />
 );
 export const HelpIcon = (props: IconComponentProps) => (
   <Icon name="help" {...props} />
@@ -106,4 +91,3 @@ export const TaskIcon = (props: IconComponentProps) => (
 
 // Re-export types for convenience
 export type { IconSize, IconWeight } from "./Icon";
-export { Icon } from "./Icon";

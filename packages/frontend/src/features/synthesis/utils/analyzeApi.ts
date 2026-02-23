@@ -11,7 +11,6 @@
 import { logger } from "@hak/shared";
 import { CONTENT_TYPE_JSON } from "@/config/constants";
 
-export { CONTENT_TYPE_JSON };
 export const ANALYZE_API_PATH = "/api/analyze";
 export const VARIANTS_API_PATH = "/api/variants";
 

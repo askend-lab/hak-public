@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-export const LOCALE_ET = "et-EE";
+const LOCALE_ET = "et-EE";
 
 function toDateObj(date: string | Date): Date {
   return typeof date === "string" ? new Date(date) : date;

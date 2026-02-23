@@ -36,7 +36,7 @@ function isOfflineMode(): boolean {
   return process.env[ENV.IS_OFFLINE] === "true";
 }
 
-export const adapterManager = {
+const adapterManager = {
   _instance: null as StorageAdapter | null,
 
   set(adapter: StorageAdapter | null): void {

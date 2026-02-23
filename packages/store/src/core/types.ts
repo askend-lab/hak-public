@@ -78,11 +78,11 @@ export interface StoreConfig {
 }
 
 /** One year in seconds — default max TTL */
-export const MAX_TTL_SECONDS = 31_536_000;
+const MAX_TTL_SECONDS = 31_536_000;
 
 /** Shared default configuration — used by store and validation */
 /** 350KB — safe limit below DynamoDB's 400KB item size cap */
-export const MAX_DATA_SIZE_BYTES = 350_000;
+const MAX_DATA_SIZE_BYTES = 350_000;
 
 /** Maximum items returned by a single query */
 export const MAX_QUERY_ITEMS = 100;

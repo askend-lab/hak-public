@@ -36,7 +36,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export async function refreshTokens(): Promise<boolean> {
+async function refreshTokens(): Promise<boolean> {
   try {
     // Refresh token is in httpOnly cookie — backend reads it automatically
     const response = await fetch(

@@ -57,11 +57,4 @@ export const markers: MarkerDefinition[] = [
   },
 ];
 
-/**
- * Get a marker by its symbol
- */
-export function getMarkerBySymbol(
-  symbol: string,
-): MarkerDefinition | undefined {
-  return markers.find((m) => m.symbol === symbol);
-}
+

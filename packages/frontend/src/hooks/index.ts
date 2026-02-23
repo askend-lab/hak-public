@@ -7,7 +7,5 @@ export { useDragAndDrop } from "./useDragAndDrop";
 export { useVariantsPanel } from "@/features/synthesis/hooks/useVariantsPanel";
 export { useSentenceMenu } from "@/features/synthesis/hooks/useSentenceMenu";
 export { useUserTasks } from "@/features/tasks/hooks/useUserTasks";
-export { useUserId } from "./useUserId";
 export { useDocumentTitle } from "./useDocumentTitle";
 export { useAppRedirects } from "./useAppRedirects";
-export { useDropdownPosition } from "./useDropdownPosition";

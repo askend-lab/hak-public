@@ -4,7 +4,7 @@
 import { logger } from "@hak/shared";
 import type { User } from "./types";
 
-export function decodeJwtPayload(token: string): Record<string, unknown> | null {
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3 || !parts[1]) {return null;}
@@ -51,7 +51,7 @@ export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): Us
   };
 }
 
-export const TOKEN_EXPIRY_BUFFER_SECONDS = 300;
+const TOKEN_EXPIRY_BUFFER_SECONDS = 300;
 
 export function isTokenExpired(
   token: string,
