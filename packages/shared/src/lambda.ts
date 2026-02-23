@@ -33,14 +33,14 @@ export function getCorsOrigin(): string {
  * Single source of truth — eliminates inconsistencies across packages.
  * Note: uses getCorsOrigin() so the origin is read at call time, not import time.
  */
-export const CORS_HEADERS: Record<string, string> = {
+export const CORS_HEADERS: Readonly<Record<string, string>> = Object.freeze({
   "Content-Type": "application/json",
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
   "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Content-Security-Policy": "default-src 'none'",
-};
+});
 
 export const HTTP_STATUS = {
   OK: 200,

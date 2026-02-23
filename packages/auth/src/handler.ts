@@ -330,3 +330,7 @@ export async function exchangeCodeHandler( // eslint-disable-line max-statements
     return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
   }
 }
+
+export function healthHandler(): APIGatewayProxyResult {
+  return createLambdaResponse(HTTP_STATUS.OK, { status: 'ok' }, corsResponseHeaders());
+}

@@ -20,6 +20,7 @@ export {
 } from "./lambda";
 export type { LambdaResponse, HttpStatusCode } from "./lambda";
 export { getAwsRegion } from "./env";
+export { loadVersion } from "./version";
 export { wrapLambdaHandler } from "./handler-wrapper";
 export {
   AppError,
