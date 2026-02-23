@@ -15,18 +15,6 @@ export interface AuthState {
   error: string | null;
 }
 
-export interface AuthTokens {
-  accessToken: string;
-  idToken: string;
-  expiresAt: number;
-}
-
-export interface TokenPayload {
-  accessToken: string;
-  idToken: string;
-  expiresIn: number;
-}
-
 export interface TaraTokens {
   accessToken: string;
   idToken: string;

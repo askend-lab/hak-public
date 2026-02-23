@@ -31,11 +31,6 @@ export interface CreateTaskRequest {
   speechEntries?: Array<{ text: string; stressedText: string }> | null;
 }
 
-export interface UpdateTaskRequest {
-  name?: string | null;
-  description?: string | null;
-}
-
 export interface TaskSummary {
   id: string;
   name: string;

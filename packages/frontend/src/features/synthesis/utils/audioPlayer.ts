@@ -6,13 +6,13 @@
  * across PronunciationVariants, SentencePhoneticPanel, useAudioPlayback, and useSynthesis
  */
 
-export interface AudioPlayCallbacks {
+interface AudioPlayCallbacks {
   onLoaded?: (() => void) | undefined;
   onEnded?: (() => void) | undefined;
   onError?: (() => void) | undefined;
 }
 
-export interface AudioPlayResult {
+interface AudioPlayResult {
   audio: HTMLAudioElement;
   cleanup: () => void;
 }

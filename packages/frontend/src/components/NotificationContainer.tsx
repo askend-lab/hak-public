@@ -8,7 +8,7 @@ import Notification, {
   NotificationAction,
 } from "./Notification";
 
-export interface NotificationData {
+interface NotificationData {
   id: string;
   type: NotificationType;
   color?: NotificationColor | undefined;

@@ -57,6 +57,3 @@ export const ErrorResponseSchema = z
   });
 
 export type SynthesizeRequest = z.infer<typeof SynthesizeRequestSchema>;
-export type SynthesizeResponse = z.infer<typeof SynthesizeResponseSchema>;
-export type StatusResponse = z.infer<typeof StatusResponseSchema>;
-export type HealthResponse = z.infer<typeof HealthResponseSchema>;
