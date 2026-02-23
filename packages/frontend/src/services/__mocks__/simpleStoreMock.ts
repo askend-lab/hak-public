@@ -22,13 +22,13 @@ export function setupSimpleStoreMock(): void {
 
     if (path === "/api/save" && options?.method === "POST") {
       const body = JSON.parse(options.body as string);
-      const { pk, sk, data } = body;
+      const { key, sortKey, data } = body;
       const type = body.type;
 
-      if (type === "unlisted" && pk === "tasks") {
-        unlistedTasks[sk] = data;
-      } else if (pk === "task") {
-        tasks[sk] = data;
+      if (type === "unlisted" && key === "tasks") {
+        unlistedTasks[sortKey] = data;
+      } else if (key === "task") {
+        tasks[sortKey] = data;
       }
 
       return {
@@ -38,21 +38,21 @@ export function setupSimpleStoreMock(): void {
     }
 
     if (path === "/api/delete" && options?.method === "DELETE") {
-      const pk = urlObj.searchParams.get("pk");
-      const sk = urlObj.searchParams.get("sk");
-      if (pk === "task" && sk) {
-        delete tasks[sk];
+      const key = urlObj.searchParams.get("key");
+      const sortKey = urlObj.searchParams.get("sortKey");
+      if (key === "task" && sortKey) {
+        delete tasks[sortKey];
       }
-      if (pk === "tasks" && sk) {
-        delete unlistedTasks[sk];
+      if (key === "tasks" && sortKey) {
+        delete unlistedTasks[sortKey];
       }
       return { ok: true, json: async (): Promise<{ success: boolean }> => ({ success: true }) };
     }
 
     if (path === "/api/query") {
-      const pk = urlObj.searchParams.get("prefix");
+      const prefix = urlObj.searchParams.get("prefix");
       const type = urlObj.searchParams.get("type");
-      if (pk === "task" && type === "private") {
+      if (prefix === "task" && type === "private") {
         const items = Object.values(tasks).map((t) => ({ data: t }));
         return {
           ok: true,
@@ -63,12 +63,12 @@ export function setupSimpleStoreMock(): void {
     }
 
     if (path === "/api/get" || path === "/api/get-public") {
-      const pk = urlObj.searchParams.get("pk");
-      const sk = urlObj.searchParams.get("sk");
+      const key = urlObj.searchParams.get("key");
+      const sortKey = urlObj.searchParams.get("sortKey");
       const type = urlObj.searchParams.get("type");
 
-      if (type === "unlisted" && pk === "tasks" && sk) {
-        const task = unlistedTasks[sk];
+      if (type === "unlisted" && key === "tasks" && sortKey) {
+        const task = unlistedTasks[sortKey];
         if (!task) {
           return {
             ok: true,
@@ -87,8 +87,8 @@ export function setupSimpleStoreMock(): void {
         };
       }
 
-      if (pk === "task" && sk) {
-        const task = tasks[sk];
+      if (key === "task" && sortKey) {
+        const task = tasks[sortKey];
         if (!task) {
           return {
             ok: true,

@@ -92,7 +92,7 @@ export class Store {
       return { success: false, error: ttlResult.error };
     }
 
-    const keys = this.resolveKeys(request.type, request.pk, request.sk);
+    const keys = this.resolveKeys(request.type, request.key, request.sortKey);
 
     return this.wrapAsync(async () => {
       if (request.type === "public" || request.type === "unlisted") {

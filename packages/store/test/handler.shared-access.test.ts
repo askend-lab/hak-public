@@ -39,8 +39,8 @@ describe("Anonymous data access", () => {
         "/save",
         undefined,
         {
-          pk: "tasks",
-          sk: "token_abc123",
+          key: "tasks",
+          sortKey: "token_abc123",
           type: "unlisted",
           ttl: 3600,
           data: { id: "task-1", name: "Unlisted Task", shareToken: "abc123" },
@@ -53,8 +53,8 @@ describe("Anonymous data access", () => {
 
       // Try to read unlisted data WITHOUT authentication
       const getEvent = createEvent("GET", "/get", {
-        pk: "tasks",
-        sk: "token_abc123",
+        key: "tasks",
+        sortKey: "token_abc123",
         type: "unlisted",
       }); // No userId - anonymous request
 
@@ -75,8 +75,8 @@ describe("Anonymous data access", () => {
         "/save",
         undefined,
         {
-          pk: "tasks",
-          sk: "token_abc123",
+          key: "tasks",
+          sortKey: "token_abc123",
           type: "unlisted",
           ttl: 3600,
           data: { id: "task-1", name: "Original" },
@@ -88,8 +88,8 @@ describe("Anonymous data access", () => {
 
       // Try to modify without auth - should fail
       const modifyEvent = createEvent("POST", "/save", undefined, {
-        pk: "tasks",
-        sk: "token_abc123",
+        key: "tasks",
+        sortKey: "token_abc123",
         type: "unlisted",
         ttl: 3600,
         data: { id: "task-1", name: "Hacked" },
@@ -107,8 +107,8 @@ describe("Anonymous data access", () => {
         "/save",
         undefined,
         {
-          pk: "shared",
-          sk: "tasks",
+          key: "shared",
+          sortKey: "tasks",
           type: "shared",
           ttl: 3600,
           data: {
@@ -124,8 +124,8 @@ describe("Anonymous data access", () => {
       expect(saveResult.statusCode).toBe(200);
 
       const getEvent = createEvent("GET", "/get", {
-        pk: "shared",
-        sk: "tasks",
+        key: "shared",
+        sortKey: "tasks",
         type: "shared",
       });
 
@@ -146,8 +146,8 @@ describe("Anonymous data access", () => {
         "/save",
         undefined,
         {
-          pk: "tasks",
-          sk: "user-1",
+          key: "tasks",
+          sortKey: "user-1",
           type: "private",
           ttl: 3600,
           data: { tasks: [{ id: "task-1", name: "Private Task" }] },
@@ -158,8 +158,8 @@ describe("Anonymous data access", () => {
       await handler(saveEvent);
 
       const getEvent = createEvent("GET", "/get", {
-        pk: "tasks",
-        sk: "user-1",
+        key: "tasks",
+        sortKey: "user-1",
         type: "private",
       });
 

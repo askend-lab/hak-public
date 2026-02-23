@@ -114,7 +114,7 @@ describe("Routes", () => {
 
     it("should return BAD_REQUEST for validation errors", async () => {
       const event = createMockEvent({
-        body: JSON.stringify({ pk: "test" }), // missing required fields
+        body: JSON.stringify({ key: "test" }), // missing required fields
       });
       const response = await handleSave(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
@@ -126,8 +126,8 @@ describe("Routes", () => {
     it("should save item and return OK", async () => {
       const event = createMockEvent({
         body: JSON.stringify({
-          pk: "entity1",
-          sk: "sort1",
+          key: "entity1",
+          sortKey: "sort1",
           type: "private",
           ttl: 3600,
           data: { key: "value" },
@@ -149,8 +149,8 @@ describe("Routes", () => {
     it("should save item without data field", async () => {
       const event = createMockEvent({
         body: JSON.stringify({
-          pk: "entity2",
-          sk: "sort2",
+          key: "entity2",
+          sortKey: "sort2",
           type: "private",
           ttl: 3600,
         }),
@@ -164,8 +164,8 @@ describe("Routes", () => {
     it("should save item with explicit undefined data", async () => {
       const event = createMockEvent({
         body: JSON.stringify({
-          pk: "entity3",
-          sk: "sort3",
+          key: "entity3",
+          sortKey: "sort3",
           type: "public",
           ttl: 0,
           data: undefined,
@@ -187,7 +187,7 @@ describe("Routes", () => {
 
     it("should return BAD_REQUEST for validation errors", async () => {
       const event = createMockEvent({
-        queryStringParameters: { pk: "test", sk: "", type: "invalid" },
+        queryStringParameters: { key: "test", sortKey: "", type: "invalid" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
@@ -195,7 +195,7 @@ describe("Routes", () => {
 
     it("should return OK with null item for not found", async () => {
       const event = createMockEvent({
-        queryStringParameters: { pk: "nonexistent", sk: "sort", type: "private" },
+        queryStringParameters: { key: "nonexistent", sortKey: "sort", type: "private" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -206,15 +206,15 @@ describe("Routes", () => {
     it("should return OK with item when found", async () => {
       // First save an item
       await store.save({
-        pk: "get-test",
-        sk: "sort1",
+        key: "get-test",
+        sortKey: "sort1",
         type: "private",
         ttl: 3600,
         data: { key: "value" },
       });
 
       const event = createMockEvent({
-        queryStringParameters: { pk: "get-test", sk: "sort1", type: "private" },
+        queryStringParameters: { key: "get-test", sortKey: "sort1", type: "private" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -230,7 +230,7 @@ describe("Routes", () => {
   describe("handleDelete", () => {
     it("should return BAD_REQUEST for validation errors", async () => {
       const event = createMockEvent({
-        queryStringParameters: { pk: "", sk: "", type: "private" },
+        queryStringParameters: { key: "", sortKey: "", type: "private" },
       });
       const response = await handleDelete(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);
@@ -239,14 +239,14 @@ describe("Routes", () => {
     it("should return OK for successful delete", async () => {
       // First save an item
       await store.save({
-        pk: "delete-test",
-        sk: "sort1",
+        key: "delete-test",
+        sortKey: "sort1",
         type: "private",
         ttl: 3600,
       });
 
       const event = createMockEvent({
-        queryStringParameters: { pk: "delete-test", sk: "sort1", type: "private" },
+        queryStringParameters: { key: "delete-test", sortKey: "sort1", type: "private" },
       });
       const response = await handleDelete(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -256,7 +256,7 @@ describe("Routes", () => {
 
     it("should return NOT_FOUND for nonexistent item", async () => {
       const event = createMockEvent({
-        queryStringParameters: { pk: "nonexistent", sk: "sort", type: "private" },
+        queryStringParameters: { key: "nonexistent", sortKey: "sort", type: "private" },
       });
       const response = await handleDelete(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.NOT_FOUND);
@@ -284,8 +284,8 @@ describe("Routes", () => {
 
     it("should return OK with items", async () => {
       // Save some items
-      await store.save({ pk: "query-prefix", sk: "sort1", type: "private", ttl: 3600 });
-      await store.save({ pk: "query-prefix", sk: "sort2", type: "private", ttl: 3600 });
+      await store.save({ key: "query-prefix", sortKey: "sort1", type: "private", ttl: 3600 });
+      await store.save({ key: "query-prefix", sortKey: "sort2", type: "private", ttl: 3600 });
 
       const event = createMockEvent({
         queryStringParameters: { prefix: "query-", type: "private" },
@@ -312,8 +312,8 @@ describe("Routes", () => {
     it("should save item with data field set", async () => {
       const event = createMockEvent({
         body: JSON.stringify({
-          pk: "data-test",
-          sk: "sort1",
+          key: "data-test",
+          sortKey: "sort1",
           type: "private",
           ttl: 3600,
           data: { field: "value" },
@@ -328,8 +328,8 @@ describe("Routes", () => {
     it("should save item without data field", async () => {
       const event = createMockEvent({
         body: JSON.stringify({
-          pk: "no-data-test",
-          sk: "sort1",
+          key: "no-data-test",
+          sortKey: "sort1",
           type: "private",
           ttl: 3600,
         }),
@@ -342,7 +342,7 @@ describe("Routes", () => {
   describe("ERROR_STATUS_MAP usage", () => {
     it("should return OK with null item for not found (private)", async () => {
       const event = createMockEvent({
-        queryStringParameters: { pk: "nonexistent-private", sk: "sort1", type: "private" },
+        queryStringParameters: { key: "nonexistent-private", sortKey: "sort1", type: "private" },
       });
       const response = await handleGet(event, store);
       expect(response.statusCode).toBe(HTTP_STATUS.OK);

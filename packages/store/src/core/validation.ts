@@ -114,8 +114,8 @@ export function validateStoreRequest(
   config: StoreConfig = DEFAULT_CONFIG,
 ): ValidationResult {
   return collectErrors((errors) => {
-    validateKeyString(request.pk, "pk", errors);
-    validateKeyString(request.sk, "sk", errors);
+    validateKeyString(request.key, "key", errors);
+    validateKeyString(request.sortKey, "sortKey", errors);
     validateType(request.type, errors);
 
     if (typeof request.ttl !== "number") {
@@ -142,13 +142,13 @@ export function validateStoreRequest(
  * Validates get/delete request parameters
  */
 export function validateGetRequest(
-  pk: unknown,
-  sk: unknown,
+  key: unknown,
+  sortKey: unknown,
   type: unknown,
 ): ValidationResult {
   return collectErrors((errors) => {
-    validateKeyString(pk, "pk", errors);
-    validateKeyString(sk, "sk", errors);
+    validateKeyString(key, "key", errors);
+    validateKeyString(sortKey, "sortKey", errors);
     validateType(type, errors);
   });
 }

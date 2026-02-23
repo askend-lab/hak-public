@@ -22,33 +22,33 @@ class OperationSpyAdapter implements StorageAdapter {
   readonly operations: string[] = [];
   private readonly data: Map<string, StoreItem> = new Map();
 
-  private key(pk: string, sk: string): string {
+  private buildKey(pk: string, sk: string): string {
     return `${pk}|${sk}`;
   }
 
   async put(item: StoreItem, _expectedVersion?: number): Promise<void> {
     this.operations.push("put");
-    this.data.set(this.key(item.PK, item.SK), { ...item });
+    this.data.set(this.buildKey(item.PK, item.SK), { ...item });
   }
 
   async get(pk: string, sk: string): Promise<StoreItem | null> {
     this.operations.push("get");
-    const item = this.data.get(this.key(pk, sk));
+    const item = this.data.get(this.buildKey(pk, sk));
     return item ? { ...item } : null;
   }
 
   async delete(pk: string, sk: string): Promise<void> {
     this.operations.push("delete");
-    this.data.delete(this.key(pk, sk));
+    this.data.delete(this.buildKey(pk, sk));
   }
 
   async conditionalDelete(pk: string, sk: string, expectedOwner: string): Promise<"deleted" | "not_found" | "not_owner"> {
     this.operations.push("conditionalDelete");
-    const key = this.key(pk, sk);
-    const existing = this.data.get(key);
+    const compositeKey = this.buildKey(pk, sk);
+    const existing = this.data.get(compositeKey);
     if (!existing) {return "not_found";}
     if (existing.owner !== expectedOwner) {return "not_owner";}
-    this.data.delete(key);
+    this.data.delete(compositeKey);
     return "deleted";
   }
 
@@ -65,7 +65,7 @@ class OperationSpyAdapter implements StorageAdapter {
 
   async upsert(pk: string, sk: string, fields: UpsertFields): Promise<StoreItem> {
     this.operations.push("upsert");
-    const existing = this.data.get(this.key(pk, sk));
+    const existing = this.data.get(this.buildKey(pk, sk));
     const now = new Date().toISOString();
     const item: StoreItem = {
       PK: pk,
@@ -77,7 +77,7 @@ class OperationSpyAdapter implements StorageAdapter {
       version: (existing?.version ?? 0) + 1,
       ...(fields.ttl !== undefined ? { ttl: fields.ttl } : {}),
     };
-    this.data.set(this.key(pk, sk), { ...item });
+    this.data.set(this.buildKey(pk, sk), { ...item });
     return { ...item };
   }
 
@@ -105,7 +105,7 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
     const spy = new OperationSpyAdapter();
     const store = new Store(spy, ownerContext);
 
-    await store.save({ pk: "doc", sk: "1", type: "public", ttl: 3600, data: {} });
+    await store.save({ key: "doc", sortKey: "1", type: "public", ttl: 3600, data: {} });
     spy.resetOps();
 
     const result = await store.delete("doc", "1", "public");
@@ -117,7 +117,7 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
     const ownerStore = new Store(spy, ownerContext);
     const otherStore = new Store(spy, otherContext);
 
-    await ownerStore.save({ pk: "doc", sk: "1", type: "public", ttl: 3600, data: {} });
+    await ownerStore.save({ key: "doc", sortKey: "1", type: "public", ttl: 3600, data: {} });
     spy.resetOps();
 
     const result = await otherStore.delete("doc", "1", "public");
@@ -138,7 +138,7 @@ describe("Audit #4: delete should be atomic (no TOCTOU)", () => {
     const spy = new OperationSpyAdapter();
     const store = new Store(spy, ownerContext);
 
-    await store.save({ pk: "doc", sk: "1", type: "public", ttl: 3600, data: {} });
+    await store.save({ key: "doc", sortKey: "1", type: "public", ttl: 3600, data: {} });
     spy.resetOps();
 
     await store.delete("doc", "1", "public");

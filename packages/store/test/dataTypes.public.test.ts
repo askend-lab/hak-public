@@ -38,8 +38,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("owner can save public item", async () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
-        pk: "article",
-        sk: "post1",
+        key: "article",
+        sortKey: "post1",
         type: "public",
         ttl: 3600,
         data: { title: "Hello World" },
@@ -50,8 +50,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("any user can read public item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "article",
-        sk: "post1",
+        key: "article",
+        sortKey: "post1",
         type: "public",
         ttl: 3600,
         data: { title: "Hello World" },
@@ -66,15 +66,15 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("any user can query public items", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "article",
-        sk: "post1",
+        key: "article",
+        sortKey: "post1",
         type: "public",
         ttl: 3600,
         data: {},
       });
       await ownerStore.save({
-        pk: "article",
-        sk: "post2",
+        key: "article",
+        sortKey: "post2",
         type: "public",
         ttl: 3600,
         data: {},
@@ -89,8 +89,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("other user cannot modify public item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "article",
-        sk: "post1",
+        key: "article",
+        sortKey: "post1",
         type: "public",
         ttl: 3600,
         data: {},
@@ -105,8 +105,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("owner can delete public item", async () => {
       const store = new Store(db, ownerContext);
       await store.save({
-        pk: "article",
-        sk: "post1",
+        key: "article",
+        sortKey: "post1",
         type: "public",
         ttl: 3600,
         data: {},
@@ -121,8 +121,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("any user can save shared item", async () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
-        pk: "wiki",
-        sk: "page1",
+        key: "wiki",
+        sortKey: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { content: "Initial content" },
@@ -133,8 +133,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("any user can read shared item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "wiki",
-        sk: "page1",
+        key: "wiki",
+        sortKey: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { content: "Hello" },
@@ -153,15 +153,15 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("any user can query shared items", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "wiki",
-        sk: "page1",
+        key: "wiki",
+        sortKey: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
       });
       await ownerStore.save({
-        pk: "wiki",
-        sk: "page2",
+        key: "wiki",
+        sortKey: "page2",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
@@ -176,8 +176,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("non-owner cannot delete shared item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "wiki",
-        sk: "page1",
+        key: "wiki",
+        sortKey: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
@@ -196,8 +196,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("owner can delete shared item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "wiki",
-        sk: "page1",
+        key: "wiki",
+        sortKey: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: {},
@@ -214,8 +214,8 @@ describe("Data Types Access Control - Public & Shared", () => {
     it("any user can overwrite shared item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "wiki",
-        sk: "page1",
+        key: "wiki",
+        sortKey: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { v: 1 },
@@ -223,8 +223,8 @@ describe("Data Types Access Control - Public & Shared", () => {
 
       const otherStore = new Store(db, otherUserContext);
       const saveResult = await otherStore.save({
-        pk: "wiki",
-        sk: "page1",
+        key: "wiki",
+        sortKey: "page1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { v: 2 },
@@ -245,29 +245,29 @@ describe("Data Types Access Control - Public & Shared", () => {
       const store = new Store(db, ownerContext);
 
       await store.save({
-        pk: "data",
-        sk: "key1",
+        key: "data",
+        sortKey: "key1",
         type: "private",
         ttl: 3600,
         data: { type: "private" },
       });
       await store.save({
-        pk: "data",
-        sk: "key1",
+        key: "data",
+        sortKey: "key1",
         type: "public",
         ttl: 3600,
         data: { type: "public" },
       });
       await store.save({
-        pk: "data",
-        sk: "key1",
+        key: "data",
+        sortKey: "key1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { type: "unlisted" },
       });
       await store.save({
-        pk: "data",
-        sk: "key1",
+        key: "data",
+        sortKey: "key1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { type: "shared" },

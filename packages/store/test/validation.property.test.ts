@@ -99,8 +99,8 @@ describe("validation — property-based tests", () => {
           validKeyArb,
           validTypeArb,
           fc.integer({ min: 0, max: 31536000 }),
-          (pk, sk, type, ttl) => {
-            const result = validateStoreRequest({ pk, sk, type, ttl });
+          (key, sortKey, type, ttl) => {
+            const result = validateStoreRequest({ key, sortKey, type, ttl });
             expect(result.valid).toBe(true);
             expect(result.errors).toHaveLength(0);
           },
@@ -116,8 +116,8 @@ describe("validation — property-based tests", () => {
           ),
           validTypeArb,
           fc.integer({ min: 0, max: 31536000 }),
-          (sk, type, ttl) => {
-            const result = validateStoreRequest({ sk, type, ttl });
+          (sortKey, type, ttl) => {
+            const result = validateStoreRequest({ sortKey, type, ttl });
             expect(result.valid).toBe(false);
           },
         ),
@@ -132,8 +132,8 @@ describe("validation — property-based tests", () => {
           validKeyArb,
           validKeyArb,
           validTypeArb,
-          (pk, sk, type) => {
-            const result = validateGetRequest(pk, sk, type);
+          (key, sortKey, type) => {
+            const result = validateGetRequest(key, sortKey, type);
             expect(result.valid).toBe(true);
           },
         ),

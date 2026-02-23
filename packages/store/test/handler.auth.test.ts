@@ -21,7 +21,7 @@ describe("Lambda Handler Auth", () => {
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { pk: "test", sk: "sort", type: "private" },
+        queryStringParameters: { key: "test", sortKey: "sort", type: "private" },
         headers,
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
@@ -34,7 +34,7 @@ describe("Lambda Handler Auth", () => {
         httpMethod: "POST",
         path: "/save",
         resource: "/save",
-        body: JSON.stringify({ pk: "x-user-test", sk: "sort1", type: "private", ttl: 3600 }),
+        body: JSON.stringify({ key: "x-user-test", sortKey: "sort1", type: "private", ttl: 3600 }),
         headers: { "X-User-Id": "local-test-user" },
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
@@ -51,15 +51,15 @@ describe("Lambda Handler Auth", () => {
       ["shared", "shared-anon"],
       ["unlisted", "unlisted-anon"],
       ["public", "public-anon"],
-    ])("should allow anonymous access to %s type on /get", async (type, pk) => {
-      const saveEvent = createPostEvent("/save", { pk, sk: "sort1", type, ttl: 3600 });
+    ])("should allow anonymous access to %s type on /get", async (type, keyValue) => {
+      const saveEvent = createPostEvent("/save", { key: keyValue, sortKey: "sort1", type, ttl: 3600 });
       await handler(saveEvent);
 
       const getEvent = createEvent({
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { pk, sk: "sort1", type },
+        queryStringParameters: { key: keyValue, sortKey: "sort1", type },
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
       const result = await handler(getEvent);
@@ -71,7 +71,7 @@ describe("Lambda Handler Auth", () => {
         httpMethod: "GET",
         path: "/get-public",
         resource: "/get-public",
-        queryStringParameters: { pk: "test", sk: "sort", type: "public" },
+        queryStringParameters: { key: "test", sortKey: "sort", type: "public" },
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
       const result = await handler(event);
@@ -79,7 +79,7 @@ describe("Lambda Handler Auth", () => {
     });
 
     it.each([
-      ["private type on /get", "GET", "/get", { pk: "test", sk: "sort", type: "private" }],
+      ["private type on /get", "GET", "/get", { key: "test", sortKey: "sort", type: "private" }],
       ["POST /save", "POST", "/save", null],
     ])("should reject anonymous %s", async (_name, method, path, params) => {
       const event = createEvent({
@@ -87,7 +87,7 @@ describe("Lambda Handler Auth", () => {
         path,
         resource: path,
         queryStringParameters: params,
-        body: method === "POST" ? JSON.stringify({ pk: "test", sk: "sort", type: "public", ttl: 3600 }) : undefined,
+        body: method === "POST" ? JSON.stringify({ key: "test", sortKey: "sort", type: "public", ttl: 3600 }) : undefined,
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
       const result = await handler(event);
@@ -106,7 +106,7 @@ describe("Lambda Handler Auth", () => {
         if (value === undefined) {delete process.env[key];}
         else {process.env[key] = value;}
       });
-      const event = createPostEvent("/save", { pk: "env-test", sk: "sort", type: "private", ttl: 3600 });
+      const event = createPostEvent("/save", { key: "env-test", sortKey: "sort", type: "private", ttl: 3600 });
       const result = await handler(event);
       expect(result.statusCode).toBe(200);
     });
@@ -119,7 +119,7 @@ describe("Lambda Handler Auth", () => {
       process.env.IS_OFFLINE = value;
       delete process.env.TABLE_NAME;
       setAdapter(null);
-      const event = createPostEvent("/save", { pk: "offline-test", sk: "sort", type: "private", ttl: 3600 });
+      const event = createPostEvent("/save", { key: "offline-test", sortKey: "sort", type: "private", ttl: 3600 });
       const result = await handler(event);
       expect(result.statusCode).toBe(200);
     });

@@ -58,8 +58,8 @@ describe("Routes - handleGetPublic", () => {
   });
 
   it.each([
-    ["private type", { pk: "test", sk: "sort", type: "private" }, "private type not allowed"],
-    ["invalid type", { pk: "test", sk: "sort", type: "invalid" }, null],
+    ["private type", { key: "test", sortKey: "sort", type: "private" }, "private type not allowed"],
+    ["invalid type", { key: "test", sortKey: "sort", type: "invalid" }, null],
   ])("should return BAD_REQUEST for %s", async (_name, params, expectedError) => {
     const event = createMockEvent({ queryStringParameters: params });
     const response = await handleGetPublic(event, store);
@@ -74,7 +74,7 @@ describe("Routes - handleGetPublic", () => {
 
   it("should return OK with null for not found public item", async () => {
     const event = createMockEvent({
-      queryStringParameters: { pk: "nonexistent", sk: "sort", type: "public" },
+      queryStringParameters: { key: "nonexistent", sortKey: "sort", type: "public" },
     });
     const response = await handleGetPublic(event, store);
     expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -85,10 +85,10 @@ describe("Routes - handleGetPublic", () => {
     ["unlisted", "unlisted-test"],
     ["shared", "shared-test"],
     ["public", "public-test"],
-  ])("should return OK for %s type", async (type, pk) => {
-    await store.save({ pk, sk: "sort1", type: type as DataType, ttl: 3600, data: { test: true } });
+  ])("should return OK for %s type", async (type, keyValue) => {
+    await store.save({ key: keyValue, sortKey: "sort1", type: type as DataType, ttl: 3600, data: { test: true } });
     const event = createMockEvent({
-      queryStringParameters: { pk, sk: "sort1", type },
+      queryStringParameters: { key: keyValue, sortKey: "sort1", type },
     });
     const response = await handleGetPublic(event, store);
     expect(response.statusCode).toBe(HTTP_STATUS.OK);
@@ -98,9 +98,9 @@ describe("Routes - handleGetPublic", () => {
   });
 
   it("should return item (not null) when public item exists", async () => {
-    await store.save({ pk: "exists-public", sk: "sort1", type: "public", ttl: 3600, data: { found: true } });
+    await store.save({ key: "exists-public", sortKey: "sort1", type: "public", ttl: 3600, data: { found: true } });
     const event = createMockEvent({
-      queryStringParameters: { pk: "exists-public", sk: "sort1", type: "public" },
+      queryStringParameters: { key: "exists-public", sortKey: "sort1", type: "public" },
     });
     const response = await handleGetPublic(event, store);
     expect(response.statusCode).toBe(HTTP_STATUS.OK);

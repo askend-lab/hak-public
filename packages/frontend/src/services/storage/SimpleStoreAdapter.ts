@@ -62,15 +62,15 @@ export class SimpleStoreAdapter {
   }
 
   private async save(
-    pk: string,
-    sk: string,
+    key: string,
+    sortKey: string,
     type: "private" | "shared" | "unlisted",
     data: Record<string, unknown>,
   ): Promise<void> {
     const response = await fetch(`${this.baseUrl}/save`, {
       method: "POST",
       headers: this.getAuthHeaders(),
-      body: JSON.stringify({ pk, sk, type, ttl: this.ttl, data }),
+      body: JSON.stringify({ key, sortKey, type, ttl: this.ttl, data }),
     });
 
     if (!response.ok) {
@@ -81,11 +81,11 @@ export class SimpleStoreAdapter {
   }
 
   private async get(
-    pk: string,
-    sk: string,
+    key: string,
+    sortKey: string,
     type: "private" | "shared" | "unlisted",
   ): Promise<Record<string, unknown> | null> {
-    const params = new URLSearchParams({ pk, sk, type });
+    const params = new URLSearchParams({ key, sortKey, type });
     // Use /get-public for unlisted/shared/public (no auth required, rejects private type)
     const isPublic = type !== "private";
     const endpoint = isPublic ? "/get-public" : "/get";
@@ -118,11 +118,11 @@ export class SimpleStoreAdapter {
   }
 
   private async delete(
-    pk: string,
-    sk: string,
+    key: string,
+    sortKey: string,
     type: "private" | "shared" | "unlisted",
   ): Promise<void> {
-    const params = new URLSearchParams({ pk, sk, type });
+    const params = new URLSearchParams({ key, sortKey, type });
     const response = await fetch(`${this.baseUrl}/delete?${params}`, {
       method: "DELETE",
       headers: this.getAuthHeaders(),
@@ -197,8 +197,8 @@ export class SimpleStoreAdapter {
       method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({
-        pk: "tasks",
-        sk: task.shareToken,
+        key: "tasks",
+        sortKey: task.shareToken,
         type: "unlisted",
         ttl: UNLISTED_TTL_SECONDS,
         data: taskToRecord(task),

@@ -78,7 +78,7 @@ describe("Lambda Handler", () => {
     });
 
     it("should return 400 for missing required fields", async () => {
-      const event = createPostEvent("/save", { pk: "test" });
+      const event = createPostEvent("/save", { key: "test" });
       const result = await handler(event);
       expect(result.statusCode).toBe(400);
       expect(JSON.parse(result.body).errors).toBeDefined();
@@ -116,8 +116,8 @@ describe("Lambda Handler", () => {
 
     it("should return 404 when deleting non-existent item", async () => {
       const event = createDeleteEvent("/delete", {
-        pk: "test",
-        sk: "sort",
+        key: "test",
+        sortKey: "sort",
         type: "public",
       });
       const result = await handler(event);
@@ -137,8 +137,8 @@ describe("Lambda Handler", () => {
   describe("get endpoint success path", () => {
     it("should return 200 with valid params", async () => {
       const event = createGetEvent("/get", {
-        pk: "test",
-        sk: "sort",
+        key: "test",
+        sortKey: "sort",
         type: "public",
       });
       const result = await handler(event);
@@ -147,8 +147,8 @@ describe("Lambda Handler", () => {
 
     it("should return 200 with null item when item not found", async () => {
       const event = createGetEvent("/get", {
-        pk: "nonexistent",
-        sk: "nothere",
+        key: "nonexistent",
+        sortKey: "nothere",
         type: "private",
       });
       const result = await handler(event);
@@ -185,15 +185,15 @@ describe("Lambda Handler", () => {
 
   describe("save endpoint validation", () => {
     it("should return 400 for validation errors", async () => {
-      const event = createPostEvent("/save", { pk: "test" });
+      const event = createPostEvent("/save", { key: "test" });
       const result = await handler(event);
       expect(result.statusCode).toBe(400);
     });
 
     it("should return 200 for valid save request", async () => {
       const event = createPostEvent("/save", {
-        pk: "test",
-        sk: "sort",
+        key: "test",
+        sortKey: "sort",
         type: "public",
         ttl: 3600,
         data: { key: "value" },
@@ -206,7 +206,7 @@ describe("Lambda Handler", () => {
 
   describe("response structure", () => {
     it("should include error field in validation errors", async () => {
-      const event = createPostEvent("/save", { pk: "test" });
+      const event = createPostEvent("/save", { key: "test" });
       const result = await handler(event);
       const body = JSON.parse(result.body);
       expect(body.errors).toBeDefined();
@@ -235,7 +235,7 @@ describe("Lambda Handler", () => {
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { pk: "test", sk: "sort", type: "private" },
+        queryStringParameters: { key: "test", sortKey: "sort", type: "private" },
         headers,
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
@@ -249,7 +249,7 @@ describe("Lambda Handler", () => {
         httpMethod: "POST",
         path: "/save",
         resource: "/save",
-        body: JSON.stringify({ pk: "test", sk: "sort", type: "private", ttl: 3600, data: {} }),
+        body: JSON.stringify({ key: "test", sortKey: "sort", type: "private", ttl: 3600, data: {} }),
         headers: { "X-User-Id": "header-user" },
       });
       const result = await handler(event);
@@ -266,7 +266,7 @@ describe("Lambda Handler", () => {
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { pk: "test", sk: "sort", type: "private" },
+        queryStringParameters: { key: "test", sortKey: "sort", type: "private" },
         requestContext: {
           ...createEvent({}).requestContext,
           authorizer: { claims: { sub: "" } },
@@ -284,7 +284,7 @@ describe("Lambda Handler", () => {
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
-        queryStringParameters: { pk: "test", sk: "sort", type: "private" },
+        queryStringParameters: { key: "test", sortKey: "sort", type: "private" },
         headers: { "X-User-Id": "fallback-user" },
         requestContext: {
           ...createEvent({}).requestContext,
@@ -302,8 +302,8 @@ describe("Lambda Handler", () => {
       process.env.TENANT = "\t";
       process.env.ENVIRONMENT = "";
       const event = createPostEvent("/save", {
-        pk: "env-test",
-        sk: "sort",
+        key: "env-test",
+        sortKey: "sort",
         type: "private",
         ttl: 3600,
       });
@@ -316,8 +316,8 @@ describe("Lambda Handler", () => {
       process.env.TENANT = "mytenant";
       process.env.ENVIRONMENT = "prod";
       const event = createPostEvent("/save", {
-        pk: "env-test2",
-        sk: "sort",
+        key: "env-test2",
+        sortKey: "sort",
         type: "private",
         ttl: 3600,
       });
@@ -332,8 +332,8 @@ describe("Lambda Handler", () => {
       process.env.TABLE_NAME = "test-table";
       setAdapter(null); // Reset adapter
       const event = createPostEvent("/save", {
-        pk: "adapter-test",
-        sk: "sort",
+        key: "adapter-test",
+        sortKey: "sort",
         type: "private",
         ttl: 3600,
       });
@@ -346,8 +346,8 @@ describe("Lambda Handler", () => {
       delete process.env.TABLE_NAME;
       setAdapter(null);
       const event = createPostEvent("/save", {
-        pk: "adapter-test2",
-        sk: "sort",
+        key: "adapter-test2",
+        sortKey: "sort",
         type: "private",
         ttl: 3600,
       });

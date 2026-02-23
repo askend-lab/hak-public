@@ -23,8 +23,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should save and retrieve private item", async () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
-          pk: "integration-test",
-          sk: "private-item",
+          key: "integration-test",
+          sortKey: "private-item",
           type: "private",
           ttl: 3600,
           data: { secret: "value" },
@@ -37,8 +37,8 @@ describe("Integration Tests - Full Pipeline", () => {
 
       const getEvent = addUserHeader(
         createGetEvent("/get", {
-          pk: "integration-test",
-          sk: "private-item",
+          key: "integration-test",
+          sortKey: "private-item",
           type: "private",
         }),
         "user-owner",
@@ -54,8 +54,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should reject invalid type in request", async () => {
       const event = addUserHeader(
         createPostEvent("/save", {
-          pk: "test",
-          sk: "test",
+          key: "test",
+          sortKey: "test",
           type: "invalid-type",
           ttl: 3600,
         }),
@@ -72,8 +72,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should save unlisted item", async () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
-          pk: "shared-doc",
-          sk: "doc1",
+          key: "shared-doc",
+          sortKey: "doc1",
           type: "unlisted",
           ttl: 3600,
           data: { content: "hello" },
@@ -88,8 +88,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should validate unlisted type is accepted", async () => {
       const getEvent = addUserHeader(
         createGetEvent("/get", {
-          pk: "shared-doc",
-          sk: "doc1",
+          key: "shared-doc",
+          sortKey: "doc1",
           type: "unlisted",
         }),
         "any-user",
@@ -105,8 +105,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should save public item", async () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
-          pk: "article",
-          sk: "post1",
+          key: "article",
+          sortKey: "post1",
           type: "public",
           ttl: 3600,
           data: { title: "Hello" },
@@ -136,8 +136,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should save shared item", async () => {
       const saveEvent = addUserHeader(
         createPostEvent("/save", {
-          pk: "wiki",
-          sk: "page1",
+          key: "wiki",
+          sortKey: "page1",
           type: "shared",
           ttl: 3600,
           data: { content: "Initial" },
@@ -152,8 +152,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should validate shared type is accepted", async () => {
       const getEvent = addUserHeader(
         createGetEvent("/get", {
-          pk: "wiki",
-          sk: "page1",
+          key: "wiki",
+          sortKey: "page1",
           type: "shared",
         }),
         "user2",
@@ -168,8 +168,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should reject empty pk", async () => {
       const event = addUserHeader(
         createPostEvent("/save", {
-          pk: "",
-          sk: "test",
+          key: "",
+          sortKey: "test",
           type: "public",
           ttl: 3600,
         }),
@@ -183,8 +183,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should reject empty sk", async () => {
       const event = addUserHeader(
         createPostEvent("/save", {
-          pk: "test",
-          sk: "",
+          key: "test",
+          sortKey: "",
           type: "public",
           ttl: 3600,
         }),
@@ -198,8 +198,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should accept zero ttl (no expiration)", async () => {
       const event = addUserHeader(
         createPostEvent("/save", {
-          pk: "test-zero-ttl",
-          sk: "test",
+          key: "test-zero-ttl",
+          sortKey: "test",
           type: "public",
           ttl: 0,
         }),
@@ -213,8 +213,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should reject negative ttl", async () => {
       const event = addUserHeader(
         createPostEvent("/save", {
-          pk: "test",
-          sk: "test",
+          key: "test",
+          sortKey: "test",
           type: "public",
           ttl: -1,
         }),
@@ -228,8 +228,8 @@ describe("Integration Tests - Full Pipeline", () => {
     it("should reject ttl exceeding max", async () => {
       const event = addUserHeader(
         createPostEvent("/save", {
-          pk: "test",
-          sk: "test",
+          key: "test",
+          sortKey: "test",
           type: "public",
           ttl: 31536001, // 1 year + 1 second
         }),

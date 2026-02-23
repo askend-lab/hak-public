@@ -46,8 +46,8 @@ describe("Adapter Selection", () => {
 
       // Save data
       const saveEvent = createPostEvent("/save", {
-        pk: "adapter-test",
-        sk: "item-1",
+        key: "adapter-test",
+        sortKey: "item-1",
         type: "private",
         ttl: 3600,
         data: { value: "test" },
@@ -63,8 +63,8 @@ describe("Adapter Selection", () => {
         httpMethod: "GET",
         resource: "/get",
         queryStringParameters: {
-          pk: "adapter-test",
-          sk: "item-1",
+          key: "adapter-test",
+          sortKey: "item-1",
           type: "private",
         },
         body: null,

@@ -39,8 +39,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("should reject save from non-owner on existing public item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "lesson",
-        sk: "lesson-1",
+        key: "lesson",
+        sortKey: "lesson-1",
         type: "public",
         ttl: 3600,
         data: { title: "Original" },
@@ -48,8 +48,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
 
       const attackerStore = new Store(db, attackerContext);
       const result = await attackerStore.save({
-        pk: "lesson",
-        sk: "lesson-1",
+        key: "lesson",
+        sortKey: "lesson-1",
         type: "public",
         ttl: 3600,
         data: { title: "Hijacked!" },
@@ -62,8 +62,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("should preserve original data after rejected overwrite", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "lesson",
-        sk: "lesson-1",
+        key: "lesson",
+        sortKey: "lesson-1",
         type: "public",
         ttl: 3600,
         data: { title: "Original" },
@@ -71,8 +71,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
 
       const attackerStore = new Store(db, attackerContext);
       await attackerStore.save({
-        pk: "lesson",
-        sk: "lesson-1",
+        key: "lesson",
+        sortKey: "lesson-1",
         type: "public",
         ttl: 3600,
         data: { title: "Hijacked!" },
@@ -86,16 +86,16 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("should allow owner to update own public item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "lesson",
-        sk: "lesson-1",
+        key: "lesson",
+        sortKey: "lesson-1",
         type: "public",
         ttl: 3600,
         data: { title: "v1" },
       });
 
       const result = await ownerStore.save({
-        pk: "lesson",
-        sk: "lesson-1",
+        key: "lesson",
+        sortKey: "lesson-1",
         type: "public",
         ttl: 3600,
         data: { title: "v2" },
@@ -108,8 +108,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("should allow first save of new public item by any user", async () => {
       const store = new Store(db, attackerContext);
       const result = await store.save({
-        pk: "new-lesson",
-        sk: "new-1",
+        key: "new-lesson",
+        sortKey: "new-1",
         type: "public",
         ttl: 3600,
         data: { title: "New" },
@@ -123,8 +123,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("should reject save from non-owner on existing unlisted item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "share-link",
-        sk: "doc-1",
+        key: "share-link",
+        sortKey: "doc-1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "Secret doc" },
@@ -132,8 +132,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
 
       const attackerStore = new Store(db, attackerContext);
       const result = await attackerStore.save({
-        pk: "share-link",
-        sk: "doc-1",
+        key: "share-link",
+        sortKey: "doc-1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "Replaced!" },
@@ -146,16 +146,16 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("should allow owner to update own unlisted item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "share-link",
-        sk: "doc-1",
+        key: "share-link",
+        sortKey: "doc-1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "v1" },
       });
 
       const result = await ownerStore.save({
-        pk: "share-link",
-        sk: "doc-1",
+        key: "share-link",
+        sortKey: "doc-1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "v2" },
@@ -170,8 +170,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("should allow non-owner to overwrite shared item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "wiki",
-        sk: "page-1",
+        key: "wiki",
+        sortKey: "page-1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { content: "Original" },
@@ -179,8 +179,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
 
       const otherStore = new Store(db, attackerContext);
       const result = await otherStore.save({
-        pk: "wiki",
-        sk: "page-1",
+        key: "wiki",
+        sortKey: "page-1",
         type: "shared" as DataType,
         ttl: 3600,
         data: { content: "Updated by other" },
@@ -195,8 +195,8 @@ describe("Audit #3: save ownership check for public/unlisted types", () => {
     it("different users have separate private namespaces", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "settings",
-        sk: "theme",
+        key: "settings",
+        sortKey: "theme",
         type: "private",
         ttl: 3600,
         data: { color: "dark" },

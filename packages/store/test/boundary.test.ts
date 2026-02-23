@@ -30,8 +30,8 @@ describe("Boundary Conditions", () => {
     it("should handle pk containing # character", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "user#123",
-        sk: "settings",
+        key: "user#123",
+        sortKey: "settings",
         type: "private",
         ttl: 3600,
         data: { value: "test" },
@@ -47,8 +47,8 @@ describe("Boundary Conditions", () => {
     it("should handle sk containing # character", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "entity",
-        sk: "version#1.0.0",
+        key: "entity",
+        sortKey: "version#1.0.0",
         type: "public",
         ttl: 3600,
         data: {},
@@ -60,8 +60,8 @@ describe("Boundary Conditions", () => {
     it("should handle both pk and sk containing # character", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "user#456",
-        sk: "doc#rev#2",
+        key: "user#456",
+        sortKey: "doc#rev#2",
         type: "shared",
         ttl: 3600,
         data: { complex: true },
@@ -77,32 +77,32 @@ describe("Boundary Conditions", () => {
   describe("empty and whitespace strings", () => {
     it("should reject empty pk in validation", () => {
       const result = validateStoreRequest({
-        pk: "",
-        sk: "valid",
+        key: "",
+        sortKey: "valid",
         type: "public",
         ttl: 3600,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("pk"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("key"))).toBe(true);
     });
 
     it("should reject empty sk in validation", () => {
       const result = validateStoreRequest({
-        pk: "valid",
-        sk: "",
+        key: "valid",
+        sortKey: "",
         type: "public",
         ttl: 3600,
       });
 
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("sk"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("sortKey"))).toBe(true);
     });
 
     it("should reject whitespace-only pk", () => {
       const result = validateStoreRequest({
-        pk: "   ",
-        sk: "valid",
+        key: "   ",
+        sortKey: "valid",
         type: "public",
         ttl: 3600,
       });
@@ -112,8 +112,8 @@ describe("Boundary Conditions", () => {
 
     it("should reject whitespace-only sk", () => {
       const result = validateStoreRequest({
-        pk: "valid",
-        sk: "\t\n",
+        key: "valid",
+        sortKey: "\t\n",
         type: "public",
         ttl: 3600,
       });
@@ -128,8 +128,8 @@ describe("Boundary Conditions", () => {
       const longPk = "a".repeat(1000);
 
       const result = await store.save({
-        pk: longPk,
-        sk: "short",
+        key: longPk,
+        sortKey: "short",
         type: "private",
         ttl: 3600,
         data: {},
@@ -146,8 +146,8 @@ describe("Boundary Conditions", () => {
       const longSk = "b".repeat(1000);
 
       const result = await store.save({
-        pk: "short",
-        sk: longSk,
+        key: "short",
+        sortKey: longSk,
         type: "private",
         ttl: 3600,
         data: {},
@@ -161,8 +161,8 @@ describe("Boundary Conditions", () => {
     it("should handle Estonian characters (õ, ä, ö, ü)", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "töötaja-ülesanne",
-        sk: "öösäälane-õppetöö",
+        key: "töötaja-ülesanne",
+        sortKey: "öösäälane-õppetöö",
         type: "public",
         ttl: 3600,
         data: { eestiKeel: "Tere päevast! Õhtu on käes." },
@@ -184,8 +184,8 @@ describe("Boundary Conditions", () => {
     it("should handle unicode in pk", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "用户-日本語-émojis-🎉",
-        sk: "data",
+        key: "用户-日本語-émojis-🎉",
+        sortKey: "data",
         type: "public",
         ttl: 3600,
         data: { unicode: true },
@@ -204,8 +204,8 @@ describe("Boundary Conditions", () => {
     it("should handle unicode in sk", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "entity",
-        sk: "Привет-мир-🌍",
+        key: "entity",
+        sortKey: "Привет-мир-🌍",
         type: "private",
         ttl: 3600,
         data: {},
@@ -217,8 +217,8 @@ describe("Boundary Conditions", () => {
     it("should handle unicode in data", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "entity",
-        sk: "data",
+        key: "entity",
+        sortKey: "data",
         type: "public",
         ttl: 3600,
         data: {
@@ -238,8 +238,8 @@ describe("Boundary Conditions", () => {
   describe("TTL boundary conditions", () => {
     it("should accept TTL of 1 second", () => {
       const result = validateStoreRequest({
-        pk: "test",
-        sk: "test",
+        key: "test",
+        sortKey: "test",
         type: "public",
         ttl: 1,
       });
@@ -249,8 +249,8 @@ describe("Boundary Conditions", () => {
 
     it("should accept TTL at exactly max limit", () => {
       const result = validateStoreRequest({
-        pk: "test",
-        sk: "test",
+        key: "test",
+        sortKey: "test",
         type: "public",
         ttl: 31536000, // exactly 1 year
       });
@@ -260,8 +260,8 @@ describe("Boundary Conditions", () => {
 
     it("should reject negative TTL", () => {
       const result = validateStoreRequest({
-        pk: "test",
-        sk: "test",
+        key: "test",
+        sortKey: "test",
         type: "public",
         ttl: -1,
       });
@@ -271,8 +271,8 @@ describe("Boundary Conditions", () => {
 
     it("should reject TTL just over max limit", () => {
       const result = validateStoreRequest({
-        pk: "test",
-        sk: "test",
+        key: "test",
+        sortKey: "test",
         type: "public",
         ttl: 31536001, // 1 year + 1 second
       });
@@ -342,8 +342,8 @@ describe("Boundary Conditions", () => {
     it("should handle null values in data object", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "test",
-        sk: "nulls",
+        key: "test",
+        sortKey: "nulls",
         type: "public",
         ttl: 3600,
         data: { nullField: null, valid: "value" },
@@ -365,8 +365,8 @@ describe("Boundary Conditions", () => {
       };
 
       const result = await store.save({
-        pk: "test",
-        sk: "nested",
+        key: "test",
+        sortKey: "nested",
         type: "public",
         ttl: 3600,
         data: nestedData,
@@ -381,8 +381,8 @@ describe("Boundary Conditions", () => {
     it("should handle arrays in data", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "test",
-        sk: "arrays",
+        key: "test",
+        sortKey: "arrays",
         type: "public",
         ttl: 3600,
         data: {
@@ -398,8 +398,8 @@ describe("Boundary Conditions", () => {
     it("should handle empty data object", async () => {
       const store = new Store(db, context);
       const result = await store.save({
-        pk: "test",
-        sk: "empty",
+        key: "test",
+        sortKey: "empty",
         type: "public",
         ttl: 3600,
         data: {},

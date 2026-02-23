@@ -38,8 +38,8 @@ describe("Data Types Access Control", () => {
     it("owner can save private item", async () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
-        pk: "my-data",
-        sk: "key1",
+        key: "my-data",
+        sortKey: "key1",
         type: "private",
         ttl: 3600,
         data: { secret: "value" },
@@ -50,8 +50,8 @@ describe("Data Types Access Control", () => {
     it("owner can read own private item", async () => {
       const store = new Store(db, ownerContext);
       await store.save({
-        pk: "my-data",
-        sk: "key1",
+        key: "my-data",
+        sortKey: "key1",
         type: "private",
         ttl: 3600,
         data: { secret: "value" },
@@ -65,8 +65,8 @@ describe("Data Types Access Control", () => {
     it("other user cannot read private item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "my-data",
-        sk: "key1",
+        key: "my-data",
+        sortKey: "key1",
         type: "private",
         ttl: 3600,
         data: { secret: "value" },
@@ -80,8 +80,8 @@ describe("Data Types Access Control", () => {
     it("owner can delete own private item", async () => {
       const store = new Store(db, ownerContext);
       await store.save({
-        pk: "my-data",
-        sk: "key1",
+        key: "my-data",
+        sortKey: "key1",
         type: "private",
         ttl: 3600,
         data: {},
@@ -94,15 +94,15 @@ describe("Data Types Access Control", () => {
     it("owner can query own private items", async () => {
       const store = new Store(db, ownerContext);
       await store.save({
-        pk: "settings",
-        sk: "theme",
+        key: "settings",
+        sortKey: "theme",
         type: "private",
         ttl: 3600,
         data: {},
       });
       await store.save({
-        pk: "settings",
-        sk: "lang",
+        key: "settings",
+        sortKey: "lang",
         type: "private",
         ttl: 3600,
         data: {},
@@ -118,8 +118,8 @@ describe("Data Types Access Control", () => {
     it("owner can save unlisted item", async () => {
       const store = new Store(db, ownerContext);
       const result = await store.save({
-        pk: "shared-doc",
-        sk: "doc1",
+        key: "shared-doc",
+        sortKey: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -130,8 +130,8 @@ describe("Data Types Access Control", () => {
     it("owner can read unlisted item", async () => {
       const store = new Store(db, ownerContext);
       await store.save({
-        pk: "shared-doc",
-        sk: "doc1",
+        key: "shared-doc",
+        sortKey: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -148,8 +148,8 @@ describe("Data Types Access Control", () => {
     it("other user can read unlisted item with exact key", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "shared-doc",
-        sk: "doc1",
+        key: "shared-doc",
+        sortKey: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -168,8 +168,8 @@ describe("Data Types Access Control", () => {
     it("other user cannot modify unlisted item", async () => {
       const ownerStore = new Store(db, ownerContext);
       await ownerStore.save({
-        pk: "shared-doc",
-        sk: "doc1",
+        key: "shared-doc",
+        sortKey: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: { content: "hello" },
@@ -188,8 +188,8 @@ describe("Data Types Access Control", () => {
     it("owner can delete unlisted item", async () => {
       const store = new Store(db, ownerContext);
       await store.save({
-        pk: "shared-doc",
-        sk: "doc1",
+        key: "shared-doc",
+        sortKey: "doc1",
         type: "unlisted" as DataType,
         ttl: 3600,
         data: {},
