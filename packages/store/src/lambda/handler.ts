@@ -105,6 +105,8 @@ function createStore(userId: string): Store {
   return new Store(adapterManager.get(), createContext(userId));
 }
 
+const MAX_BODY_SIZE = 400_000;
+
 type RouteHandler = (event: APIGatewayProxyEvent, store: Store) => Promise<APIGatewayProxyResult>;
 
 const routes: { method: string; path: string; handler: RouteHandler }[] = [
@@ -135,6 +137,16 @@ function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
 export async function handler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
+  if (event.resource === "/health" && event.httpMethod === "GET") {
+    return createResponse(HTTP_STATUS.OK, { status: "ok" });
+  }
+
+  if (event.body && event.body.length > MAX_BODY_SIZE) {
+    return createResponse(HTTP_STATUS.BAD_REQUEST, {
+      error: `Request body too large (max ${MAX_BODY_SIZE} bytes)`,
+    });
+  }
+
   const userId = getUserId(event);
 
   // Allow unauthenticated GET requests for shared data

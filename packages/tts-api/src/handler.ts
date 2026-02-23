@@ -3,7 +3,7 @@
 
 import { createHash } from "crypto";
 
-import { logger, extractErrorMessage } from "@hak/shared";
+import { logger, extractErrorMessage, loadVersion } from "@hak/shared";
 import {
   createResponse,
   createBadRequest,
@@ -20,18 +20,6 @@ import {
   type SynthesizeRequest,
 } from "./schemas";
 
-// Read version from package.json (same pattern as vabamorf-api)
-function loadVersion(): string {
-  try {
-    return require("./package.json").version;
-  } catch {
-    try {
-      return require("../package.json").version;
-    } catch {
-      return "0.0.0";
-    }
-  }
-}
 export const VERSION = loadVersion();
 
 export type { SynthesizeRequest } from "./schemas";

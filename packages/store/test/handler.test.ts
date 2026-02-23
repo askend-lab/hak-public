@@ -51,6 +51,25 @@ describe("Lambda Handler", () => {
     });
   });
 
+  describe("health endpoint", () => {
+    it("should return 200 with status ok", async () => {
+      const event = createGetEvent("/health", null);
+      const result = await handler(event);
+      expect(result.statusCode).toBe(200);
+      expect(JSON.parse(result.body)).toStrictEqual({ status: "ok" });
+    });
+  });
+
+  describe("body size limit", () => {
+    it("should return 400 for oversized body", async () => {
+      const largeBody = "x".repeat(400_001);
+      const event = createPostEvent("/save", largeBody);
+      const result = await handler(event);
+      expect(result.statusCode).toBe(400);
+      expect(JSON.parse(result.body).error).toMatch(/too large/);
+    });
+  });
+
   describe("routing", () => {
     it("should return 404 for unknown path", async () => {
       const event = createEvent({ path: "/unknown" });

@@ -102,6 +102,10 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: !Ref ApiGatewayAuthorizer
+      - http:
+          path: /health
+          method: get
+          cors: true
 
 resources:
   Resources:

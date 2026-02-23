@@ -70,7 +70,6 @@ provider:
             - cognito-idp:AdminUpdateUserAttributes
             - cognito-idp:AdminInitiateAuth
             - cognito-idp:AdminRespondToAuthChallenge
-            - cognito-idp:AdminSetUserPassword
             - cognito-idp:ListUsers
           Resource:
             - !Sub arn:aws:cognito-idp:${self:provider.region}:${AWS::AccountId}:userpool/${ssm:/hak/${self:provider.stage}/cognito-user-pool-id}
@@ -112,6 +111,14 @@ functions:
       - http:
           path: /tara/refresh
           method: options
+          cors: true
+
+  health:
+    handler: src/handler.healthHandler
+    events:
+      - http:
+          path: /tara/health
+          method: get
           cors: true
 
   tokenExchange:

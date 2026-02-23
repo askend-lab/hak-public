@@ -149,11 +149,12 @@ While most are justified with descriptions, the count is high. Notable: `max-sta
 
 ## Recommended Priority Order
 
-1. **SEC-1** — Remove unused `AdminSetUserPassword` IAM permission (1 line)
-2. **DUP-1** — Extract shared audio playback hook (saves ~200 lines)
+1. ✅ **SEC-1** — Remove unused `AdminSetUserPassword` IAM permission — **PR #679**
+2. **DUP-1** — Extract shared audio playback hook (saves ~200 lines) — DEFERRED (larger frontend refactor)
 3. **FE-1** — Add error feedback for audio playback failures
-4. **ARCH-1** — Freeze CORS_HEADERS object
+4. ✅ **ARCH-1** — Freeze CORS_HEADERS object — **PR #679**
 5. **SEC-3 + TEST-G1** — Add logging to silent frontend catches
-6. **DUP-2** — Extract shared `loadVersion()` utility
-7. **ARCH-3** — Add input validation to store route parameters
-8. **INFRA-1** — Add health check endpoints to store and auth
+6. ✅ **DUP-2** — Extract shared `loadVersion()` utility — **PR #679**
+7. ✅ **ARCH-3** — Already implemented (false positive: store validation.ts has key length, charset, data size checks)
+8. ✅ **INFRA-1** — Add health check endpoints to store and auth — **PR #679**
+9. ✅ **INFRA-2** — Add request body size limit to store Lambda (400KB) — **PR #679**

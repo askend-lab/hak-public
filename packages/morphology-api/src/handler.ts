@@ -3,7 +3,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { extractStressedText, extractVariants } from "./parser";
-import { logger, extractErrorMessage } from "./logger";
+import { logger, extractErrorMessage, loadVersion } from "./logger";
 import { LambdaResponse } from "./types";
 import { createResponse, parseJsonBody, HTTP_STATUS } from "./validation";
 import { analyze, isInitialized, initVmetajson } from "./vmetajson";
@@ -19,18 +19,6 @@ function ensureInitialized(): void {
   if (!isInitialized()) {initVmetajson(VMETAJSON_PATH, DICT_PATH);}
 }
 
-// Docker: both files in /var/task/, Dev: package.json is one level up from src/
-function loadVersion(): string {
-  try {
-    return require("./package.json").version;
-  } catch {
-    try {
-      return require("../package.json").version;
-    } catch {
-      return "0.0.0";
-    }
-  }
-}
 const version = loadVersion();
 
 const ERRORS = {
