@@ -1,74 +1,40 @@
-# Securing Public API Endpoints — Request for Client Discussion
+# Auth for public endpoints — message to team
 
-**From:** Alex (Development Team Lead)
-**To:** [Project Manager], [Architect]
-**Date:** 2026-02-23
-**Subject:** Proposal to add authentication to speech synthesis and morphological analysis endpoints
+Hey guys,
 
----
+I want to bring up something we need to discuss with the client.
 
-## The Problem
+Right now our speech synthesis and morphology endpoints are completely open — no auth, anyone on the internet can hit them. And here's the catch: **we can't turn on auto-scaling** in this setup. If we do, we're basically competing with every bot on the internet using our project budget. That's not a fight we win.
 
-Our speech synthesis and morphological analysis API endpoints are currently open to the entire internet without any authentication. This creates a real and immediate vulnerability:
+So auto-scaling is off. Which means the system is really easy to overwhelm — two laptops and a curl script is literally all it takes to fill the queue and make the service unavailable for real users.
 
-**Auto-scaling is disabled.** We cannot enable it because without knowing who is making requests, auto-scaling means competing with the entire internet using our project budget. A bot swarm would trigger scaling, and we would pay for it.
+We do have WAF rate limits, geo-blocking, queue caps — but those are all just speed bumps. They slow an attacker down, they don't stop them. And the fundamental problem is: **we can't tell a real user from an attacker.** Every limit we set also hits legitimate users.
 
-**Without auto-scaling, the system is trivially easy to overwhelm.** Two laptops running a simple curl script are enough to flood the request queue and make the service unavailable for real users. Normal users would see timeouts and errors while the queue processes attacker traffic.
+**The fix is simple:** put all the generative endpoints behind login.
 
-We have protective measures in place — WAF rate limiting (20 requests per 5 minutes per IP for synthesis), geo-blocking (restricted to Baltic/Nordic countries), and a queue depth cap (503 when queue exceeds 50 messages). These slow down an attacker but do not stop them. An attacker with 10 proxy IPs in allowed countries can send 2,400 synthesis requests per hour. Our protections are damage limitation, not access control.
+The good news — everything is already built:
+- TARA and Google login — working
+- JWT tokens with auto-refresh — working
+- API Gateway authorizer — already used by SimpleStore
+- The frontend already sends the auth token for synthesis — the backend just ignores it
 
-**The core issue:** we cannot distinguish a legitimate user from an attacker. Every defensive measure we add is a blunt instrument that also affects real users.
+Impact on users is minimal. They log in once via TARA or Google, and the session can last months with auto-refresh. Teachers and students already log in to work with lessons — this just extends the same model.
 
----
+**What this gives us:**
+- We can **safely turn on auto-scaling** — because we know the load is from real users
+- We can set **per-user rate limits** natively in API Gateway — one user's heavy usage doesn't affect others
+- System **availability actually goes up** — we handle peak loads instead of returning errors
+- Budget is protected — creating a bot account requires a real eID or real Google account, that's a completely different class of attack than anonymous curl
+- Full monitoring — every request tied to a user, can disable specific abusers
 
-## The Solution
+**In short: auth doesn't restrict the system, it lets us actually run it properly.**
 
-Hide all generative endpoints (`/synthesize`, `/status`, `/analyze`, `/variants`) behind authentication via the existing AWS Cognito infrastructure.
+Can we set up a call with the client to discuss this? I have a full technical proposal ready with threat scenarios, cost numbers, and implementation steps if needed.
 
-**This is not new development.** The authentication system is already fully built and operational:
-- TARA login (Estonian eID: ID-card, Mobile-ID, Smart-ID) — working
-- Google social login — working
-- JWT tokens with automatic refresh — working
-- API Gateway authorizer — working (already used by the data storage service)
+I think this should happen soon — the longer we run without auth on these endpoints, the higher the risk of someone flooding the service or burning through the budget.
 
-The frontend already sends the authentication token with synthesis requests — the backend simply ignores it today.
-
----
-
-## Impact on Users
-
-**Minimal.** Users log in once — via TARA or Google — and the system remembers them. The session token refreshes automatically; a user may not need to log in again for months.
-
-Teachers and students already log in to create and access lessons. Adding authentication to speech synthesis extends the existing model — it is not a new requirement for the user.
+Alex
 
 ---
 
-## What This Enables
-
-Once we know who is making requests:
-
-1. **We can enable auto-scaling.** Load from authenticated users is predictable and traceable. Scaling up during peak usage becomes safe — we are serving real users, not bots.
-
-2. **We can set per-user rate limits.** API Gateway supports this natively with JWT identity. One user's heavy usage does not degrade service for others.
-
-3. **System availability increases.** With auto-scaling enabled and per-user isolation, the system handles peak loads gracefully instead of returning 503 errors.
-
-4. **Budget is protected.** Bot account creation requires a real Estonian eID or a real Google account — this is a fundamentally different class of attack than sending anonymous HTTP requests. The attack surface shrinks from "anyone with curl" to "someone with a verified identity."
-
-5. **We can monitor and act.** Every request is attributed to a user. Abuse is detectable, and a specific user can be disabled without affecting anyone else.
-
-**In short: adding authentication does not restrict the system — it makes it possible to run it reliably.**
-
----
-
-## Request
-
-I would like us to discuss this with the client. The technical proposal with full details, threat calculations, and implementation steps is prepared (see `PROPOSAL-Auth-Public-Endpoints.md`).
-
-The scope of backend changes is small. The main question is the client's agreement to require login for speech synthesis functionality.
-
-I believe this conversation should happen soon — the current configuration is a known vulnerability, and the longer we operate without authentication on these endpoints, the higher the risk of a service disruption or budget incident.
-
----
-
-*Supporting document: `internal/PROPOSAL-Auth-Public-Endpoints.md` — full technical proposal with threat scenarios, cost calculations, implementation details, and checklist of alternative measures.*
+*Full technical details: `internal/PROPOSAL-Auth-Public-Endpoints.md`*
