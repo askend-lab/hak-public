@@ -5,6 +5,7 @@ import {
   CreateAuthChallengeTriggerEvent,
   VerifyAuthChallengeResponseTriggerEvent,
 } from 'aws-lambda';
+import { logger } from '@hak/shared';
 import { TARA_VERIFIED, CUSTOM_CHALLENGE, TARA_AUTH_METADATA } from './types';
 
 export async function handleDefineAuthChallenge(
@@ -17,6 +18,7 @@ export async function handleDefineAuthChallenge(
     event.response.challengeName = CUSTOM_CHALLENGE;
     event.response.issueTokens = false;
     event.response.failAuthentication = false;
+    logger.debug('DefineAuthChallenge: issuing first challenge');
   } else {
     const lastChallenge = session[session.length - 1];
     
@@ -24,10 +26,12 @@ export async function handleDefineAuthChallenge(
       // Challenge passed - issue tokens
       event.response.issueTokens = true;
       event.response.failAuthentication = false;
+      logger.debug('DefineAuthChallenge: challenge passed, issuing tokens');
     } else {
       // Challenge failed
       event.response.issueTokens = false;
       event.response.failAuthentication = true;
+      logger.warn('DefineAuthChallenge: challenge failed');
     }
   }
 
@@ -51,6 +55,7 @@ export async function handleVerifyAuthChallengeResponse(
 ): Promise<VerifyAuthChallengeResponseTriggerEvent> {
   // TARA Lambda sends 'TARA_VERIFIED' as challenge answer after successful TARA authentication
   event.response.answerCorrect = event.request.challengeAnswer === TARA_VERIFIED;
+  logger.debug('VerifyAuthChallenge: answer correct =', event.response.answerCorrect);
 
   return event;
 }
@@ -69,6 +74,7 @@ export const handler = async (
     case 'VerifyAuthChallengeResponse_Authentication':
       return handleVerifyAuthChallengeResponse(event);
     default:
+      logger.error('Unknown Cognito trigger source', triggerSource);
       throw new Error(`Unknown trigger source: ${triggerSource}`);
   }
 };

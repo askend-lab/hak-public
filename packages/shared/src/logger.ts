@@ -4,7 +4,14 @@
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
 export type LogMethod = (message: string, ...args: unknown[]) => void;
-export type Logger = Record<LogLevel, LogMethod>;
+
+export interface LogContext {
+  [key: string]: unknown;
+}
+
+export interface Logger extends Record<LogLevel, LogMethod> {
+  withContext(fields: LogContext): Logger;
+}
 
 const LOG_LEVELS: Record<LogLevel, number> = {
   debug: 0,
@@ -15,6 +22,7 @@ const LOG_LEVELS: Record<LogLevel, number> = {
 
 const DEFAULT_LEVEL: LogLevel = "info";
 const LOG_LEVEL_ENV = "LOG_LEVEL";
+const LAMBDA_ENV = "AWS_LAMBDA_FUNCTION_NAME";
 
 // Derived once — avoids repeated Object.keys cast
 const LOG_LEVEL_KEYS = Object.keys(LOG_LEVELS) as LogLevel[];
@@ -26,33 +34,86 @@ const LEVEL_TAGS = Object.fromEntries(
 // Shared no-op — one instance for all filtered-out log methods
 const NO_OP: LogMethod = (): void => {};
 
-function formatMessage(level: LogLevel, message: string): string {
+function isNodeEnv(): boolean {
+  // eslint-disable-next-line no-restricted-globals -- env detection needs process global
+  return typeof process !== "undefined";
+}
+
+function isLambdaEnv(): boolean {
+  try {
+    // eslint-disable-next-line no-restricted-globals -- env detection needs process global
+    return isNodeEnv() && !!process.env?.[LAMBDA_ENV];
+  } catch {
+    return false;
+  }
+}
+
+function formatPlainText(level: LogLevel, message: string): string {
   return `[${new Date().toISOString()}] ${LEVEL_TAGS[level]} ${message}`;
 }
 
-function createLogMethod(level: LogLevel, minLevel: LogLevel): LogMethod {
+function formatJson(
+  level: LogLevel,
+  message: string,
+  context: LogContext,
+  args: unknown[],
+): string {
+  const entry: Record<string, unknown> = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    ...context,
+  };
+  if (args.length > 0) {
+    entry.data = args.length === 1 ? args[0] : args;
+  }
+  return JSON.stringify(entry);
+}
+
+function createLogMethod(
+  level: LogLevel,
+  minLevel: LogLevel,
+  context: LogContext,
+  json: boolean,
+): LogMethod {
   if (LOG_LEVELS[level] < LOG_LEVELS[minLevel]) {
     return NO_OP;
   }
   const consoleFn = console[level].bind(console); // eslint-disable-line no-console -- logger implementation binds to console
+  if (json) {
+    return (message: string, ...args: unknown[]): void => {
+      consoleFn(formatJson(level, message, context, args));
+    };
+  }
+  if (Object.keys(context).length > 0) {
+    return (message: string, ...args: unknown[]): void => {
+      consoleFn(formatPlainText(level, message), context, ...args);
+    };
+  }
   return (message: string, ...args: unknown[]): void => {
-    consoleFn(formatMessage(level, message), ...args);
+    consoleFn(formatPlainText(level, message), ...args);
   };
 }
 
-export function createLogger(minLevel: LogLevel = DEFAULT_LEVEL): Logger {
-  return Object.fromEntries(
-    LOG_LEVEL_KEYS.map((level) => [level, createLogMethod(level, minLevel)]),
-  ) as Logger;
+export function createLogger(
+  minLevel: LogLevel = DEFAULT_LEVEL,
+  context: LogContext = {},
+): Logger {
+  const json = isLambdaEnv();
+  const methods = Object.fromEntries(
+    LOG_LEVEL_KEYS.map((level) => [level, createLogMethod(level, minLevel, context, json)]),
+  ) as Record<LogLevel, LogMethod>;
+
+  return {
+    ...methods,
+    withContext(fields: LogContext): Logger {
+      return createLogger(minLevel, { ...context, ...fields });
+    },
+  };
 }
 
 function isValidLogLevel(level: string): level is LogLevel {
   return level in LOG_LEVELS;
-}
-
-function isNodeEnv(): boolean {
-  // eslint-disable-next-line no-restricted-globals -- env detection needs process global
-  return typeof process !== "undefined";
 }
 
 function getLogLevel(): LogLevel {

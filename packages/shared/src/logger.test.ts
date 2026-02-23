@@ -103,6 +103,118 @@ describe("logger", () => {
     });
   });
 
+  describe("withContext", () => {
+    it("returns a new logger that includes context fields in plain text mode", () => {
+      const log = createLogger("info").withContext({ requestId: "req-123" });
+      log.info("test");
+      expect(mockConsole.info).toHaveBeenCalledWith(
+        expect.stringContaining("[INFO] test"),
+        expect.objectContaining({ requestId: "req-123" }),
+      );
+    });
+
+    it("merges context fields from multiple withContext calls", () => {
+      const log = createLogger("info")
+        .withContext({ requestId: "req-1" })
+        .withContext({ userId: "user-1" });
+      log.info("test");
+      expect(mockConsole.info).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ requestId: "req-1", userId: "user-1" }),
+      );
+    });
+
+    it("preserves log level filtering", () => {
+      const log = createLogger("warn").withContext({ pkg: "test" });
+      log.info("should-not-appear");
+      log.warn("should-appear");
+      expect(mockConsole.info).not.toHaveBeenCalled();
+      expect(mockConsole.warn).toHaveBeenCalled();
+    });
+
+    it("does not mutate the parent logger", () => {
+      const parent = createLogger("info");
+      parent.withContext({ extra: true });
+      parent.info("parent-test");
+      // Parent should not include context — only 1 arg (the formatted string)
+      expect(mockConsole.info).toHaveBeenCalledWith(
+        expect.stringContaining("[INFO] parent-test"),
+      );
+    });
+  });
+
+  describe("JSON output in Lambda environment", () => {
+    const originalLambda = process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+    afterEach(() => {
+      if (originalLambda === undefined) {
+        delete process.env.AWS_LAMBDA_FUNCTION_NAME;
+      } else {
+        process.env.AWS_LAMBDA_FUNCTION_NAME = originalLambda;
+      }
+      vi.resetModules();
+    });
+
+    it("outputs JSON when AWS_LAMBDA_FUNCTION_NAME is set", async () => {
+      process.env.AWS_LAMBDA_FUNCTION_NAME = "my-function";
+      vi.resetModules();
+      const mod = await import("./logger");
+      const log = mod.createLogger("info");
+      log.info("json-test");
+
+      const output = mockConsole.info.mock.calls[0]?.[0] as string;
+      const parsed = JSON.parse(output);
+      expect(parsed).toMatchObject({
+        level: "info",
+        message: "json-test",
+      });
+      expect(parsed.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    });
+
+    it("includes context fields in JSON output", async () => {
+      process.env.AWS_LAMBDA_FUNCTION_NAME = "my-function";
+      vi.resetModules();
+      const mod = await import("./logger");
+      const log = mod.createLogger("info").withContext({ requestId: "req-abc" });
+      log.info("ctx-test");
+
+      const parsed = JSON.parse(mockConsole.info.mock.calls[0]?.[0] as string);
+      expect(parsed).toMatchObject({
+        level: "info",
+        message: "ctx-test",
+        requestId: "req-abc",
+      });
+    });
+
+    it("includes extra args as data field in JSON output", async () => {
+      process.env.AWS_LAMBDA_FUNCTION_NAME = "my-function";
+      vi.resetModules();
+      const mod = await import("./logger");
+      const log = mod.createLogger("info");
+      log.error("fail", "extra-detail");
+
+      const parsed = JSON.parse(mockConsole.error.mock.calls[0]?.[0] as string);
+      expect(parsed).toMatchObject({
+        level: "error",
+        message: "fail",
+        data: "extra-detail",
+      });
+    });
+
+    it("outputs plain text when AWS_LAMBDA_FUNCTION_NAME is not set", async () => {
+      delete process.env.AWS_LAMBDA_FUNCTION_NAME;
+      vi.resetModules();
+      const mod = await import("./logger");
+      const log = mod.createLogger("info");
+      log.info("plain-test");
+
+      const output = mockConsole.info.mock.calls[0]?.[0] as string;
+      expect(output).toContain("[INFO] plain-test");
+      // Should NOT be valid JSON
+      expect(() => JSON.parse(output)).toThrow();
+    });
+  });
+
   describe("LOG_LEVEL env detection", () => {
     const originalLogLevel = process.env.LOG_LEVEL;
 
