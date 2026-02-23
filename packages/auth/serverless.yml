@@ -41,6 +41,7 @@ provider:
   runtime: nodejs22.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
+  timeout: 15
   logRetentionInDays: 30
   environment:
     TARA_ISSUER: ${self:custom.taraConfig.${self:provider.stage}.issuer}
