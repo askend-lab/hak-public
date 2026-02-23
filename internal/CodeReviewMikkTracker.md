@@ -351,15 +351,15 @@ Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
 
 - ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-1** (CRITICAL) Upgrade `shared/src/logger.ts` — output JSON in Lambda/production, plain text in dev/browser. Fields: `timestamp`, `level`, `message`, `package`. **How:** detect `AWS_LAMBDA_FUNCTION_NAME` env var → switch to JSON format. **PR #674**
 - ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-2** (CRITICAL) Add `withContext(fields)` method to logger — returns child logger that includes metadata (requestId, userId, package) in every log line. **How:** extend `createLogger` to accept default fields. **PR #674**
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-3** (HIGH) Add request correlation — pass `event.requestContext.requestId` into logger context in every Lambda handler (auth, store, tts-api, morphology-api). **How:** `const log = logger.withContext({ requestId: event.requestContext.requestId })`.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-3** (HIGH) Add request correlation — pass `event.requestContext.requestId` into logger context in every Lambda handler (auth, store, tts-api, morphology-api). **How:** `const log = logger.withContext({ requestId: event.requestContext.requestId })`. **PR #675**
 
 ### Phase 2: Add Logging to Silent Handlers
 
 - ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-4** (CRITICAL) Add logging to tts-api — currently ZERO logging across 9 source files. Add info-level to `synthesize()` (cache hit/miss, queue send, validation fail) and `status()`. **How:** import logger, add ~8 log calls. **PR #674**
 - ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-5** (HIGH) Fix store handler silent error swallowing — `handler.ts:162` has bare `catch {}` returning 500 without logging. **How:** add `logger.error()` with error details in catch block. **PR #674**
 - ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-6** (HIGH) Add logging to auth Cognito triggers — `cognito-triggers.ts` has zero logging for security-critical challenge flow. **How:** add debug-level logging for challenge state transitions. **PR #674**
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-7** (MEDIUM) Add logging to store routes — `routes.ts` handles save/get/delete/query with no logging. **How:** add info-level for operations, error-level for failures.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LOG-8** (MEDIUM) Add logging to auth supporting modules — `tara-client.ts`, `cognito-client.ts`, `cookies.ts` have zero logging. **How:** add error + debug level for OIDC exchange, Cognito calls, cookie operations.
+- ✅ Accept  [⚠️] Deferred  [ ] Closed — **LOG-7** (MEDIUM) Add logging to store routes — `routes.ts` handles save/get/delete/query with no logging. **Blocked:** store handler tests have pre-existing ESM transform issue; adding lines drops coverage below 95%.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LOG-8** (MEDIUM) Add logging to auth supporting modules — `tara-client.ts`, `cognito-client.ts`, `cookies.ts` have zero logging. **How:** add error + debug level for OIDC exchange, Cognito calls, cookie operations. **PR #675**
 
 ### Phase 3: Infrastructure & Observability
 
@@ -377,12 +377,12 @@ Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
 
 | Metric | Current | Target |
 |--------|---------|--------|
-| Backend files with logging | 6/32 → 9/32 (28%) | 20+/32 (60%+) |
+| Backend files with logging | 6/32 → 11/32 (34%) | 20+/32 (60%+) |
 | Structured/JSON logging | ✅ Lambda JSON | ✅ All Lambda |
-| Request correlation | withContext() ready | ✅ All Lambda |
+| Request correlation | ✅ All Lambda handlers | ✅ All Lambda |
 | Log retention configured | ✅ 30 days (all 4) | ✅ 30 days |
-| Error-only calls | 12/21 (57%) | <50% |
-| Info-level calls | 4 | 15+ |
+| Error-only calls | 16/27 (59%) | <50% |
+| Info-level calls | 5 | 15+ |
 | Debug-level calls | 5 | 10+ |
 
 ---
