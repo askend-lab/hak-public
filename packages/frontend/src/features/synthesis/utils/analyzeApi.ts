@@ -32,7 +32,7 @@ export function postJSON(
   });
 }
 
-export interface AnalyzeResponse {
+interface AnalyzeResponse {
   stressedText: string;
 }
 
