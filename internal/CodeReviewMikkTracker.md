@@ -388,6 +388,36 @@ Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
 
 ---
 
+## Error Handling Audit (2026-02-23)
+
+Ref: `internal/ERROR-HANDLING-ANALYSIS.md` | Analysis of all backend packages + frontend service layer
+
+**Current state:** 8 different error handling patterns across 4 backend packages. 3 variants of error message extraction. 2 silent error swallowing locations. No custom error hierarchy. No unified handler wrapper.
+
+### Quick Wins
+
+- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-1** (HIGH) Use `extractErrorMessage()` everywhere — 3 different variants of error extraction exist. Shared already has `extractErrorMessage()` but it's only used in 1 place. **How:** replace all `error instanceof Error ? error.message : String(error)` and `UNKNOWN_ERROR` patterns.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-4** (HIGH) Fix silent catches in cognito-client — `findUserByPersonalCode` and `findUserByEmail` silently swallow ALL errors including network/permission/throttling. **How:** add `logger.warn()` in catch blocks.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-5** (MEDIUM) Fix error re-wrapping in cognito-client — `throw new Error(\`Token generation failed: ${error}\`)` loses original stack trace. **How:** use `{ cause: error }` option.
+
+### Structural Improvements
+
+- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-2** (MEDIUM) Add `AppError` base class to shared — with `code`, `statusCode`, `isOperational` fields. Subclasses: `ValidationError(400)`, `NotFoundError(404)`, `AuthError(401)`, `ExternalServiceError(502)`.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-6** (MEDIUM) Migrate morphology-api to shared response utilities — currently duplicates `HTTP_STATUS`, `createResponse()`, `LambdaResponse` locally instead of importing from `@hak/shared`.
+- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-3** (LARGER) Create `wrapLambdaHandler()` in shared — higher-order function that standardizes try/catch, logging, and error responses for all Lambda handlers. Requires updating all 4 packages.
+
+### Statistics
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Error extraction variants | 3 | 1 (`extractErrorMessage`) |
+| Silent error swallowing | 2 locations | 0 |
+| Custom error classes | 2 (`VersionConflictError`, `QueueFullError`) | 5+ (hierarchy) |
+| Packages using shared response utils | 2/4 | 4/4 |
+| Handler wrapper pattern | 0/4 packages | 4/4 packages |
+
+---
+
 ### Testing & Verification (Penetration Tests)
 
 - ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/`. **Verifies:** PUB-9 WAF rate limit.
