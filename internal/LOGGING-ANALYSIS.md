@@ -148,6 +148,46 @@ Frontend uses `logger` from `@hak/shared` in 29+ source files. Primarily error-l
 
 ---
 
+## CloudWatch Logs Insights Queries
+
+### Error Analysis (last 24h)
+```
+fields @timestamp, level, message, handler, requestId, @logStream
+| filter level = "error"
+| sort @timestamp desc
+| limit 50
+```
+
+### Request Tracing (by requestId)
+```
+fields @timestamp, level, message, handler
+| filter requestId = "REQUEST_ID_HERE"
+| sort @timestamp asc
+```
+
+### TTS Synthesis Flow (by cacheKey)
+```
+fields @timestamp, level, message, handler, cacheKey, voice
+| filter cacheKey = "CACHE_KEY_HERE"
+| sort @timestamp asc
+```
+
+### Error Rate by Handler (last 1h)
+```
+fields handler
+| filter level = "error"
+| stats count(*) as errors by handler
+| sort errors desc
+```
+
+### Auth Flow Monitoring
+```
+fields @timestamp, level, message, handler
+| filter handler like /Handler/
+| sort @timestamp desc
+| limit 100
+```
+
 ## Statistics
 
 | Metric | Value |
