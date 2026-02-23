@@ -19,6 +19,7 @@ const MAX_KEY_LENGTH = 1024;
 const KEY_DELIMITER = DEFAULT_CONFIG.keyDelimiter;
 const VALID_TYPES_SET = new Set<string>(VALID_DATA_TYPES);
 const VALID_TYPES_MESSAGE = `type must be one of: ${VALID_DATA_TYPES.join(", ")}`;
+const CONTROL_CHAR_REGEX = /[\x00-\x1f\x7f]/;
 
 /**
  * Creates a validation result
@@ -58,8 +59,15 @@ function validateKeyString(
   maxLength = MAX_KEY_LENGTH,
 ): void {
   validateRequiredString(value, name, errors, maxLength);
-  if (typeof value === "string" && value.includes(KEY_DELIMITER)) {
+  if (typeof value !== "string") {return;}
+  if (value !== value.trim()) {
+    errors.push(`${name} must not have leading or trailing whitespace`);
+  }
+  if (value.includes(KEY_DELIMITER)) {
     errors.push(`${name} must not contain the delimiter character '${KEY_DELIMITER}'`);
+  }
+  if (CONTROL_CHAR_REGEX.test(value)) {
+    errors.push(`${name} must not contain control characters`);
   }
 }
 
@@ -127,8 +135,8 @@ export function validateStoreRequest(
       }
     }
 
-    if (request.data !== undefined && typeof request.data !== "object") {
-      errors.push("data must be an object");
+    if (request.data !== undefined && (request.data === null || typeof request.data !== "object" || Array.isArray(request.data))) {
+      errors.push("data must be a plain object");
     } else if (request.data !== undefined) {
       const dataSize = JSON.stringify(request.data).length;
       if (dataSize > config.maxDataSizeBytes) {
@@ -165,6 +173,16 @@ export function validateQueryRequest(
       errors.push("prefix is required");
     } else if (typeof pkPrefix !== "string") {
       errors.push("prefix must be a string");
+    } else {
+      if (pkPrefix.length > MAX_KEY_LENGTH) {
+        errors.push(`prefix exceeds maximum length of ${MAX_KEY_LENGTH} characters`);
+      }
+      if (pkPrefix.includes(KEY_DELIMITER)) {
+        errors.push(`prefix must not contain the delimiter character '${KEY_DELIMITER}'`);
+      }
+      if (CONTROL_CHAR_REGEX.test(pkPrefix)) {
+        errors.push("prefix must not contain control characters");
+      }
     }
     validateType(type, errors);
   });

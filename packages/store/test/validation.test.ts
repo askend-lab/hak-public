@@ -31,7 +31,7 @@ describe("Validation", () => {
       ["invalid type", { key: "entity1", id: "sort1", type: "invalid", ttl: 3600 }, "type must be one of"],
       ["negative ttl", { key: "entity1", id: "sort1", type: "private", ttl: -1 }, "TTL must be 0"],
       ["ttl exceeding max", { key: "entity1", id: "sort1", type: "private", ttl: 31536001 }, "exceeds maximum"],
-      ["invalid data type", { key: "entity1", id: "sort1", type: "private", ttl: 3600, data: "string" }, "data must be an object"],
+      ["invalid data type", { key: "entity1", id: "sort1", type: "private", ttl: 3600, data: "string" }, "data must be a plain object"],
     ])("should reject %s", (_name, input, expectedError) => {
       const result = validateStoreRequest(input as unknown as Partial<StoreRequest>);
       expect(result.valid).toBe(false);

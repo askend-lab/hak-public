@@ -88,7 +88,7 @@ describe("validation — property-based tests", () => {
 
   // Keys must not contain the delimiter character '#'
   const validKeyArb = fc.string({ minLength: 1, maxLength: 1024 }).filter(
-    (s) => s.trim().length > 0 && !s.includes("#"),
+    (s) => s.trim().length > 0 && !s.includes("#") && s === s.trim() && !/[\x00-\x1f\x7f]/.test(s),
   );
 
   describe("validateStoreRequest", () => {
@@ -142,9 +142,12 @@ describe("validation — property-based tests", () => {
   });
 
   describe("validateQueryRequest", () => {
-    it("any string prefix with valid type passes", () => {
+    it("any safe string prefix with valid type passes", () => {
+      const safePrefixArb = fc.string({ maxLength: 1024 }).filter(
+        (s) => !s.includes("#") && !/[\x00-\x1f\x7f]/.test(s),
+      );
       fc.assert(
-        fc.property(fc.string(), validTypeArb, (prefix, type) => {
+        fc.property(safePrefixArb, validTypeArb, (prefix, type) => {
           const result = validateQueryRequest(prefix, type);
           expect(result.valid).toBe(true);
         }),
@@ -162,10 +165,7 @@ describe("validation — property-based tests", () => {
           validTypeArb,
           (prefix, type) => {
             const result = validateQueryRequest(prefix, type);
-            // null/undefined prefix is allowed (optional), but number/boolean fails
-            if (typeof prefix === "number" || typeof prefix === "boolean") {
-              expect(result.valid).toBe(false);
-            }
+            expect(result.valid).toBe(false);
           },
         ),
       );
