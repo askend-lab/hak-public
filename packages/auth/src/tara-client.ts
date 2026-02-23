@@ -1,5 +1,6 @@
 import * as jose from 'jose';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+import { logger } from '@hak/shared';
 import { TaraIdToken, TaraTokens } from './types';
 
 export const DEFAULT_TARA_ISSUER = 'https://tara-test.ria.ee';
@@ -102,6 +103,7 @@ export async function createTaraClient(): Promise<TaraClient> {
 
       if (!response.ok) {
         const errorText = await response.text();
+        logger.error('TARA token exchange failed', { status: response.status });
         throw new Error(`Token exchange failed: ${response.status} ${errorText}`);
       }
 
@@ -115,6 +117,7 @@ export async function createTaraClient(): Promise<TaraClient> {
       });
 
       if (payload.nonce !== expectedNonce) {
+        logger.error('TARA nonce mismatch');
         throw new Error('Nonce mismatch in TARA id_token');
       }
 
