@@ -153,14 +153,15 @@ These two hooks share ~90% identical logic (audio playback, abort control, synth
 
 | Category | HIGH | MEDIUM | LOW | Fixed |
 |----------|------|--------|-----|-------|
-| Dependencies | ~~1~~ | ~~1~~ | 1 | ✅ DEP-1, DEP-2 |
+| Dependencies | ~~1~~ | ~~1~~ | ~~1~~ | ✅ DEP-1, DEP-2, DEP-3 |
 | Dead Code | ~~1~~ | ~~1~~ | 0 | ✅ DEAD-1, DEAD-2 |
+| Unused Types | 0 | 0 | 0 | ✅ TYPE-1 (42 types) |
 | Serverless Config | 0 | ~~1~~+1 | 1 | ✅ SLS-1 |
 | Silent Catches | ~~1~~ | 0 | 0 | ✅ SILENT-1 |
 | React Patterns | 0 | 1 | 1 | |
 | Audio Resources | 0 | 1 | 0 | |
 | Code Duplication | 0 | 1 | 0 | |
-| **Total** | **0** | **4** | **2** | **6 fixed** |
+| **Total** | **0** | **4** | **1** | **8 fixed** |
 
 ---
 
@@ -174,6 +175,9 @@ These two hooks share ~90% identical logic (audio playback, abort control, synth
 | SILENT-1 — Log 12 silent catches | #682 | ✅ merged |
 | DEAD-1 — Remove/un-export 32 unused exports | #684 | ✅ merged |
 | DEP-2 — Remove 6 unused devDependencies | #684 | ✅ merged |
+| TYPE-1 — Clean up 42+ unused type exports | #685 | ✅ in branch |
+| DEP-3 — Add @testing-library/jest-dom + postcss-scss | #685 | ✅ in branch |
+| KNIP-1 — Fix knip config (redundant entry) | #685 | ✅ in branch |
 
 ## Remaining Priority Order
 
@@ -182,4 +186,11 @@ These two hooks share ~90% identical logic (audio playback, abort control, synth
 3. **SLS-2** — Enable X-Ray tracing
 4. **SLS-3** — Set reserved concurrency limits
 5. **AUDIO-1** — Audio cleanup observability
-6. **DEP-3** — Add `@testing-library/jest-dom` to root package.json
+
+## Knip Status
+
+After all fixes, `npx knip --include exports,types` reports:
+- 1 unused export: `healthHandler` (false positive — referenced by serverless.yml)
+- 14 unused types: all in `api-client/src/generated/*` (auto-generated, skip)
+- 0 unlisted dependencies
+- 0 unused files
