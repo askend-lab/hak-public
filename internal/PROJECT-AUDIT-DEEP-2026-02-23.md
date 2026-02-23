@@ -7,7 +7,7 @@
 
 ## 1. Unused Dependencies (knip)
 
-### DEP-1 (HIGH) 7 unused production dependencies in frontend
+### DEP-1 ~~(HIGH)~~ ✅ FIXED — 7 unused production dependencies removed
 
 ```
 @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
@@ -17,7 +17,7 @@ zod
 zustand
 ```
 
-These add to bundle size and attack surface. Either remove or start using them.
+Removed in PR #681. Also cleaned up corresponding `manualChunks` entries in `vite.config.ts`.
 
 ### DEP-2 (MEDIUM) 37 unused devDependencies across packages
 
@@ -51,24 +51,24 @@ Notable: `serverless-domain-manager` in 3 packages, `serverless-esbuild` in 2, `
 - `runPageAudit` in a11y-dev utils
 - Multiple unused type exports
 
-### DEAD-2 (MEDIUM) Auth package entry file misconfigured
+### DEAD-2 ~~(MEDIUM)~~ ✅ FIXED — Auth package entry file
 
-knip reports: `./src/index.ts` listed as entry in `packages/auth/package.json` but file not found. Auth uses `src/handler.ts` directly via serverless.yml.
+Removed invalid `main` and `types` fields from `packages/auth/package.json` — auth is a serverless Lambda, not a library. Fixed in PR #681.
 
 ---
 
 ## 3. Serverless Configuration Gaps
 
-### SLS-1 (MEDIUM) No timeout configured for auth and store Lambdas
+### SLS-1 ~~(MEDIUM)~~ ✅ FIXED — Explicit timeouts for auth and store
 
 | Package | timeout | memorySize |
 |---------|---------|------------|
 | tts-api | 5-30s per function | default (128MB) |
 | morphology-api | 30s | 1024MB |
-| auth | **default (6s)** | **default (128MB)** |
-| store | **default (6s)** | 512MB |
+| auth | **15s** ✅ | **default (128MB)** |
+| store | **10s** ✅ | 512MB |
 
-Auth and store use AWS default 6s timeout. TARA token exchange involves external HTTP call — 6s may be tight.
+Set explicit timeouts: 15s for auth (TARA token exchange involves external HTTP), 10s for store (DynamoDB ops). Fixed in PR #681.
 
 ### SLS-2 (MEDIUM) No X-Ray tracing configured
 
@@ -82,21 +82,23 @@ No `reservedConcurrency` on any Lambda. During traffic spikes, one noisy functio
 
 ## 4. Frontend Silent Catches (14 locations)
 
-### SILENT-1 (HIGH) 14 parameterless catch blocks in production frontend code
+### SILENT-1 ~~(HIGH)~~ ✅ FIXED — 12 silent catches now log warnings
 
-| File | Count | Risk |
-|------|-------|------|
-| useSharedTaskAudio.ts | 3 | Audio errors hidden |
-| useAudioPlayback.ts | 3 | Audio errors hidden |
-| useSynthesisOrchestrator.ts | 2 | Synthesis errors hidden |
-| usePronunciationVariants.ts | 1 | API errors hidden |
-| context.tsx (auth) | 1 | Token refresh failure hidden |
-| storage.ts (auth) | 1 | localStorage parse error hidden |
-| token.ts (auth) | 1 | JWT decode error hidden |
-| SpecsPage.tsx | 1 | Data load error hidden |
-| main.tsx | 1 | Sentry init failure (acceptable) |
+Added `logger.warn()` from `@hak/shared` to 12 parameterless catch blocks. Fixed in PR #682.
 
-Only `main.tsx` Sentry catch is justified. The rest should at minimum log warnings.
+| File | Count | Status |
+|------|-------|--------|
+| useSharedTaskAudio.ts | 3 | ✅ logged |
+| useAudioPlayback.ts | 3 | ✅ logged |
+| useSynthesisOrchestrator.ts | 2 | ✅ logged |
+| context.tsx (auth) | 1 | ✅ logged |
+| storage.ts (auth) | 1 | ✅ logged |
+| token.ts (auth) | 1 | ✅ logged |
+| SpecsPage.tsx | 1 | ✅ logged |
+| usePronunciationVariants.ts | 1 | Already had logger.error |
+| main.tsx | 1 | Sentry init (acceptable) |
+
+Also added error-path test for SpecsPage to maintain 95% coverage.
 
 ---
 
@@ -126,27 +128,44 @@ Pattern: `currentAudioRef.current.src = ""` used to stop playback. This is corre
 
 ---
 
-## Summary Table
+## 7. Code Duplication
 
-| Category | HIGH | MEDIUM | LOW |
-|----------|------|--------|-----|
-| Dependencies | 1 | 1 | 1 |
-| Dead Code | 1 | 1 | 0 |
-| Serverless Config | 0 | 2 | 1 |
-| Silent Catches | 1 | 0 | 0 |
-| React Patterns | 0 | 1 | 1 |
-| Audio Resources | 0 | 1 | 0 |
-| **Total** | **3** | **6** | **3** |
+### DUP-1 (MEDIUM) useSharedTaskAudio.ts ≈ useAudioPlayback.ts (~250 lines each)
+
+These two hooks share ~90% identical logic (audio playback, abort control, synthesis polling). Only differences are whether `entries` is passed as argument or from parent context. Should be extracted into a shared `useAudioPlaybackCore` hook.
 
 ---
 
-## Recommended Priority Order
+## Summary Table
 
-1. **DEP-1** — Remove 7 unused frontend dependencies (reduces bundle + attack surface)
-2. **DEAD-1** — Remove unused exports (reduces confusion, improves tree-shaking)
-3. **SILENT-1** — Add logging to 13 silent catches (1 Sentry catch is OK)
-4. **SLS-1** — Set explicit timeouts for auth (15s) and store (10s)
-5. **DEP-2** — Clean up 37 unused devDependencies
-6. **REACT-1** — Fix array index keys in TagsInput/TagsList
-7. **SLS-2** — Enable X-Ray tracing
-8. **DEAD-2** — Fix auth package.json entry
+| Category | HIGH | MEDIUM | LOW | Fixed |
+|----------|------|--------|-----|-------|
+| Dependencies | ~~1~~ | 1 | 1 | ✅ DEP-1 |
+| Dead Code | 1 | ~~1~~ | 0 | ✅ DEAD-2 |
+| Serverless Config | 0 | ~~1~~+1 | 1 | ✅ SLS-1 |
+| Silent Catches | ~~1~~ | 0 | 0 | ✅ SILENT-1 |
+| React Patterns | 0 | 1 | 1 | |
+| Audio Resources | 0 | 1 | 0 | |
+| Code Duplication | 0 | 1 | 0 | |
+| **Total** | **1** | **5** | **2** | **4 fixed** |
+
+---
+
+## Completed Fixes
+
+| Finding | PR | Status |
+|---------|-----|--------|
+| DEP-1 — Remove 7 unused deps | #681 | ✅ merged |
+| SLS-1 — Explicit Lambda timeouts | #681 | ✅ merged |
+| DEAD-2 — Fix auth package.json | #681 | ✅ merged |
+| SILENT-1 — Log 12 silent catches | #682 | ✅ merged |
+
+## Remaining Priority Order
+
+1. **DEAD-1** — Remove 32 unused exports (reduces confusion, improves tree-shaking)
+2. **DUP-1** — Extract shared audio playback hook (~250 lines dedup)
+3. **DEP-2** — Clean up 37 unused devDependencies
+4. **REACT-1** — Fix array index keys in TagsInput/TagsList
+5. **SLS-2** — Enable X-Ray tracing
+6. **SLS-3** — Set reserved concurrency limits
+7. **AUDIO-1** — Audio cleanup observability
