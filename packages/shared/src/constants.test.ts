@@ -16,10 +16,10 @@ describe("Constants", () => {
       );
     });
 
-    it("should be readonly (as const)", () => {
-      // `as const` provides compile-time immutability; runtime freeze is not needed
-      expect(TEXT_LIMITS).toBeDefined();
-      expect(Object.keys(TEXT_LIMITS).length).toBeGreaterThan(0);
+    it("should have exact expected keys", () => {
+      expect(Object.keys(TEXT_LIMITS).sort()).toStrictEqual(
+        ["MAX_AUDIO_TEXT_LENGTH", "MAX_MORPHOLOGY_TEXT_LENGTH"].sort(),
+      );
     });
   });
 
@@ -38,9 +38,10 @@ describe("Constants", () => {
       expect(TIMING.NOTIFICATION_DURATION_MS).toBeGreaterThan(0);
     });
 
-    it("should be readonly (as const)", () => {
-      expect(TIMING).toBeDefined();
-      expect(Object.keys(TIMING).length).toBeGreaterThan(0);
+    it("should have exact expected keys", () => {
+      expect(Object.keys(TIMING).sort()).toStrictEqual(
+        ["ERROR_RETRY_DELAY_MS", "NOTIFICATION_DURATION_MS", "POLL_INTERVAL_MS"].sort(),
+      );
     });
   });
 });

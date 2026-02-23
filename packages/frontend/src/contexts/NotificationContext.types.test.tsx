@@ -2,40 +2,30 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { NotificationProvider, useNotification } from "./NotificationContext";
 
-function TypesTestComponent() {
-  const notification = useNotification();
-
-  return (
-    <div>
-      <span data-testid="defined">{notification ? "yes" : "no"}</span>
-      <span data-testid="has-show">
-        {typeof notification.showNotification === "function" ? "yes" : "no"}
-      </span>
-    </div>
-  );
+function wrapper({ children }: { children: ReactNode }) {
+  return <NotificationProvider>{children}</NotificationProvider>;
 }
 
-describe("NotificationContext types", () => {
-  it("provides context object", () => {
-    render(
-      <NotificationProvider>
-        <TypesTestComponent />
-      </NotificationProvider>,
-    );
-
-    expect(screen.getByTestId("defined")).toHaveTextContent("yes");
+describe("NotificationContext", () => {
+  it("provides showNotification function within provider", () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+    expect(typeof result.current.showNotification).toBe("function");
   });
 
-  it("provides showNotification function", () => {
-    render(
-      <NotificationProvider>
-        <TypesTestComponent />
-      </NotificationProvider>,
-    );
+  it("throws when used outside provider", () => {
+    expect(() => {
+      renderHook(() => useNotification());
+    }).toThrow("useNotification must be used within NotificationProvider");
+  });
 
-    expect(screen.getByTestId("has-show")).toHaveTextContent("yes");
+  it("showNotification does not throw when called", () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+    expect(() => {
+      result.current.showNotification({ type: "info", message: "test" });
+    }).not.toThrow();
   });
 });

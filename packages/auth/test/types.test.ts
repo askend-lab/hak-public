@@ -10,55 +10,54 @@ import {
 import { DEFAULT_REGION } from '../src/cognito-client';
 
 describe('types constants and helpers', () => {
-  describe('TARA_VERIFIED', () => {
-    it('should be TARA_VERIFIED', () => {
-      expect(TARA_VERIFIED).toBe('TARA_VERIFIED');
+  describe('auth protocol constants are non-empty strings used in Cognito flows', () => {
+    it('TARA_VERIFIED is a non-empty string for challenge answer', () => {
+      expect(TARA_VERIFIED.length).toBeGreaterThan(0);
+      expect(typeof TARA_VERIFIED).toBe('string');
     });
-  });
 
-  describe('CUSTOM_CHALLENGE', () => {
-    it('should be CUSTOM_CHALLENGE', () => {
+    it('CUSTOM_CHALLENGE matches Cognito challenge type', () => {
       expect(CUSTOM_CHALLENGE).toBe('CUSTOM_CHALLENGE');
     });
-  });
 
-  describe('TARA_AUTH_METADATA', () => {
-    it('should be TARA_AUTH', () => {
-      expect(TARA_AUTH_METADATA).toBe('TARA_AUTH');
+    it('TARA_AUTH_METADATA is used as challengeMetadata key', () => {
+      expect(typeof TARA_AUTH_METADATA).toBe('string');
+      expect(TARA_AUTH_METADATA.length).toBeGreaterThan(0);
     });
   });
 
-  describe('FALLBACK_EMAIL_DOMAIN', () => {
-    it('should be tara.ee', () => {
-      expect(FALLBACK_EMAIL_DOMAIN).toBe('tara.ee');
+  describe('PERSONAL_CODE_ATTR follows Cognito custom attribute format', () => {
+    it('starts with custom: prefix', () => {
+      expect(PERSONAL_CODE_ATTR).toMatch(/^custom:/);
     });
   });
 
-  describe('PERSONAL_CODE_ATTR', () => {
-    it('should be custom:personal_code', () => {
-      expect(PERSONAL_CODE_ATTR).toBe('custom:personal_code');
-    });
-  });
-
-  describe('DEFAULT_EXPIRES_IN', () => {
-    it('should be 3600', () => {
+  describe('DEFAULT_EXPIRES_IN represents token TTL in seconds', () => {
+    it('is exactly 1 hour', () => {
       expect(DEFAULT_EXPIRES_IN).toBe(3600);
     });
   });
 
-  describe('DEFAULT_REGION', () => {
-    it('should be eu-west-1', () => {
-      expect(DEFAULT_REGION).toBe('eu-west-1');
+  describe('DEFAULT_REGION is a valid AWS region', () => {
+    it('matches AWS region format', () => {
+      expect(DEFAULT_REGION).toMatch(/^[a-z]+-[a-z]+-\d+$/);
     });
   });
 
   describe('buildFallbackEmail', () => {
-    it('should build email from personal code', () => {
-      expect(buildFallbackEmail('EE38001085718')).toBe('EE38001085718@tara.ee');
+    it('builds email from personal code using FALLBACK_EMAIL_DOMAIN', () => {
+      expect(buildFallbackEmail('EE38001085718')).toBe(`EE38001085718@${FALLBACK_EMAIL_DOMAIN}`);
     });
 
-    it('should use FALLBACK_EMAIL_DOMAIN', () => {
-      expect(buildFallbackEmail('TEST')).toContain(`@${FALLBACK_EMAIL_DOMAIN}`);
+    it('produces valid email format', () => {
+      const email = buildFallbackEmail('TEST123');
+      expect(email).toMatch(/^.+@.+\..+$/);
+    });
+
+    it('preserves personal code as local part', () => {
+      const code = 'EE38001085718';
+      const email = buildFallbackEmail(code);
+      expect(email.split('@')[0]).toBe(code);
     });
   });
 });

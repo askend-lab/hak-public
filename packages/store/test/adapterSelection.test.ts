@@ -28,13 +28,10 @@ describe("Adapter Selection", () => {
       expect(customAdapter).toBeInstanceOf(InMemoryAdapter);
     });
 
-    it("should allow resetting adapter to null", () => {
+    it("should allow resetting adapter to null without throwing", () => {
       const adapter = new InMemoryAdapter();
       setAdapter(adapter);
-      setAdapter(null);
-
-      // No error should be thrown
-      expect(true).toBe(true);
+      expect(() => setAdapter(null)).not.toThrow();
     });
   });
 

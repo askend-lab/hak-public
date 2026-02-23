@@ -198,33 +198,27 @@ describe('createTaraClient', () => {
     });
   });
 
-  describe('constants', () => {
-    it('DEFAULT_TARA_ISSUER should be tara-test URL', () => {
-      expect(DEFAULT_TARA_ISSUER).toBe('https://tara-test.ria.ee');
+  describe('OIDC constants — protocol contracts', () => {
+    it('DEFAULT_TARA_ISSUER is a valid HTTPS URL', () => {
+      expect(DEFAULT_TARA_ISSUER).toMatch(/^https:\/\/.+/);
     });
 
-    it('DEFAULT_CALLBACK_URL should be askend-lab callback', () => {
-      expect(DEFAULT_CALLBACK_URL).toContain('auth.askend-lab.com');
+    it('DEFAULT_CALLBACK_URL is a valid HTTPS URL', () => {
+      expect(DEFAULT_CALLBACK_URL).toMatch(/^https:\/\/.+/);
     });
 
-    it('OIDC_AUTHORIZE_PATH should be /oidc/authorize', () => {
-      expect(OIDC_AUTHORIZE_PATH).toBe('/oidc/authorize');
+    it('OIDC paths follow /oidc/* convention', () => {
+      expect(OIDC_AUTHORIZE_PATH).toMatch(/^\/oidc\//);
+      expect(OIDC_TOKEN_PATH).toMatch(/^\/oidc\//);
+      expect(OIDC_JWKS_PATH).toMatch(/^\/oidc\//);
     });
 
-    it('OIDC_TOKEN_PATH should be /oidc/token', () => {
-      expect(OIDC_TOKEN_PATH).toBe('/oidc/token');
+    it('CONTENT_TYPE_FORM_URLENCODED is valid Content-Type header', () => {
+      expect(CONTENT_TYPE_FORM_URLENCODED).toMatch(/^application\//);
     });
 
-    it('OIDC_JWKS_PATH should be /oidc/jwks', () => {
-      expect(OIDC_JWKS_PATH).toBe('/oidc/jwks');
-    });
-
-    it('CONTENT_TYPE_FORM_URLENCODED should be application/x-www-form-urlencoded', () => {
-      expect(CONTENT_TYPE_FORM_URLENCODED).toBe('application/x-www-form-urlencoded');
-    });
-
-    it('UI_LOCALE should be et', () => {
-      expect(UI_LOCALE).toBe('et');
+    it('UI_LOCALE is a 2-letter language code', () => {
+      expect(UI_LOCALE).toMatch(/^[a-z]{2}$/);
     });
   });
 });

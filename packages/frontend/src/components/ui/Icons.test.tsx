@@ -68,83 +68,37 @@ describe("Icon component", () => {
 });
 
 describe("Named icon components", () => {
-  it("PlayIcon renders correctly", () => {
-    const { container } = render(<PlayIcon />);
+  const iconMap: [string, React.FC<Record<string, unknown>>, string][] = [
+    ["PlayIcon", PlayIcon, "play_arrow"],
+    ["PauseIcon", PauseIcon, "pause"],
+    ["CloseIcon", CloseIcon, "close"],
+    ["StopIcon", StopIcon, "stop"],
+    ["MusicNoteIcon", MusicNoteIcon, "music_note"],
+    ["CheckCircleIcon", CheckCircleIcon, "check_circle"],
+    ["MenuIcon", MenuIcon, "menu"],
+    ["TaskIcon", TaskIcon, "assignment"],
+    ["VolumeIcon", VolumeIcon, "volume_up"],
+    ["MuteIcon", MuteIcon, "volume_off"],
+    ["SpeedIcon", SpeedIcon, "speed"],
+    ["PlusCircleIcon", PlusCircleIcon, "add_circle"],
+    ["DocumentPlusIcon", DocumentPlusIcon, "note_add"],
+  ];
+
+  it.each(iconMap)("%s renders correct Material Symbol name", (_name, Component, expectedText) => {
+    const { container } = render(<Component />);
     const span = container.querySelector(".icon");
-    expect(span?.textContent).toBe("play_arrow");
+    expect(span).toBeTruthy();
+    expect(span?.textContent).toBe(expectedText);
+    expect(span?.getAttribute("aria-hidden")).toBe("true");
   });
 
-  it("PauseIcon renders correctly", () => {
-    const { container } = render(<PauseIcon />);
-    const span = container.querySelector(".icon");
-    expect(span?.textContent).toBe("pause");
-  });
-
-  it("CloseIcon renders correctly", () => {
-    const { container } = render(<CloseIcon />);
-    const span = container.querySelector(".icon");
-    expect(span?.textContent).toBe("close");
-  });
-
-  it("EditIcon renders with custom size", () => {
+  it("EditIcon passes size prop through", () => {
     const { container } = render(<EditIcon size="2xl" />);
-    const span = container.querySelector(".icon");
-    expect(span?.classList.contains("icon--2xl")).toBe(true);
+    expect(container.querySelector(".icon")?.classList.contains("icon--2xl")).toBe(true);
   });
 
-  it("TrashIcon renders with custom weight", () => {
+  it("TrashIcon passes weight prop through", () => {
     const { container } = render(<TrashIcon weight="medium" />);
-    const span = container.querySelector(".icon");
-    expect(span?.classList.contains("icon--medium")).toBe(true);
-  });
-
-  it("StopIcon renders correctly", () => {
-    const { container } = render(<StopIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("stop");
-  });
-
-  it("MusicNoteIcon renders correctly", () => {
-    const { container } = render(<MusicNoteIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("music_note");
-  });
-
-  it("CheckCircleIcon renders correctly", () => {
-    const { container } = render(<CheckCircleIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("check_circle");
-  });
-
-  it("MenuIcon renders correctly", () => {
-    const { container } = render(<MenuIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("menu");
-  });
-
-  it("TaskIcon renders correctly", () => {
-    const { container } = render(<TaskIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("assignment");
-  });
-
-  it("VolumeIcon renders correctly", () => {
-    const { container } = render(<VolumeIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("volume_up");
-  });
-
-  it("MuteIcon renders correctly", () => {
-    const { container } = render(<MuteIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("volume_off");
-  });
-
-  it("SpeedIcon renders correctly", () => {
-    const { container } = render(<SpeedIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("speed");
-  });
-
-  it("PlusCircleIcon renders correctly", () => {
-    const { container } = render(<PlusCircleIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("add_circle");
-  });
-
-  it("DocumentPlusIcon renders correctly", () => {
-    const { container } = render(<DocumentPlusIcon />);
-    expect(container.querySelector(".icon")?.textContent).toBe("note_add");
+    expect(container.querySelector(".icon")?.classList.contains("icon--medium")).toBe(true);
   });
 });
