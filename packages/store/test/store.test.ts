@@ -27,8 +27,8 @@ describe("Store", () => {
   describe("save", () => {
     it("should save an item successfully", async () => {
       const request: StoreRequest = {
-        pk: "entity1",
-        sk: "sort1",
+        key: "entity1",
+        id: "sort1",
         type: "private",
         ttl: ONE_HOUR,
         data: { name: "test" },
@@ -47,26 +47,26 @@ describe("Store", () => {
       ["zero TTL (no expiration)", 0, true],
       ["negative TTL", -1, false],
     ])("should handle %s", async (_name, ttl, expectedSuccess) => {
-      const result = await store.save({ pk: "entity1", sk: "sort1", type: "private", ttl, data: {} });
+      const result = await store.save({ key: "entity1", id: "sort1", type: "private", ttl, data: {} });
       expect(result.success).toBe(expectedSuccess);
       if (!expectedSuccess) {expect(result.error).toContain("TTL");}
     });
 
     it("should set owner and timestamps from context", async () => {
-      const result = await store.save({ pk: "entity1", sk: "sort1", type: "public", ttl: ONE_HOUR, data: {} });
+      const result = await store.save({ key: "entity1", id: "sort1", type: "public", ttl: ONE_HOUR, data: {} });
       expect(result.item?.owner).toBe(context.userId);
       expect(result.item?.createdAt).toBeDefined();
       expect(result.item?.updatedAt).toBeDefined();
     });
 
     it("should default data to empty object when undefined", async () => {
-      const result = await store.save({ pk: "entity1", sk: "sort1", type: "public", ttl: 3600 } as StoreRequest);
+      const result = await store.save({ key: "entity1", id: "sort1", type: "public", ttl: 3600 } as StoreRequest);
       expect(result.success).toBe(true);
       expect(result.item?.data).toStrictEqual({});
     });
 
     it("should increment version on each save", async () => {
-      const req: StoreRequest = { pk: "entity1", sk: "sort1", type: "private", ttl: ONE_HOUR, data: { name: "v1" } };
+      const req: StoreRequest = { key: "entity1", id: "sort1", type: "private", ttl: ONE_HOUR, data: { name: "v1" } };
       const r1 = await store.save(req);
       expect(r1.item?.version).toBe(1);
       const r2 = await store.save({ ...req, data: { name: "v2" } });
@@ -77,8 +77,8 @@ describe("Store", () => {
 
     it("should preserve createdAt when updating existing item", async () => {
       const request: StoreRequest = {
-        pk: "entity1",
-        sk: "sort1",
+        key: "entity1",
+        id: "sort1",
         type: "private",
         ttl: ONE_HOUR,
         data: { version: 1 },
@@ -104,8 +104,8 @@ describe("Store", () => {
   describe("get", () => {
     it("should retrieve existing item", async () => {
       await store.save({
-        pk: "entity1",
-        sk: "sort1",
+        key: "entity1",
+        id: "sort1",
         type: "private",
         ttl: ONE_HOUR,
         data: { value: 42 },
@@ -126,8 +126,8 @@ describe("Store", () => {
 
     it("should not find private item when querying as public", async () => {
       await store.save({
-        pk: "entity1",
-        sk: "sort1",
+        key: "entity1",
+        id: "sort1",
         type: "private",
         ttl: ONE_HOUR,
         data: {},
@@ -142,8 +142,8 @@ describe("Store", () => {
   describe("delete", () => {
     it("should delete own item", async () => {
       await store.save({
-        pk: "entity1",
-        sk: "sort1",
+        key: "entity1",
+        id: "sort1",
         type: "private",
         ttl: ONE_HOUR,
         data: {},
@@ -164,8 +164,8 @@ describe("Store", () => {
 
     it("should not delete item owned by another user", async () => {
       await store.save({
-        pk: "entity1",
-        sk: "sort1",
+        key: "entity1",
+        id: "sort1",
         type: "public",
         ttl: ONE_HOUR,
         data: {},
@@ -185,22 +185,22 @@ describe("Store", () => {
   describe("query", () => {
     beforeEach(async () => {
       await store.save({
-        pk: "user-settings",
-        sk: "theme",
+        key: "user-settings",
+        id: "theme",
         type: "private",
         ttl: ONE_HOUR,
         data: { color: "dark" },
       });
       await store.save({
-        pk: "user-settings",
-        sk: "lang",
+        key: "user-settings",
+        id: "lang",
         type: "private",
         ttl: ONE_HOUR,
         data: { lang: "en" },
       });
       await store.save({
-        pk: "app-config",
-        sk: "v1",
+        key: "app-config",
+        id: "v1",
         type: "private",
         ttl: ONE_HOUR,
         data: {},
@@ -238,8 +238,8 @@ describe("Store", () => {
 
     it("should handle save errors", async () => {
       const result = await failingStore.save({
-        pk: "entity1",
-        sk: "sort1",
+        key: "entity1",
+        id: "sort1",
         type: "private",
         ttl: ONE_HOUR,
         data: {},
@@ -275,8 +275,8 @@ describe("Store", () => {
     it("should handle concurrent saves to different keys", async () => {
       const promises = Array.from({ length: 10 }, (_, i) =>
         store.save({
-          pk: `entity-${i}`,
-          sk: `sort-${i}`,
+          key: `entity-${i}`,
+          id: `sort-${i}`,
           type: "private",
           ttl: ONE_HOUR,
           data: { index: i },
@@ -297,8 +297,8 @@ describe("Store", () => {
     it("should handle concurrent saves to the same key (version conflicts expected)", async () => {
       const promises = Array.from({ length: 5 }, (_, i) =>
         store.save({
-          pk: "shared-entity",
-          sk: "shared-sort",
+          key: "shared-entity",
+          id: "shared-sort",
           type: "private",
           ttl: ONE_HOUR,
           data: { version: i },
@@ -316,8 +316,8 @@ describe("Store", () => {
 
     it("should handle concurrent reads and writes", async () => {
       await store.save({
-        pk: "rw-entity",
-        sk: "rw-sort",
+        key: "rw-entity",
+        id: "rw-sort",
         type: "private",
         ttl: ONE_HOUR,
         data: { initial: true },
@@ -328,8 +328,8 @@ describe("Store", () => {
       );
       const writes = Array.from({ length: 3 }, (_, i) =>
         store.save({
-          pk: "rw-entity",
-          sk: "rw-sort",
+          key: "rw-entity",
+          id: "rw-sort",
           type: "private",
           ttl: ONE_HOUR,
           data: { version: i },
@@ -349,8 +349,8 @@ describe("Store", () => {
     it("should calculate TTL correctly (future timestamp)", async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const result = await store.save({
-        pk: "ttl-test",
-        sk: "sort1",
+        key: "ttl-test",
+        id: "sort1",
         type: "private",
         ttl: ONE_HOUR,
         data: {},
@@ -365,8 +365,8 @@ describe("Store", () => {
 
     it("should use key delimiter in composite keys", async () => {
       const result = await store.save({
-        pk: "pk-part",
-        sk: "sk-part",
+        key: "pk-part",
+        id: "sk-part",
         type: "private",
         ttl: ONE_HOUR,
         data: {},

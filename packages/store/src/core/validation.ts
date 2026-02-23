@@ -16,9 +16,9 @@ export interface ValidationResult {
 }
 
 const MAX_KEY_LENGTH = 1024;
-const KEY_DELIMITER = DEFAULT_CONFIG.keyDelimiter;
 const VALID_TYPES_SET = new Set<string>(VALID_DATA_TYPES);
 const VALID_TYPES_MESSAGE = `type must be one of: ${VALID_DATA_TYPES.join(", ")}`;
+const ALLOWED_KEY_CHARS = /^[\w.\-:@]+$/;
 
 /**
  * Creates a validation result
@@ -58,8 +58,9 @@ function validateKeyString(
   maxLength = MAX_KEY_LENGTH,
 ): void {
   validateRequiredString(value, name, errors, maxLength);
-  if (typeof value === "string" && value.includes(KEY_DELIMITER)) {
-    errors.push(`${name} must not contain the delimiter character '${KEY_DELIMITER}'`);
+  if (typeof value !== "string" || value.trim() === "" || value.length > maxLength) {return;}
+  if (!ALLOWED_KEY_CHARS.test(value)) {
+    errors.push(`${name} contains invalid characters (allowed: a-z A-Z 0-9 . _ - : @)`);
   }
 }
 
@@ -114,8 +115,8 @@ export function validateStoreRequest(
   config: StoreConfig = DEFAULT_CONFIG,
 ): ValidationResult {
   return collectErrors((errors) => {
-    validateKeyString(request.pk, "pk", errors);
-    validateKeyString(request.sk, "sk", errors);
+    validateKeyString(request.key, "key", errors);
+    validateKeyString(request.id, "id", errors);
     validateType(request.type, errors);
 
     if (typeof request.ttl !== "number") {
@@ -127,8 +128,8 @@ export function validateStoreRequest(
       }
     }
 
-    if (request.data !== undefined && typeof request.data !== "object") {
-      errors.push("data must be an object");
+    if (request.data !== undefined && (request.data === null || typeof request.data !== "object" || Array.isArray(request.data))) {
+      errors.push("data must be a plain object");
     } else if (request.data !== undefined) {
       const dataSize = JSON.stringify(request.data).length;
       if (dataSize > config.maxDataSizeBytes) {
@@ -142,13 +143,13 @@ export function validateStoreRequest(
  * Validates get/delete request parameters
  */
 export function validateGetRequest(
-  pk: unknown,
-  sk: unknown,
+  key: unknown,
+  id: unknown,
   type: unknown,
 ): ValidationResult {
   return collectErrors((errors) => {
-    validateKeyString(pk, "pk", errors);
-    validateKeyString(sk, "sk", errors);
+    validateKeyString(key, "key", errors);
+    validateKeyString(id, "id", errors);
     validateType(type, errors);
   });
 }
@@ -165,6 +166,13 @@ export function validateQueryRequest(
       errors.push("prefix is required");
     } else if (typeof pkPrefix !== "string") {
       errors.push("prefix must be a string");
+    } else {
+      if (pkPrefix.length > MAX_KEY_LENGTH) {
+        errors.push(`prefix exceeds maximum length of ${MAX_KEY_LENGTH} characters`);
+      }
+      if (pkPrefix.length > 0 && !ALLOWED_KEY_CHARS.test(pkPrefix)) {
+        errors.push("prefix contains invalid characters (allowed: a-z A-Z 0-9 . _ - : @)");
+      }
     }
     validateType(type, errors);
   });

@@ -86,10 +86,9 @@ describe("validation — property-based tests", () => {
     });
   });
 
-  // Keys must not contain the delimiter character '#'
-  const validKeyArb = fc.string({ minLength: 1, maxLength: 1024 }).filter(
-    (s) => s.trim().length > 0 && !s.includes("#"),
-  );
+  // Keys must only contain allowed characters: a-z A-Z 0-9 . _ - : @
+  const allowedKeyChars = [..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-:@"];
+  const validKeyArb = fc.array(fc.constantFrom(...allowedKeyChars), { minLength: 1, maxLength: 100 }).map((chars) => chars.join(""));
 
   describe("validateStoreRequest", () => {
     it("valid requests always pass", () => {
@@ -99,8 +98,8 @@ describe("validation — property-based tests", () => {
           validKeyArb,
           validTypeArb,
           fc.integer({ min: 0, max: 31536000 }),
-          (pk, sk, type, ttl) => {
-            const result = validateStoreRequest({ pk, sk, type, ttl });
+          (key, id, type, ttl) => {
+            const result = validateStoreRequest({ key, id, type, ttl });
             expect(result.valid).toBe(true);
             expect(result.errors).toHaveLength(0);
           },
@@ -116,8 +115,8 @@ describe("validation — property-based tests", () => {
           ),
           validTypeArb,
           fc.integer({ min: 0, max: 31536000 }),
-          (sk, type, ttl) => {
-            const result = validateStoreRequest({ sk, type, ttl });
+          (id, type, ttl) => {
+            const result = validateStoreRequest({ id, type, ttl });
             expect(result.valid).toBe(false);
           },
         ),
@@ -132,8 +131,8 @@ describe("validation — property-based tests", () => {
           validKeyArb,
           validKeyArb,
           validTypeArb,
-          (pk, sk, type) => {
-            const result = validateGetRequest(pk, sk, type);
+          (key, id, type) => {
+            const result = validateGetRequest(key, id, type);
             expect(result.valid).toBe(true);
           },
         ),
@@ -142,9 +141,13 @@ describe("validation — property-based tests", () => {
   });
 
   describe("validateQueryRequest", () => {
-    it("any string prefix with valid type passes", () => {
+    it("any safe string prefix with valid type passes", () => {
+      const safePrefixArb = fc.array(
+        fc.constantFrom(...allowedKeyChars),
+        { maxLength: 100 },
+      ).map((chars) => chars.join(""));
       fc.assert(
-        fc.property(fc.string(), validTypeArb, (prefix, type) => {
+        fc.property(safePrefixArb, validTypeArb, (prefix, type) => {
           const result = validateQueryRequest(prefix, type);
           expect(result.valid).toBe(true);
         }),
@@ -162,10 +165,7 @@ describe("validation — property-based tests", () => {
           validTypeArb,
           (prefix, type) => {
             const result = validateQueryRequest(prefix, type);
-            // null/undefined prefix is allowed (optional), but number/boolean fails
-            if (typeof prefix === "number" || typeof prefix === "boolean") {
-              expect(result.valid).toBe(false);
-            }
+            expect(result.valid).toBe(false);
           },
         ),
       );
