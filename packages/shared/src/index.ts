@@ -20,6 +20,16 @@ export {
 } from "./lambda";
 export type { LambdaResponse, HttpStatusCode } from "./lambda";
 export { getAwsRegion } from "./env";
+export { wrapLambdaHandler } from "./handler-wrapper";
+export {
+  AppError,
+  ValidationError,
+  NotFoundError,
+  AuthError,
+  ForbiddenError,
+  ExternalServiceError,
+  RateLimitError,
+} from "./errors";
 export {
   isNotFoundError,
   buildS3Url,

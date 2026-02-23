@@ -8,7 +8,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
-import { logger } from "@hak/shared";
+import { logger, extractErrorMessage } from "@hak/shared";
 import { Store, ServerContext, StorageAdapter } from "../core";
 import { InMemoryAdapter, DynamoDBAdapter } from "../adapters";
 import {
@@ -164,7 +164,7 @@ export async function handler(
     logger.error("[SimpleStore] Handler error", {
       requestId: event.requestContext?.requestId,
       route: route.path,
-      error: error instanceof Error ? error.message : String(error),
+      error: extractErrorMessage(error),
     });
     return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
       error: HTTP_ERRORS.INTERNAL,

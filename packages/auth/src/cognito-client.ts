@@ -7,7 +7,7 @@ import {
   ListUsersCommand,
   UsernameExistsException,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { logger } from '@hak/shared';
+import { logger, extractErrorMessage } from '@hak/shared';
 import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLENGE, PERSONAL_CODE_ATTR, DEFAULT_EXPIRES_IN, buildFallbackEmail } from './types';
 
 export const DEFAULT_REGION = 'eu-west-1';
@@ -59,7 +59,8 @@ export class CognitoClient {
       });
       const response = await this.client.send(command);
       return response.Users?.[0]?.Username || null;
-    } catch {
+    } catch (error) {
+      logger.warn('Cognito findUserByPersonalCode failed', extractErrorMessage(error));
       return null;
     }
   }
@@ -76,7 +77,8 @@ export class CognitoClient {
       });
       const response = await this.client.send(command);
       return response.Users?.[0]?.Username || null;
-    } catch {
+    } catch (error) {
+      logger.warn('Cognito findUserByEmail failed', extractErrorMessage(error));
       return null;
     }
   }
@@ -127,7 +129,7 @@ export class CognitoClient {
       await this.client.send(createCommand);
     } catch (error) {
       if (!(error instanceof UsernameExistsException)) {
-        logger.error('Cognito createUser failed', error instanceof Error ? error.message : String(error));
+        logger.error('Cognito createUser failed', extractErrorMessage(error));
         throw error;
       }
       // User already exists, continue
@@ -187,8 +189,11 @@ export class CognitoClient {
         expiresIn: ExpiresIn || DEFAULT_EXPIRES_IN,
       };
     } catch (error) {
-      logger.error('Cognito token generation failed', error instanceof Error ? error.message : String(error));
-      throw new Error(`Token generation failed: ${error}`);
+      logger.error('Cognito token generation failed', extractErrorMessage(error));
+      const msg = extractErrorMessage(error);
+      const wrapped = new Error(`Token generation failed: ${msg}`);
+      (wrapped as unknown as Record<string, unknown>).cause = error;
+      throw wrapped;
     }
   }
 }

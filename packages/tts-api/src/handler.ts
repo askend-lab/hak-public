@@ -3,7 +3,7 @@
 
 import { createHash } from "crypto";
 
-import { logger } from "@hak/shared";
+import { logger, extractErrorMessage } from "@hak/shared";
 import {
   createResponse,
   createBadRequest,
@@ -142,7 +142,7 @@ export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse
         error: "Service temporarily unavailable — too many pending requests",
       });
     }
-    log.error("Synthesize error", error instanceof Error ? error.message : String(error));
+    log.error("Synthesize error", extractErrorMessage(error));
     return createInternalError("Synthesize error", error);
   }
 }
@@ -168,7 +168,7 @@ export async function status(event: StatusEvent): Promise<LambdaResponse> {
       audioUrl: ready ? buildAudioUrl(cacheKey) : null,
     });
   } catch (error) {
-    log.error("Status error", error instanceof Error ? error.message : String(error));
+    log.error("Status error", extractErrorMessage(error));
     return createInternalError("Status error", error);
   }
 }

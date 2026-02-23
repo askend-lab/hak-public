@@ -396,25 +396,25 @@ Ref: `internal/ERROR-HANDLING-ANALYSIS.md` | Analysis of all backend packages + 
 
 ### Quick Wins
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-1** (HIGH) Use `extractErrorMessage()` everywhere — 3 different variants of error extraction exist. Shared already has `extractErrorMessage()` but it's only used in 1 place. **How:** replace all `error instanceof Error ? error.message : String(error)` and `UNKNOWN_ERROR` patterns.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-4** (HIGH) Fix silent catches in cognito-client — `findUserByPersonalCode` and `findUserByEmail` silently swallow ALL errors including network/permission/throttling. **How:** add `logger.warn()` in catch blocks.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-5** (MEDIUM) Fix error re-wrapping in cognito-client — `throw new Error(\`Token generation failed: ${error}\`)` loses original stack trace. **How:** use `{ cause: error }` option.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-1** (HIGH) Use `extractErrorMessage()` everywhere — replaced all 3 variants across auth, tts-api, store, morphology-api, cognito-client. Made fallback param optional. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-4** (HIGH) Fix silent catches in cognito-client — added `logger.warn()` to `findUserByPersonalCode` and `findUserByEmail` catch blocks. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-5** (MEDIUM) Fix error re-wrapping in cognito-client — now sets `cause` property to preserve error chain (ES2020-compatible). **PR #677**
 
 ### Structural Improvements
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-2** (MEDIUM) Add `AppError` base class to shared — with `code`, `statusCode`, `isOperational` fields. Subclasses: `ValidationError(400)`, `NotFoundError(404)`, `AuthError(401)`, `ExternalServiceError(502)`.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-6** (MEDIUM) Migrate morphology-api to shared response utilities — currently duplicates `HTTP_STATUS`, `createResponse()`, `LambdaResponse` locally instead of importing from `@hak/shared`.
-- ✅ Accept  [ ] Fixed  [ ] Closed — **ERR-3** (LARGER) Create `wrapLambdaHandler()` in shared — higher-order function that standardizes try/catch, logging, and error responses for all Lambda handlers. Requires updating all 4 packages.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-2** (MEDIUM) Add `AppError` base class to shared — 7 classes: `AppError`, `ValidationError(400)`, `NotFoundError(404)`, `AuthError(401)`, `ForbiddenError(403)`, `ExternalServiceError(502)`, `RateLimitError(429)`. 10 tests. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-6** (MEDIUM) Migrate morphology-api to shared response utilities — removed local `HTTP_STATUS` constant, now imports from `@hak/shared` via validation.ts. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-3** (LARGER) Create `wrapLambdaHandler()` in shared — generic handler wrapper with contextual logging, AppError-aware catch, 8 tests. Packages can adopt incrementally. **PR #677**
 
 ### Statistics
 
 | Metric | Current | Target |
 |--------|---------|--------|
-| Error extraction variants | 3 | 1 (`extractErrorMessage`) |
-| Silent error swallowing | 2 locations | 0 |
-| Custom error classes | 2 (`VersionConflictError`, `QueueFullError`) | 5+ (hierarchy) |
-| Packages using shared response utils | 2/4 | 4/4 |
-| Handler wrapper pattern | 0/4 packages | 4/4 packages |
+| Error extraction variants | 3 → 1 | 1 (`extractErrorMessage`) |
+| Silent error swallowing | 2 → 0 | 0 |
+| Custom error classes | 2 → 9 (hierarchy) | 5+ (hierarchy) |
+| Packages using shared response utils | 2/4 → 3/4 | 4/4 |
+| Handler wrapper pattern | ✅ Available in shared | 4/4 packages (incremental) |
 
 ---
 
