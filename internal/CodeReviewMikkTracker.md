@@ -8,7 +8,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 1. Documentation
 
-- ✅ Accept  [✅] Fixed  [✅] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181 — *Verified: React ^19.0.0 in package.json, port 5181 in README. ⚠️ README lines 24/27 still say `merlin-worker` instead of `tts-worker` after rename (minor, separate fix).*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **1.1.1** (Low) README inconsistencies: React version 18→19, dev port 5180→5181 — *Verified: React ^19.0.0 in package.json, port 5181 in README. ⚠️ README lines 24/27 still say `merlin-worker` instead of `ol after rename (minor, separate fix).*
 - ❌ Reject (wrong)  —  — **1.1.2** (Low) Shared module doesn't list dependencies — finding incorrect, s3 client IS in package.json
 - ✅ Accept  [✅] Fixed  [✅] Closed — **1.1.3** (Low) vabamorf-api README lists deps but package.json dependencies empty — *Verified: README now says "Runtime Dependencies (non-npm)" with native binaries. package.json has `@hak/shared` + `zod` in dependencies. Consistent.*
 - ✅ Accept  [✅] Fixed  [✅] Closed — **1.2.1** (Low) No separate INSTALL.md — expanded Quick Start in root README — *Verified: Quick Start section in README.md has prerequisites, clone, install, test, dx, start commands + separate merlin-worker setup block.*
