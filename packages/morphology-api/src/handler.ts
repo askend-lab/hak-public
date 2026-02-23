@@ -3,9 +3,9 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { extractStressedText, extractVariants } from "./parser";
-import { logger } from "./logger";
+import { logger, extractErrorMessage } from "./logger";
 import { LambdaResponse } from "./types";
-import { createResponse, parseJsonBody } from "./validation";
+import { createResponse, parseJsonBody, HTTP_STATUS } from "./validation";
 import { analyze, isInitialized, initVmetajson } from "./vmetajson";
 import { AnalyzeRequestSchema, VariantsRequestSchema } from "./schemas";
 import type { ZodObject, ZodRawShape } from "zod";
@@ -32,12 +32,6 @@ function loadVersion(): string {
   }
 }
 const version = loadVersion();
-
-const HTTP_STATUS = {
-  OK: 200,
-  BAD_REQUEST: 400,
-  INTERNAL_SERVER_ERROR: 500,
-} as const;
 
 const ERRORS = {
   MISSING_BODY: "Missing request body",
@@ -87,7 +81,7 @@ function parseAndValidateWithSchema(
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {
-  logger.error(PROCESSING_ERROR_PREFIX, error instanceof Error ? error.message : String(error));
+  logger.error(PROCESSING_ERROR_PREFIX, extractErrorMessage(error));
   return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: `${PROCESSING_ERROR_PREFIX}${ERRORS.UNKNOWN}`,
   });

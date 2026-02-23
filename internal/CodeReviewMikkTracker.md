@@ -388,6 +388,36 @@ Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
 
 ---
 
+## Error Handling Audit (2026-02-23)
+
+Ref: `internal/ERROR-HANDLING-ANALYSIS.md` | Analysis of all backend packages + frontend service layer
+
+**Current state:** 8 different error handling patterns across 4 backend packages. 3 variants of error message extraction. 2 silent error swallowing locations. No custom error hierarchy. No unified handler wrapper.
+
+### Quick Wins
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-1** (HIGH) Use `extractErrorMessage()` everywhere — replaced all 3 variants across auth, tts-api, store, morphology-api, cognito-client. Made fallback param optional. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-4** (HIGH) Fix silent catches in cognito-client — added `logger.warn()` to `findUserByPersonalCode` and `findUserByEmail` catch blocks. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-5** (MEDIUM) Fix error re-wrapping in cognito-client — now sets `cause` property to preserve error chain (ES2020-compatible). **PR #677**
+
+### Structural Improvements
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-2** (MEDIUM) Add `AppError` base class to shared — 7 classes: `AppError`, `ValidationError(400)`, `NotFoundError(404)`, `AuthError(401)`, `ForbiddenError(403)`, `ExternalServiceError(502)`, `RateLimitError(429)`. 10 tests. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-6** (MEDIUM) Migrate morphology-api to shared response utilities — removed local `HTTP_STATUS` constant, now imports from `@hak/shared` via validation.ts. **PR #677**
+- ✅ Accept  [✅] Fixed  [ ] Closed — **ERR-3** (LARGER) Create `wrapLambdaHandler()` in shared — generic handler wrapper with contextual logging, AppError-aware catch, 8 tests. Packages can adopt incrementally. **PR #677**
+
+### Statistics
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Error extraction variants | 3 → 1 | 1 (`extractErrorMessage`) |
+| Silent error swallowing | 2 → 0 | 0 |
+| Custom error classes | 2 → 9 (hierarchy) | 5+ (hierarchy) |
+| Packages using shared response utils | 2/4 → 3/4 | 4/4 |
+| Handler wrapper pattern | ✅ Available in shared | 4/4 packages (incremental) |
+
+---
+
 ### Testing & Verification (Penetration Tests)
 
 - ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/`. **Verifies:** PUB-9 WAF rate limit.

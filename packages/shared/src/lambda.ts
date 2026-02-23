@@ -100,7 +100,7 @@ export function createInternalErrorResponse(
   context: string,
   error: unknown,
 ): LambdaResponse {
-  logger.error(`${context}:`, error instanceof Error ? error.message : String(error));
+  logger.error(`${context}:`, extractErrorMessage(error));
   return createApiResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
     error: "Internal server error",
   });
@@ -111,7 +111,7 @@ export function createInternalErrorResponse(
  */
 export function extractErrorMessage(
   error: unknown,
-  fallback: string,
+  fallback?: string,
 ): string {
-  return error instanceof Error ? error.message : fallback;
+  return error instanceof Error ? error.message : (fallback ?? String(error));
 }

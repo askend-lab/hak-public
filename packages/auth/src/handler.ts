@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse, getCorsOrigin, logger } from '@hak/shared';
+import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse, getCorsOrigin, logger, extractErrorMessage } from '@hak/shared';
 import { createTaraClient } from './tara-client';
 import { createCognitoClient } from './cognito-client';
 import { AuthState } from './types';
@@ -27,7 +27,6 @@ import {
   requireCognitoConfig,
 } from './middleware';
 
-const UNKNOWN_ERROR = 'Unknown error';
 
 // Re-export everything from cookies and middleware for backward compatibility
 export {
@@ -91,7 +90,7 @@ export async function startHandler(
       body: '',
     };
   } catch (error) {
-    log.error('TARA start error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('TARA start error:', extractErrorMessage(error));
     return createLambdaResponse(
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       { error: 'Failed to start TARA authentication' },
@@ -154,7 +153,7 @@ export async function callbackHandler( // eslint-disable-line max-statements -- 
     return redirectToFrontendWithCookies(frontendUrl, cognitoTokens);
 
   } catch (error) {
-    log.error('TARA callback error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('TARA callback error:', extractErrorMessage(error));
     return redirectToFrontend(frontendUrl, { 
       error: 'Authentication failed - please try again' 
     }, clearStateCookie());
@@ -258,7 +257,7 @@ export async function refreshHandler(
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token }),
     };
   } catch (error) {
-    log.error('Refresh error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('Refresh error:', extractErrorMessage(error));
     return {
       statusCode: 401,
       headers: corsResponseHeaders(),
@@ -327,7 +326,7 @@ export async function exchangeCodeHandler( // eslint-disable-line max-statements
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
     };
   } catch (error) {
-    log.error('Exchange code error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('Exchange code error:', extractErrorMessage(error));
     return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
   }
 }
