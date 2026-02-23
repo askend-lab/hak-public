@@ -137,8 +137,13 @@ describe("Routes", () => {
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
       const body = JSON.parse(response.body);
       expect(body.item).toBeDefined();
-      expect(body.item.PK).toBeDefined();
-      expect(body.item.SK).toBeDefined();
+      expect(body.item.data).toStrictEqual({ key: "value" });
+      expect(body.item.createdAt).toBeDefined();
+      expect(body.item.updatedAt).toBeDefined();
+      expect(body.item.PK).toBeUndefined();
+      expect(body.item.SK).toBeUndefined();
+      expect(body.item.owner).toBeUndefined();
+      expect(body.item.version).toBeUndefined();
     });
 
     it("should save item without data field", async () => {
@@ -215,7 +220,10 @@ describe("Routes", () => {
       expect(response.statusCode).toBe(HTTP_STATUS.OK);
       const body = JSON.parse(response.body);
       expect(body.item).toBeDefined();
-      expect(body.item.PK).toBeDefined();
+      expect(body.item.data).toStrictEqual({ key: "value" });
+      expect(body.item.createdAt).toBeDefined();
+      expect(body.item.PK).toBeUndefined();
+      expect(body.item.owner).toBeUndefined();
     });
   });
 

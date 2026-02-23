@@ -40,7 +40,9 @@ describe("Lambda Handler Auth", () => {
       });
       const result = await handler(event);
       expect(result.statusCode).toBe(200);
-      expect(JSON.parse(result.body).item.owner).toBe("local-test-user");
+      const body = JSON.parse(result.body);
+      expect(body.item.owner).toBeUndefined();
+      expect(body.item.data).toBeDefined();
     });
   });
 

@@ -12,6 +12,7 @@ import {
   Store,
   DataType,
   StoreRequest,
+  StoreItem,
   validateStoreRequest,
   validateGetRequest,
   validateQueryRequest,
@@ -28,6 +29,20 @@ export const HTTP_ERRORS = {
   INVALID_JSON: "Invalid JSON body",
   PRIVATE_NOT_ALLOWED: "private type not allowed on /get-public endpoint",
 } as const;
+
+interface ClientItem {
+  readonly data: Record<string, unknown>;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+function toClientItem(item: StoreItem): ClientItem {
+  return {
+    data: item.data,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+  };
+}
 
 const ERROR_STATUS_MAP: Record<string, number> = {
   [ERRORS.NOT_FOUND]: HTTP_STATUS.NOT_FOUND,
@@ -114,9 +129,10 @@ export async function handleSave(
   };
 
   const result = await store.save(request);
-  return result.success
-    ? createResponse(HTTP_STATUS.OK, { item: result.item })
-    : createErrorResponse(result.error, HTTP_STATUS.BAD_REQUEST);
+  if (!result.success || !result.item) {
+    return createErrorResponse(result.error, HTTP_STATUS.BAD_REQUEST);
+  }
+  return createResponse(HTTP_STATUS.OK, { item: toClientItem(result.item) });
 }
 
 export async function handleGet(
@@ -130,8 +146,8 @@ export async function handleGet(
 
   const result = await store.get(pk as string, sk as string, type as DataType);
 
-  if (result.success) {
-    return createResponse(HTTP_STATUS.OK, { item: result.item });
+  if (result.success && result.item) {
+    return createResponse(HTTP_STATUS.OK, { item: toClientItem(result.item) });
   }
 
   // Not found is a valid result - return 200 with null item
@@ -173,7 +189,7 @@ export async function handleQuery(
 
   const result = await store.query(prefix as string, type as DataType);
   return result.success
-    ? createResponse(HTTP_STATUS.OK, { items: result.items })
+    ? createResponse(HTTP_STATUS.OK, { items: (result.items ?? []).map(toClientItem) })
     : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_SERVER_ERROR);
 }
 
