@@ -1,40 +1,40 @@
-# Auth for public endpoints — message to team
+# Auth для публичных эндпоинтов — сообщение команде
 
-Hey guys,
+Привет!
 
-I want to bring up something we need to discuss with the client.
+Хочу обсудить одну тему, которую нужно поднять с клиентом.
 
-Right now our speech synthesis and morphology endpoints are completely open — no auth, anyone on the internet can hit them. And here's the catch: **we can't turn on auto-scaling** in this setup. If we do, we're basically competing with every bot on the internet using our project budget. That's not a fight we win.
+Сейчас наши эндпоинты синтеза речи и морфологического анализа полностью открыты — никакой аутентификации, любой человек в интернете может к ним обращаться. И вот в чём проблема: **мы не можем включить автоскейлинг**. Если включим — мы по сути будем соревноваться со всеми ботами интернета, используя бюджет проекта. Это не та битва, которую мы выиграем.
 
-So auto-scaling is off. Which means the system is really easy to overwhelm — two laptops and a curl script is literally all it takes to fill the queue and make the service unavailable for real users.
+Поэтому автоскейлинг выключен. А значит, систему очень легко забить — двух ноутбуков и маленького curl-скрипта буквально достаточно, чтобы забить очередь и сделать сервис недоступным для реальных пользователей.
 
-We do have WAF rate limits, geo-blocking, queue caps — but those are all just speed bumps. They slow an attacker down, they don't stop them. And the fundamental problem is: **we can't tell a real user from an attacker.** Every limit we set also hits legitimate users.
+У нас есть WAF rate limits, гео-блокировка, лимит очереди — но это всё просто лежачие полицейские. Они замедляют атакующего, но не останавливают. А фундаментальная проблема в том, что **мы не можем отличить реального пользователя от атакующего**. Каждый лимит, который мы ставим, бьёт и по легитимным пользователям тоже.
 
-**The fix is simple:** put all the generative endpoints behind login.
+**Решение простое:** спрятать все генеративные эндпоинты за логин.
 
-The good news — everything is already built:
-- TARA and Google login — working
-- JWT tokens with auto-refresh — working
-- API Gateway authorizer — already used by SimpleStore
-- The frontend already sends the auth token for synthesis — the backend just ignores it
+Хорошая новость — всё уже готово:
+- TARA и Google логин — работают
+- JWT токены с авто-обновлением — работают
+- Авторизатор API Gateway — уже используется в SimpleStore
+- Фронтенд уже отправляет токен аутентификации при синтезе — бэкенд просто его игнорирует
 
-Impact on users is minimal. They log in once via TARA or Google, and the session can last months with auto-refresh. Teachers and students already log in to work with lessons — this just extends the same model.
+Влияние на пользователей минимальное. Логинятся один раз через TARA или Google, сессия живёт месяцами с авто-обновлением. Учителя и ученики уже логинятся для работы с уроками — это просто расширение той же модели.
 
-**What this gives us:**
-- We can **safely turn on auto-scaling** — because we know the load is from real users
-- We can set **per-user rate limits** natively in API Gateway — one user's heavy usage doesn't affect others
-- System **availability actually goes up** — we handle peak loads instead of returning errors
-- Budget is protected — creating a bot account requires a real eID or real Google account, that's a completely different class of attack than anonymous curl
-- Full monitoring — every request tied to a user, can disable specific abusers
+**Что это нам даёт:**
+- Можно **безопасно включить автоскейлинг** — потому что мы знаем, что нагрузка от реальных пользователей
+- Можно поставить **лимиты per-user** нативно в API Gateway — нагрузка одного пользователя не влияет на других
+- **Доступность системы реально растёт** — мы обрабатываем пиковые нагрузки вместо того, чтобы возвращать ошибки
+- Бюджет защищён — для создания бот-аккаунта нужен реальный eID или реальный Google аккаунт, это совершенно другой класс атаки по сравнению с анонимным curl
+- Полный мониторинг — каждый запрос привязан к пользователю, можно отключить конкретного абьюзера
 
-**In short: auth doesn't restrict the system, it lets us actually run it properly.**
+**Короче: auth не ограничивает систему — он позволяет её нормально запустить.**
 
-Can we set up a call with the client to discuss this? I have a full technical proposal ready with threat scenarios, cost numbers, and implementation steps if needed.
+Можем назначить звонок с клиентом, чтобы это обсудить? У меня готово полное техническое предложение с threat-сценариями, расчётами стоимости и шагами реализации.
 
-I think this should happen soon — the longer we run without auth on these endpoints, the higher the risk of someone flooding the service or burning through the budget.
+Думаю, это нужно сделать скорее — чем дольше мы работаем без auth на этих эндпоинтах, тем выше риск, что кто-то зальёт сервис или сожжёт бюджет.
 
 Alex
 
 ---
 
-*Full technical details: `internal/PROPOSAL-Auth-Public-Endpoints.md`*
+*Полное техническое описание: `internal/PROPOSAL-Auth-Public-Endpoints.md`*
