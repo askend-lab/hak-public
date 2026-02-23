@@ -12,6 +12,7 @@ provider:
   runtime: nodejs22.x
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
+  logRetentionInDays: 30
   httpApi:
     cors:
       allowedOrigins:

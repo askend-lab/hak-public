@@ -8,6 +8,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
+import { logger } from "@hak/shared";
 import { Store, ServerContext, StorageAdapter } from "../core";
 import { InMemoryAdapter, DynamoDBAdapter } from "../adapters";
 import {
@@ -159,7 +160,8 @@ export async function handler(
     // For anonymous shared access, use 'anonymous' as userId
     const effectiveUserId = userId || ANONYMOUS_USER;
     return await route.handler(event, createStore(effectiveUserId));
-  } catch {
+  } catch (error) {
+    logger.error("[SimpleStore] Handler error", error instanceof Error ? error.message : String(error));
     return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
       error: HTTP_ERRORS.INTERNAL,
     });

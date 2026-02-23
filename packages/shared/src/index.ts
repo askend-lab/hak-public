@@ -3,7 +3,7 @@
 
 export { calculateHash } from "./hash";
 export { createLogger, logger } from "./logger";
-export type { Logger, LogLevel, LogMethod } from "./logger";
+export type { Logger, LogLevel, LogMethod, LogContext } from "./logger";
 export { TEXT_LIMITS, TIMING } from "./constants";
 export type { TextLimitKey, TimingKey } from "./constants";
 export { sleep, isNonEmpty, isEmpty } from "./utils";
