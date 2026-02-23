@@ -63,8 +63,9 @@ export {
 } from './middleware';
 
 export async function startHandler(
-  _event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
+  const log = logger.withContext({ handler: 'startHandler', requestId: event.requestContext?.requestId });
   try {
     const taraClient = await createTaraClient();
 
@@ -90,7 +91,7 @@ export async function startHandler(
       body: '',
     };
   } catch (error) {
-    logger.error('TARA start error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('TARA start error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return createLambdaResponse(
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
       { error: 'Failed to start TARA authentication' },
@@ -102,6 +103,7 @@ export async function startHandler(
 export async function callbackHandler( // eslint-disable-line max-statements -- auth callback has many sequential steps
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
+  const log = logger.withContext({ handler: 'callbackHandler', requestId: event.requestContext?.requestId });
   const frontendUrl = getFrontendUrl();
 
   try {
@@ -109,7 +111,7 @@ export async function callbackHandler( // eslint-disable-line max-statements -- 
 
     // Handle TARA errors
     if (error) {
-      logger.error('TARA error:', error, error_description);
+      log.error('TARA error:', error, error_description);
       return redirectToFrontend(frontendUrl, { error: error_description || error });
     }
 
@@ -139,7 +141,7 @@ export async function callbackHandler( // eslint-disable-line max-statements -- 
     // Verify and decode ID token
     const taraIdToken = await taraClient.verifyIdToken(taraTokens.id_token, savedState.nonce);
 
-    logger.info('TARA authentication successful');
+    log.info('TARA authentication successful');
 
     // Find or create Cognito user
     const cognitoClient = createCognitoClient();
@@ -152,7 +154,7 @@ export async function callbackHandler( // eslint-disable-line max-statements -- 
     return redirectToFrontendWithCookies(frontendUrl, cognitoTokens);
 
   } catch (error) {
-    logger.error('TARA callback error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('TARA callback error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return redirectToFrontend(frontendUrl, { 
       error: 'Authentication failed - please try again' 
     }, clearStateCookie());
@@ -217,6 +219,7 @@ function redirectToFrontendWithCookies(
 export async function refreshHandler(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
+  const log = logger.withContext({ handler: 'refreshHandler', requestId: event.requestContext?.requestId });
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: corsResponseHeaders(), body: '' };
   }
@@ -255,7 +258,7 @@ export async function refreshHandler(
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token }),
     };
   } catch (error) {
-    logger.error('Refresh error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('Refresh error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return {
       statusCode: 401,
       headers: corsResponseHeaders(),
@@ -268,6 +271,7 @@ export async function refreshHandler(
 export async function exchangeCodeHandler( // eslint-disable-line max-statements -- code exchange has many sequential steps
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
+  const log = logger.withContext({ handler: 'exchangeCodeHandler', requestId: event.requestContext?.requestId });
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: corsResponseHeaders(), body: '' };
   }
@@ -306,7 +310,7 @@ export async function exchangeCodeHandler( // eslint-disable-line max-statements
     });
 
     if (!response.ok) {
-      logger.error('Code exchange failed:', response.status);
+      log.error('Code exchange failed:', response.status);
       return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Code exchange failed' }, corsResponseHeaders());
     }
 
@@ -323,7 +327,7 @@ export async function exchangeCodeHandler( // eslint-disable-line max-statements
       body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
     };
   } catch (error) {
-    logger.error('Exchange code error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
+    log.error('Exchange code error:', error instanceof Error ? error.message : UNKNOWN_ERROR);
     return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
   }
 }

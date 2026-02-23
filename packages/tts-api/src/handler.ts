@@ -40,10 +40,12 @@ export { SynthesizeRequestSchema, CacheKeySchema } from "./schemas";
 
 export interface SynthesizeEvent {
   body?: string;
+  requestContext?: { requestId?: string };
 }
 
 export interface StatusEvent {
   pathParameters?: { cacheKey?: string };
+  requestContext?: { requestId?: string };
 }
 
 export interface SynthesizeParams {
@@ -90,7 +92,7 @@ export function applySynthesizeDefaults(body: SynthesizeRequest): SynthesizePara
 }
 
 export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> { // eslint-disable-line max-statements -- logging adds necessary observability statements
-  const log = logger.withContext({ handler: "synthesize" });
+  const log = logger.withContext({ handler: "synthesize", requestId: event.requestContext?.requestId });
   try {
     const parsed = parseRequestBody(event.body);
     if (!parsed.ok) {
@@ -146,7 +148,7 @@ export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse
 }
 
 export async function status(event: StatusEvent): Promise<LambdaResponse> {
-  const log = logger.withContext({ handler: "status" });
+  const log = logger.withContext({ handler: "status", requestId: event.requestContext?.requestId });
   try {
     const rawCacheKey = event.pathParameters?.cacheKey;
     const cacheKeyResult = CacheKeySchema.safeParse(rawCacheKey);

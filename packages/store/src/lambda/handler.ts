@@ -161,7 +161,11 @@ export async function handler(
     const effectiveUserId = userId || ANONYMOUS_USER;
     return await route.handler(event, createStore(effectiveUserId));
   } catch (error) {
-    logger.error("[SimpleStore] Handler error", error instanceof Error ? error.message : String(error));
+    logger.error("[SimpleStore] Handler error", {
+      requestId: event.requestContext?.requestId,
+      route: route.path,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
       error: HTTP_ERRORS.INTERNAL,
     });
