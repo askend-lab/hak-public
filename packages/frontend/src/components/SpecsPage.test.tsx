@@ -114,6 +114,17 @@ describe("SpecsPage", () => {
     });
   });
 
+  it("handles loadSpecs error gracefully", async () => {
+    const { getFeatureGroups } = await import("../services/specs");
+    (getFeatureGroups as ReturnType<typeof vi.fn>).mockImplementation(() => { throw new Error("load failed"); });
+
+    render(<SpecsPage onBack={mockOnBack} />);
+    const { waitFor } = await import("@testing-library/react");
+    await waitFor(() => {
+      expect(screen.queryByText(/Laen spetsifikatsioone/)).toBeFalsy();
+    });
+  });
+
   it("renders back button in loaded state", async () => {
     const { getFeatureGroups } = await import("../services/specs");
     const { parseFeatureContent } = await import("@hak/specifications");

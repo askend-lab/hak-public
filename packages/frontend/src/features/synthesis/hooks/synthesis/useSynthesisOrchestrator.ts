@@ -124,7 +124,8 @@ export function useSynthesisOrchestrator(): ReturnType<
             },
           });
           return;
-        } catch {
+        } catch (error) {
+          logger.warn("Cache playback failed, re-synthesizing:", error);
           updateSentence(id, CACHE_INVALIDATION);
         }
       }
@@ -195,7 +196,8 @@ export function useSynthesisOrchestrator(): ReturnType<
             },
           });
           return;
-        } catch {
+        } catch (error) {
+          logger.warn("Cache playback failed, re-synthesizing with text:", error);
           updateSentence(id, CACHE_INVALIDATION);
         }
       }

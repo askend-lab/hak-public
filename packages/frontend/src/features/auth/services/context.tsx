@@ -10,6 +10,7 @@ import {
   ReactNode,
 } from "react";
 
+import { logger } from "@hak/shared";
 import { AuthStorage } from "./storage";
 import {
   getLoginUrl,
@@ -56,7 +57,8 @@ export async function refreshTokens(): Promise<boolean> {
       AuthStorage.setIdToken(data.id_token);
     }
     return true;
-  } catch {
+  } catch (error) {
+    logger.warn("Token refresh failed:", error);
     return false;
   }
 }
