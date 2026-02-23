@@ -284,6 +284,63 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are publi
 
 ---
 
+## Weak Tests Cleanup (2026-02-23)
+
+Ref: `internal/WEAK-TESTS-REPORT.md` | Branch: `fix/strengthen-weak-tests` | PR: #671 (merged)
+
+Identified ~60 weak/useless tests across 12 files in 6 packages. Replaced with meaningful behavioral assertions. Net: +246 / −314 lines.
+
+### Tautologies (`expect(true).toBe(true)`)
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-1** morphology-api/test/hello.test.ts — `expect(true).toBe(true)` → healthHandler returns 200 + parseJsonBody tests
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-2** store/test/adapterSelection.test.ts — `expect(true).toBe(true)` → `expect(() => setAdapter(null)).not.toThrow()`
+
+### Coverage Padding (`toBeDefined()` on imports)
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-3** morphology-api/test/coverage-imports.test.ts — 5× `toBeDefined()` → behavioral smoke tests for each module
+
+### Export Checks (`typeof === "function"`)
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-4** shared/src/index.test.ts — 12× `typeof` checks → real invocations with result verification
+
+### Readonly Tautologies
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-5** shared/src/constants.test.ts — 2× "as const" `toBeDefined()` → exact key enumeration checks
+
+### Constant Equals Literal
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-6** auth/test/types.test.ts — 7× constant===literal → Cognito format checks, email format, prefix validation
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-7** auth/test/handler.test.ts — 9× constant===literal → security contracts (TTL ranges, HTTPS, cookie flags, min CSRF length)
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-8** auth/test/tara-client.test.ts — 7× constant===literal → OIDC protocol contracts (HTTPS URLs, /oidc/* paths, language code format)
+
+### Duplicate Test Suites
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-9** frontend/Footer.test.tsx — full duplicate `describe("Footer")` block (80+ lines from merged Footer.full.test.tsx) → removed, kept 2 unique tests
+
+### Mechanical Enumeration
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-10** frontend/Icons.test.tsx — 12 copy-paste icon render tests → single `it.each` with 13 icons + aria-hidden check
+
+### Weak Type Checks
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-11** frontend/NotificationContext.types.test.tsx — rendered `data-testid` type checking → `renderHook` + error boundary + invocation safety
+- ✅ Accept  [✅] Fixed  [✅] Closed — **WT-12** frontend/specs/index.test.ts — 2× `typeof === "object"` → non-empty record verification with value type checks
+
+### Statistics
+
+| Metric | Value |
+|--------|-------|
+| Files modified | 12 |
+| Packages touched | 6 |
+| Weak tests fixed | ~60 |
+| Lines added | 246 |
+| Lines removed | 314 |
+| All tests passing | ✅ |
+| All CI checks | ✅ |
+| Coverage regression | None |
+
+---
+
 ### Testing & Verification (Penetration Tests)
 
 - ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/`. **Verifies:** PUB-9 WAF rate limit.
