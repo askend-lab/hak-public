@@ -16,10 +16,9 @@ export interface ValidationResult {
 }
 
 const MAX_KEY_LENGTH = 1024;
-const KEY_DELIMITER = DEFAULT_CONFIG.keyDelimiter;
 const VALID_TYPES_SET = new Set<string>(VALID_DATA_TYPES);
 const VALID_TYPES_MESSAGE = `type must be one of: ${VALID_DATA_TYPES.join(", ")}`;
-const CONTROL_CHAR_REGEX = /[\x00-\x1f\x7f]/;
+const ALLOWED_KEY_CHARS = /^[\w.\-:@]+$/;
 
 /**
  * Creates a validation result
@@ -59,15 +58,9 @@ function validateKeyString(
   maxLength = MAX_KEY_LENGTH,
 ): void {
   validateRequiredString(value, name, errors, maxLength);
-  if (typeof value !== "string") {return;}
-  if (value !== value.trim()) {
-    errors.push(`${name} must not have leading or trailing whitespace`);
-  }
-  if (value.includes(KEY_DELIMITER)) {
-    errors.push(`${name} must not contain the delimiter character '${KEY_DELIMITER}'`);
-  }
-  if (CONTROL_CHAR_REGEX.test(value)) {
-    errors.push(`${name} must not contain control characters`);
+  if (typeof value !== "string" || value.trim() === "" || value.length > maxLength) {return;}
+  if (!ALLOWED_KEY_CHARS.test(value)) {
+    errors.push(`${name} contains invalid characters (allowed: a-z A-Z 0-9 . _ - : @)`);
   }
 }
 
@@ -177,11 +170,8 @@ export function validateQueryRequest(
       if (pkPrefix.length > MAX_KEY_LENGTH) {
         errors.push(`prefix exceeds maximum length of ${MAX_KEY_LENGTH} characters`);
       }
-      if (pkPrefix.includes(KEY_DELIMITER)) {
-        errors.push(`prefix must not contain the delimiter character '${KEY_DELIMITER}'`);
-      }
-      if (CONTROL_CHAR_REGEX.test(pkPrefix)) {
-        errors.push("prefix must not contain control characters");
+      if (pkPrefix.length > 0 && !ALLOWED_KEY_CHARS.test(pkPrefix)) {
+        errors.push("prefix contains invalid characters (allowed: a-z A-Z 0-9 . _ - : @)");
       }
     }
     validateType(type, errors);

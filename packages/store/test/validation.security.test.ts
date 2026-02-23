@@ -18,7 +18,7 @@ describe("Validation — security hardening", () => {
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("control characters"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
 
     it("should reject id with newline", () => {
@@ -29,19 +29,19 @@ describe("Validation — security hardening", () => {
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("control characters"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
 
     it("should reject key with tab in get request", () => {
       const result = validateGetRequest("entity\t1", "sort1", "private");
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("control characters"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
 
     it("should reject id with DEL character in get request", () => {
       const result = validateGetRequest("entity1", "sort\x7f1", "private");
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("control characters"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
   });
 
@@ -54,7 +54,7 @@ describe("Validation — security hardening", () => {
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("leading or trailing whitespace"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
 
     it("should reject id with trailing whitespace", () => {
@@ -65,17 +65,18 @@ describe("Validation — security hardening", () => {
         ttl: 3600,
       });
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("leading or trailing whitespace"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
 
-    it("should accept key with internal spaces", () => {
+    it("should reject key with internal spaces", () => {
       const result = validateStoreRequest({
         key: "my entity",
         id: "sort1",
         type: "private",
         ttl: 3600,
       });
-      expect(result.valid).toBe(true);
+      expect(result.valid).toBe(false);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
   });
 
@@ -120,13 +121,13 @@ describe("Validation — security hardening", () => {
     it("should reject prefix with delimiter", () => {
       const result = validateQueryRequest("task#evil", "private");
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("delimiter"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
 
     it("should reject prefix with control characters", () => {
       const result = validateQueryRequest("task\x00", "private");
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("control characters"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("invalid characters"))).toBe(true);
     });
 
     it("should reject prefix exceeding max length", () => {

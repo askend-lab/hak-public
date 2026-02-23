@@ -86,10 +86,9 @@ describe("validation — property-based tests", () => {
     });
   });
 
-  // Keys must not contain the delimiter character '#'
-  const validKeyArb = fc.string({ minLength: 1, maxLength: 1024 }).filter(
-    (s) => s.trim().length > 0 && !s.includes("#") && s === s.trim() && !/[\x00-\x1f\x7f]/.test(s),
-  );
+  // Keys must only contain allowed characters: a-z A-Z 0-9 . _ - : @
+  const allowedKeyChars = [..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-:@"];
+  const validKeyArb = fc.array(fc.constantFrom(...allowedKeyChars), { minLength: 1, maxLength: 100 }).map((chars) => chars.join(""));
 
   describe("validateStoreRequest", () => {
     it("valid requests always pass", () => {
@@ -143,9 +142,10 @@ describe("validation — property-based tests", () => {
 
   describe("validateQueryRequest", () => {
     it("any safe string prefix with valid type passes", () => {
-      const safePrefixArb = fc.string({ maxLength: 1024 }).filter(
-        (s) => !s.includes("#") && !/[\x00-\x1f\x7f]/.test(s),
-      );
+      const safePrefixArb = fc.array(
+        fc.constantFrom(...allowedKeyChars),
+        { maxLength: 100 },
+      ).map((chars) => chars.join(""));
       fc.assert(
         fc.property(safePrefixArb, validTypeArb, (prefix, type) => {
           const result = validateQueryRequest(prefix, type);
