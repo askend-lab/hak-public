@@ -275,6 +275,15 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are publi
 - ⏸️ Deferred  [ ] Fixed  [ ] Closed — **PUB-11** (MEDIUM) Bot-detection / Proof-of-Work — AWS WAF Bot Control (~$10/month) or custom PoW header. Separate evaluation.
 - ⏸️ Deferred  [ ] Fixed  [ ] Closed — **PUB-12** (MEDIUM) Request fingerprinting — device fingerprint + session token. Frontend + backend changes needed.
 
+---
+
+## Lauri Findings
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-1** (Medium) Store API leaks DynamoDB terminology — client-facing `pk`/`sk` renamed to `key`/`id`, `sortKey` intermediate step also removed. API contract is now database-agnostic. Validation, routes, frontend adapter, and all tests updated. *Needs verification: deploy to staging and confirm frontend works with new field names.*
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-2** (Medium) Store API input validation too permissive — switched from blacklist to whitelist character validation. Keys/IDs now only allow `a-z A-Z 0-9 . _ - : @`. Null/array data payloads rejected. Query prefix hardened (delimiter, control chars, max length). 14 security tests added. *Needs verification: deploy to staging and confirm no legitimate keys are rejected by the whitelist.*
+
+---
+
 ### Testing & Verification (Penetration Tests)
 
 - ⏸️ Pending  [ ] Done  [ ] Closed — **TEST-1** (CRITICAL) Load testing — normal (10 users) and attack (100+ req/min) scripts. **How:** k6 or Artillery scripts in `scripts/`. **Verifies:** PUB-9 WAF rate limit.
