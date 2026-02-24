@@ -44,6 +44,7 @@ export default [
       "**/.stryker-tmp/**",
       "**/.venv/**",
       ".playwright-browsers/**",
+      "internal/pentests/**",
     ],
   },
 
