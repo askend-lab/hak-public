@@ -74,6 +74,7 @@ provider:
 functions:
   api:
     handler: src/lambda/handler.handler
+    reservedConcurrency: 50
     events:
       - http:
           path: /save

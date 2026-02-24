@@ -78,6 +78,7 @@ functions:
   synthesize:
     handler: src/handler.synthesize
     timeout: 30
+    reservedConcurrency: 25
     events:
       - httpApi:
           path: /synthesize
@@ -86,6 +87,7 @@ functions:
   status:
     handler: src/handler.status
     timeout: 10
+    reservedConcurrency: 25
     events:
       - httpApi:
           path: /status/{cacheKey}
@@ -94,6 +96,7 @@ functions:
   health:
     handler: src/handler.health
     timeout: 5
+    reservedConcurrency: 5
     events:
       - httpApi:
           path: /health

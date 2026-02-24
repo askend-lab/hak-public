@@ -96,6 +96,7 @@ provider:
 functions:
   taraStart:
     handler: src/handler.startHandler
+    reservedConcurrency: 10
     events:
       - http:
           path: /tara/start
@@ -104,6 +105,7 @@ functions:
 
   taraCallback:
     handler: src/handler.callbackHandler
+    reservedConcurrency: 10
     events:
       - http:
           path: /tara/callback
@@ -112,6 +114,7 @@ functions:
 
   tokenRefresh:
     handler: src/handler.refreshHandler
+    reservedConcurrency: 10
     events:
       - http:
           path: /tara/refresh
@@ -124,6 +127,7 @@ functions:
 
   health:
     handler: src/handler.healthHandler
+    reservedConcurrency: 5
     events:
       - http:
           path: /tara/health
@@ -132,6 +136,7 @@ functions:
 
   tokenExchange:
     handler: src/handler.exchangeCodeHandler
+    reservedConcurrency: 10
     events:
       - http:
           path: /tara/exchange-code
@@ -144,6 +149,7 @@ functions:
 
   cognitoTriggers:
     handler: src/cognito-triggers.handler
+    reservedConcurrency: 10
     description: Cognito Custom Auth triggers for TARA authentication
     # No VPC needed - only processes Cognito events
     vpc: ~
