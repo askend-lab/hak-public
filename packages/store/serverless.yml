@@ -43,6 +43,9 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-1'}
   logRetentionInDays: 30
+  tracing:
+    lambda: true
+    apiGateway: true
   environment:
     TABLE_NAME: ${self:service}-${self:provider.stage}
     APP_NAME: ${self:service}
@@ -62,6 +65,11 @@ provider:
             - dynamodb:UpdateItem
           Resource:
             - !GetAtt DataTable.Arn
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: "*"
 
 functions:
   api:

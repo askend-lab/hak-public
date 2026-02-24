@@ -43,6 +43,9 @@ provider:
   region: ${opt:region, 'eu-west-1'}
   timeout: 15
   logRetentionInDays: 30
+  tracing:
+    lambda: true
+    apiGateway: true
   environment:
     TARA_ISSUER: ${self:custom.taraConfig.${self:provider.stage}.issuer}
     TARA_SECRETS_ARN: ${ssm:/hak/${self:provider.stage}/tara-secrets-arn}
@@ -84,6 +87,11 @@ provider:
             - secretsmanager:GetSecretValue
           Resource:
             - !Sub arn:aws:secretsmanager:${self:provider.region}:${AWS::AccountId}:secret:hak/*
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: "*"
 
 functions:
   taraStart:
