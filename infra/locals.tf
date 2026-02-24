@@ -1,13 +1,3 @@
-# Read API Gateway URLs from Serverless CloudFormation stacks
-# These APIs have no public DNS — only reachable through CloudFront
-data "aws_cloudformation_stack" "merlin_api" {
-  name = "merlin-api-${var.env}"
-}
-
-data "aws_cloudformation_stack" "vabamorf_api" {
-  name = "vabamorf-api-${var.env}"
-}
-
 locals {
   app_name = "hak"
   region   = "eu-west-1"
@@ -15,17 +5,10 @@ locals {
   # Domain logic: dev → hak-dev.example.com, prod → hak.example.com
   domain_name = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
 
-  # API Gateway domains (no public DNS — extracted from CloudFormation outputs)
-  # Use HttpApiUrl which exists in all stack versions (ApiEndpoint is missing in some prod stacks).
-  # HttpApiUrl may include a stage path (e.g. /dev) — split into hostname + path.
-  # CloudFront origin domain_name must be hostname-only; stage goes into origin_path.
-  merlin_api_raw      = replace(data.aws_cloudformation_stack.merlin_api.outputs["HttpApiUrl"], "https://", "")
-  merlin_api_domain   = element(split("/", local.merlin_api_raw), 0)
-  merlin_api_path     = length(split("/", local.merlin_api_raw)) > 1 ? "/${element(split("/", local.merlin_api_raw), 1)}" : ""
-
-  vabamorf_api_raw      = replace(data.aws_cloudformation_stack.vabamorf_api.outputs["HttpApiUrl"], "https://", "")
-  vabamorf_api_domain   = element(split("/", local.vabamorf_api_raw), 0)
-  vabamorf_api_path     = length(split("/", local.vabamorf_api_raw)) > 1 ? "/${element(split("/", local.vabamorf_api_raw), 1)}" : ""
+  # API Gateway custom domains (managed by serverless-domain-manager)
+  # dev: merlin-dev.askend-lab.com, prod: merlin.askend-lab.com
+  merlin_api_domain   = var.env == "prod" ? "merlin.${var.domain_name}" : "merlin-${var.env}.${var.domain_name}"
+  vabamorf_api_domain = var.env == "prod" ? "vabamorf.${var.domain_name}" : "vabamorf-${var.env}.${var.domain_name}"
 
   # Resource naming
   website_bucket_name     = "${local.app_name}-${var.env}-website"

@@ -71,10 +71,9 @@ resource "aws_cloudfront_distribution" "website" {
     origin_access_control_id = aws_cloudfront_origin_access_control.website.id
   }
 
-  # Vabamorf API origin (no public DNS — only reachable through CloudFront)
+  # Vabamorf API origin (custom domain on API Gateway)
   origin {
     domain_name = local.vabamorf_api_domain
-    origin_path = local.vabamorf_api_path
     origin_id   = "vabamorf-api"
     custom_origin_config {
       http_port              = 80
@@ -84,10 +83,9 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-  # Merlin API origin (no public DNS — only reachable through CloudFront)
+  # Merlin API origin (custom domain on API Gateway)
   origin {
     domain_name = local.merlin_api_domain
-    origin_path = local.merlin_api_path
     origin_id   = "merlin-api"
     custom_origin_config {
       http_port              = 80
