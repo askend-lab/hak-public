@@ -31,6 +31,12 @@ custom:
     securityPolicy: tls_1_2
     apiType: rest
 
+  concurrency:
+    dev:
+      api: 5
+    prod:
+      api: 50
+
   allowedOrigin:
     dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
     prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
@@ -74,7 +80,7 @@ provider:
 functions:
   api:
     handler: src/lambda/handler.handler
-    reservedConcurrency: 50
+    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.api}
     events:
       - http:
           path: /save
