@@ -71,13 +71,13 @@ Removed invalid `main` and `types` fields from `packages/auth/package.json` — 
 
 Set explicit timeouts: 15s for auth (TARA token exchange involves external HTTP), 10s for store (DynamoDB ops). Fixed in PR #681.
 
-### SLS-2 (MEDIUM) No X-Ray tracing configured
+### SLS-2 ~~(MEDIUM)~~ ✅ FIXED — X-Ray tracing enabled (PR #689)
 
-No `tracing` configuration in any serverless.yml. X-Ray would provide distributed tracing across Lambda → DynamoDB → S3 → SQS.
+Added `tracing: lambda: true` to all 4 serverless.yml files, `apiGateway: true` for REST API services (simplestore, tara-auth), and xray IAM permissions.
 
-### SLS-3 (LOW) No reserved concurrency limits
+### SLS-3 ~~(LOW)~~ ✅ FIXED — Reserved concurrency limits set (PR #689)
 
-No `reservedConcurrency` on any Lambda. During traffic spikes, one noisy function could consume all account-level concurrency (1000 default).
+Simplestore: 50, merlin synthesize/status: 25, health: 5, vabamorf: 25, tara-auth functions: 10, health: 5.
 
 ---
 
@@ -105,35 +105,29 @@ Also added error-path test for SpecsPage to maintain 95% coverage.
 
 ## 5. React Patterns
 
-### REACT-1 (MEDIUM) Array index used as React key (3 locations)
+### REACT-1 ~~(MEDIUM)~~ ✅ FIXED — Array index keys replaced (PR #689)
 
-```
-TagsInput.tsx:105    <input key={index} ...
-TagsInput.tsx:121    <div key={index} ...
-TagsList.tsx:35      <div key={index} ...
-```
+Replaced `key={index}` with stable content-based keys using `buildTagKeys()` helper in TagsList and TagsInput.
 
-If tags are reordered/deleted, React will misidentify elements.
+### REACT-2 ~~(LOW)~~ ✅ FIXED — requestAnimationFrame for focus (PR #691)
 
-### REACT-2 (LOW) setTimeout in focus management
-
-`AddToTaskDropdown.tsx:137` uses `setTimeout(() => searchInputRef.current?.focus(), 100)` — fragile timing-based focus. Should use `requestAnimationFrame` or `useEffect` with ref callback.
+Replaced `setTimeout(..., 100)` with `requestAnimationFrame` in `AddToTaskDropdown.tsx` for reliable focus management.
 
 ---
 
 ## 6. Audio Resource Management
 
-### AUDIO-1 (MEDIUM) 9 locations set `audio.src = ""` for cleanup
+### AUDIO-1 ~~(MEDIUM)~~ ✅ FIXED — Audio cleanup observability added (PR #689)
 
-Pattern: `currentAudioRef.current.src = ""` used to stop playback. This is correct but combined with silent catches means failed cleanup goes unnoticed. The `URL.revokeObjectURL` calls (20 locations) appear balanced with `URL.createObjectURL` calls (3 locations) — cleanup looks correct.
+Added `revokeAndLog()` helper with debug-level logging to all `URL.revokeObjectURL` and `audio.src` cleanup paths. Each cleanup now logs reason (ended, error, abort, play-failure, catch) and entry ID.
 
 ---
 
 ## 7. Code Duplication
 
-### DUP-1 (MEDIUM) useSharedTaskAudio.ts ≈ useAudioPlayback.ts (~250 lines each)
+### DUP-1 ~~(MEDIUM)~~ ✅ FIXED — Shared audio playback hook extracted (PR #689)
 
-These two hooks share ~90% identical logic (audio playback, abort control, synthesis polling). Only differences are whether `entries` is passed as argument or from parent context. Should be extracted into a shared `useAudioPlaybackCore` hook.
+Created `useAudioPlaybackCore` (258 lines). `useAudioPlayback` reduced from 246 → 46 lines, `useSharedTaskAudio` from 250 → 22 lines. ~250 lines deduplication, 10 new core tests, all 46 audio tests pass.
 
 ---
 
@@ -156,12 +150,12 @@ These two hooks share ~90% identical logic (audio playback, abort control, synth
 | Dependencies | ~~1~~ | ~~1~~ | ~~1~~ | ✅ DEP-1, DEP-2, DEP-3 |
 | Dead Code | ~~1~~ | ~~1~~ | 0 | ✅ DEAD-1, DEAD-2 |
 | Unused Types | 0 | 0 | 0 | ✅ TYPE-1 (42 types) |
-| Serverless Config | 0 | ~~1~~+1 | 1 | ✅ SLS-1 |
+| Serverless Config | 0 | ~~1~~ | ~~1~~ | ✅ SLS-1, SLS-2, SLS-3 |
 | Silent Catches | ~~1~~ | 0 | 0 | ✅ SILENT-1 |
-| React Patterns | 0 | 1 | 1 | |
-| Audio Resources | 0 | 1 | 0 | |
-| Code Duplication | 0 | 1 | 0 | |
-| **Total** | **0** | **4** | **1** | **8 fixed** |
+| React Patterns | 0 | ~~1~~ | ~~1~~ | ✅ REACT-1, REACT-2 |
+| Audio Resources | 0 | ~~1~~ | 0 | ✅ AUDIO-1 |
+| Code Duplication | 0 | ~~1~~ | 0 | ✅ DUP-1 |
+| **Total** | **0** | **0** | **0** | **14 fixed** |
 
 ---
 
@@ -175,17 +169,19 @@ These two hooks share ~90% identical logic (audio playback, abort control, synth
 | SILENT-1 — Log 12 silent catches | #682 | ✅ merged |
 | DEAD-1 — Remove/un-export 32 unused exports | #684 | ✅ merged |
 | DEP-2 — Remove 6 unused devDependencies | #684 | ✅ merged |
-| TYPE-1 — Clean up 42+ unused type exports | #685 | ✅ in branch |
-| DEP-3 — Add @testing-library/jest-dom + postcss-scss | #685 | ✅ in branch |
-| KNIP-1 — Fix knip config (redundant entry) | #685 | ✅ in branch |
+| TYPE-1 — Clean up 42+ unused type exports | #685 | ✅ merged |
+| DEP-3 — Add @testing-library/jest-dom + postcss-scss | #685 | ✅ merged |
+| KNIP-1 — Fix knip config (redundant entry) | #685 | ✅ merged |
+| DUP-1 — Extract shared useAudioPlaybackCore hook | #689 | ✅ merged |
+| REACT-1 — Replace array index keys in TagsList/TagsInput | #689 | ✅ merged |
+| SLS-2 — Enable X-Ray tracing for all Lambda services | #689 | ✅ merged |
+| SLS-3 — Set reserved concurrency limits | #689 | ✅ merged |
+| AUDIO-1 — Audio cleanup observability | #689 | ✅ merged |
+| REACT-2 — requestAnimationFrame for focus management | #691 | ✅ merged |
 
-## Remaining Priority Order
+## Remaining
 
-1. **DUP-1** — Extract shared audio playback hook (~250 lines dedup)
-2. **REACT-1** — Fix array index keys in TagsInput/TagsList
-3. **SLS-2** — Enable X-Ray tracing
-4. **SLS-3** — Set reserved concurrency limits
-5. **AUDIO-1** — Audio cleanup observability
+All findings resolved. ✅
 
 ## Knip Status
 
