@@ -3,6 +3,7 @@
 
 
 import React from "react";
+import { buildTagKeys } from "./tagKeys";
 
 interface TagsListProps {
   id: string;
@@ -23,6 +24,7 @@ export function TagsList({
   allTagsSelected,
   onTagClick,
 }: TagsListProps): React.ReactElement {
+  const tagKeys = buildTagKeys(tags);
   return (
     <div className="sentence-synthesis-item__content">
       <div className="sentence-synthesis-item__tags-group">
@@ -31,8 +33,7 @@ export function TagsList({
             (isPronunciationPanelOpen && selectedTagIndex === index) ||
             (isPronunciationPanelOpen && allTagsSelected);
           return (
-            // eslint-disable-next-line react/no-array-index-key -- tag identity is its position in the sentence
-            <div key={index}
+            <div key={tagKeys[index]}
               className={`sentence-synthesis-item__tag ${onTagClick ? "sentence-synthesis-item__tag--clickable" : ""} ${isSelected ? "sentence-synthesis-item__tag--selected" : ""}`}
               onClick={
                 onTagClick ? () => onTagClick(id, index, tag) : undefined
