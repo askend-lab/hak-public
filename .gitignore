@@ -82,3 +82,6 @@ packages/merlin-worker/tools/WORLD/wav_test/
 packages/merlin-worker/.coverage
 .playwright-browsers
 .scannerwork/
+
+# Pentest / load-test data (large word lists, synthesis logs)
+internal/pentests/
