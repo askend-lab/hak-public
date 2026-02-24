@@ -13,6 +13,8 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
   logRetentionInDays: 30
+  tracing:
+    lambda: true
   httpApi:
     cors:
       allowedOrigins:
@@ -42,6 +44,7 @@ functions:
     image:
       name: vabamorf
     timeout: 30
+    reservedConcurrency: 25
     memorySize: 1024
     events:
       - httpApi:

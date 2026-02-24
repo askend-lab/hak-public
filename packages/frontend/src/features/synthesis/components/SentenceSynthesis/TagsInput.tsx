@@ -5,6 +5,7 @@
 import React from "react";
 
 import { ChevronDownIcon, CloseIcon } from "@/components/ui/Icons";
+import { buildTagKeys } from "./tagKeys";
 
 interface TagMenuItem {
   label: string;
@@ -78,6 +79,7 @@ export function TagsInput({
   onInputBlur,
   onClear,
 }: TagsInputProps): React.ReactElement {
+  const tagKeys = buildTagKeys(tags);
   return (
     <div className="sentence-synthesis-item__content">
       <div
@@ -101,8 +103,7 @@ export function TagsInput({
             onEditTagCommit
           ) {
             return (
-              // eslint-disable-next-line react/no-array-index-key -- tag identity is its position in the sentence
-              <input key={index} type="text"
+              <input key={tagKeys[index]} type="text"
                 className="sentence-synthesis-item__tag-edit-input"
                 aria-label="Muuda silti"
                 value={editingTag.value}
@@ -117,8 +118,7 @@ export function TagsInput({
           }
 
           return (
-            // eslint-disable-next-line react/no-array-index-key -- tag identity is its position in the sentence
-            <div key={index} className={`sentence-synthesis-item__tag sentence-synthesis-item__tag--clickable ${isSelected ? "sentence-synthesis-item__tag--selected" : ""}`}
+            <div key={tagKeys[index]} className={`sentence-synthesis-item__tag sentence-synthesis-item__tag--clickable ${isSelected ? "sentence-synthesis-item__tag--selected" : ""}`}
               onClick={() => onTagMenuOpen && onTagMenuOpen(id, index)}
               role="button"
               tabIndex={0}

@@ -26,6 +26,8 @@ provider:
   region: eu-west-1
   stage: ${opt:stage, 'dev'}
   logRetentionInDays: 30
+  tracing:
+    lambda: true
   httpApi:
     cors:
       allowedOrigins:
@@ -66,11 +68,17 @@ provider:
             - ecs:UpdateService
             - ecs:DescribeServices
           Resource: arn:aws:ecs:${self:provider.region}:${env:AWS_ACCOUNT_ID, '000000000000'}:service/hak-merlin-${self:provider.stage}/merlin-worker
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: "*"
 
 functions:
   synthesize:
     handler: src/handler.synthesize
     timeout: 30
+    reservedConcurrency: 25
     events:
       - httpApi:
           path: /synthesize
@@ -79,6 +87,7 @@ functions:
   status:
     handler: src/handler.status
     timeout: 10
+    reservedConcurrency: 25
     events:
       - httpApi:
           path: /status/{cacheKey}
@@ -87,6 +96,7 @@ functions:
   health:
     handler: src/handler.health
     timeout: 5
+    reservedConcurrency: 5
     events:
       - httpApi:
           path: /health
