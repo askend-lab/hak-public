@@ -7,6 +7,11 @@ import { TaskEntry, hasAudioSource, getEntryPlayUrl } from "@/types/task";
 import { synthesizeWithPolling } from "@/features/synthesis/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
 
+function revokeAndLog(url: string, prefix: string, reason: string): void {
+  URL.revokeObjectURL(url);
+  logger.debug(`${prefix} cleanup: revoked URL (${reason})`);
+}
+
 interface AudioPlaybackCoreOptions {
   continueOnFailure?: boolean;
   logPrefix?: string;
@@ -66,13 +71,13 @@ export function useAudioPlaybackCore(
         audio.onended = (): void => {
           setCurrentPlayingId(null);
           setCurrentLoadingId(null);
-          URL.revokeObjectURL(audioUrl);
+          revokeAndLog(audioUrl, logPrefix, `synthesized ended ${id}`);
         };
 
         audio.onerror = (): void => {
           setCurrentPlayingId(null);
           setCurrentLoadingId(null);
-          URL.revokeObjectURL(audioUrl);
+          revokeAndLog(audioUrl, logPrefix, `synthesized error ${id}`);
         };
 
         await audio.play();
@@ -98,14 +103,20 @@ export function useAudioPlaybackCore(
           const audio = new Audio(playUrl);
           audio.onended = (): void => {
             setCurrentPlayingId(null);
-            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
+            if (playResult.shouldRevoke) {
+              revokeAndLog(playUrl, logPrefix, `cached ended ${id}`);
+            }
           };
           audio.onerror = (): void => {
-            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
+            if (playResult.shouldRevoke) {
+              revokeAndLog(playUrl, logPrefix, `cached error ${id}`);
+            }
             void synthesizeAndPlay(entry.stressedText, entry.text, id);
           };
           audio.play().catch(() => {
-            if (playResult.shouldRevoke) {URL.revokeObjectURL(playUrl);}
+            if (playResult.shouldRevoke) {
+              revokeAndLog(playUrl, logPrefix, `cached play-failure ${id}`);
+            }
             void synthesizeAndPlay(entry.stressedText, entry.text, id);
           });
         }
@@ -155,11 +166,13 @@ export function useAudioPlaybackCore(
           const audio = new Audio(finalAudioUrl);
           setCurrentAudio(audio);
 
-          const cleanup = (): void => {
+          const cleanup = (reason: string): void => {
             setCurrentPlayingId(null);
             setCurrentLoadingId(null);
             setCurrentAudio(null);
-            if (shouldRevokeUrl && audioUrl) {URL.revokeObjectURL(audioUrl);}
+            if (shouldRevokeUrl && audioUrl) {
+              revokeAndLog(audioUrl, logPrefix, `${reason} ${entry.id}`);
+            }
           };
 
           audio.onloadeddata = (): void => {
@@ -168,23 +181,23 @@ export function useAudioPlaybackCore(
           };
 
           audio.onended = (): void => {
-            cleanup();
+            cleanup("ended");
             resolve(true);
           };
           audio.onerror = (): void => {
-            cleanup();
+            cleanup("error");
             resolve(false);
           };
 
           abortSignal.addEventListener("abort", () => {
             audio.pause();
             audio.src = "";
-            cleanup();
+            cleanup("abort");
             resolve(false);
           });
 
           audio.play().catch(() => {
-            cleanup();
+            cleanup("play-failure");
             resolve(false);
           });
         });
@@ -192,7 +205,9 @@ export function useAudioPlaybackCore(
         logger.warn(`${logPrefix} playback error:`, error);
         setCurrentLoadingId(null);
         setCurrentPlayingId(null);
-        if (shouldRevokeUrl && audioUrl) {URL.revokeObjectURL(audioUrl);}
+        if (shouldRevokeUrl && audioUrl) {
+          revokeAndLog(audioUrl, logPrefix, "catch");
+        }
         return false;
       }
     },
@@ -210,6 +225,7 @@ export function useAudioPlaybackCore(
           currentAudioRef.current.pause();
           currentAudioRef.current.src = "";
           setCurrentAudio(null);
+          logger.debug(`${logPrefix} cleanup: stopped current audio on playAll toggle`);
         }
         setCurrentPlayingId(null);
         setCurrentLoadingId(null);
