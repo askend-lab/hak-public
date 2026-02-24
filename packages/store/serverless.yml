@@ -32,8 +32,6 @@ custom:
     apiType: rest
 
   concurrency:
-    dev:
-      api: 5
     prod:
       api: 50
 
@@ -80,7 +78,7 @@ provider:
 functions:
   api:
     handler: src/lambda/handler.handler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.api}
+    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.api, null}
     events:
       - http:
           path: /save

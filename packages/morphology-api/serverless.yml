@@ -4,8 +4,6 @@ frameworkVersion: "3"
 
 custom:
   concurrency:
-    dev:
-      api: 3
     prod:
       api: 25
 
@@ -50,7 +48,7 @@ functions:
     image:
       name: vabamorf
     timeout: 30
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.api}
+    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.api, null}
     memorySize: 1024
     events:
       - httpApi:
