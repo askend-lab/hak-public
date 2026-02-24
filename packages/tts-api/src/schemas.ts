@@ -11,7 +11,7 @@ export const SynthesizeRequestSchema = z
   .object({
     text: z
       .string()
-      .min(1, "Text must not be empty")
+      .min(2, "Text must be at least 2 characters")
       .max(MAX_TEXT_LENGTH, `Text must be at most ${MAX_TEXT_LENGTH} characters`),
     voice: z.string().optional(),
     speed: z

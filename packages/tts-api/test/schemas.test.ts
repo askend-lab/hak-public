@@ -39,6 +39,16 @@ describe("SynthesizeRequestSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("should reject single-character text (Merlin TTS crashes on 1-char input)", () => {
+    const result = SynthesizeRequestSchema.safeParse({ text: "a" });
+    expect(result.success).toBe(false);
+  });
+
+  it("should accept two-character text", () => {
+    const result = SynthesizeRequestSchema.safeParse({ text: "aa" });
+    expect(result.success).toBe(true);
+  });
+
   it("should reject missing text", () => {
     const result = SynthesizeRequestSchema.safeParse({});
     expect(result.success).toBe(false);

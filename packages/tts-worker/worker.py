@@ -75,6 +75,7 @@ class WorkerConfig:
 SPEED_MIN, SPEED_MAX = 0.5, 2.0
 PITCH_MIN, PITCH_MAX = -500, 500
 MAX_TEXT_LENGTH = 100
+MIN_TEXT_LENGTH = 2
 VALID_CACHE_KEY = re.compile(r"^[a-f0-9]{64}$")
 
 
@@ -93,6 +94,8 @@ class SynthesisRequest:
         text = body.get("text", "")
         if not isinstance(text, str) or not text.strip():
             raise ValueError("Missing or empty text field")
+        if len(text) < MIN_TEXT_LENGTH:
+            raise ValueError(f"Text too short ({len(text)} < {MIN_TEXT_LENGTH})")
         if len(text) > MAX_TEXT_LENGTH:
             raise ValueError(f"Text too long ({len(text)} > {MAX_TEXT_LENGTH})")
 
