@@ -8,15 +8,15 @@ Status legend: ⬜ not started | 🔄 in progress | ✅ done
 
 Small fixes from Mikk code review that are marked Fixed but have ⚠️ caveats.
 
-- [ ] **1.1** `generate.mjs` references old package paths (`packages/merlin-api/` → `packages/tts-api/`, `packages/vabamorf-api/` → `packages/morphology-api/`) — ref: 1.4.1
-- [ ] **1.2** ARCHITECTURE.md still uses old package names throughout (simplestore, merlin-api, merlin-worker, vabamorf-api, tara-auth) — ref: 1.3.2, 14.1
-- [ ] **1.3** tts-api README still lists `/warmup` endpoint, warmup rate limit, and ECS env vars "for warmup" — ref: 15.1
-- [ ] **1.4** Frontend textarea missing `maxLength` attribute + user-facing character limit message — ref: 15.5, PUB-5
-- [ ] **1.5** `generate.py:73` still uses `shell=True` in `subprocess.Popen()` — ref: 12.4, 15.3
-- [ ] **1.6** `run_process` dead import in `run_merlin.py:53` — ref: 15.3
-- [ ] **1.7** `LoginModalProps.message` declared but unused in `LoginModal.tsx:14` — ref: 4.6
-- [ ] **1.8** ESLint rule `no-unnecessary-type-arguments` not found in config — ref: 4.7
-- [ ] **1.9** `pickle.load()` in `run_merlin.py:100` excluded from ruff rules (`merlin/**` = `["ALL"]` ignore) — ref: 12.5
+- [x] **1.1** ~~`generate.mjs` references old package paths~~ — ALREADY FIXED (paths use `tts-api/`, `morphology-api/`)
+- [x] **1.2** ~~ARCHITECTURE.md still uses old package names~~ — ALREADY FIXED (only match is `build-merlin-worker.yml` workflow filename)
+- [x] **1.3** ~~tts-api README still lists `/warmup`~~ — ALREADY FIXED (no warmup references)
+- [x] **1.4** Frontend `maxLength={100}` added to TagsInput main input — ref: 15.5, PUB-5
+- [x] **1.5** ~~`generate.py:73` shell=True~~ — NOT ACTIONABLE: external Merlin library code (`merlin/` dir excluded from all ruff rules)
+- [x] **1.6** ~~`run_process` dead import~~ — NOT FOUND in `run_merlin.py` (already removed or tracker line number was wrong)
+- [x] **1.7** `LoginModalProps.message` removed + `MODAL_STRINGS.LOGIN_MESSAGE` removed — ref: 4.6
+- [x] **1.8** ~~ESLint `no-unnecessary-type-arguments` not in config~~ — ALREADY IN CONFIG (line 212 of `eslint.base.config.mjs`)
+- [x] **1.9** ~~`pickle.load()` excluded from ruff~~ — NOT ACTIONABLE: external Merlin library code, `merlin/**` must be excluded
 
 ---
 

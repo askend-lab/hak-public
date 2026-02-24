@@ -38,7 +38,6 @@ export const SYNTHESIS_STRINGS = {
 
 export const MODAL_STRINGS = {
   PHONETIC_APPLIED: "Lause uus häälduskuju rakendatud",
-  LOGIN_MESSAGE: "Sisene, et luua ja hallata ülesandeid",
   DELETE_TASK_TITLE: "Kustuta ülesanne",
   DELETE_TASK_CONFIRM: (name: string) =>
     `Kas oled kindel, et soovid ülesande "${name}" kustutada?`,

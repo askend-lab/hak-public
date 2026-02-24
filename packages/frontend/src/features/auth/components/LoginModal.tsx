@@ -11,7 +11,6 @@ import { ErrorIcon } from "@/components/ui/Icons";
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  message?: string;
 }
 
 const LoginIntro = () => (
