@@ -99,7 +99,6 @@ export default function AppModals({
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
-        message={MODAL_STRINGS.LOGIN_MESSAGE}
       />
       <ConfirmationModal
         isOpen={modals.showDeleteConfirmation}

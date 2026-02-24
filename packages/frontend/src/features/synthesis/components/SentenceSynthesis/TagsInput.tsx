@@ -237,6 +237,7 @@ export function TagsInput({
             onChange={(e) => onInputChange(id, e.target.value)}
             onKeyDown={onInputKeyDown}
             onBlur={() => onInputBlur && onInputBlur(id)}
+            maxLength={100}
             spellCheck={false}
           />
         )}
