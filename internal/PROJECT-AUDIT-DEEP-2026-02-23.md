@@ -75,8 +75,9 @@ Set explicit timeouts: 15s for auth (TARA token exchange involves external HTTP)
 
 Added `tracing: lambda: true` to all 4 serverless.yml files, `apiGateway: true` for REST API services (simplestore, tara-auth), and xray IAM permissions.
 
-### SLS-3 ~~(LOW)~~ ✅ FIXED — Reserved concurrency limits set (PR #689)
+### SLS-3 ~~(LOW)~~ ✅ FIXED — Reserved concurrency limits set (PR #689, #693)
 
+Prod-only concurrency via SLS v3 `${var, null}` fallback (dev uses shared unreserved pool).
 Simplestore: 50, merlin synthesize/status: 25, health: 5, vabamorf: 25, tara-auth functions: 10, health: 5.
 
 ---
