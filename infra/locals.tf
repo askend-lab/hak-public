@@ -16,9 +16,16 @@ locals {
   domain_name = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
 
   # API Gateway domains (no public DNS — extracted from CloudFormation outputs)
-  # Use HttpApiUrl which exists in all stack versions (ApiEndpoint is missing in some prod stacks)
-  merlin_api_domain   = replace(data.aws_cloudformation_stack.merlin_api.outputs["HttpApiUrl"], "https://", "")
-  vabamorf_api_domain = replace(data.aws_cloudformation_stack.vabamorf_api.outputs["HttpApiUrl"], "https://", "")
+  # Use HttpApiUrl which exists in all stack versions (ApiEndpoint is missing in some prod stacks).
+  # HttpApiUrl may include a stage path (e.g. /dev) — split into hostname + path.
+  # CloudFront origin domain_name must be hostname-only; stage goes into origin_path.
+  merlin_api_raw      = replace(data.aws_cloudformation_stack.merlin_api.outputs["HttpApiUrl"], "https://", "")
+  merlin_api_domain   = element(split("/", local.merlin_api_raw), 0)
+  merlin_api_path     = length(split("/", local.merlin_api_raw)) > 1 ? "/${element(split("/", local.merlin_api_raw), 1)}" : ""
+
+  vabamorf_api_raw      = replace(data.aws_cloudformation_stack.vabamorf_api.outputs["HttpApiUrl"], "https://", "")
+  vabamorf_api_domain   = element(split("/", local.vabamorf_api_raw), 0)
+  vabamorf_api_path     = length(split("/", local.vabamorf_api_raw)) > 1 ? "/${element(split("/", local.vabamorf_api_raw), 1)}" : ""
 
   # Resource naming
   website_bucket_name     = "${local.app_name}-${var.env}-website"

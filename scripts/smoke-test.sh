@@ -131,19 +131,20 @@ fi
 echo ""
 echo "=== Frontend API Routing (CloudFront) ==="
 test_endpoint_content "CloudFront /api/analyze" "$FRONTEND_URL/api/analyze" "POST" '{"text":"Tere"}' "stressedText"
-# /api/synthesize — validates CloudFront routes to Merlin API
-# Direct Merlin test above validates full response; this only checks routing works
-# Accepted: HTTP 200/202 (routed OK), HTTP 403 (WAF geo-block)
-SYNTH_CF=$(curl -s -m 10 -w "\n%{http_code}" -X POST -H "Content-Type: application/json" -d '{"text":"Tere","voice":"efm_l"}' "$FRONTEND_URL/api/synthesize" 2>&1)
-SYNTH_CF_CODE=$(echo "$SYNTH_CF" | tail -n1)
-if [[ "$SYNTH_CF_CODE" == "200" || "$SYNTH_CF_CODE" == "202" ]]; then
-  echo -e "${GREEN}✓${NC} CloudFront /api/synthesize - HTTP $SYNTH_CF_CODE"
+# /api/synthesize — validates CloudFront routes to Merlin API (not S3)
+# CRITICAL: Check content-type is JSON. HTTP 200 with text/html means
+# CloudFront is serving SPA HTML instead of routing to the API backend.
+SYNTH_CF_HEADERS=$(curl -s -m 10 -D - -o /dev/null -X POST -H "Content-Type: application/json" -d '{"text":"Tere","voice":"efm_l"}' "$FRONTEND_URL/api/synthesize" 2>&1)
+SYNTH_CF_CODE=$(echo "$SYNTH_CF_HEADERS" | grep -i "^HTTP" | tail -1 | awk '{print $2}')
+SYNTH_CF_CT=$(echo "$SYNTH_CF_HEADERS" | grep -i "^content-type:" | tail -1)
+if echo "$SYNTH_CF_CT" | grep -qi "application/json"; then
+  echo -e "${GREEN}✓${NC} CloudFront /api/synthesize - HTTP $SYNTH_CF_CODE (JSON)"
   ((PASSED++))
 elif [[ "$SYNTH_CF_CODE" == "403" ]]; then
   echo -e "${GREEN}✓${NC} CloudFront /api/synthesize - WAF geo-block active (HTTP 403)"
   ((PASSED++))
 else
-  echo -e "${RED}✗${NC} CloudFront /api/synthesize - HTTP $SYNTH_CF_CODE (expected 200/202/403)"
+  echo -e "${RED}✗${NC} CloudFront /api/synthesize - HTTP $SYNTH_CF_CODE content-type: $SYNTH_CF_CT (expected application/json)"
   ((FAILED++))
 fi
 test_endpoint_content "CloudFront /api/status/*" "$FRONTEND_URL/api/status/test-key" "GET" "" "cacheKey\|error"
