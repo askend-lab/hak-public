@@ -57,6 +57,18 @@ resource "aws_s3_bucket_policy" "website" {
             "AWS:SourceArn" = aws_cloudfront_distribution.website.arn
           }
         }
+      },
+      {
+        Sid       = "AllowCloudFrontOACList"
+        Effect    = "Allow"
+        Principal = { Service = "cloudfront.amazonaws.com" }
+        Action    = "s3:ListBucket"
+        Resource  = aws_s3_bucket.website.arn
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.website.arn
+          }
+        }
       }
     ]
   })
