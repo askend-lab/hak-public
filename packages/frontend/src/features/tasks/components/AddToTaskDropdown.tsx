@@ -134,7 +134,7 @@ export default function AddToTaskDropdown({
   }, [isOpen, user, dataService]);
   useEffect(() => {
     if (isOpen && !selectedTask && searchInputRef.current)
-      {setTimeout(() => searchInputRef.current?.focus(), 100);}
+      {requestAnimationFrame(() => searchInputRef.current?.focus());}
   }, [isOpen, selectedTask]);
   useEffect(() => {
     if (!isOpen) {
