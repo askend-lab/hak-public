@@ -74,6 +74,7 @@ resource "aws_cloudfront_distribution" "website" {
   # Vabamorf API origin (no public DNS — only reachable through CloudFront)
   origin {
     domain_name = local.vabamorf_api_domain
+    origin_path = local.vabamorf_api_path
     origin_id   = "vabamorf-api"
     custom_origin_config {
       http_port              = 80
@@ -86,6 +87,7 @@ resource "aws_cloudfront_distribution" "website" {
   # Merlin API origin (no public DNS — only reachable through CloudFront)
   origin {
     domain_name = local.merlin_api_domain
+    origin_path = local.merlin_api_path
     origin_id   = "merlin-api"
     custom_origin_config {
       http_port              = 80
@@ -172,12 +174,10 @@ resource "aws_cloudfront_distribution" "website" {
     error_caching_min_ttl = 0
   }
 
-  custom_error_response {
-    error_code            = 403
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 0
-  }
+  # NOTE: Do NOT add custom_error_response for 403.
+  # CloudFront custom_error_response is GLOBAL — it applies to ALL behaviors
+  # including API routes. A 403 from an API origin would be silently replaced
+  # with /index.html (200 OK), making API errors invisible.
 
   restrictions {
     geo_restriction {
