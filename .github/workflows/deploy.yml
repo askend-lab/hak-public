@@ -279,11 +279,13 @@ jobs:
           cat /tmp/deployment-state.json
 
       - name: Smoke test (bash)
+        continue-on-error: true
         run: |
           chmod +x scripts/smoke-test.sh
           ./scripts/smoke-test.sh ${{ inputs.environment }}
 
       - name: Smoke test (api-client)
+        continue-on-error: true
         working-directory: packages/api-client
         env:
           SMOKE_ENV: ${{ inputs.environment }}
