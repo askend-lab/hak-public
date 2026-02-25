@@ -292,7 +292,7 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 ### Full Code Review Findings (12 items)
 
-- ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-1** (High) No architecture pattern, duplicate validation, drift risk, missing middleware — `createResponse()` independently defined in 4 places. *Verified 2026-02-25:* 3/4 packages now import from `@hak/shared` (morphology-api via `validation.ts:8`, tts-api via `response.ts:13`). Store still has its own `createResponse` with CORS-specific logic (`routes.ts:53`). `wrapLambdaHandler()` exists in shared (ERR-3) but not yet adopted by all packages. Validation still duplicated in store.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-1** (High) No architecture pattern, duplicate validation, drift risk, missing middleware — *Fixed 2026-02-25:* All 4 packages now use `createApiResponse` from `@hak/shared`. Store's `createResponse` is now a re-export alias of shared's `createApiResponse` (`routes.ts:53`). `wrapLambdaHandler()` exists in shared (ERR-3) for incremental adoption. *Remaining:* validation still duplicated in store (uses own framework, not Zod — see LAURI-12).
 
 - ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-2** (High) Write skew on first insert — DynamoDB `put` uses `ConditionExpression` only on update. *Fixed 2026-02-25:* Added `attribute_not_exists(PK)` condition on first insert (`dynamodb.ts:64`). Concurrent duplicate inserts now throw `VersionConflictError`. Regression test added (`dynamodbAdapter.test.ts`). *Needs verification: deploy to staging.*
 
@@ -300,15 +300,15 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-4** (Medium) Missing logging — *Verified 2026-02-25:* Addressed by LOG-1 through LOG-14. Structured JSON logger in shared. Request correlation in all Lambda handlers. `console.error`/`console.log` replaced with shared logger across all src. See Logging System Audit section.*
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LAURI-5** (High) Risky authentication — no default API Gateway enforcement. If authorizer is removed, unauthenticated requests fall through silently. Tests use `X-User-Id` header shortcut only — never test real Cognito claims. *Verified 2026-02-25:* Still open — `store/src/lambda/handler.ts:72-79` still has X-User-Id fallback and isOfflineMode check. No tests with real Cognito claims. Overlaps with LAURI-9.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-5** (High) Risky authentication — *Fixed 2026-02-25:* Removed X-User-Id fallback from production handler (`handler.ts:69-73`). Authentication now exclusively via `requestContext.authorizer.claims.sub`. All 7 test files updated to use Cognito claims. Added regression test: X-User-Id header with no Cognito claims returns 401. *Needs verification: deploy to staging.*
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-6** (Medium) Broken tests — `contains(200, 500)` pattern. *Fixed 2026-02-25:* Last remaining instance at `store/test/integration.test.ts:131` replaced with `expect(result.statusCode).toBe(200)`. Zero instances of multi-status assertions remain in codebase.*
 
 - ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-7** (High) Merlin prone to resource starvation and DDoS. *Verified 2026-02-25:* WAF rate limits (PUB-9: 200/5min for synthesize ✅), SQS queue depth cap (PUB-4: 50 messages ✅), ECS max capacity (PUB-2 ✅), geo-blocking (PUB-10 ✅). **Still missing:** per-user rate limiting (requires auth — see SEC-H4, pending client decision).
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LAURI-8** (Medium) DynamoDB incorrectly mocked in tests — hand-written `InMemoryDynamoDB` mock doesn't exercise real DynamoDB behavior. *Verified 2026-02-25:* `store/test/mockDynamoDB.ts` still exists. Production `InMemoryAdapter` exists at `store/src/adapters/memory.ts`. **Remediation:** use production `InMemoryAdapter` in tests or replace with `aws-sdk-client-mock`.
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-8** (Medium) DynamoDB incorrectly mocked in tests — *Fixed 2026-02-25:* Removed `InMemoryDynamoDB` from `mockDynamoDB.ts`. All tests now use production `InMemoryAdapter` from `src/adapters/memory.ts`. Only `FailingDynamoDB` remains for error simulation. Version conflict test added for InMemoryAdapter.*
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LAURI-9** (Medium) Test code in production — `X-User-Id` header path in production handler when `IS_OFFLINE=true`. *Verified 2026-02-25:* Still present at `store/src/lambda/handler.ts:75-79`. Risk: misconfiguration of `IS_OFFLINE` env var could expose trivial auth bypass. **Remediation:** remove `X-User-Id` from production handler; construct test events with `requestContext.authorizer.claims.sub` instead.
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-9** (Medium) Test code in production — *Fixed 2026-02-25:* Removed X-User-Id header path from `handler.ts`. No more IS_OFFLINE-gated auth shortcuts in production code. Tests use `requestContext.authorizer.claims.sub` exclusively. Addressed together with LAURI-5.*
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-10** (Low) Low-value unit tests — testing TypeScript instead of logic. *Verified 2026-02-25:* Addressed by Weak Tests Cleanup (WT-1 through WT-12). ~60 weak tests replaced with meaningful behavioral assertions across 12 files in 6 packages. See Weak Tests Cleanup section.*
 
