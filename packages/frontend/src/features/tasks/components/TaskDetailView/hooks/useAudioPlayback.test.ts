@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAudioPlayback } from "./useAudioPlayback";
 
@@ -116,8 +116,11 @@ describe("getVoiceModel logic", () => {
 });
 
 describe("useAudioPlayback with existing audio", () => {
+  const pendingTimers: ReturnType<typeof setTimeout>[] = [];
+
   beforeEach(() => {
     vi.clearAllMocks();
+    pendingTimers.length = 0;
     class MockAudio {
       src = "";
       onloadeddata: (() => void) | null = null;
@@ -125,14 +128,18 @@ describe("useAudioPlayback with existing audio", () => {
       onerror: (() => void) | null = null;
       pause = vi.fn();
       play = vi.fn().mockImplementation(function (this: MockAudio) {
-        setTimeout(() => this.onloadeddata?.(), 0);
-        setTimeout(() => this.onended?.(), 10);
+        pendingTimers.push(setTimeout(() => this.onloadeddata?.(), 0));
+        pendingTimers.push(setTimeout(() => this.onended?.(), 10));
         return Promise.resolve();
       });
     }
     global.Audio = MockAudio as unknown as typeof Audio;
     global.URL.createObjectURL = vi.fn(() => "blob:mock-url");
     global.URL.revokeObjectURL = vi.fn();
+  });
+
+  afterEach(() => {
+    pendingTimers.forEach(clearTimeout);
   });
 
   it("plays entry with audioUrl directly", () => {
