@@ -1,8 +1,3 @@
-variable "aws_account_id" {
-  description = "AWS account ID for ECR and other resources"
-  type        = string
-}
-
 variable "aws_region" {
   description = "AWS region"
   type        = string
