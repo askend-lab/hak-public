@@ -15,9 +15,9 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     allow {}
   }
 
-  # Rule 1: Per-IP general rate limiting (1000 req/5min ≈ 3.3 req/sec)
-  # Must accommodate status polling during synthesis (~15 in-flight × 12 polls/min = 180/min)
-  # Real abuse protection is Rule 2 (30 req/5min on /api/synthesize)
+  # Rule 1: Per-IP general rate limiting (2000 req/5min)
+  # Budget: ~200 submits + ~900 polls (15 in-flight × 12/min × 5min) + browsing
+  # Real abuse protection is Rule 2 (synthesize-specific limit)
   rule {
     name     = "rate-limit-per-ip"
     priority = 1
@@ -28,7 +28,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
 
     statement {
       rate_based_statement {
-        limit              = 1000
+        limit              = 2000
         aggregate_key_type = "IP"
       }
     }
@@ -41,7 +41,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
   }
 
   # Rule 2: Per-path rate limit for /synthesize (PUB-9)
-  # 30 req/5min per IP — synthesis takes ~4s/word, so 30 is generous for normal use
+  # 200 req/5min per IP — 2 ECS workers process ~150 words/5min, 200 gives headroom
   rule {
     name     = "rate-limit-synthesize"
     priority = 2
@@ -52,7 +52,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
 
     statement {
       rate_based_statement {
-        limit              = 30
+        limit              = 200
         aggregate_key_type = "IP"
 
         scope_down_statement {
