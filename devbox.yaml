@@ -210,7 +210,6 @@ hooks:
 
   security-audit:
     mode: warning
-    packageManager: pnpm
 
   secret-detection:
     required: true

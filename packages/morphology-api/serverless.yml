@@ -52,11 +52,14 @@ functions:
     memorySize: 1024
     events:
       - httpApi:
-          path: /{proxy+}
-          method: ANY
+          path: /api/analyze
+          method: POST
       - httpApi:
-          path: /
-          method: ANY
+          path: /api/variants
+          method: POST
+      - httpApi:
+          path: /api/health
+          method: GET
 
 resources:
   Outputs:
