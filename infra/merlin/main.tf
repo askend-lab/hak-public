@@ -13,9 +13,12 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_caller_identity" "current" {}
+
 locals {
-  name_prefix = "${var.project}-merlin-${var.env}"
-  ecr_repo    = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/merlin-worker"
+  name_prefix    = "${var.project}-merlin-${var.env}"
+  aws_account_id = data.aws_caller_identity.current.account_id
+  ecr_repo       = "${local.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/merlin-worker"
 
   tags = {
     Project     = var.project
