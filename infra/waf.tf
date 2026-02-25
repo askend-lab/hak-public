@@ -15,7 +15,9 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     allow {}
   }
 
-  # Rule 1: Per-IP rate limiting (300 req/5min ≈ 1 req/sec — sufficient for browsing + API)
+  # Rule 1: Per-IP general rate limiting (1000 req/5min ≈ 3.3 req/sec)
+  # Must accommodate status polling during synthesis (~15 in-flight × 12 polls/min = 180/min)
+  # Real abuse protection is Rule 2 (30 req/5min on /api/synthesize)
   rule {
     name     = "rate-limit-per-ip"
     priority = 1
@@ -26,7 +28,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
 
     statement {
       rate_based_statement {
-        limit              = 300
+        limit              = 1000
         aggregate_key_type = "IP"
       }
     }
