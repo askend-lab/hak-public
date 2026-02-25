@@ -1,4 +1,4 @@
-# IAM policy for agent to access DynamoDB (read + write)
+# IAM policy for agent to access DynamoDB (read-only)
 # Note: simplestore-* tables are managed by Serverless (packages/simplestore/serverless.yml)
 resource "aws_iam_user_policy" "agent_dynamodb_access" {
   name = "hak-dynamodb-${var.env}-access"
@@ -11,9 +11,6 @@ resource "aws_iam_user_policy" "agent_dynamodb_access" {
         Effect = "Allow"
         Action = [
           "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem",
-          "dynamodb:DeleteItem",
           "dynamodb:Query"
         ]
         Resource = [

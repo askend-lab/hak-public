@@ -23,8 +23,8 @@ This document serves as both a **security audit** (identifying vulnerabilities) 
 |----------|-------|-----------|
 | CRITICAL | 2     | 2 ✅      |
 | HIGH     | 3     | 3 ✅      |
-| MEDIUM   | 7     | 4 ✅ / 3 ❌ |
-| LOW/INFO | 4     | 1 ✅ / 3 ❌ |
+| MEDIUM   | 7     | 6 ✅ / 1 ❌ |
+| LOW/INFO | 4     | 2 ✅ / 2 ❌ |
 
 ---
 
@@ -68,16 +68,16 @@ The auth service previously shared the same public custom domain as SimpleStore.
 ### SEC-H2: Fargate Worker Runs in Default VPC with Public IP [HIGH]
 
 **File:** `infra/merlin/main.tf:353-357`
-**Status:** ❌ OPEN (documented as TODO)
+**Status:** ✅ Accepted risk — ingress blocked, egress restricted
 
-The Merlin ECS worker runs in the default VPC with `assign_public_ip = true`. The security group restricts egress to HTTPS (port 443) only, which is good. However:
-- The task has a public IP address, making it a potential target
-- Default VPC subnets are public — no NAT gateway isolation
-- If the container is compromised (e.g., via a malicious TTS input exploiting Merlin), the attacker has a public IP to use as a pivot point
+The Merlin ECS worker runs in the default VPC with `assign_public_ip = true`. However, the security controls are sufficient:
+- **Ingress:** Security group has NO ingress rules — all incoming connections blocked by AWS default deny
+- **Egress:** Restricted to port 443 only (HTTPS to AWS services: SQS, S3, ECR)
+- The public IP is required because default VPC has no private subnets with NAT gateway
 
-The code has a TODO: `# TODO: Move to private subnets + NAT gateway to eliminate public IP requirement`
+Moving to private subnets + NAT gateway (~$32/month) or VPC endpoints (~$7/month each) would eliminate the public IP but adds cost with marginal security benefit given the existing controls.
 
-**Remediation:** Move to private subnets with NAT gateway. This eliminates the public IP while still allowing outbound HTTPS to AWS services.
+**Risk assessment:** Low residual risk. Attack requires container compromise AND ability to use the public IP as pivot, but egress is restricted to port 443.
 
 ### SEC-H3: Merlin Audio S3 Bucket Allows Unrestricted Public Read [HIGH]
 
@@ -104,12 +104,10 @@ Audio content is non-sensitive educational material with hash-keyed URLs (SHA-25
 
 ### SEC-M1: DynamoDB Access Policy Grants Write to `agent-readonly` User [MEDIUM]
 
-**File:** `infra/dynamodb.tf:3-26`
-**Status:** ❌ OPEN
+**File:** `infra/dynamodb.tf:3-23`
+**Status:** ✅ FIXED — policy restricted to read-only (GetItem, Query)
 
-An IAM user policy named `hak-dynamodb-{env}-access` grants **full CRUD** (GetItem, PutItem, UpdateItem, DeleteItem, Query) to a user named `agent-readonly`. The name suggests read-only intent, but the policy grants write access.
-
-**Remediation:** Either rename the user or restrict the policy to read-only operations.
+The IAM user `agent-readonly` previously had full CRUD access (GetItem, PutItem, UpdateItem, DeleteItem, Query). Policy now restricted to read-only operations matching the user name.
 
 ### SEC-M2: No WAF Protection on `/api/status/*` Path [MEDIUM]
 
@@ -124,15 +122,10 @@ WAF has per-path rate limiting only for `/api/synthesize`. The `/api/status/*` e
 
 ### SEC-M3: Morphology API Catch-All Route Accepts ANY Method [MEDIUM]
 
-**File:** `packages/morphology-api/serverless.yml:53-59`
-**Status:** ❌ OPEN
+**File:** `packages/morphology-api/serverless.yml:53-62`
+**Status:** ✅ FIXED — restricted to `POST /api/analyze`, `POST /api/variants`, `GET /api/health`
 
-The Vabamorf API uses `method: ANY` with `path: /{proxy+}` — a catch-all route that forwards all HTTP methods and paths to the Lambda function. This means:
-- PUT, DELETE, PATCH methods are accepted (even if the application doesn't handle them)
-- Any path is forwarded (e.g., `/admin`, `/debug`)
-- Increases attack surface unnecessarily
-
-**Remediation:** Restrict to specific paths and methods (`POST /analyze`, `POST /variants`, `GET /health`).
+The Vabamorf API previously used `method: ANY` with `path: /{proxy+}` — a catch-all route. Now restricted to the 3 specific endpoints defined in the OpenAPI spec.
 
 ### SEC-M4: CloudTrail Bucket Lacks MFA Delete and Object Lock [MEDIUM]
 
@@ -212,21 +205,10 @@ The `/api/synthesize` endpoint requires no authentication. Anyone can submit tex
 
 ### SEC-L3: Gitleaks Config Allows `.env` Files [LOW]
 
-**File:** `.gitleaks.toml:7`
-**Status:** ❌ OPEN
+**File:** `.gitleaks.toml:5-12`
+**Status:** ✅ FIXED — `.env` removed from allowlist
 
-The gitleaks configuration allowlists `.env` paths:
-```toml
-paths = [
-    '''test/fixtures''',
-    '''.env''',
-    ...
-]
-```
-
-This means secrets in `.env` files won't be detected by gitleaks scanning. While `.env` is in `.gitignore`, accidental commits could leak secrets.
-
-**Remediation:** Remove `.env` from the allowlist. If test fixtures need env-like files, allowlist only the specific test fixture paths.
+The gitleaks configuration previously allowlisted `.env` paths, meaning secrets in `.env` files wouldn't be detected. Now removed — accidental `.env` commits will be caught by gitleaks scanning.
 
 ### SEC-L4: CSP connect-src Includes Broad Wildcards [LOW]
 
@@ -370,9 +352,9 @@ How HAK addresses common web application threat categories (OWASP-aligned).
 |--------|-----------|--------|
 | Overly permissive CORS | CORS restricted to app domains; `ALLOWED_ORIGIN` from env | ✅ |
 | Missing security headers | CSP, HSTS, X-Frame-Options: DENY, X-Content-Type-Options: nosniff via CloudFront | ✅ |
-| Default VPC with public IP (Fargate) | SEC-H2 — egress restricted to 443 only, but public IP remains | ⚠️ Open |
-| Catch-all API route | SEC-M3 — Vabamorf `ANY /{proxy+}` still open | ⚠️ Open |
-| `.env` in gitleaks allowlist | SEC-L3 — still open | ⚠️ Open |
+| Default VPC with public IP (Fargate) | SEC-H2 — egress restricted to 443 only, no ingress rules. Accepted risk | ✅ Accepted |
+| Catch-all API route | SEC-M3 — Vabamorf restricted to 3 specific endpoints (fixed 2026-02-25) | ✅ |
+| `.env` in gitleaks allowlist | SEC-L3 — removed from allowlist (fixed 2026-02-25) | ✅ |
 
 ### A06: Vulnerable and Outdated Components
 
@@ -453,22 +435,25 @@ How HAK addresses common web application threat categories (OWASP-aligned).
 
 ### Short-term (next 2 weeks)
 
-5. **[SEC-M1] Fix DynamoDB policy** — Either rename user or restrict to read-only
-6. **[SEC-M2] Add WAF rate limit for /api/status/** — Prevent enumeration attacks
-7. **[SEC-M3] Restrict Vabamorf routes** — Replace catch-all with specific paths/methods
-8. **[SEC-L3] Fix gitleaks allowlist** — Remove `.env` from allowed paths
+5. **[SEC-M1] Fix DynamoDB policy** — Restricted to read-only (GetItem, Query) ✅
+6. **[SEC-M3] Restrict Vabamorf routes** — Restricted to 3 specific endpoints ✅
+7. **[SEC-L3] Fix gitleaks allowlist** — `.env` removed from allowed paths ✅
+
+### Short-term (next 2 weeks)
+
+8. **[SEC-M2] Add WAF rate limit for /api/status/** — Prevent enumeration attacks
+9. **Branch protection** — Add "Lint, Typecheck, Test" to required status checks
 
 ### Medium-term (next month)
 
-9. **[SEC-H2] Move Fargate to private subnets** — Eliminate public IP, add NAT gateway
 10. **[SEC-M4] Add MFA Delete to CloudTrail bucket** — Protect audit logs
 11. **[SEC-M5] Switch Merlin ECR to immutable tags** — Improve image provenance
-12. **Branch protection** — Add "Lint, Typecheck, Test" to required status checks
 
 ### Accepted Risks (documented, no action needed)
 
 - **[SEC-H3]** Public S3 audio bucket — content is non-sensitive, hash-keyed, CORS-restricted
 - **[SEC-M6]** Tokens in response body — frontend needs JS access, mitigated by CSRF + short expiry
+- **[SEC-H2]** Fargate public IP — ingress blocked, egress restricted to 443, low residual risk
 - **[SEC-L1]** Unauthenticated synthesize — mitigated by WAF rate limiting + geo-blocking + queue depth
 - **[SEC-L2]** Non-HttpOnly access/ID tokens — documented design decision, mitigated by CSP + short expiry
 - **[SEC-L4]** Broad CSP connect-src — necessary for S3 audio + Cognito
