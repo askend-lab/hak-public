@@ -431,24 +431,15 @@ How HAK addresses common web application threat categories (OWASP-aligned).
 1. **[SEC-C2] Lock down SimpleStore API Gateway** — Custom domain removed, execute-api URL in CloudFront
 2. **[SEC-H1] Lock down Auth API Gateway** — Same as SimpleStore
 3. **[SEC-C1] Partially reverted WAF rate limits** — Synthesize back to 200/5min
+4. **[SEC-M1] Fix DynamoDB policy** — Restricted to read-only (GetItem, Query)
+5. **[SEC-M3] Restrict Vabamorf routes** — Restricted to 3 specific endpoints (corrected paths in PR #716)
+6. **[SEC-L3] Fix gitleaks allowlist** — `.env` removed from allowed paths
 
-### Immediate (this week)
+### TODO
 
-4. **[SEC-C1] Revert general WAF rate limit** — Change 2000→300 req/5min after confirming mass generation complete
-
-### Short-term (next 2 weeks)
-
-5. **[SEC-M1] Fix DynamoDB policy** — Restricted to read-only (GetItem, Query) ✅
-6. **[SEC-M3] Restrict Vabamorf routes** — Restricted to 3 specific endpoints ✅ (corrected paths in PR #716)
-7. **[SEC-L3] Fix gitleaks allowlist** — `.env` removed from allowed paths ✅
-
-### Short-term (next 2 weeks)
-
+7. **[SEC-C1] Revert general WAF rate limit** — Change 2000→300 req/5min after confirming mass generation complete
 8. **[SEC-M2] Add WAF rate limit for /api/status/** — Prevent enumeration attacks
 9. **Branch protection** — Add "Lint, Typecheck, Test" to required status checks
-
-### Medium-term (next month)
-
 10. **[SEC-M4] Add MFA Delete to CloudTrail bucket** — Protect audit logs
 11. **[SEC-M5] Switch Merlin ECR to immutable tags** — Improve image provenance
 
