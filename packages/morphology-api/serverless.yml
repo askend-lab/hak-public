@@ -52,13 +52,13 @@ functions:
     memorySize: 1024
     events:
       - httpApi:
-          path: /api/analyze
+          path: /analyze
           method: POST
       - httpApi:
-          path: /api/variants
+          path: /variants
           method: POST
       - httpApi:
-          path: /api/health
+          path: /health
           method: GET
 
 resources:

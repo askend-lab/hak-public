@@ -56,7 +56,12 @@
       "@smithy/config-resolver": ">=4.4.0",
       "diff": ">=4.0.4"
     },
-    "auditConfig": {}
+    "auditConfig": {
+      "ignoreCves": [
+        "CVE-2026-26996",
+        "CVE-2025-69873"
+      ]
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

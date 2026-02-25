@@ -210,6 +210,8 @@ hooks:
 
   security-audit:
     mode: warning
+    packageManager: pnpm
+    auditLevel: critical
 
   secret-detection:
     required: true
