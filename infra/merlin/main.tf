@@ -351,9 +351,9 @@ resource "aws_ecs_service" "merlin_worker" {
   }
 
   network_configuration {
-    subnets          = data.aws_subnets.default.ids
+    subnets          = var.private_subnet_ids
     security_groups  = [aws_security_group.merlin_worker.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   tags = local.tags
@@ -407,27 +407,17 @@ resource "aws_appautoscaling_policy" "merlin_sqs_scaling" {
 }
 
 # =============================================================================
-# VPC / Networking (use default VPC)
+# VPC / Networking (private subnets — no public IP, outbound via NAT gateway)
 # =============================================================================
-
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
 
 resource "aws_security_group" "merlin_worker" {
   name        = "${local.name_prefix}-worker-sg"
   description = "Security group for Merlin worker"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = var.vpc_id
 
-  # Restrict egress to HTTPS only (AWS services: ECR, S3, SQS, CloudWatch)
-  # TODO: Move to private subnets + NAT gateway to eliminate public IP requirement
+  # No ingress rules — worker only polls SQS outbound, accepts no connections
+
+  # Restrict egress to HTTPS only (AWS services: ECR, S3, SQS, CloudWatch via NAT)
   egress {
     from_port   = 443
     to_port     = 443

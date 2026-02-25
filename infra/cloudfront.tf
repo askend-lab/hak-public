@@ -39,9 +39,11 @@ resource "aws_cloudfront_function" "api_rewrite" {
   code    = <<-EOF
     function handler(event) {
       var request = event.request;
-      // Rewrite /api/xxx to /xxx for backend APIs
+      // Strip path prefix before forwarding to API Gateway origins
       if (request.uri.startsWith('/api/')) {
-        request.uri = request.uri.substring(4);
+        request.uri = request.uri.substring(4);  // /api/save -> /save
+      } else if (request.uri.startsWith('/auth/')) {
+        request.uri = request.uri.substring(5);  // /auth/tara/start -> /tara/start
       }
       return request;
     }
@@ -95,10 +97,24 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-  # SimpleStore API origin
+  # SimpleStore API origin (REST API v1 — no public DNS, stage path via origin_path)
   origin {
-    domain_name = var.env == "prod" ? "hak-api.${var.domain_name}" : "hak-api-${var.env}.${var.domain_name}"
+    domain_name = local.simplestore_api_domain
     origin_id   = "simplestore-api"
+    origin_path = "/${var.env}"
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  # Auth API origin (REST API v1 — no public DNS, stage path via origin_path)
+  origin {
+    domain_name = local.tara_auth_api_domain
+    origin_id   = "auth-api"
+    origin_path = "/${var.env}"
     custom_origin_config {
       http_port              = 80
       https_port             = 443
@@ -124,7 +140,7 @@ resource "aws_cloudfront_distribution" "website" {
           "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"
         ]
         cookies {
-          forward = "none"
+          forward = ordered_cache_behavior.value.cookies
         }
       }
 

@@ -285,23 +285,28 @@ jobs:
 
           # Custom domains created by serverless-domain-manager that bypass CloudFront WAF.
           # These must not exist — all traffic must go through CloudFront.
+          # Includes both HTTP API (v2) domains (Merlin, Vabamorf) and REST API (v1) domains (SimpleStore, Auth).
           DOMAINS_TO_DELETE=(
             "merlin-${ENV}.${DOMAIN}"
             "vabamorf-${ENV}.${DOMAIN}"
+            "hak-api-${ENV}.${DOMAIN}"
           )
-          # Prod uses different naming: merlin.domain, vabamorf.domain
+          # Prod uses different naming
           if [ "$ENV" == "prod" ]; then
             DOMAINS_TO_DELETE=(
               "merlin.${DOMAIN}"
               "vabamorf.${DOMAIN}"
               "merlin-prod.${DOMAIN}"
               "vabamorf-prod.${DOMAIN}"
+              "hak-api.${DOMAIN}"
+              "hak-api-prod.${DOMAIN}"
             )
           fi
 
           for domain in "${DOMAINS_TO_DELETE[@]}"; do
             echo "Checking $domain..."
             # Delete API mapping first, then custom domain
+            # Check both HTTP API (v2) and REST API (v1) custom domains
             if aws apigatewayv2 get-domain-name --domain-name "$domain" 2>/dev/null; then
               echo "⚠️  Found orphaned custom domain: $domain — deleting"
 
@@ -334,6 +339,17 @@ jobs:
                 }" 2>/dev/null || true
                 echo "✅ Deleted Route53 record for $domain"
               fi
+            elif aws apigateway get-domain-name --domain-name "$domain" 2>/dev/null; then
+              echo "⚠️  Found orphaned REST API domain: $domain — deleting"
+              TARGET=$(aws apigateway get-domain-name --domain-name "$domain" --query 'regionalDomainName' --output text 2>/dev/null || true)
+              for bp in $(aws apigateway get-base-path-mappings --domain-name "$domain" --query 'items[].basePath' --output text 2>/dev/null || true); do
+                aws apigateway delete-base-path-mapping --domain-name "$domain" --base-path "$bp" || true
+              done
+              aws apigateway delete-domain-name --domain-name "$domain" || true
+              if [ -n "$TARGET" ] && [ "$TARGET" != "None" ]; then
+                aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch "{\"Changes\":[{\"Action\":\"DELETE\",\"ResourceRecordSet\":{\"Name\":\"$domain\",\"Type\":\"A\",\"AliasTarget\":{\"HostedZoneId\":\"ZLY8HYME6SFDD\",\"DNSName\":\"$TARGET\",\"EvaluateTargetHealth\":false}}}]}" 2>/dev/null || true
+              fi
+              echo "✅ Cleaned up $domain"
             else
               echo "✅ $domain — not found (already clean)"
             fi
