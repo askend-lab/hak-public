@@ -12,7 +12,7 @@ import {
   HTTP_ERRORS,
 } from "../src/lambda/routes";
 import { Store, ServerContext } from "../src/core";
-import { InMemoryDynamoDB } from "./mockDynamoDB";
+import { InMemoryAdapter } from "../src/adapters/memory";
 
 const testContext: ServerContext = {
   app: "test",
@@ -74,7 +74,7 @@ describe("Routes", () => {
   let store: Store;
 
   beforeEach(() => {
-    store = new Store(new InMemoryDynamoDB(), testContext);
+    store = new Store(new InMemoryAdapter(), testContext);
   });
 
   describe("createResponse", () => {

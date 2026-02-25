@@ -29,6 +29,16 @@ describe("InMemoryAdapter", () => {
       expect(adapter.size()).toBe(1);
     });
 
+    it("throws VersionConflictError when expectedVersion does not match", async () => {
+      const item = createItem("pk1", "sk1", 1);
+      await adapter.put(item);
+
+      const updated = { ...item, data: { changed: true }, version: 2 };
+      await expect(adapter.put(updated, 99)).rejects.toThrow(
+        "Item was modified by another request",
+      );
+    });
+
     it("overwrites existing item with same key", async () => {
       const item1 = createItem("pk1", "sk1");
       const item2 = { ...createItem("pk1", "sk1"), data: { updated: true } };
