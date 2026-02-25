@@ -29,6 +29,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.990.0",
     "@aws-sdk/lib-dynamodb": "^3.990.0",
-    "@hak/shared": "workspace:*"
+    "@hak/shared": "workspace:*",
+    "zod": "^3.25.76"
   }
 }
