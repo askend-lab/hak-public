@@ -45,13 +45,4 @@ variable "merlin_memory" {
   default     = 4096
 }
 
-variable "vpc_id" {
-  description = "VPC ID for the Fargate worker security group"
-  type        = string
-}
-
-variable "private_subnet_ids" {
-  description = "Private subnet IDs for Fargate tasks (must have NAT gateway for outbound HTTPS)"
-  type        = list(string)
-}
 

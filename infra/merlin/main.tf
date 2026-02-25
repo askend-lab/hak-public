@@ -351,7 +351,7 @@ resource "aws_ecs_service" "merlin_worker" {
   }
 
   network_configuration {
-    subnets          = var.private_subnet_ids
+    subnets          = local.private_subnet_ids
     security_groups  = [aws_security_group.merlin_worker.id]
     assign_public_ip = false
   }
@@ -408,12 +408,31 @@ resource "aws_appautoscaling_policy" "merlin_sqs_scaling" {
 
 # =============================================================================
 # VPC / Networking (private subnets — no public IP, outbound via NAT gateway)
+# Read VPC/subnet config from SSM (same params used by auth Lambda)
 # =============================================================================
+
+data "aws_ssm_parameter" "private_subnet_1" {
+  name = "/hak/shared/private-subnet-id-1"
+}
+
+data "aws_ssm_parameter" "private_subnet_2" {
+  name = "/hak/shared/private-subnet-id-2"
+}
+
+# Derive VPC ID from private subnet (no extra SSM param needed)
+data "aws_subnet" "private" {
+  id = data.aws_ssm_parameter.private_subnet_1.value
+}
+
+locals {
+  vpc_id             = data.aws_subnet.private.vpc_id
+  private_subnet_ids = [data.aws_ssm_parameter.private_subnet_1.value, data.aws_ssm_parameter.private_subnet_2.value]
+}
 
 resource "aws_security_group" "merlin_worker" {
   name        = "${local.name_prefix}-worker-sg"
   description = "Security group for Merlin worker"
-  vpc_id      = var.vpc_id
+  vpc_id      = local.vpc_id
 
   # No ingress rules — worker only polls SQS outbound, accepts no connections
 

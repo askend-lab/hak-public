@@ -2,9 +2,11 @@ import * as jose from 'jose';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { logger } from '@hak/shared';
 import { TaraIdToken, TaraTokens } from './types';
+import { getFrontendUrl } from './cookies';
 
 export const DEFAULT_TARA_ISSUER = 'https://tara-test.ria.ee';
-export const DEFAULT_CALLBACK_URL = 'https://hak-dev.askend-lab.com/auth/tara/callback';
+export const TARA_CALLBACK_PATH = '/auth/tara/callback';
+export const DEFAULT_CALLBACK_URL = `${getFrontendUrl()}${TARA_CALLBACK_PATH}`;
 export const OIDC_AUTHORIZE_PATH = '/oidc/authorize';
 export const OIDC_TOKEN_PATH = '/oidc/token';
 export const OIDC_JWKS_PATH = '/oidc/jwks';
