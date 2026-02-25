@@ -18,7 +18,7 @@ function createEvent(
     path: resource,
     queryStringParameters: params || null,
     body: body ? JSON.stringify(body) : null,
-    headers: userId ? { "X-User-Id": userId } : {},
+    headers: {},
     requestContext: {
       authorizer: userId ? { claims: { sub: userId } } : null,
     },

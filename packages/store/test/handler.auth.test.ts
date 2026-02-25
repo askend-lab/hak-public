@@ -10,39 +10,33 @@ describe("Lambda Handler Auth", () => {
     setAdapter(null);
   });
 
-  describe("X-User-Id edge cases", () => {
-    it.each([
-      ["not provided, IS_OFFLINE=false", "false", {}, 401],
-      ["ignored when IS_OFFLINE=false", "false", { "X-User-Id": "ignored" }, 401],
-      ["empty in offline mode", "true", { "X-User-Id": "" }, 401],
-    ])("should handle X-User-Id %s", async (_name, offline, headers, expectedStatus) => {
-      process.env.IS_OFFLINE = offline;
+  describe("Cognito authorizer edge cases", () => {
+    it("should reject when X-User-Id header is provided but no Cognito claims", async () => {
       const event = createEvent({
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
         queryStringParameters: { key: "test", id: "sort", type: "private" },
-        headers,
+        headers: { "X-User-Id": "should-be-ignored" },
         requestContext: { ...createEvent({}).requestContext, authorizer: null },
       });
       const result = await handler(event);
-      expect(result.statusCode).toBe(expectedStatus);
+      expect(result.statusCode).toBe(401);
     });
 
-    it("should use X-User-Id when provided and IS_OFFLINE is true", async () => {
+    it("should authenticate when Cognito claims sub is present", async () => {
       const event = createEvent({
         httpMethod: "POST",
         path: "/save",
         resource: "/save",
-        body: JSON.stringify({ key: "x-user-test", id: "sort1", type: "private", ttl: 3600 }),
-        headers: { "X-User-Id": "local-test-user" },
-        requestContext: { ...createEvent({}).requestContext, authorizer: null },
+        body: JSON.stringify({ key: "cognito-test", id: "sort1", type: "private", ttl: 3600 }),
+        requestContext: {
+          ...createEvent({}).requestContext,
+          authorizer: { claims: { sub: "cognito-user-abc" } },
+        },
       });
       const result = await handler(event);
       expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body);
-      expect(body.item.owner).toBeUndefined();
-      expect(body.item.data).toBeDefined();
     });
   });
 

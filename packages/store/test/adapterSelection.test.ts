@@ -49,7 +49,10 @@ describe("Adapter Selection", () => {
         ttl: 3600,
         data: { value: "test" },
       });
-      saveEvent.headers["X-User-Id"] = "test-user";
+      saveEvent.requestContext = {
+        ...saveEvent.requestContext,
+        authorizer: { claims: { sub: "test-user" } },
+      };
 
       const saveResult = await handler(saveEvent);
       expect(saveResult.statusCode).toBe(200);

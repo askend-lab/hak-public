@@ -9,19 +9,22 @@
 import { handler } from "../src/lambda/handler";
 import { createPostEvent, createGetEvent } from "./setup";
 
-// Helper to add user header for auth
-function addUserHeader(
+// Helper to set Cognito authorizer claims for auth
+function withCognitoUser(
   event: ReturnType<typeof createPostEvent>,
   userId: string,
 ): ReturnType<typeof createPostEvent> {
-  event.headers["X-User-Id"] = userId;
+  event.requestContext = {
+    ...event.requestContext,
+    authorizer: { claims: { sub: userId } },
+  };
   return event;
 }
 
 describe("Integration Tests - Full Pipeline", () => {
   describe("private type through handler", () => {
     it("should save and retrieve private item", async () => {
-      const saveEvent = addUserHeader(
+      const saveEvent = withCognitoUser(
         createPostEvent("/save", {
           key: "integration-test",
           id: "private-item",
@@ -35,7 +38,7 @@ describe("Integration Tests - Full Pipeline", () => {
       const saveResult = await handler(saveEvent);
       expect(saveResult.statusCode).toBe(200);
 
-      const getEvent = addUserHeader(
+      const getEvent = withCognitoUser(
         createGetEvent("/get", {
           key: "integration-test",
           id: "private-item",
@@ -52,7 +55,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should reject invalid type in request", async () => {
-      const event = addUserHeader(
+      const event = withCognitoUser(
         createPostEvent("/save", {
           key: "test",
           id: "test",
@@ -70,7 +73,7 @@ describe("Integration Tests - Full Pipeline", () => {
 
   describe("unlisted type through handler", () => {
     it("should save unlisted item", async () => {
-      const saveEvent = addUserHeader(
+      const saveEvent = withCognitoUser(
         createPostEvent("/save", {
           key: "shared-doc",
           id: "doc1",
@@ -86,7 +89,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should validate unlisted type is accepted", async () => {
-      const getEvent = addUserHeader(
+      const getEvent = withCognitoUser(
         createGetEvent("/get", {
           key: "shared-doc",
           id: "doc1",
@@ -103,7 +106,7 @@ describe("Integration Tests - Full Pipeline", () => {
 
   describe("public type through handler", () => {
     it("should save public item", async () => {
-      const saveEvent = addUserHeader(
+      const saveEvent = withCognitoUser(
         createPostEvent("/save", {
           key: "article",
           id: "post1",
@@ -119,7 +122,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should query public items", async () => {
-      const queryEvent = addUserHeader(
+      const queryEvent = withCognitoUser(
         createGetEvent("/query", {
           prefix: "article",
           type: "public",
@@ -134,7 +137,7 @@ describe("Integration Tests - Full Pipeline", () => {
 
   describe("shared type through handler", () => {
     it("should save shared item", async () => {
-      const saveEvent = addUserHeader(
+      const saveEvent = withCognitoUser(
         createPostEvent("/save", {
           key: "wiki",
           id: "page1",
@@ -150,7 +153,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should validate shared type is accepted", async () => {
-      const getEvent = addUserHeader(
+      const getEvent = withCognitoUser(
         createGetEvent("/get", {
           key: "wiki",
           id: "page1",
@@ -166,7 +169,7 @@ describe("Integration Tests - Full Pipeline", () => {
 
   describe("validation through handler", () => {
     it("should reject empty pk", async () => {
-      const event = addUserHeader(
+      const event = withCognitoUser(
         createPostEvent("/save", {
           key: "",
           id: "test",
@@ -181,7 +184,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should reject empty sk", async () => {
-      const event = addUserHeader(
+      const event = withCognitoUser(
         createPostEvent("/save", {
           key: "test",
           id: "",
@@ -196,7 +199,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should accept zero ttl (no expiration)", async () => {
-      const event = addUserHeader(
+      const event = withCognitoUser(
         createPostEvent("/save", {
           key: "test-zero-ttl",
           id: "test",
@@ -211,7 +214,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should reject negative ttl", async () => {
-      const event = addUserHeader(
+      const event = withCognitoUser(
         createPostEvent("/save", {
           key: "test",
           id: "test",
@@ -226,7 +229,7 @@ describe("Integration Tests - Full Pipeline", () => {
     });
 
     it("should reject ttl exceeding max", async () => {
-      const event = addUserHeader(
+      const event = withCognitoUser(
         createPostEvent("/save", {
           key: "test",
           id: "test",
