@@ -15,11 +15,8 @@ function isLocalDev(): boolean {
 
 function getApiBaseUrl(): string {
   if (import.meta.env?.VITE_AUTH_API_URL) {return import.meta.env.VITE_AUTH_API_URL;}
-  if (isLocalDev()) {return "/auth";}
-  // Runtime derivation: hak-dev.askend-lab.com → hak-api-dev.askend-lab.com
-  //                     hak.askend-lab.com → hak-api.askend-lab.com
-  const hostname = getHostname();
-  return `https://${hostname.replace(/^hak/, "hak-api")}/auth`;
+  // Auth API is routed through CloudFront on the same domain (/auth/tara/*)
+  return "/auth";
 }
 
 export function getAuthApiUrl(): string {
@@ -28,7 +25,6 @@ export function getAuthApiUrl(): string {
 
 export function getTaraLoginUrlValue(): string {
   if (import.meta.env?.VITE_TARA_LOGIN_URL) {return import.meta.env.VITE_TARA_LOGIN_URL;}
-  if (isLocalDev()) {return "/auth/tara/start";}
   return `${getApiBaseUrl()}/tara/start`;
 }
 export const PKCE_STORAGE_KEY = "pkce_code_verifier";

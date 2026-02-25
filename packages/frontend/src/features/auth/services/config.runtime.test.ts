@@ -23,31 +23,31 @@ describe("runtime API URL derivation (non-localhost)", () => {
     vi.stubEnv("VITE_COGNITO_DOMAIN", "auth.example.com");
   }
 
-  it("should derive dev API URL from dev frontend hostname", async () => {
+  it("should use relative /auth path on dev hostname (same CloudFront domain)", async () => {
     stubDeployedEnv("hak-dev.askend-lab.com");
     const { getAuthApiUrl } = await import("./config");
-    expect(getAuthApiUrl()).toBe("https://hak-api-dev.askend-lab.com/auth");
+    expect(getAuthApiUrl()).toBe("/auth");
   });
 
-  it("should derive prod API URL from prod frontend hostname", async () => {
+  it("should use relative /auth path on prod hostname (same CloudFront domain)", async () => {
     stubDeployedEnv("hak.askend-lab.com");
     const { getAuthApiUrl } = await import("./config");
-    expect(getAuthApiUrl()).toBe("https://hak-api.askend-lab.com/auth");
+    expect(getAuthApiUrl()).toBe("/auth");
   });
 
-  it("should derive TARA login URL from dev hostname", async () => {
+  it("should use relative TARA login URL on dev hostname", async () => {
     stubDeployedEnv("hak-dev.askend-lab.com");
     const { getTaraLoginUrlValue } = await import("./config");
-    expect(getTaraLoginUrlValue()).toBe("https://hak-api-dev.askend-lab.com/auth/tara/start");
+    expect(getTaraLoginUrlValue()).toBe("/auth/tara/start");
   });
 
-  it("should derive TARA login URL from prod hostname", async () => {
+  it("should use relative TARA login URL on prod hostname", async () => {
     stubDeployedEnv("hak.askend-lab.com");
     const { getTaraLoginUrlValue } = await import("./config");
-    expect(getTaraLoginUrlValue()).toBe("https://hak-api.askend-lab.com/auth/tara/start");
+    expect(getTaraLoginUrlValue()).toBe("/auth/tara/start");
   });
 
-  it("should exchange code via backend on non-localhost", async () => {
+  it("should exchange code via backend on non-localhost (same-origin)", async () => {
     stubDeployedEnv("hak-dev.askend-lab.com");
     sessionStorage.setItem("pkce_code_verifier", "test-verifier");
     global.fetch = vi.fn().mockResolvedValue({
@@ -58,7 +58,7 @@ describe("runtime API URL derivation (non-localhost)", () => {
     const result = await exchangeCodeForTokens("code");
     expect(result).toStrictEqual({ accessToken: "a", idToken: "i", expiresIn: 3600 });
     expect(vi.mocked(global.fetch).mock.calls[0]?.[0]).toBe(
-      "https://hak-api-dev.askend-lab.com/auth/tara/exchange-code",
+      "/auth/tara/exchange-code",
     );
     const opts = vi.mocked(global.fetch).mock.calls[0]?.[1];
     expect(opts?.credentials).toBe("include");
