@@ -57,6 +57,31 @@ jobs:
             -backend-config="dynamodb_table=askend-lab-terraform-locks" \
             -backend-config="key=merlin/${{ github.event.inputs.environment || 'dev' }}/terraform.tfstate"
 
+      - name: Check for stale state lock
+        working-directory: infra/merlin
+        timeout-minutes: 2
+        run: |
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          STATE_KEY="merlin/${ENV}/terraform.tfstate"
+          LOCK_ID=$(aws dynamodb get-item --table-name askend-lab-terraform-locks \
+            --key "{\"LockID\":{\"S\":\"askend-lab-terraform-state/${STATE_KEY}\"}}" \
+            --query 'Item.Info.S' --output text 2>/dev/null || echo "NONE")
+          if [ "$LOCK_ID" != "NONE" ] && [ "$LOCK_ID" != "None" ] && [ -n "$LOCK_ID" ]; then
+            echo "⚠️ Found stale lock, force-unlocking..."
+            REAL_LOCK_ID=$(echo "$LOCK_ID" | python3 -c "import sys,json; print(json.loads(sys.stdin.read())['ID'])" 2>/dev/null || true)
+            if [ -n "$REAL_LOCK_ID" ]; then
+              terraform force-unlock -force "$REAL_LOCK_ID"
+              echo "✅ Unlocked stale lock: $REAL_LOCK_ID"
+            else
+              aws dynamodb delete-item --table-name askend-lab-terraform-locks \
+                --key "{\"LockID\":{\"S\":\"askend-lab-terraform-state/${STATE_KEY}\"}}"
+              echo "✅ Deleted stale lock directly"
+            fi
+          else
+            echo "✅ No stale lock found"
+          fi
+        continue-on-error: true
+
       - name: Terraform Plan
         working-directory: infra/merlin
         run: |
