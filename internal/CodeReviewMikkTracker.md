@@ -314,7 +314,7 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-11** (Medium) DynamoDB logic leaked into frontend — *Fixed 2026-02-25:* LAURI-P1 renamed pk/sk to key/id ✅. Now also extracted `STORE_KEYS.TASK`/`STORE_KEYS.TASKS` constants to `@hak/shared/constants.ts`. Frontend `SimpleStoreAdapter` imports from shared — no more hardcoded type strings.*
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LAURI-12** (Low) Inefficient TypeScript patterns — manual `typeof` checks where Zod schemas would be cleaner. *Verified 2026-02-25:* tts-api and morphology-api use Zod ✅. Store still uses manual typeof validation in `store/src/core/validation.ts`. Handler still has `as string | undefined` cast at `handler.ts:71`. **Remediation:** adopt Zod schema at store handler boundary.
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-12** (Low) Inefficient TypeScript patterns — *Fixed 2026-02-25:* Refactored `store/src/core/validation.ts` from manual typeof checks to Zod schemas. All 4 packages now use Zod for validation (tts-api, morphology-api, store, shared). Same public API, same error messages, same behavior. `zod` added to store dependencies.*
 
 ---
 
