@@ -123,9 +123,11 @@ WAF has per-path rate limiting only for `/api/synthesize`. The `/api/status/*` e
 ### SEC-M3: Morphology API Catch-All Route Accepts ANY Method [MEDIUM]
 
 **File:** `packages/morphology-api/serverless.yml:53-62`
-**Status:** ✅ FIXED — restricted to `POST /api/analyze`, `POST /api/variants`, `GET /api/health`
+**Status:** ✅ FIXED — restricted to `POST /analyze`, `POST /variants`, `GET /health`
 
 The Vabamorf API previously used `method: ANY` with `path: /{proxy+}` — a catch-all route. Now restricted to the 3 specific endpoints defined in the OpenAPI spec.
+
+**⚠️ Incident 2026-02-25:** Initial fix incorrectly used `/api/analyze` paths in serverless.yml. CloudFront strips `/api/` prefix before forwarding, so API Gateway returned 404 → `custom_error_response` converted to 200 + index.html → frontend received HTML instead of JSON → generation broken on dev. Fixed in PR #716 by removing `/api/` prefix from routes. Static test `cloudfront-route-consistency.test.ts` now prevents recurrence.
 
 ### SEC-M4: CloudTrail Bucket Lacks MFA Delete and Object Lock [MEDIUM]
 
@@ -354,6 +356,7 @@ How HAK addresses common web application threat categories (OWASP-aligned).
 | Missing security headers | CSP, HSTS, X-Frame-Options: DENY, X-Content-Type-Options: nosniff via CloudFront | ✅ |
 | Default VPC with public IP (Fargate) | SEC-H2 — egress restricted to 443 only, no ingress rules. Accepted risk | ✅ Accepted |
 | Catch-all API route | SEC-M3 — Vabamorf restricted to 3 specific endpoints (fixed 2026-02-25) | ✅ |
+| CloudFront route ↔ API GW mismatch | Static test validates all routes after CloudFront rewrite match serverless.yml | ✅ |
 | `.env` in gitleaks allowlist | SEC-L3 — removed from allowlist (fixed 2026-02-25) | ✅ |
 
 ### A06: Vulnerable and Outdated Components
@@ -436,7 +439,7 @@ How HAK addresses common web application threat categories (OWASP-aligned).
 ### Short-term (next 2 weeks)
 
 5. **[SEC-M1] Fix DynamoDB policy** — Restricted to read-only (GetItem, Query) ✅
-6. **[SEC-M3] Restrict Vabamorf routes** — Restricted to 3 specific endpoints ✅
+6. **[SEC-M3] Restrict Vabamorf routes** — Restricted to 3 specific endpoints ✅ (corrected paths in PR #716)
 7. **[SEC-L3] Fix gitleaks allowlist** — `.env` removed from allowed paths ✅
 
 ### Short-term (next 2 weeks)
@@ -507,7 +510,8 @@ How HAK addresses common web application threat categories (OWASP-aligned).
 
 ### Security Tests
 - `packages/api-client/test/smoke/api-gateway-lockdown.smoke.test.ts` — Verifies API Gateways not publicly accessible
-- `packages/api-client/test/smoke/cloudfront-routing.smoke.test.ts` — Verifies CloudFront API routing returns JSON
+- `packages/api-client/test/smoke/cloudfront-routing.smoke.test.ts` — Verifies CloudFront API routing returns JSON (smoke, post-deploy)
+- `packages/api-client/test/cloudfront-route-consistency.test.ts` — Validates CloudFront routes match serverless.yml after rewrite (static, pre-merge)
 
 ---
 
