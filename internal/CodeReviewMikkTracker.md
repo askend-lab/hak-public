@@ -1,6 +1,8 @@
-# Code Review Tracker — Mikk Merimaa Findings
+# Code Review Tracker
 
-Ref: `internal/CodeReviewMikkReport.txt` (original) | `internal/CodeReviewMikkCrossCheck.md` (cross-check)
+Ref: `internal/CodeReviewMikkReport.txt` (Mikk original) | `internal/CodeReviewMikkCrossCheck.md` (cross-check) | `internal/LauriCodeReview.txt` (Lauri original)
+
+## Mikk Merimaa Findings
 
 Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code changed | [ ] Closed — verified done | 🛡️ — enforced by DevBox hook (won't regress)
 
@@ -277,10 +279,42 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are publi
 
 ---
 
-## Lauri Findings
+## Lauri Code Review (Lauri Index)
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-1** (Medium) Store API leaks DynamoDB terminology — client-facing `pk`/`sk` renamed to `key`/`id`, `sortKey` intermediate step also removed. API contract is now database-agnostic. Validation, routes, frontend adapter, and all tests updated. *Needs verification: deploy to staging and confirm frontend works with new field names.*
-- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-2** (Medium) Store API input validation too permissive — switched from blacklist to whitelist character validation. Keys/IDs now only allow `a-z A-Z 0-9 . _ - : @`. Null/array data payloads rejected. Query prefix hardened (delimiter, control chars, max length). 14 security tests added. *Needs verification: deploy to staging and confirm no legitimate keys are rejected by the whitelist.*
+Ref: `internal/LauriCodeReview.txt` (original report)
+
+Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
+
+### Previously Tracked (from earlier review)
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-P1** (Medium) Store API leaks DynamoDB terminology — client-facing `pk`/`sk` renamed to `key`/`id`, `sortKey` intermediate step also removed. API contract is now database-agnostic. Validation, routes, frontend adapter, and all tests updated. *Needs verification: deploy to staging and confirm frontend works with new field names.*
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-P2** (Medium) Store API input validation too permissive — switched from blacklist to whitelist character validation. Keys/IDs now only allow `a-z A-Z 0-9 . _ - : @`. Null/array data payloads rejected. Query prefix hardened (delimiter, control chars, max length). 14 security tests added. *Needs verification: deploy to staging and confirm no legitimate keys are rejected by the whitelist.*
+
+### Full Code Review Findings (12 items)
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-1** (High) No architecture pattern, duplicate validation, drift risk, missing middleware — `createResponse()` independently defined in 4 places (simplestore, merlin-api, vabamorf-api, shared). Validation helpers duplicated across 3 packages. No middleware abstraction — each Lambda handler manually performs parse→validate→authenticate→execute→error→response inline. **Remediation:** adopt `withMiddleware(handler, [...])` wrapper; move all response creation to `@hak/shared`; extract common validation into `@hak/shared/validation`.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-2** (High) Write skew on first insert — DynamoDB `put` uses `ConditionExpression` only on update (when `expectedVersion` is set). First insert is unconditional — two concurrent inserts for the same key both succeed, second silently overwrites first. **Location:** `store/src/core/store.ts:97-100`, `store/src/adapters/dynamodb.ts:59-62`. **Remediation:** use `attribute_not_exists(PK)` as condition on first insert.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-3** (Medium) Inconsistent error handling — different conventions across packages. `store/src/core/store.ts:179` catches all errors with `String(error)` (loses type + stack). `merlin-api/src/response.ts:51` and `vabamorf-api/src/handler.ts:88` use `console.error` directly. `ERROR_STATUS_MAP` pattern only in simplestore. **Remediation:** standardize error handling at handler boundary; use shared error mapping; replace `console.error` with `logger.error`.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-4** (Medium) Missing logging — shared logger exists but used inconsistently. `console.error`/`console.log` used directly in merlin-api, vabamorf-api, shared. No structured request logging. No logging on auth failures, access denied, or successful writes. **Remediation:** replace all `console.*` with shared logger; add request-level logging; log auth failures at warn level; log mutations at info level.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-5** (High) Risky authentication — no default API Gateway enforcement. If authorizer is removed, unauthenticated requests fall through silently. Tests use `X-User-Id` header shortcut only — never test real Cognito claims. No test with `IS_OFFLINE=false` and no Cognito sub to verify 401 path. **Location:** `store/src/lambda/handler.ts:62-77`. **Remediation:** add tests with real `requestContext.authorizer.claims.sub`; test 401 path without IS_OFFLINE.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-6** (Medium) Broken tests — `contains(200, 500)` pattern — some test assertions accept both success and error status codes, making them useless as regression guards. A test that passes on 200 or 500 tests nothing. **Remediation:** audit all multi-status assertions; replace with exact equality; split into separate success/error test cases.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-7** (High) Merlin prone to resource starvation and DDoS — no per-user rate limiting, no request queue depth cap (at time of review), no backpressure. Single client can flood SQS and starve legitimate users. **Location:** `tts-api/src/handler.ts:111-156`. **Note:** partially addressed by WAF rate limits (PUB-9) and SQS queue depth cap (PUB-4). Per-user limits still missing (requires auth — SEC-H4).
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-8** (Medium) DynamoDB incorrectly mocked in tests — hand-written `InMemoryDynamoDB` mock doesn't exercise real DynamoDB behavior (attribute serialization, condition expressions, pagination). Production `InMemoryAdapter` exists but test mock drifts from it. **Location:** `store/test/mockDynamoDB.ts`. **Remediation:** use production `InMemoryAdapter` in tests or replace with `aws-sdk-client-mock`.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-9** (Medium) Test code in production — `X-User-Id` header path in production handler when `IS_OFFLINE=true`. Risk: misconfiguration could expose trivial auth bypass. **Location:** `store/src/lambda/handler.ts:62-77`. **Remediation:** remove `X-User-Id` from production handler; move to separate `handler.local.ts` or use Lambda authorizer mock.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-10** (Low) Low-value unit tests — testing TypeScript instead of logic. `createResponse()` tests verify pass-through behavior with no conditional branches. Trivially guaranteed by type system. **Remediation:** delete pass-through tests; redirect effort to authorization decisions, error mapping, validation rules.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-11** (Medium) DynamoDB logic leaked into frontend — frontend `SimpleStoreAdapter` constructs `pk`/`sk` pairs directly (`"task"`, `task.id`). Couples frontend to backend storage schema. **Location:** `frontend/src/services/storage/SimpleStoreAdapter.ts:84-150`. **Note:** partially addressed by LAURI-P1 (renamed pk/sk to key/id). Type strings still hardcoded in frontend.
+
+- [ ] Accept  [ ] Fixed  [ ] Closed — **LAURI-12** (Low) Inefficient TypeScript patterns — manual `typeof` checks where Zod schemas would be cleaner, repeated validation patterns, `as string | undefined` casts that bypass type safety. **Location:** `store/src/core/validation.ts`, `store/src/lambda/handler.ts:64`. **Remediation:** replace typeof patterns with Zod schema at handler boundary; avoid `as Type` casts on external data.
 
 ---
 
