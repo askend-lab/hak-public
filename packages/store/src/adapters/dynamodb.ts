@@ -58,7 +58,11 @@ export class DynamoDBAdapter implements StorageAdapter {
         );
       } else {
         await this.docClient.send(
-          new PutCommand({ TableName: this.tableName, Item: item }),
+          new PutCommand({
+            TableName: this.tableName,
+            Item: item,
+            ConditionExpression: "attribute_not_exists(PK)",
+          }),
         );
       }
     } catch (error) {

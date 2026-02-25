@@ -64,22 +64,13 @@ export function setAdapter(adapter: StorageAdapter | null): void {
 }
 
 /**
- * Get user ID from Cognito claims or local header
+ * Get user ID from Cognito authorizer claims
  */
 function getUserId(event: APIGatewayProxyEvent): string | null {
   const cognitoId = event.requestContext.authorizer?.claims?.sub as
     | string
     | undefined;
-  if (cognitoId) {return cognitoId;}
-
-  // In offline/test mode, allow X-User-Id header for testing
-  if (isOfflineMode()) {
-    const localUserId =
-      event.headers["X-User-Id"] ?? event.headers["x-user-id"];
-    if (localUserId) {return localUserId;}
-  }
-
-  return null;
+  return cognitoId || null;
 }
 
 function getEnv(name: string, defaultValue: string): string {

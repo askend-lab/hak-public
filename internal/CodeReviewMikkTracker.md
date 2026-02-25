@@ -1,6 +1,8 @@
-# Code Review Tracker — Mikk Merimaa Findings
+# Code Review Tracker
 
-Ref: `internal/CodeReviewMikkReport.txt` (original) | `internal/CodeReviewMikkCrossCheck.md` (cross-check)
+Ref: `internal/CodeReviewMikkReport.txt` (Mikk original) | `internal/CodeReviewMikkCrossCheck.md` (cross-check) | `internal/LauriCodeReview.txt` (Lauri original)
+
+## Mikk Merimaa Findings
 
 Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code changed | [ ] Closed — verified done | 🛡️ — enforced by DevBox hook (won't regress)
 
@@ -277,10 +279,42 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are publi
 
 ---
 
-## Lauri Findings
+## Lauri Code Review (Lauri Index)
 
-- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-1** (Medium) Store API leaks DynamoDB terminology — client-facing `pk`/`sk` renamed to `key`/`id`, `sortKey` intermediate step also removed. API contract is now database-agnostic. Validation, routes, frontend adapter, and all tests updated. *Needs verification: deploy to staging and confirm frontend works with new field names.*
-- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-2** (Medium) Store API input validation too permissive — switched from blacklist to whitelist character validation. Keys/IDs now only allow `a-z A-Z 0-9 . _ - : @`. Null/array data payloads rejected. Query prefix hardened (delimiter, control chars, max length). 14 security tests added. *Needs verification: deploy to staging and confirm no legitimate keys are rejected by the whitelist.*
+Ref: `internal/LauriCodeReview.txt` (original report)
+
+Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
+
+### Previously Tracked (from earlier review)
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-P1** (Medium) Store API leaks DynamoDB terminology — client-facing `pk`/`sk` renamed to `key`/`id`, `sortKey` intermediate step also removed. API contract is now database-agnostic. Validation, routes, frontend adapter, and all tests updated. *Needs verification: deploy to staging and confirm frontend works with new field names.*
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-P2** (Medium) Store API input validation too permissive — switched from blacklist to whitelist character validation. Keys/IDs now only allow `a-z A-Z 0-9 . _ - : @`. Null/array data payloads rejected. Query prefix hardened (delimiter, control chars, max length). 14 security tests added. *Needs verification: deploy to staging and confirm no legitimate keys are rejected by the whitelist.*
+
+### Full Code Review Findings (12 items)
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-1** (High) No architecture pattern, duplicate validation, drift risk, missing middleware — *Fixed 2026-02-25:* All 4 packages now use `createApiResponse` from `@hak/shared`. Store's `createResponse` is now a re-export alias of shared's `createApiResponse` (`routes.ts:53`). `wrapLambdaHandler()` exists in shared (ERR-3) for incremental adoption. *Remaining:* validation still duplicated in store (uses own framework, not Zod — see LAURI-12).
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-2** (High) Write skew on first insert — DynamoDB `put` uses `ConditionExpression` only on update. *Fixed 2026-02-25:* Added `attribute_not_exists(PK)` condition on first insert (`dynamodb.ts:64`). Concurrent duplicate inserts now throw `VersionConflictError`. Regression test added (`dynamodbAdapter.test.ts`). *Needs verification: deploy to staging.*
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-3** (Medium) Inconsistent error handling — *Verified 2026-02-25:* Addressed by ERR-1 through ERR-6. `extractErrorMessage()` used everywhere. `AppError` hierarchy with 7 classes in shared. `console.error` removed from all production src (0 matches). `wrapLambdaHandler()` available for adoption. See Error Handling Audit section.*
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-4** (Medium) Missing logging — *Verified 2026-02-25:* Addressed by LOG-1 through LOG-14. Structured JSON logger in shared. Request correlation in all Lambda handlers. `console.error`/`console.log` replaced with shared logger across all src. See Logging System Audit section.*
+
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-5** (High) Risky authentication — *Fixed 2026-02-25:* Removed X-User-Id fallback from production handler (`handler.ts:69-73`). Authentication now exclusively via `requestContext.authorizer.claims.sub`. All 7 test files updated to use Cognito claims. Added regression test: X-User-Id header with no Cognito claims returns 401. *Needs verification: deploy to staging.*
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-6** (Medium) Broken tests — `contains(200, 500)` pattern. *Fixed 2026-02-25:* Last remaining instance at `store/test/integration.test.ts:131` replaced with `expect(result.statusCode).toBe(200)`. Zero instances of multi-status assertions remain in codebase.*
+
+- ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-7** (High) Merlin prone to resource starvation and DDoS. *Verified 2026-02-25:* WAF rate limits (PUB-9: 200/5min for synthesize ✅), SQS queue depth cap (PUB-4: 50 messages ✅), ECS max capacity (PUB-2 ✅), geo-blocking (PUB-10 ✅). **Still missing:** per-user rate limiting (requires auth — see SEC-H4, pending client decision).
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-8** (Medium) DynamoDB incorrectly mocked in tests — *Fixed 2026-02-25:* Removed `InMemoryDynamoDB` from `mockDynamoDB.ts`. All tests now use production `InMemoryAdapter` from `src/adapters/memory.ts`. Only `FailingDynamoDB` remains for error simulation. Version conflict test added for InMemoryAdapter.*
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-9** (Medium) Test code in production — *Fixed 2026-02-25:* Removed X-User-Id header path from `handler.ts`. No more IS_OFFLINE-gated auth shortcuts in production code. Tests use `requestContext.authorizer.claims.sub` exclusively. Addressed together with LAURI-5.*
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-10** (Low) Low-value unit tests — testing TypeScript instead of logic. *Verified 2026-02-25:* Addressed by Weak Tests Cleanup (WT-1 through WT-12). ~60 weak tests replaced with meaningful behavioral assertions across 12 files in 6 packages. See Weak Tests Cleanup section.*
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-11** (Medium) DynamoDB logic leaked into frontend — *Fixed 2026-02-25:* LAURI-P1 renamed pk/sk to key/id ✅. Now also extracted `STORE_KEYS.TASK`/`STORE_KEYS.TASKS` constants to `@hak/shared/constants.ts`. Frontend `SimpleStoreAdapter` imports from shared — no more hardcoded type strings.*
+
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-12** (Low) Inefficient TypeScript patterns — *Fixed 2026-02-25:* Refactored `store/src/core/validation.ts` from manual typeof checks to Zod schemas. All 4 packages now use Zod for validation (tts-api, morphology-api, store, shared). Same public API, same error messages, same behavior. `zod` added to store dependencies.*
 
 ---
 

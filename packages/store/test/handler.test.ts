@@ -244,42 +244,37 @@ describe("Lambda Handler", () => {
     });
   });
 
-  describe("X-User-Id header handling", () => {
-    it.each([
-      ["X-User-Id", { "X-User-Id": "header-user" }],
-      ["x-user-id (lowercase)", { "x-user-id": "header-user-lower" }],
-    ])("should use %s header in offline mode", async (_name, headers) => {
-      process.env.IS_OFFLINE = "true";
-      const event = createEvent({
-        httpMethod: "GET",
-        path: "/get",
-        resource: "/get",
-        queryStringParameters: { key: "test", id: "sort", type: "private" },
-        headers,
-        requestContext: { ...createEvent({}).requestContext, authorizer: null },
-      });
-      const result = await handler(event);
-      expect(result.statusCode).not.toBe(401);
-    });
-
-    it("should prefer Cognito ID over X-User-Id header", async () => {
-      process.env.IS_OFFLINE = "true";
+  describe("Cognito authorizer claims handling", () => {
+    it("should authenticate via Cognito claims sub", async () => {
       const event = createEvent({
         httpMethod: "POST",
         path: "/save",
         resource: "/save",
         body: JSON.stringify({ key: "test", id: "sort", type: "private", ttl: 3600, data: {} }),
-        headers: { "X-User-Id": "header-user" },
+        requestContext: {
+          ...createEvent({}).requestContext,
+          authorizer: { claims: { sub: "cognito-user-123" } },
+        },
       });
       const result = await handler(event);
       expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body);
-      expect(body.item.owner).toBeUndefined();
-      expect(body.item.data).toBeDefined();
     });
-  });
 
-  describe("empty cognito ID handling", () => {
+    it("should reject when no authorizer claims present", async () => {
+      const event = createEvent({
+        httpMethod: "GET",
+        path: "/get",
+        resource: "/get",
+        queryStringParameters: { key: "test", id: "sort", type: "private" },
+        requestContext: {
+          ...createEvent({}).requestContext,
+          authorizer: null,
+        },
+      });
+      const result = await handler(event);
+      expect(result.statusCode).toBe(401);
+    });
+
     it("should reject empty string cognito ID", async () => {
       const event = createEvent({
         httpMethod: "GET",
@@ -291,27 +286,25 @@ describe("Lambda Handler", () => {
           authorizer: { claims: { sub: "" } },
         },
       });
-      // With IS_OFFLINE=true and no X-User-Id, should return 401
-      process.env.IS_OFFLINE = "false";
       const result = await handler(event);
       expect(result.statusCode).toBe(401);
     });
 
-    it("should fall back to X-User-Id when cognito ID is empty string", async () => {
+    it("should ignore X-User-Id header (no fallback to test headers)", async () => {
       process.env.IS_OFFLINE = "true";
       const event = createEvent({
         httpMethod: "GET",
         path: "/get",
         resource: "/get",
         queryStringParameters: { key: "test", id: "sort", type: "private" },
-        headers: { "X-User-Id": "fallback-user" },
+        headers: { "X-User-Id": "should-be-ignored" },
         requestContext: {
           ...createEvent({}).requestContext,
-          authorizer: { claims: { sub: "" } },
+          authorizer: null,
         },
       });
       const result = await handler(event);
-      expect(result.statusCode).not.toBe(401);
+      expect(result.statusCode).toBe(401);
     });
   });
 

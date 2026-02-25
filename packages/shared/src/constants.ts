@@ -17,3 +17,11 @@ export const TIMING = {
 } as const;
 
 export type TimingKey = keyof typeof TIMING;
+
+/** Store entity type keys — shared between frontend and backend to avoid hardcoding */
+export const STORE_KEYS = {
+  TASK: "task",
+  TASKS: "tasks",
+} as const;
+
+export type StoreKey = (typeof STORE_KEYS)[keyof typeof STORE_KEYS];

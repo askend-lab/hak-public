@@ -4,8 +4,8 @@
 export { calculateHash } from "./hash";
 export { createLogger, logger } from "./logger";
 export type { Logger, LogLevel, LogMethod, LogContext } from "./logger";
-export { TEXT_LIMITS, TIMING } from "./constants";
-export type { TextLimitKey, TimingKey } from "./constants";
+export { TEXT_LIMITS, TIMING, STORE_KEYS } from "./constants";
+export type { TextLimitKey, TimingKey, StoreKey } from "./constants";
 export { sleep, isNonEmpty, isEmpty } from "./utils";
 export type { NullableString } from "./utils";
 export {

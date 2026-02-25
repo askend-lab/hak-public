@@ -6,7 +6,7 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { CORS_HEADERS, HTTP_STATUS, getCorsOrigin } from "@hak/shared";
+import { createApiResponse, HTTP_STATUS } from "@hak/shared";
 
 import {
   Store,
@@ -50,16 +50,8 @@ const ERROR_STATUS_MAP: Record<string, number> = {
   [ERRORS.VERSION_CONFLICT]: 409,
 };
 
-export function createResponse(
-  statusCode: number,
-  body: unknown,
-): APIGatewayProxyResult {
-  return {
-    statusCode,
-    headers: { ...CORS_HEADERS, "Access-Control-Allow-Origin": getCorsOrigin() },
-    body: JSON.stringify(body),
-  };
-}
+export const createResponse: (statusCode: number, body: unknown) => APIGatewayProxyResult =
+  createApiResponse as (statusCode: number, body: unknown) => APIGatewayProxyResult;
 
 function createErrorResponse(
   error: string | undefined,

@@ -5,7 +5,7 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { handleGetPublic, HTTP_STATUS } from "../src/lambda/routes";
 import { Store, ServerContext } from "../src/core";
 import type { DataType } from "../src/core/types";
-import { InMemoryDynamoDB } from "./mockDynamoDB";
+import { InMemoryAdapter } from "../src/adapters/memory";
 
 const testContext: ServerContext = {
   app: "test",
@@ -54,7 +54,7 @@ describe("Routes - handleGetPublic", () => {
   let store: Store;
 
   beforeEach(() => {
-    store = new Store(new InMemoryDynamoDB(), testContext);
+    store = new Store(new InMemoryAdapter(), testContext);
   });
 
   it.each([
