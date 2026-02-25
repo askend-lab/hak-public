@@ -4,7 +4,7 @@
 import { Task } from "@/types/task";
 import { AuthStorage } from "@/features/auth/services/storage";
 import { CONTENT_TYPE_JSON } from "@/config/constants";
-import { logger } from "@hak/shared";
+import { logger, STORE_KEYS } from "@hak/shared";
 
 /** Serialize a Task to a plain JSON-safe record for storage. */
 function taskToRecord(task: Task): Record<string, unknown> {
@@ -109,7 +109,7 @@ export class SimpleStoreAdapter {
 
   async getTaskByShareToken(shareToken: string): Promise<Task | null> {
     try {
-      const data = await this.get("tasks", shareToken, "unlisted");
+      const data = await this.get(STORE_KEYS.TASKS, shareToken, "unlisted");
       return data ? recordToTask(data) : null;
     } catch (error) {
       logger.error("Failed to get task by share token:", error);
@@ -157,7 +157,7 @@ export class SimpleStoreAdapter {
 
   async saveTask(task: Task): Promise<void> {
     await this.save(
-      "task",
+      STORE_KEYS.TASK,
       task.id,
       "private",
       taskToRecord(task),
@@ -165,16 +165,16 @@ export class SimpleStoreAdapter {
   }
 
   async getTask(taskId: string): Promise<Task | null> {
-    const data = await this.get("task", taskId, "private");
+    const data = await this.get(STORE_KEYS.TASK, taskId, "private");
     return data ? recordToTask(data) : null;
   }
 
   async deleteTask(taskId: string): Promise<void> {
-    await this.delete("task", taskId, "private");
+    await this.delete(STORE_KEYS.TASK, taskId, "private");
   }
 
   async queryUserTasks(): Promise<Task[]> {
-    const items = await this.query("task", "private");
+    const items = await this.query(STORE_KEYS.TASK, "private");
     return items
       .map((item) => recordToTask(item))
       .filter((t): t is Task => t !== null);
@@ -182,7 +182,7 @@ export class SimpleStoreAdapter {
 
   async deleteUnlistedTask(shareToken: string): Promise<void> {
     try {
-      await this.delete("tasks", shareToken, "unlisted");
+      await this.delete(STORE_KEYS.TASKS, shareToken, "unlisted");
     } catch (error) {
       logger.error("Failed to delete unlisted task:", error);
       throw error;
@@ -197,7 +197,7 @@ export class SimpleStoreAdapter {
       method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({
-        key: "tasks",
+        key: STORE_KEYS.TASKS,
         id: task.shareToken,
         type: "unlisted",
         ttl: UNLISTED_TTL_SECONDS,

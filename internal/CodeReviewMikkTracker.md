@@ -294,7 +294,7 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 - ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-1** (High) No architecture pattern, duplicate validation, drift risk, missing middleware — `createResponse()` independently defined in 4 places. *Verified 2026-02-25:* 3/4 packages now import from `@hak/shared` (morphology-api via `validation.ts:8`, tts-api via `response.ts:13`). Store still has its own `createResponse` with CORS-specific logic (`routes.ts:53`). `wrapLambdaHandler()` exists in shared (ERR-3) but not yet adopted by all packages. Validation still duplicated in store.
 
-- ✅ Accept  [ ] Fixed  [ ] Closed — **LAURI-2** (High) Write skew on first insert — DynamoDB `put` uses `ConditionExpression` only on update (when `expectedVersion` is set). First insert is unconditional — two concurrent inserts for the same key both succeed, second silently overwrites first. *Verified 2026-02-25:* Still open — `store/src/adapters/dynamodb.ts:59-62` does unconditional PUT when `expectedVersion` is undefined. **Remediation:** use `attribute_not_exists(PK)` as condition on first insert.
+- ✅ Accept  [✅] Fixed  [ ] Closed — **LAURI-2** (High) Write skew on first insert — DynamoDB `put` uses `ConditionExpression` only on update. *Fixed 2026-02-25:* Added `attribute_not_exists(PK)` condition on first insert (`dynamodb.ts:64`). Concurrent duplicate inserts now throw `VersionConflictError`. Regression test added (`dynamodbAdapter.test.ts`). *Needs verification: deploy to staging.*
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-3** (Medium) Inconsistent error handling — *Verified 2026-02-25:* Addressed by ERR-1 through ERR-6. `extractErrorMessage()` used everywhere. `AppError` hierarchy with 7 classes in shared. `console.error` removed from all production src (0 matches). `wrapLambdaHandler()` available for adoption. See Error Handling Audit section.*
 
@@ -302,7 +302,7 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **LAURI-5** (High) Risky authentication — no default API Gateway enforcement. If authorizer is removed, unauthenticated requests fall through silently. Tests use `X-User-Id` header shortcut only — never test real Cognito claims. *Verified 2026-02-25:* Still open — `store/src/lambda/handler.ts:72-79` still has X-User-Id fallback and isOfflineMode check. No tests with real Cognito claims. Overlaps with LAURI-9.
 
-- ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-6** (Medium) Broken tests — `contains(200, 500)` pattern. *Verified 2026-02-25:* Weak Tests Cleanup (WT-1 through WT-12) fixed ~60 weak tests. One instance remains: `store/test/integration.test.ts:131` — `expect([200, 500]).toContain(result.statusCode)`. **Remediation:** fix last remaining instance.
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-6** (Medium) Broken tests — `contains(200, 500)` pattern. *Fixed 2026-02-25:* Last remaining instance at `store/test/integration.test.ts:131` replaced with `expect(result.statusCode).toBe(200)`. Zero instances of multi-status assertions remain in codebase.*
 
 - ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-7** (High) Merlin prone to resource starvation and DDoS. *Verified 2026-02-25:* WAF rate limits (PUB-9: 200/5min for synthesize ✅), SQS queue depth cap (PUB-4: 50 messages ✅), ECS max capacity (PUB-2 ✅), geo-blocking (PUB-10 ✅). **Still missing:** per-user rate limiting (requires auth — see SEC-H4, pending client decision).
 
@@ -312,7 +312,7 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-10** (Low) Low-value unit tests — testing TypeScript instead of logic. *Verified 2026-02-25:* Addressed by Weak Tests Cleanup (WT-1 through WT-12). ~60 weak tests replaced with meaningful behavioral assertions across 12 files in 6 packages. See Weak Tests Cleanup section.*
 
-- ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-11** (Medium) DynamoDB logic leaked into frontend — frontend `SimpleStoreAdapter` constructs `key`/`id` pairs directly. *Verified 2026-02-25:* LAURI-P1 renamed `pk`/`sk` to `key`/`id` (database-agnostic names ✅). But frontend still hardcodes type strings `"task"` and `"tasks"` in `SimpleStoreAdapter.ts:160,168,177,185,200`. These should be constants from `@hak/shared`.
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-11** (Medium) DynamoDB logic leaked into frontend — *Fixed 2026-02-25:* LAURI-P1 renamed pk/sk to key/id ✅. Now also extracted `STORE_KEYS.TASK`/`STORE_KEYS.TASKS` constants to `@hak/shared/constants.ts`. Frontend `SimpleStoreAdapter` imports from shared — no more hardcoded type strings.*
 
 - ✅ Accept  [ ] Fixed  [ ] Closed — **LAURI-12** (Low) Inefficient TypeScript patterns — manual `typeof` checks where Zod schemas would be cleaner. *Verified 2026-02-25:* tts-api and morphology-api use Zod ✅. Store still uses manual typeof validation in `store/src/core/validation.ts`. Handler still has `as string | undefined` cast at `handler.ts:71`. **Remediation:** adopt Zod schema at store handler boundary.
 

@@ -128,7 +128,7 @@ describe("Integration Tests - Full Pipeline", () => {
       );
 
       const result = await handler(queryEvent);
-      expect([200, 500]).toContain(result.statusCode);
+      expect(result.statusCode).toBe(200);
     });
   });
 

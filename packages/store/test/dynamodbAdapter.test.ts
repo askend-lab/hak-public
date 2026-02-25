@@ -89,14 +89,14 @@ describe("DynamoDBAdapter", () => {
       expect(call.input.ExpressionAttributeValues).toStrictEqual({ ":expectedVersion": 1 });
     });
 
-    it("should not add ConditionExpression without expectedVersion", async () => {
+    it("should add attribute_not_exists(PK) condition on first insert (no expectedVersion)", async () => {
       mockSend.mockResolvedValue({});
       const item = makeItem("user#1", "task#1");
 
       await adapter.put(item);
 
       const call = mockSend.mock.calls[0][0];
-      expect(call.input.ConditionExpression).toBeUndefined();
+      expect(call.input.ConditionExpression).toBe("attribute_not_exists(PK)");
     });
 
     it("should throw VersionConflictError on ConditionalCheckFailedException", async () => {
@@ -106,6 +106,15 @@ describe("DynamoDBAdapter", () => {
       const item = makeItem("user#1", "task#1", 2);
 
       await expect(adapter.put(item, 1)).rejects.toThrow(VersionConflictError);
+    });
+
+    it("should throw VersionConflictError on concurrent first insert (write skew protection)", async () => {
+      mockSend.mockRejectedValue(
+        new (ConditionalCheckFailedException as unknown as new (opts: { message: string; $metadata: Record<string, unknown> }) => Error)({ message: "condition", $metadata: {} }),
+      );
+      const item = makeItem("user#1", "task#1");
+
+      await expect(adapter.put(item)).rejects.toThrow(VersionConflictError);
     });
   });
 
