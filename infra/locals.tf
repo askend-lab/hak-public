@@ -60,6 +60,6 @@ locals {
     { path = "/api/query",      origin = "simplestore-api", rewrite = true, auth = true,  query_string = true,  cookies = "none" },
     { path = "/api/get-shared", origin = "simplestore-api", rewrite = true, auth = false, query_string = true,  cookies = "none" },
     { path = "/api/get-public", origin = "simplestore-api", rewrite = true, auth = false, query_string = true,  cookies = "none" },
-    { path = "/auth/*",         origin = "auth-api",        rewrite = true, auth = false, query_string = true,  cookies = "all"  },
+    { path = "/auth/tara/*",    origin = "auth-api",        rewrite = true, auth = false, query_string = true,  cookies = "all"  },
   ]
 }
