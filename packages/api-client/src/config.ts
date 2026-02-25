@@ -7,6 +7,7 @@ export interface ApiUrls {
   merlin: string;
   vabamorf: string;
   simplestore: string;
+  auth: string;
   frontend: string;
 }
 
@@ -15,12 +16,14 @@ const URLS: Record<Environment, ApiUrls> = {
     merlin: "https://merlin-dev.askend-lab.com",
     vabamorf: "https://vabamorf-dev.askend-lab.com",
     simplestore: "https://hak-api-dev.askend-lab.com",
+    auth: "https://hak-api-dev.askend-lab.com",
     frontend: "https://hak-dev.askend-lab.com",
   },
   prod: {
     merlin: "https://merlin-prod.askend-lab.com",
     vabamorf: "https://vabamorf.askend-lab.com",
     simplestore: "https://hak-api.askend-lab.com",
+    auth: "https://hak-api.askend-lab.com",
     frontend: "https://hak.askend-lab.com",
   },
 };

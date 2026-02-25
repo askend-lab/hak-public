@@ -5,7 +5,6 @@ frameworkVersion: "3"
 plugins:
   - serverless-esbuild
   - serverless-offline
-  - serverless-domain-manager
 
 custom:
   esbuild:
@@ -15,21 +14,6 @@ custom:
     platform: "node"
     target: "node20"
     packager: "pnpm"
-
-  # Custom domain configuration
-  domainName:
-    dev: hak-api-dev.${env:DOMAIN_NAME, 'example.com'}
-    prod: hak-api.${env:DOMAIN_NAME, 'example.com'}
-
-  customDomain:
-    domainName: ${self:custom.domainName.${self:provider.stage}}
-    basePath: api
-    stage: ${self:provider.stage}
-    certificateName: "*.${env:DOMAIN_NAME, 'example.com'}"
-    createRoute53Record: true
-    endpointType: regional
-    securityPolicy: tls_1_2
-    apiType: rest
 
   concurrency:
     prod:

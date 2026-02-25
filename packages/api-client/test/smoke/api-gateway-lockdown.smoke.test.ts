@@ -4,9 +4,9 @@
 /**
  * API Gateway Lockdown Tests
  *
- * Verifies that backend API Gateways (Merlin, Vabamorf) are NOT directly
- * accessible from the public internet. All traffic must go through CloudFront
- * (which applies WAF protection).
+ * Verifies that ALL backend API Gateways (Merlin, Vabamorf, SimpleStore, Auth)
+ * are NOT directly accessible from the public internet. All traffic must go
+ * through CloudFront (which applies WAF protection).
  *
  * If any of these tests fail, it means the API Gateway has a public custom
  * domain or its execute-api endpoint is exposed — a critical security issue.
@@ -20,6 +20,8 @@ const urls = getUrls();
 const DIRECT_ENDPOINTS = [
   { name: "Merlin API", url: `${urls.merlin}/health` },
   { name: "Vabamorf API", url: `${urls.vabamorf}/analyze`, method: "POST", body: JSON.stringify({ text: "test" }) },
+  { name: "SimpleStore API", url: `${urls.simplestore}/api/health` },
+  { name: "Auth API", url: `${urls.auth}/auth/tara/health` },
 ];
 
 describe("API Gateway lockdown — backends must NOT be publicly accessible", () => {

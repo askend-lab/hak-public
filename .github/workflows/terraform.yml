@@ -161,15 +161,22 @@ jobs:
             echo "✅ No stale lock found"
           fi
 
-      - name: Remove orphaned audio resources from state
+      - name: Remove orphaned resources from state
         run: |
           # Audio resources were removed from code but still in state.
           # S3 buckets aren't empty so Terraform can't destroy them.
-          # Remove from state — actual cleanup via cleanup-orphaned.yml workflow.
-          # Remove any remaining audio-related resources from state
           for resource in $(terraform state list 2>/dev/null | grep -E '\.audio' || true); do
             echo "Removing $resource from state..."
             terraform state rm "$resource" 2>/dev/null || true
+          done
+
+          # API Gateway custom domain removed — SimpleStore/Auth now route through CloudFront.
+          # Remove from state to prevent Terraform from trying to destroy (may already be gone).
+          for resource in aws_api_gateway_domain_name.api aws_route53_record.api; do
+            if terraform state list 2>/dev/null | grep -qF "$resource"; then
+              echo "Removing $resource from state..."
+              terraform state rm "$resource" 2>/dev/null || true
+            fi
           done
           echo "✅ Orphaned resources removed from state"
         continue-on-error: true

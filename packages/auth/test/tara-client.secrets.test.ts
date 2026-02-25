@@ -59,7 +59,7 @@ describe('Secrets Manager integration', () => {
 
     const client = await createTaraClient();
     const url = client.buildAuthorizationUrl('s', 'n');
-    expect(url).toContain('auth.askend-lab.com');
+    expect(url).toContain('hak-dev.askend-lab.com');
   });
 
   it('should handle empty SecretString gracefully', async () => {

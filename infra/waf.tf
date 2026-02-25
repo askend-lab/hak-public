@@ -15,8 +15,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     allow {}
   }
 
-  # Rule 1: Per-IP rate limiting
-  # TEMP: raised from 100 to 2000 for mass TTS generation (revert after)
+  # Rule 1: Per-IP rate limiting (300 req/5min ≈ 1 req/sec — sufficient for browsing + API)
   rule {
     name     = "rate-limit-per-ip"
     priority = 1
@@ -27,7 +26,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
 
     statement {
       rate_based_statement {
-        limit              = 2000
+        limit              = 300
         aggregate_key_type = "IP"
       }
     }
@@ -40,7 +39,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
   }
 
   # Rule 2: Per-path rate limit for /synthesize (PUB-9)
-  # TEMP: raised from 20 to 500 for mass TTS generation (revert after)
+  # 30 req/5min per IP — synthesis takes ~4s/word, so 30 is generous for normal use
   rule {
     name     = "rate-limit-synthesize"
     priority = 2
@@ -51,7 +50,7 @@ resource "aws_wafv2_web_acl" "cloudfront" {
 
     statement {
       rate_based_statement {
-        limit              = 500
+        limit              = 30
         aggregate_key_type = "IP"
 
         scope_down_statement {

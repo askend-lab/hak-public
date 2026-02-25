@@ -351,9 +351,9 @@ resource "aws_ecs_service" "merlin_worker" {
   }
 
   network_configuration {
-    subnets          = data.aws_subnets.default.ids
+    subnets          = local.private_subnet_ids
     security_groups  = [aws_security_group.merlin_worker.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   tags = local.tags
@@ -407,27 +407,36 @@ resource "aws_appautoscaling_policy" "merlin_sqs_scaling" {
 }
 
 # =============================================================================
-# VPC / Networking (use default VPC)
+# VPC / Networking (private subnets — no public IP, outbound via NAT gateway)
+# Read VPC/subnet config from SSM (same params used by auth Lambda)
 # =============================================================================
 
-data "aws_vpc" "default" {
-  default = true
+data "aws_ssm_parameter" "private_subnet_1" {
+  name = "/hak/shared/private-subnet-id-1"
 }
 
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
+data "aws_ssm_parameter" "private_subnet_2" {
+  name = "/hak/shared/private-subnet-id-2"
+}
+
+# Derive VPC ID from private subnet (no extra SSM param needed)
+data "aws_subnet" "private" {
+  id = data.aws_ssm_parameter.private_subnet_1.value
+}
+
+locals {
+  vpc_id             = data.aws_subnet.private.vpc_id
+  private_subnet_ids = [data.aws_ssm_parameter.private_subnet_1.value, data.aws_ssm_parameter.private_subnet_2.value]
 }
 
 resource "aws_security_group" "merlin_worker" {
   name        = "${local.name_prefix}-worker-sg"
   description = "Security group for Merlin worker"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = local.vpc_id
 
-  # Restrict egress to HTTPS only (AWS services: ECR, S3, SQS, CloudWatch)
-  # TODO: Move to private subnets + NAT gateway to eliminate public IP requirement
+  # No ingress rules — worker only polls SQS outbound, accepts no connections
+
+  # Restrict egress to HTTPS only (AWS services: ECR, S3, SQS, CloudWatch via NAT)
   egress {
     from_port   = 443
     to_port     = 443
