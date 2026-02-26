@@ -79,7 +79,7 @@ describe("synthesize", () => {
         });
 
       const promise = synthesizeWithPolling("hello", "efm_l");
-      await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(2000);
 
       const result = await promise;
       expect(result).toBe("http://example.com/audio.wav");
@@ -114,8 +114,8 @@ describe("synthesize", () => {
         });
 
       const promise = synthesizeWithPolling("hello", "efm_l");
-      await vi.advanceTimersByTimeAsync(1000);
-      await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(2000);
+      await vi.advanceTimersByTimeAsync(2000);
       const result = await promise;
       expect(result).toBe("http://example.com/audio.wav");
 
