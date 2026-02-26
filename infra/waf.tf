@@ -78,50 +78,11 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     }
   }
 
-  # Rule 2b: Per-path rate limit for /api/status (SEC-02)
-  # 300 req/5min per IP — status polling is lightweight but unlimited polling
-  # allows cache key enumeration
-  rule {
-    name     = "rate-limit-status"
-    priority = 3
-
-    action {
-      block {}
-    }
-
-    statement {
-      rate_based_statement {
-        limit              = 300
-        aggregate_key_type = "IP"
-
-        scope_down_statement {
-          byte_match_statement {
-            search_string         = "/api/status"
-            positional_constraint = "STARTS_WITH"
-            field_to_match {
-              uri_path {}
-            }
-            text_transformation {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "${local.app_name}-${var.env}-rate-limit-status"
-      sampled_requests_enabled   = true
-    }
-  }
-
   # Rule 3: Geo-blocking for /synthesize (PUB-10)
   # Only allow speech synthesis from Baltic/Nordic region
   rule {
     name     = "geo-restrict-synthesize"
-    priority = 4
+    priority = 3
 
     action {
       block {}
