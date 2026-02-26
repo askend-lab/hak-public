@@ -14,7 +14,7 @@ The platform runs on AWS serverless infrastructure, has 3100+ automated tests, a
 
 ---
 
-## Phase 1: Next-Generation Speech Synthesis (Months 1–3)
+## Phase 1: Next-Generation Speech Synthesis
 
 *The single biggest leap in user experience and platform capability.*
 
@@ -54,7 +54,7 @@ Replace WAV (large, uncompressed) with Opus or MP3 — **5–10× smaller files*
 
 ---
 
-## Phase 2: Active Learning (Months 2–4)
+## Phase 2: Active Learning
 
 *Transform HAK from a passive listening tool into an interactive pronunciation trainer.*
 
@@ -117,7 +117,7 @@ Schools are the primary adoption channel for a government language institute. Te
 
 ---
 
-## Phase 3: HAK Everywhere (Months 4–8)
+## Phase 3: HAK Everywhere
 
 *Put Estonian pronunciation help wherever people need it — not just on hak.askend-lab.com.*
 
@@ -181,7 +181,7 @@ Priority languages determined by immigration statistics and EKI input. Framework
 
 ---
 
-## Phase 4: National Language Lab (Months 6–12)
+## Phase 4: National Language Lab
 
 *Position HAK as Estonia's national pronunciation infrastructure — a platform that only EKI can build.*
 
@@ -275,12 +275,12 @@ No other platform can provide this data. EKI becomes the authority on how people
 
 ## Investment Summary
 
-| Phase | Duration | Key Deliverables |
-|-------|----------|------------------|
-| **1: Neural TTS** | Months 1–3 | GPU infrastructure, streaming architecture, compressed audio (model depends on EKI partnership) |
-| **2: Active Learning** | Months 2–4 | Voice recording, minimal pairs, progress tracking, teacher dashboard, exam prep |
-| **3: HAK Everywhere** | Months 4–8 | Telegram bot, Chrome extension, embeddable widget, API keys, LTI, multilingual UI |
-| **4: National Language Lab** | Months 6–12 | Regional dialects, morphology UI, spell-check, IPA, research portal |
+| Phase | Key Deliverables |
+|-------|------------------|
+| **1: Neural TTS** | GPU infrastructure, streaming architecture, compressed audio (model depends on EKI partnership) |
+| **2: Active Learning** | Voice recording, minimal pairs, progress tracking, teacher dashboard, exam prep |
+| **3: HAK Everywhere** | Telegram bot, Chrome extension, embeddable widget, API keys, LTI, multilingual UI |
+| **4: National Language Lab** | Regional dialects, morphology UI, spell-check, IPA, research portal |
 
 Phases overlap — work on Phase 2 frontend features begins while Phase 1 GPU infrastructure is being deployed.
 
