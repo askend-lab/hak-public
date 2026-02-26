@@ -18,20 +18,22 @@ The platform runs on AWS serverless infrastructure, has 3100+ automated tests, a
 
 *The single biggest leap in user experience and platform capability.*
 
-### GPU-Accelerated Neural TTS
+### Next-Generation Neural TTS
 
 | Aspect | Today (Merlin) | After Upgrade |
 |--------|---------------|---------------|
-| **Technology** | Statistical parametric (2016) | Neural (VITS / Tacotron 2 + HiFi-GAN) |
-| **Voice quality** | Functional, with artifacts | Near-human naturalness |
-| **Synthesis speed** | ~4 sec per word | <1 sec per sentence |
-| **User-perceived latency** | 3–6 sec (queue → process → poll) | <1 sec (real-time streaming) |
-| **Voice options** | 2 models | Multiple voices, tones, emotions |
-| **Infrastructure** | CPU (ECS Fargate) | GPU (Inferentia / g5.xlarge / SageMaker) |
+| **Technology** | Statistical parametric (Theano, 2016) | Neural (model TBD — depends on EKI/TartuNLP partnership) |
+| **Voice quality** | Functional, with artifacts | Depends on chosen model |
+| **Synthesis speed** | ~4 sec per word (CPU) | Depends on chosen model and infrastructure |
+| **User-perceived latency** | 5–7 sec (queue + synthesis + poll) | Reduced by streaming architecture (exact gain depends on model) |
+| **Voice options** | 2 models | Depends on chosen model |
+| **Infrastructure** | CPU-only (ECS Fargate) — note: Theano already supports GPU | GPU infrastructure (Inferentia / g5.xlarge / SageMaker) |
+
+**Important context:** The current Merlin model (Theano) already supports GPU — the limitation is infrastructure (Fargate has no GPU), not the model. Moving to GPU is an infrastructure change, not a model change. A new model is a separate decision that depends on EKI partnership.
 
 **Migration path:**
-1. Evaluate available Estonian neural TTS models (TartuNLP, EKI research, open-source VITS)
-2. Deploy GPU inference infrastructure (AWS Inferentia for cost, or g5.xlarge for flexibility)
+1. Explore partnership with TartuNLP / EKI for next-generation Estonian TTS model (we build the platform, not the model)
+2. Deploy GPU-capable inference infrastructure (AWS Inferentia for cost, or g5.xlarge for flexibility)
 3. Replace queue-poll architecture with real-time WebSocket streaming
 4. Keep current Merlin as fallback during transition
 
@@ -42,8 +44,8 @@ Today:    Browser → API → SQS → CPU Worker → S3 → poll → download WA
 After:    Browser → WebSocket → GPU → stream audio chunks → instant playback
 ```
 
-- **Latency**: 3–6 sec → under 1 sec
-- **Cost efficiency**: GPU instances handle 10–50× more requests per dollar than CPU
+- **Latency**: Streaming eliminates ~1–2 sec of queue/poll overhead; total latency improvement depends on chosen model
+- **Cost efficiency**: Depends on model, GPU type, and traffic volume — requires benchmarking
 - **User experience**: hear audio as it's generated, not after full synthesis
 
 ### Compressed Audio Formats
@@ -99,22 +101,21 @@ Schools are the primary adoption channel for a government language institute. Te
 
 ### Public API
 
+**Already implemented:**
+| Feature | Status |
+|---------|--------|
+| **OpenAPI specification** | ✅ Done — `merlin-api.openapi.yaml`, `vabamorf-api.openapi.yaml`, generated from Zod schemas |
+| **TypeScript client** | ✅ Done — `packages/api-client` with auto-generated types from OpenAPI |
+| **Rate limiting (WAF)** | ✅ Done — per-IP and per-path rate limiting in `infra/waf.tf` |
+
+**New work needed:**
 | Feature | Description |
 |---------|-------------|
-| **API key management** | Self-service keys via developer dashboard |
-| **OpenAPI specification** | Machine-readable docs, Swagger UI, code generation |
-| **Per-key rate limiting** | Quotas, usage tiers, monitoring |
-| **TypeScript & Python SDKs** | Client libraries for easy integration |
+| **API key management** | Self-service keys via developer dashboard (currently: Cognito JWT or anonymous) |
+| **Per-key quotas & usage tiers** | Usage analytics, tiered access beyond current WAF rate limits |
+| **Python SDK** | Client library for Python (TypeScript already exists) |
 
-The strategic arc for API access:
-
-```
-Now:     Endpoints locked behind WAF — security-first
-Phase 1: GPU synthesis → fast, cost-effective at scale
-Phase 3: Re-open as authenticated Public API → per-key limits, usage analytics
-```
-
-Once synthesis is fast and cheap (GPU), opening the API to third parties creates an ecosystem: other language apps, speech therapy software, educational publishers, research institutions — all building on HAK's unique Estonian TTS + phonetic analysis.
+Opening the API to third parties creates an ecosystem: other language apps, speech therapy software, educational publishers, research institutions — all building on HAK's unique Estonian TTS + phonetic analysis.
 
 ### LTI Integration (Education)
 
@@ -173,18 +174,24 @@ Vabamorf-powered "Did you mean?" for typos — especially valuable for learners 
 
 | Metric | Today | Target |
 |--------|-------|--------|
-| Synthesis latency | 3–6 sec | <1 sec (streaming) |
+| Synthesis latency | 5–7 sec (queue + synthesis + poll) | Reduced via streaming (exact target depends on model) |
 | Audio file size | WAV (~100 KB/sentence) | Opus (~10 KB/sentence) |
 | Mobile app experience | Web only | PWA ("Add to Home Screen", offline cached audio) |
 | Cold start | ~3 sec | <1 sec (provisioned concurrency) |
 
 ### Infrastructure
 
+**Already implemented:**
+| Feature | Status |
+|---------|--------|
+| **Auto-scaling workers** | ✅ Done — SQS-driven 0→N scaling with `appautoscaling` target tracking in `infra/merlin/main.tf` |
+| **Scale-to-zero** | ✅ Done — `desired_count = 0`, auto-scaling manages worker count based on queue depth |
+
+**New work needed:**
 | Improvement | Description |
 |-------------|-------------|
-| **GPU inference** | Inferentia or SageMaker for cost-optimized neural TTS |
-| **Auto-scaling workers** | SQS-driven 0→N scaling (pay only for active synthesis) |
-| **CDN for audio** | CloudFront caching — lower latency, reduced S3 egress cost |
+| **GPU-capable infrastructure** | Inferentia or EC2 GPU instances for neural TTS (requires ECS on EC2, not Fargate) |
+| **CDN for audio** | CloudFront caching for synthesized audio — lower latency, reduced S3 egress cost |
 | **Private networking** | Move compute to private subnets (no public IPs) |
 | **Staging environment** | Dev → Staging → Production pipeline |
 
@@ -192,9 +199,9 @@ Vabamorf-powered "Did you mean?" for typos — especially valuable for learners 
 
 | Component | Today | After GPU Migration |
 |-----------|-------|---------------------|
-| Synthesis cost | ~$0.04/hour per CPU worker | ~$0.50/hour per GPU, but 50× throughput |
-| Effective cost per synthesis | ~$0.001 | ~$0.0002 (5× cheaper) |
-| Idle cost | Fixed Fargate tasks | Scale-to-zero (GPU spins down when idle) |
+| Synthesis cost | ~$0.04/hour per CPU Fargate worker | GPU instance cost varies ($0.84/hr for g5.xlarge) — requires benchmarking |
+| Effective cost per synthesis | Depends on traffic volume | Depends on model, batching capability, and traffic — requires benchmarking |
+| Idle cost | ✅ Already scale-to-zero (auto-scaling) | Same principle applies to GPU instances |
 | Storage | WAV files, no lifecycle | Compressed + lifecycle policy |
 
 ---
@@ -203,9 +210,9 @@ Vabamorf-powered "Did you mean?" for typos — especially valuable for learners 
 
 | Phase | Duration | Key Deliverables |
 |-------|----------|------------------|
-| **1: Neural TTS** | Months 1–3 | GPU synthesis, real-time streaming, compressed audio |
+| **1: Neural TTS** | Months 1–3 | GPU infrastructure, streaming architecture, compressed audio (model depends on EKI partnership) |
 | **2: Active Learning** | Months 2–4 | Voice recording, progress tracking, teacher dashboard |
-| **3: Platform** | Months 4–8 | Public API, LTI integration, multi-language UI |
+| **3: Platform** | Months 4–8 | API key management, Python SDK, LTI integration, multi-language UI (OpenAPI, TS client, rate limiting already done) |
 | **4: Linguistics** | Months 6–12 | Morphology UI, spell-check, IPA, homonym disambiguation |
 
 Phases overlap — work on Phase 2 frontend features begins while Phase 1 GPU infrastructure is being deployed.
@@ -222,7 +229,7 @@ Phases overlap — work on Phase 2 frontend features begins while Phase 1 GPU in
 | Voice recording & comparison | ✅ (after Phase 2) | ❌ | ❌ | Some |
 | Teacher–Student workflow | ✅ (after Phase 2) | ❌ | ❌ | ❌ |
 | LTI / Moodle integration | ✅ (after Phase 3) | ❌ | ❌ | ❌ |
-| Public API for Estonian TTS | ✅ (after Phase 3) | ✅ (limited Estonian) | ✅ (limited Estonian) | ❌ |
+| Public API for Estonian TTS | ✅ Partially (OpenAPI, TS client, WAF rate limiting done; API keys, Python SDK pending) | ✅ (limited Estonian) | ✅ (limited Estonian) | ❌ |
 | Open source (MIT) | ✅ | ❌ | ❌ | ❌ |
 | TARA eID authentication | ✅ | ❌ | ❌ | ❌ |
 | Zero-barrier entry (no registration) | ✅ | ❌ | ❌ | ❌ |
@@ -235,7 +242,7 @@ Phases overlap — work on Phase 2 frontend features begins while Phase 1 GPU in
 
 | # | Decision | Impact |
 |---|----------|--------|
-| 1 | **Which neural TTS model to adopt?** TartuNLP, EKI research, or train new? | Phase 1 timeline |
+| 1 | **Which neural TTS model to pursue?** Partnership with TartuNLP, EKI research, or commission new? (We build the platform, not the model) | Phase 1 timeline |
 | 2 | **Public API scope** — free for research? Paid tiers for commercial? | Phase 3 business model |
 | 3 | **Content moderation policy** — needed for school context vs speech therapy ("perse" is a valid Estonian word) | User trust |
 | 4 | **Authentication for synthesis** — keep anonymous access? Require login after N uses? | Abuse prevention vs adoption |
