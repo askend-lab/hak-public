@@ -2,92 +2,57 @@
 
 **Date:** 2026-02-25 | **Scope:** Full system | **Auditor:** Kate (AI)
 
-**Overall posture: STRONG — all critical gaps closed.**
-
-| Severity | Count | Addressed |
-|----------|-------|-----------|
-| CRITICAL | 2     | 2 ✅      |
-| HIGH     | 3     | 3 ✅      |
-| MEDIUM   | 7     | 6 ✅ / 1 ❌ |
-| LOW/INFO | 4     | 2 ✅ / 2 ❌ |
+**Overall posture: STRONG.** Open issues: 1 critical, 2 medium.
 
 ---
 
-## CRITICAL Findings
+## Open Issues
 
-### SEC-C1: WAF Rate Limits Temporarily Raised [CRITICAL] — ✅ Partially reverted
+### WAF General Rate Limit Too High [CRITICAL]
 
-`infra/waf.tf:19-30, 42-55` — Synthesize back to 200/5min. General per-IP remains at 2000/5min (original was 100 — still excessive).
+`infra/waf.tf:42-55` — General per-IP limit is 2000 req/5min (was temporarily raised). Should be 300 req/5min for production.
 
-### SEC-C2: API Gateways Had Public Custom Domains — Bypassed WAF [CRITICAL] — ✅ FIXED
+### No WAF Per-Path Limit on `/api/status/*` [MEDIUM]
 
-`packages/store/serverless.yml`, `packages/auth/serverless.yml` — Removed `serverless-domain-manager`, switched to execute-api URLs. All 4 API Gateways (Merlin, Vabamorf, SimpleStore, Auth) now only reachable through CloudFront WAF. E2E test `api-gateway-lockdown.smoke.test.ts` prevents regression.
+`infra/waf.tf` — Only general rate limit applies. Could allow cache key enumeration via polling.
 
----
+### CloudTrail Bucket Lacks MFA Delete [MEDIUM]
 
-## HIGH Findings
+`infra/cloudtrail.tf` — Versioning + log file validation enabled, but no MFA Delete or Object Lock. Compromised admin could delete audit logs.
 
-### SEC-H1: Auth Service Public Custom Domain [HIGH] — ✅ FIXED
+### Merlin ECR Mutable Tags [MEDIUM]
 
-Addressed together with SEC-C2. Auth Lambda also runs in VPC.
+`infra/merlin/main.tf:131` — Merlin uses `MUTABLE` + `:latest`. Vabamorf uses `IMMUTABLE` + SHA tags. Mutable tags allow image overwrites from compromised CI.
 
-### SEC-H2: Fargate Worker in Default VPC with Public IP [HIGH] — ✅ Accepted risk
+### Branch Protection Insufficient [MEDIUM]
 
-`infra/merlin/main.tf:353-357` — No ingress rules (AWS default deny). Egress restricted to port 443 only (SQS, S3, ECR). Public IP required — no private subnets with NAT in default VPC. Low residual risk.
-
-### SEC-H3: Audio S3 Bucket Public Read [HIGH] — ✅ Accepted risk
-
-`infra/merlin/main.tf:97-123` — `Principal = "*"` on `s3:GetObject`. Content is non-sensitive educational audio with SHA-256 hash-keyed URLs. CORS restricted to app domains. Documented in DESIGN-DECISIONS.md #15.
+Only "Build" is a required status check. Terraform-only PRs can auto-merge before "Lint, Typecheck, Test" completes.
 
 ---
 
-## MEDIUM Findings
+## Accepted Risks
 
-### SEC-M1: DynamoDB `agent-readonly` Had Write Access [MEDIUM] — ✅ FIXED
+### Fargate Worker Public IP [HIGH]
 
-`infra/dynamodb.tf:3-23` — Restricted to read-only (GetItem, Query).
+`infra/merlin/main.tf:353-357` — No ingress rules (AWS default deny). Egress port 443 only. Public IP required — no private subnets with NAT in default VPC. Low residual risk.
 
-### SEC-M2: No WAF Per-Path Limit on `/api/status/*` [MEDIUM] — ❌ OPEN
+### Audio S3 Bucket Public Read [HIGH]
 
-`infra/waf.tf` — Only general rate limit applies. Could allow cache key enumeration.
+`infra/merlin/main.tf:97-123` — `Principal = "*"` on `s3:GetObject`. Content is non-sensitive educational audio, SHA-256 hash-keyed URLs, CORS restricted to app domains. Documented in DESIGN-DECISIONS.md #15.
 
-### SEC-M3: Vabamorf Catch-All Route [MEDIUM] — ✅ FIXED
+### Tokens in Response Body [MEDIUM]
 
-`packages/morphology-api/serverless.yml` — Restricted from `ANY /{proxy+}` to 3 specific endpoints. Static test `cloudfront-route-consistency.test.ts` prevents route mismatch recurrence.
+`packages/auth/src/handler.ts:254-258` — Frontend needs JS access for Authorization header. Mitigated by CSRF + short expiry (1h) + SameSite=Lax.
 
-### SEC-M4: CloudTrail Bucket Lacks MFA Delete [MEDIUM] — ✅ Partially mitigated
+### Unauthenticated Synthesize [LOW]
 
-`infra/cloudtrail.tf` — Versioning + log file validation enabled. No MFA Delete or Object Lock.
+WAF rate limiting + geo-blocking + SQS queue depth cap (50) + Fargate max capacity.
 
-### SEC-M5: ECR Image Tag Mutability [MEDIUM] — ✅ Partially addressed
-
-Merlin: `MUTABLE` (`:latest`). Vabamorf: `IMMUTABLE` (SHA tags). Mutable tags allow image overwrites.
-
-### SEC-M6: Tokens in Response Body [MEDIUM] — ✅ Accepted risk
-
-`packages/auth/src/handler.ts:254-258` — Frontend needs JS access to tokens. Mitigated by CSRF + short expiry (1h) + SameSite=Lax.
-
-### SEC-M7: Implicit Deny-All Ingress on Merlin SG [MEDIUM] — ✅ Good but implicit
-
-`infra/merlin/main.tf:424-440` — Relies on AWS default deny. Should add explicit comment.
-
----
-
-## LOW / Informational
-
-### SEC-L1: Unauthenticated Synthesize [LOW] — ✅ By design
-
-Protected by WAF rate limiting, geo-blocking, SQS queue depth cap (50), Fargate max capacity.
-
-### SEC-L2: Non-HttpOnly Access/ID Cookies [LOW] — ✅ By design
+### Non-HttpOnly Access/ID Cookies [LOW]
 
 Frontend reads tokens for Authorization header. Refresh token IS HttpOnly. Short expiry (1h), CSP, SameSite=Lax.
 
-### SEC-L3: Gitleaks `.env` Allowlist [LOW] — ✅ FIXED
-
-`.env` removed from allowlist.
-
-### SEC-L4: Broad CSP `connect-src` Wildcards [LOW] — ✅ Necessary
+### Broad CSP `connect-src` Wildcards [LOW]
 
 `*.amazonaws.com` needed for S3 audio + Cognito. `*.askend-lab.com` for API subdomains.
 
@@ -125,42 +90,13 @@ Internet
 
 | Category | Status |
 |----------|--------|
-| **A01: Broken Access Control** | ✅ Cognito JWT, CSRF origin check, scoped partition keys, all APIs behind WAF, test header removed |
+| **A01: Broken Access Control** | ✅ Cognito JWT, CSRF origin check, scoped partition keys, all APIs behind WAF |
 | **A02: Cryptographic Failures** | ✅ TLS everywhere, AES256/SSE at rest, Gitleaks, Cognito JWTs, `crypto.randomBytes` |
 | **A03: Injection** | ✅ `shlex.quote()`, parameterized DynamoDB, React + CSP, Zod schemas, SHA-256 regex |
 | **A04: Insecure Design** | ✅ Optimistic locking, queue depth cap, `AppError` hierarchy, shared constants |
-| **A05: Security Misconfiguration** | ✅ Restricted CORS, security headers, route validation test, gitleaks fixed |
+| **A05: Security Misconfiguration** | ⚠️ CORS restricted, security headers ✅ — branch protection insufficient ⚠️ |
 | **A06: Outdated Components** | ✅ `pnpm audit`, Trivy, SHA-pinned actions, SBOM + SLSA |
 | **A07: Auth Failures** | ✅ TARA eID (no passwords), random state/nonce, HttpOnly refresh, WAF rate limits |
 | **A08: Integrity Failures** | ⚠️ OIDC, pinned actions, log validation ✅ — Merlin ECR mutable tags ⚠️ |
 | **A09: Logging Failures** | ✅ WAF + CloudFront + CloudTrail logging, GuardDuty alerts, structured request IDs |
 | **A10: SSRF** | ✅ No user-controlled URLs server-side, hardcoded TARA redirect_uri |
-
----
-
-## Remediation Plan
-
-### Completed ✅
-
-1. **[SEC-C2/H1]** Lock down all 4 API Gateways — execute-api URLs via CloudFront only
-2. **[SEC-C1]** Partially reverted WAF rate limits — synthesize back to 200/5min
-3. **[SEC-M1]** DynamoDB policy restricted to read-only
-4. **[SEC-M3]** Vabamorf routes restricted to 3 endpoints
-5. **[SEC-L3]** Gitleaks `.env` allowlist removed
-
-### TODO
-
-6. **[SEC-C1]** Revert general WAF rate limit 2000→300 req/5min
-7. **[SEC-M2]** Add WAF per-path rate limit for `/api/status/*`
-8. **Branch protection** — Add "Lint, Typecheck, Test" to required status checks
-9. **[SEC-M4]** Add MFA Delete to CloudTrail bucket
-10. **[SEC-M5]** Switch Merlin ECR to immutable tags
-
-### Accepted Risks
-
-- **[SEC-H3]** Public audio S3 — non-sensitive, hash-keyed, CORS-restricted
-- **[SEC-H2]** Fargate public IP — no ingress, egress 443 only
-- **[SEC-M6]** Tokens in response body — CSRF + short expiry
-- **[SEC-L1]** Unauthenticated synthesize — WAF + geo-block + queue cap
-- **[SEC-L2]** Non-HttpOnly tokens — CSP + short expiry
-- **[SEC-L4]** Broad CSP connect-src — required for S3 + Cognito
