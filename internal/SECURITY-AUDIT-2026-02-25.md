@@ -2,70 +2,69 @@
 
 **Date:** 2026-02-25 | **Scope:** Full system | **Auditor:** Kate (AI)
 
-**Overall posture: STRONG.**
-
 ## Summary
 
-All traffic goes through CloudFront + WAF. All 4 API Gateways locked behind CloudFront (no public DNS). Authentication via TARA eID + Cognito with PKCE. Input validation (Zod) on all APIs. Encryption in transit (TLS 1.2+) and at rest (AES256/SSE). CI/CD uses OIDC — no long-lived credentials.
+**Overall posture: STRONG.** All traffic through CloudFront + WAF. All 4 API Gateways locked behind CloudFront. Auth via TARA eID + Cognito PKCE. Zod validation on all APIs. TLS 1.2+ in transit, AES256/SSE at rest. CI/CD on OIDC — no long-lived credentials.
 
-**What needs attention:**
-- WAF general rate limit is 20× too high (2000 vs 300 req/5min) — **critical**
-- No per-path rate limit on `/api/status/*` — enumeration risk
-- CloudTrail bucket has no MFA Delete — admin compromise risk
-- Merlin ECR uses mutable `:latest` tags — supply chain risk
-- Branch protection only checks "Build" — broken code can merge before full tests run
-
-**Accepted design trade-offs:** Fargate public IP (no ingress, egress 443 only), public audio S3 (non-sensitive content, CORS-restricted), tokens in response body (frontend needs JS access), unauthenticated synthesize (rate-limited + geo-blocked).
+| # | Finding | Severity | Status |
+|---|---------|----------|--------|
+| 1 | WAF general rate limit 20× too high | CRITICAL | Open |
+| 2 | No per-path WAF limit on `/api/status/*` | MEDIUM | Open |
+| 3 | CloudTrail bucket lacks MFA Delete | MEDIUM | Open |
+| 4 | Merlin ECR mutable `:latest` tags | MEDIUM | Open |
+| 5 | Branch protection insufficient | MEDIUM | Open |
+| 6 | Fargate worker has public IP | HIGH | Accepted |
+| 7 | Audio S3 bucket is publicly readable | HIGH | Accepted |
+| 8 | Tokens returned in response body | MEDIUM | Accepted |
+| 9 | Synthesize endpoint unauthenticated | LOW | Accepted |
+| 10 | Access/ID cookies not HttpOnly | LOW | Accepted |
+| 11 | Broad CSP `connect-src` wildcards | LOW | Accepted |
 
 ---
 
-## Open Issues
+## Findings
 
-### WAF General Rate Limit Too High [CRITICAL]
+### 1. WAF General Rate Limit Too High [CRITICAL]
 
-`infra/waf.tf:42-55` — General per-IP limit is 2000 req/5min (was temporarily raised). Should be 300 req/5min for production.
+`infra/waf.tf:42-55` — General per-IP limit is 2000 req/5min (temporarily raised, never reverted). Should be 300 req/5min for production.
 
-### No WAF Per-Path Limit on `/api/status/*` [MEDIUM]
+### 2. No Per-Path WAF Limit on `/api/status/*` [MEDIUM]
 
 `infra/waf.tf` — Only general rate limit applies. Could allow cache key enumeration via polling.
 
-### CloudTrail Bucket Lacks MFA Delete [MEDIUM]
+### 3. CloudTrail Bucket Lacks MFA Delete [MEDIUM]
 
 `infra/cloudtrail.tf` — Versioning + log file validation enabled, but no MFA Delete or Object Lock. Compromised admin could delete audit logs.
 
-### Merlin ECR Mutable Tags [MEDIUM]
+### 4. Merlin ECR Mutable Tags [MEDIUM]
 
 `infra/merlin/main.tf:131` — Merlin uses `MUTABLE` + `:latest`. Vabamorf uses `IMMUTABLE` + SHA tags. Mutable tags allow image overwrites from compromised CI.
 
-### Branch Protection Insufficient [MEDIUM]
+### 5. Branch Protection Insufficient [MEDIUM]
 
 Only "Build" is a required status check. Terraform-only PRs can auto-merge before "Lint, Typecheck, Test" completes.
 
----
-
-## Accepted Risks
-
-### Fargate Worker Public IP [HIGH]
+### 6. Fargate Worker Public IP [HIGH — accepted]
 
 `infra/merlin/main.tf:353-357` — No ingress rules (AWS default deny). Egress port 443 only. Public IP required — no private subnets with NAT in default VPC. Low residual risk.
 
-### Audio S3 Bucket Public Read [HIGH]
+### 7. Audio S3 Bucket Public Read [HIGH — accepted]
 
-`infra/merlin/main.tf:97-123` — `Principal = "*"` on `s3:GetObject`. Content is non-sensitive educational audio, SHA-256 hash-keyed URLs, CORS restricted to app domains. Documented in DESIGN-DECISIONS.md #15.
+`infra/merlin/main.tf:97-123` — `Principal = "*"` on `s3:GetObject`. Non-sensitive educational audio, SHA-256 hash-keyed URLs, CORS restricted. Documented in DESIGN-DECISIONS.md #15.
 
-### Tokens in Response Body [MEDIUM]
+### 8. Tokens in Response Body [MEDIUM — accepted]
 
 `packages/auth/src/handler.ts:254-258` — Frontend needs JS access for Authorization header. Mitigated by CSRF + short expiry (1h) + SameSite=Lax.
 
-### Unauthenticated Synthesize [LOW]
+### 9. Unauthenticated Synthesize [LOW — accepted]
 
 WAF rate limiting + geo-blocking + SQS queue depth cap (50) + Fargate max capacity.
 
-### Non-HttpOnly Access/ID Cookies [LOW]
+### 10. Non-HttpOnly Access/ID Cookies [LOW — accepted]
 
 Frontend reads tokens for Authorization header. Refresh token IS HttpOnly. Short expiry (1h), CSP, SameSite=Lax.
 
-### Broad CSP `connect-src` Wildcards [LOW]
+### 11. Broad CSP `connect-src` Wildcards [LOW — accepted]
 
 `*.amazonaws.com` needed for S3 audio + Cognito. `*.askend-lab.com` for API subdomains.
 
