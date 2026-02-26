@@ -86,16 +86,15 @@ git clone --single-branch --branch "$BRANCH" "$REPO_ROOT" "$WORK_DIR/repo" --qui
 
 cd "$WORK_DIR/repo"
 
-# --- Remove excluded paths ---
+# --- Remove excluded paths (supports globs like SECURITY-AUDIT-*.md) ---
 echo ">>> Removing excluded paths..."
 REMOVED_COUNT=0
 for pattern in "${EXCLUDES[@]}"; do
-  # -e checks existing files, -L catches broken symlinks (e.g. defaults.yaml → devbox)
-  if [[ -e "$pattern" || -L "$pattern" ]]; then
-    echo "  - $pattern"
-    rm -rf "$pattern"
-    REMOVED_COUNT=$((REMOVED_COUNT + 1))
-  fi
+  for match in $(compgen -G "$pattern" 2>/dev/null || true); do
+    echo "  - $match"; rm -rf "$match"; REMOVED_COUNT=$((REMOVED_COUNT + 1))
+  done
+  # Fallback: literal path check (-e for files/dirs, -L for broken symlinks)
+  [[ -e "$pattern" || -L "$pattern" ]] && echo "  - $pattern" && rm -rf "$pattern" && REMOVED_COUNT=$((REMOVED_COUNT + 1))
 done
 echo "  Removed $REMOVED_COUNT paths"
 
@@ -332,6 +331,7 @@ rm -rf packages/merlin-worker/tools/SPTK-3.9/build packages/merlin-worker/tools/
 # --- Clean up docs (remove internal/ file references that don't exist in public repo) ---
 [[ -f SECURITY.md ]] && sed -i 's|For the full security audit findings and remediation status, see `internal/SECURITY-AUDIT-2026-02.md`. Architecture decisions related to security are documented in `internal/DESIGN-DECISIONS.md` and `docs/adr/`.|Architecture decisions related to security are documented in `docs/adr/`.|' SECURITY.md
 [[ -f packages/merlin-api/README.md ]] && sed -i 's| This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.|This is an intentional trade-off — see `docs/adr/` for architecture decisions.|' packages/merlin-api/README.md
+[[ -f packages/tts-api/README.md ]] && sed -i 's| This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.|This is an intentional trade-off — see `docs/adr/` for architecture decisions.|' packages/tts-api/README.md
 
 
 # --- Clean up .gitignore (remove internal/unused patterns) ---
@@ -372,6 +372,11 @@ echo ">>> Verifying internal files are excluded..."
 for p in infra/ internal/ packages/tara-auth/ .githooks/ devbox.yaml defaults.yaml scripts/smoke-test.sh; do
   [[ -e "$p" ]] && { echo "ABORTING: $p still present! Check .opensource-exclude"; exit 1; }
 done
+# Glob check: security audit files must not leak
+if compgen -G "SECURITY-AUDIT-*.md" >/dev/null 2>&1; then
+  echo "ABORTING: SECURITY-AUDIT-*.md still present! Check .opensource-exclude"
+  exit 1
+fi
 echo "  All sensitive paths verified excluded."
 
 # --- Push to public repository ---

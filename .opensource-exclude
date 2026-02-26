@@ -53,6 +53,9 @@ knip.json
 # --- Scripts with hardcoded infrastructure URLs ---
 scripts/smoke-test.sh
 
+# --- Security audit reports (contain internal findings) ---
+SECURITY-AUDIT-*.md
+
 # --- Internal documentation ---
 internal/
 docs/internal/
