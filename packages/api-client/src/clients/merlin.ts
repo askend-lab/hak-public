@@ -15,7 +15,7 @@ export interface ApiResult<T> {
   error?: string;
 }
 
-const POLL_INTERVAL_MS = 2_000;
+const POLL_INTERVAL_MS = 4_000;
 const MAX_POLL_ATTEMPTS = 30;
 
 export class MerlinClient {

@@ -42,7 +42,7 @@ describe("Index exports — behavioral verification", () => {
   });
 
   it("TIMING has expected poll interval", () => {
-    expect(TIMING.POLL_INTERVAL_MS).toBe(1000);
+    expect(TIMING.POLL_INTERVAL_MS).toBe(2000);
   });
 
   it("sleep resolves after delay", async () => {

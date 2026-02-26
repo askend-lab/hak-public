@@ -5,7 +5,7 @@ import { postJSON } from "./analyzeApi";
 import { getVoiceModel } from "@/types/synthesis";
 import { AuthStorage } from "@/features/auth/services/storage";
 
-const POLL_INTERVAL_MS = 1000;
+const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 30;
 const SYNTHESIZE_API_PATH = "/api/synthesize";
 const STATUS_API_PATH = "/api/status";
