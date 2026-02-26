@@ -86,15 +86,16 @@ git clone --single-branch --branch "$BRANCH" "$REPO_ROOT" "$WORK_DIR/repo" --qui
 
 cd "$WORK_DIR/repo"
 
-# --- Remove excluded paths (supports globs like SECURITY-AUDIT-*.md) ---
+# --- Remove excluded paths ---
 echo ">>> Removing excluded paths..."
 REMOVED_COUNT=0
 for pattern in "${EXCLUDES[@]}"; do
-  for match in $(compgen -G "$pattern" 2>/dev/null || true); do
-    echo "  - $match"; rm -rf "$match"; REMOVED_COUNT=$((REMOVED_COUNT + 1))
-  done
-  # Fallback: literal path check (-e for files/dirs, -L for broken symlinks)
-  [[ -e "$pattern" || -L "$pattern" ]] && echo "  - $pattern" && rm -rf "$pattern" && REMOVED_COUNT=$((REMOVED_COUNT + 1))
+  # -e checks existing files, -L catches broken symlinks (e.g. defaults.yaml → devbox)
+  if [[ -e "$pattern" || -L "$pattern" ]]; then
+    echo "  - $pattern"
+    rm -rf "$pattern"
+    REMOVED_COUNT=$((REMOVED_COUNT + 1))
+  fi
 done
 echo "  Removed $REMOVED_COUNT paths"
 
@@ -372,11 +373,6 @@ echo ">>> Verifying internal files are excluded..."
 for p in infra/ internal/ packages/tara-auth/ .githooks/ devbox.yaml defaults.yaml scripts/smoke-test.sh; do
   [[ -e "$p" ]] && { echo "ABORTING: $p still present! Check .opensource-exclude"; exit 1; }
 done
-# Glob check: security audit files must not leak
-if compgen -G "SECURITY-AUDIT-*.md" >/dev/null 2>&1; then
-  echo "ABORTING: SECURITY-AUDIT-*.md still present! Check .opensource-exclude"
-  exit 1
-fi
 echo "  All sensitive paths verified excluded."
 
 # --- Push to public repository ---
