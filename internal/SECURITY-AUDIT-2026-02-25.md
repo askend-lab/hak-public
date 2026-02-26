@@ -5,10 +5,10 @@
 | ID | Finding | Severity | Status |
 |------|---------|----------|--------|
 | SEC-01 | All API endpoints are public — no authentication | CRITICAL | Open — pending client decision |
-| SEC-02 | No per-path WAF limit on `/api/status/*` | MEDIUM | Open |
+| SEC-02 | No per-path WAF limit on `/api/status/*` | MEDIUM | ✅ Fixed |
 | SEC-03 | CloudTrail bucket lacks MFA Delete | MEDIUM | Open |
 | SEC-04 | Merlin ECR mutable `:latest` tags | MEDIUM | Open |
-| SEC-05 | Branch protection insufficient | MEDIUM | Open |
+| SEC-05 | Branch protection insufficient | MEDIUM | ✅ Fixed |
 | SEC-06 | Fargate worker has public IP | HIGH | Accepted |
 | SEC-07 | Audio S3 bucket publicly readable | HIGH | Accepted |
 | SEC-08 | Tokens in response body | MEDIUM | Accepted |
@@ -23,10 +23,6 @@
 
 `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` — all open to the internet without authentication. Anyone can generate speech, enumerate cache keys, and use morphological analysis. Auth infrastructure exists (Cognito + TARA + JWT) but is not applied to these endpoints. Risks: cost exhaustion via bot attacks, denial of service, resource abuse by third parties. WAF rate limits are bypassable with proxy pools. Detailed analysis in `PROPOSAL-Auth-Public-Endpoints.md`. Pending client decision.
 
-### SEC-02: No Per-Path WAF Limit on `/api/status/*` [MEDIUM]
-
-`infra/waf.tf` — Only general rate limit applies. Allows cache key enumeration via polling.
-
 ### SEC-03: CloudTrail Bucket Lacks MFA Delete [MEDIUM]
 
 `infra/cloudtrail.tf` — No MFA Delete or Object Lock. Compromised admin could delete audit logs.
@@ -34,10 +30,6 @@
 ### SEC-04: Merlin ECR Mutable Tags [MEDIUM]
 
 `infra/merlin/main.tf:131` — Merlin uses `MUTABLE` + `:latest`. Compromised CI could overwrite images. Vabamorf already uses `IMMUTABLE` + SHA tags.
-
-### SEC-05: Branch Protection Insufficient [MEDIUM]
-
-Only "Build" is a required status check. Terraform-only PRs auto-merge before "Lint, Typecheck, Test" completes.
 
 ---
 
