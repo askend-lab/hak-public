@@ -22,7 +22,7 @@
 | SEC-09 | Access/ID cookies not HttpOnly | LOW | Accepted |
 | SEC-10 | Broad CSP `connect-src` wildcards | LOW | Accepted |
 
-**Previously resolved:** SEC-02 WAF per-path rate limit, SEC-03 CloudTrail Object Lock, SEC-04 ECR immutable tags, SEC-05 branch protection.
+**Previously resolved:** SEC-02 WAF per-path rate limit, SEC-03 CloudTrail Object Lock, SEC-04 ECR immutable tags, SEC-05 branch protection (`enforce_admins` enabled — admins can no longer bypass required checks).
 
 ---
 
@@ -154,7 +154,7 @@ WAF logging enabled — blocked/counted requests sent to CloudWatch (`aws-waf-lo
 | ECR image scanning on push | ✅ | `ecr.tf:6-8`, `merlin/main.tf:136-138` |
 | ECR immutable tags | ✅ | Both repos — prevents image tag overwrite |
 | ECR lifecycle policy | ✅ | Keep last 10 images per repo |
-| Branch protection (required checks) | ✅ | Build check required, auto-merge disabled for infra-only PRs |
+| Branch protection (required checks) | ✅ | Build check required, `enforce_admins` enabled, auto-merge disabled for infra-only PRs |
 
 ### IAM & Access Control
 
