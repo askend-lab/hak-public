@@ -2,7 +2,20 @@
 
 **Date:** 2026-02-25 | **Scope:** Full system | **Auditor:** Kate (AI)
 
-**Overall posture: STRONG.** Open issues: 1 critical, 2 medium.
+**Overall posture: STRONG.**
+
+## Summary
+
+All traffic goes through CloudFront + WAF. All 4 API Gateways locked behind CloudFront (no public DNS). Authentication via TARA eID + Cognito with PKCE. Input validation (Zod) on all APIs. Encryption in transit (TLS 1.2+) and at rest (AES256/SSE). CI/CD uses OIDC — no long-lived credentials.
+
+**What needs attention:**
+- WAF general rate limit is 20× too high (2000 vs 300 req/5min) — **critical**
+- No per-path rate limit on `/api/status/*` — enumeration risk
+- CloudTrail bucket has no MFA Delete — admin compromise risk
+- Merlin ECR uses mutable `:latest` tags — supply chain risk
+- Branch protection only checks "Build" — broken code can merge before full tests run
+
+**Accepted design trade-offs:** Fargate public IP (no ingress, egress 443 only), public audio S3 (non-sensitive content, CORS-restricted), tokens in response body (frontend needs JS access), unauthenticated synthesize (rate-limited + geo-blocked).
 
 ---
 
