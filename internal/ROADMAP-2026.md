@@ -1,6 +1,6 @@
 # HAK Development Roadmap
 
-**Date:** 2026-02-25
+**Date:** 2026-02-26
 **Prepared by:** Askend Lab
 **For:** EKI (Eesti Keele Instituut)
 
@@ -69,6 +69,17 @@ Replace WAV (large, uncompressed) with Opus or MP3 — **5–10× smaller files*
 
 This is the most-requested feature across all user personas (learner, teacher, speech therapist, parent). It turns HAK into a practice tool, not just a reference tool.
 
+### Minimal Pairs Trainer
+
+| Feature | Description |
+|---------|-------------|
+| **Curated minimal pair sets** | "kool" vs "kuul", "saal" vs "seal" — the most common pronunciation mistakes |
+| **Listen & choose** | Hear a word, pick which one was spoken — trains phonemic awareness |
+| **Difficulty progression** | Start with obvious pairs, advance to subtle distinctions |
+| **Native-language specific sets** | Different pairs for Russian, Ukrainian, English speakers — each language has different blind spots |
+
+Minimal pair training is the gold standard in phonetics education. No Estonian language app offers this.
+
 ### Student Progress Tracking
 
 | Feature | Description |
@@ -91,13 +102,48 @@ Expand the current task-sharing into a full pedagogical workflow:
 | **Feedback mechanism** | Rate student pronunciation, add comments |
 | **Completion confirmation** | Student marks "Done" → teacher sees status in real-time |
 
+### Exam Preparation Mode
+
+| Feature | Description |
+|---------|-------------|
+| **B1/B2 vocabulary lists** | Words and phrases from official Estonian language exam programs |
+| **Situational dialogues** | "At the store", "At the doctor", "Job interview" — real-life conversation practice |
+| **Timed practice sessions** | Simulate exam conditions with time pressure |
+| **Readiness assessment** | Track which exam topics are mastered vs need more practice |
+
+Estonia requires Estonian language proficiency for citizenship and many jobs. HAK becomes the national exam preparation tool.
+
 Schools are the primary adoption channel for a government language institute. Teacher workflows drive student engagement.
 
 ---
 
-## Phase 3: Platform & Ecosystem (Months 4–8)
+## Phase 3: HAK Everywhere (Months 4–8)
 
-*Transform HAK from a tool into a platform that others build upon.*
+*Put Estonian pronunciation help wherever people need it — not just on hak.askend-lab.com.*
+
+### Telegram / WhatsApp Bot
+
+Send any Estonian text → get audio back instantly. No website, no registration, no app download.
+
+- Estonian immigrants live in messaging apps. Meet them where they are.
+- Share pronunciation in group chats — social learning.
+- Implementation: AWS Lambda + Telegram Bot API + existing synthesis pipeline.
+
+### Chrome Extension
+
+Highlight any Estonian text on any website → hear it pronounced. Right-click context menu: "Pronounce with HAK".
+
+- Reading Estonian news, blogs, government websites — pronunciation help is one click away.
+- Viral growth: every user becomes a distribution channel.
+- Builds on existing Public API infrastructure.
+
+### Embeddable Widget
+
+```html
+<script src="https://hak.askend-lab.com/widget.js"></script>
+```
+
+Any Estonian website adds pronunciation to their content. Newspapers, educational portals, government sites, blogs — HAK becomes the pronunciation layer of the Estonian internet.
 
 ### Public API
 
@@ -127,21 +173,29 @@ Opening the API to third parties creates an ecosystem: other language apps, spee
 
 Estonian schools use Moodle extensively. LTI integration means students access HAK directly from their learning environment — zero friction, no separate accounts.
 
-### Multi-Language UI
-
-| Language | Purpose |
-|----------|---------|
-| **Russian** | Primary immigrant language in Estonia |
-| **English** | International researchers, tourists, EU partners |
-| **Ukrainian** | Growing immigrant population |
+### Multilingual UI
 
 The target audience — people learning Estonian — by definition doesn't fully understand Estonian. A UI in their native language removes the single biggest adoption barrier for immigrants.
 
+Priority languages determined by immigration statistics and EKI input. Framework (react-i18next) supports unlimited languages — community can contribute translations via standard JSON files.
+
 ---
 
-## Phase 4: Advanced Linguistics (Months 6–12)
+## Phase 4: National Language Lab (Months 6–12)
 
-*Leverage HAK's unique Vabamorf integration for features no competitor can match.*
+*Position HAK as Estonia's national pronunciation infrastructure — a platform that only EKI can build.*
+
+### Regional Dialect Explorer
+
+Estonia has distinct dialect regions (Saare, Võru, Mulgi, Seto) with unique pronunciation patterns. HAK can become the living archive:
+
+| Feature | Description |
+|---------|-------------|
+| **Dialect map** | Interactive map of Estonia — click a region, hear how they say it |
+| **Standard vs regional** | Side-by-side comparison of standard and regional pronunciation |
+| **Historical pronunciation** | How Estonian sounded 50, 100 years ago (from EKI archives) |
+
+This positions HAK as a cultural heritage tool, not just a learning tool. Unique to EKI — no commercial provider has access to this data.
 
 ### Morphological Analysis UI
 
@@ -165,6 +219,19 @@ This serves researchers, translators, and advanced learners — audiences that c
 ### Spell-Check & Suggestions
 
 Vabamorf-powered "Did you mean?" for typos — especially valuable for learners who make systematic spelling errors. The morphological engine already knows valid Estonian word forms; suggesting corrections is a natural extension.
+
+### Research Portal
+
+Anonymized, aggregated data from HAK usage — a goldmine for linguistics research:
+
+| Insight | Value |
+|---------|-------|
+| **Which words are hardest?** | Ranked by synthesis frequency + recording retry count |
+| **Error patterns by native language** | Russian speakers struggle with X, Ukrainian with Y |
+| **Regional learning patterns** | Tallinn vs Tartu vs Narva — different needs |
+| **Pronunciation improvement over time** | Longitudinal data on learning effectiveness |
+
+No other platform can provide this data. EKI becomes the authority on how people learn Estonian pronunciation.
 
 ---
 
@@ -211,9 +278,9 @@ Vabamorf-powered "Did you mean?" for typos — especially valuable for learners 
 | Phase | Duration | Key Deliverables |
 |-------|----------|------------------|
 | **1: Neural TTS** | Months 1–3 | GPU infrastructure, streaming architecture, compressed audio (model depends on EKI partnership) |
-| **2: Active Learning** | Months 2–4 | Voice recording, progress tracking, teacher dashboard |
-| **3: Platform** | Months 4–8 | API key management, Python SDK, LTI integration, multi-language UI (OpenAPI, TS client, rate limiting already done) |
-| **4: Linguistics** | Months 6–12 | Morphology UI, spell-check, IPA, homonym disambiguation |
+| **2: Active Learning** | Months 2–4 | Voice recording, minimal pairs, progress tracking, teacher dashboard, exam prep |
+| **3: HAK Everywhere** | Months 4–8 | Telegram bot, Chrome extension, embeddable widget, API keys, LTI, multilingual UI |
+| **4: National Language Lab** | Months 6–12 | Regional dialects, morphology UI, spell-check, IPA, research portal |
 
 Phases overlap — work on Phase 2 frontend features begins while Phase 1 GPU infrastructure is being deployed.
 
@@ -222,13 +289,20 @@ Phases overlap — work on Phase 2 frontend features begins while Phase 1 GPU in
 ## Competitive Position After Roadmap
 
 | Capability | HAK | Google TTS | Amazon Polly | Competitor Apps |
-|------------|-----|-----------|--------------|-----------------|
+|------------|-----|-----------|--------------|------------------|
 | Estonian phonetic variant selection | ✅ Unique | ❌ | ❌ | ❌ |
 | Morphological analysis (Vabamorf) | ✅ Unique | ❌ | ❌ | ❌ |
+| Regional dialect explorer | ✅ Unique (after Phase 4) | ❌ | ❌ | ❌ |
+| Minimal pairs trainer | ✅ (after Phase 2) | ❌ | ❌ | ❌ |
 | Neural TTS quality | ✅ (after Phase 1) | ✅ | ✅ | Varies |
 | Voice recording & comparison | ✅ (after Phase 2) | ❌ | ❌ | Some |
+| Exam preparation (B1/B2) | ✅ (after Phase 2) | ❌ | ❌ | ❌ |
 | Teacher–Student workflow | ✅ (after Phase 2) | ❌ | ❌ | ❌ |
+| Telegram/WhatsApp bot | ✅ (after Phase 3) | ❌ | ❌ | ❌ |
+| Chrome extension | ✅ (after Phase 3) | ❌ | ❌ | ❌ |
+| Embeddable widget | ✅ (after Phase 3) | ❌ | ❌ | ❌ |
 | LTI / Moodle integration | ✅ (after Phase 3) | ❌ | ❌ | ❌ |
+| Research portal | ✅ (after Phase 4) | ❌ | ❌ | ❌ |
 | Public API for Estonian TTS | ✅ Partially (OpenAPI, TS client, WAF rate limiting done; API keys, Python SDK pending) | ✅ (limited Estonian) | ✅ (limited Estonian) | ❌ |
 | Open source (MIT) | ✅ | ❌ | ❌ | ❌ |
 | TARA eID authentication | ✅ | ❌ | ❌ | ❌ |
@@ -246,8 +320,12 @@ Phases overlap — work on Phase 2 frontend features begins while Phase 1 GPU in
 | 2 | **Public API scope** — free for research? Paid tiers for commercial? | Phase 3 business model |
 | 3 | **Content moderation policy** — needed for school context vs speech therapy ("perse" is a valid Estonian word) | User trust |
 | 4 | **Authentication for synthesis** — keep anonymous access? Require login after N uses? | Abuse prevention vs adoption |
-| 5 | **i18n priority** — Russian first? English first? Both simultaneously? | Phase 3 ordering |
+| 5 | **i18n priority** — which languages first? Community translations? | Phase 3 ordering |
+| 6 | **Dialect data access** — can EKI provide regional pronunciation recordings/data? | Phase 4 scope |
+| 7 | **Research portal ethics** — anonymization standards for usage data? IRB approval needed? | Phase 4 launch |
 
 ---
 
 *This roadmap is informed by 51 comprehensive audits covering 25 user personas (from beginner learner to EU procurement specialist) and 25 technical checklists, yielding 773 observations consolidated into 99 unique development opportunities.*
+
+*Updated 2026-02-26: Added Telegram bot, Chrome extension, embeddable widget, minimal pairs trainer, exam preparation mode, regional dialect explorer, and research portal.*
