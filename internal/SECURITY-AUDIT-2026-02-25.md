@@ -5,15 +5,13 @@
 | ID | Finding | Severity | Status |
 |------|---------|----------|--------|
 | SEC-01 | All API endpoints are public — no authentication | CRITICAL | Open — pending client decision |
-| SEC-02 | No per-path WAF limit on `/api/status/*` | MEDIUM | ✅ Fixed |
-| SEC-03 | CloudTrail bucket lacks MFA Delete / Object Lock | MEDIUM | ✅ Fixed |
-| SEC-04 | Merlin ECR mutable `:latest` tags | MEDIUM | ✅ Fixed |
-| SEC-05 | Branch protection insufficient | MEDIUM | ✅ Fixed |
 | SEC-06 | Fargate worker has public IP | HIGH | Accepted |
 | SEC-07 | Audio S3 bucket publicly readable | HIGH | Accepted |
 | SEC-08 | Tokens in response body | MEDIUM | Accepted |
 | SEC-09 | Access/ID cookies not HttpOnly | LOW | Accepted |
 | SEC-10 | Broad CSP `connect-src` wildcards | LOW | Accepted |
+
+**Resolved (removed from active tracking):** SEC-02 (WAF status rate limit), SEC-03 (CloudTrail Object Lock), SEC-04 (ECR immutable tags), SEC-05 (branch protection).
 
 ---
 
