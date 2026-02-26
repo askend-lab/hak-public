@@ -77,31 +77,69 @@ jobs:
           severity: 'CRITICAL,HIGH'
           trivyIgnores: packages/tts-worker/.trivyignore
 
-      - name: Tag and push Docker image
+      - name: Push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker tag $ECR_REGISTRY/merlin-worker:${{ github.sha }} $ECR_REGISTRY/merlin-worker:latest
           docker push $ECR_REGISTRY/merlin-worker:${{ github.sha }}
-          docker push $ECR_REGISTRY/merlin-worker:latest
 
       - name: Clean up secrets
         if: always()
         run: rm -f /tmp/aws_creds_key /tmp/aws_creds_secret /tmp/aws_creds_token
 
       - name: Deploy to dev
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition hak-merlin-dev-worker \
+            --region eu-west-1 \
+            --query 'taskDefinition.containerDefinitions' \
+            --output json)
+          UPDATED=$(echo "$TASK_DEF" | jq --arg IMG "$ECR_REGISTRY/merlin-worker:$IMAGE_TAG" \
+            '.[0].image = $IMG')
+          aws ecs register-task-definition \
+            --family hak-merlin-dev-worker \
+            --container-definitions "$UPDATED" \
+            --network-mode awsvpc \
+            --requires-compatibilities FARGATE \
+            --cpu 1024 --memory 4096 \
+            --execution-role-arn $(aws ecs describe-task-definition --task-definition hak-merlin-dev-worker --region eu-west-1 --query 'taskDefinition.executionRoleArn' --output text) \
+            --task-role-arn $(aws ecs describe-task-definition --task-definition hak-merlin-dev-worker --region eu-west-1 --query 'taskDefinition.taskRoleArn' --output text) \
+            --region eu-west-1
           aws ecs update-service \
             --cluster hak-merlin-dev \
             --service merlin-worker \
+            --task-definition hak-merlin-dev-worker \
             --force-new-deployment \
             --region eu-west-1
 
       - name: Deploy to prod
         if: github.event_name == 'workflow_dispatch'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition hak-merlin-prod-worker \
+            --region eu-west-1 \
+            --query 'taskDefinition.containerDefinitions' \
+            --output json)
+          UPDATED=$(echo "$TASK_DEF" | jq --arg IMG "$ECR_REGISTRY/merlin-worker:$IMAGE_TAG" \
+            '.[0].image = $IMG')
+          aws ecs register-task-definition \
+            --family hak-merlin-prod-worker \
+            --container-definitions "$UPDATED" \
+            --network-mode awsvpc \
+            --requires-compatibilities FARGATE \
+            --cpu 1024 --memory 4096 \
+            --execution-role-arn $(aws ecs describe-task-definition --task-definition hak-merlin-prod-worker --region eu-west-1 --query 'taskDefinition.executionRoleArn' --output text) \
+            --task-role-arn $(aws ecs describe-task-definition --task-definition hak-merlin-prod-worker --region eu-west-1 --query 'taskDefinition.taskRoleArn' --output text) \
+            --region eu-west-1
           aws ecs update-service \
             --cluster hak-merlin-prod \
             --service merlin-worker \
+            --task-definition hak-merlin-prod-worker \
             --force-new-deployment \
             --region eu-west-1
