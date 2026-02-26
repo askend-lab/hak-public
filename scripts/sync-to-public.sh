@@ -332,6 +332,7 @@ rm -rf packages/merlin-worker/tools/SPTK-3.9/build packages/merlin-worker/tools/
 # --- Clean up docs (remove internal/ file references that don't exist in public repo) ---
 [[ -f SECURITY.md ]] && sed -i 's|For the full security audit findings and remediation status, see `internal/SECURITY-AUDIT-2026-02.md`. Architecture decisions related to security are documented in `internal/DESIGN-DECISIONS.md` and `docs/adr/`.|Architecture decisions related to security are documented in `docs/adr/`.|' SECURITY.md
 [[ -f packages/merlin-api/README.md ]] && sed -i 's| This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.|This is an intentional trade-off — see `docs/adr/` for architecture decisions.|' packages/merlin-api/README.md
+[[ -f packages/tts-api/README.md ]] && sed -i 's| This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.|This is an intentional trade-off — see `docs/adr/` for architecture decisions.|' packages/tts-api/README.md
 
 
 # --- Clean up .gitignore (remove internal/unused patterns) ---
