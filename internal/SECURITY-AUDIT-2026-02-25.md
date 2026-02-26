@@ -5,8 +5,8 @@
 | ID | Finding | Severity | Status |
 |------|---------|----------|--------|
 | SEC-01 | All API endpoints are public — no authentication | CRITICAL | Open — pending client decision |
-| SEC-06 | Fargate worker has public IP | HIGH | Accepted |
-| SEC-07 | Audio S3 bucket publicly readable | HIGH | Accepted |
+| SEC-06 | Fargate worker has public IP | MEDIUM | Accepted |
+| SEC-07 | Audio S3 bucket publicly readable | MEDIUM | Accepted |
 | SEC-08 | Tokens in response body | MEDIUM | Accepted |
 | SEC-09 | Access/ID cookies not HttpOnly | LOW | Accepted |
 | SEC-10 | Broad CSP `connect-src` wildcards | LOW | Accepted |
@@ -25,11 +25,11 @@
 
 ## Accepted — documented, no action
 
-### SEC-06: Fargate Worker Public IP [HIGH]
+### SEC-06: Fargate Worker Public IP [MEDIUM]
 
 `infra/merlin/main.tf:353-357` — Worker has public IP in default VPC. No ingress rules. Egress port 443 only. No private subnets available without NAT ($32/month).
 
-### SEC-07: Audio S3 Bucket Public Read [HIGH]
+### SEC-07: Audio S3 Bucket Public Read [MEDIUM]
 
 `infra/merlin/main.tf:97-123` — `Principal = "*"` on `s3:GetObject`. Non-sensitive educational audio. SHA-256 hash-keyed URLs. CORS restricted to app domains.
 
