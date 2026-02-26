@@ -7,7 +7,7 @@
 | SEC-01 | All API endpoints are public — no authentication | CRITICAL | Open — pending client decision |
 | SEC-02 | No per-path WAF limit on `/api/status/*` | MEDIUM | ✅ Fixed |
 | SEC-03 | CloudTrail bucket lacks MFA Delete / Object Lock | MEDIUM | ✅ Fixed |
-| SEC-04 | Merlin ECR mutable `:latest` tags | MEDIUM | Open |
+| SEC-04 | Merlin ECR mutable `:latest` tags | MEDIUM | ✅ Fixed |
 | SEC-05 | Branch protection insufficient | MEDIUM | ✅ Fixed |
 | SEC-06 | Fargate worker has public IP | HIGH | Accepted |
 | SEC-07 | Audio S3 bucket publicly readable | HIGH | Accepted |
@@ -22,10 +22,6 @@
 ### SEC-01: Public API Endpoints — No Authentication [CRITICAL]
 
 `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` — all open to the internet without authentication. Anyone can generate speech, enumerate cache keys, and use morphological analysis. Auth infrastructure exists (Cognito + TARA + JWT) but is not applied to these endpoints. Risks: cost exhaustion via bot attacks, denial of service, resource abuse by third parties. WAF rate limits are bypassable with proxy pools. Detailed analysis in `PROPOSAL-Auth-Public-Endpoints.md`. Pending client decision.
-
-### SEC-04: Merlin ECR Mutable Tags [MEDIUM]
-
-`infra/merlin/main.tf:131` — Merlin uses `MUTABLE` + `:latest`. Compromised CI could overwrite images. Vabamorf already uses `IMMUTABLE` + SHA tags.
 
 ---
 
