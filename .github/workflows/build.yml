@@ -341,6 +341,13 @@ jobs:
           echo "gh workflow run deploy.yml -f build_id=${{ steps.build.outputs.build_id }} -f environment=dev" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
+      - name: Notify Slack (build failure)
+        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
+        run: |
+          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"attachments\":[{\"color\":\"#ff0000\",\"title\":\"🚨 Build FAILED\",\"text\":\"Branch: ${{ github.ref_name }}\nSHA: ${{ github.sha }}\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"footer\":\"HAK CI/CD\"}]}"
+
   deploy-dev:
     name: Deploy to Dev
     needs: build
