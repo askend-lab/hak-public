@@ -310,70 +310,72 @@ Dashboard `hak-activity-{env}` показывает:
 
 ### Фаза 0: Верификация текущей инфраструктуры
 
-- [ ] Добавить Terraform validation: `slack_webhook_url` обязателен (не может быть пустым), система не деплоится без него
+- [x] Добавить Terraform validation: `slack_webhook_url` обязателен (не может быть пустым), система не деплоится без него
 - [ ] Добавить проверку в Slack notifier Lambda: если webhook возвращает ошибку → alarm (сейчас ошибка глотается)
 - [ ] Добавить validation в frontend build: `VITE_SENTRY_DSN` обязателен для production build (fail build если пустой)
 
 ### Фаза 1: Все 500-ки → алерт
 
 **1.1 Lambda error alarms (Terraform: cloudwatch-alarms.tf)**
-- [ ] Alarm `merlin-api-{env}-lambda-errors`: Lambda errors для `merlin-api-{env}-synthesize` + `merlin-api-{env}-status`
-- [ ] Alarm `tara-auth-{env}-lambda-errors`: Lambda errors для всех `tara-auth-{env}-*` функций
-- [ ] Alarm `vabamorf-api-{env}-lambda-errors`: Lambda errors для `vabamorf-api-{env}-api`
-- [ ] Убедиться что существующий alarm `simplestore-{env}-api` корректен (FunctionName match)
+- [x] Alarm `merlin-api-{env}-lambda-errors`: Lambda errors для `merlin-api-{env}-synthesize` + `merlin-api-{env}-status`
+- [x] Alarm `tara-auth-{env}-lambda-errors`: Lambda errors для всех `tara-auth-{env}-*` функций
+- [x] Alarm `vabamorf-api-{env}-lambda-errors`: Lambda errors для `vabamorf-api-{env}-api`
+- [x] Убедиться что существующий alarm `simplestore-{env}-api` корректен (FunctionName match)
 
 **1.2 API Gateway alarms для КАЖДОГО API**
-- [ ] Alarm на 5XX для `merlin-api` HTTP API (tts-api)
-- [ ] Alarm на 5XX для `tara-auth` REST API (auth)
-- [ ] Alarm на 5XX для `vabamorf-api` REST API (morphology)
-- [ ] Оставить существующие 5XX/4XX/latency для `simplestore`
+- [x] Alarm на 5XX для `merlin-api` HTTP API (tts-api)
+- [x] Alarm на 5XX для `tara-auth` REST API (auth)
+- [x] Alarm на 5XX для `vabamorf-api` REST API (morphology)
+- [x] Оставить существующие 5XX/4XX/latency для `simplestore`
 
 **1.3 Synthesis flow end-to-end**
-- [ ] Alarm на DLQ depth > 0 (CRITICAL: клиент не получит звук)
-- [ ] Alarm на SQS main queue age > 5 min (сообщение залипло, worker не берёт)
-- [ ] Alarm на ECS service running count = 0 в prod (worker вообще не запущен)
+- [x] Alarm на DLQ depth > 0 (CRITICAL: клиент не получит звук)
+- [x] Alarm на SQS main queue age > 5 min (сообщение залипло, worker не берёт)
+- [x] Alarm на ECS service running count = 0 в prod (worker вообще не запущен)
 
 ### Фаза 2: Frontend error tracking
 
 **2.1 Sentry configuration**
-- [ ] Включить `replaysOnErrorSampleRate: 1.0`
-- [ ] Включить `tracesSampleRate: 0.1`
-- [ ] Убрать try/catch вокруг Sentry.init — если DSN невалидный, пусть падает в console
+- [x] Включить `replaysOnErrorSampleRate: 1.0`
+- [x] Включить `tracesSampleRate: 0.1`
+- [x] Убрать try/catch вокруг Sentry.init — если DSN невалидный, пусть падает в console
 
 **2.2 Все API ошибки → Sentry**
-- [ ] Создать utility `reportApiError(response, context)` → Sentry.captureException
-- [ ] Применить в `synthesize.ts`: synthesis request failed, synthesis timed out
-- [ ] Применить в `orchestratorHelpers.ts`: "Failed to synthesize" → + Sentry
+- [x] Создать utility `reportApiError(response, context)` → Sentry.captureException
+- [x] Применить в `synthesize.ts`: synthesis request failed, synthesis timed out
+- [x] Применить в `orchestratorHelpers.ts`: "Failed to synthesize" → + Sentry
 - [ ] Применить в `audioPlayer.ts`: "Audio playback failed" → + Sentry
-- [ ] Применить в `SimpleStoreAdapter.ts`: все fetch errors → + Sentry
-- [ ] Применить в `analyzeApi.ts`: analyze/variants errors → + Sentry
-- [ ] Неожиданные 4xx от API → трактовать как internal error → Sentry
+- [x] Применить в `SimpleStoreAdapter.ts`: все fetch errors → + Sentry
+- [x] Применить в `analyzeApi.ts`: analyze/variants errors → + Sentry
+- [x] Неожиданные 4xx от API → трактовать как internal error → Sentry
 
 ### Фаза 3: Dashboard (единое окно)
 
 **3.1 Переработать CloudWatch Dashboard `hak-activity-{env}`:**
 
+**Row 0: Alarm Status (green/red timeline)** — DONE
+
 **Row 1: Общая активность**
-- [ ] API Gateway суммарные requests по ВСЕМ API (или CloudFront requests как proxy)
-- [ ] Уникальные IP (CloudFront Viewer Requests metric, или WAF sampled requests)
-- [ ] CloudFront error rate (4xx + 5xx)
+- [x] CloudFront requests (proxy для всего трафика)
+- [x] CloudFront error rate (4xx + 5xx)
+- [x] WAF blocked requests
 
 **Row 2: Synthesis (генерация звука) — отдельно**
-- [ ] `merlin-api` Lambda invocations (сколько генераций)
-- [ ] SQS queue depth (текущая длина очереди)
-- [ ] DLQ depth (потерянные генерации)
-- [ ] ECS running tasks + desired count
+- [x] `merlin-api` Lambda invocations (synthesize + status poll)
+- [x] SQS queue depth (waiting + in-flight)
+- [x] DLQ depth (потерянные генерации)
+- [x] ECS running tasks (target: 1)
 
 **Row 3: Morphology (анализ текста) — отдельно**
-- [ ] `vabamorf-api` Lambda invocations
-- [ ] `vabamorf-api` Lambda errors
-- [ ] `vabamorf-api` Lambda duration
+- [x] `vabamorf-api` Lambda invocations
+- [x] `vabamorf-api` Lambda errors
+- [x] `vabamorf-api` Lambda duration (avg + p99)
 
 **Row 4: Всё остальное (store + auth + infra)**
-- [ ] `simplestore` Lambda invocations + errors + duration
-- [ ] `tara-auth` Lambda invocations + errors
-- [ ] DynamoDB consumed capacity + throttling
-- [ ] WAF blocked requests
+- [x] `simplestore` Lambda invocations + errors
+- [x] `tara-auth` Lambda invocations + errors
+- [x] DynamoDB capacity + throttling
+- [x] CloudFront bandwidth
 
 ### Фаза 4: Uptime и CI/CD
 
@@ -382,12 +384,12 @@ Dashboard `hak-activity-{env}` показывает:
 - [ ] Route53 health check на synthesis API health endpoint
 
 **4.2 CI/CD**
-- [ ] Slack notification в `build.yml` при failure
-- [ ] Slack notification в `deploy.yml` при failure и при успешном деплое
+- [x] Slack notification в `build.yml` при failure
+- [x] Slack notification в `deploy.yml` при failure и при успешном деплое
 - [ ] Smoke tests: добавить Slack notification при failure (keep `continue-on-error` но алертить)
 
 **4.3 Security**
-- [ ] GuardDuty в prod (убрать `count = var.env == "dev"`)
+- [x] GuardDuty — уже включен для всего аккаунта через dev env (оба env на одном AWS account, дублировать нельзя)
 
 ### Фаза 5: Зрелость
 
