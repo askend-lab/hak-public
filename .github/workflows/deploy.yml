@@ -385,15 +385,11 @@ jobs:
           [ "${{ steps.state.outputs.deploy_auth }}" == "true" ] && echo "- ✅ auth" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ auth (unchanged)" >> $GITHUB_STEP_SUMMARY
 
       - name: Notify Slack (success)
-        if: success() && secrets.SLACK_WEBHOOK_URL != ''
-        run: |
-          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"attachments\":[{\"color\":\"#00ff00\",\"title\":\"✅ Deploy ${{ inputs.environment }} succeeded\",\"text\":\"Build: ${{ inputs.build_id }}\nSHA: ${{ github.sha }}\",\"footer\":\"HAK CI/CD\"}]}"
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }
+        run: 'curl -s -X POST "$SLACK_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"attachments\":[{\"color\":\"#00ff00\",\"title\":\"✅ Deploy ${{ inputs.environment }} succeeded\",\"text\":\"Build: ${{ inputs.build_id }}\\nSHA: ${{ github.sha }}\",\"footer\":\"HAK CI/CD\"}]}"'
 
       - name: Notify Slack (failure)
-        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
-        run: |
-          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"attachments\":[{\"color\":\"#ff0000\",\"title\":\"🚨 Deploy ${{ inputs.environment }} FAILED\",\"text\":\"Build: ${{ inputs.build_id }}\nSHA: ${{ github.sha }}\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"footer\":\"HAK CI/CD\"}]}"
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }
+        run: 'curl -s -X POST "$SLACK_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"attachments\":[{\"color\":\"#ff0000\",\"title\":\"🚨 Deploy ${{ inputs.environment }} FAILED\",\"text\":\"Build: ${{ inputs.build_id }}\\nSHA: ${{ github.sha }}\\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"footer\":\"HAK CI/CD\"}]}"'
