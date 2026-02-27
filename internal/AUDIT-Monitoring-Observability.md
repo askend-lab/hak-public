@@ -344,7 +344,7 @@ Dashboard `hak-activity-{env}` показывает:
 - [x] Создать utility `reportApiError(response, context)` → Sentry.captureException
 - [x] Применить в `synthesize.ts`: synthesis request failed, synthesis timed out
 - [x] Применить в `orchestratorHelpers.ts`: "Failed to synthesize" → + Sentry
-- [ ] Применить в `audioPlayer.ts`: "Audio playback failed" → + Sentry
+- [x] Применить в `audioPlayer.ts`: "Audio playback failed" → + Sentry
 - [x] Применить в `SimpleStoreAdapter.ts`: все fetch errors → + Sentry
 - [x] Применить в `analyzeApi.ts`: analyze/variants errors → + Sentry
 - [x] Неожиданные 4xx от API → трактовать как internal error → Sentry
@@ -380,8 +380,9 @@ Dashboard `hak-activity-{env}` показывает:
 ### Фаза 4: Uptime и CI/CD
 
 **4.1 Uptime**
-- [ ] Route53 health check на `https://{domain}/` → alarm → Slack
-- [ ] Route53 health check на synthesis API health endpoint
+- [x] Route53 health check на `https://{domain}/` → alarm (CloudWatch, cross-region SNS relay нужен для Slack)
+- [x] Route53 health check на `/api/health` (merlin-api) → alarm (CloudWatch)
+- [ ] Cross-region SNS relay для Slack уведомлений о health check failures (Phase 5)
 
 **4.2 CI/CD**
 - [x] Slack notification в `build.yml` при failure
@@ -397,10 +398,11 @@ Dashboard `hak-activity-{env}` показывает:
 - [ ] Correlation ID (X-Request-Id) от CloudFront до Lambda
 - [ ] CloudWatch Logs Insights saved queries
 - [ ] Runbooks для каждого alarm
+- [ ] Cross-region SNS relay (us-east-1 → eu-west-1) для Route53 health check → Slack
 
 ### Решение по 400 vs 500
 
 **Решение:** бэкенд оставляем как есть (400 = корректный API ответ для невалидных запросов). На фронтенде: любой неожиданный 4xx от API трактуется как internal error и отправляется в Sentry (наш баг — фронтенд не должен отправлять невалидные запросы).
 
-- [ ] Создать frontend utility `reportApiError(response, context)` → Sentry
-- [ ] Применить во всех API-вызовах фронтенда
+- [x] Создать frontend utility `reportApiError(opts)` → Sentry.captureException + logger.error
+- [x] Применить во всех API-вызовах фронтенда (synthesize, analyze, SimpleStore, audioPlayer)
