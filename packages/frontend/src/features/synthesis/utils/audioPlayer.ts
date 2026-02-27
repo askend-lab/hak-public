@@ -5,6 +5,7 @@
  * Shared audio playback utility to eliminate DRY violations
  * across PronunciationVariants, SentencePhoneticPanel, useAudioPlayback, and useSynthesis
  */
+import * as Sentry from "@sentry/react";
 
 interface AudioPlayCallbacks {
   onLoaded?: (() => void) | undefined;
@@ -76,7 +77,9 @@ export async function playAudioWithCallbacks(
         },
         onError: () => {
           callbacks.onError?.();
-          reject(new Error("Audio playback failed"));
+          const err = new Error("Audio playback failed");
+          Sentry.captureException(err, { tags: { audio: "playback" }, extra: { audioUrl } });
+          reject(err);
         },
       },
       shouldRevokeUrl,
