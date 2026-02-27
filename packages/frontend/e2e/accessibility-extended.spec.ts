@@ -30,7 +30,7 @@ async function bypassOnboarding(page: Page) {
   );
 }
 
-describe("accessibility-extended.spec", () => {
+test.describe("accessibility-extended.spec", () => {
   test.beforeEach(async ({ page }) => {
     await bypassOnboarding(page);
   });
