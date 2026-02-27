@@ -365,6 +365,35 @@ resource "aws_cloudwatch_metric_alarm" "merlin_ecs_zero_tasks" {
 }
 
 # =============================================================================
+# Slack Notifier Lambda Alarm — meta-monitoring
+# If this Lambda fails, NO alerts reach the team
+# NOTE: alarm_actions points to the same SNS topic. If the notifier is broken,
+# this alarm won't reach Slack either, but it will be visible in CloudWatch
+# console and dashboard. This is the best we can do without a second channel.
+# =============================================================================
+
+resource "aws_cloudwatch_metric_alarm" "slack_notifier_errors" {
+  alarm_name          = "hak-${var.env}-slack-notifier-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 0
+  alarm_description   = "CRITICAL: Slack notifier Lambda is failing — alerts are NOT reaching Slack"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    FunctionName = "hak-slack-notifier-${var.env}"
+  }
+
+  tags = local.common_tags
+}
+
+# =============================================================================
 # Public API Hardening Alarms (PUB-6)
 # =============================================================================
 
