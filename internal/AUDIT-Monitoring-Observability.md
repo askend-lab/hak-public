@@ -235,3 +235,81 @@
 │  Actions    │     │  only        │
 └─────────────┘     └──────────────┘
 ```
+
+---
+
+## 6. План действий (чеклист)
+
+### Фаза 1: Критические user-facing сбои (приоритет №1)
+
+**1.1 Все 500-ки → алерт в Slack**
+- [ ] Добавить CloudWatch alarm на Lambda errors для `tts-api` (synthesize + status)
+- [ ] Добавить CloudWatch alarm на Lambda errors для `auth` (все handlers)
+- [ ] Добавить CloudWatch alarm на Lambda errors для `morphology-api` (analyze + variants)
+- [ ] Проверить что существующий alarm для `simplestore` корректно работает
+- [ ] Проверить что `slack_webhook_url` задан в dev и prod tfvars/secrets
+
+**1.2 Synthesis flow — мониторинг от начала до конца**
+- [ ] Alarm на SQS Dead Letter Queue depth > 0 (worker не смог обработать → звук потерян)
+- [ ] Alarm на synthesis Lambda 503 (QueueFullError) — клиент не может генерировать
+- [ ] Alarm на ECS task failures / stopped tasks (worker crash)
+- [ ] Frontend: отправлять synthesis timeout в Sentry (30 попыток polling без результата)
+- [ ] Frontend: отправлять Audio.onerror в Sentry (S3 audio не загрузился)
+
+**1.3 Frontend → Sentry полноценно**
+- [ ] Включить `replaysOnErrorSampleRate: 1.0` (запись сессии при каждой ошибке)
+- [ ] Включить `tracesSampleRate: 0.1` (10% запросов трейсятся)
+- [ ] Добавить глобальный перехват неожиданных 4xx от API как Sentry events (фронт не должен получать 400 — если получил, это наш баг)
+- [ ] Добавить `Sentry.captureMessage()` для synthesis timeout, audio playback failure
+- [ ] Настроить Sentry alert rules: email/Slack на новые ошибки
+
+**1.4 Frontend error classification**
+- [ ] В `synthesize.ts`: обернуть `throw new Error("Synthesis request failed")` в Sentry.captureException
+- [ ] В `synthesize.ts`: обернуть `throw new Error("Synthesis timed out")` в Sentry.captureException
+- [ ] В `orchestratorHelpers.ts`: все `logger.error("Failed to synthesize:", error)` → + Sentry.captureException
+- [ ] В `audioPlayer.ts`: `reject(new Error("Audio playback failed"))` → + Sentry.captureException
+
+### Фаза 2: Uptime и CI/CD visibility
+
+**2.1 Uptime monitoring**
+- [ ] Добавить Route53 health check на `https://{domain}/` (или CloudWatch Synthetics canary)
+- [ ] Health check alarm → SNS → Slack (сайт down)
+- [ ] Добавить health check на `/api/synthesize` health endpoint
+- [ ] Добавить health check на `/api/analyze` health endpoint
+
+**2.2 CI/CD алертинг**
+- [ ] Добавить Slack notification step в `build.yml` при failure
+- [ ] Добавить Slack notification step в `deploy.yml` при failure
+- [ ] Добавить Slack notification step в `deploy.yml` при успешном деплое
+- [ ] Сделать smoke tests (`continue-on-error: true` → алерт при неудаче, не блокирует, но уведомляет)
+
+**2.3 Security**
+- [ ] Включить GuardDuty в prod (убрать `count = var.env == "dev"`)
+- [ ] Добавить CloudWatch alarm на Cognito failed auth attempts (brute force protection)
+
+### Фаза 3: Observability зрелость
+
+**3.1 Distributed tracing**
+- [ ] Добавить X-Ray tracing для morphology-api API Gateway
+- [ ] Пробросить X-Request-Id (correlation ID) от CloudFront до Lambda через headers
+- [ ] Добавить requestId в Sentry breadcrumbs для frontend→backend корреляции
+
+**3.2 Log Insights и метрики**
+- [ ] Создать CloudWatch Logs Insights saved queries: top errors, slow requests, synthesis failures
+- [ ] Добавить custom CloudWatch metric: synthesis requests/min
+- [ ] Добавить custom CloudWatch metric: synthesis success rate
+- [ ] Добавить custom CloudWatch metric: average synthesis duration (queue → ready)
+
+**3.3 Operational readiness**
+- [ ] Создать runbook для каждого CloudWatch alarm (что делать при срабатывании)
+- [ ] Создать Sentry project dashboard с ключевыми графиками
+- [ ] Добавить `/dashboard` или build-info.json endpoint для быстрой проверки версии в production
+
+### Решение по 400 vs 500
+
+**Решение:** бэкенд оставляем как есть (400 для невалидных запросов — корректно для универсального API). На фронтенде: любой неожиданный 4xx (который фронтенд не должен вызывать) трактуется как internal error и отправляется в Sentry.
+
+- [ ] Создать frontend utility `reportUnexpectedApiError(response, context)` — отправляет в Sentry если response.status >= 400 и это не ожидаемый клиентский error
+- [ ] Применить в `SimpleStoreAdapter` — save/get/delete/query
+- [ ] Применить в `synthesize.ts` — POST /api/synthesize
+- [ ] Применить в `analyzeApi.ts` — POST /api/analyze, POST /api/variants
