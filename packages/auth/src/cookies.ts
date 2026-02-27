@@ -24,16 +24,17 @@ export function createStateCookie(state: AuthState): string {
   return `${STATE_COOKIE_NAME}=${encoded}; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Max-Age=600; Path=/`;
 }
 
+function findCookieValue(cookieHeader: string, name: string): string | null {
+  const cookies = cookieHeader.split(';').map(c => c.trim());
+  const found = cookies.find(c => c.startsWith(`${name}=`));
+  return found ? found.split('=')[1] : null;
+}
+
 export function parseStateCookie(cookieHeader: string | undefined): AuthState | null {
   if (!cookieHeader) {return null;}
-
-  const cookies = cookieHeader.split(';').map(c => c.trim());
-  const stateCookie = cookies.find(c => c.startsWith(`${STATE_COOKIE_NAME}=`));
-  
-  if (!stateCookie) {return null;}
-
+  const encoded = findCookieValue(cookieHeader, STATE_COOKIE_NAME);
+  if (!encoded) {return null;}
   try {
-    const encoded = stateCookie.split('=')[1];
     const decoded = Buffer.from(encoded, 'base64url').toString('utf-8');
     return JSON.parse(decoded) as AuthState;
   } catch {

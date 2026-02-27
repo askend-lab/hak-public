@@ -26,6 +26,8 @@ const GENERATED_FILE_PATTERNS = [
 ];
 
 const HOOKS_FILE_PATTERNS = ["**/hooks/**/*.ts"];
+const SERVICE_FILE_PATTERNS = ["**/services/**/*.ts", "**/services/**/*.tsx", "**/repository/**/*.ts"];
+const FRONTEND_UTIL_PATTERNS = ["packages/frontend/src/utils/**/*.ts", "packages/frontend/src/types/**/*.ts", "packages/frontend/src/**/utils/**/*.ts"];
 
 export default [
   ...baseConfig,
@@ -108,49 +110,18 @@ export default [
     },
   },
 
-  // TSX components have higher complexity and size due to conditional rendering + hooks
-  {
-    files: ["**/*.tsx"],
-    ignores: TEST_FILE_PATTERNS,
-    rules: {
-      "complexity": ["error", 30],
-      "max-lines-per-function": ["error", 250], // components with hooks are naturally larger
-      "max-statements": ["error", 30],          // JSX + state + effects add statements
-    },
-  },
-
-  // === QS-1 MIGRATION: newly active rules on .ts/.tsx ===
-  // These rules were previously only applied to .js files.
-  // Enable one at a time: fix violations → remove "off" → commit.
-  // Track progress in CodeReviewMikkTracker.md § Quality System Improvements.
+  // === QS-1 MIGRATION: TS/TSX now uses same base limits as JS ===
+  // All threshold rules inherited from base config (no overrides).
+  // Base limits: complexity 8, cognitive-complexity 8, max-statements 10,
+  // max-lines-per-function 30, max-nested-callbacks 2, max-depth 3, max-params 3.
   {
     files: ["**/*.ts", "**/*.tsx"],
     rules: {
-      // --- FIXED: curly, import/first, import/newline-after-import (auto-fix)
-      // --- FIXED: sonarjs/no-redundant-jump, no-alert, max-depth, no-return-assign
-      // --- FIXED: require-atomic-updates, security/detect-non-literal-regexp
-      // --- FIXED: sonarjs/no-identical-functions, eslint-comments/require-description
-      // --- FIXED: sonarjs/prefer-immediate-return, import/no-duplicates
-      // --- FIXED: no-return-await, prefer-promise-reject-errors
-      // --- FIXED: unicorn/prefer-spread, unicorn/explicit-length-check, regexp/prefer-w
-
       // --- STYLE-ONLY: disabled for TS (intentional patterns) ---
       "no-nested-ternary": "off",    // TSX conditional rendering uses nested ternaries
       "promise/prefer-await-to-then": "off", // .then() chains in event handlers are idiomatic
       "promise/prefer-await-to-callbacks": "off", // callback patterns in event handlers
       "unicorn/no-useless-undefined": "off", // conflicts with TS strict params
-
-      // --- THRESHOLD ADJUSTMENTS ---
-      "max-params": ["error", 5],    // hooks/handlers take 4-5 dependency params
-      "max-classes-per-file": ["error", 3], // adapter files may co-locate related classes
-
-      // --- THRESHOLD RULES (raised to practical limits, outliers use eslint-disable) ---
-      "max-statements": ["error", 20],         // default 10 → 20
-      "max-lines-per-function": ["error", 150], // default 50 → 150
-      "max-nested-callbacks": ["error", 5],     // default 4 → 5
-      "max-lines": ["error", 400],              // default 300 → 400
-      "complexity": ["error", 15],              // default 10 → 15
-      "sonarjs/cognitive-complexity": ["error", 20], // default 15 → 20
 
       // --- THRESHOLD: raised to 4 (default 3), steps-ts/test files excluded ---
       "sonarjs/no-duplicate-string": ["error", { "threshold": 4 }],
@@ -158,6 +129,55 @@ export default [
   },
 
   // --- Post-QS-1 overrides (must come AFTER QS-1 block which applies to all .ts/.tsx) ---
+
+  // React hooks compose multiple useState/useCallback/useEffect — inherently need
+  // more statements, lines, and branching than plain utility functions.
+  {
+    files: HOOKS_FILE_PATTERNS,
+    rules: {
+      "max-statements": ["error", 20],
+      "max-lines-per-function": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
+      "max-lines": ["error", { max: 250, skipBlankLines: true, skipComments: true }],
+      "max-nested-callbacks": ["error", 3],
+      "complexity": ["error", 15],
+      "sonarjs/cognitive-complexity": ["error", 15],
+      "max-params": ["error", 5],
+    },
+  },
+
+  // Service classes and auth/config modules have complex orchestration logic
+  {
+    files: SERVICE_FILE_PATTERNS,
+    rules: {
+      "max-statements": ["error", 15],
+      "max-lines-per-function": ["error", { max: 60, skipBlankLines: true, skipComments: true }],
+      "complexity": ["error", 12],
+      "sonarjs/cognitive-complexity": ["error", 12],
+      "max-params": ["error", 4],
+    },
+  },
+
+  // Frontend utilities handle diverse input types with branching validation
+  {
+    files: FRONTEND_UTIL_PATTERNS,
+    rules: {
+      "max-statements": ["error", 15],
+      "complexity": ["error", 12],
+      "sonarjs/cognitive-complexity": ["error", 12],
+    },
+  },
+
+  // TSX components compose multiple useState/useCallback — same rationale as hooks.
+  // Default parameter values in React props each add a branch to cyclomatic complexity,
+  // so TSX components with many optional props need a higher limit.
+  {
+    files: ["**/*.tsx"],
+    rules: {
+      "max-statements": ["error", 18],
+      "complexity": ["error", 30],
+      "sonarjs/cognitive-complexity": ["error", 18],
+    },
+  },
 
   // Generated files — skip size rules
   {
@@ -169,28 +189,8 @@ export default [
     },
   },
 
-  // TSX components — higher thresholds due to hooks + JSX + conditional rendering
-  {
-    files: ["**/*.tsx"],
-    ignores: TEST_FILE_PATTERNS,
-    rules: {
-      "complexity": ["error", 30],
-      "max-lines-per-function": ["error", 250],
-      "max-statements": ["error", 30],
-    },
-  },
 
-  // Hooks — aggregate multiple concerns, naturally larger
-  {
-    files: HOOKS_FILE_PATTERNS,
-    ignores: TEST_FILE_PATTERNS,
-    rules: {
-      "max-lines-per-function": ["error", 250],
-      "max-statements": ["error", 30],
-    },
-  },
-
-  // Test overrides
+  // Test overrides (must come AFTER hooks block to override max-nested-callbacks for test files in hooks dirs)
   {
     files: TEST_FILE_PATTERNS,
     rules: {
@@ -204,6 +204,7 @@ export default [
       "sonarjs/cognitive-complexity": "off",
       "sonarjs/no-duplicate-string": "off",
       "no-param-reassign": "off",
+      "max-nested-callbacks": ["error", 10],
     },
   },
 

@@ -53,7 +53,7 @@ describe("wrapLambdaHandler", () => {
 
   it("catches non-operational AppError as 500", async () => {
     const wrapped = wrapLambdaHandler("test", async () => {
-      throw new AppError("critical bug", "BUG", 500, false);
+      throw new AppError("critical bug", "BUG", { statusCode: 500, isOperational: false });
     });
 
     const result = await wrapped(mockEvent);

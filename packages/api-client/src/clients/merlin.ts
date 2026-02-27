@@ -37,34 +37,25 @@ export class MerlinClient {
    * Synthesize text and poll until audio is ready.
    * Returns the final status response with audioUrl.
    */
+  private async pollUntilReady(cacheKey: string, maxAttempts: number): Promise<ApiResult<StatusResponse>> {
+    for (let i = 0; i < maxAttempts; i++) {
+      await new Promise((resolve) => { setTimeout(resolve, POLL_INTERVAL_MS); }); // eslint-disable-line no-await-in-loop -- sequential polling is intentional
+      const result = await this.status(cacheKey); // eslint-disable-line no-await-in-loop -- sequential polling
+      if (result.data?.status === "ready") {return result;}
+    }
+    return { status: 408, error: "Synthesis timed out" };
+  }
+
   async synthesizeAndWait(
     request: SynthesizeRequest,
     maxAttempts = MAX_POLL_ATTEMPTS,
   ): Promise<ApiResult<StatusResponse>> {
     const synthResult = await this.synthesize(request);
     if (!synthResult.data) {return { status: synthResult.status, error: synthResult.error };}
-
     if (synthResult.data.status === "ready") {
-      return {
-        status: synthResult.status,
-        data: {
-          status: "ready",
-          cacheKey: synthResult.data.cacheKey,
-          audioUrl: synthResult.data.audioUrl,
-        },
-      };
+      return { status: synthResult.status, data: synthResult.data };
     }
-
-    const cacheKey = synthResult.data.cacheKey;
-
-    for (let i = 0; i < maxAttempts; i++) {
-      await new Promise((resolve) => { setTimeout(resolve, POLL_INTERVAL_MS); }); // eslint-disable-line no-await-in-loop -- sequential polling is intentional
-      const statusResult = await this.status(cacheKey); // eslint-disable-line no-await-in-loop -- sequential polling
-      if (!statusResult.data) {continue;}
-      if (statusResult.data.status === "ready") {return statusResult;}
-    }
-
-    return { status: 408, error: "Synthesis timed out" };
+    return this.pollUntilReady(synthResult.data.cacheKey, maxAttempts);
   }
 
   private async get<T>(path: string): Promise<ApiResult<T>> {

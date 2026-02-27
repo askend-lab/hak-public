@@ -11,6 +11,17 @@ import { logger } from "@hak/shared";
 const MAX_RETRY_COUNT = 1;
 const RETRY_DELAY_MS = 100;
 
+function makeRetryOnError(
+  id: string, retryCount: number,
+  updateSentence: (id: string, updates: Partial<SentenceState>) => void,
+  retryFn: () => void,
+) {
+  return () => {
+    updateSentence(id, { isLoading: false, isPlaying: false, ...CACHE_INVALIDATION });
+    if (retryCount < MAX_RETRY_COUNT) { setTimeout(retryFn, RETRY_DELAY_MS); }
+  };
+}
+
 export function useSynthesisOrchestrator(): ReturnType<
   typeof useSentenceState
 > & {
@@ -109,19 +120,9 @@ export function useSynthesisOrchestrator(): ReturnType<
         try {
           updateSentence(id, { tags, isPlaying: false });
           await playAudio(sentence.audioUrl, {
-            onLoadComplete: () =>
-              updateSentence(id, { isLoading: false, isPlaying: true }),
+            onLoadComplete: () => updateSentence(id, { isLoading: false, isPlaying: true }),
             onEnded: () => updateSentence(id, { isPlaying: false }),
-            onError: () => {
-              updateSentence(id, {
-                isLoading: false,
-                isPlaying: false,
-                ...CACHE_INVALIDATION,
-              });
-              if (retryCount < MAX_RETRY_COUNT) {
-                setTimeout(() => { void synthesizeAndPlay(id, retryCount + 1); }, RETRY_DELAY_MS);
-              }
-            },
+            onError: makeRetryOnError(id, retryCount, updateSentence, () => { void synthesizeAndPlay(id, retryCount + 1); }),
           });
           return;
         } catch (error) {
@@ -181,19 +182,9 @@ export function useSynthesisOrchestrator(): ReturnType<
         try {
           await playAudio(sentence.audioUrl, {
             onLoadStart: () => updateSentence(id, { isPlaying: false }),
-            onLoadComplete: () =>
-              updateSentence(id, { isLoading: false, isPlaying: true }),
+            onLoadComplete: () => updateSentence(id, { isLoading: false, isPlaying: true }),
             onEnded: () => updateSentence(id, { isPlaying: false }),
-            onError: () => {
-              updateSentence(id, {
-                isLoading: false,
-                isPlaying: false,
-                ...CACHE_INVALIDATION,
-              });
-              if (retryCount < MAX_RETRY_COUNT) {
-                setTimeout(() => { void synthesizeWithText(id, text, retryCount + 1); }, RETRY_DELAY_MS);
-              }
-            },
+            onError: makeRetryOnError(id, retryCount, updateSentence, () => { void synthesizeWithText(id, text, retryCount + 1); }),
           });
           return;
         } catch (error) {

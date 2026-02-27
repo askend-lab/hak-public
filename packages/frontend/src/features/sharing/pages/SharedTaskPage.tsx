@@ -16,73 +16,46 @@ import SentenceSynthesisItem from "@/features/synthesis/components/SentenceSynth
 import { PlayAllButton } from "@/components/ui/PlayAllButton";
 import { PageLoadingState } from "@/components/ui/PageLoadingState";
 
-export function SharedTaskPage() {
-  const { token } = useParams<{ token: string }>();
-  const navigate = useNavigate();
-  const { showNotification } = useNotification();
+function useSharedTaskData(token: string | undefined) {
   const dataService = useDataService();
-  const { setCopiedEntries } = useCopiedEntries();
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const {
-    currentPlayingId,
-    currentLoadingId,
-    isPlayingAll,
-    isLoadingPlayAll,
-    handlePlayEntry,
-    handlePlayAll,
-  } = useSharedTaskAudio();
-
-  useDocumentTitle(task?.name ? `Jagatud: ${task.name}` : undefined);
-
   useEffect(() => {
     async function loadTask(): Promise<void> {
-      if (!token) {
-        setError("Token puudub");
-        setIsLoading(false);
-        return;
-      }
-
+      if (!token) { setError("Token puudub"); setIsLoading(false); return; }
       try {
         const foundTask = await dataService.getTaskByShareToken(token);
-
-        if (foundTask) {
-          setTask(foundTask);
-        } else {
-          setError("Ülesannet ei leitud");
-        }
+        if (foundTask) { setTask(foundTask); }
+        else { setError("Ülesannet ei leitud"); }
       } catch (err) {
         logger.error("Failed to load shared task:", err);
         setError("Viga ülesande laadimisel");
-      } finally {
-        setIsLoading(false);
-      }
+      } finally { setIsLoading(false); }
     }
-
     void loadTask();
   }, [token, dataService]);
 
+  return { task, isLoading, error };
+}
+
+export function SharedTaskPage() {
+  const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
+  const { setCopiedEntries } = useCopiedEntries();
+  const { task, isLoading, error } = useSharedTaskData(token);
+  const audio = useSharedTaskAudio();
+
+  useDocumentTitle(task?.name ? `Jagatud: ${task.name}` : undefined);
+
   const entries = task?.entries || [];
-
-  const onPlayEntry = useCallback(
-    (id: string) => {
-      handlePlayEntry(id, entries);
-    },
-    [handlePlayEntry, entries],
-  );
-
-  const onPlayAll = useCallback(async () => {
-    await handlePlayAll(entries);
-  }, [handlePlayAll, entries]);
-
+  const onPlayEntry = useCallback((id: string) => { audio.handlePlayEntry(id, entries); }, [audio.handlePlayEntry, entries]);
+  const onPlayAll = useCallback(async () => { await audio.handlePlayAll(entries); }, [audio.handlePlayAll, entries]);
   const handleCopyToPlaylist = (): void => {
     if (!task?.entries) {return;}
-
-    setCopiedEntries(task.entries);
-    showNotification({ type: "success", message: "Laused kopeeritud!" });
-    void navigate("/synthesis");
+    setCopiedEntries(task.entries); showNotification({ type: "success", message: "Laused kopeeritud!" }); void navigate("/synthesis");
   };
 
   // Loading state
@@ -128,8 +101,8 @@ export function SharedTaskPage() {
           </div>
           <div className="page-header__actions">
             <PlayAllButton
-              isPlaying={isPlayingAll}
-              isLoading={isLoadingPlayAll}
+              isPlaying={audio.isPlayingAll}
+              isLoading={audio.isLoadingPlayAll}
               disabled={entries.length === 0}
               onClick={() => { void onPlayAll(); }}
             />
@@ -172,8 +145,8 @@ export function SharedTaskPage() {
                   id={entry.id}
                   text={entry.text}
                   mode="readonly"
-                  isPlaying={currentPlayingId === entry.id}
-                  isLoading={currentLoadingId === entry.id}
+                  isPlaying={audio.currentPlayingId === entry.id}
+                  isLoading={audio.currentLoadingId === entry.id}
                   onPlay={onPlayEntry}
                 />
               ))

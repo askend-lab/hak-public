@@ -5,6 +5,14 @@ import { useState, useCallback, useRef } from "react";
 import { EditingTag, OpenTagMenu, SentenceState, convertTextToTags, normalizeTags } from "@/types/synthesis";
 import type { useTagUpdater } from "./useTagUpdater";
 
+function computeNewText(tags: string[], tagIndex: number, trimmedValue: string): string {
+  if (trimmedValue === "") {
+    return tags.filter((_, i) => i !== tagIndex).join(" ");
+  }
+  const newWords = convertTextToTags(trimmedValue);
+  return normalizeTags([...tags.slice(0, tagIndex), ...newWords, ...tags.slice(tagIndex + 1)]).join(" ");
+}
+
 interface UseInlineTagEditorDeps {
   sentences: SentenceState[];
   getSentence: (id: string) => SentenceState | undefined;
@@ -65,50 +73,23 @@ export function useInlineTagEditor({
     setEditingTag(null);
   }, [editingTag, tagUpdater]);
 
+  const commitAndSynthesize = useCallback(() => {
+    if (!editingTag) {return;}
+    const { sentenceId, tagIndex, value } = editingTag;
+    const trimmedValue = value.trim();
+    const sentence = sentencesRef.current.find((s) => s.id === sentenceId);
+    const newText = sentence ? computeNewText(sentence.tags, tagIndex, trimmedValue) : "";
+    handleEditTagCommit();
+    if (newText) { synthesizeWithText(sentenceId, newText); }
+  }, [editingTag, handleEditTagCommit, synthesizeWithText]);
+
   const handleEditTagKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        if (editingTag) {
-          const sentenceId = editingTag.sentenceId;
-          const tagIndex = editingTag.tagIndex;
-          const trimmedValue = editingTag.value.trim();
-          // Compute the new text BEFORE commit clears editingTag
-          const sentence = sentencesRef.current.find(
-            (s) => s.id === sentenceId,
-          );
-          let newText = "";
-          /* eslint-disable max-depth -- tag edit logic requires nesting inside sentence lookup */
-          if (sentence) {
-            if (trimmedValue === "") {
-              const newTags = sentence.tags.filter((_, i) => i !== tagIndex);
-              newText = newTags.join(" ");
-            } else {
-              const newWords = convertTextToTags(trimmedValue);
-              const newTags = normalizeTags([
-                ...sentence.tags.slice(0, tagIndex),
-                ...newWords,
-                ...sentence.tags.slice(tagIndex + 1),
-              ]);
-              newText = newTags.join(" ");
-            }
-          }
-          /* eslint-enable max-depth -- end nested tag edit block */
-          handleEditTagCommit();
-          // Use synthesizeWithText to pass the correct text directly, bypassing stale ref
-          if (newText) {
-            synthesizeWithText(sentenceId, newText);
-          }
-        }
-      } else if (e.key === " ") {
-        e.preventDefault();
-        handleEditTagCommit();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        setEditingTag(null);
-      }
+      if (e.key === "Enter") { e.preventDefault(); commitAndSynthesize(); }
+      else if (e.key === " ") { e.preventDefault(); handleEditTagCommit(); }
+      else if (e.key === "Escape") { e.preventDefault(); setEditingTag(null); }
     },
-    [editingTag, handleEditTagCommit, synthesizeWithText],
+    [commitAndSynthesize, handleEditTagCommit],
   );
 
   return {

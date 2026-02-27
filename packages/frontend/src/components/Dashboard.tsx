@@ -85,6 +85,24 @@ function ActivitySection({
   );
 }
 
+async function fetchMetrics(
+  isAuthenticated: boolean,
+  user: ReturnType<typeof useAuth>["user"],
+  dataService: ReturnType<typeof useDataService>,
+): Promise<ActivityMetric[]> {
+  let taskCount = 0;
+  let entryCount = 0;
+  if (isAuthenticated && user) {
+    const tasks = await dataService.getUserTasks();
+    taskCount = tasks.length;
+    entryCount = tasks.reduce((sum, task) => sum + task.entryCount, 0);
+  }
+  return [
+    { label: "Ülesanded", value: taskCount, icon: "📋" },
+    { label: "Kirjed", value: entryCount, icon: "📝" },
+  ];
+}
+
 function useDashboardData() {
   const { user, isAuthenticated } = useAuth();
   const [metrics, setMetrics] = useState<ActivityMetric[]>([]);
@@ -94,25 +112,13 @@ function useDashboardData() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      let taskCount = 0;
-        let entryCount = 0;
-      if (isAuthenticated && user) {
-        const tasks = await dataService.getUserTasks();
-        taskCount = tasks.length;
-        entryCount = tasks.reduce((sum, task) => sum + task.entryCount, 0);
-      }
-      setMetrics([
-        { label: "Ülesanded", value: taskCount, icon: "📋" },
-        { label: "Kirjed", value: entryCount, icon: "📝" },
-      ]);
+      setMetrics(await fetchMetrics(isAuthenticated, user, dataService));
       setRecentActivity([]);
     } finally {
       setIsLoading(false);
     }
   }, [isAuthenticated, user, dataService]);
-  useEffect(() => {
-    void loadData();
-  }, [loadData]);
+  useEffect(() => { void loadData(); }, [loadData]);
   return { metrics, recentActivity, isLoading, isAuthenticated };
 }
 

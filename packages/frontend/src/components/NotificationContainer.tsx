@@ -31,56 +31,52 @@ export interface NotificationRef {
   show: (options: ShowNotificationOptions) => void;
 }
 
-const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
+const MAX_NOTIFICATIONS = 5;
+
+function createNotification(options: ShowNotificationOptions): NotificationData {
+  return {
+    id: `notification-${crypto.randomUUID()}`,
+    type: options.type, color: options.color, message: options.message,
+    description: options.description, action: options.action, duration: options.duration,
+  };
+}
+
+const filterById = (id: string) => (n: NotificationData) => n.id !== id;
+
+function useNotificationState() {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
-
   const removeNotification = useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    setNotifications((prev) => prev.filter(filterById(id)));
   }, []);
+  const show = useCallback((options: ShowNotificationOptions) => {
+    setNotifications((prev) => [...prev, createNotification(options)].slice(-MAX_NOTIFICATIONS));
+  }, []);
+  return { notifications, removeNotification, show };
+}
 
-  const show = useCallback(
-    (options: ShowNotificationOptions) => {
-      const id = `notification-${crypto.randomUUID()}`;
-      const notification: NotificationData = {
-        id,
-        type: options.type,
-        color: options.color,
-        message: options.message,
-        description: options.description,
-        action: options.action,
-        duration: options.duration,
-      };
-
-      const MAX_NOTIFICATIONS = 5;
-      setNotifications((prev) => [...prev, notification].slice(-MAX_NOTIFICATIONS));
-    },
-    [],
-  );
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      show,
-    }),
-    [show],
-  );
-
+function NotificationList({ notifications, removeNotification }: { notifications: NotificationData[]; removeNotification: (id: string) => void }) {
   return (
     <div className="notification-container" aria-live="polite" aria-atomic="true">
-      {notifications.map((notification) => (
+      {notifications.map((n) => (
         <Notification
-          key={notification.id}
-          type={notification.type}
-          color={notification.color ?? undefined}
-          message={notification.message}
-          description={notification.description ?? undefined}
-          action={notification.action ?? undefined}
-          duration={notification.duration ?? undefined}
-          onClose={() => removeNotification(notification.id)}
+          key={n.id}
+          type={n.type}
+          color={n.color ?? undefined}
+          message={n.message}
+          description={n.description ?? undefined}
+          action={n.action ?? undefined}
+          duration={n.duration ?? undefined}
+          onClose={() => removeNotification(n.id)}
         />
       ))}
     </div>
   );
+}
+
+const NotificationContainer = forwardRef<NotificationRef>((_, ref) => {
+  const { notifications, removeNotification, show } = useNotificationState();
+  useImperativeHandle(ref, () => ({ show }), [show]);
+  return <NotificationList notifications={notifications} removeNotification={removeNotification} />;
 });
 
 NotificationContainer.displayName = "NotificationContainer";

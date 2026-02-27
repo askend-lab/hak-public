@@ -13,7 +13,7 @@ import {
 
 describe("AppError hierarchy", () => {
   it("AppError has correct defaults", () => {
-    const err = new AppError("test", "TEST_CODE", 500, true);
+    const err = new AppError("test", "TEST_CODE", { statusCode: 500, isOperational: true });
     expect(err).toBeInstanceOf(Error);
     expect(err).toBeInstanceOf(AppError);
     expect(err.message).toBe("test");

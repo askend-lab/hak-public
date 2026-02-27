@@ -23,6 +23,25 @@ interface UseDropdownPositionOptions {
   anchorEl?: HTMLElement | null;
 }
 
+function calcDropdownPosition(
+  anchorRect: DOMRect,
+  menuRect: DOMRect,
+  alignment: "right" | "left",
+): DropdownPosition {
+  const { height: menuHeight, width: menuWidth } = menuRect;
+  const vh = window.innerHeight;
+  const vw = window.innerWidth;
+  let top = anchorRect.bottom + MENU_GAP;
+  let left = alignment === "right" ? anchorRect.right - menuWidth : anchorRect.left;
+  if (top + menuHeight > vh - VIEWPORT_PADDING) {
+    const aboveTop = anchorRect.top - MENU_GAP - menuHeight;
+    top = aboveTop >= VIEWPORT_PADDING ? aboveTop : Math.max(VIEWPORT_PADDING, vh - menuHeight - VIEWPORT_PADDING);
+  }
+  left = Math.max(VIEWPORT_PADDING, left);
+  if (left + menuWidth > vw - VIEWPORT_PADDING) { left = vw - menuWidth - VIEWPORT_PADDING; }
+  return { top, left };
+}
+
 /**
  * Hook for viewport-aware dropdown positioning.
  * Returns refs for anchor and menu elements, plus calculated position.
@@ -52,40 +71,9 @@ export function useDropdownPosition({
   const recalcPosition = useCallback(() => {
     const anchor = getAnchorElement();
     if (!anchor || !menuRef.current) {return;}
-    const anchorRect = anchor.getBoundingClientRect();
-    const menuRect = menuRef.current.getBoundingClientRect();
-    const menuHeight = menuRect.height;
-    const menuWidth = menuRect.width;
-    const vh = window.innerHeight;
-    const vw = window.innerWidth;
-
-    // Preferred: below the anchor
-    let top = anchorRect.bottom + MENU_GAP;
-
-    // Horizontal alignment
-    let left =
-      alignment === "right"
-        ? anchorRect.right - menuWidth // align right edges
-        : anchorRect.left; // align left edges
-
-    // If menu overflows bottom, flip above the anchor
-    if (top + menuHeight > vh - VIEWPORT_PADDING) {
-      const aboveTop = anchorRect.top - MENU_GAP - menuHeight;
-      if (aboveTop >= VIEWPORT_PADDING) {
-        top = aboveTop;
-      } else {
-        // Not enough room above either - clamp to viewport bottom
-        top = Math.max(VIEWPORT_PADDING, vh - menuHeight - VIEWPORT_PADDING);
-      }
-    }
-
-    // Ensure left/right stay within viewport
-    left = Math.max(VIEWPORT_PADDING, left);
-    if (left + menuWidth > vw - VIEWPORT_PADDING) {
-      left = vw - menuWidth - VIEWPORT_PADDING;
-    }
-
-    setPosition({ top, left });
+    setPosition(
+      calcDropdownPosition(anchor.getBoundingClientRect(), menuRef.current.getBoundingClientRect(), alignment),
+    );
   }, [alignment, getAnchorElement]);
 
   // Set initial position from anchor (before menu is measured)

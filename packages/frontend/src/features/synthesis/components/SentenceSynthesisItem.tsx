@@ -2,9 +2,38 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { DragHandleIcon, MoreIcon } from "@/components/ui/Icons";
 import { PlayButton, RowMenu, TagsInput, TagsList } from "./SentenceSynthesis";
+
+function setContainerOpacity(ref: React.RefObject<HTMLDivElement | null>, opacity: string): void {
+  const el = ref.current;
+  if (el) { el.style.opacity = opacity; }
+}
+
+function useDragStartHandler(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  onDragStart: ((e: React.DragEvent, id: string) => void) | undefined,
+  id: string,
+) {
+  return useCallback((e: React.DragEvent): void => {
+    if (containerRef.current) {
+      e.dataTransfer.setDragImage(containerRef.current, 20, containerRef.current.offsetHeight / 2);
+      setTimeout(() => { setContainerOpacity(containerRef, "0.5"); }, 0);
+    }
+    onDragStart?.(e, id);
+  }, [containerRef, onDragStart, id]);
+}
+
+function useDragEndHandler(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  onDragEnd: ((e: React.DragEvent) => void) | undefined,
+) {
+  return useCallback((e: React.DragEvent): void => {
+    setContainerOpacity(containerRef, "1");
+    onDragEnd?.(e);
+  }, [containerRef, onDragEnd]);
+}
 
 interface SentenceSynthesisItemProps {
   // Identity
@@ -132,33 +161,8 @@ function SentenceSynthesisItem({
   sentenceIndex = 0,
 }: SentenceSynthesisItemProps): React.ReactElement {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleDragStartInternal = (e: React.DragEvent): void => {
-    if (containerRef.current) {
-      e.dataTransfer.setDragImage(
-        containerRef.current,
-        20,
-        containerRef.current.offsetHeight / 2,
-      );
-      setTimeout(() => {
-        if (containerRef.current) {
-          containerRef.current.style.opacity = "0.5";
-        }
-      }, 0);
-    }
-    if (onDragStart) {
-      onDragStart(e, id);
-    }
-  };
-
-  const handleDragEndInternal = (e: React.DragEvent): void => {
-    if (containerRef.current) {
-      containerRef.current.style.opacity = "1";
-    }
-    if (onDragEnd) {
-      onDragEnd(e);
-    }
-  };
+  const handleDragStartInternal = useDragStartHandler(containerRef, onDragStart, id);
+  const handleDragEndInternal = useDragEndHandler(containerRef, onDragEnd);
 
   const containerClasses = [
     "sentence-synthesis-item",

@@ -108,17 +108,9 @@ function storeRequestSchema(config: StoreConfig): z.ZodType {
 /**
  * Validates store request for save operations
  */
-export function validateStoreRequest(
-  request: Partial<StoreRequest>,
-  config: StoreConfig = DEFAULT_CONFIG,
-): ValidationResult {
-  const schema = storeRequestSchema(config);
-  const parsed = schema.safeParse(request);
-  if (parsed.success) {return { valid: true, errors: [] };}
-
+function mapZodIssues(issues: z.ZodIssue[]): string[] {
   const errors: string[] = [];
-  for (const issue of parsed.error.issues) {
-    // Replace Zod's generic record error with our custom message for non-object data
+  for (const issue of issues) {
     if (issue.path.includes("data") && issue.code === "invalid_type") {
       if (!errors.includes("data must be a plain object")) {
         errors.push("data must be a plain object");
@@ -127,8 +119,16 @@ export function validateStoreRequest(
       errors.push(issue.message);
     }
   }
+  return errors;
+}
 
-  return { valid: false, errors };
+export function validateStoreRequest(
+  request: Partial<StoreRequest>,
+  config: StoreConfig = DEFAULT_CONFIG,
+): ValidationResult {
+  const parsed = storeRequestSchema(config).safeParse(request);
+  if (parsed.success) {return { valid: true, errors: [] };}
+  return { valid: false, errors: mapZodIssues(parsed.error.issues) };
 }
 
 /**

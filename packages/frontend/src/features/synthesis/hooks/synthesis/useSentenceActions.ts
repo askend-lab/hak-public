@@ -8,6 +8,19 @@ import { copyTextToClipboard } from "@/utils/clipboardUtils";
 import { logger } from "@hak/shared";
 import { useNotification } from "@/contexts/NotificationContext";
 
+async function downloadAudioBlob(audioUrl: string, text: string): Promise<void> {
+  const audioResponse = await fetch(audioUrl);
+  const audioBlob = await audioResponse.blob();
+  const blobUrl = URL.createObjectURL(audioBlob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = `${(text || "audio").replace(/[<>:"/\\|?*\x00-\x1f\s]+/g, "_").slice(0, 80)}.wav`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(blobUrl);
+}
+
 interface UseSentenceActionsDeps {
   getSentence: (id: string) => SentenceState | undefined;
   updateSentence: (id: string, updates: Partial<SentenceState>) => void;
@@ -83,34 +96,13 @@ export function useSentenceActions({
       const sentence = getSentence(id);
       if (!sentence) {return;}
       let audioUrl = sentence.audioUrl;
-
       if (!audioUrl) {
-        try {
-          audioUrl = await synthesizeAuto(sentence.text);
-          updateSentence(id, { audioUrl });
-        } catch (error) {
-          logger.error("Failed to generate audio:", error);
-          return;
-        }
+        try { audioUrl = await synthesizeAuto(sentence.text); updateSentence(id, { audioUrl }); }
+        catch (error) { logger.error("Failed to generate audio:", error); return; }
       }
-
       if (!audioUrl) {return;}
-
-      try {
-        const audioResponse = await fetch(audioUrl);
-        const audioBlob = await audioResponse.blob();
-        const blobUrl = URL.createObjectURL(audioBlob);
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        const safeName = (sentence.text || "audio").replace(/[<>:"/\\|?*\x00-\x1f\s]+/g, "_").slice(0, 80);
-        a.download = `${safeName}.wav`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      } catch (error) {
-        logger.error("Failed to download audio:", error);
-      }
+      try { await downloadAudioBlob(audioUrl, sentence.text); }
+      catch (error) { logger.error("Failed to download audio:", error); }
     },
     [getSentence, updateSentence],
   );

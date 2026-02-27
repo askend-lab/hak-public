@@ -14,6 +14,26 @@ const MAX_TASK_NAME_LENGTH = 200;
 const MAX_TASK_DESCRIPTION_LENGTH = 2000;
 const MAX_ENTRIES_PER_TASK = 500;
 
+type TextEntryInput = string | { text: string; stressedText: string };
+
+function getStartOrder(entries: TaskEntry[], isReplace: boolean): number {
+  if (isReplace || entries.length === 0) {return 0;}
+  return Math.max(...entries.map((e) => e.order));
+}
+
+function buildNewEntries(taskId: string, textEntries: TextEntryInput[], startOrder: number): TaskEntry[] {
+  return textEntries.map((entry, index) => ({
+    id: generateId("entry"),
+    taskId,
+    text: typeof entry === "string" ? entry : entry.text,
+    stressedText: typeof entry === "string" ? entry : entry.stressedText,
+    audioUrl: null,
+    audioBlob: null,
+    order: startOrder + index + 1,
+    createdAt: new Date(),
+  }));
+}
+
 export class TaskRepository {
   constructor(
     private storage: SimpleStoreAdapter,
@@ -166,41 +186,13 @@ export class TaskRepository {
 
     const isReplace = mode === "replace";
     const currentEntries = task.entries ?? [];
-    const startOrder = isReplace
-      ? 0
-      : currentEntries.length > 0
-        ? Math.max(...currentEntries.map((e) => e.order))
-        : 0;
+    const startOrder = getStartOrder(currentEntries, isReplace);
+    const newEntries = buildNewEntries(taskId, textEntries, startOrder);
+    const newTexts = newEntries.map((entry) => entry.text);
 
-    const newEntries: TaskEntry[] = textEntries.map((entry, index) => {
-      const isStringEntry = typeof entry === "string";
-      return {
-        id: generateId("entry"),
-        taskId,
-        text: isStringEntry ? entry : entry.text,
-        stressedText: isStringEntry ? entry : entry.stressedText,
-        audioUrl: null,
-        audioBlob: null,
-        order: startOrder + index + 1,
-        createdAt: new Date(),
-      };
-    });
-
-    const newTexts = textEntries.map((entry) =>
-      typeof entry === "string" ? entry : entry.text,
-    );
-
-    const updatedEntries = isReplace
-      ? newEntries
-      : [...currentEntries, ...newEntries];
-    const updatedSequences = isReplace
-      ? newTexts
-      : [...(task.speechSequences ?? []), ...newTexts];
-    await this.applyTaskUpdate(task, {
-      entries: updatedEntries,
-      speechSequences: updatedSequences,
-    });
-
+    const updatedEntries = isReplace ? newEntries : [...currentEntries, ...newEntries];
+    const updatedSequences = isReplace ? newTexts : [...(task.speechSequences ?? []), ...newTexts];
+    await this.applyTaskUpdate(task, { entries: updatedEntries, speechSequences: updatedSequences });
     return newEntries;
   }
 

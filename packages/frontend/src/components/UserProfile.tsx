@@ -25,26 +25,15 @@ function getDisplayName(user: User): string {
   return user.name ?? user.email?.split("@")[0] ?? "User";
 }
 
-export default function UserProfile({ user }: UserProfileProps) {
-  const { logout } = useAuth();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const closeDropdown = useCallback(() => {
-    setIsDropdownOpen(false);
-    triggerRef.current?.focus();
-  }, []);
-
-  const handleLogout = () => {
-    void logout();
-    setIsDropdownOpen(false);
-  };
-
+function useDropdownKeyboard(
+  isOpen: boolean,
+  dropdownRef: React.RefObject<HTMLDivElement | null>,
+  onClose: () => void,
+): void {
   useEffect(() => {
-    if (!isDropdownOpen || !dropdownRef.current) {return;}
+    if (!isOpen || !dropdownRef.current) {return;}
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { closeDropdown(); return; }
+      if (e.key === "Escape") { onClose(); return; }
       /* c8 ignore start -- focus trap requires real browser */
       if (e.key !== "Tab") {return;}
       const focusable = dropdownRef.current?.querySelectorAll<HTMLElement>(
@@ -62,7 +51,26 @@ export default function UserProfile({ user }: UserProfileProps) {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [isDropdownOpen, closeDropdown]);
+  }, [isOpen, onClose, dropdownRef]);
+}
+
+export default function UserProfile({ user }: UserProfileProps) {
+  const { logout } = useAuth();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const closeDropdown = useCallback(() => {
+    setIsDropdownOpen(false);
+    triggerRef.current?.focus();
+  }, []);
+
+  const handleLogout = () => {
+    void logout();
+    setIsDropdownOpen(false);
+  };
+
+  useDropdownKeyboard(isDropdownOpen, dropdownRef, closeDropdown);
 
   return (
     <div className="user-profile">

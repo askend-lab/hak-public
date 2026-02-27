@@ -19,51 +19,35 @@ export function usePlaylistControl(
   const [playAllAbortController, setPlayAllAbortController] =
     useState<AbortController | null>(null);
 
-  const handlePlayAll = useCallback(async () => {
-    if (isPlayingAll || isLoadingPlayAll) {
-      playAllAbortController?.abort();
-      setPlayAllAbortController(null);
-      setIsPlayingAll(false);
-      setIsLoadingPlayAll(false);
-      stopAudio();
-      updateAllSentences({ isPlaying: false, isLoading: false });
-      return;
-    }
+  const stopAll = useCallback(() => {
+    playAllAbortController?.abort();
+    setPlayAllAbortController(null);
+    setIsPlayingAll(false);
+    setIsLoadingPlayAll(false);
+    stopAudio();
+    updateAllSentences({ isPlaying: false, isLoading: false });
+  }, [playAllAbortController, stopAudio, updateAllSentences]);
 
-    const sentencesWithText = filterNonEmptySentences(sentences);
-    if (sentencesWithText.length === 0) {return;}
-
+  const playSequence = useCallback(async (sentencesWithText: SentenceState[]) => {
     const abortController = new AbortController();
     setPlayAllAbortController(abortController);
     setIsLoadingPlayAll(true);
-
-    let isFirstSentence = true;
+    let isFirst = true;
     for (const sentence of sentencesWithText) {
       if (abortController.signal.aborted) {break;}
-
       const success = await playSingle(sentence.id, abortController.signal); // eslint-disable-line no-await-in-loop -- sequential playback
-
-      if (isFirstSentence && success) {
-        setIsLoadingPlayAll(false);
-        setIsPlayingAll(true);
-        isFirstSentence = false;
-      }
-
+      if (isFirst && success) { setIsLoadingPlayAll(false); setIsPlayingAll(true); isFirst = false; }
       if (!success || abortController.signal.aborted) {break;}
     }
+    setIsPlayingAll(false); setIsLoadingPlayAll(false); setPlayAllAbortController(null);
+  }, [playSingle]);
 
-    setIsPlayingAll(false);
-    setIsLoadingPlayAll(false);
-    setPlayAllAbortController(null);
-  }, [
-    isPlayingAll,
-    isLoadingPlayAll,
-    playAllAbortController,
-    sentences,
-    playSingle,
-    stopAudio,
-    updateAllSentences,
-  ]);
+  const handlePlayAll = useCallback(async () => {
+    if (isPlayingAll || isLoadingPlayAll) { stopAll(); return; }
+    const sentencesWithText = filterNonEmptySentences(sentences);
+    if (sentencesWithText.length === 0) {return;}
+    await playSequence(sentencesWithText);
+  }, [isPlayingAll, isLoadingPlayAll, stopAll, sentences, playSequence]);
 
   return {
     isPlayingAll,

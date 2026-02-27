@@ -38,6 +38,73 @@ interface PronunciationVariantsProps {
   customPhoneticForm?: string | null;
 }
 
+function useVariantAudio() {
+  const [playingVariant, setPlayingVariant] = useState<string | null>(null);
+  const [loadingVariant, setLoadingVariant] = useState<string | null>(null);
+  const [isCustomPlaying, setIsCustomPlaying] = useState(false);
+  const [isCustomLoading, setIsCustomLoading] = useState(false);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopCurrentAudio = () => {
+    if (currentAudioRef.current) { currentAudioRef.current.pause(); currentAudioRef.current.src = ""; currentAudioRef.current = null; }
+  };
+
+  const resetVariant = () => { currentAudioRef.current = null; setPlayingVariant(null); setLoadingVariant(null); };
+  const resetCustom = () => { currentAudioRef.current = null; setIsCustomPlaying(false); setIsCustomLoading(false); };
+
+  const playVariant = async (variant: Variant) => {
+    if (playingVariant === variant.text) { stopCurrentAudio(); setPlayingVariant(null); return; }
+    stopCurrentAudio(); setIsCustomPlaying(false); setLoadingVariant(variant.text); setPlayingVariant(null);
+    try {
+      const audioUrl = await synthesizeAuto(variant.text);
+      const { audio } = createAudioPlayer(audioUrl, {
+        onLoaded: () => { setLoadingVariant(null); setPlayingVariant(variant.text); },
+        onEnded: resetVariant, onError: resetVariant,
+      });
+      currentAudioRef.current = audio;
+      await audio.play();
+    } catch (err) { logger.error("Failed to play variant:", err); resetVariant(); }
+  };
+
+  const playCustom = async (customVariant: string) => {
+    if (!customVariant.trim()) {return;}
+    if (isCustomPlaying) { stopCurrentAudio(); setIsCustomPlaying(false); return; }
+    stopCurrentAudio(); setPlayingVariant(null); setIsCustomLoading(true); setIsCustomPlaying(false);
+    try {
+      const audioUrl = await synthesizeAuto(transformToVabamorf(customVariant) || "");
+      const { audio } = createAudioPlayer(audioUrl, {
+        onLoaded: () => { setIsCustomLoading(false); setIsCustomPlaying(true); },
+        onEnded: resetCustom, onError: resetCustom,
+      });
+      currentAudioRef.current = audio;
+      await audio.play();
+    } catch (err) { logger.error("Failed to play custom variant:", err); resetCustom(); }
+  };
+
+  return { playingVariant, loadingVariant, isCustomPlaying, isCustomLoading, playVariant, playCustom };
+}
+
+function useVariantsFetch(word: string | null, isOpen: boolean) {
+  const [variants, setVariants] = useState<Variant[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!word || !isOpen) {return;}
+    setIsLoading(true); setError(null);
+    postJSON(VARIANTS_API_PATH, { word })
+      .then(async (response) => {
+        if (!response.ok) {throw new Error("Failed to fetch variants");}
+        const data = await response.json();
+        return setVariants(deduplicateByText(data.variants || []));
+      })
+      .catch((err) => setError(getErrorMessage(err, "An error occurred")))
+      .finally(() => setIsLoading(false));
+  }, [word, isOpen]);
+
+  return { variants, isLoading, error };
+}
+
 export default function PronunciationVariants({
   word,
   isOpen,
@@ -45,149 +112,17 @@ export default function PronunciationVariants({
   onUseVariant,
   customPhoneticForm,
 }: PronunciationVariantsProps) {
-  const [variants, setVariants] = useState<Variant[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [playingVariant, setPlayingVariant] = useState<string | null>(null);
-  const [loadingVariant, setLoadingVariant] = useState<string | null>(null);
+  const { variants, isLoading, error } = useVariantsFetch(word, isOpen);
+  const audio = useVariantAudio();
   const [customVariant, setCustomVariant] = useState("");
-  const [isCustomPlaying, setIsCustomPlaying] = useState(false);
-  const [isCustomLoading, setIsCustomLoading] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [showCustomForm, setShowCustomForm] = useState(false);
-  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    if (word && isOpen) {
-      void fetchVariants(word);
-      setCustomVariant("");
-    }
-  }, [word, isOpen]);
+  useEffect(() => { if (word && isOpen) {setCustomVariant("");} }, [word, isOpen]);
 
-  const fetchVariants = async (selectedWord: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await postJSON(VARIANTS_API_PATH, { word: selectedWord });
-      if (!response.ok) {throw new Error("Failed to fetch variants");}
-      const data = await response.json();
-      setVariants(deduplicateByText(data.variants || []));
-    } catch (err) {
-      setError(getErrorMessage(err, "An error occurred"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const stopCurrentAudio = () => {
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current.src = "";
-      currentAudioRef.current = null;
-    }
-  };
-
-  const handlePlayVariant = async (variant: Variant) => {
-    // If this variant is already playing, pause it
-    if (playingVariant === variant.text) {
-      stopCurrentAudio();
-      setPlayingVariant(null);
-      return;
-    }
-
-    // Stop any currently playing audio (variant or custom)
-    stopCurrentAudio();
-    setIsCustomPlaying(false);
-
-    setLoadingVariant(variant.text);
-    setPlayingVariant(null);
-    try {
-      const audioUrl = await synthesizeAuto(variant.text);
-      const { audio } = createAudioPlayer(audioUrl, {
-        onLoaded: () => {
-          setLoadingVariant(null);
-          setPlayingVariant(variant.text);
-        },
-        onEnded: () => {
-          currentAudioRef.current = null;
-          setPlayingVariant(null);
-          setLoadingVariant(null);
-        },
-        onError: () => {
-          currentAudioRef.current = null;
-          setPlayingVariant(null);
-          setLoadingVariant(null);
-        },
-      });
-      currentAudioRef.current = audio;
-      await audio.play();
-    } catch (error) {
-      logger.error("Failed to play variant:", error);
-      currentAudioRef.current = null;
-      setPlayingVariant(null);
-      setLoadingVariant(null);
-    }
-  };
-
-  const handleUseVariant = (variant: Variant) => {
-    onUseVariant?.(variant.text);
-  };
-
-  const handlePlayCustomVariant = async () => {
-    if (!customVariant.trim()) {return;}
-
-    // If custom variant is already playing, pause it
-    if (isCustomPlaying) {
-      stopCurrentAudio();
-      setIsCustomPlaying(false);
-      return;
-    }
-
-    // Stop any currently playing audio (variant or custom)
-    stopCurrentAudio();
-    setPlayingVariant(null);
-
-    setIsCustomLoading(true);
-    setIsCustomPlaying(false);
-    try {
-      const vabamorfText = transformToVabamorf(customVariant);
-      const audioUrl = await synthesizeAuto(vabamorfText || "");
-      const { audio } = createAudioPlayer(audioUrl, {
-        onLoaded: () => {
-          setIsCustomLoading(false);
-          setIsCustomPlaying(true);
-        },
-        onEnded: () => {
-          currentAudioRef.current = null;
-          setIsCustomPlaying(false);
-          setIsCustomLoading(false);
-        },
-        onError: () => {
-          currentAudioRef.current = null;
-          setIsCustomPlaying(false);
-          setIsCustomLoading(false);
-        },
-      });
-      currentAudioRef.current = audio;
-      await audio.play();
-    } catch (error) {
-      logger.error("Failed to play custom variant:", error);
-      currentAudioRef.current = null;
-      setIsCustomPlaying(false);
-      setIsCustomLoading(false);
-    }
-  };
-
-  const handleUseCustomVariant = () => {
-    if (!customVariant.trim()) {return;}
-    const vabamorfText = transformToVabamorf(customVariant);
-    onUseVariant?.(vabamorfText || "");
-  };
-
-  const handleCloseCustomForm = () => {
-    setShowCustomForm(false);
-    setCustomVariant("");
-  };
+  const handleUseVariant = (variant: Variant) => { onUseVariant?.(variant.text); };
+  const handleUseCustomVariant = () => { if (customVariant.trim()) { onUseVariant?.(transformToVabamorf(customVariant) || ""); } };
+  const handleCloseCustomForm = () => { setShowCustomForm(false); setCustomVariant(""); };
 
   if (!isOpen) {return null;}
 
@@ -234,9 +169,9 @@ export default function PronunciationVariants({
                       key={variant.text}
                       variant={variant}
                       isSelected={customPhoneticForm === variant.text}
-                      isPlaying={playingVariant === variant.text}
-                      isLoading={loadingVariant === variant.text}
-                      onPlay={(...args: Parameters<typeof handlePlayVariant>) => { void handlePlayVariant(...args); }}
+                      isPlaying={audio.playingVariant === variant.text}
+                      isLoading={audio.loadingVariant === variant.text}
+                      onPlay={(...args: Parameters<typeof audio.playVariant>) => { void audio.playVariant(...args); }}
                       onUse={handleUseVariant}
                     />
                   ))}
@@ -253,12 +188,12 @@ export default function PronunciationVariants({
                       <CustomVariantForm
                         value={customVariant}
                         onChange={setCustomVariant}
-                        onPlay={() => { void handlePlayCustomVariant(); }}
+                        onPlay={() => { void audio.playCustom(customVariant); }}
                         onUse={handleUseCustomVariant}
                         onClose={handleCloseCustomForm}
                         onShowGuide={() => setShowGuide(true)}
-                        isPlaying={isCustomPlaying}
-                        isLoading={isCustomLoading}
+                        isPlaying={audio.isCustomPlaying}
+                        isLoading={audio.isCustomLoading}
                       />
                     )}
                   </div>

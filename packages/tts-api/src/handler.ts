@@ -43,13 +43,8 @@ export interface SynthesizeParams {
   pitch: number;
 }
 
-export function generateCacheKey(
-  text: string,
-  voice: string,
-  speed: number,
-  pitch: number,
-): string {
-  const input = `${text}|${voice}|${speed}|${pitch}`;
+export function generateCacheKey(params: SynthesizeParams): string {
+  const input = `${params.text}|${params.voice}|${params.speed}|${params.pitch}`;
   return createHash("sha256").update(input).digest("hex");
 }
 
@@ -79,77 +74,81 @@ export function applySynthesizeDefaults(body: SynthesizeRequest): SynthesizePara
   };
 }
 
-export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> { // eslint-disable-line max-statements -- logging adds necessary observability statements
+function validateRequest(
+  event: SynthesizeEvent,
+  log: ReturnType<typeof logger.withContext>,
+): SynthesizeParams | LambdaResponse {
+  const parsed = parseRequestBody(event.body);
+  if (!parsed.ok) {
+    log.warn("Invalid request body", parsed.error);
+    return createBadRequest(parsed.error);
+  }
+  const validated = SynthesizeRequestSchema.safeParse(parsed.data);
+  if (!validated.success) {
+    const firstError = validated.error.errors[0];
+    log.warn("Validation failed", firstError?.message);
+    return createBadRequest(firstError?.message ?? "Invalid request");
+  }
+  return applySynthesizeDefaults(validated.data);
+}
+
+async function processSynthesis(
+  params: SynthesizeParams,
+  log: ReturnType<typeof logger.withContext>,
+): Promise<LambdaResponse> {
+  const cacheKey = generateCacheKey(params);
+  const cached = await checkS3Cache(cacheKey);
+  if (cached) {
+    log.info("Cache hit", { cacheKey, voice: params.voice });
+    return createResponse(HTTP_STATUS.OK, { status: "ready", cacheKey, audioUrl: buildAudioUrl(cacheKey) });
+  }
+  await sendToQueue({ ...params, cacheKey });
+  log.info("Queued for synthesis", { cacheKey, voice: params.voice, textLength: params.text.length });
+  return createResponse(HTTP_STATUS.ACCEPTED, { status: "processing", cacheKey, audioUrl: buildAudioUrl(cacheKey) });
+}
+
+function handleSynthesizeError(error: unknown, log: ReturnType<typeof logger.withContext>): LambdaResponse {
+  if (error instanceof QueueFullError) {
+    log.warn("Queue full, rejecting request");
+    return createResponse(HTTP_STATUS.SERVICE_UNAVAILABLE, {
+      error: "Service temporarily unavailable — too many pending requests",
+    });
+  }
+  log.error("Synthesize error", extractErrorMessage(error));
+  return createInternalError("Synthesize error", error);
+}
+
+export async function synthesize(event: SynthesizeEvent): Promise<LambdaResponse> {
   const log = logger.withContext({ handler: "synthesize", requestId: event.requestContext?.requestId });
   try {
-    const parsed = parseRequestBody(event.body);
-    if (!parsed.ok) {
-      log.warn("Invalid request body", parsed.error);
-      return createBadRequest(parsed.error);
-    }
-
-    const validated = SynthesizeRequestSchema.safeParse(parsed.data);
-    if (!validated.success) {
-      const firstError = validated.error.errors[0];
-      log.warn("Validation failed", firstError?.message);
-      return createBadRequest(firstError?.message ?? "Invalid request");
-    }
-
-    const { text, voice, speed, pitch } = applySynthesizeDefaults(validated.data);
-    const cacheKey = generateCacheKey(text, voice, speed, pitch);
-
-    const cached = await checkS3Cache(cacheKey);
-    if (cached) {
-      log.info("Cache hit", { cacheKey, voice });
-      return createResponse(HTTP_STATUS.OK, {
-        status: "ready",
-        cacheKey,
-        audioUrl: buildAudioUrl(cacheKey),
-      });
-    }
-
-    await sendToQueue({
-      text,
-      voice,
-      speed,
-      pitch,
-      cacheKey,
-    });
-
-    log.info("Queued for synthesis", { cacheKey, voice, textLength: text.length });
-
-    return createResponse(HTTP_STATUS.ACCEPTED, {
-      status: "processing",
-      cacheKey,
-      audioUrl: buildAudioUrl(cacheKey),
-    });
+    const result = validateRequest(event, log);
+    if ("statusCode" in result) {return result;}
+    return await processSynthesis(result, log);
   } catch (error) {
-    if (error instanceof QueueFullError) {
-      log.warn("Queue full, rejecting request");
-      return createResponse(HTTP_STATUS.SERVICE_UNAVAILABLE, {
-        error: "Service temporarily unavailable — too many pending requests",
-      });
-    }
-    log.error("Synthesize error", extractErrorMessage(error));
-    return createInternalError("Synthesize error", error);
+    return handleSynthesizeError(error, log);
   }
+}
+
+function validateCacheKey(
+  event: StatusEvent,
+  log: ReturnType<typeof logger.withContext>,
+): string | LambdaResponse {
+  const rawCacheKey = event.pathParameters?.cacheKey;
+  const result = CacheKeySchema.safeParse(rawCacheKey);
+  if (!result.success) {
+    log.warn("Invalid cacheKey", rawCacheKey);
+    return createBadRequest("Missing or invalid cacheKey");
+  }
+  return result.data;
 }
 
 export async function status(event: StatusEvent): Promise<LambdaResponse> {
   const log = logger.withContext({ handler: "status", requestId: event.requestContext?.requestId });
   try {
-    const rawCacheKey = event.pathParameters?.cacheKey;
-    const cacheKeyResult = CacheKeySchema.safeParse(rawCacheKey);
-
-    if (!cacheKeyResult.success) {
-      log.warn("Invalid cacheKey", rawCacheKey);
-      return createBadRequest("Missing or invalid cacheKey");
-    }
-    const cacheKey = cacheKeyResult.data;
-
+    const cacheKey = validateCacheKey(event, log);
+    if (typeof cacheKey !== "string") {return cacheKey;}
     const ready = await checkS3Cache(cacheKey);
     log.debug("Status check", { cacheKey, ready });
-
     return createResponse(HTTP_STATUS.OK, {
       status: ready ? "ready" : "processing",
       cacheKey,

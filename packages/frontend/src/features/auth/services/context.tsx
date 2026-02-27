@@ -91,117 +91,50 @@ function storeTokensAndSetAuth(
   return false;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [state, setState] = useState<AuthState>(initialState);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+const LOGGED_OUT_STATE: AuthState = { user: null, isAuthenticated: false, isLoading: false, error: null };
 
+function useAuthInit(setState: React.Dispatch<React.SetStateAction<AuthState>>) {
   useEffect(() => {
     async function initAuth() {
       const storedUser = AuthStorage.getUser();
       const accessToken = AuthStorage.getAccessToken();
-
-      if (storedUser && accessToken) {
-        // Same session — tokens are in memory, check expiry
-        const needsRefresh = isTokenExpired(accessToken);
-        const canContinue = !needsRefresh || await refreshTokens();
-
-        if (canContinue) {
-          setState({
-            user: storedUser,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-        } else {
-          AuthStorage.clear();
-          setState({ ...initialState, isLoading: false });
-        }
-      } else if (storedUser) {
-        // Page refresh — access/id tokens are gone (in-memory only),
-        // refresh token is in httpOnly cookie — try to re-obtain tokens
-        const refreshed = await refreshTokens();
-
-        if (refreshed) {
-          setState({
-            user: storedUser,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-        } else {
-          AuthStorage.clear();
-          setState({ ...initialState, isLoading: false });
-        }
-      } else {
-        setState({ ...initialState, isLoading: false });
-      }
+      if (!storedUser) { setState({ ...initialState, isLoading: false }); return; }
+      const canRestore = accessToken
+        ? (!isTokenExpired(accessToken) || await refreshTokens())
+        : await refreshTokens();
+      if (canRestore) {
+        setState({ user: storedUser, isAuthenticated: true, isLoading: false, error: null });
+      } else { AuthStorage.clear(); setState({ ...initialState, isLoading: false }); }
     }
     void initAuth();
-  }, []);
+  }, [setState]);
+}
 
-  const login = useCallback(async () => {
-    window.location.href = await getLoginUrl();
-  }, []);
-
-  const loginWithTara = useCallback(() => {
-    window.location.href = getTaraLoginUrl();
-  }, []);
-
-  const logout = useCallback(async () => {
-    AuthStorage.clear();
-    setState({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-    });
-    window.location.href = getLogoutUrl();
-  }, []);
-
-  const handleCodeCallback = useCallback(
-    async (code: string): Promise<boolean> => {
-      const tokens = await exchangeCodeForTokens(code);
-      if (!tokens) {return false;}
-      return storeTokensAndSetAuth(tokens, setState);
-    },
-    [],
-  );
-
+function useAuthCallbacks(setState: React.Dispatch<React.SetStateAction<AuthState>>) {
+  const login = useCallback(async () => { window.location.href = await getLoginUrl(); }, []);
+  const loginWithTara = useCallback(() => { window.location.href = getTaraLoginUrl(); }, []);
+  const logout = useCallback(async () => { AuthStorage.clear(); setState(LOGGED_OUT_STATE); window.location.href = getLogoutUrl(); }, [setState]);
+  const handleCodeCallback = useCallback(async (code: string): Promise<boolean> => {
+    const tokens = await exchangeCodeForTokens(code);
+    if (!tokens) {return false;}
+    return storeTokensAndSetAuth(tokens, setState);
+  }, [setState]);
   const refreshSession = useCallback(async () => {
     const refreshed = await refreshTokens();
-    if (!refreshed) {
-      AuthStorage.clear();
-      setState({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-      });
-    }
-  }, []);
+    if (!refreshed) { AuthStorage.clear(); setState(LOGGED_OUT_STATE); }
+  }, [setState]);
+  const handleTaraTokens = useCallback((tokens: { accessToken: string; idToken: string }): boolean => {
+    return storeTokensAndSetAuth(tokens, setState);
+  }, [setState]);
+  return { login, loginWithTara, logout, handleCodeCallback, refreshSession, handleTaraTokens };
+}
 
-  const handleTaraTokens = useCallback(
-    (tokens: {
-      accessToken: string;
-      idToken: string;
-    }): boolean => {
-      return storeTokensAndSetAuth(tokens, setState);
-    },
-    [],
-  );
-
-  const value: AuthContextValue = {
-    ...state,
-    login,
-    loginWithTara,
-    logout,
-    refreshSession,
-    handleCodeCallback,
-    handleTaraTokens,
-    showLoginModal,
-    setShowLoginModal,
-  };
-
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [state, setState] = useState<AuthState>(initialState);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  useAuthInit(setState);
+  const callbacks = useAuthCallbacks(setState);
+  const value: AuthContextValue = { ...state, ...callbacks, showLoginModal, setShowLoginModal };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

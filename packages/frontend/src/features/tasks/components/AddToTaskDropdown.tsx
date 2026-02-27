@@ -107,6 +107,27 @@ const ConfirmPanel = ({
   </>
 );
 
+function useTaskDropdownState(isOpen: boolean) {
+  const { user } = useAuth();
+  const dataService = useDataService();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [tasks, setTasks] = useState<TaskSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskSummary | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!isOpen || !user) {return;}
+    setIsLoading(true);
+    dataService.getUserTasks().then(setTasks).catch((e) => logger.error("Failed to load tasks:", e)).finally(() => setIsLoading(false));
+  }, [isOpen, user, dataService]);
+  useEffect(() => {
+    if (isOpen && !selectedTask && searchInputRef.current) { requestAnimationFrame(() => searchInputRef.current?.focus()); }
+  }, [isOpen, selectedTask]);
+  useEffect(() => { if (!isOpen) { setSearchQuery(""); setSelectedTask(null); } }, [isOpen]);
+  const filteredTasks = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  return { searchQuery, setSearchQuery, isLoading, selectedTask, setSelectedTask, searchInputRef, filteredTasks };
+}
+
 export default function AddToTaskDropdown({
   isOpen,
   onClose,
@@ -115,64 +136,26 @@ export default function AddToTaskDropdown({
   sentenceCount,
   anchorRef: _anchorRef,
 }: AddToTaskDropdownProps) {
-  const { user } = useAuth();
-  const dataService = useDataService();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [tasks, setTasks] = useState<TaskSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<TaskSummary | null>(null);
+  const state = useTaskDropdownState(isOpen);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (!isOpen || !user) {return;}
-    setIsLoading(true);
-    dataService
-      .getUserTasks()
-      .then(setTasks)
-      .catch((e) => logger.error("Failed to load tasks:", e))
-      .finally(() => setIsLoading(false));
-  }, [isOpen, user, dataService]);
-  useEffect(() => {
-    if (isOpen && !selectedTask && searchInputRef.current)
-      {requestAnimationFrame(() => searchInputRef.current?.focus());}
-  }, [isOpen, selectedTask]);
-  useEffect(() => {
-    if (!isOpen) {
-      setSearchQuery("");
-      setSelectedTask(null);
-    }
-  }, [isOpen]);
-  const filteredTasks = tasks.filter((t) =>
-    t.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
   const handleTaskClick = (task: TaskSummary) => {
-    if (task.entryCount > 0) {
-      setSelectedTask(task);
-    } else {
-      onSelectTask(task.id, task.name, "append");
-      onClose();
-    }
+    if (task.entryCount > 0) { state.setSelectedTask(task); }
+    else { onSelectTask(task.id, task.name, "append"); onClose(); }
   };
   const handleConfirm = (mode: AddToTaskMode) => {
-    if (!selectedTask) {return;}
-    onSelectTask(selectedTask.id, selectedTask.name, mode);
-    onClose();
+    if (!state.selectedTask) {return;}
+    onSelectTask(state.selectedTask.id, state.selectedTask.name, mode); onClose();
   };
-  const handleBack = () => {
-    setSelectedTask(null);
-  };
-  const handleCreate = () => {
-    onCreateNew();
-    onClose();
-  };
+  const handleBack = () => { state.setSelectedTask(null); };
+  const handleCreate = () => { onCreateNew(); onClose(); };
   if (!isOpen) {return null;}
   return (
     <>
       <div className="add-to-task-backdrop" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") {onClose();} }} role="presentation" tabIndex={-1} />
       <div className="add-to-task-dropdown" ref={dropdownRef}>
-        {selectedTask ? (
+        {state.selectedTask ? (
           <ConfirmPanel
-            task={selectedTask}
+            task={state.selectedTask}
             sentenceCount={sentenceCount}
             onBack={handleBack}
             onConfirm={handleConfirm}
@@ -181,21 +164,21 @@ export default function AddToTaskDropdown({
           <>
             <div className="add-to-task-search">
               <input
-                ref={searchInputRef}
+                ref={state.searchInputRef}
                 type="text"
                 className="add-to-task-search-input"
                 placeholder="Otsi"
                 aria-label="Otsi ülesannet"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={state.searchQuery}
+                onChange={(e) => state.setSearchQuery(e.target.value)}
               />
               <SearchIcon size="2xl" className="add-to-task-search-icon" />
             </div>
             <div className="add-to-task-list">
               <TaskList
-                isLoading={isLoading}
-                filteredTasks={filteredTasks}
-                searchQuery={searchQuery}
+                isLoading={state.isLoading}
+                filteredTasks={state.filteredTasks}
+                searchQuery={state.searchQuery}
                 onSelect={handleTaskClick}
               />
             </div>

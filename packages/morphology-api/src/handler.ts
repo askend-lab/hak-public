@@ -44,28 +44,31 @@ function badRequest(error: string): ParseError {
   return { success: false, response: createResponse(HTTP_STATUS.BAD_REQUEST, { error }) };
 }
 
+function validateBody(
+  body: unknown,
+  schema: ZodObject<ZodRawShape>,
+  fieldName: string,
+): ParseResult {
+  const result = schema.safeParse(body);
+  if (!result.success) {
+    const firstError = result.error.errors[0];
+    return badRequest(firstError?.message ?? "Invalid request");
+  }
+  const value = (result.data as Record<string, string>)[fieldName];
+  if (!value) {return badRequest(`Missing '${fieldName}' field in request body`);}
+  return { success: true, value };
+}
+
 function parseAndValidateWithSchema(
   event: APIGatewayProxyEvent,
   schema: ZodObject<ZodRawShape>,
   fieldName: string,
 ): ParseResult {
   ensureInitialized();
-
   if (event.body === null) {return badRequest(ERRORS.MISSING_BODY);}
-
   const body = parseJsonBody(event.body);
   if (body === null) {return badRequest(ERRORS.INVALID_JSON);}
-
-  const result = schema.safeParse(body);
-  if (!result.success) {
-    const firstError = result.error.errors[0];
-    return badRequest(firstError?.message ?? "Invalid request");
-  }
-
-  const value = (result.data as Record<string, string>)[fieldName];
-  if (!value) {return badRequest(`Missing '${fieldName}' field in request body`);}
-
-  return { success: true, value };
+  return validateBody(body, schema, fieldName);
 }
 
 function handleError(error: unknown): APIGatewayProxyResult {

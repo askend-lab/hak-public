@@ -140,21 +140,13 @@ export function useVariantsPanel(
         void handleTagClick(sentenceId, tagIndex, word);
       } catch (error) {
         clearTimeout(timeoutId);
-        // Ensure minimum display time even on error
         await minDisplayTime;
-        if (error instanceof Error && error.name === "AbortError") {
-          showNotification?.({
-            type: "error",
-            message: VARIANTS_STRINGS.TIMEOUT,
-            description: VARIANTS_STRINGS.TIMEOUT_DESC,
-          });
-        } else {
-          showNotification?.({
-            type: "error",
-            message: VARIANTS_STRINGS.LOAD_FAILED,
-            description: VARIANTS_STRINGS.NOT_FOUND_DESC,
-          });
-        }
+        const isTimeout = error instanceof Error && error.name === "AbortError";
+        showNotification?.({
+          type: "error",
+          message: isTimeout ? VARIANTS_STRINGS.TIMEOUT : VARIANTS_STRINGS.LOAD_FAILED,
+          description: isTimeout ? VARIANTS_STRINGS.TIMEOUT_DESC : VARIANTS_STRINGS.NOT_FOUND_DESC,
+        });
       } finally {
         setLoadingVariantsTag(null);
       }

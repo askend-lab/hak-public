@@ -15,49 +15,49 @@ describe("buildDescription", () => {
     ["I", "hüüdsõna"],
     ["Y", "lühend"],
   ])("should map POS %s to %s", (pos, expected) => {
-    const result = buildDescription("word", pos, "", "word");
+    const result = buildDescription({ lemma: "word", pos, fs: "" }, "word");
     expect(result).toBe(expected);
   });
 
   it("should return 'tavaline' when no parts", () => {
-    const result = buildDescription("word", "", "", "word");
+    const result = buildDescription({ lemma: "word", pos: "", fs: "" }, "word");
     expect(result).toBe("tavaline");
   });
 
   it("should include lemma when different from word", () => {
-    const result = buildDescription("lemma", "S", "", "word");
+    const result = buildDescription({ lemma: "lemma", pos: "S", fs: "" }, "word");
     expect(result).toContain("lemma: lemma");
     expect(result).toContain("nimisõna");
   });
 
   it("should not include lemma when same as word (case insensitive)", () => {
-    const result = buildDescription("Word", "S", "", "word");
+    const result = buildDescription({ lemma: "Word", pos: "S", fs: "" }, "word");
     expect(result).not.toContain("lemma:");
     expect(result).toBe("nimisõna");
   });
 
   it("should not include empty lemma", () => {
-    const result = buildDescription("", "S", "", "word");
+    const result = buildDescription({ lemma: "", pos: "S", fs: "" }, "word");
     expect(result).not.toContain("lemma:");
   });
 
   it("should include fs when provided", () => {
-    const result = buildDescription("word", "S", "sg n", "word");
+    const result = buildDescription({ lemma: "word", pos: "S", fs: "sg n" }, "word");
     expect(result).toContain("sg n");
   });
 
   it("should join all parts with comma", () => {
-    const result = buildDescription("lemma", "V", "da", "word");
+    const result = buildDescription({ lemma: "lemma", pos: "V", fs: "da" }, "word");
     expect(result).toBe("lemma: lemma, tegusõna, da");
   });
 
   it("should handle unknown POS", () => {
-    const result = buildDescription("word", "X", "", "word");
+    const result = buildDescription({ lemma: "word", pos: "X", fs: "" }, "word");
     expect(result).toBe("tavaline");
   });
 
   it("should handle only fs", () => {
-    const result = buildDescription("word", "", "sg g", "word");
+    const result = buildDescription({ lemma: "word", pos: "", fs: "sg g" }, "word");
     expect(result).toBe("sg g");
   });
 });

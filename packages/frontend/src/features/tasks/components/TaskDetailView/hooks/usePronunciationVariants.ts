@@ -7,6 +7,15 @@ import { useDataService } from "@/contexts/DataServiceContext";
 import { convertTextToTags } from "@/types/synthesis";
 import { logger } from "@hak/shared";
 
+function buildVariantUpdate(entry: TaskEntry, tagIndex: number, variantText: string): { newStressedText: string; updatedEntry: TaskEntry } | null {
+  const displayWords = convertTextToTags(entry.text);
+  if (tagIndex < 0 || tagIndex >= displayWords.length) {return null;}
+  const stressedWords = convertTextToTags(entry.stressedText || entry.text);
+  stressedWords[tagIndex] = variantText;
+  const newStressedText = stressedWords.join(" ");
+  return { newStressedText, updatedEntry: { ...entry, stressedText: newStressedText, audioUrl: null, audioBlob: null } };
+}
+
 interface UsePronunciationVariantsReturn {
   variantsWord: string | null;
   variantsCustomPhonetic: string | null;
@@ -61,75 +70,22 @@ export function usePronunciationVariants(
 
   const handleUseVariant = useCallback(
     async (variantText: string) => {
-      if (selectedEntryId !== null && selectedTagIndex !== null && task) {
-        const entryToUpdate = entries.find((e) => e.id === selectedEntryId);
-        if (!entryToUpdate) {
-          handleCloseVariants();
-          return;
-        }
+      if (selectedEntryId === null || selectedTagIndex === null || !task) { handleCloseVariants(); return; }
+      const entryToUpdate = entries.find((e) => e.id === selectedEntryId);
+      if (!entryToUpdate) { handleCloseVariants(); return; }
+      const update = buildVariantUpdate(entryToUpdate, selectedTagIndex, variantText);
+      if (!update) { handleCloseVariants(); return; }
 
-        const displayWords = convertTextToTags(entryToUpdate.text);
-        const stressedWords = convertTextToTags(entryToUpdate.stressedText || entryToUpdate.text);
-
-        if (selectedTagIndex < 0 || selectedTagIndex >= displayWords.length) {
-          handleCloseVariants();
-          return;
-        }
-
-        stressedWords[selectedTagIndex] = variantText;
-        const newStressedText = stressedWords.join(" ");
-        const newText = entryToUpdate.text;
-
-        setEntries((prev) =>
-          prev.map((entry) => {
-            if (entry.id === selectedEntryId) {
-              return {
-                ...entry,
-                text: newText,
-                stressedText: newStressedText,
-                audioUrl: null,
-                audioBlob: null,
-              };
-            }
-            return entry;
-          }),
-        );
-
-        handleCloseVariants();
-
-        try {
-          if (userId) {
-            await dataService.updateTaskEntry(
-              task.id,
-              selectedEntryId,
-              {
-                text: newText,
-                stressedText: newStressedText,
-              },
-            );
-          }
-        } catch {
-          setEntries((prev) =>
-            prev.map((entry) =>
-              entry.id === selectedEntryId ? entryToUpdate : entry,
-            ),
-          );
-          logger.error("Viga: variandi salvestamine ebaõnnestus");
-        }
-      } else {
-        handleCloseVariants();
+      setEntries((prev) => prev.map((entry) => (entry.id === selectedEntryId ? update.updatedEntry : entry)));
+      handleCloseVariants();
+      try {
+        if (userId) { await dataService.updateTaskEntry(task.id, selectedEntryId, { text: entryToUpdate.text, stressedText: update.newStressedText }); }
+      } catch {
+        setEntries((prev) => prev.map((entry) => (entry.id === selectedEntryId ? entryToUpdate : entry)));
+        logger.error("Viga: variandi salvestamine ebaõnnestus");
       }
     },
-    [
-      selectedEntryId,
-      selectedTagIndex,
-      task,
-      entries,
-      setEntries,
-      userId,
-      handleCloseVariants,
-      dataService,
-    ],
+    [selectedEntryId, selectedTagIndex, task, entries, setEntries, userId, handleCloseVariants, dataService],
   );
 
   return {

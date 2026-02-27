@@ -94,6 +94,18 @@ function parseBody(
   }
 }
 
+function buildStoreRequest(body: Record<string, unknown>): StoreRequest {
+  return {
+    key: body.key as string,
+    id: body.id as string,
+    type: body.type as DataType,
+    ttl: body.ttl as number,
+    ...(body.data !== undefined && {
+      data: body.data as Record<string, unknown>,
+    }),
+  };
+}
+
 export async function handleSave(
   event: APIGatewayProxyEvent,
   store: Store,
@@ -110,17 +122,7 @@ export async function handleSave(
   );
   if (validationError) {return validationError;}
 
-  const request: StoreRequest = {
-    key: body.key as string,
-    id: body.id as string,
-    type: body.type as DataType,
-    ttl: body.ttl as number,
-    ...(body.data !== undefined && {
-      data: body.data as Record<string, unknown>,
-    }),
-  };
-
-  const result = await store.save(request);
+  const result = await store.save(buildStoreRequest(body));
   if (!result.success || !result.item) {
     return createErrorResponse(result.error, HTTP_STATUS.BAD_REQUEST);
   }

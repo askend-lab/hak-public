@@ -59,6 +59,13 @@ function useSpecsData() {
   return { groups, testSuites, loading };
 }
 
+function toggleSet(set: Set<string>, name: string): Set<string> {
+  const next = new Set(set);
+  if (next.has(name)) {next.delete(name);}
+  else {next.add(name);}
+  return next;
+}
+
 export default function SpecsPage({ onBack }: SpecsPageProps) {
   const { groups, testSuites, loading } = useSpecsData();
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
@@ -77,13 +84,6 @@ export default function SpecsPage({ onBack }: SpecsPageProps) {
       }
     }
   }, [groups, selectedFeature]);
-
-  const toggleSet = (set: Set<string>, name: string) => {
-    const next = new Set(set);
-    if (next.has(name)) {next.delete(name);}
-    else {next.add(name);}
-    return next;
-  };
 
   const allFeatures = groups.flatMap((g) => g.features);
   const selectedFeatureData =

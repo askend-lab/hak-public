@@ -36,6 +36,79 @@ interface TaskDetailViewProps {
   initialTask?: Task; // Pre-loaded task for shared view (no auth required)
 }
 
+function useTaskDetailState(taskId: string, initialTask?: Task) {
+  const { user } = useAuth();
+  const { showNotification } = useNotification();
+  const dataService = useDataService();
+  const { setCopiedEntries } = useCopiedEntries();
+  const [task, setTask] = useState<Task | null>(initialTask || null);
+  const [entries, setEntries] = useState<TaskEntry[]>(initialTask?.entries || []);
+  const [isLoading, setIsLoading] = useState(!initialTask);
+  const [error, setError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  useEffect(() => {
+    if (initialTask || !user) {
+      if (!initialTask && !user) {setError("Kasutaja pole sisse logitud");}
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    dataService.getTask(taskId)
+      .then((taskData) => {
+        // eslint-disable-next-line promise/always-return -- fire-and-forget state update in useEffect
+        if (taskData) { setTask(taskData); setEntries(taskData.entries || []); }
+        else { setError("Ülesannet ei leitud"); }
+      })
+      .catch((err) => setError(getErrorMessage(err, "Viga ülesande laadimisel")))
+      .finally(() => setIsLoading(false));
+  }, [taskId, user, initialTask, dataService]);
+
+  return { user, showNotification, dataService, setCopiedEntries, task, entries, setEntries, isLoading, error, isDownloading, setIsDownloading };
+}
+
+function useTaskDetailActions(
+  state: ReturnType<typeof useTaskDetailState>,
+  taskId: string,
+  onNavigateToSynthesis: () => void,
+) {
+  const { user, showNotification, dataService, setCopiedEntries, task, entries, setEntries, isDownloading, setIsDownloading } = state;
+
+  const handleDownloadZip = useCallback(async () => {
+    if (!task || isDownloading) {return;}
+    setIsDownloading(true);
+    try {
+      await downloadTaskAsZip({ ...task, entries });
+      showNotification({ type: "success", message: "ZIP-fail allalaaditud!", color: "success" });
+    } catch (err) { logger.error("ZIP download failed:", err); showNotification({ type: "error", message: "Viga ZIP-faili loomisel" }); }
+    finally { setIsDownloading(false); }
+  }, [task, entries, isDownloading, showNotification, setIsDownloading]);
+
+  const handleCopyToSynthesis = useCallback(() => {
+    if (!entries || entries.length === 0) {return;}
+    setCopiedEntries(entries); showNotification({ type: "success", message: "Laused kopeeritud!" }); onNavigateToSynthesis();
+  }, [entries, setCopiedEntries, showNotification, onNavigateToSynthesis]);
+
+  const handleCopyText = useCallback(async (id: string) => {
+    const entry = entries.find((e) => e.id === id);
+    if (!entry || !entry.text.trim()) {return;}
+    await copyTextToClipboard(entry.text, showNotification);
+  }, [entries, showNotification]);
+
+  const handleDeleteEntry = useCallback(async (id: string) => {
+    if (!user) {return;}
+    const entryToDelete = entries.find((e) => e.id === id);
+    const updatedEntries = entries.filter((e) => e.id !== id);
+    setEntries(updatedEntries);
+    try {
+      await dataService.updateTask(taskId, { entries: updatedEntries });
+      if (entryToDelete) { showNotification({ type: "success", message: "Lause kustutatud", color: "success" }); }
+    } catch (_err) { setEntries(entries); showNotification({ type: "error", message: "Viga lause kustutamisel" }); }
+  }, [user, entries, setEntries, dataService, taskId, showNotification]);
+
+  return { handleDownloadZip, handleCopyToSynthesis, handleCopyText, handleDeleteEntry };
+}
+
 export default function TaskDetailView({
   taskId,
   onBack,
@@ -44,124 +117,18 @@ export default function TaskDetailView({
   onNavigateToSynthesis,
   initialTask,
 }: TaskDetailViewProps) {
-  const { user } = useAuth();
-  const { showNotification } = useNotification();
-  const dataService = useDataService();
-  const { setCopiedEntries } = useCopiedEntries();
-  const [task, setTask] = useState<Task | null>(initialTask || null);
-  const [entries, setEntries] = useState<TaskEntry[]>(
-    initialTask?.entries || [],
-  );
-  const [isLoading, setIsLoading] = useState(!initialTask);
-  const [error, setError] = useState<string | null>(null);
+  const state = useTaskDetailState(taskId, initialTask);
+  const { user, task, entries, setEntries, isLoading, error } = state;
+  const actions = useTaskDetailActions(state, taskId, onNavigateToSynthesis);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isHeaderMenuOpen, setIsHeaderMenuOpen] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
-
   const handleMenuClose = () => setOpenMenuId(null);
 
-  // Custom hooks
   const dragDrop = useDragAndDrop(setEntries);
   const audio = useAudioPlayback(entries);
-  const variants = usePronunciationVariants(
-    entries,
-    setEntries,
-    task,
-    user?.id,
-  );
-  const phonetic = usePhoneticPanel(
-    entries,
-    setEntries,
-    task,
-    user?.id,
-    handleMenuClose,
-  );
-
-  const handleDownloadZip = useCallback(async () => {
-    if (!task || isDownloading) {return;}
-    setIsDownloading(true);
-    try {
-      await downloadTaskAsZip({ ...task, entries });
-      showNotification({ type: "success", message: "ZIP-fail allalaaditud!", color: "success" });
-    } catch (err) {
-      logger.error("ZIP download failed:", err);
-      showNotification({ type: "error", message: "Viga ZIP-faili loomisel" });
-    } finally {
-      setIsDownloading(false);
-    }
-  }, [task, entries, isDownloading, showNotification]);
-
-  const handleCopyToSynthesis = useCallback(() => {
-    if (!entries || entries.length === 0) {return;}
-
-    setCopiedEntries(entries);
-    showNotification({ type: "success", message: "Laused kopeeritud!" });
-    onNavigateToSynthesis();
-  }, [entries, setCopiedEntries, showNotification, onNavigateToSynthesis]);
-
-  // Load task data (skip if initialTask provided)
-  useEffect(() => {
-    if (initialTask || !user) {
-      if (!initialTask && !user) {setError("Kasutaja pole sisse logitud");}
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    dataService
-      .getTask(taskId)
-      .then((taskData) => {
-        // eslint-disable-next-line promise/always-return -- fire-and-forget state update in useEffect
-        if (taskData) {
-          setTask(taskData);
-          setEntries(taskData.entries || []);
-        } else {
-          setError("Ülesannet ei leitud");
-        }
-      })
-      .catch((err) =>
-        setError(
-          getErrorMessage(err, "Viga ülesande laadimisel"),
-        ),
-      )
-      .finally(() => setIsLoading(false));
-  }, [taskId, user, initialTask, dataService]);
-
-  const handleCopyText = async (id: string) => {
-    const entry = entries.find((e) => e.id === id);
-    if (!entry || !entry.text.trim()) {return;}
-
-    await copyTextToClipboard(entry.text, showNotification);
-  };
-
-  const handleDeleteEntry = async (id: string) => {
-    if (!user) {return;}
-
-    const entryToDelete = entries.find((e) => e.id === id);
-    const updatedEntries = entries.filter((e) => e.id !== id);
-
-    // Update local state immediately for responsive UI
-    setEntries(updatedEntries);
-
-    // Persist to backend
-    try {
-      await dataService.updateTask(taskId, {
-        entries: updatedEntries,
-      });
-      if (entryToDelete) {
-        showNotification({
-          type: "success",
-          message: "Lause kustutatud",
-          color: "success",
-        });
-      }
-    } catch (_err) {
-      // Revert on error
-      setEntries(entries);
-      showNotification({ type: "error", message: "Viga lause kustutamisel" });
-    }
-  };
+  const variants = usePronunciationVariants(entries, setEntries, task, user?.id);
+  const phonetic = usePhoneticPanel(entries, setEntries, task, user?.id, handleMenuClose);
 
   if (isLoading) {return <TaskDetailLoading />;}
   if (error) {return <TaskDetailError onBack={onBack} error={error} />;}
@@ -178,9 +145,9 @@ export default function TaskDetailView({
         setIsHeaderMenuOpen={setIsHeaderMenuOpen}
         onShare={() => setIsShareModalOpen(true)}
         onPlayAll={() => { void audio.handlePlayAll(); }}
-        onDownloadZip={() => { void handleDownloadZip(); }}
-        isDownloading={isDownloading}
-        onCopyToSynthesis={() => { void handleCopyToSynthesis(); }}
+        onDownloadZip={() => { void actions.handleDownloadZip(); }}
+        isDownloading={state.isDownloading}
+        onCopyToSynthesis={() => { void actions.handleCopyToSynthesis(); }}
         onEditTask={onEditTask}
         onDeleteTask={onDeleteTask}
       />
@@ -229,10 +196,10 @@ export default function TaskDetailView({
                     label: "Uuri häälduskuju",
                     onClick: (...args: Parameters<typeof phonetic.handleExplorePhonetic>) => { void phonetic.handleExplorePhonetic(...args); },
                   },
-                  { label: "Kopeeri tekst", onClick: (...args: Parameters<typeof handleCopyText>) => { void handleCopyText(...args); } },
+                  { label: "Kopeeri tekst", onClick: (...args: Parameters<typeof actions.handleCopyText>) => { void actions.handleCopyText(...args); } },
                   {
                     label: "Kustuta",
-                    onClick: (...args: Parameters<typeof handleDeleteEntry>) => { void handleDeleteEntry(...args); },
+                    onClick: (...args: Parameters<typeof actions.handleDeleteEntry>) => { void actions.handleDeleteEntry(...args); },
                     danger: true,
                   },
                 ]}

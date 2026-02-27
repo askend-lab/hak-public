@@ -115,74 +115,50 @@ export function getTaraLoginUrl(): string {
   return getTaraLoginUrlValue();
 }
 
-export async function exchangeCodeForTokens(code: string): Promise<{
-  accessToken: string;
-  idToken: string;
-  expiresIn: number;
-} | null> {
-  const codeVerifier = sessionStorage.getItem(PKCE_STORAGE_KEY);
-  if (!codeVerifier) {
-    logger.error("[Auth] Missing PKCE code verifier");
+function fetchTokenExchange(code: string, codeVerifier: string): Promise<Response> {
+  if (isLocalDev()) {
+    return fetch(OAUTH2_TOKEN_PATH, {
+      method: "POST",
+      headers: { "Content-Type": CONTENT_TYPE_FORM },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        client_id: cognitoConfig.clientId,
+        code,
+        redirect_uri: cognitoConfig.redirectUri,
+        code_verifier: codeVerifier,
+      }),
+    });
+  }
+  return fetch(`${getAuthApiUrl()}/tara/exchange-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ code, code_verifier: codeVerifier }),
+  });
+}
+
+interface TokenResult { accessToken: string; idToken: string; expiresIn: number }
+
+function parseTokenResponse(data: Record<string, unknown>): TokenResult | null {
+  if (typeof data.access_token !== "string" || typeof data.id_token !== "string" || typeof data.expires_in !== "number") {
+    logger.error("[Auth] Invalid token exchange response shape");
     return null;
   }
+  return { accessToken: data.access_token, idToken: data.id_token, expiresIn: data.expires_in };
+}
 
+export async function exchangeCodeForTokens(code: string): Promise<TokenResult | null> {
+  const codeVerifier = sessionStorage.getItem(PKCE_STORAGE_KEY);
+  if (!codeVerifier) { logger.error("[Auth] Missing PKCE code verifier"); return null; }
   try {
-    // Local dev: exchange directly with Cognito via proxy to avoid redirect_uri
-    // mismatch (backend hardcodes deployed URL, but we need localhost).
-    // Production: exchange via backend — refresh token is set as httpOnly cookie.
-    const response = isLocalDev()
-      ? await fetch(OAUTH2_TOKEN_PATH, {
-          method: "POST",
-          headers: { "Content-Type": CONTENT_TYPE_FORM },
-          body: new URLSearchParams({
-            grant_type: "authorization_code",
-            client_id: cognitoConfig.clientId,
-            code,
-            redirect_uri: cognitoConfig.redirectUri,
-            code_verifier: codeVerifier,
-          }),
-        })
-      : await fetch(
-          `${getAuthApiUrl()}/tara/exchange-code`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-              code,
-              code_verifier: codeVerifier,
-            }),
-          },
-        );
-
+    const response = await fetchTokenExchange(code, codeVerifier);
     if (!response.ok) {
-      const errorData = await response.text();
-      logger.error(
-        "[Auth] Token exchange failed:",
-        response.status,
-        errorData,
-      );
+      logger.error("[Auth] Token exchange failed:", response.status, await response.text());
       return null;
     }
-
-    const data = await response.json();
-
-    if (
-      typeof data.access_token !== "string" ||
-      typeof data.id_token !== "string" ||
-      typeof data.expires_in !== "number"
-    ) {
-      logger.error("[Auth] Invalid token exchange response shape");
-      return null;
-    }
-
-    sessionStorage.removeItem(PKCE_STORAGE_KEY);
-
-    return {
-      accessToken: data.access_token,
-      idToken: data.id_token,
-      expiresIn: data.expires_in,
-    };
+    const result = parseTokenResponse(await response.json());
+    if (result) { sessionStorage.removeItem(PKCE_STORAGE_KEY); }
+    return result;
   } catch (error) {
     logger.error("[Auth] Token exchange error:", error);
     return null;

@@ -82,6 +82,36 @@ const GuideView = ({
   </div>
 );
 
+function usePhoneticAudio() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopAudio = () => {
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; audioRef.current = null; }
+  };
+  const reset = () => { audioRef.current = null; setIsPlaying(false); setIsLoading(false); };
+
+  useEffect(() => () => { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } }, []);
+
+  const play = async (text: string) => {
+    if (!text.trim()) {return;}
+    if (isPlaying) { stopAudio(); setIsPlaying(false); return; }
+    stopAudio(); setIsLoading(true); setIsPlaying(false);
+    try {
+      const url = await synthesizeAuto(transformToVabamorf(text) || "");
+      const { audio } = createAudioPlayer(url, {
+        onLoaded: () => { setIsLoading(false); setIsPlaying(true); },
+        onEnded: reset, onError: reset,
+      });
+      audioRef.current = audio;
+      await audio.play();
+    } catch (e) { logger.error("Failed to play:", e); reset(); }
+  };
+
+  return { isPlaying, isLoading, play, stopAudio: reset };
+}
+
 export default function SentencePhoneticPanel({
   sentenceText,
   phoneticText,
@@ -90,99 +120,27 @@ export default function SentencePhoneticPanel({
   onApply,
 }: SentencePhoneticPanelProps) {
   const [editedText, setEditedText] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audio = usePhoneticAudio();
 
   useEffect(() => {
-    if (isOpen && phoneticText) {
-      setEditedText(transformToUI(phoneticText) || "");
-    } else if (isOpen && sentenceText && !phoneticText) {
-      setEditedText(sentenceText);
+    if (!isOpen) {return;}
+    if (phoneticText) { setEditedText(transformToUI(phoneticText) || ""); }
+    else if (sentenceText) { setEditedText(sentenceText); }
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);
     }
   }, [isOpen, phoneticText, sentenceText]);
-
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.setSelectionRange(
-        inputRef.current.value.length,
-        inputRef.current.value.length,
-      );
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
 
   const insertMarkerAtCursor = (marker: string) => {
     const ta = inputRef.current;
     if (!ta) {return;}
     const s = ta.selectionStart || 0;
     const e = ta.selectionEnd || 0;
-    setEditedText(
-      editedText.substring(0, s) + marker + editedText.substring(e),
-    );
-    setTimeout(() => {
-      ta.focus();
-      ta.setSelectionRange(s + marker.length, s + marker.length);
-    }, 0);
-  };
-
-  const handlePlay = async () => {
-    if (!editedText.trim()) {return;}
-
-    // If already playing, pause it
-    if (isPlaying) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-        audioRef.current = null;
-      }
-      setIsPlaying(false);
-      return;
-    }
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setIsLoading(true);
-    setIsPlaying(false);
-    try {
-      const vt = transformToVabamorf(editedText);
-      const url = await synthesizeAuto(vt || "");
-      const { audio } = createAudioPlayer(url, {
-        onLoaded: () => {
-          setIsLoading(false);
-          setIsPlaying(true);
-        },
-        onEnded: () => {
-          setIsPlaying(false);
-          setIsLoading(false);
-          audioRef.current = null;
-        },
-        onError: () => {
-          setIsPlaying(false);
-          setIsLoading(false);
-          audioRef.current = null;
-        },
-      });
-      audioRef.current = audio; // eslint-disable-line require-atomic-updates -- ref assignment is safe here, no race
-      await audio.play();
-    } catch (e) {
-      logger.error("Failed to play:", e);
-      setIsPlaying(false);
-      setIsLoading(false);
-    }
+    setEditedText(editedText.substring(0, s) + marker + editedText.substring(e));
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(s + marker.length, s + marker.length); }, 0);
   };
 
   const handleApply = () => {
@@ -191,15 +149,7 @@ export default function SentencePhoneticPanel({
     onClose();
   };
 
-  const handleClose = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setIsPlaying(false);
-    setIsLoading(false);
-    onClose();
-  };
+  const handleClose = () => { audio.stopAudio(); onClose(); };
 
   if (!isOpen) {return null;}
 
@@ -250,14 +200,14 @@ export default function SentencePhoneticPanel({
             />
             <div className="sentence-phonetic-panel__actions">
               <button
-                onClick={() => { void handlePlay(); }}
-                disabled={!editedText.trim() || isLoading}
-                className={`button button--primary ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
-                title={isLoading ? "Laen..." : isPlaying ? "Mängib" : "Kuula"}
+                onClick={() => { void audio.play(editedText); }}
+                disabled={!editedText.trim() || audio.isLoading}
+                className={`button button--primary ${audio.isLoading ? "loading" : ""} ${audio.isPlaying ? "playing" : ""}`}
+                title={audio.isLoading ? "Laen..." : audio.isPlaying ? "Mängib" : "Kuula"}
               >
-                {isLoading ? (
+                {audio.isLoading ? (
                   <div className="loader-spinner"></div>
-                ) : isPlaying ? (
+                ) : audio.isPlaying ? (
                   <PauseIcon size="2xl" />
                 ) : (
                   <PlayIcon size="2xl" />
