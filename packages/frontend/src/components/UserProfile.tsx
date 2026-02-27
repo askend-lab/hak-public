@@ -25,99 +25,71 @@ function getDisplayName(user: User): string {
   return user.name ?? user.email?.split("@")[0] ?? "User";
 }
 
-export default function UserProfile({ user }: UserProfileProps) {
-  const { logout } = useAuth();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+function trapTabFocus(e: KeyboardEvent, dropdownRef: React.RefObject<HTMLDivElement | null>): void {
+  /* c8 ignore start -- focus trap requires real browser */
+  const focusable = dropdownRef.current?.querySelectorAll<HTMLElement>(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  );
+  if (!focusable?.length) {return;}
+  const first = focusable[0]!;
+  const last = focusable[focusable.length - 1]!;
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  /* c8 ignore stop */
+}
 
-  const closeDropdown = useCallback(() => {
-    setIsDropdownOpen(false);
-    triggerRef.current?.focus();
-  }, []);
-
-  const handleLogout = () => {
-    void logout();
-    setIsDropdownOpen(false);
-  };
-
+function useDropdownKeyboard(isOpen: boolean, dropdownRef: React.RefObject<HTMLDivElement | null>, onClose: () => void): void {
   useEffect(() => {
-    if (!isDropdownOpen || !dropdownRef.current) {return;}
+    if (!isOpen || !dropdownRef.current) {return;}
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { closeDropdown(); return; }
-      /* c8 ignore start -- focus trap requires real browser */
-      if (e.key !== "Tab") {return;}
-      const focusable = dropdownRef.current?.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusable?.length) {return;}
-      const first = focusable[0]!;
-      const last = focusable[focusable.length - 1]!;
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus();
-      }
-      /* c8 ignore stop */
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key === "Tab") { trapTabFocus(e, dropdownRef); }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [isDropdownOpen, closeDropdown]);
+  }, [isOpen, onClose, dropdownRef]);
+}
+
+function ProfileDropdown({ user, dropdownRef, onLogout, onClose }: { user: User; dropdownRef: React.RefObject<HTMLDivElement | null>; onLogout: () => void; onClose: () => void }) {
+  return (
+    <>
+      <div className="user-profile__backdrop" onClick={onClose} role="presentation" />
+      <div ref={dropdownRef} className="user-profile__dropdown" role="menu">
+        <div className="user-profile__header">
+          <div className="user-profile__avatar user-profile__avatar--large">{getInitials(user)}</div>
+          <div className="user-profile__details">
+            <div className="user-profile__name--large">{getDisplayName(user)}</div>
+            <div className="user-profile__email">{user.email}</div>
+          </div>
+        </div>
+        <div className="user-profile__actions">
+          <button onClick={onLogout} className="user-profile__action-button user-profile__action-button--danger" role="menuitem">
+            <div className="user-profile__action-button-content">Logi välja</div>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default function UserProfile({ user }: UserProfileProps) {
+  const { logout } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => { setIsOpen(false); triggerRef.current?.focus(); }, []);
+  const handleLogout = () => { void logout(); setIsOpen(false); };
+  useDropdownKeyboard(isOpen, dropdownRef, close);
+  const arrowCls = `user-profile__arrow ${isOpen ? "user-profile__arrow--open" : ""}`;
 
   return (
     <div className="user-profile">
-      <button
-        ref={triggerRef}
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="user-profile__button"
-        aria-expanded={isDropdownOpen}
-        aria-haspopup="true"
-        aria-label="Kasutaja profiil"
-      >
+      <button ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className="user-profile__button" aria-expanded={isOpen} aria-haspopup="true" aria-label="Kasutaja profiil">
         <div className="user-profile__avatar">{getInitials(user)}</div>
-        <div className="user-profile__info">
-          <div className="user-profile__name">{getDisplayName(user)}</div>
-        </div>
-        <ChevronDownIcon
-          size="md"
-          className={`user-profile__arrow ${isDropdownOpen ? "user-profile__arrow--open" : ""}`}
-        />
+        <div className="user-profile__info"><div className="user-profile__name">{getDisplayName(user)}</div></div>
+        <ChevronDownIcon size="md" className={arrowCls} />
       </button>
-
-      {isDropdownOpen && (
-        <>
-          <div
-            className="user-profile__backdrop"
-            onClick={closeDropdown}
-            role="presentation"
-          />
-          <div ref={dropdownRef} className="user-profile__dropdown" role="menu">
-            <div className="user-profile__header">
-              <div className="user-profile__avatar user-profile__avatar--large">
-                {getInitials(user)}
-              </div>
-              <div className="user-profile__details">
-                <div className="user-profile__name--large">
-                  {getDisplayName(user)}
-                </div>
-                <div className="user-profile__email">{user.email}</div>
-              </div>
-            </div>
-
-            <div className="user-profile__actions">
-              <button
-                onClick={handleLogout}
-                className="user-profile__action-button user-profile__action-button--danger"
-                role="menuitem"
-              >
-                <div className="user-profile__action-button-content">
-                  Logi välja
-                </div>
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      {isOpen && <ProfileDropdown user={user} dropdownRef={dropdownRef} onLogout={handleLogout} onClose={close} />}
     </div>
   );
 }

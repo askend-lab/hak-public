@@ -25,29 +25,42 @@ interface StatusResponse {
   error?: string;
 }
 
+function getPollingDelay(attempt: number): number {
+  return Math.min(POLL_INTERVAL_MS * Math.pow(2, Math.min(attempt, 3)), 8000);
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => { setTimeout(resolve, ms); });
+}
+
+async function fetchStatus(cacheKey: string, signal?: AbortSignal): Promise<StatusResponse | null> {
+  const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
+  if (!response.ok) {throw new Error("Status check failed");}
+  return response.json();
+}
+
+async function safeFetchStatus(cacheKey: string, signal?: AbortSignal): Promise<StatusResponse | null> {
+  try { return await fetchStatus(cacheKey, signal); }
+  catch (err) { if (err instanceof TypeError) {return null;} throw err; }
+}
+
+function checkAborted(signal?: AbortSignal): void {
+  if (signal?.aborted) {throw new DOMException("Aborted", "AbortError");}
+}
+
+function handlePollResult(data: StatusResponse): string | null {
+  if (data.status === "ready" && data.audioUrl) {return data.audioUrl;}
+  if (data.status === "error") {throw new Error(data.error ?? "Synthesis failed");}
+  return null;
+}
+
 async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
-    if (signal?.aborted) {throw new DOMException("Aborted", "AbortError");}
-    const delay = Math.min(POLL_INTERVAL_MS * Math.pow(2, Math.min(i, 3)), 8000);
-    let response: Response;
-    try {
-      response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {}); // eslint-disable-line no-await-in-loop -- sequential polling
-    } catch (err) {
-      if (signal?.aborted) {throw err;}
-      // Transient network error — continue polling
-      await new Promise((resolve) => { setTimeout(resolve, delay); }); // eslint-disable-line no-await-in-loop -- sequential polling delay
-      continue;
-    }
-    if (!response.ok) {throw new Error("Status check failed");}
-    const data: StatusResponse = await response.json(); // eslint-disable-line no-await-in-loop -- sequential polling
-
-    if (data.status === "ready" && data.audioUrl) {
-      return data.audioUrl;
-    }
-    if (data.status === "error") {
-      throw new Error(data.error ?? "Synthesis failed");
-    }
-    await new Promise((resolve) => { setTimeout(resolve, delay); }); // eslint-disable-line no-await-in-loop -- sequential polling delay
+    checkAborted(signal);
+    const data = await safeFetchStatus(cacheKey, signal); // eslint-disable-line no-await-in-loop -- sequential polling
+    const url = data ? handlePollResult(data) : null;
+    if (url) {return url;}
+    await wait(getPollingDelay(i)); // eslint-disable-line no-await-in-loop -- sequential polling delay
   }
   throw new Error("Synthesis timed out");
 }
@@ -60,23 +73,22 @@ export async function synthesizeAuto(text: string, signal?: AbortSignal): Promis
   return synthesizeWithPolling(text, getVoiceModel(text), signal);
 }
 
-export async function synthesizeWithPolling(
-  text: string,
-  voice: string,
-  signal?: AbortSignal,
-): Promise<string> {
+function buildSynthOpts(signal?: AbortSignal): Record<string, unknown> {
   const token = AuthStorage.getAccessToken();
-  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, {
+  return {
     ...(signal && { signal }),
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
-  });
+  };
+}
+
+function isReady(data: SynthesizeResponse): data is SynthesizeResponse & { audioUrl: string } {
+  return (data.status === "cached" || data.status === "ready") && data.audioUrl !== null;
+}
+
+export async function synthesizeWithPolling(text: string, voice: string, signal?: AbortSignal): Promise<string> {
+  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, buildSynthOpts(signal));
   if (!response.ok) {throw new Error("Synthesis request failed");}
-
   const data: SynthesizeResponse = await response.json();
-
-  if ((data.status === "cached" || data.status === "ready") && data.audioUrl) {
-    return data.audioUrl;
-  }
-
+  if (isReady(data)) {return data.audioUrl;}
   return pollForAudio(data.cacheKey, signal);
 }

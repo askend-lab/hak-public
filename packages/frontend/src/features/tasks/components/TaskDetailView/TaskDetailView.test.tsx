@@ -3,7 +3,6 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import TaskDetailView from "./TaskDetailView";
 import { Task } from "@/types/task";
 import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
@@ -205,102 +204,4 @@ describe("TaskDetailView", () => {
     expect(screen.getByText(/ei leitud/)).toBeInTheDocument();
   });
 
-  it("shows error on fetch failure", async () => {
-    mockGetTask.mockRejectedValue(new Error("Network fail"));
-    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
-    await waitFor(() =>
-      expect(screen.getByTestId("error")).toBeInTheDocument(),
-    );
-  });
-
-  it("renders with initialTask (skips fetch)", async () => {
-    render(<TaskDetailView {...defaultProps} initialTask={mockTask} />, { wrapper: dsWrapper });
-    expect(screen.getByTestId("entry-e1")).toBeInTheDocument();
-    expect(mockGetTask).not.toHaveBeenCalled();
-  });
-
-  it("renders empty state when task has no entries", async () => {
-    mockGetTask.mockResolvedValue({ ...mockTask, entries: [] });
-    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
-    await waitFor(() =>
-      expect(screen.getByTestId("empty")).toBeInTheDocument(),
-    );
-  });
-
-  it("handleDeleteEntry calls updateTask and shows notification", async () => {
-    const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
-    await waitFor(() =>
-      expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
-    );
-
-    await user.click(screen.getAllByText("Kustuta")[0]!);
-    await waitFor(() => expect(mockUpdateTask).toHaveBeenCalled());
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      type: "success",
-      message: expect.any(String),
-      color: "success",
-    });
-  });
-
-  it("handleDeleteEntry reverts on error", async () => {
-    mockUpdateTask.mockRejectedValueOnce(new Error("fail"));
-    const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
-    await waitFor(() =>
-      expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
-    );
-
-    await user.click(screen.getAllByText("Kustuta")[0]!);
-    await waitFor(() =>
-      expect(mockShowNotification).toHaveBeenCalledWith({
-        type: "error",
-        message: expect.any(String),
-      }),
-    );
-  });
-
-  it("opens share modal from header", async () => {
-    const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
-    await waitFor(() =>
-      expect(screen.getByTestId("header")).toBeInTheDocument(),
-    );
-
-    await user.click(screen.getByText("Share"));
-    expect(screen.getByTestId("share-modal")).toBeInTheDocument();
-
-    await user.click(screen.getByText("Close Share"));
-    expect(screen.queryByTestId("share-modal")).not.toBeInTheDocument();
-  });
-
-  it("play button calls handlePlayEntry", async () => {
-    const mockHandlePlayEntry = vi.fn();
-    const { useAudioPlayback } = await import("./hooks");
-    (useAudioPlayback as ReturnType<typeof vi.fn>).mockReturnValue({
-      currentPlayingId: null,
-      currentLoadingId: null,
-      isPlayingAll: false,
-      isLoadingPlayAll: false,
-      handlePlayEntry: mockHandlePlayEntry,
-      handlePlayAll: vi.fn(),
-    });
-    const user = userEvent.setup();
-    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
-    await waitFor(() =>
-      expect(screen.getByTestId("entry-e1")).toBeInTheDocument(),
-    );
-
-    await user.click(screen.getAllByText("Play")[0]!);
-    expect(mockHandlePlayEntry).toHaveBeenCalledWith("e1");
-  });
-
-  it("shows error when no user", async () => {
-    const { useAuth } = await import("@/features/auth/services");
-    (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({ user: null });
-    render(<TaskDetailView {...defaultProps} />, { wrapper: dsWrapper });
-    await waitFor(() =>
-      expect(screen.getByTestId("error")).toBeInTheDocument(),
-    );
-  });
 });

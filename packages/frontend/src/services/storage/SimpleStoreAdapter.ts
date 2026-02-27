@@ -11,25 +11,23 @@ function taskToRecord(task: Task): Record<string, unknown> {
   return JSON.parse(JSON.stringify(task)) as Record<string, unknown>;
 }
 
+function isValidTaskData(data: Record<string, unknown>): boolean {
+  return typeof data.id === "string" && typeof data.userId === "string" && typeof data.name === "string";
+}
+
+function parseDate(value: unknown): Date {
+  return value instanceof Date ? value : new Date((value as string) || Date.now());
+}
+
 /** Deserialize a storage record back to a Task with runtime validation. */
 function recordToTask(data: Record<string, unknown>): Task | null {
-  if (
-    typeof data.id !== "string" ||
-    typeof data.userId !== "string" ||
-    typeof data.name !== "string"
-  ) {
-    logger.error("Invalid task data: missing required fields");
-    return null;
-  }
+  if (!isValidTaskData(data)) { logger.error("Invalid task data: missing required fields"); return null; }
   return {
-    id: data.id,
-    userId: data.userId,
-    name: data.name,
+    id: data.id as string, userId: data.userId as string, name: data.name as string,
     description: typeof data.description === "string" ? data.description : null,
     speechSequences: Array.isArray(data.speechSequences) ? data.speechSequences as string[] : [],
     entries: Array.isArray(data.entries) ? data.entries as Task["entries"] : [],
-    createdAt: data.createdAt instanceof Date ? data.createdAt : new Date(data.createdAt as string || Date.now()),
-    updatedAt: data.updatedAt instanceof Date ? data.updatedAt : new Date(data.updatedAt as string || Date.now()),
+    createdAt: parseDate(data.createdAt), updatedAt: parseDate(data.updatedAt),
     shareToken: typeof data.shareToken === "string" ? data.shareToken : "",
   };
 }
@@ -61,48 +59,32 @@ export class SimpleStoreAdapter {
     return headers;
   }
 
-  private async save(
-    key: string,
-    id: string,
-    type: "private" | "shared" | "unlisted",
-    data: Record<string, unknown>,
-  ): Promise<void> {
+  private async save(opts: { key: string; id: string; type: string; data: Record<string, unknown>; ttl?: number }): Promise<void> {
     const response = await fetch(`${this.baseUrl}/save`, {
       method: "POST",
       headers: this.getAuthHeaders(),
-      body: JSON.stringify({ key, id, type, ttl: this.ttl, data }),
+      body: JSON.stringify({ key: opts.key, id: opts.id, type: opts.type, ttl: opts.ttl ?? this.ttl, data: opts.data }),
     });
-
-    if (!response.ok) {
-      const error = await response.text();
-      logger.error("SimpleStore save failed:", error);
-      throw new Error(`Failed to save: ${error}`);
-    }
+    if (!response.ok) { const error = await response.text(); logger.error("SimpleStore save failed:", error); throw new Error(`Failed to save: ${error}`); }
   }
 
-  private async get(
-    key: string,
-    id: string,
-    type: "private" | "shared" | "unlisted",
-  ): Promise<Record<string, unknown> | null> {
-    const params = new URLSearchParams({ key, id, type });
-    // Use /get-public for unlisted/shared/public (no auth required, rejects private type)
+  private getEndpoint(type: string): { endpoint: string; headers: Record<string, string> } {
     const isPublic = type !== "private";
-    const endpoint = isPublic ? "/get-public" : "/get";
-    const headers = isPublic
-      ? { "Content-Type": CONTENT_TYPE_JSON }
-      : this.getAuthHeaders();
-    const response = await fetch(`${this.baseUrl}${endpoint}?${params}`, {
-      headers,
-    });
+    return {
+      endpoint: isPublic ? "/get-public" : "/get",
+      headers: isPublic ? { "Content-Type": CONTENT_TYPE_JSON } : this.getAuthHeaders(),
+    };
+  }
 
-    if (!response.ok) {
-      if (response.status === 404) {return null;}
-      const error = await response.text();
-      logger.error("SimpleStore get failed:", error);
-      throw new Error(`Failed to get: ${error}`);
-    }
+  private async handleGetError(response: Response): Promise<null> {
+    if (response.status === 404) {return null;}
+    const error = await response.text(); logger.error("SimpleStore get failed:", error); throw new Error(`Failed to get: ${error}`);
+  }
 
+  private async get(key: string, id: string, type: string): Promise<Record<string, unknown> | null> {
+    const { endpoint, headers } = this.getEndpoint(type);
+    const response = await fetch(`${this.baseUrl}${endpoint}?${new URLSearchParams({ key, id, type })}`, { headers });
+    if (!response.ok) {return this.handleGetError(response);}
     const result: SimpleStoreResponse = await response.json();
     return result.item?.data ?? null;
   }
@@ -156,12 +138,7 @@ export class SimpleStoreAdapter {
   }
 
   async saveTask(task: Task): Promise<void> {
-    await this.save(
-      STORE_KEYS.TASK,
-      task.id,
-      "private",
-      taskToRecord(task),
-    );
+    await this.save({ key: STORE_KEYS.TASK, id: task.id, type: "private", data: taskToRecord(task) });
   }
 
   async getTask(taskId: string): Promise<Task | null> {
@@ -190,25 +167,7 @@ export class SimpleStoreAdapter {
   }
 
   async saveTaskAsUnlisted(task: Task): Promise<void> {
-    if (!task.shareToken) {
-      throw new Error("Task must have shareToken to save as unlisted");
-    }
-    const response = await fetch(`${this.baseUrl}/save`, {
-      method: "POST",
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify({
-        key: STORE_KEYS.TASKS,
-        id: task.shareToken,
-        type: "unlisted",
-        ttl: UNLISTED_TTL_SECONDS,
-        data: taskToRecord(task),
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      logger.error("SimpleStore save unlisted failed:", error);
-      throw new Error(`Failed to save unlisted: ${error}`);
-    }
+    if (!task.shareToken) { throw new Error("Task must have shareToken to save as unlisted"); }
+    await this.save({ key: STORE_KEYS.TASKS, id: task.shareToken, type: "unlisted", ttl: UNLISTED_TTL_SECONDS, data: taskToRecord(task) });
   }
 }

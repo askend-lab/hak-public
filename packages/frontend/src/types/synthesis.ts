@@ -54,35 +54,28 @@ function isWordToken(token: string): boolean {
  *   ["tere", ",", "maailm"] → ["tere,", "maailm"]
  *   ["(", "tere", ")"]     → ["(tere)"]
  */
+function leftAttachPass(tags: string[]): string[] {
+  const out: string[] = [];
+  for (const tag of tags) {
+    if (isWordToken(tag)) { out.push(tag); }
+    else if (out.length > 0) { out[out.length - 1] += tag; }
+    else { out.push(tag); }
+  }
+  return out;
+}
+
+function rightAttachFirst(tokens: string[]): string[] {
+  if (tokens.length <= 1) {return tokens;}
+  const first = tokens[0];
+  if (first !== undefined && !isWordToken(first)) {
+    return [first + (tokens[1] ?? ""), ...tokens.slice(2)];
+  }
+  return tokens;
+}
+
 export function normalizeTags(tags: string[]): string[] {
   if (tags.length === 0) {return [];}
-
-  const result: string[] = [];
-
-  // Pass 1: left-attach punctuation-only tokens to the previous token
-  for (const tag of tags) {
-    if (isWordToken(tag)) {
-      result.push(tag);
-    } else {
-      // Purely punctuation — attach to previous token
-      if (result.length > 0) {
-        result[result.length - 1] += tag;
-      } else {
-        // No previous token yet; will be right-attached in pass 2
-        result.push(tag);
-      }
-    }
-  }
-
-  // Pass 2: right-attach if the first token is still punctuation-only
-  const first = result[0];
-  const second = result[1];
-  if (result.length > 1 && first !== undefined && second !== undefined && !isWordToken(first)) {
-    result[1] = first + second;
-    result.shift();
-  }
-
-  return result;
+  return rightAttachFirst(leftAttachPass(tags));
 }
 
 /**

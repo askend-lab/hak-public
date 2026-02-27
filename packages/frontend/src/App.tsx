@@ -19,55 +19,48 @@ import {
 import { useTaskHandlers } from "./features/tasks/hooks/useTaskHandlers";
 import type { AppLayoutContext } from "./routes/types";
 
-export default function AppLayout() {
-  const { user, isAuthenticated, showLoginModal, setShowLoginModal } =
-    useAuth();
-  const { showNotification } = useNotification();
-  const {
-    state: onboardingState,
-    isWizardActive,
-    isLoading: isOnboardingLoading,
-  } = useOnboarding();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  useDocumentTitle();
-
-  const synthesis = useSynthesis();
-  const navigateToTasks = useCallback((): void => { void navigate("/tasks"); }, [navigate]);
-  const taskHandlers = useTaskHandlers(
-    synthesis.sentences,
-    navigateToTasks,
-  );
-  const { handleTasksClick } = useAppRedirects();
-
+function useFocusOnNavigate(pathname: string): React.RefObject<HTMLElement | null> {
   const mainRef = useRef<HTMLElement>(null);
   const prevPathnameRef = useRef(pathname);
-
   useEffect(() => {
     if (prevPathnameRef.current !== pathname) {
       prevPathnameRef.current = pathname;
       mainRef.current?.focus({ preventScroll: true });
     }
   }, [pathname]);
+  return mainRef;
+}
+
+function useAppSetup() {
+  const auth = useAuth();
+  const { showNotification } = useNotification();
+  const onboarding = useOnboarding();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  useDocumentTitle();
+  const synthesis = useSynthesis();
+  const navigateToTasks = useCallback((): void => { void navigate("/tasks"); }, [navigate]);
+  const taskHandlers = useTaskHandlers(synthesis.sentences, navigateToTasks);
+  const { handleTasksClick } = useAppRedirects();
+  const mainRef = useFocusOnNavigate(pathname);
 
   useEffect(() => {
-    if (isWizardActive && onboardingState.selectedRole)
-      {synthesis.setDemoSentences();}
-  }, [
-    isWizardActive,
-    onboardingState.selectedRole,
-    synthesis.setDemoSentences,
-  ]);
+    if (onboarding.isWizardActive && onboarding.state.selectedRole) { synthesis.setDemoSentences(); }
+  }, [onboarding.isWizardActive, onboarding.state.selectedRole, synthesis.setDemoSentences]);
 
-  const outletContext = useMemo<AppLayoutContext>(() => ({
-    synthesis,
-    taskHandlers,
-    showNotification,
-    isAuthenticated,
-    setShowLoginModal,
-  }), [synthesis, taskHandlers, showNotification, isAuthenticated, setShowLoginModal]);
+  return { auth, showNotification, onboarding, navigate, pathname, synthesis, taskHandlers, handleTasksClick, mainRef };
+}
 
-  if (isOnboardingLoading) {
+export default function AppLayout() {
+  const { auth, showNotification, onboarding, navigate, pathname, synthesis, taskHandlers, handleTasksClick, mainRef } = useAppSetup();
+  const { user, isAuthenticated, showLoginModal, setShowLoginModal } = auth;
+
+  const outletContext = useMemo<AppLayoutContext>(
+    () => ({ synthesis, taskHandlers, showNotification, isAuthenticated, setShowLoginModal }),
+    [synthesis, taskHandlers, showNotification, isAuthenticated, setShowLoginModal],
+  );
+
+  if (onboarding.isLoading) {
     return (
       <div className="page-layout page-layout--centered">
         <PageLoadingState />
@@ -105,7 +98,7 @@ export default function AppLayout() {
       <AppModals
         showLoginModal={showLoginModal}
         setShowLoginModal={setShowLoginModal}
-        isWizardActive={isWizardActive}
+        isWizardActive={onboarding.isWizardActive}
         taskHandlers={taskHandlers}
       />
       <CookieConsent />

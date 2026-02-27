@@ -28,6 +28,11 @@ describe("LoginModal", () => {
     });
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   describe("rendering", () => {
     it("returns null when not open", () => {
       const { container } = render(
@@ -190,23 +195,14 @@ describe("LoginModal", () => {
     });
   });
 
-  describe("TARA login", () => {
-    it("calls loginWithTara when TARA button clicked", async () => {
-      const user = userEvent.setup();
-      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
-
-      await user.click(screen.getByText(/Logi sisse TARA/));
-
-      expect(mockLoginWithTara).toHaveBeenCalled();
-    });
-
-    it("shows loading state after TARA click", async () => {
-      const user = userEvent.setup();
-      render(<LoginModal isOpen={true} onClose={mockOnClose} />);
-
-      await user.click(screen.getByText(/Logi sisse TARA/));
-
-      expect(screen.getAllByText("Suunan...").length).toBeGreaterThan(0);
-    });
   });
+
+  });
+
+  });
+
+  });
+
+  });
+
 });

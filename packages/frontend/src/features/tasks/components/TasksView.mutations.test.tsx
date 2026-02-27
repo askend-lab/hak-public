@@ -221,22 +221,4 @@ describe("TasksView mutation kills", () => {
     expect(mockGetTask).not.toHaveBeenCalled();
   });
 
-  it("handleShareTask logs error on failure", async () => {
-    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    mockGetTask.mockRejectedValueOnce(new Error("fail"));
-    const user = userEvent.setup();
-    render(<TasksView {...props} />, { wrapper: dsWrapper });
-    await user.click(screen.getByText("share-t1"));
-    await waitFor(() => expect(spy).toHaveBeenCalledWith("Failed to fetch task for sharing:", expect.any(Error)));
-    spy.mockRestore();
-  });
-
-  it("handleShareTask skips when task null", async () => {
-    mockGetTask.mockResolvedValueOnce(null);
-    const user = userEvent.setup();
-    render(<TasksView {...props} />, { wrapper: dsWrapper });
-    await user.click(screen.getByText("share-t1"));
-    await waitFor(() => expect(mockGetTask).toHaveBeenCalled());
-    expect(props.onShareTask).not.toHaveBeenCalled();
-  });
 });

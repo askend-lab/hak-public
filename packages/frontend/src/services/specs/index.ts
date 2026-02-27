@@ -55,24 +55,21 @@ export function getFeatureGroups(): Record<string, Record<string, string>> {
   return FEATURE_GROUPS;
 }
 
+function parseScenario(featureName: string, scenario: CucumberResult["elements"][0]): TestResult {
+  const allPassed = scenario.steps.every((s) => s.result.status === "passed");
+  const totalDuration = scenario.steps.reduce((sum, s) => sum + (s.result.duration ?? 0), 0);
+  return {
+    name: scenario.name,
+    fullName: `${featureName} > ${scenario.name}`,
+    status: allPassed ? "passed" : "failed",
+    duration: totalDuration / 1000000,
+  };
+}
+
 export function parseCucumberResults(results: CucumberResult[]): TestSuite[] {
   return results.map((feature) => ({
     name: feature.name,
     status: "passed",
-    tests: feature.elements.map((scenario) => {
-      const allPassed = scenario.steps.every(
-        (s) => s.result.status === "passed",
-      );
-      const totalDuration = scenario.steps.reduce(
-        (sum, s) => sum + (s.result.duration ?? 0),
-        0,
-      );
-      return {
-        name: scenario.name,
-        fullName: `${feature.name} > ${scenario.name}`,
-        status: allPassed ? ("passed" as const) : ("failed" as const),
-        duration: totalDuration / 1000000,
-      };
-    }),
+    tests: feature.elements.map((scenario) => parseScenario(feature.name, scenario)),
   }));
 }

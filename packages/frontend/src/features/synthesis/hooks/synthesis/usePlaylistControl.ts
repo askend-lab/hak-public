@@ -4,66 +4,51 @@
 import { useState, useCallback } from "react";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
 
-export function usePlaylistControl(
-  sentences: SentenceState[],
-  playSingle: (id: string, abortSignal?: AbortSignal) => Promise<boolean>,
-  stopAudio: () => void,
-  updateAllSentences: (updates: Partial<SentenceState>) => void,
-): {
+interface PlaylistDeps {
+  sentences: SentenceState[];
+  playSingle: (id: string, abortSignal?: AbortSignal) => Promise<boolean>;
+  stopAudio: () => void;
+  updateAllSentences: (updates: Partial<SentenceState>) => void;
+}
+
+export function usePlaylistControl(deps: PlaylistDeps): {
   isPlayingAll: boolean;
   isLoadingPlayAll: boolean;
   handlePlayAll: () => Promise<void>;
 } {
+  const { sentences, playSingle, stopAudio, updateAllSentences } = deps;
   const [isPlayingAll, setIsPlayingAll] = useState(false);
   const [isLoadingPlayAll, setIsLoadingPlayAll] = useState(false);
-  const [playAllAbortController, setPlayAllAbortController] =
-    useState<AbortController | null>(null);
+  const [abortCtrl, setAbortCtrl] = useState<AbortController | null>(null);
+
+  const stopAll = useCallback(() => {
+    abortCtrl?.abort(); setAbortCtrl(null);
+    setIsPlayingAll(false); setIsLoadingPlayAll(false);
+    stopAudio(); updateAllSentences({ isPlaying: false, isLoading: false });
+  }, [abortCtrl, stopAudio, updateAllSentences]);
+
+  const resetPlayState = useCallback(() => {
+    setIsPlayingAll(false); setIsLoadingPlayAll(false); setAbortCtrl(null);
+  }, []);
+
+  const playSequence = useCallback(async (items: SentenceState[]) => {
+    const ctrl = new AbortController();
+    setAbortCtrl(ctrl); setIsLoadingPlayAll(true);
+    let started = false;
+    for (const s of items) {
+      if (ctrl.signal.aborted) {break;}
+      const ok = await playSingle(s.id, ctrl.signal); // eslint-disable-line no-await-in-loop -- sequential playback
+      if (!started && ok) { setIsLoadingPlayAll(false); setIsPlayingAll(true); started = true; }
+      if (!ok) {break;}
+    }
+    resetPlayState();
+  }, [playSingle, resetPlayState]);
 
   const handlePlayAll = useCallback(async () => {
-    if (isPlayingAll || isLoadingPlayAll) {
-      playAllAbortController?.abort();
-      setPlayAllAbortController(null);
-      setIsPlayingAll(false);
-      setIsLoadingPlayAll(false);
-      stopAudio();
-      updateAllSentences({ isPlaying: false, isLoading: false });
-      return;
-    }
-
-    const sentencesWithText = filterNonEmptySentences(sentences);
-    if (sentencesWithText.length === 0) {return;}
-
-    const abortController = new AbortController();
-    setPlayAllAbortController(abortController);
-    setIsLoadingPlayAll(true);
-
-    let isFirstSentence = true;
-    for (const sentence of sentencesWithText) {
-      if (abortController.signal.aborted) {break;}
-
-      const success = await playSingle(sentence.id, abortController.signal); // eslint-disable-line no-await-in-loop -- sequential playback
-
-      if (isFirstSentence && success) {
-        setIsLoadingPlayAll(false);
-        setIsPlayingAll(true);
-        isFirstSentence = false;
-      }
-
-      if (!success || abortController.signal.aborted) {break;}
-    }
-
-    setIsPlayingAll(false);
-    setIsLoadingPlayAll(false);
-    setPlayAllAbortController(null);
-  }, [
-    isPlayingAll,
-    isLoadingPlayAll,
-    playAllAbortController,
-    sentences,
-    playSingle,
-    stopAudio,
-    updateAllSentences,
-  ]);
+    if (isPlayingAll || isLoadingPlayAll) { stopAll(); return; }
+    const items = filterNonEmptySentences(sentences);
+    if (items.length > 0) { await playSequence(items); }
+  }, [isPlayingAll, isLoadingPlayAll, stopAll, sentences, playSequence]);
 
   return {
     isPlayingAll,

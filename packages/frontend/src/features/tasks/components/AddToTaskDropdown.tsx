@@ -107,113 +107,62 @@ const ConfirmPanel = ({
   </>
 );
 
-export default function AddToTaskDropdown({
-  isOpen,
-  onClose,
-  onSelectTask,
-  onCreateNew,
-  sentenceCount,
-  anchorRef: _anchorRef,
-}: AddToTaskDropdownProps) {
+function useTaskDropdownState(isOpen: boolean) {
   const { user } = useAuth();
   const dataService = useDataService();
   const [searchQuery, setSearchQuery] = useState("");
   const [tasks, setTasks] = useState<TaskSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskSummary | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (!isOpen || !user) {return;}
     setIsLoading(true);
-    dataService
-      .getUserTasks()
-      .then(setTasks)
-      .catch((e) => logger.error("Failed to load tasks:", e))
-      .finally(() => setIsLoading(false));
+    dataService.getUserTasks().then(setTasks).catch((e) => logger.error("Failed to load tasks:", e)).finally(() => setIsLoading(false));
   }, [isOpen, user, dataService]);
   useEffect(() => {
-    if (isOpen && !selectedTask && searchInputRef.current)
-      {requestAnimationFrame(() => searchInputRef.current?.focus());}
+    if (isOpen && !selectedTask && searchInputRef.current) { requestAnimationFrame(() => searchInputRef.current?.focus()); }
   }, [isOpen, selectedTask]);
-  useEffect(() => {
-    if (!isOpen) {
-      setSearchQuery("");
-      setSelectedTask(null);
-    }
-  }, [isOpen]);
-  const filteredTasks = tasks.filter((t) =>
-    t.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  useEffect(() => { if (!isOpen) { setSearchQuery(""); setSelectedTask(null); } }, [isOpen]);
+  const filteredTasks = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  return { searchQuery, setSearchQuery, isLoading, selectedTask, setSelectedTask, searchInputRef, filteredTasks };
+}
+
+function SearchPanel({ state, onTaskClick, onCreate }: {
+  state: ReturnType<typeof useTaskDropdownState>; onTaskClick: (t: TaskSummary) => void; onCreate: () => void;
+}) {
+  return (
+    <>
+      <div className="add-to-task-search">
+        <input ref={state.searchInputRef} type="text" className="add-to-task-search-input" placeholder="Otsi" aria-label="Otsi ülesannet"
+          value={state.searchQuery} onChange={(e) => state.setSearchQuery(e.target.value)} />
+        <SearchIcon size="2xl" className="add-to-task-search-icon" />
+      </div>
+      <div className="add-to-task-list"><TaskList isLoading={state.isLoading} filteredTasks={state.filteredTasks} searchQuery={state.searchQuery} onSelect={onTaskClick} /></div>
+      <div className="add-to-task-create">
+        <button className="add-to-task-create-button" onClick={onCreate}>
+          <span className="add-to-task-create-icon"><AddIcon size="sm" /></span><span className="add-to-task-create-text">Loo uus ülesanne</span>
+        </button>
+      </div>
+    </>
   );
+}
+
+export default function AddToTaskDropdown({ isOpen, onClose, onSelectTask, onCreateNew, sentenceCount, anchorRef: _anchorRef }: AddToTaskDropdownProps) {
+  const state = useTaskDropdownState(isOpen);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const handleTaskClick = (task: TaskSummary) => {
-    if (task.entryCount > 0) {
-      setSelectedTask(task);
-    } else {
-      onSelectTask(task.id, task.name, "append");
-      onClose();
-    }
+    if (task.entryCount > 0) { state.setSelectedTask(task); } else { onSelectTask(task.id, task.name, "append"); onClose(); }
   };
-  const handleConfirm = (mode: AddToTaskMode) => {
-    if (!selectedTask) {return;}
-    onSelectTask(selectedTask.id, selectedTask.name, mode);
-    onClose();
-  };
-  const handleBack = () => {
-    setSelectedTask(null);
-  };
-  const handleCreate = () => {
-    onCreateNew();
-    onClose();
-  };
+  const handleConfirm = (mode: AddToTaskMode) => { if (!state.selectedTask) {return;} onSelectTask(state.selectedTask.id, state.selectedTask.name, mode); onClose(); };
   if (!isOpen) {return null;}
   return (
     <>
       <div className="add-to-task-backdrop" onClick={onClose} onKeyDown={(e) => { if (e.key === "Escape") {onClose();} }} role="presentation" tabIndex={-1} />
       <div className="add-to-task-dropdown" ref={dropdownRef}>
-        {selectedTask ? (
-          <ConfirmPanel
-            task={selectedTask}
-            sentenceCount={sentenceCount}
-            onBack={handleBack}
-            onConfirm={handleConfirm}
-          />
-        ) : (
-          <>
-            <div className="add-to-task-search">
-              <input
-                ref={searchInputRef}
-                type="text"
-                className="add-to-task-search-input"
-                placeholder="Otsi"
-                aria-label="Otsi ülesannet"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <SearchIcon size="2xl" className="add-to-task-search-icon" />
-            </div>
-            <div className="add-to-task-list">
-              <TaskList
-                isLoading={isLoading}
-                filteredTasks={filteredTasks}
-                searchQuery={searchQuery}
-                onSelect={handleTaskClick}
-              />
-            </div>
-            <div className="add-to-task-create">
-              <button
-                className="add-to-task-create-button"
-                onClick={handleCreate}
-              >
-                <span className="add-to-task-create-icon">
-                  <AddIcon size="sm" />
-                </span>
-                <span className="add-to-task-create-text">
-                  Loo uus ülesanne
-                </span>
-              </button>
-            </div>
-          </>
-        )}
+        {state.selectedTask
+          ? <ConfirmPanel task={state.selectedTask} sentenceCount={sentenceCount} onBack={() => state.setSelectedTask(null)} onConfirm={handleConfirm} />
+          : <SearchPanel state={state} onTaskClick={handleTaskClick} onCreate={() => { onCreateNew(); onClose(); }} />}
       </div>
     </>
   );

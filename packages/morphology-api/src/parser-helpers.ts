@@ -34,7 +34,7 @@ export function createVariantFromMrf(
 
   const { stem, ending = "", pos = "", lemma = "", fs = "" } = mrfVariant;
   const text = formatPhoneticText(stem, ending);
-  const description = buildDescription(lemma, pos, fs, word);
+  const description = buildDescription({ lemma, pos, fs }, word);
 
   return {
     text,

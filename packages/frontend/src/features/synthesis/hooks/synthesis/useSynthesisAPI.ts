@@ -12,78 +12,30 @@ interface SynthesisResult {
   stressedTags?: string[] | undefined;
 }
 
-export function useSynthesisAPI(): {
-  analyzeText: (text: string) => Promise<{ stressedText: string }>;
-  synthesizeText: (
-    text: string,
-    phoneticText?: string,
-  ) => Promise<SynthesisResult>;
-  synthesizeWithCache: (
-    text: string,
-    cachedPhoneticText?: string | null,
-    cachedAudioUrl?: string | null,
-  ) => Promise<SynthesisResult>;
-} {
-  const analyzeText = useCallback(
-    async (text: string): Promise<{ stressedText: string }> => {
-      const response = await postJSON(ANALYZE_API_PATH, { text });
+async function resolvePhonetic(analyzeText: (t: string) => Promise<{ stressedText: string }>, text: string, phoneticText?: string) {
+  if (phoneticText) {return { actualPhoneticText: phoneticText, stressedTags: undefined };}
+  const { stressedText } = await analyzeText(text);
+  const actual = stressedText || text;
+  return { actualPhoneticText: actual, stressedTags: stressedText ? convertTextToTags(stressedText) : undefined };
+}
 
-      if (!response.ok) {
-        throw new Error("Analysis failed");
-      }
+export function useSynthesisAPI() {
+  const analyzeText = useCallback(async (text: string): Promise<{ stressedText: string }> => {
+    const response = await postJSON(ANALYZE_API_PATH, { text });
+    if (!response.ok) {throw new Error("Analysis failed");}
+    return response.json();
+  }, []);
 
-      return response.json();
-    },
-    [],
-  );
+  const synthesizeText = useCallback(async (text: string, phoneticText?: string): Promise<SynthesisResult> => {
+    const { actualPhoneticText, stressedTags } = await resolvePhonetic(analyzeText, text, phoneticText);
+    const audioUrl = await synthesizeAuto(actualPhoneticText);
+    return { audioUrl, phoneticText: actualPhoneticText, stressedTags };
+  }, [analyzeText]);
 
-  const synthesizeText = useCallback(
-    async (text: string, phoneticText?: string): Promise<SynthesisResult> => {
-      let actualPhoneticText: string;
-      let stressedTags: string[] | undefined;
+  const synthesizeWithCache = useCallback(async (text: string, cachedPhonetic?: string | null, cachedAudio?: string | null): Promise<SynthesisResult> => {
+    if (cachedAudio && cachedPhonetic) {return { audioUrl: cachedAudio, phoneticText: cachedPhonetic };}
+    return synthesizeText(text, cachedPhonetic || undefined);
+  }, [synthesizeText]);
 
-      if (phoneticText) {
-        actualPhoneticText = phoneticText;
-      } else {
-        const { stressedText } = await analyzeText(text);
-        actualPhoneticText = stressedText || text;
-        if (stressedText) {
-          stressedTags = convertTextToTags(stressedText);
-        }
-      }
-
-      const audioUrl = await synthesizeAuto(actualPhoneticText);
-
-      return {
-        audioUrl,
-        phoneticText: actualPhoneticText,
-        stressedTags,
-      };
-    },
-    [analyzeText],
-  );
-
-  const synthesizeWithCache = useCallback(
-    async (
-      text: string,
-      cachedPhoneticText?: string | null,
-      cachedAudioUrl?: string | null,
-    ): Promise<SynthesisResult> => {
-      if (cachedAudioUrl && cachedPhoneticText) {
-        return {
-          audioUrl: cachedAudioUrl,
-          phoneticText: cachedPhoneticText,
-        };
-      }
-
-      return synthesizeText(text, cachedPhoneticText || undefined);
-    },
-    [synthesizeText],
-  );
-
-  return {
-    analyzeText,
-    synthesizeText,
-    synthesizeWithCache,
-  };
+  return { analyzeText, synthesizeText, synthesizeWithCache };
 }

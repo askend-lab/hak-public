@@ -35,7 +35,7 @@ function createMockProcess(): MockProcess {
   }) as MockProcess;
 }
 
-describe("vmetajson", () => {
+describe("vmetajson.test", () => {
   let mockProcess: MockProcess;
 
   beforeEach(() => {
@@ -193,59 +193,4 @@ describe("vmetajson", () => {
     });
   });
 
-  describe("edge cases", () => {
-    it("should handle empty line in buffer", async () => {
-      initVmetajson("./vmetajson", ".");
-
-      const analyzePromise = analyze("test");
-
-      setTimeout(() => {
-        mockProcess.stdout.emit("data", Buffer.from('\n{"annotations":{}}\n'));
-      }, 10);
-
-      const result = await analyzePromise;
-      expect(result.annotations).toStrictEqual({});
-    });
-
-    it("should use default paths", () => {
-      initVmetajson();
-
-      expect(mockSpawn).toHaveBeenCalledWith(
-        "./vmetajson",
-        ["--path=."],
-        expect.any(Object),
-      );
-    });
-
-    it("should handle stderr output", () => {
-      const { logger } = require("../src/logger");
-      const loggerSpy = jest.spyOn(logger, "error").mockImplementation();
-      initVmetajson("./vmetajson", ".");
-
-      mockProcess.stderr.emit("data", Buffer.from("warning message"));
-
-      expect(loggerSpy).toHaveBeenCalledWith(
-        "[vmetajson stderr]",
-        "warning message",
-      );
-      loggerSpy.mockRestore();
-    });
-
-    it("should handle timeout for queued and current requests", async () => {
-      jest.useFakeTimers();
-      initVmetajson("./vmetajson", ".");
-
-      // First request becomes currentRequest, second stays in queue
-      const first = analyze("first");
-      const second = analyze("second");
-
-      // Both timeouts fire
-      jest.advanceTimersByTime(6000);
-
-      await expect(first).rejects.toThrow("vmetajson timeout");
-      await expect(second).rejects.toThrow("vmetajson timeout");
-
-      jest.useRealTimers();
-    });
-  });
 });

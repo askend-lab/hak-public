@@ -35,28 +35,14 @@ import { CopiedEntriesProvider } from "../../contexts/CopiedEntriesContext";
   meta: { env: { PROD: false, DEV: true } },
 };
 
-const dom = new JSDOM(
-  '<!DOCTYPE html><html><body><div id="root"></div></body></html>',
-  {
-    url: "http://localhost:3000",
-    pretendToBeVisual: true,
-  },
-);
+const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></html>', { url: "http://localhost:3000", pretendToBeVisual: true });
 
 // Polyfill requestAnimationFrame for BaseModal and other components
-const rafPolyfill = (callback: FrameRequestCallback): number => {
-  return setTimeout(() => callback(Date.now()), 16) as unknown as number;
-};
-const cafPolyfill = (id: number): void => {
-  clearTimeout(id);
-};
+const rafPolyfill = (callback: FrameRequestCallback): number => setTimeout(() => callback(Date.now()), 16) as unknown as number;
+const cafPolyfill = (id: number): void => { clearTimeout(id); };
 
-if (!dom.window.requestAnimationFrame) {
-  dom.window.requestAnimationFrame = rafPolyfill;
-}
-if (!dom.window.cancelAnimationFrame) {
-  dom.window.cancelAnimationFrame = cafPolyfill;
-}
+if (!dom.window.requestAnimationFrame) { dom.window.requestAnimationFrame = rafPolyfill; }
+if (!dom.window.cancelAnimationFrame) { dom.window.cancelAnimationFrame = cafPolyfill; }
 
 // Set globals
 Object.assign(global, {
@@ -78,25 +64,12 @@ Object.assign(global, {
 });
 
 // Polyfill attachEvent/detachEvent for React DOM compatibility
-const htmlProto = global.window.HTMLElement.prototype as HTMLElement & {
-  attachEvent?: unknown;
-  detachEvent?: unknown;
-};
+const htmlProto = global.window.HTMLElement.prototype as HTMLElement & { attachEvent?: unknown; detachEvent?: unknown };
 if (!htmlProto.attachEvent) {
-  htmlProto.attachEvent = function (
-    event: string,
-    handler: EventListener,
-  ): void {
-    this.addEventListener(event.replace(/^on/, ""), handler);
-  };
+  htmlProto.attachEvent = function (event: string, handler: EventListener): void { this.addEventListener(event.replace(/^on/, ""), handler); };
 }
 if (!htmlProto.detachEvent) {
-  htmlProto.detachEvent = function (
-    event: string,
-    handler: EventListener,
-  ): void {
-    this.removeEventListener(event.replace(/^on/, ""), handler);
-  };
+  htmlProto.detachEvent = function (event: string, handler: EventListener): void { this.removeEventListener(event.replace(/^on/, ""), handler); };
 }
 
 // Mock matchMedia
@@ -115,29 +88,12 @@ Object.defineProperty(global.window, "matchMedia", {
 });
 
 // Mock fetch for API calls
-global.fetch = async (
-  input: RequestInfo | URL,
-  _init?: RequestInit,
-): Promise<Response> => {
-  let url =
-    typeof input === "string"
-      ? input
-      : input instanceof URL
-        ? input.href
-        : input.url;
-
-  if (url.startsWith("/")) {
-    url = `http://localhost:3000${url}`;
-  }
-
-  // Return mock response for API calls
+global.fetch = async (input: RequestInfo | URL, _init?: RequestInit): Promise<Response> => {
+  let url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  if (url.startsWith("/")) { url = `http://localhost:3000${url}`; }
   if (url.includes("/api/")) {
-    return new Response(JSON.stringify({ items: [], tasks: [] }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ items: [], tasks: [] }), { status: 200, headers: { "Content-Type": "application/json" } });
   }
-
   return new Response("{}", { status: 200 });
 };
 
@@ -188,14 +144,8 @@ export class TestWorld extends World {
 
   type(element: Element, text: string): void {
     const input = element as HTMLInputElement;
-    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-      window.HTMLInputElement.prototype,
-      "value",
-    )?.set;
-    const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
-      window.HTMLTextAreaElement.prototype,
-      "value",
-    )?.set;
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
+    const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;
 
     if (element.tagName === "TEXTAREA" && nativeTextAreaValueSetter) {
       nativeTextAreaValueSetter.call(element, text);

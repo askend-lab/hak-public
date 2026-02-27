@@ -122,34 +122,36 @@ function isPublicReadableRequest(event: APIGatewayProxyEvent): boolean {
   return type !== undefined && PUBLIC_READABLE_TYPES.has(type);
 }
 
-/**
- * Main Lambda handler
- */
-export async function handler(
+function checkPreconditions(
   event: APIGatewayProxyEvent,
-): Promise<APIGatewayProxyResult> {
+): APIGatewayProxyResult | null {
   if (event.resource === "/health" && event.httpMethod === "GET") {
     return createResponse(HTTP_STATUS.OK, { status: "ok" });
   }
-
   if (event.body && event.body.length > MAX_BODY_SIZE) {
     return createResponse(HTTP_STATUS.BAD_REQUEST, {
       error: `Request body too large (max ${MAX_BODY_SIZE} bytes)`,
     });
   }
+  return null;
+}
 
+function resolveUserId(
+  event: APIGatewayProxyEvent,
+): string | APIGatewayProxyResult {
   const userId = getUserId(event);
-
-  // Allow unauthenticated GET requests for shared data
-  const isAnonymousSharedAccess = !userId && isPublicReadableRequest(event);
-
-  if (!userId && !isAnonymousSharedAccess) {
+  const isAnonymous = !userId && isPublicReadableRequest(event);
+  if (!userId && !isAnonymous) {
     return createResponse(HTTP_STATUS.UNAUTHORIZED, {
       error: HTTP_ERRORS.UNAUTHORIZED,
     });
   }
+  return userId || ANONYMOUS_USER;
+}
 
-  // Use event.resource (API Gateway resource path) instead of event.path (which includes basePath)
+function findRoute(
+  event: APIGatewayProxyEvent,
+): RouteHandler | APIGatewayProxyResult {
   const route = routes.find(
     (r) => r.method === event.httpMethod && r.path === event.resource,
   );
@@ -158,19 +160,41 @@ export async function handler(
       error: HTTP_ERRORS.NOT_FOUND,
     });
   }
+  return route.handler;
+}
 
+async function executeRoute(
+  routeHandler: RouteHandler,
+  event: APIGatewayProxyEvent,
+  userId: string,
+): Promise<APIGatewayProxyResult> {
   try {
-    // For anonymous shared access, use 'anonymous' as userId
-    const effectiveUserId = userId || ANONYMOUS_USER;
-    return await route.handler(event, createStore(effectiveUserId));
+    return await routeHandler(event, createStore(userId));
   } catch (error) {
     logger.error("[SimpleStore] Handler error", {
       requestId: event.requestContext?.requestId,
-      route: route.path,
       error: extractErrorMessage(error),
     });
     return createResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
       error: HTTP_ERRORS.INTERNAL,
     });
   }
+}
+
+/**
+ * Main Lambda handler
+ */
+export async function handler(
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> {
+  const precondition = checkPreconditions(event);
+  if (precondition) {return precondition;}
+
+  const userResult = resolveUserId(event);
+  if (typeof userResult !== "string") {return userResult;}
+
+  const routeResult = findRoute(event);
+  if (typeof routeResult !== "function") {return routeResult;}
+
+  return executeRoute(routeResult, event, userResult);
 }

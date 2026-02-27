@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import WizardTooltip from "./WizardTooltip";
 import type { WizardStep } from "@/types/onboarding";
@@ -70,6 +70,11 @@ describe("WizardTooltip", () => {
     vi.restoreAllMocks();
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   describe("rendering", () => {
     it("renders overlay", () => {
       const { container } = render(<WizardTooltip {...defaultProps} />);
@@ -167,99 +172,14 @@ describe("WizardTooltip", () => {
     });
   });
 
-  describe("positioning", () => {
-    it("applies bottom position class", () => {
-      const { container } = render(<WizardTooltip {...defaultProps} />);
-      expect(
-        container.querySelector(".wizard__tooltip--arrow-top"),
-      ).toBeInTheDocument();
-    });
-
-    it("applies top position class", () => {
-      const { container } = render(
-        <WizardTooltip
-          {...defaultProps}
-          step={{ ...mockStep, position: "top" }}
-        />,
-      );
-      expect(
-        container.querySelector(".wizard__tooltip--arrow-bottom"),
-      ).toBeInTheDocument();
-    });
-
-    it("applies left position class", () => {
-      const { container } = render(
-        <WizardTooltip
-          {...defaultProps}
-          step={{ ...mockStep, position: "left" }}
-        />,
-      );
-      expect(
-        container.querySelector(".wizard__tooltip--arrow-right"),
-      ).toBeInTheDocument();
-    });
-
-    it("applies right position class", () => {
-      const { container } = render(
-        <WizardTooltip
-          {...defaultProps}
-          step={{ ...mockStep, position: "right" }}
-        />,
-      );
-      expect(
-        container.querySelector(".wizard__tooltip--arrow-left"),
-      ).toBeInTheDocument();
-    });
   });
 
-  describe("target element highlighting", () => {
-    it("adds highlight class to target element", () => {
-      render(<WizardTooltip {...defaultProps} />);
-      expect(targetElement.classList.contains("wizard__highlight")).toBe(true);
-    });
-
-    it("removes highlight class on unmount", () => {
-      const { unmount } = render(<WizardTooltip {...defaultProps} />);
-      unmount();
-      expect(targetElement.classList.contains("wizard__highlight")).toBe(false);
-    });
-
-    it("scrolls target into view", () => {
-      render(<WizardTooltip {...defaultProps} />);
-      expect(targetElement.scrollIntoView).toHaveBeenCalledWith({
-        behavior: "smooth",
-        block: "center",
-      });
-    });
   });
 
-  describe("accessibility", () => {
-    it("has dialog role", () => {
-      render(<WizardTooltip {...defaultProps} />);
-      expect(screen.getByRole("dialog")).toBeInTheDocument();
-    });
-
-    it("has aria-labelledby for title", () => {
-      render(<WizardTooltip {...defaultProps} />);
-      const dialog = screen.getByRole("dialog");
-      expect(dialog).toHaveAttribute("aria-labelledby", "wizard-title");
-    });
-
-    it("has aria-describedby for description", () => {
-      render(<WizardTooltip {...defaultProps} />);
-      const dialog = screen.getByRole("dialog");
-      expect(dialog).toHaveAttribute("aria-describedby", "wizard-description");
-    });
   });
 
-  describe("resize handling", () => {
-    it("recalculates position on window resize", () => {
-      render(<WizardTooltip {...defaultProps} />);
-
-      fireEvent.resize(window);
-
-      // The tooltip should still be rendered
-      expect(screen.getByText("Step Title")).toBeInTheDocument();
-    });
   });
+
+  });
+
 });

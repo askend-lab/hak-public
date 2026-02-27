@@ -23,66 +23,31 @@ export function useTaskDelete(deps: UseTaskDeleteDeps) {
   const { showNotification } = useNotification();
   const dataService = useDataService();
   const [isDeleting, setIsDeleting] = useState(false);
-  const {
-    setSelectedTaskId,
-    onNavigateToTasks,
-    setShowDeleteConfirmation,
-    setTaskToDelete,
-    setTaskRefreshTrigger,
-    taskToDelete,
-    requireAuth,
-  } = deps;
+  const { setSelectedTaskId, onNavigateToTasks, setShowDeleteConfirmation, setTaskToDelete, setTaskRefreshTrigger, taskToDelete, requireAuth } = deps;
 
-  const handleDeleteTask = useCallback(
-    async (taskId: string) => {
-      if (requireAuth()) {return;}
-      if (!user) {return;}
-      try {
-        const fullTask = await dataService.getTask(taskId);
-        if (fullTask) {
-          setTaskToDelete({ id: taskId, name: fullTask.name });
-          setShowDeleteConfirmation(true);
-        }
-      } catch (error) {
-        logger.error("Failed to load task:", error);
-      }
-    },
-    [requireAuth, user, dataService],
-  );
+  const handleDeleteTask = useCallback(async (taskId: string) => {
+    if (requireAuth() || !user) {return;}
+    try {
+      const fullTask = await dataService.getTask(taskId);
+      if (fullTask) { setTaskToDelete({ id: taskId, name: fullTask.name }); setShowDeleteConfirmation(true); }
+    } catch (error) { logger.error("Failed to load task:", error); }
+  }, [requireAuth, user, dataService]);
 
   const handleConfirmDelete = useCallback(async () => {
     if (!user || !taskToDelete) {return;}
     setIsDeleting(true);
-    const taskName = taskToDelete.name;
     try {
       await dataService.deleteTask(taskToDelete.id);
       setTaskRefreshTrigger((prev) => prev + 1);
-      showNotification({
-        type: "success",
-        message: TASK_STRINGS.TASK_DELETED(taskName),
-        color: "success",
-      });
-      setSelectedTaskId(null);
-      onNavigateToTasks();
+      showNotification({ type: "success", message: TASK_STRINGS.TASK_DELETED(taskToDelete.name), color: "success" });
+      setSelectedTaskId(null); onNavigateToTasks();
     } catch (error) {
       logger.error("Failed to delete task:", error);
       showNotification({ type: "error", message: TASK_STRINGS.TASK_DELETE_FAILED });
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteConfirmation(false);
-      setTaskToDelete(null);
-    }
+    } finally { setIsDeleting(false); setShowDeleteConfirmation(false); setTaskToDelete(null); }
   }, [user, taskToDelete, showNotification, setSelectedTaskId, onNavigateToTasks, dataService]);
 
-  const handleCancelDelete = useCallback(() => {
-    setShowDeleteConfirmation(false);
-    setTaskToDelete(null);
-  }, []);
+  const handleCancelDelete = useCallback(() => { setShowDeleteConfirmation(false); setTaskToDelete(null); }, []);
 
-  return {
-    handleDeleteTask,
-    handleConfirmDelete,
-    handleCancelDelete,
-    isDeleting,
-  };
+  return { handleDeleteTask, handleConfirmDelete, handleCancelDelete, isDeleting };
 }

@@ -8,33 +8,32 @@ import {
 import { logger } from '@hak/shared';
 import { TARA_VERIFIED, CUSTOM_CHALLENGE, TARA_AUTH_METADATA } from './types';
 
+function setFirstChallenge(response: DefineAuthChallengeTriggerEvent['response']): void {
+  response.challengeName = CUSTOM_CHALLENGE;
+  response.issueTokens = false;
+  response.failAuthentication = false;
+  logger.debug('DefineAuthChallenge: issuing first challenge');
+}
+
+function evaluateChallenge(
+  response: DefineAuthChallengeTriggerEvent['response'],
+  session: DefineAuthChallengeTriggerEvent['request']['session'],
+): void {
+  const last = session[session.length - 1];
+  const passed = last.challengeName === CUSTOM_CHALLENGE && last.challengeResult;
+  response.issueTokens = passed;
+  response.failAuthentication = !passed;
+  logger.debug(`DefineAuthChallenge: challenge ${passed ? 'passed' : 'failed'}`);
+}
+
 export async function handleDefineAuthChallenge(
   event: DefineAuthChallengeTriggerEvent
 ): Promise<DefineAuthChallengeTriggerEvent> {
-  const session = event.request.session;
-
-  if (session.length === 0) {
-    // First attempt - issue CUSTOM_CHALLENGE
-    event.response.challengeName = CUSTOM_CHALLENGE;
-    event.response.issueTokens = false;
-    event.response.failAuthentication = false;
-    logger.debug('DefineAuthChallenge: issuing first challenge');
+  if (event.request.session.length === 0) {
+    setFirstChallenge(event.response);
   } else {
-    const lastChallenge = session[session.length - 1];
-    
-    if (lastChallenge.challengeName === CUSTOM_CHALLENGE && lastChallenge.challengeResult) {
-      // Challenge passed - issue tokens
-      event.response.issueTokens = true;
-      event.response.failAuthentication = false;
-      logger.debug('DefineAuthChallenge: challenge passed, issuing tokens');
-    } else {
-      // Challenge failed
-      event.response.issueTokens = false;
-      event.response.failAuthentication = true;
-      logger.warn('DefineAuthChallenge: challenge failed');
-    }
+    evaluateChallenge(event.response, event.request.session);
   }
-
   return event;
 }
 

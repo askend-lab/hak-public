@@ -2,9 +2,38 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { DragHandleIcon, MoreIcon } from "@/components/ui/Icons";
 import { PlayButton, RowMenu, TagsInput, TagsList } from "./SentenceSynthesis";
+
+function setContainerOpacity(ref: React.RefObject<HTMLDivElement | null>, opacity: string): void {
+  const el = ref.current;
+  if (el) { el.style.opacity = opacity; }
+}
+
+function useDragStartHandler(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  onDragStart: ((e: React.DragEvent, id: string) => void) | undefined,
+  id: string,
+) {
+  return useCallback((e: React.DragEvent): void => {
+    if (containerRef.current) {
+      e.dataTransfer.setDragImage(containerRef.current, 20, containerRef.current.offsetHeight / 2);
+      setTimeout(() => { setContainerOpacity(containerRef, "0.5"); }, 0);
+    }
+    onDragStart?.(e, id);
+  }, [containerRef, onDragStart, id]);
+}
+
+function useDragEndHandler(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  onDragEnd: ((e: React.DragEvent) => void) | undefined,
+) {
+  return useCallback((e: React.DragEvent): void => {
+    setContainerOpacity(containerRef, "1");
+    onDragEnd?.(e);
+  }, [containerRef, onDragEnd]);
+}
 
 interface SentenceSynthesisItemProps {
   // Identity
@@ -86,198 +115,76 @@ interface SentenceSynthesisItemProps {
   sentenceIndex?: number;
 }
 
-function SentenceSynthesisItem({
-  id,
-  text,
-  tags = [],
-  stressedTags: _stressedTags = [],
-  mode,
-  draggable = false,
-  isDragging = false,
-  isDragOver = false,
-  onDragStart,
-  onDragEnd,
-  onDragOver,
-  onDragLeave,
-  onDrop,
-  isPlaying = false,
-  isLoading = false,
-  onPlay,
-  onTagClick,
-  selectedTagIndex,
-  isPronunciationPanelOpen,
-  allTagsSelected,
-  onTagMenuOpen,
-  openTagMenu,
-  onTagMenuClose,
-  tagMenuItems = [],
-  loadingTagIndex,
-  editingTag,
-  onEditTagChange,
-  onEditTagKeyDown,
-  onEditTagCommit,
-  currentInput = "",
-  onInputChange,
-  onInputKeyDown,
-  onInputBlur,
-  onClear,
-  placeholder,
-  openMenuId,
-  onMenuOpen,
-  onMenuClose,
-  rowMenuItems = [],
-  menuContent,
-  onMenuOpenLegacy,
-  className = "",
-  sentenceIndex = 0,
-}: SentenceSynthesisItemProps): React.ReactElement {
+function resolveArrayDefaults(p: SentenceSynthesisItemProps) {
+  return {
+    tags: p.tags ?? [], tagMenuItems: p.tagMenuItems ?? [], rowMenuItems: p.rowMenuItems ?? [],
+    currentInput: p.currentInput ?? "", className: p.className ?? "", sentenceIndex: p.sentenceIndex ?? 0,
+  };
+}
+
+function resolveBoolDefaults(p: SentenceSynthesisItemProps) {
+  return {
+    draggable: p.draggable ?? false, isDragging: p.isDragging ?? false, isDragOver: p.isDragOver ?? false,
+    isPlaying: p.isPlaying ?? false, isLoading: p.isLoading ?? false,
+  };
+}
+
+function resolveDefaults(p: SentenceSynthesisItemProps) {
+  return { ...resolveArrayDefaults(p), ...resolveBoolDefaults(p) };
+}
+
+function ItemContent(p: SentenceSynthesisItemProps & { tags: string[]; currentInput: string; tagMenuItems: NonNullable<SentenceSynthesisItemProps["tagMenuItems"]>; sentenceIndex: number }): React.ReactElement {
+  if (p.mode === "input") {
+    return <TagsInput id={p.id} tags={p.tags} currentInput={p.currentInput} placeholder={p.placeholder} sentenceIndex={p.sentenceIndex}
+      selectedTagIndex={p.selectedTagIndex} isPronunciationPanelOpen={p.isPronunciationPanelOpen} allTagsSelected={p.allTagsSelected}
+      openTagMenu={p.openTagMenu} tagMenuItems={p.tagMenuItems} loadingTagIndex={p.loadingTagIndex} onTagMenuOpen={p.onTagMenuOpen} onTagMenuClose={p.onTagMenuClose}
+      editingTag={p.editingTag} onEditTagChange={p.onEditTagChange} onEditTagKeyDown={p.onEditTagKeyDown} onEditTagCommit={p.onEditTagCommit}
+      onInputChange={p.onInputChange} onInputKeyDown={p.onInputKeyDown} onInputBlur={p.onInputBlur} onClear={p.onClear} />;
+  }
+  if (p.mode === "tags") {
+    return <TagsList id={p.id} tags={p.tags} selectedTagIndex={p.selectedTagIndex} isPronunciationPanelOpen={p.isPronunciationPanelOpen} allTagsSelected={p.allTagsSelected} onTagClick={p.onTagClick} />;
+  }
+  return <div className="sentence-synthesis-item__content"><div className="sentence-synthesis-item__text-readonly">{p.text}</div></div>;
+}
+
+function ItemMenus({ p, d }: { p: SentenceSynthesisItemProps; d: ReturnType<typeof resolveDefaults> }) {
+  return (
+    <>
+      {p.onMenuOpen && d.rowMenuItems.length > 0 && p.onMenuClose && (
+        <RowMenu id={p.id} isOpen={p.openMenuId === p.id} items={d.rowMenuItems} onOpen={p.onMenuOpen} onClose={p.onMenuClose} data-onboarding-target={`sentence-${d.sentenceIndex}-menu`} />
+      )}
+      {p.onMenuOpenLegacy && (
+        <div className="sentence-synthesis-item__menu-container">
+          <button className="sentence-synthesis-item__menu-button" aria-label="Rohkem valikuid" onClick={(e) => p.onMenuOpenLegacy?.(e, p.id)} data-onboarding-target={`sentence-${d.sentenceIndex}-menu`}><MoreIcon size="2xl" /></button>
+          {p.menuContent}
+        </div>
+      )}
+    </>
+  );
+}
+
+function isPlayDisabled(p: SentenceSynthesisItemProps, d: ReturnType<typeof resolveDefaults>): boolean {
+  return d.isLoading || (p.mode === "input" && d.tags.length === 0 && !d.currentInput.trim());
+}
+
+function buildContainerCls(d: ReturnType<typeof resolveDefaults>): string {
+  return ["sentence-synthesis-item", d.isDragging && "sentence-synthesis-item--dragging", d.isDragOver && "sentence-synthesis-item--drag-over", d.className].filter(Boolean).join(" ");
+}
+
+function SentenceSynthesisItem(p: SentenceSynthesisItemProps): React.ReactElement {
+  const d = resolveDefaults(p);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleDragStartInternal = (e: React.DragEvent): void => {
-    if (containerRef.current) {
-      e.dataTransfer.setDragImage(
-        containerRef.current,
-        20,
-        containerRef.current.offsetHeight / 2,
-      );
-      setTimeout(() => {
-        if (containerRef.current) {
-          containerRef.current.style.opacity = "0.5";
-        }
-      }, 0);
-    }
-    if (onDragStart) {
-      onDragStart(e, id);
-    }
-  };
-
-  const handleDragEndInternal = (e: React.DragEvent): void => {
-    if (containerRef.current) {
-      containerRef.current.style.opacity = "1";
-    }
-    if (onDragEnd) {
-      onDragEnd(e);
-    }
-  };
-
-  const containerClasses = [
-    "sentence-synthesis-item",
-    isDragging && "sentence-synthesis-item--dragging",
-    isDragOver && "sentence-synthesis-item--drag-over",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const renderContent = (): React.ReactElement => {
-    switch (mode) {
-      case "input":
-        return (
-          <TagsInput
-            id={id}
-            tags={tags}
-            currentInput={currentInput}
-            placeholder={placeholder}
-            sentenceIndex={sentenceIndex}
-            selectedTagIndex={selectedTagIndex}
-            isPronunciationPanelOpen={isPronunciationPanelOpen}
-            allTagsSelected={allTagsSelected}
-            openTagMenu={openTagMenu}
-            tagMenuItems={tagMenuItems}
-            loadingTagIndex={loadingTagIndex}
-            onTagMenuOpen={onTagMenuOpen}
-            onTagMenuClose={onTagMenuClose}
-            editingTag={editingTag}
-            onEditTagChange={onEditTagChange}
-            onEditTagKeyDown={onEditTagKeyDown}
-            onEditTagCommit={onEditTagCommit}
-            onInputChange={onInputChange}
-            onInputKeyDown={onInputKeyDown}
-            onInputBlur={onInputBlur}
-            onClear={onClear}
-          />
-        );
-
-      case "tags":
-        return (
-          <TagsList
-            id={id}
-            tags={tags}
-            selectedTagIndex={selectedTagIndex}
-            isPronunciationPanelOpen={isPronunciationPanelOpen}
-            allTagsSelected={allTagsSelected}
-            onTagClick={onTagClick}
-          />
-        );
-
-      case "readonly":
-        return (
-          <div className="sentence-synthesis-item__content">
-            <div className="sentence-synthesis-item__text-readonly">{text}</div>
-          </div>
-        );
-    }
-  };
+  const onDragStartInt = useDragStartHandler(containerRef, p.onDragStart, p.id);
+  const onDragEndInt = useDragEndHandler(containerRef, p.onDragEnd);
 
   return (
-    <div
-      ref={containerRef}
-      className={containerClasses}
-      onDragOver={onDragOver ? (e) => onDragOver(e, id) : undefined}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop ? (e) => onDrop(e, id) : undefined}
-    >
-      {draggable && mode !== "readonly" && (
-        <div
-          className="sentence-synthesis-item__drag-handle"
-          role="button"
-          tabIndex={0}
-          draggable
-          onDragStart={handleDragStartInternal}
-          onDragEnd={handleDragEndInternal}
-          aria-label="Lohista järjestamiseks"
-        >
-          <DragHandleIcon size="2xl" />
-        </div>
+    <div ref={containerRef} className={buildContainerCls(d)} onDragOver={p.onDragOver ? (e) => p.onDragOver?.(e, p.id) : undefined} onDragLeave={p.onDragLeave} onDrop={p.onDrop ? (e) => p.onDrop?.(e, p.id) : undefined}>
+      {d.draggable && p.mode !== "readonly" && (
+        <div className="sentence-synthesis-item__drag-handle" role="button" tabIndex={0} draggable onDragStart={onDragStartInt} onDragEnd={onDragEndInt} aria-label="Lohista järjestamiseks"><DragHandleIcon size="2xl" /></div>
       )}
-
-      {renderContent()}
-
-      <PlayButton
-        isPlaying={isPlaying}
-        isLoading={isLoading}
-        disabled={
-          isLoading ||
-          (mode === "input" && tags.length === 0 && !currentInput.trim())
-        }
-        onClick={() => onPlay(id)}
-        data-onboarding-target={`sentence-${sentenceIndex}-play`}
-      />
-
-      {onMenuOpen && rowMenuItems.length > 0 && onMenuClose && (
-        <RowMenu
-          id={id}
-          isOpen={openMenuId === id}
-          items={rowMenuItems}
-          onOpen={onMenuOpen}
-          onClose={onMenuClose}
-          data-onboarding-target={`sentence-${sentenceIndex}-menu`}
-        />
-      )}
-
-      {onMenuOpenLegacy && (
-        <div className="sentence-synthesis-item__menu-container">
-          <button
-            className="sentence-synthesis-item__menu-button"
-            aria-label="Rohkem valikuid"
-            onClick={(e) => onMenuOpenLegacy(e, id)}
-            data-onboarding-target={`sentence-${sentenceIndex}-menu`}
-          >
-            <MoreIcon size="2xl" />
-          </button>
-          {menuContent}
-        </div>
-      )}
+      <ItemContent {...p} tags={d.tags} currentInput={d.currentInput} tagMenuItems={d.tagMenuItems} sentenceIndex={d.sentenceIndex} />
+      <PlayButton isPlaying={d.isPlaying} isLoading={d.isLoading} disabled={isPlayDisabled(p, d)} onClick={() => p.onPlay(p.id)} data-onboarding-target={`sentence-${d.sentenceIndex}-play`} />
+      <ItemMenus p={p} d={d} />
     </div>
   );
 }

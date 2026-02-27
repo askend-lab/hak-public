@@ -14,11 +14,11 @@ import { parseJsonBody, getFieldError } from "../src/validation";
 
 describe("Module smoke tests", () => {
   it("buildDescription returns default for empty inputs", () => {
-    expect(buildDescription("", "", "", "word")).toBe("tavaline");
+    expect(buildDescription({ lemma: "", pos: "", fs: "" }, "word")).toBe("tavaline");
   });
 
   it("buildDescription includes POS label for known part of speech", () => {
-    expect(buildDescription("koer", "S", "", "koer")).toContain("nimisõna");
+    expect(buildDescription({ lemma: "koer", pos: "S", fs: "" }, "koer")).toContain("nimisõna");
   });
 
   it("healthHandler returns valid JSON with status and version", () => {

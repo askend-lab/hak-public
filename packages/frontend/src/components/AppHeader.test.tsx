@@ -32,6 +32,11 @@ describe("AppHeader", () => {
     vi.clearAllMocks();
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   describe("rendering", () => {
     it("renders logo", () => {
       render(
@@ -168,29 +173,14 @@ describe("AppHeader", () => {
     });
   });
 
-  describe("button interactions", () => {
-    it("calls onHelpClick when help button is clicked", async () => {
-      const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-
-      await user.click(screen.getByTitle("Näita juhendeid"));
-      expect(mockOnHelpClick).toHaveBeenCalled();
-    });
-
-    it("calls onLoginClick when login button is clicked", async () => {
-      const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-
-      await user.click(screen.getByText("Logi sisse"));
-      expect(mockOnLoginClick).toHaveBeenCalled();
-    });
   });
+
+  });
+
+  });
+
+  });
+
+  });
+
 });

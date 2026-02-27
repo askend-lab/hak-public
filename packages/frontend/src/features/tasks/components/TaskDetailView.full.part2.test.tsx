@@ -1,0 +1,163 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import TaskDetailView from "./TaskDetailView";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
+
+vi.mock("@/features/auth/services", () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: "user-1", name: "Test" },
+    isAuthenticated: true,
+  })),
+}));
+
+vi.mock("@/contexts/NotificationContext", () => ({
+  useNotification: vi.fn(() => ({ showNotification: vi.fn() })),
+}));
+vi.mock("@/contexts/CopiedEntriesContext", () => ({
+  useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
+}));
+
+vi.mock("@/features/synthesis/utils/synthesize", () => ({
+  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+}));
+
+const mockTask = {
+  id: "task-1",
+  name: "Test Task",
+  description: "Description",
+  shareToken: "token-1",
+  entries: [
+    {
+      id: "e1",
+      text: "Entry 1",
+      stressedText: "Entry 1",
+      order: 0,
+      audioUrl: null,
+    },
+    {
+      id: "e2",
+      text: "Entry 2",
+      stressedText: "Entry 2",
+      order: 1,
+      audioUrl: null,
+    },
+  ],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const mockGetTask = vi.fn().mockResolvedValue(mockTask);
+const mockUpdateTaskEntry = vi.fn().mockResolvedValue({});
+const mockShareUserTask = vi.fn().mockResolvedValue({});
+const mockDS = createMockDataService({
+  getTask: mockGetTask,
+  updateTaskEntry: mockUpdateTaskEntry,
+  shareUserTask: mockShareUserTask,
+  deleteTaskEntry: vi.fn().mockResolvedValue({}),
+} as never);
+const dsWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper>;
+
+describe("TaskDetailView Full", () => {
+  const props = {
+    taskId: "task-1",
+    onBack: vi.fn(),
+    onEditTask: vi.fn(),
+    onDeleteTask: vi.fn(),
+    onNavigateToSynthesis: vi.fn(),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetTask.mockResolvedValue(mockTask);
+    class MockAudio {
+      src = "";
+      onended: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      onloadeddata: (() => void) | null = null;
+      pause = vi.fn();
+      play = vi.fn().mockImplementation(() => {
+        setTimeout(() => this.onended?.(), 10);
+        return Promise.resolve();
+      });
+    }
+    global.Audio = MockAudio as unknown as typeof Audio;
+    global.URL.createObjectURL = vi.fn(() => "blob-url");
+    global.URL.revokeObjectURL = vi.fn();
+  });
+
+  it("handles multiple entries correctly", async () => {
+    const taskWithMany = {
+      ...mockTask,
+      entries: [
+        {
+          id: "e1",
+          text: "First",
+          stressedText: "First",
+          order: 0,
+          audioUrl: null,
+        },
+        {
+          id: "e2",
+          text: "Second",
+          stressedText: "Second",
+          order: 1,
+          audioUrl: null,
+        },
+        {
+          id: "e3",
+          text: "Third",
+          stressedText: "Third",
+          order: 2,
+          audioUrl: null,
+        },
+      ],
+    };
+    mockGetTask.mockResolvedValue(taskWithMany);
+    render(<TaskDetailView {...props} />, { wrapper: dsWrapper });
+    await waitFor(() => {
+      expect(screen.getByText("First")).toBeInTheDocument();
+      expect(screen.getByText("Second")).toBeInTheDocument();
+      expect(screen.getByText("Third")).toBeInTheDocument();
+    });
+  });
+
+  it("renders shareToken in task", async () => {
+    render(<TaskDetailView {...props} />, { wrapper: dsWrapper });
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
+    expect(mockGetTask).toHaveBeenCalledWith("task-1");
+  });
+
+  it("handles task refresh", async () => {
+    const { rerender } = render(<TaskDetailView {...props} />, { wrapper: dsWrapper });
+    await waitFor(() =>
+      expect(screen.getByText("Test Task")).toBeInTheDocument(),
+    );
+    rerender(<TaskDetailView {...props} taskId="task-2" />);
+    await waitFor(() =>
+      expect(mockGetTask).toHaveBeenCalledWith("task-2"),
+    );
+  });
+
+  it("loads task with dynamically generated ID (e.g. task_timestamp_random)", async () => {
+    // RED TEST: Bug - navigation to task with generated ID fails
+    // URL pattern: /tasks/task_1769185807640_wublowec
+    const dynamicTaskId = "task_1769185807640_wublowec";
+    const dynamicTask = { ...mockTask, id: dynamicTaskId };
+    mockGetTask.mockResolvedValue(dynamicTask);
+
+    render(<TaskDetailView {...props} taskId={dynamicTaskId} />, { wrapper: dsWrapper });
+
+    await waitFor(() => {
+      expect(mockGetTask).toHaveBeenCalledWith(dynamicTaskId);
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Test Task")).toBeInTheDocument();
+    });
+  });
+
+});

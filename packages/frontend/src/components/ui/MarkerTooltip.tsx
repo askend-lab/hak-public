@@ -22,103 +22,45 @@ interface MarkerTooltipProps {
  * Positioned below button to avoid covering input fields
  * Alignment adjusts based on button position to stay within panel
  */
-export default function MarkerTooltip({
-  marker,
-  children,
-  align = "center",
-}: MarkerTooltipProps) {
+function useTooltipVisibility() {
   const [isVisible, setIsVisible] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Detect touch device on mount
-  useEffect(() => {
-    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
-  }, []);
-
-  // Clear timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Handle click outside for touch devices
+  useEffect(() => { setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0); }, []);
+  useEffect(() => () => { if (hideTimeoutRef.current) { clearTimeout(hideTimeoutRef.current); } }, []);
   useEffect(() => {
     if (!isTouchDevice || !isVisible) {return;}
-
-    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target as Node)
-      ) {
-        setIsVisible(false);
-      }
+    const handler = (e: MouseEvent | TouchEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) { setIsVisible(false); }
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler);
+    return () => { document.removeEventListener("mousedown", handler); document.removeEventListener("touchstart", handler); };
   }, [isTouchDevice, isVisible]);
 
   const showTooltip = useCallback(() => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
-    }
+    if (hideTimeoutRef.current) { clearTimeout(hideTimeoutRef.current); hideTimeoutRef.current = null; }
     setIsVisible(true);
   }, []);
+  const hideTooltip = useCallback(() => { hideTimeoutRef.current = setTimeout(() => { setIsVisible(false); }, 100); }, []);
 
-  const hideTooltip = useCallback(() => {
-    // Small delay before hiding to allow moving to the tooltip
-    hideTimeoutRef.current = setTimeout(() => {
-      setIsVisible(false);
-    }, 100);
-  }, []);
+  return { isVisible, setIsVisible, isTouchDevice, wrapperRef, hideTimeoutRef, showTooltip, hideTooltip };
+}
 
-  const handleMouseEnter = () => {
-    if (!isTouchDevice) {
-      showTooltip();
-    }
-  };
+export default function MarkerTooltip({
+  marker,
+  children,
+  align = "center",
+}: MarkerTooltipProps) {
+  const { isVisible, setIsVisible, isTouchDevice, wrapperRef, hideTimeoutRef, showTooltip, hideTooltip } = useTooltipVisibility();
 
-  const handleMouseLeave = () => {
-    if (!isTouchDevice) {
-      hideTooltip();
-    }
-  };
-
-  const handleTooltipMouseEnter = () => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
-    }
-  };
-
-  const handleTooltipMouseLeave = () => {
-    hideTooltip();
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (isTouchDevice) {
-      e.preventDefault();
-      setIsVisible((prev) => !prev);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape" && isVisible) {
-      setIsVisible(false);
-    }
-  };
-
+  const handleMouseEnter = isTouchDevice ? undefined : showTooltip;
+  const handleMouseLeave = isTouchDevice ? undefined : hideTooltip;
+  const handleTooltipMouseEnter = () => { if (hideTimeoutRef.current) {clearTimeout(hideTimeoutRef.current); hideTimeoutRef.current = null;} };
+  const handleTouchStart = (e: React.TouchEvent) => { if (isTouchDevice) {e.preventDefault(); setIsVisible((prev) => !prev);} };
+  const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Escape" && isVisible) {setIsVisible(false);} };
   const tooltipClassName = `marker-tooltip marker-tooltip--align-${align}`;
 
   return (
@@ -140,7 +82,7 @@ export default function MarkerTooltip({
         >
           <div
             onMouseEnter={handleTooltipMouseEnter}
-            onMouseLeave={handleTooltipMouseLeave}
+            onMouseLeave={hideTooltip}
           >
           <div className="marker-tooltip__arrow" />
           <div className="marker-tooltip__content">

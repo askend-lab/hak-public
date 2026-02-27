@@ -29,125 +29,58 @@ interface TasksViewProps {
   onNavigateToSynthesis: () => void;
 }
 
-export default function TasksView({
-  selectedTaskId,
-  taskRefreshTrigger,
-  onBack,
-  onViewTask,
-  onCreateTask,
-  onEditTask,
-  onDeleteTask,
-  onShareTask,
-  onNavigateToSynthesis,
-}: TasksViewProps) {
+function TaskEmptyState({ onCreateTask }: { onCreateTask: () => void }) {
+  return (
+    <div className="page-content page-content--empty">
+      <div className="empty-state">
+        <img className="empty-state__icon" src="/icons/avatar_task_empty.png" alt="" />
+        <h2 className="empty-state__title">Ülesanded puuduvad</h2>
+        <p className="empty-state__description">Sul pole veel ühtegi ülesannet. Alusta uue ülesande loomisega!</p>
+        <button className="empty-state__action button button--primary" onClick={onCreateTask}><AddIcon size="2xl" />Loo esimene ülesanne</button>
+      </div>
+    </div>
+  );
+}
+
+function useTaskActions(onEditTask: (t: Task) => void, onShareTask: (t: Task) => void) {
   const { user } = useAuth();
   const dataService = useDataService();
+  const handleEdit = async (taskId: string) => {
+    if (!user) {return;}
+    try {
+      const task = await dataService.getTask(taskId);
+      if (task) { onEditTask({ id: task.id, name: task.name, ...(task.description && { description: task.description }) }); }
+    } catch (e) { logger.error("Failed to fetch task for editing:", e); }
+  };
+  const handleShare = async (taskId: string) => {
+    if (!user) {return;}
+    try {
+      const task = await dataService.getTask(taskId);
+      if (task) { onShareTask({ id: task.id, name: task.name, ...(task.description && { description: task.description }), ...(task.shareToken && { shareToken: task.shareToken }) }); }
+    } catch (e) { logger.error("Failed to fetch task for sharing:", e); }
+  };
+  return { handleEdit, handleShare };
+}
+
+export default function TasksView({ selectedTaskId, taskRefreshTrigger, onBack, onViewTask, onCreateTask, onEditTask, onDeleteTask, onShareTask, onNavigateToSynthesis }: TasksViewProps) {
   const { tasks, isLoading, error, isEmpty } = useUserTasks(taskRefreshTrigger);
-
-  const handleEditTask = async (taskId: string) => {
-    if (!user) {return;}
-    try {
-      const task = await dataService.getTask(taskId);
-      if (task) {
-        const taskData: Task = { id: task.id, name: task.name };
-        if (task.description) {taskData.description = task.description;}
-        onEditTask(taskData);
-      }
-    } catch (error) {
-      logger.error("Failed to fetch task for editing:", error);
-    }
-  };
-
-  const handleShareTask = async (taskId: string) => {
-    if (!user) {return;}
-    try {
-      const task = await dataService.getTask(taskId);
-      if (task) {
-        const taskData: Task = { id: task.id, name: task.name };
-        if (task.description) {taskData.description = task.description;}
-        if (task.shareToken) {taskData.shareToken = task.shareToken;}
-        onShareTask(taskData);
-      }
-    } catch (error) {
-      logger.error("Failed to fetch task for sharing:", error);
-    }
-  };
-
-  // Task detail view
+  const actions = useTaskActions(onEditTask, onShareTask);
   if (selectedTaskId) {
-    return (
-      <div className="page-content">
-        <TaskDetailView
-          taskId={selectedTaskId}
-          onBack={onBack}
-          onEditTask={(...args: Parameters<typeof handleEditTask>) => { void handleEditTask(...args); }}
-          onDeleteTask={onDeleteTask}
-          onNavigateToSynthesis={onNavigateToSynthesis}
-        />
-      </div>
-    );
+    return <div className="page-content"><TaskDetailView taskId={selectedTaskId} onBack={onBack}
+      onEditTask={(...a: Parameters<typeof actions.handleEdit>) => { void actions.handleEdit(...a); }} onDeleteTask={onDeleteTask} onNavigateToSynthesis={onNavigateToSynthesis} /></div>;
   }
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="page-content page-content--empty">
-        <PageLoadingState message="Laen ülesandeid..." />
-      </div>
-    );
-  }
-
-  // Layout Type 4: Empty State (no header, centered content)
-  if (isEmpty) {
-    return (
-      <div className="page-content page-content--empty">
-        <div className="empty-state">
-          <img
-            className="empty-state__icon"
-            src="/icons/avatar_task_empty.png"
-            alt=""
-          />
-          <h2 className="empty-state__title">Ülesanded puuduvad</h2>
-          <p className="empty-state__description">
-            Sul pole veel ühtegi ülesannet. Alusta uue ülesande loomisega!
-          </p>
-          <button
-            className="empty-state__action button button--primary"
-            onClick={() => { void onCreateTask(); }}
-          >
-            <AddIcon size="2xl" />
-            Loo esimene ülesanne
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Layout Type 3: With Actions (header + task list)
+  if (isLoading) { return <div className="page-content page-content--empty"><PageLoadingState message="Laen ülesandeid..." /></div>; }
+  if (isEmpty) { return <TaskEmptyState onCreateTask={onCreateTask} />; }
   return (
     <>
       <div className="page-header page-header--with-actions">
         <h1 className="page-header__title">Ülesanded</h1>
-        <div className="page-header__actions">
-          <button onClick={() => { void onCreateTask(); }} className="button button--primary">
-            <AddIcon size="2xl" />
-            Loo uus ülesanne
-          </button>
-        </div>
+        <div className="page-header__actions"><button onClick={onCreateTask} className="button button--primary"><AddIcon size="2xl" />Loo uus ülesanne</button></div>
       </div>
       <div className="page-content">
-        {error && (
-          <div className="task-manager__error">
-            <p>Viga ülesannete laadimisel: {error}</p>
-          </div>
-        )}
-        <TaskManager
-          tasks={tasks}
-          onEditTask={(...args: Parameters<typeof handleEditTask>) => { void handleEditTask(...args); }}
-          onViewTask={onViewTask}
-          onDeleteTask={onDeleteTask}
-          onShareTask={(...args: Parameters<typeof handleShareTask>) => { void handleShareTask(...args); }}
-        />
+        {error && <div className="task-manager__error"><p>Viga ülesannete laadimisel: {error}</p></div>}
+        <TaskManager tasks={tasks} onEditTask={(...a: Parameters<typeof actions.handleEdit>) => { void actions.handleEdit(...a); }}
+          onViewTask={onViewTask} onDeleteTask={onDeleteTask} onShareTask={(...a: Parameters<typeof actions.handleShare>) => { void actions.handleShare(...a); }} />
       </div>
     </>
   );

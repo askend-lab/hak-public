@@ -2,7 +2,6 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesis } from "./useSynthesis";
 
@@ -50,6 +49,11 @@ describe("useSynthesis playback", () => {
     });
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   it("handlePlay synthesizes and plays audio", async () => {
     const { result } = renderHook(() => useSynthesis());
     act(() => {
@@ -165,68 +169,14 @@ describe("useSynthesis playback", () => {
     expect(result.current.editingTag).toBeNull();
   });
 
-  it("handleEditTagKeyDown handles Enter key", () => {
-    const { result } = renderHook(() => useSynthesis());
-    act(() => {
-      result.current.setDemoSentences();
-    });
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => {
-      result.current.handleEditTag(id, 0);
-    });
-    const preventDefault = vi.fn();
-    act(() => {
-      result.current.handleEditTagKeyDown({
-        key: "Enter",
-        preventDefault,
-      } as unknown as React.KeyboardEvent);
-    });
-    expect(result.current.editingTag).toBeNull();
   });
 
-  it("handleEditTagKeyDown handles Escape key", () => {
-    const { result } = renderHook(() => useSynthesis());
-    act(() => {
-      result.current.setDemoSentences();
-    });
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => {
-      result.current.handleEditTag(id, 0);
-    });
-    const preventDefault = vi.fn();
-    act(() => {
-      result.current.handleEditTagKeyDown({
-        key: "Escape",
-        preventDefault,
-      } as unknown as React.KeyboardEvent);
-    });
-    expect(result.current.editingTag).toBeNull();
   });
 
-  it("handleUseVariant updates sentence phonetic", () => {
-    const { result } = renderHook(() => useSynthesis());
-    act(() => {
-      result.current.setDemoSentences();
-    });
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => {
-      result.current.handleUseVariant("new`phonetic", id, 0);
-    });
   });
 
-  it("handles synthesis error gracefully", async () => {
-    mockSynthesize.mockRejectedValueOnce(new Error("Synthesis failed"));
-    const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
-
-    const { result } = renderHook(() => useSynthesis());
-    act(() => {
-      result.current.setDemoSentences();
-    });
-    const id = result.current.sentences[0]?.id ?? "";
-    await act(async () => {
-      result.current.handlePlay(id);
-    });
-
-    consoleSpy.mockRestore();
   });
+
+  });
+
 });

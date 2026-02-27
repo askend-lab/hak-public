@@ -21,32 +21,28 @@ export class CognitoClient {
     this.client = new CognitoIdentityProviderClient({ region: config.region });
   }
 
-  async findOrCreateUser(taraIdToken: TaraIdToken): Promise<string> {
-    const personalCode = taraIdToken.sub;
-
-    // Validate personal code format to prevent Cognito filter injection
-    if (!/^[A-Z]{2}\d{11}$/.test(personalCode)) {
+  private validatePersonalCode(code: string): void {
+    if (!/^[A-Z]{2}\d{11}$/.test(code)) {
       logger.error('Invalid personal code format');
       throw new Error('Invalid personal code format');
     }
+  }
 
-    // 1. Try to find user by personal_code custom attribute
-    let username = await this.findUserByPersonalCode(personalCode);
+  private async findByEmailAndLink(taraIdToken: TaraIdToken): Promise<string | null> {
+    if (!taraIdToken.email) {return null;}
+    const username = await this.findUserByEmail(taraIdToken.email);
     if (username) {
-      return username;
+      await this.updatePersonalCode(username, taraIdToken.sub);
     }
+    return username;
+  }
 
-    // 2. Try to find by email if provided
-    if (taraIdToken.email) {
-      username = await this.findUserByEmail(taraIdToken.email);
-      if (username) {
-        // Link TARA to existing account by adding personal_code
-        await this.updatePersonalCode(username, personalCode);
-        return username;
-      }
-    }
-
-    // 3. Create new user
+  async findOrCreateUser(taraIdToken: TaraIdToken): Promise<string> {
+    this.validatePersonalCode(taraIdToken.sub);
+    const byCode = await this.findUserByPersonalCode(taraIdToken.sub);
+    if (byCode) {return byCode;}
+    const byEmail = await this.findByEmailAndLink(taraIdToken);
+    if (byEmail) {return byEmail;}
     return this.createUser(taraIdToken);
   }
 
@@ -138,60 +134,44 @@ export class CognitoClient {
     return username;
   }
 
-  async generateTokens(username: string): Promise<CognitoTokens> {
-    // Use CUSTOM_AUTH flow - no passwords needed
-    // TARA Lambda has already verified user identity via TARA
-    // Cognito triggers will complete the auth flow
-    
-    const initiateCommand = new AdminInitiateAuthCommand({
+  private async initiateCustomAuth(username: string): Promise<string> {
+    const response = await this.client.send(new AdminInitiateAuthCommand({
       UserPoolId: this.config.userPoolId,
       ClientId: this.config.clientId,
       AuthFlow: 'CUSTOM_AUTH' as const,
-      AuthParameters: {
-        USERNAME: username,
-      },
-    });
+      AuthParameters: { USERNAME: username },
+    }));
+    if (!response.ChallengeName) {
+      throw new Error('Expected CUSTOM_CHALLENGE from Cognito');
+    }
+    return response.Session as string;
+  }
 
+  private async respondToChallenge(username: string, session: string): Promise<CognitoTokens> {
+    const response = await this.client.send(new AdminRespondToAuthChallengeCommand({
+      UserPoolId: this.config.userPoolId,
+      ClientId: this.config.clientId,
+      ChallengeName: CUSTOM_CHALLENGE,
+      Session: session,
+      ChallengeResponses: { USERNAME: username, ANSWER: TARA_VERIFIED },
+    }));
+    if (!response.AuthenticationResult) {
+      throw new Error('No authentication result from Cognito');
+    }
+    const { AccessToken, IdToken, RefreshToken, ExpiresIn } = response.AuthenticationResult;
+    if (!AccessToken || !IdToken || !RefreshToken) {
+      throw new Error('Cognito returned incomplete tokens');
+    }
+    return { accessToken: AccessToken, idToken: IdToken, refreshToken: RefreshToken, expiresIn: ExpiresIn || DEFAULT_EXPIRES_IN };
+  }
+
+  async generateTokens(username: string): Promise<CognitoTokens> {
     try {
-      const initiateResponse = await this.client.send(initiateCommand);
-      
-      if (!initiateResponse.ChallengeName) {
-        throw new Error('Expected CUSTOM_CHALLENGE from Cognito');
-      }
-
-      // Respond to the custom challenge with TARA_VERIFIED
-      // This tells the Cognito trigger that TARA authentication succeeded
-      const respondCommand = new AdminRespondToAuthChallengeCommand({
-        UserPoolId: this.config.userPoolId,
-        ClientId: this.config.clientId,
-        ChallengeName: CUSTOM_CHALLENGE,
-        Session: initiateResponse.Session,
-        ChallengeResponses: {
-          USERNAME: username,
-          ANSWER: TARA_VERIFIED,
-        },
-      });
-
-      const authResponse = await this.client.send(respondCommand);
-
-      if (!authResponse.AuthenticationResult) {
-        throw new Error('No authentication result from Cognito');
-      }
-
-      const { AccessToken, IdToken, RefreshToken, ExpiresIn } = authResponse.AuthenticationResult;
-      if (!AccessToken || !IdToken || !RefreshToken) {
-        throw new Error('Cognito returned incomplete tokens');
-      }
-      return {
-        accessToken: AccessToken,
-        idToken: IdToken,
-        refreshToken: RefreshToken,
-        expiresIn: ExpiresIn || DEFAULT_EXPIRES_IN,
-      };
+      const session = await this.initiateCustomAuth(username);
+      return await this.respondToChallenge(username, session);
     } catch (error) {
       logger.error('Cognito token generation failed', extractErrorMessage(error));
-      const msg = extractErrorMessage(error);
-      const wrapped = new Error(`Token generation failed: ${msg}`);
+      const wrapped = new Error(`Token generation failed: ${extractErrorMessage(error)}`);
       (wrapped as unknown as Record<string, unknown>).cause = error;
       throw wrapped;
     }

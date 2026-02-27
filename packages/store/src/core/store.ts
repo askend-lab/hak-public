@@ -54,7 +54,7 @@ function buildSortKey(
 /**
  * Builds complete PK/SK pair for DynamoDB operations
  */
-function buildKeys(
+function buildKeys( // eslint-disable-line max-params -- mirrors DynamoDB key structure
   context: ServerContext,
   type: DataType,
   entityPk: string,
@@ -142,24 +142,9 @@ export class Store {
 
     return this.wrapAsync(async () => {
       if (this.adapter.conditionalDelete) {
-        const result = await this.adapter.conditionalDelete(keys.pk, keys.sk, this.context.userId);
-        if (result === "not_found") {return { success: false, error: ERRORS.NOT_FOUND };}
-        if (result === "not_owner") {return { success: false, error: ERRORS.ACCESS_DENIED };}
-        return { success: true };
+        return this.handleConditionalDelete(keys);
       }
-
-      const existing = await this.adapter.get(keys.pk, keys.sk);
-
-      if (!existing) {
-        return { success: false, error: ERRORS.NOT_FOUND };
-      }
-
-      if (!this.isOwner(existing)) {
-        return { success: false, error: ERRORS.ACCESS_DENIED };
-      }
-
-      await this.adapter.delete(keys.pk, keys.sk);
-      return { success: true };
+      return this.handleFallbackDelete(keys);
     });
   }
 
@@ -196,6 +181,26 @@ export class Store {
       logger.error("[SimpleStore] Operation failed:", error);
       return { success: false, error: extractErrorMessage(error, "Unknown error") };
     }
+  }
+
+  private async handleConditionalDelete(
+    keys: { pk: string; sk: string },
+  ): Promise<StoreResult> {
+    if (!this.adapter.conditionalDelete) {throw new Error("conditionalDelete not available");}
+    const result = await this.adapter.conditionalDelete(keys.pk, keys.sk, this.context.userId);
+    if (result === "not_found") {return { success: false, error: ERRORS.NOT_FOUND };}
+    if (result === "not_owner") {return { success: false, error: ERRORS.ACCESS_DENIED };}
+    return { success: true };
+  }
+
+  private async handleFallbackDelete(
+    keys: { pk: string; sk: string },
+  ): Promise<StoreResult> {
+    const existing = await this.adapter.get(keys.pk, keys.sk);
+    if (!existing) {return { success: false, error: ERRORS.NOT_FOUND };}
+    if (!this.isOwner(existing)) {return { success: false, error: ERRORS.ACCESS_DENIED };}
+    await this.adapter.delete(keys.pk, keys.sk);
+    return { success: true };
   }
 
   private calculateTtl(ttlSeconds: number): number {

@@ -50,118 +50,78 @@ const ModalHeader = ({
   </div>
 );
 
-export default function BaseModal({
-  isOpen,
-  onClose,
-  title,
-  showCloseButton = true,
-  size = "medium",
-  children,
-  className = "",
-  headerClassName = "",
-  contentClassName = "",
-  preventBackdropClose = false,
-}: BaseModalProps) {
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function getFocusBoundary(modalRef: React.RefObject<HTMLDivElement | null>): { first: HTMLElement; last: HTMLElement } | null {
+  if (!modalRef.current) {return null;}
+  const els = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+  const first = els[0];
+  const last = els[els.length - 1];
+  return first && last ? { first, last } : null;
+}
+
+function handleTabTrap(e: KeyboardEvent, modalRef: React.RefObject<HTMLDivElement | null>): void {
+  if (e.key !== "Tab") {return;}
+  const bounds = getFocusBoundary(modalRef);
+  if (!bounds) {return;}
+  if (e.shiftKey && document.activeElement === bounds.first) { e.preventDefault(); bounds.last.focus(); }
+  else if (!e.shiftKey && document.activeElement === bounds.last) { e.preventDefault(); bounds.first.focus(); }
+}
+
+function useModalFocusTrap(isOpen: boolean, onClose: () => void) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
-  const titleId = useId();
-
-  // Keep the onClose ref updated to avoid stale closures
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  }, [onClose]);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) {return;}
-
-    // Store the previously focused element
     previousFocusRef.current = document.activeElement as HTMLElement;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {onCloseRef.current();}
-    };
-
-    // Focus trap - keep focus within modal
-    const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== "Tab" || !modalRef.current) {return;}
-
-      const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
-
-      if (focusableElements.length === 0) {return;}
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-
-      if (!firstElement || !lastElement) {return;}
-
-      if (e.shiftKey && document.activeElement === firstElement) {
-        e.preventDefault();
-        lastElement.focus();
-      } else if (!e.shiftKey && document.activeElement === lastElement) {
-        e.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    document.addEventListener("keydown", handleTabKey);
-    const previousOverflow = document.body.style.overflow;
+    const onEsc = (e: KeyboardEvent) => { if (e.key === "Escape") {onCloseRef.current();} };
+    const onTab = (e: KeyboardEvent) => { handleTabTrap(e, modalRef); };
+    document.addEventListener("keydown", onEsc);
+    document.addEventListener("keydown", onTab);
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
-    // Focus the modal or first focusable element
-    requestAnimationFrame(() => {
-      const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
-      firstFocusable?.focus();
-    });
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.removeEventListener("keydown", handleTabKey);
-      document.body.style.overflow = previousOverflow;
-
-      // Restore focus to previously focused element
-      previousFocusRef.current?.focus();
-    };
+    requestAnimationFrame(() => { modalRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus(); });
+    return () => { document.removeEventListener("keydown", onEsc); document.removeEventListener("keydown", onTab); document.body.style.overflow = prev; previousFocusRef.current?.focus(); };
   }, [isOpen]);
 
-  if (!isOpen) {return null;}
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (!preventBackdropClose && e.target === e.currentTarget) {onClose();}
-  };
-  const modalClasses = `base-modal base-modal--${size} ${className}`.trim();
+  return modalRef;
+}
 
+function resolveModalDefaults(props: BaseModalProps) {
+  return {
+    showCloseButton: props.showCloseButton ?? true,
+    size: props.size ?? "medium",
+    className: props.className ?? "",
+    headerClassName: props.headerClassName ?? "",
+    contentClassName: props.contentClassName ?? "",
+  };
+}
+
+function ModalBody({ modalRef, props, titleId }: { modalRef: React.RefObject<HTMLDivElement | null>; props: BaseModalProps; titleId: string }) {
+  const d = resolveModalDefaults(props);
+  const showHeader = props.title !== null || d.showCloseButton;
+  const labelledBy = props.title ? titleId : undefined;
+  return (
+    <div ref={modalRef} className={`base-modal base-modal--${d.size} ${d.className}`.trim()} role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
+      {showHeader && <ModalHeader title={props.title} showCloseButton={d.showCloseButton} onClose={props.onClose} headerClasses={`base-modal__header ${d.headerClassName}`.trim()} titleId={titleId} />}
+      <div className={`base-modal__content ${d.contentClassName}`.trim()}>{props.children}</div>
+    </div>
+  );
+}
+
+export default function BaseModal(props: BaseModalProps) {
+  const { isOpen, onClose, preventBackdropClose = false } = props;
+  const modalRef = useModalFocusTrap(isOpen, onClose);
+  const titleId = useId();
+  if (!isOpen) {return null;}
+  const onBackdrop = (e: React.MouseEvent) => { if (!preventBackdropClose && e.target === e.currentTarget) {onClose();} };
   return (
     <>
-      <div
-        className="base-modal__backdrop"
-        onClick={handleBackdropClick}
-        aria-hidden="true"
-      />
-      <div
-        ref={modalRef}
-        className={modalClasses}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
-      >
-        {(title !== null || showCloseButton) && (
-          <ModalHeader
-            title={title}
-            showCloseButton={showCloseButton}
-            onClose={onClose}
-            headerClasses={`base-modal__header ${headerClassName}`.trim()}
-            titleId={titleId}
-          />
-        )}
-        <div className={`base-modal__content ${contentClassName}`.trim()}>
-          {children}
-        </div>
-      </div>
+      <div className="base-modal__backdrop" onClick={onBackdrop} aria-hidden="true" />
+      <ModalBody modalRef={modalRef} props={props} titleId={titleId} />
     </>
   );
 }

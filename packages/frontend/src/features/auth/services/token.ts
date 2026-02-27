@@ -27,26 +27,24 @@ interface ParseIdTokenOptions {
  *
  * When expectedIssuer/expectedAudience are provided, rejects tokens from other pools/apps.
  */
-export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): User | null { // eslint-disable-line complexity -- token validation has many conditional checks
+function hasRequiredClaims(payload: Record<string, unknown>): boolean {
+  if (!payload.sub || typeof payload.sub !== "string") {return false;}
+  if (payload.exp && Date.now() / 1000 > (payload.exp as number)) {return false;}
+  return typeof payload.email === "string";
+}
+
+function matchesExpected(payload: Record<string, unknown>, options?: ParseIdTokenOptions): boolean {
+  if (options?.expectedIssuer && payload.iss !== options.expectedIssuer) {return false;}
+  if (options?.expectedAudience && payload.aud !== options.expectedAudience) {return false;}
+  return true;
+}
+
+export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): User | null {
   const payload = decodeJwtPayload(idToken);
-  if (!payload) {return null;}
-
-  // Validate required claims
-  if (!payload.sub || typeof payload.sub !== "string") {return null;}
-  if (payload.exp && Date.now() / 1000 > (payload.exp as number)) {return null;}
-
-  // Validate issuer (Cognito User Pool URL)
-  if (options?.expectedIssuer && payload.iss !== options.expectedIssuer) {return null;}
-
-  // Validate audience (Cognito Client ID)
-  if (options?.expectedAudience && payload.aud !== options.expectedAudience) {return null;}
-
-  const email = typeof payload.email === "string" ? payload.email : undefined;
-  if (!email) {return null;}
-
+  if (!payload || !hasRequiredClaims(payload) || !matchesExpected(payload, options)) {return null;}
+  const email = payload.email as string;
   return {
-    id: payload.sub,
-    email,
+    id: payload.sub as string, email,
     name: typeof payload.name === "string" ? payload.name : (email.split("@")[0] ?? email),
   };
 }

@@ -16,15 +16,17 @@ const POS_MAP: Record<string, string> = {
   Y: "lühend",
 };
 
-export function buildDescription(
-  lemma: string,
-  pos: string,
-  fs: string,
-  word: string,
-): string {
+interface DescriptionInput {
+  readonly lemma: string;
+  readonly pos: string;
+  readonly fs: string;
+}
+
+export function buildDescription(input: DescriptionInput, word: string): string {
   const parts: string[] = [];
-  if (lemma && lemma.toLowerCase() !== word.toLowerCase()) {parts.push(`lemma: ${lemma}`);}
-  if (pos && POS_MAP[pos]) {parts.push(POS_MAP[pos]);}
-  if (fs) {parts.push(fs);}
+  if (input.lemma && input.lemma.toLowerCase() !== word.toLowerCase()) {parts.push(`lemma: ${input.lemma}`);}
+  const posLabel = input.pos ? POS_MAP[input.pos] : undefined;
+  if (posLabel) {parts.push(posLabel);}
+  if (input.fs) {parts.push(input.fs);}
   return parts.length > 0 ? parts.join(PARTS_SEPARATOR) : DEFAULT_DESCRIPTION;
 }

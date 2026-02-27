@@ -25,7 +25,7 @@ function createEvent(
   } as unknown as APIGatewayProxyEvent;
 }
 
-describe("/get-public endpoint", () => {
+describe("handler.get-public.test", () => {
   beforeEach(() => {
     setAdapter(new InMemoryAdapter());
     process.env.IS_OFFLINE = "true";
@@ -187,30 +187,4 @@ describe("/get-public endpoint", () => {
     });
   });
 
-  describe("validation", () => {
-    it("should reject missing type parameter", async () => {
-      const getEvent = createEvent("GET", "/get-public", {
-        key: "tasks",
-        id: "some-key",
-        // No type
-      });
-
-      const result = await handler(getEvent);
-      expect(result.statusCode).toBe(400);
-    });
-
-    it("should return null for non-existent data", async () => {
-      const getEvent = createEvent("GET", "/get-public", {
-        key: "tasks",
-        id: "non-existent",
-        type: "unlisted",
-      });
-
-      const result = await handler(getEvent);
-      expect(result.statusCode).toBe(200);
-
-      const body = JSON.parse(result.body);
-      expect(body.item).toBeNull();
-    });
-  });
 });

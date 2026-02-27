@@ -10,6 +10,12 @@ import { VARIANTS_STRINGS } from "@/config/ui-strings";
 const VARIANTS_API_TIMEOUT_MS = 10000;
 const MIN_SPINNER_DISPLAY_MS = 500;
 
+const mapStressed = (sentenceId: string, stressedWords: string[]) => (s: SentenceState) =>
+  s.id !== sentenceId ? s : { ...s, stressedTags: stressedWords.length === s.tags.length ? stressedWords : undefined };
+
+const mapPhonetic = (sentenceId: string, phoneticText: string) => (s: SentenceState) =>
+  s.id !== sentenceId ? s : { ...s, phoneticText };
+
 interface UseVariantsPanelReturn {
   variantsWord: string | null;
   variantsCustomPhonetic: string | null;
@@ -27,182 +33,98 @@ interface UseVariantsPanelReturn {
   handleCloseSentencePhonetic: () => void;
 }
 
+function useVariantsState() {
+  const [variantsWord, setVariantsWord] = useState<string | null>(null);
+  const [variantsCustomPhonetic, setVariantsCustomPhonetic] = useState<string | null>(null);
+  const [isVariantsPanelOpen, setIsVariantsPanelOpen] = useState(false);
+  const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(null);
+  const [selectedTagIndex, setSelectedTagIndex] = useState<number | null>(null);
+  const [loadingVariantsTag, setLoadingVariantsTag] = useState<{ sentenceId: string; tagIndex: number } | null>(null);
+
+  const openPanel = useCallback((opts: { sentenceId: string; tagIndex: number; word: string; phonetic?: string | null | undefined }) => {
+    setSelectedSentenceId(opts.sentenceId);
+    setSelectedTagIndex(opts.tagIndex);
+    setVariantsWord(stripPunctuationForLookup(opts.word));
+    setVariantsCustomPhonetic(opts.phonetic || null);
+    setIsVariantsPanelOpen(true);
+  }, []);
+
+  const closePanel = useCallback(() => {
+    setIsVariantsPanelOpen(false); setVariantsWord(null); setVariantsCustomPhonetic(null); setSelectedSentenceId(null); setSelectedTagIndex(null);
+  }, []);
+
+  return { variantsWord, variantsCustomPhonetic, setVariantsCustomPhonetic, isVariantsPanelOpen, selectedSentenceId, selectedTagIndex, loadingVariantsTag, setLoadingVariantsTag, openPanel, closePanel };
+}
+
+function usePhoneticState(sentences: SentenceState[], setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>) {
+  const [showPanel, setShowPanel] = useState(false);
+  const [phoneticId, setPhoneticId] = useState<string | null>(null);
+
+  const explore = useCallback(async (sentenceId: string) => {
+    const sentence = sentences.find((s) => s.id === sentenceId);
+    if (!sentence || !sentence.text.trim()) {return;}
+    if (!sentence.phoneticText) {
+      const stressed = await analyzeText(sentence.text);
+      if (stressed) { setSentences((prev) => prev.map(mapPhonetic(sentenceId, stressed))); }
+    }
+    setPhoneticId(sentenceId);
+    setShowPanel(true);
+  }, [sentences, setSentences]);
+
+  const close = useCallback(() => { setShowPanel(false); setPhoneticId(null); }, []);
+  return { showPanel, phoneticId, explore, close };
+}
+
+async function fetchAndCheckVariants(word: string, signal: AbortSignal): Promise<boolean> {
+  const response = await postJSON(VARIANTS_API_PATH, { word: stripPunctuationForLookup(word) }, { signal });
+  if (!response.ok) {throw new Error("API error");}
+  const data = await response.json();
+  return Boolean(data.variants?.length);
+}
+
+function notifyVariantsError(error: unknown, notify?: (o: ShowNotificationOptions) => void): void {
+  const isTimeout = error instanceof Error && error.name === "AbortError";
+  notify?.({ type: "error", message: isTimeout ? VARIANTS_STRINGS.TIMEOUT : VARIANTS_STRINGS.LOAD_FAILED, description: isTimeout ? VARIANTS_STRINGS.TIMEOUT_DESC : VARIANTS_STRINGS.NOT_FOUND_DESC });
+}
+
 export function useVariantsPanel(
   sentences: SentenceState[],
   setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>,
   showNotification?: (options: ShowNotificationOptions) => void,
 ): UseVariantsPanelReturn {
-  const [variantsWord, setVariantsWord] = useState<string | null>(null);
-  const [variantsCustomPhonetic, setVariantsCustomPhonetic] = useState<
-    string | null
-  >(null);
-  const [isVariantsPanelOpen, setIsVariantsPanelOpen] = useState(false);
-  const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(
-    null,
-  );
-  const [selectedTagIndex, setSelectedTagIndex] = useState<number | null>(null);
-  const [showSentencePhoneticPanel, setShowSentencePhoneticPanel] =
-    useState(false);
-  const [sentencePhoneticId, setSentencePhoneticId] = useState<string | null>(
-    null,
-  );
-  const [loadingVariantsTag, setLoadingVariantsTag] = useState<{
-    sentenceId: string;
-    tagIndex: number;
-  } | null>(null);
+  const vs = useVariantsState();
+  const ps = usePhoneticState(sentences, setSentences);
 
-  const handleTagClick = useCallback(
-    async (sentenceId: string, tagIndex: number, word: string) => {
-      const sentence = sentences.find((s) => s.id === sentenceId);
+  const handleTagClick = useCallback(async (sentenceId: string, tagIndex: number, word: string) => {
+    const sentence = sentences.find((s) => s.id === sentenceId);
+    if (sentence?.stressedTags) { vs.openPanel({ sentenceId, tagIndex, word, phonetic: sentence.stressedTags[tagIndex] }); return; }
+    const stressed = await analyzeText(sentence?.tags.join(" ") || "");
+    if (!stressed) { vs.openPanel({ sentenceId, tagIndex, word }); return; }
+    const words = convertTextToTags(stressed);
+    setSentences((prev) => prev.map(mapStressed(sentenceId, words)));
+    vs.openPanel({ sentenceId, tagIndex, word, phonetic: words.length === sentence?.tags.length ? words[tagIndex] : null });
+  }, [sentences, setSentences, vs.openPanel]);
 
-      if (!sentence?.stressedTags) {
-        const fullText = sentence?.tags.join(" ") || "";
-        const stressedText = await analyzeText(fullText);
-        if (stressedText) {
-          const stressedWords = convertTextToTags(stressedText);
-          setSentences((prev) =>
-            prev.map((s) => {
-              if (s.id !== sentenceId) {return s;}
-              return {
-                ...s,
-                stressedTags:
-                  stressedWords.length === s.tags.length
-                    ? stressedWords
-                    : undefined,
-              };
-            }),
-          );
-
-          const customPhoneticForm =
-            stressedWords.length === sentence?.tags.length
-              ? stressedWords[tagIndex]
-              : null;
-          setSelectedSentenceId(sentenceId);
-          setSelectedTagIndex(tagIndex);
-          setVariantsWord(stripPunctuationForLookup(word));
-          setVariantsCustomPhonetic(customPhoneticForm || null);
-          setIsVariantsPanelOpen(true);
-          return;
-        }
-      }
-
-      const customPhoneticForm = sentence?.stressedTags?.[tagIndex];
-      setSelectedSentenceId(sentenceId);
-      setSelectedTagIndex(tagIndex);
-      setVariantsWord(stripPunctuationForLookup(word));
-      setVariantsCustomPhonetic(customPhoneticForm || null);
-      setIsVariantsPanelOpen(true);
-    },
-    [sentences, setSentences],
-  );
-
-  const handleCloseVariants = useCallback(() => {
-    setIsVariantsPanelOpen(false);
-    setVariantsWord(null);
-    setVariantsCustomPhonetic(null);
-    setSelectedSentenceId(null);
-    setSelectedTagIndex(null);
-  }, []);
-
-  const handleOpenVariantsFromMenu = useCallback(
-    async (sentenceId: string, tagIndex: number, word: string) => {
-      setLoadingVariantsTag({ sentenceId, tagIndex });
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), VARIANTS_API_TIMEOUT_MS);
-
-      // Minimum spinner display time for better UX
-      const minDisplayTime = new Promise((resolve) => { setTimeout(resolve, MIN_SPINNER_DISPLAY_MS); });
-
-      // Strip punctuation for API lookup (preserve dashes for compound words)
-      const lookupWord = stripPunctuationForLookup(word);
-
-      try {
-        const [response] = await Promise.all([
-          postJSON(VARIANTS_API_PATH, { word: lookupWord }, { signal: controller.signal }),
-          minDisplayTime,
-        ]);
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {throw new Error("API error");}
-
-        const data = await response.json();
-
-        if (!data.variants?.length) {
-          showNotification?.({
-            type: "warning",
-            message: VARIANTS_STRINGS.NOT_FOUND,
-            description: VARIANTS_STRINGS.NOT_FOUND_DESC,
-          });
-          return;
-        }
-
-        void handleTagClick(sentenceId, tagIndex, word);
-      } catch (error) {
-        clearTimeout(timeoutId);
-        // Ensure minimum display time even on error
-        await minDisplayTime;
-        if (error instanceof Error && error.name === "AbortError") {
-          showNotification?.({
-            type: "error",
-            message: VARIANTS_STRINGS.TIMEOUT,
-            description: VARIANTS_STRINGS.TIMEOUT_DESC,
-          });
-        } else {
-          showNotification?.({
-            type: "error",
-            message: VARIANTS_STRINGS.LOAD_FAILED,
-            description: VARIANTS_STRINGS.NOT_FOUND_DESC,
-          });
-        }
-      } finally {
-        setLoadingVariantsTag(null);
-      }
-    },
-    [handleTagClick, showNotification],
-  );
-
-  const handleExplorePhonetic = useCallback(
-    async (sentenceId: string) => {
-      const sentence = sentences.find((s) => s.id === sentenceId);
-      if (!sentence || !sentence.text.trim()) {return;}
-
-      if (!sentence.phoneticText) {
-        const stressedText = await analyzeText(sentence.text);
-        if (stressedText) {
-          setSentences((prev) =>
-            prev.map((s) =>
-              s.id === sentenceId ? { ...s, phoneticText: stressedText } : s,
-            ),
-          );
-        }
-      }
-
-      setSentencePhoneticId(sentenceId);
-      setShowSentencePhoneticPanel(true);
-    },
-    [sentences, setSentences],
-  );
-
-  const handleCloseSentencePhonetic = useCallback(() => {
-    setShowSentencePhoneticPanel(false);
-    setSentencePhoneticId(null);
-  }, []);
+  const handleOpenVariantsFromMenu = useCallback(async (sentenceId: string, tagIndex: number, word: string) => {
+    vs.setLoadingVariantsTag({ sentenceId, tagIndex });
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), VARIANTS_API_TIMEOUT_MS);
+    const minWait = new Promise((resolve) => { setTimeout(resolve, MIN_SPINNER_DISPLAY_MS); });
+    try {
+      const [has] = await Promise.all([fetchAndCheckVariants(word, ctrl.signal), minWait]);
+      clearTimeout(tid);
+      if (!has) { showNotification?.({ type: "warning", message: VARIANTS_STRINGS.NOT_FOUND, description: VARIANTS_STRINGS.NOT_FOUND_DESC }); return; }
+      void handleTagClick(sentenceId, tagIndex, word);
+    } catch (error) { clearTimeout(tid); await minWait; notifyVariantsError(error, showNotification); }
+    finally { vs.setLoadingVariantsTag(null); }
+  }, [handleTagClick, showNotification, vs.setLoadingVariantsTag]);
 
   return {
-    variantsWord,
-    variantsCustomPhonetic,
-    setVariantsCustomPhonetic,
-    isVariantsPanelOpen,
-    selectedSentenceId,
-    selectedTagIndex,
-    showSentencePhoneticPanel,
-    sentencePhoneticId,
-    loadingVariantsTag,
-    handleTagClick,
-    handleCloseVariants,
-    handleOpenVariantsFromMenu,
-    handleExplorePhonetic: (...args: Parameters<typeof handleExplorePhonetic>) => { void handleExplorePhonetic(...args); },
-    handleCloseSentencePhonetic,
+    variantsWord: vs.variantsWord, variantsCustomPhonetic: vs.variantsCustomPhonetic, setVariantsCustomPhonetic: vs.setVariantsCustomPhonetic,
+    isVariantsPanelOpen: vs.isVariantsPanelOpen, selectedSentenceId: vs.selectedSentenceId, selectedTagIndex: vs.selectedTagIndex,
+    showSentencePhoneticPanel: ps.showPanel, sentencePhoneticId: ps.phoneticId, loadingVariantsTag: vs.loadingVariantsTag,
+    handleTagClick, handleCloseVariants: vs.closePanel, handleOpenVariantsFromMenu,
+    handleExplorePhonetic: (...args: Parameters<typeof ps.explore>) => { void ps.explore(...args); },
+    handleCloseSentencePhonetic: ps.close,
   };
 }

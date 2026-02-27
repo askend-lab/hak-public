@@ -25,8 +25,6 @@ const GENERATED_FILE_PATTERNS = [
   "**/*.generated.tsx",
 ];
 
-const HOOKS_FILE_PATTERNS = ["**/hooks/**/*.ts"];
-
 export default [
   ...baseConfig,
 
@@ -56,6 +54,51 @@ export default [
     },
   },
 
+  // === UNIFIED QUALITY ===
+  // Logic complexity is uniform: complexity 8, cognitive-complexity 8 everywhere.
+  // Size limits adapted to format: JSX markup ≠ imperative logic.
+  //   .ts:  max-statements 10, max-lines-per-function 30 (base defaults)
+  //   .tsx: max-statements 15, max-lines-per-function 60 (JSX markup is declarative)
+  //   hooks: max-statements 15, max-lines-per-function 60 (compose multiple hooks)
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    rules: {
+      // Style-only: disabled for TS (intentional patterns)
+      "no-nested-ternary": "off",
+      "promise/prefer-await-to-then": "off",
+      "promise/prefer-await-to-callbacks": "off",
+      "unicorn/no-useless-undefined": "off",
+      "sonarjs/no-duplicate-string": ["error", { "threshold": 4 }],
+
+      // Uniform logic complexity — same everywhere
+      "complexity": ["error", 8],
+      "sonarjs/cognitive-complexity": ["error", 8],
+      "max-depth": ["error", 3],
+      "max-lines": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
+      "max-lines-per-function": ["error", { max: 30, skipBlankLines: true, skipComments: true }],
+    },
+  },
+
+  // TSX components: adapted size limits (JSX markup is declarative, not logic)
+  {
+    files: ["**/*.tsx"],
+    rules: {
+      "max-statements": ["error", 15],
+      "max-lines-per-function": ["error", { max: 60, skipBlankLines: true, skipComments: true }],
+    },
+  },
+
+  // React hooks compose multiple useState/useCallback/useEffect
+  {
+    files: ["**/hooks/**/*.ts"],
+    rules: {
+      "max-statements": ["error", 15],
+      "max-lines-per-function": ["error", { max: 60, skipBlankLines: true, skipComments: true }],
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+    },
+  },
+
   // Generated files — auto-generated code, skip quality rules
   {
     files: GENERATED_FILE_PATTERNS,
@@ -63,39 +106,6 @@ export default [
       "max-lines": "off",
       "max-statements": "off",
       "max-lines-per-function": "off",
-    },
-  },
-
-  // Fix jest rules for test files
-  {
-    files: TEST_FILE_PATTERNS,
-    rules: {
-      "jest/no-standalone-expect": "off",
-      "jest/no-disabled-tests": "off",
-      "jest/require-top-level-describe": "off",
-      "max-lines": "off",
-      "max-lines-per-function": "off",
-      "max-nested-callbacks": ["error", 10], // describe > describe > it > callback nesting is normal
-      "max-statements": ["error", 30], // test setup + assertions need more statements
-      "sonarjs/no-duplicate-string": "off", // repeated test strings are idiomatic
-      "no-console": "off", // test debugging output is acceptable
-      "no-param-reassign": "off", // test mocks often reassign params
-      "max-classes-per-file": "off", // test mock classes are co-located
-      "no-promise-executor-return": "off", // test Promise executors often return for brevity
-      "promise/param-names": "off", // test mocks use non-standard param names
-      "promise/prefer-await-to-callbacks": "off", // test patterns use callbacks
-      "promise/prefer-await-to-then": "off", // test assertions chain with .then
-      "promise/always-return": "off", // test promise chains don't always return
-      "max-params": ["error", 6], // test helpers take more params (mock deps)
-    },
-  },
-
-  // React hooks return complex inferred objects — explicit return types add noise
-  {
-    files: HOOKS_FILE_PATTERNS,
-    rules: {
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
     },
   },
 
@@ -108,102 +118,30 @@ export default [
     },
   },
 
-  // TSX components have higher complexity and size due to conditional rendering + hooks
-  {
-    files: ["**/*.tsx"],
-    ignores: TEST_FILE_PATTERNS,
-    rules: {
-      "complexity": ["error", 30],
-      "max-lines-per-function": ["error", 250], // components with hooks are naturally larger
-      "max-statements": ["error", 30],          // JSX + state + effects add statements
-    },
-  },
-
-  // === QS-1 MIGRATION: newly active rules on .ts/.tsx ===
-  // These rules were previously only applied to .js files.
-  // Enable one at a time: fix violations → remove "off" → commit.
-  // Track progress in CodeReviewMikkTracker.md § Quality System Improvements.
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-    rules: {
-      // --- FIXED: curly, import/first, import/newline-after-import (auto-fix)
-      // --- FIXED: sonarjs/no-redundant-jump, no-alert, max-depth, no-return-assign
-      // --- FIXED: require-atomic-updates, security/detect-non-literal-regexp
-      // --- FIXED: sonarjs/no-identical-functions, eslint-comments/require-description
-      // --- FIXED: sonarjs/prefer-immediate-return, import/no-duplicates
-      // --- FIXED: no-return-await, prefer-promise-reject-errors
-      // --- FIXED: unicorn/prefer-spread, unicorn/explicit-length-check, regexp/prefer-w
-
-      // --- STYLE-ONLY: disabled for TS (intentional patterns) ---
-      "no-nested-ternary": "off",    // TSX conditional rendering uses nested ternaries
-      "promise/prefer-await-to-then": "off", // .then() chains in event handlers are idiomatic
-      "promise/prefer-await-to-callbacks": "off", // callback patterns in event handlers
-      "unicorn/no-useless-undefined": "off", // conflicts with TS strict params
-
-      // --- THRESHOLD ADJUSTMENTS ---
-      "max-params": ["error", 5],    // hooks/handlers take 4-5 dependency params
-      "max-classes-per-file": ["error", 3], // adapter files may co-locate related classes
-
-      // --- THRESHOLD RULES (raised to practical limits, outliers use eslint-disable) ---
-      "max-statements": ["error", 20],         // default 10 → 20
-      "max-lines-per-function": ["error", 150], // default 50 → 150
-      "max-nested-callbacks": ["error", 5],     // default 4 → 5
-      "max-lines": ["error", 400],              // default 300 → 400
-      "complexity": ["error", 15],              // default 10 → 15
-      "sonarjs/cognitive-complexity": ["error", 20], // default 15 → 20
-
-      // --- THRESHOLD: raised to 4 (default 3), steps-ts/test files excluded ---
-      "sonarjs/no-duplicate-string": ["error", { "threshold": 4 }],
-    },
-  },
-
-  // --- Post-QS-1 overrides (must come AFTER QS-1 block which applies to all .ts/.tsx) ---
-
-  // Generated files — skip size rules
-  {
-    files: GENERATED_FILE_PATTERNS,
-    rules: {
-      "max-lines": "off",
-      "max-statements": "off",
-      "max-lines-per-function": "off",
-    },
-  },
-
-  // TSX components — higher thresholds due to hooks + JSX + conditional rendering
-  {
-    files: ["**/*.tsx"],
-    ignores: TEST_FILE_PATTERNS,
-    rules: {
-      "complexity": ["error", 30],
-      "max-lines-per-function": ["error", 250],
-      "max-statements": ["error", 30],
-    },
-  },
-
-  // Hooks — aggregate multiple concerns, naturally larger
-  {
-    files: HOOKS_FILE_PATTERNS,
-    ignores: TEST_FILE_PATTERNS,
-    rules: {
-      "max-lines-per-function": ["error", 250],
-      "max-statements": ["error", 30],
-    },
-  },
-
-  // Test overrides
+  // Test files — moderate quality rules (prevent monster files, allow test flexibility)
   {
     files: TEST_FILE_PATTERNS,
     rules: {
-      "max-classes-per-file": "off",
-      "no-await-in-loop": "off",
-      "promise/always-return": "off",
-      "max-lines-per-function": "off",
-      "max-lines": "off",
-      "max-statements": "off",
+      "jest/no-standalone-expect": "off",
+      "jest/no-disabled-tests": "off",
+      "jest/require-top-level-describe": "off",
+      "max-lines": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
+      "max-lines-per-function": ["error", { max: 150, skipBlankLines: true, skipComments: true }],
+      "max-statements": ["error", 30],
       "complexity": "off",
       "sonarjs/cognitive-complexity": "off",
       "sonarjs/no-duplicate-string": "off",
+      "max-nested-callbacks": ["error", 10],
+      "max-classes-per-file": "off",
+      "no-await-in-loop": "off",
+      "no-console": "off",
       "no-param-reassign": "off",
+      "no-promise-executor-return": "off",
+      "promise/param-names": "off",
+      "promise/prefer-await-to-callbacks": "off",
+      "promise/prefer-await-to-then": "off",
+      "promise/always-return": "off",
+      "max-params": ["error", 6],
     },
   },
 

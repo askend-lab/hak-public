@@ -52,46 +52,50 @@ function formatPlainText(level: LogLevel, message: string): string {
   return `[${new Date().toISOString()}] ${LEVEL_TAGS[level]} ${message}`;
 }
 
-function formatJson(
-  level: LogLevel,
-  message: string,
-  context: LogContext,
-  args: unknown[],
-): string {
+interface FormatJsonInput {
+  readonly level: LogLevel;
+  readonly message: string;
+  readonly context: LogContext;
+  readonly args: unknown[];
+}
+
+function formatJson(input: FormatJsonInput): string {
   const entry: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
-    level,
-    message,
-    ...context,
+    level: input.level,
+    message: input.message,
+    ...input.context,
   };
-  if (args.length > 0) {
-    entry.data = args.length === 1 ? args[0] : args;
+  if (input.args.length > 0) {
+    entry.data = input.args.length === 1 ? input.args[0] : input.args;
   }
   return JSON.stringify(entry);
 }
 
-function createLogMethod(
-  level: LogLevel,
-  minLevel: LogLevel,
-  context: LogContext,
-  json: boolean,
-): LogMethod {
-  if (LOG_LEVELS[level] < LOG_LEVELS[minLevel]) {
+interface LogMethodConfig {
+  readonly level: LogLevel;
+  readonly minLevel: LogLevel;
+  readonly context: LogContext;
+  readonly json: boolean;
+}
+
+function createLogMethod(config: LogMethodConfig): LogMethod {
+  if (LOG_LEVELS[config.level] < LOG_LEVELS[config.minLevel]) {
     return NO_OP;
   }
-  const consoleFn = console[level].bind(console); // eslint-disable-line no-console -- logger implementation binds to console
-  if (json) {
+  const consoleFn = console[config.level].bind(console); // eslint-disable-line no-console -- logger implementation binds to console
+  if (config.json) {
     return (message: string, ...args: unknown[]): void => {
-      consoleFn(formatJson(level, message, context, args));
+      consoleFn(formatJson({ level: config.level, message, context: config.context, args }));
     };
   }
-  if (Object.keys(context).length > 0) {
+  if (Object.keys(config.context).length > 0) {
     return (message: string, ...args: unknown[]): void => {
-      consoleFn(formatPlainText(level, message), context, ...args);
+      consoleFn(formatPlainText(config.level, message), config.context, ...args);
     };
   }
   return (message: string, ...args: unknown[]): void => {
-    consoleFn(formatPlainText(level, message), ...args);
+    consoleFn(formatPlainText(config.level, message), ...args);
   };
 }
 
@@ -101,7 +105,7 @@ export function createLogger(
 ): Logger {
   const json = isLambdaEnv();
   const methods = Object.fromEntries(
-    LOG_LEVEL_KEYS.map((level) => [level, createLogMethod(level, minLevel, context, json)]),
+    LOG_LEVEL_KEYS.map((level) => [level, createLogMethod({ level, minLevel, context, json })]),
   ) as Record<LogLevel, LogMethod>;
 
   return {

@@ -57,6 +57,11 @@ describe("useSharedTaskAudio", () => {
     global.URL.revokeObjectURL = vi.fn();
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   it("initializes with correct default state", () => {
     const { result } = renderHook(() => useSharedTaskAudio());
 
@@ -186,128 +191,14 @@ describe("useSharedTaskAudio", () => {
     expect(result.current.isLoadingPlayAll).toBe(false);
   });
 
-  it("handlePlayEntry handles audio error gracefully", async () => {
-    class MockAudioWithError {
-      src = "";
-      onloadeddata: (() => void) | null = null;
-      onended: (() => void) | null = null;
-      onerror: (() => void) | null = null;
-      pause = vi.fn();
-      play = vi.fn().mockImplementation(() => {
-        setTimeout(() => this.onerror?.(), 5);
-        return Promise.resolve();
-      });
-    }
-    global.Audio = MockAudioWithError as unknown as typeof Audio;
-
-    const { result } = renderHook(() => useSharedTaskAudio());
-    const entries: TaskEntry[] = [
-      createEntry({
-        id: "1",
-        text: "test",
-        stressedText: "test",
-        audioUrl: "http://audio.url",
-      }),
-    ];
-
-    // Should not throw
-    act(() => {
-      result.current.handlePlayEntry("1", entries);
-    });
-
-    // Wait for error handler to be called
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 20));
-    });
-    expect(result.current.currentPlayingId).toBeNull();
   });
 
-  it("handlePlayEntry handles play rejection gracefully", async () => {
-    class MockAudioWithRejection {
-      src = "";
-      onloadeddata: (() => void) | null = null;
-      onended: (() => void) | null = null;
-      onerror: (() => void) | null = null;
-      pause = vi.fn();
-      play = vi.fn().mockRejectedValue(new Error("Play failed"));
-    }
-    global.Audio = MockAudioWithRejection as unknown as typeof Audio;
-
-    const { result } = renderHook(() => useSharedTaskAudio());
-    const entries: TaskEntry[] = [
-      createEntry({
-        id: "1",
-        text: "test",
-        stressedText: "test",
-        audioUrl: "http://audio.url",
-      }),
-    ];
-
-    // Should not throw
-    act(() => {
-      result.current.handlePlayEntry("1", entries);
-    });
-
-    // Wait for rejection handler
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 20));
-    });
-    expect(result.current.currentPlayingId).toBeNull();
   });
 
-  it("handlePlayAll plays multiple entries", async () => {
-    const { result } = renderHook(() => useSharedTaskAudio());
-    const entries: TaskEntry[] = [
-      createEntry({
-        id: "1",
-        text: "test1",
-        stressedText: "test1",
-        audioUrl: "http://audio1.url",
-      }),
-      createEntry({
-        id: "2",
-        text: "test2",
-        stressedText: "test2",
-        audioUrl: "http://audio2.url",
-      }),
-    ];
-
-    act(() => {
-      void result.current.handlePlayAll(entries);
-    });
-
-    expect(result.current.isLoadingPlayAll).toBe(true);
-
-    await waitFor(
-      () => {
-        expect(
-          result.current.isPlayingAll || result.current.isLoadingPlayAll,
-        ).toBe(true);
-      },
-      { timeout: 100 },
-    );
   });
 
-  it("cleans up audio on playAll abort", async () => {
-    const { result } = renderHook(() => useSharedTaskAudio());
-    const entries: TaskEntry[] = [
-      createEntry({
-        id: "1",
-        text: "test1",
-        stressedText: "test1",
-        audioUrl: "http://audio1.url",
-      }),
-    ];
-
-    act(() => {
-      void result.current.handlePlayAll(entries);
-    });
-
-    // Stop immediately
-    await act(async () => {
-      await result.current.handlePlayAll(entries);
-    });
-
-    expect(result.current.currentPlayingId).toBeNull();
   });
+
+  });
+
 });

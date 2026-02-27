@@ -33,51 +33,32 @@ const typeToColorMap: Record<NotificationType, NotificationColor> = {
   info: "primary",
 };
 
-export default function Notification({
-  type,
-  color,
-  message,
-  description,
-  action,
-  duration = 4000,
-  onClose,
-}: NotificationProps) {
+function NotificationBody({ description, action, onClose }: { description?: string | undefined; action?: NotificationAction | undefined; onClose: () => void }) {
+  if (!description && !action) {return null;}
+  const handleAction = () => { action?.onClick(); onClose(); };
+  return (
+    <p>
+      {description}
+      {description && action && " "}
+      {action && <button className="notification-action-link" onClick={handleAction}>{action.label}</button>}
+    </p>
+  );
+}
+
+export default function Notification({ type, color, message, description, action, duration = 4000, onClose }: NotificationProps) {
   useEffect(() => {
-    if (duration > 0) {
-      const t = setTimeout(onClose, duration);
-      return () => clearTimeout(t);
-    }
+    if (duration > 0) { const t = setTimeout(onClose, duration); return () => clearTimeout(t); }
     return undefined;
   }, [duration, onClose]);
-  const colorClass = `modal--${color ?? typeToColorMap[type]}--outlined`;
-  const handleAction = () => {
-    if (action) {
-      action.onClick();
-      onClose();
-    }
-  };
+  const resolvedColor = color ?? typeToColorMap[type];
+  const role = type === "error" ? "alert" : "status";
   return (
-    <div
-      className={`modal modal--small ${colorClass} modal--outlined notification-toast`}
-      role={type === "error" ? "alert" : "status"}
-    >
+    <div className={`modal modal--small modal--${resolvedColor}--outlined modal--outlined notification-toast`} role={role}>
       <div className="modal__top">
         <p className="notification__message">{message}</p>
-        <button onClick={onClose} aria-label="Sulge teade">
-          <CloseIcon size="2xl" />
-        </button>
+        <button onClick={onClose} aria-label="Sulge teade"><CloseIcon size="2xl" /></button>
       </div>
-      {(description || action) && (
-        <p>
-          {description}
-          {description && action && " "}
-          {action && (
-            <button className="notification-action-link" onClick={handleAction}>
-              {action.label}
-            </button>
-          )}
-        </p>
-      )}
+      <NotificationBody description={description} action={action} onClose={onClose} />
     </div>
   );
 }

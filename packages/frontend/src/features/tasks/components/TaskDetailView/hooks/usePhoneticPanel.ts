@@ -8,6 +8,17 @@ import { stripPhoneticMarkers } from "@/features/synthesis/utils/phoneticMarkers
 import { analyzeText } from "@/features/synthesis/utils/analyzeApi";
 import { logger } from "@hak/shared";
 
+const mapStressed = (id: string, stressedText: string) => (e: TaskEntry) => e.id === id ? { ...e, stressedText } : e;
+const mapPhoneticUpdate = (id: string, text: string, stressedText: string) => (e: TaskEntry) => e.id === id ? { ...e, text, stressedText, audioUrl: null, audioBlob: null } : e;
+
+interface PhoneticPanelDeps {
+  entries: TaskEntry[];
+  setEntries: React.Dispatch<React.SetStateAction<TaskEntry[]>>;
+  task: Task | null;
+  userId: string | undefined;
+  onMenuClose: () => void;
+}
+
 interface UsePhoneticPanelReturn {
   showPhoneticPanel: boolean;
   phoneticPanelEntryId: string | null;
@@ -16,13 +27,8 @@ interface UsePhoneticPanelReturn {
   handlePhoneticApply: (newPhoneticText: string) => Promise<void>;
 }
 
-export function usePhoneticPanel(
-  entries: TaskEntry[],
-  setEntries: React.Dispatch<React.SetStateAction<TaskEntry[]>>,
-  task: Task | null,
-  userId: string | undefined,
-  onMenuClose: () => void,
-): UsePhoneticPanelReturn {
+export function usePhoneticPanel(deps: PhoneticPanelDeps): UsePhoneticPanelReturn {
+  const { entries, setEntries, task, userId, onMenuClose } = deps;
   const dataService = useDataService();
   const [showPhoneticPanel, setShowPhoneticPanel] = useState(false);
   const [phoneticPanelEntryId, setPhoneticPanelEntryId] = useState<
@@ -37,14 +43,8 @@ export function usePhoneticPanel(
       onMenuClose();
 
       if (!entry.stressedText) {
-        const stressedText = await analyzeText(entry.text);
-        if (stressedText) {
-          setEntries((prev) =>
-            prev.map((e) =>
-              e.id === entryId ? { ...e, stressedText } : e,
-            ),
-          );
-        }
+        const stressed = await analyzeText(entry.text);
+        if (stressed) { setEntries((prev) => prev.map(mapStressed(entryId, stressed))); }
       }
 
       setPhoneticPanelEntryId(entryId);
@@ -67,20 +67,7 @@ export function usePhoneticPanel(
 
       const newPlainText = stripPhoneticMarkers(newPhoneticText) || "";
 
-      setEntries((prev) =>
-        prev.map((entry) => {
-          if (entry.id === phoneticPanelEntryId) {
-            return {
-              ...entry,
-              text: newPlainText,
-              stressedText: newPhoneticText,
-              audioUrl: null,
-              audioBlob: null,
-            };
-          }
-          return entry;
-        }),
-      );
+      setEntries((prev) => prev.map(mapPhoneticUpdate(phoneticPanelEntryId, newPlainText, newPhoneticText)));
 
       handleClosePhoneticPanel();
 
