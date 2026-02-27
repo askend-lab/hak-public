@@ -2,7 +2,12 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as Sentry from "@sentry/react";
 import { playAudioWithCallbacks } from "./audioPlayer";
+
+vi.mock("@sentry/react", () => ({
+  captureException: vi.fn(),
+}));
 
 interface MockAudioInstance {
   src: string;
@@ -152,6 +157,23 @@ describe("audioPlayer", () => {
       await expect(playPromise).rejects.toThrow("Audio playback failed");
       expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(
         "blob:https://example.com/audio",
+      );
+    });
+
+    it("should report audio error to Sentry with audioUrl context", async () => {
+      const playPromise = playAudioWithCallbacks(
+        "blob:https://example.com/test-audio",
+      );
+
+      mockAudio.onerror?.();
+
+      await expect(playPromise).rejects.toThrow("Audio playback failed");
+      expect(Sentry.captureException).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Audio playback failed" }),
+        {
+          tags: { audio: "playback" },
+          extra: { audioUrl: "blob:https://example.com/test-audio" },
+        },
       );
     });
   });
