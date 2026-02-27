@@ -193,6 +193,14 @@ jobs:
         if: steps.detect.outputs.gherkin-parser == 'true'
         run: pnpm --filter @hak/gherkin-parser test:full
 
+      - name: Validate frontend secrets
+        if: steps.detect.outputs.frontend == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          if [ -z "${{ secrets.VITE_SENTRY_DSN }}" ]; then
+            echo "::error::VITE_SENTRY_DSN secret is not set. Frontend error tracking will be disabled in production."
+            exit 1
+          fi
+
       - name: Build frontend
         if: steps.detect.outputs.frontend == 'true'
         env:
