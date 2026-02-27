@@ -66,19 +66,21 @@ function useVariantAudio() {
     } catch (err) { logger.error("Failed to play variant:", err); resetVariant(); }
   };
 
+  const doPlayCustom = async (text: string) => {
+    const audioUrl = await synthesizeAuto(text);
+    const { audio } = createAudioPlayer(audioUrl, {
+      onLoaded: () => { setIsCustomLoading(false); setIsCustomPlaying(true); },
+      onEnded: resetCustom, onError: resetCustom,
+    });
+    currentAudioRef.current = audio; await audio.play();
+  };
+
   const playCustom = async (customVariant: string) => {
     if (!customVariant.trim()) {return;}
     if (isCustomPlaying) { stopCurrentAudio(); setIsCustomPlaying(false); return; }
-    stopCurrentAudio(); setPlayingVariant(null); setIsCustomLoading(true); setIsCustomPlaying(false);
-    try {
-      const audioUrl = await synthesizeAuto(transformToVabamorf(customVariant) || "");
-      const { audio } = createAudioPlayer(audioUrl, {
-        onLoaded: () => { setIsCustomLoading(false); setIsCustomPlaying(true); },
-        onEnded: resetCustom, onError: resetCustom,
-      });
-      currentAudioRef.current = audio;
-      await audio.play();
-    } catch (err) { logger.error("Failed to play custom variant:", err); resetCustom(); }
+    stopCurrentAudio(); setPlayingVariant(null); setIsCustomLoading(true);
+    try { await doPlayCustom(transformToVabamorf(customVariant) || ""); }
+    catch (err) { logger.error("Failed to play custom variant:", err); resetCustom(); }
   };
 
   return { playingVariant, loadingVariant, isCustomPlaying, isCustomLoading, playVariant, playCustom };
@@ -105,13 +107,45 @@ function useVariantsFetch(word: string | null, isOpen: boolean) {
   return { variants, isLoading, error };
 }
 
-export default function PronunciationVariants({
-  word,
-  isOpen,
-  onClose,
-  onUseVariant,
-  customPhoneticForm,
-}: PronunciationVariantsProps) {
+function VariantsList({ variants, customPhoneticForm, audio, onUseVariant, customVariant, setCustomVariant, showCustomForm, setShowCustomForm, setShowGuide }: {
+  variants: Variant[]; customPhoneticForm?: string | null | undefined; audio: ReturnType<typeof useVariantAudio>;
+  onUseVariant?: ((v: string) => void) | undefined; customVariant: string; setCustomVariant: (v: string) => void;
+  showCustomForm: boolean; setShowCustomForm: (v: boolean) => void; setShowGuide: (v: boolean) => void;
+}) {
+  const handleUseVariant = (v: Variant) => { onUseVariant?.(v.text); };
+  const handleUseCustom = () => { if (customVariant.trim()) { onUseVariant?.(transformToVabamorf(customVariant) || ""); } };
+  const handleCloseForm = () => { setShowCustomForm(false); setCustomVariant(""); };
+  return (
+    <div className="pronunciation-variants__list">
+      {variants.map((v) => (
+        <VariantItem key={v.text} variant={v} isSelected={customPhoneticForm === v.text}
+          isPlaying={audio.playingVariant === v.text} isLoading={audio.loadingVariant === v.text}
+          onPlay={(...args: Parameters<typeof audio.playVariant>) => { void audio.playVariant(...args); }} onUse={handleUseVariant} />
+      ))}
+      <div className="pronunciation-variants__custom-section">
+        {!showCustomForm
+          ? <button className="pronunciation-variants__toggle-link" onClick={() => setShowCustomForm(true)}>Loo oma variant</button>
+          : <CustomVariantForm value={customVariant} onChange={setCustomVariant} onPlay={() => { void audio.playCustom(customVariant); }}
+              onUse={handleUseCustom} onClose={handleCloseForm} onShowGuide={() => setShowGuide(true)}
+              isPlaying={audio.isCustomPlaying} isLoading={audio.isCustomLoading} />}
+      </div>
+    </div>
+  );
+}
+
+function PanelContent({ isLoading, error, variants, customPhoneticForm, audio, onUseVariant, customVariant, setCustomVariant, showCustomForm, setShowCustomForm, setShowGuide }: {
+  isLoading: boolean; error: string | null; variants: Variant[]; customPhoneticForm?: string | null | undefined;
+  audio: ReturnType<typeof useVariantAudio>; onUseVariant?: ((v: string) => void) | undefined;
+  customVariant: string; setCustomVariant: (v: string) => void; showCustomForm: boolean; setShowCustomForm: (v: boolean) => void; setShowGuide: (v: boolean) => void;
+}) {
+  if (isLoading) {return <div className="pronunciation-variants__loading"><p>Laen variante...</p></div>;}
+  if (error) {return <div className="pronunciation-variants__error" role="alert"><p>Viga: {error}</p></div>;}
+  if (variants.length === 0) {return null;}
+  return <VariantsList variants={variants} customPhoneticForm={customPhoneticForm} audio={audio} onUseVariant={onUseVariant}
+    customVariant={customVariant} setCustomVariant={setCustomVariant} showCustomForm={showCustomForm} setShowCustomForm={setShowCustomForm} setShowGuide={setShowGuide} />;
+}
+
+export default function PronunciationVariants({ word, isOpen, onClose, onUseVariant, customPhoneticForm }: PronunciationVariantsProps) {
   const { variants, isLoading, error } = useVariantsFetch(word, isOpen);
   const audio = useVariantAudio();
   const [customVariant, setCustomVariant] = useState("");
@@ -119,11 +153,6 @@ export default function PronunciationVariants({
   const [showCustomForm, setShowCustomForm] = useState(false);
 
   useEffect(() => { if (word && isOpen) {setCustomVariant("");} }, [word, isOpen]);
-
-  const handleUseVariant = (variant: Variant) => { onUseVariant?.(variant.text); };
-  const handleUseCustomVariant = () => { if (customVariant.trim()) { onUseVariant?.(transformToVabamorf(customVariant) || ""); } };
-  const handleCloseCustomForm = () => { setShowCustomForm(false); setCustomVariant(""); };
-
   if (!isOpen) {return null;}
 
   return (
@@ -133,74 +162,16 @@ export default function PronunciationVariants({
           <div className="pronunciation-variants__header">
             <h3 className="pronunciation-variants__title">{word}</h3>
             <div className="pronunciation-variants__header-actions">
-              <button
-                onClick={onClose}
-                className="pronunciation-variants__close"
-                aria-label="Sulge"
-              >
-                <CloseIcon size="2xl" />
-              </button>
+              <button onClick={onClose} className="pronunciation-variants__close" aria-label="Sulge"><CloseIcon size="2xl" /></button>
             </div>
           </div>
         )}
-
         <div className="pronunciation-variants__content">
-          {showGuide ? (
-            <PhoneticGuide
-              onBack={() => setShowGuide(false)}
-              onClose={onClose}
-            />
-          ) : (
-            <>
-              {isLoading && (
-                <div className="pronunciation-variants__loading">
-                  <p>Laen variante...</p>
-                </div>
-              )}
-              {error && (
-                <div className="pronunciation-variants__error" role="alert">
-                  <p>Viga: {error}</p>
-                </div>
-              )}
-              {!isLoading && !error && variants.length > 0 && (
-                <div className="pronunciation-variants__list">
-                  {variants.map((variant) => (
-                    <VariantItem
-                      key={variant.text}
-                      variant={variant}
-                      isSelected={customPhoneticForm === variant.text}
-                      isPlaying={audio.playingVariant === variant.text}
-                      isLoading={audio.loadingVariant === variant.text}
-                      onPlay={(...args: Parameters<typeof audio.playVariant>) => { void audio.playVariant(...args); }}
-                      onUse={handleUseVariant}
-                    />
-                  ))}
-
-                  <div className="pronunciation-variants__custom-section">
-                    {!showCustomForm ? (
-                      <button
-                        className="pronunciation-variants__toggle-link"
-                        onClick={() => setShowCustomForm(true)}
-                      >
-                        Loo oma variant
-                      </button>
-                    ) : (
-                      <CustomVariantForm
-                        value={customVariant}
-                        onChange={setCustomVariant}
-                        onPlay={() => { void audio.playCustom(customVariant); }}
-                        onUse={handleUseCustomVariant}
-                        onClose={handleCloseCustomForm}
-                        onShowGuide={() => setShowGuide(true)}
-                        isPlaying={audio.isCustomPlaying}
-                        isLoading={audio.isCustomLoading}
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+          {showGuide
+            ? <PhoneticGuide onBack={() => setShowGuide(false)} onClose={onClose} />
+            : <PanelContent isLoading={isLoading} error={error} variants={variants} customPhoneticForm={customPhoneticForm} audio={audio}
+                onUseVariant={onUseVariant} customVariant={customVariant} setCustomVariant={setCustomVariant}
+                showCustomForm={showCustomForm} setShowCustomForm={setShowCustomForm} setShowGuide={setShowGuide} />}
         </div>
       </div>
     </>

@@ -35,92 +35,52 @@ interface UseSentenceActionsDeps {
   };
 }
 
-export function useSentenceActions({
-  getSentence,
-  updateSentence,
-  synthesizeAndPlay,
-  synthesizeWithText,
-  handleRemoveSentence,
-  currentAudio,
-  playlist,
-}: UseSentenceActionsDeps) {
+function stopPlayback(deps: UseSentenceActionsDeps, id: string): void {
+  if (deps.playlist.isPlayingAll || deps.playlist.isLoadingPlayAll) {
+    deps.playlist.handlePlayAll();
+  } else {
+    const audio = deps.currentAudio;
+    if (audio) { audio.pause(); audio.src = ""; }
+    deps.updateSentence(id, { isPlaying: false });
+  }
+}
+
+function playWithInput(deps: UseSentenceActionsDeps, id: string, sentence: SentenceState): void {
+  const allTags = normalizeTags([...sentence.tags, ...convertTextToTags(sentence.currentInput)]);
+  const fullText = allTags.join(" ");
+  deps.updateSentence(id, { tags: allTags, currentInput: "", text: fullText, ...CACHE_INVALIDATION });
+  deps.synthesizeWithText(id, fullText);
+}
+
+export function useSentenceActions(deps: UseSentenceActionsDeps) {
   const { showNotification } = useNotification();
 
-  const handleRemoveSentenceWrapper = useCallback(
-    (id: string) => {
-      handleRemoveSentence(id, true);
-    },
-    [handleRemoveSentence],
-  );
+  const handlePlay = useCallback((id: string): void => {
+    const sentence = deps.getSentence(id);
+    if (!sentence) {return;}
+    if (sentence.isPlaying) { stopPlayback(deps, id); return; }
+    if (sentence.currentInput.trim()) { playWithInput(deps, id, sentence); }
+    else if (sentence.tags.length > 0) { deps.synthesizeAndPlay(id); }
+  }, [deps]);
 
-  const handlePlay = useCallback(
-    (id: string): void => {
-      const sentence = getSentence(id);
-      if (!sentence) {return;}
-      // If sentence is already playing, stop it (pause behavior)
-      if (sentence.isPlaying) {
-        if (playlist.isPlayingAll || playlist.isLoadingPlayAll) {
-          // Stop the entire play-all sequence
-          playlist.handlePlayAll();
-        } else {
-          // Stop individual playback
-          if (currentAudio) {
-            currentAudio.pause();
-            currentAudio.src = ""; // eslint-disable-line no-param-reassign -- clearing audio source to stop playback
-          }
-          updateSentence(id, { isPlaying: false });
-        }
-        return;
-      }
+  const handleDownload = useCallback(async (id: string) => {
+    const sentence = deps.getSentence(id);
+    if (!sentence) {return;}
+    let audioUrl = sentence.audioUrl;
+    if (!audioUrl) {
+      try { audioUrl = await synthesizeAuto(sentence.text); deps.updateSentence(id, { audioUrl }); }
+      catch (error) { logger.error("Failed to generate audio:", error); return; }
+    }
+    if (audioUrl) { try { await downloadAudioBlob(audioUrl, sentence.text); } catch (error) { logger.error("Failed to download audio:", error); } }
+  }, [deps]);
 
-      if (sentence.currentInput.trim()) {
-        const inputWords = convertTextToTags(sentence.currentInput);
-        const allTags = normalizeTags([...sentence.tags, ...inputWords]);
-        const fullText = allTags.join(" ");
-        updateSentence(id, {
-          tags: allTags,
-          currentInput: "",
-          text: fullText,
-          ...CACHE_INVALIDATION,
-        });
-        synthesizeWithText(id, fullText);
-      } else if (sentence.tags.length > 0) {
-        synthesizeAndPlay(id);
-      }
-    },
-    [getSentence, updateSentence, synthesizeAndPlay, synthesizeWithText, currentAudio, playlist],
-  );
-
-  const handleDownload = useCallback(
-    async (id: string) => {
-      const sentence = getSentence(id);
-      if (!sentence) {return;}
-      let audioUrl = sentence.audioUrl;
-      if (!audioUrl) {
-        try { audioUrl = await synthesizeAuto(sentence.text); updateSentence(id, { audioUrl }); }
-        catch (error) { logger.error("Failed to generate audio:", error); return; }
-      }
-      if (!audioUrl) {return;}
-      try { await downloadAudioBlob(audioUrl, sentence.text); }
-      catch (error) { logger.error("Failed to download audio:", error); }
-    },
-    [getSentence, updateSentence],
-  );
-
-  const handleCopyText = useCallback(
-    async (id: string) => {
-      const sentence = getSentence(id);
-      if (!sentence || !sentence.text.trim()) {return;}
-
-      await copyTextToClipboard(sentence.text, showNotification);
-    },
-    [getSentence, showNotification],
-  );
+  const handleCopyText = useCallback(async (id: string) => {
+    const sentence = deps.getSentence(id);
+    if (sentence?.text.trim()) { await copyTextToClipboard(sentence.text, showNotification); }
+  }, [deps, showNotification]);
 
   return {
-    handlePlay,
-    handleDownload,
-    handleCopyText,
-    handleRemoveSentence: handleRemoveSentenceWrapper,
+    handlePlay, handleDownload, handleCopyText,
+    handleRemoveSentence: useCallback((id: string) => { deps.handleRemoveSentence(id, true); }, [deps]),
   };
 }

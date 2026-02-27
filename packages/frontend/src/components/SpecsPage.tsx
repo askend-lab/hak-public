@@ -66,67 +66,39 @@ function toggleSet(set: Set<string>, name: string): Set<string> {
   return next;
 }
 
+function SpecsHeader({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="specs-page__header">
+      <button className="specs-page__back" onClick={onBack}>← Tagasi</button>
+      <h1>Testid</h1>
+    </div>
+  );
+}
+
 export default function SpecsPage({ onBack }: SpecsPageProps) {
   const { groups, testSuites, loading } = useSpecsData();
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const [expandedFeatures, setExpandedFeatures] = useState<Set<string>>(
-    new Set(),
-  );
+  const [expandedFeatures, setExpandedFeatures] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (groups.length > 0 && !selectedFeature) {
       const first = groups[0];
       if (first?.features[0]) {
-        setExpandedGroups(new Set([first.name]));
-        setSelectedFeature(first.features[0].name);
-        setExpandedFeatures(new Set([first.features[0].name]));
+        setExpandedGroups(new Set([first.name])); setSelectedFeature(first.features[0].name); setExpandedFeatures(new Set([first.features[0].name]));
       }
     }
   }, [groups, selectedFeature]);
 
-  const allFeatures = groups.flatMap((g) => g.features);
-  const selectedFeatureData =
-    allFeatures.find((f) => f.name === selectedFeature) ?? null;
-
-  if (loading) {
-    return (
-      <div className="specs-page">
-        <div className="specs-page__header">
-          <button className="specs-page__back" onClick={onBack}>
-            ← Tagasi
-          </button>
-          <h1>Testid</h1>
-        </div>
-        <p className="specs-page__loading-text">Laen spetsifikatsioone...</p>
-      </div>
-    );
-  }
-
+  if (loading) { return <div className="specs-page"><SpecsHeader onBack={onBack} /><p className="specs-page__loading-text">Laen spetsifikatsioone...</p></div>; }
+  const selectedData = groups.flatMap((g) => g.features).find((f) => f.name === selectedFeature) ?? null;
   return (
     <div className="specs-page">
-      <div className="specs-page__header">
-        <button className="specs-page__back" onClick={onBack}>
-          ← Tagasi
-        </button>
-        <h1>Testid</h1>
-      </div>
+      <SpecsHeader onBack={onBack} />
       <div className="specs-page__layout">
-        <SpecsNav
-          groups={groups}
-          testSuites={testSuites}
-          selectedFeature={selectedFeature}
-          expandedGroups={expandedGroups}
-          expandedFeatures={expandedFeatures}
-          onToggleGroup={(n) => setExpandedGroups(toggleSet(expandedGroups, n))}
-          onToggleFeature={(n) =>
-            setExpandedFeatures(toggleSet(expandedFeatures, n))
-          }
-          onSelectFeature={setSelectedFeature}
-        />
-        <section className="specs-page__content" tabIndex={0}>
-          <SpecsContent feature={selectedFeatureData} testSuites={testSuites} />
-        </section>
+        <SpecsNav groups={groups} testSuites={testSuites} selectedFeature={selectedFeature} expandedGroups={expandedGroups} expandedFeatures={expandedFeatures}
+          onToggleGroup={(n) => setExpandedGroups(toggleSet(expandedGroups, n))} onToggleFeature={(n) => setExpandedFeatures(toggleSet(expandedFeatures, n))} onSelectFeature={setSelectedFeature} />
+        <section className="specs-page__content" tabIndex={0}><SpecsContent feature={selectedData} testSuites={testSuites} /></section>
       </div>
     </div>
   );

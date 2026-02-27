@@ -47,124 +47,68 @@ function getFeatureStats(feature: ParsedFeature, testSuites: TestSuite[]) {
   return { passed, total };
 }
 
-export default function SpecsNav({
-  groups,
-  testSuites,
-  selectedFeature,
-  expandedGroups,
-  expandedFeatures,
-  onToggleGroup,
-  onToggleFeature,
-  onSelectFeature,
-}: SpecsNavProps) {
-  const totalFeatures = groups.flatMap((g) => g.features).length;
+function getGroupStats(features: ParsedFeature[], testSuites: TestSuite[]) {
+  return features.reduce((acc, f) => { const s = getFeatureStats(f, testSuites); return { passed: acc.passed + s.passed, total: acc.total + s.total }; }, { passed: 0, total: 0 });
+}
 
+function ScenarioList({ feature, testSuites, isSkipped, onSelectFeature }: { feature: ParsedFeature; testSuites: TestSuite[]; isSkipped: boolean; onSelectFeature: (n: string) => void }) {
+  return (
+    <>{feature.scenarios.map((scenario) => {
+      const result = getTestResult(testSuites, scenario.name);
+      const status = isSkipped ? "skipped" : result?.status === "passed" ? "passed" : "pending";
+      return (
+        <div key={scenario.name} className="specs-scenario__item" onClick={() => onSelectFeature(feature.name)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") {onSelectFeature(feature.name);} }} role="button" tabIndex={0}>
+          <span className={getBadgeClass(status)}>{status === "passed" ? "✓" : "○"}</span>
+          <span className="specs-scenario__name">{scenario.name}</span>
+        </div>
+      );
+    })}</>
+  );
+}
+
+function FeatureRow({ feature, testSuites, isSelected, isExpanded, onToggle, onSelect }: {
+  feature: ParsedFeature; testSuites: TestSuite[]; isSelected: boolean; isExpanded: boolean;
+  onToggle: (n: string) => void; onSelect: (n: string) => void;
+}) {
+  const isSkipped = feature.tags.includes("@skip");
+  const stats = getFeatureStats(feature, testSuites);
+  const cls = `specs-feature__item ${isSelected ? "specs-feature__item--selected" : ""} ${isSkipped ? "specs-feature__item--skipped" : ""}`;
+  return (
+    <div key={feature.name}>
+      <div className={cls} onClick={() => { onToggle(feature.name); onSelect(feature.name); }}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { onToggle(feature.name); onSelect(feature.name); } }} role="button" tabIndex={0}>
+        <span className="specs-feature__name">{isExpanded ? "▼" : "▶"} {feature.name.replace(/\s*\(US-\d+\)/, "")}</span>
+        {isSkipped ? <span className={getBadgeClass("skipped")}>skip</span>
+          : <span className={getBadgeClass(stats.passed === stats.total ? "passed" : "pending")}>{stats.passed}/{stats.total}</span>}
+      </div>
+      {isExpanded && <ScenarioList feature={feature} testSuites={testSuites} isSkipped={isSkipped} onSelectFeature={onSelect} />}
+    </div>
+  );
+}
+
+export default function SpecsNav({ groups, testSuites, selectedFeature, expandedGroups, expandedFeatures, onToggleGroup, onToggleFeature, onSelectFeature }: SpecsNavProps) {
+  const totalFeatures = groups.flatMap((g) => g.features).length;
   return (
     <nav className="specs-page__nav">
       <div className="specs-page__nav-header">
         <strong className="specs-page__nav-title">📋 Features</strong>
         <span className="specs-page__nav-count">{totalFeatures} total</span>
       </div>
-
-      {}
       {groups.map((group) => {
-        const isGroupExpanded = expandedGroups.has(group.name);
-        const groupStats = group.features.reduce(
-          (acc, f) => {
-            const s = getFeatureStats(f, testSuites);
-            return {
-              passed: acc.passed + s.passed,
-              total: acc.total + s.total,
-            };
-          },
-          { passed: 0, total: 0 },
-        );
-
+        const isExp = expandedGroups.has(group.name);
+        const gs = getGroupStats(group.features, testSuites);
         return (
           <div key={group.name}>
-            <div
-              className={`specs-group__header ${isGroupExpanded ? "specs-group__header--expanded" : ""}`}
-              onClick={() => onToggleGroup(group.name)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") {onToggleGroup(group.name);} }}
-              role="button"
-              tabIndex={0}
-            >
-              <span>
-                {isGroupExpanded ? "📂" : "📁"} {group.name}
-              </span>
-              <span
-                className={getBadgeClass(
-                  groupStats.passed === groupStats.total ? "passed" : "pending",
-                )}
-              >
-                {groupStats.passed}/{groupStats.total}
-              </span>
+            <div className={`specs-group__header ${isExp ? "specs-group__header--expanded" : ""}`}
+              onClick={() => onToggleGroup(group.name)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") {onToggleGroup(group.name);} }} role="button" tabIndex={0}>
+              <span>{isExp ? "📂" : "📁"} {group.name}</span>
+              <span className={getBadgeClass(gs.passed === gs.total ? "passed" : "pending")}>{gs.passed}/{gs.total}</span>
             </div>
-
-            {isGroupExpanded &&
-              group.features.map((feature) => {
-                const isSkipped = feature.tags.includes("@skip");
-                const isFeatureExpanded = expandedFeatures.has(feature.name);
-                const stats = getFeatureStats(feature, testSuites);
-
-                return (
-                  <div key={feature.name}>
-                    <div
-                      className={`specs-feature__item ${selectedFeature === feature.name ? "specs-feature__item--selected" : ""} ${isSkipped ? "specs-feature__item--skipped" : ""}`}
-                      onClick={() => {
-                        onToggleFeature(feature.name);
-                        onSelectFeature(feature.name);
-                      }}
-                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { onToggleFeature(feature.name); onSelectFeature(feature.name); } }}
-                      role="button"
-                      tabIndex={0}
-                    >
-                      <span className="specs-feature__name">
-                        {isFeatureExpanded ? "▼" : "▶"}{" "}
-                        {feature.name.replace(/\s*\(US-\d+\)/, "")}
-                      </span>
-                      {isSkipped ? (
-                        <span className={getBadgeClass("skipped")}>skip</span>
-                      ) : (
-                        <span
-                          className={getBadgeClass(
-                            stats.passed === stats.total ? "passed" : "pending",
-                          )}
-                        >
-                          {stats.passed}/{stats.total}
-                        </span>
-                      )}
-                    </div>
-
-                    {isFeatureExpanded &&
-                      feature.scenarios.map((scenario) => {
-                        const result = getTestResult(testSuites, scenario.name);
-                        const status = isSkipped
-                          ? "skipped"
-                          : result?.status === "passed"
-                            ? "passed"
-                            : "pending";
-                        return (
-                          <div
-                            key={scenario.name}
-                            className="specs-scenario__item"
-                            onClick={() => onSelectFeature(feature.name)}
-                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") {onSelectFeature(feature.name);} }}
-                            role="button"
-                            tabIndex={0}
-                          >
-                            <span className={getBadgeClass(status)}>
-                              {status === "passed" ? "✓" : "○"}
-                            </span>
-                            <span className="specs-scenario__name">
-                              {scenario.name}
-                            </span>
-                          </div>
-                        );
-                      })}
-                  </div>
-                );
-              })}
+            {isExp && group.features.map((f) => (
+              <FeatureRow key={f.name} feature={f} testSuites={testSuites} isSelected={selectedFeature === f.name}
+                isExpanded={expandedFeatures.has(f.name)} onToggle={onToggleFeature} onSelect={onSelectFeature} />
+            ))}
           </div>
         );
       })}

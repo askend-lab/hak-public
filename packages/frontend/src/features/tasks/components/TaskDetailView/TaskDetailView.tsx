@@ -109,136 +109,85 @@ function useTaskDetailActions(
   return { handleDownloadZip, handleCopyToSynthesis, handleCopyText, handleDeleteEntry };
 }
 
-export default function TaskDetailView({
-  taskId,
-  onBack,
-  onEditTask,
-  onDeleteTask,
-  onNavigateToSynthesis,
-  initialTask,
-}: TaskDetailViewProps) {
+function useTaskDetailUI(opts: { setEntries: React.Dispatch<React.SetStateAction<TaskEntry[]>>; entries: TaskEntry[]; task: Task | null; userId: string | undefined }) {
+  const { setEntries, entries, task, userId } = opts;
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const handleMenuClose = () => setOpenMenuId(null);
+  const dragDrop = useDragAndDrop(setEntries);
+  const audio = useAudioPlayback(entries);
+  const variants = usePronunciationVariants({ entries, setEntries, task, userId });
+  const phonetic = usePhoneticPanel({ entries, setEntries, task, userId, onMenuClose: handleMenuClose });
+  return { openMenuId, setOpenMenuId, handleMenuClose, dragDrop, audio, variants, phonetic };
+}
+
+function buildRowMenuItems(phonetic: ReturnType<typeof usePhoneticPanel>, actions: ReturnType<typeof useTaskDetailActions>) {
+  return [
+    { label: "Uuri häälduskuju", onClick: (...args: Parameters<typeof phonetic.handleExplorePhonetic>) => { void phonetic.handleExplorePhonetic(...args); } },
+    { label: "Kopeeri tekst", onClick: (...args: Parameters<typeof actions.handleCopyText>) => { void actions.handleCopyText(...args); } },
+    { label: "Kustuta", onClick: (...args: Parameters<typeof actions.handleDeleteEntry>) => { void actions.handleDeleteEntry(...args); }, danger: true },
+  ];
+}
+
+function TaskPanels({ task, entries, variants, phonetic, isShareModalOpen, onCloseShare }: {
+  task: Task; entries: TaskEntry[]; variants: ReturnType<typeof usePronunciationVariants>; phonetic: ReturnType<typeof usePhoneticPanel>;
+  isShareModalOpen: boolean; onCloseShare: () => void;
+}) {
+  const phoneticEntry = phonetic.phoneticPanelEntryId ? entries.find((e) => e.id === phonetic.phoneticPanelEntryId) : undefined;
+  const shareToken = task.shareToken ?? "";
+  const taskName = task.name ?? "";
+  const variantsWord = variants.variantsWord ?? "";
+  return (
+    <>
+      <ShareTaskModal isOpen={isShareModalOpen} shareToken={shareToken} taskName={taskName} onClose={onCloseShare} />
+      <PronunciationVariants isOpen={variants.isVariantsPanelOpen} word={variantsWord}
+        onClose={variants.handleCloseVariants} onUseVariant={(...args: Parameters<typeof variants.handleUseVariant>) => { void variants.handleUseVariant(...args); }}
+        customPhoneticForm={variants.variantsCustomPhonetic} />
+      {phoneticEntry && (
+        <SentencePhoneticPanel sentenceText={phoneticEntry.text} phoneticText={phoneticEntry.stressedText ?? null}
+          isOpen={phonetic.showPhoneticPanel} onClose={phonetic.handleClosePhoneticPanel}
+          onApply={(...args: Parameters<typeof phonetic.handlePhoneticApply>) => { void phonetic.handlePhoneticApply(...args); }} />
+      )}
+    </>
+  );
+}
+
+export default function TaskDetailView({ taskId, onBack, onEditTask, onDeleteTask, onNavigateToSynthesis, initialTask }: TaskDetailViewProps) {
   const state = useTaskDetailState(taskId, initialTask);
   const { user, task, entries, setEntries, isLoading, error } = state;
   const actions = useTaskDetailActions(state, taskId, onNavigateToSynthesis);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isHeaderMenuOpen, setIsHeaderMenuOpen] = useState(false);
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const handleMenuClose = () => setOpenMenuId(null);
-
-  const dragDrop = useDragAndDrop(setEntries);
-  const audio = useAudioPlayback(entries);
-  const variants = usePronunciationVariants(entries, setEntries, task, user?.id);
-  const phonetic = usePhoneticPanel(entries, setEntries, task, user?.id, handleMenuClose);
+  const ui = useTaskDetailUI({ setEntries, entries, task, userId: user?.id });
 
   if (isLoading) {return <TaskDetailLoading />;}
   if (error) {return <TaskDetailError onBack={onBack} error={error} />;}
   if (!task) {return null;}
 
+  const rowMenuItems = buildRowMenuItems(ui.phonetic, actions);
+
   return (
     <div className="task-detail-view">
-      <TaskDetailHeader
-        task={task}
-        entriesCount={entries.length}
-        isLoadingPlayAll={audio.isLoadingPlayAll}
-        isPlayingAll={audio.isPlayingAll}
-        isHeaderMenuOpen={isHeaderMenuOpen}
-        setIsHeaderMenuOpen={setIsHeaderMenuOpen}
-        onShare={() => setIsShareModalOpen(true)}
-        onPlayAll={() => { void audio.handlePlayAll(); }}
-        onDownloadZip={() => { void actions.handleDownloadZip(); }}
-        isDownloading={state.isDownloading}
-        onCopyToSynthesis={() => { void actions.handleCopyToSynthesis(); }}
-        onEditTask={onEditTask}
-        onDeleteTask={onDeleteTask}
-      />
-
-      {entries.length === 0 ? (
-        <TaskDetailEmpty
-          task={task}
-          onNavigateToSynthesis={onNavigateToSynthesis}
-        />
-      ) : (
-        <div className="task-detail__entries">
-          <div className="task-detail__entries-list">
-            {entries.map((entry) => (
-              <SentenceSynthesisItem
-                key={entry.id}
-                id={entry.id}
-                text={entry.text}
-                tags={convertTextToTags(entry.text)}
-                mode="tags"
-                draggable={true}
-                isDragging={dragDrop.draggedId === entry.id}
-                isDragOver={dragDrop.dragOverId === entry.id}
-                isPlaying={audio.currentPlayingId === entry.id}
-                isLoading={audio.currentLoadingId === entry.id}
-                onPlay={audio.handlePlayEntry}
-                onDragStart={dragDrop.handleDragStart}
-                onDragEnd={dragDrop.handleDragEnd}
-                onDragOver={dragDrop.handleDragOver}
-                onDragLeave={dragDrop.handleDragLeave}
-                onDrop={dragDrop.handleDrop}
-                onTagClick={variants.handleTagClick}
-                selectedTagIndex={
-                  variants.selectedEntryId === entry.id
-                    ? variants.selectedTagIndex
-                    : null
-                }
-                isPronunciationPanelOpen={
-                  variants.isVariantsPanelOpen || phonetic.showPhoneticPanel
-                }
-                allTagsSelected={phonetic.phoneticPanelEntryId === entry.id}
-                openMenuId={openMenuId}
-                onMenuOpen={setOpenMenuId}
-                onMenuClose={handleMenuClose}
-                rowMenuItems={[
-                  {
-                    label: "Uuri häälduskuju",
-                    onClick: (...args: Parameters<typeof phonetic.handleExplorePhonetic>) => { void phonetic.handleExplorePhonetic(...args); },
-                  },
-                  { label: "Kopeeri tekst", onClick: (...args: Parameters<typeof actions.handleCopyText>) => { void actions.handleCopyText(...args); } },
-                  {
-                    label: "Kustuta",
-                    onClick: (...args: Parameters<typeof actions.handleDeleteEntry>) => { void actions.handleDeleteEntry(...args); },
-                    danger: true,
-                  },
-                ]}
-              />
-            ))}
-          </div>
-        </div>
+      <TaskDetailHeader task={task} entriesCount={entries.length} isLoadingPlayAll={ui.audio.isLoadingPlayAll} isPlayingAll={ui.audio.isPlayingAll}
+        isHeaderMenuOpen={isHeaderMenuOpen} setIsHeaderMenuOpen={setIsHeaderMenuOpen} onShare={() => setIsShareModalOpen(true)}
+        onPlayAll={() => { void ui.audio.handlePlayAll(); }} onDownloadZip={() => { void actions.handleDownloadZip(); }} isDownloading={state.isDownloading}
+        onCopyToSynthesis={() => { void actions.handleCopyToSynthesis(); }} onEditTask={onEditTask} onDeleteTask={onDeleteTask} />
+      {entries.length === 0 ? <TaskDetailEmpty task={task} onNavigateToSynthesis={onNavigateToSynthesis} /> : (
+        <div className="task-detail__entries"><div className="task-detail__entries-list">
+          {entries.map((entry) => (
+            <SentenceSynthesisItem key={entry.id} id={entry.id} text={entry.text} tags={convertTextToTags(entry.text)} mode="tags" draggable={true}
+              isDragging={ui.dragDrop.draggedId === entry.id} isDragOver={ui.dragDrop.dragOverId === entry.id}
+              isPlaying={ui.audio.currentPlayingId === entry.id} isLoading={ui.audio.currentLoadingId === entry.id}
+              onPlay={ui.audio.handlePlayEntry} onDragStart={ui.dragDrop.handleDragStart} onDragEnd={ui.dragDrop.handleDragEnd}
+              onDragOver={ui.dragDrop.handleDragOver} onDragLeave={ui.dragDrop.handleDragLeave} onDrop={ui.dragDrop.handleDrop}
+              onTagClick={ui.variants.handleTagClick}
+              selectedTagIndex={ui.variants.selectedEntryId === entry.id ? ui.variants.selectedTagIndex : null}
+              isPronunciationPanelOpen={ui.variants.isVariantsPanelOpen || ui.phonetic.showPhoneticPanel}
+              allTagsSelected={ui.phonetic.phoneticPanelEntryId === entry.id}
+              openMenuId={ui.openMenuId} onMenuOpen={ui.setOpenMenuId} onMenuClose={ui.handleMenuClose} rowMenuItems={rowMenuItems} />
+          ))}
+        </div></div>
       )}
-
-      <ShareTaskModal
-        isOpen={isShareModalOpen}
-        shareToken={task?.shareToken || ""}
-        taskName={task?.name || ""}
-        onClose={() => setIsShareModalOpen(false)}
-      />
-
-      <PronunciationVariants
-        isOpen={variants.isVariantsPanelOpen}
-        word={variants.variantsWord || ""}
-        onClose={variants.handleCloseVariants}
-        onUseVariant={(...args: Parameters<typeof variants.handleUseVariant>) => { void variants.handleUseVariant(...args); }}
-        customPhoneticForm={variants.variantsCustomPhonetic}
-      />
-
-      {phonetic.phoneticPanelEntryId && (
-        <SentencePhoneticPanel
-          sentenceText={
-            entries.find((e) => e.id === phonetic.phoneticPanelEntryId)?.text ||
-            ""
-          }
-          phoneticText={
-            entries.find((e) => e.id === phonetic.phoneticPanelEntryId)
-              ?.stressedText || null
-          }
-          isOpen={phonetic.showPhoneticPanel}
-          onClose={phonetic.handleClosePhoneticPanel}
-          onApply={(...args: Parameters<typeof phonetic.handlePhoneticApply>) => { void phonetic.handlePhoneticApply(...args); }}
-        />
-      )}
+      <TaskPanels task={task} entries={entries} variants={ui.variants} phonetic={ui.phonetic} isShareModalOpen={isShareModalOpen} onCloseShare={() => setIsShareModalOpen(false)} />
     </div>
   );
 }

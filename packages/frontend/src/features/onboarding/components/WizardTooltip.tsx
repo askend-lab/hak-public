@@ -24,206 +24,100 @@ interface Position {
   arrowOffset?: number; // Percentage offset for arrow positioning
 }
 
+function computeArrowOffset(opts: { arrowPos: string; targetRect: DOMRect; tooltipRect: DOMRect; left: number; top: number }): number {
+  const { arrowPos, targetRect, tooltipRect, left, top } = opts;
+  if (arrowPos === "top" || arrowPos === "bottom") {
+    const tc = targetRect.left + targetRect.width / 2;
+    return Math.max(15, Math.min(85, ((tc - left) / tooltipRect.width) * 100));
+  }
+  if (arrowPos === "left" || arrowPos === "right") {
+    const tc = targetRect.top + targetRect.height / 2;
+    return Math.max(15, Math.min(85, ((tc - top) / tooltipRect.height) * 100));
+  }
+  return 50;
+}
+
+function clampToViewport(pos: { top: number; left: number }, tooltipRect: DOMRect, padding: number) {
+  let { top, left } = pos;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  if (left < padding) {left = padding;}
+  if (left + tooltipRect.width > vw - padding) { left = vw - tooltipRect.width - padding; }
+  if (top < padding) {top = padding;}
+  if (top + tooltipRect.height > vh - padding) { top = vh - tooltipRect.height - padding; }
+  return { top, left };
+}
+
+function computeRawPosition(step: WizardStep, targetRect: DOMRect, tooltipRect: DOMRect) {
+  const padding = 16; const arrowSize = 12;
+  let top = 0; let left = 0; let arrowPosition = step.position;
+  switch (step.position) {
+    case "bottom": top = targetRect.bottom + padding + arrowSize; left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2; arrowPosition = "top"; break;
+    case "top": top = targetRect.top - tooltipRect.height - padding - arrowSize; left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2; arrowPosition = "bottom"; break;
+    case "left": top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2; left = targetRect.left - tooltipRect.width - padding - arrowSize; arrowPosition = "right"; break;
+    case "right": top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2; left = targetRect.right + padding + arrowSize; arrowPosition = "left"; break;
+  }
+  const clamped = clampToViewport({ top, left }, tooltipRect, padding);
+  const arrowOffset = computeArrowOffset({ arrowPos: arrowPosition, targetRect, tooltipRect, left: clamped.left, top: clamped.top });
+  return { ...clamped, arrowPosition, arrowOffset };
+}
+
 /**
  * WizardTooltip - Individual tooltip for wizard steps
  *
  * Positions itself relative to the target element and highlights it.
  * Shows title, description, progress indicator, and navigation buttons.
  */
-export default function WizardTooltip({
-  step,
-  currentIndex,
-  totalSteps,
-  onNext,
-  onPrev,
-  onSkip,
-  isFirst,
-  isLast,
-}: WizardTooltipProps) {
-  const [position, setPosition] = useState<Position>({
-    top: 0,
-    left: 0,
-    arrowPosition: "top",
-  });
+function useTooltipPosition(step: WizardStep, tooltipRef: React.RefObject<HTMLDivElement | null>) {
+  const [position, setPosition] = useState<Position>({ top: 0, left: 0, arrowPosition: "top" });
   const [targetElement, setTargetElement] = useState<Element | null>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const calculatePosition = useCallback(() => { // eslint-disable-line max-statements -- position calculation has many DOM measurements
+  const calculatePosition = useCallback(() => {
     const target = document.querySelector(step.targetSelector);
-    if (!target || !tooltipRef.current) {return false;} // Return false if can't calculate
-
+    if (!target || !tooltipRef.current) {return false;}
     setTargetElement(target);
-
-    const targetRect = target.getBoundingClientRect();
-    const tooltipRect = tooltipRef.current.getBoundingClientRect();
-    const padding = 16;
-    const arrowSize = 12;
-
-    let top = 0;
-    let left = 0;
-    let arrowPosition = step.position;
-
-    switch (step.position) {
-      case "bottom":
-        top = targetRect.bottom + padding + arrowSize;
-        left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
-        arrowPosition = "top";
-        break;
-      case "top":
-        top = targetRect.top - tooltipRect.height - padding - arrowSize;
-        left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
-        arrowPosition = "bottom";
-        break;
-      case "left":
-        top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2;
-        left = targetRect.left - tooltipRect.width - padding - arrowSize;
-        arrowPosition = "right";
-        break;
-      case "right":
-        top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2;
-        left = targetRect.right + padding + arrowSize;
-        arrowPosition = "left";
-        break;
-    }
-
-    // Keep tooltip within viewport bounds
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    if (left < padding) {left = padding;}
-    if (left + tooltipRect.width > viewportWidth - padding) {
-      left = viewportWidth - tooltipRect.width - padding;
-    }
-    if (top < padding) {top = padding;}
-    if (top + tooltipRect.height > viewportHeight - padding) {
-      top = viewportHeight - tooltipRect.height - padding;
-    }
-
-    // Calculate arrow offset to point at target element center
-    let arrowOffset = 50; // Default to center (50%)
-
-    if (arrowPosition === "top" || arrowPosition === "bottom") {
-      // For top/bottom arrows, calculate horizontal offset
-      const targetCenter = targetRect.left + targetRect.width / 2;
-      const tooltipLeft = left;
-      arrowOffset = ((targetCenter - tooltipLeft) / tooltipRect.width) * 100;
-      // Clamp between 15% and 85% to keep arrow visible
-      arrowOffset = Math.max(15, Math.min(85, arrowOffset));
-    } else if (arrowPosition === "left" || arrowPosition === "right") {
-      // For left/right arrows, calculate vertical offset
-      const targetCenter = targetRect.top + targetRect.height / 2;
-      const tooltipTop = top;
-      arrowOffset = ((targetCenter - tooltipTop) / tooltipRect.height) * 100;
-      // Clamp between 15% and 85% to keep arrow visible
-      arrowOffset = Math.max(15, Math.min(85, arrowOffset));
-    }
-
-    setPosition({ top, left, arrowPosition, arrowOffset });
-    return true; // Return true on success
-  }, [step.targetSelector, step.position]);
+    const pos = computeRawPosition(step, target.getBoundingClientRect(), tooltipRef.current.getBoundingClientRect());
+    setPosition(pos);
+    return true;
+  }, [step, tooltipRef]);
 
   useEffect(() => {
-    let retryCount = 0;
-    const maxRetries = 10;
-    let rafId: number;
-
-    // Retry mechanism to handle timing issues with DOM rendering
-    const tryCalculatePosition = () => {
-      const success = calculatePosition();
-      if (!success && retryCount < maxRetries) {
-        retryCount++;
-        // Use requestAnimationFrame to wait for next paint cycle
-        rafId = requestAnimationFrame(tryCalculatePosition);
-      }
-    };
-
-    // Start with a small delay to ensure DOM is ready
-    rafId = requestAnimationFrame(tryCalculatePosition);
-
-    // Recalculate on resize/scroll
-    const handleResize = () => calculatePosition();
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleResize, true);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleResize, true);
-    };
+    let retryCount = 0; let rafId: number;
+    const tryCalc = () => { if (!calculatePosition() && retryCount < 10) { retryCount++; rafId = requestAnimationFrame(tryCalc); } };
+    rafId = requestAnimationFrame(tryCalc);
+    const onResize = () => calculatePosition();
+    window.addEventListener("resize", onResize); window.addEventListener("scroll", onResize, true);
+    return () => { cancelAnimationFrame(rafId); window.removeEventListener("resize", onResize); window.removeEventListener("scroll", onResize, true); };
   }, [calculatePosition]);
 
-  // Add highlight class to target element
   useEffect(() => {
-    if (targetElement) {
-      targetElement.classList.add("wizard__highlight");
-
-      // Scroll target into view if needed
-      targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
-
-      return () => {
-        targetElement.classList.remove("wizard__highlight");
-      };
-    }
-    return undefined;
+    if (!targetElement) {return undefined;}
+    targetElement.classList.add("wizard__highlight");
+    targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    return () => { targetElement.classList.remove("wizard__highlight"); };
   }, [targetElement]);
+
+  return position;
+}
+
+export default function WizardTooltip({ step, currentIndex, totalSteps, onNext, onPrev, onSkip, isFirst, isLast }: WizardTooltipProps) {
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const position = useTooltipPosition(step, tooltipRef);
+  const style = { top: position.top, left: position.left, opacity: position.top === 0 && position.left === 0 ? 0 : 1, "--arrow-offset": `${position.arrowOffset || 50}%` } as React.CSSProperties;
 
   return (
     <>
-      {/* Overlay that dims the rest of the page */}
       <div className="wizard__overlay" onClick={onSkip} onKeyDown={(e) => { if (e.key === "Escape") {onSkip();} }} role="presentation" />
-
-      {/* Tooltip */}
-      <div
-        ref={tooltipRef}
-        className={`wizard__tooltip wizard__tooltip--arrow-${position.arrowPosition}`}
-        style={{
-          top: position.top,
-          left: position.left,
-          opacity: position.top === 0 && position.left === 0 ? 0 : 1,
-          "--arrow-offset": `${position.arrowOffset || 50}%`,
-        } as React.CSSProperties}
-        role="dialog"
-        aria-labelledby="wizard-title"
-        aria-describedby="wizard-description"
-      >
-        {/* Close button */}
-        <button
-          className="wizard__close"
-          onClick={onSkip}
-          aria-label="Sulge juhend"
-        >
-          <CloseIcon size="2xl" />
-        </button>
-
-        <h3 id="wizard-title" className="wizard__title">
-          {step.title}
-        </h3>
-
-        <p id="wizard-description" className="wizard__description">
-          {step.description}
-        </p>
-
+      <div ref={tooltipRef} className={`wizard__tooltip wizard__tooltip--arrow-${position.arrowPosition}`} style={style} role="dialog" aria-labelledby="wizard-title" aria-describedby="wizard-description">
+        <button className="wizard__close" onClick={onSkip} aria-label="Sulge juhend"><CloseIcon size="2xl" /></button>
+        <h3 id="wizard-title" className="wizard__title">{step.title}</h3>
+        <p id="wizard-description" className="wizard__description">{step.description}</p>
         <div className="wizard__footer">
-          <span className="wizard__progress">
-            {currentIndex + 1} / {totalSteps}
-          </span>
-
+          <span className="wizard__progress">{currentIndex + 1} / {totalSteps}</span>
           <div className="wizard__nav">
-            <button
-              className="wizard__nav-button"
-              onClick={onPrev}
-              disabled={isFirst}
-              aria-label="Eelmine samm"
-            >
-              <BackIcon size="2xl" />
-            </button>
-            <button
-              className="wizard__nav-button wizard__nav-button--primary"
-              onClick={isLast ? onSkip : onNext}
-              aria-label={isLast ? "Lõpeta juhend" : "Järgmine samm"}
-            >
-              <ArrowForwardIcon size="2xl" />
-            </button>
+            <button className="wizard__nav-button" onClick={onPrev} disabled={isFirst} aria-label="Eelmine samm"><BackIcon size="2xl" /></button>
+            <button className="wizard__nav-button wizard__nav-button--primary" onClick={isLast ? onSkip : onNext}
+              aria-label={isLast ? "Lõpeta juhend" : "Järgmine samm"}><ArrowForwardIcon size="2xl" /></button>
           </div>
         </div>
       </div>

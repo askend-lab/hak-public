@@ -147,20 +147,17 @@ function parseTokenResponse(data: Record<string, unknown>): TokenResult | null {
   return { accessToken: data.access_token, idToken: data.id_token, expiresIn: data.expires_in };
 }
 
+async function doTokenExchange(code: string, codeVerifier: string): Promise<TokenResult | null> {
+  const response = await fetchTokenExchange(code, codeVerifier);
+  if (!response.ok) { logger.error("[Auth] Token exchange failed:", response.status, await response.text()); return null; }
+  const result = parseTokenResponse(await response.json());
+  if (result) { sessionStorage.removeItem(PKCE_STORAGE_KEY); }
+  return result;
+}
+
 export async function exchangeCodeForTokens(code: string): Promise<TokenResult | null> {
   const codeVerifier = sessionStorage.getItem(PKCE_STORAGE_KEY);
   if (!codeVerifier) { logger.error("[Auth] Missing PKCE code verifier"); return null; }
-  try {
-    const response = await fetchTokenExchange(code, codeVerifier);
-    if (!response.ok) {
-      logger.error("[Auth] Token exchange failed:", response.status, await response.text());
-      return null;
-    }
-    const result = parseTokenResponse(await response.json());
-    if (result) { sessionStorage.removeItem(PKCE_STORAGE_KEY); }
-    return result;
-  } catch (error) {
-    logger.error("[Auth] Token exchange error:", error);
-    return null;
-  }
+  try { return await doTokenExchange(code, codeVerifier); }
+  catch (error) { logger.error("[Auth] Token exchange error:", error); return null; }
 }

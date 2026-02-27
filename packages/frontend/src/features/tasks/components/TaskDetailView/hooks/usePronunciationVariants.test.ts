@@ -41,7 +41,7 @@ describe("usePronunciationVariants", () => {
   it("initializes with panel closed", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     expect(result.current.isVariantsPanelOpen).toBe(false);
@@ -51,7 +51,7 @@ describe("usePronunciationVariants", () => {
   it("handleTagClick opens panel with word", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     act(() => {
@@ -65,7 +65,7 @@ describe("usePronunciationVariants", () => {
   it("handleCloseVariants closes panel", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     act(() => {
@@ -81,7 +81,7 @@ describe("usePronunciationVariants", () => {
   it("handleUseVariant closes when no selection", async () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     await act(async () => {
@@ -93,7 +93,7 @@ describe("usePronunciationVariants", () => {
   it("handleUseVariant closes when entry not found", async () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePronunciationVariants([], setEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [], setEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     act(() => {
@@ -108,7 +108,7 @@ describe("usePronunciationVariants", () => {
   it("handleUseVariant closes when tag index out of range", async () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     act(() => {
@@ -129,7 +129,7 @@ describe("usePronunciationVariants", () => {
       }) as unknown as React.Dispatch<React.SetStateAction<TaskEntry[]>>;
 
     const { result } = renderHook(() =>
-      usePronunciationVariants([mockEntry], invokingSetEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [mockEntry], setEntries: invokingSetEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     act(() => {
@@ -149,7 +149,7 @@ describe("usePronunciationVariants", () => {
     mockUpdateTaskEntry.mockRejectedValueOnce(new Error("fail"));
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePronunciationVariants([mockEntry], setEntries, mockTask, "u1"),
+      usePronunciationVariants({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1" }),
       { wrapper: dsWrapper },
     );
     act(() => {

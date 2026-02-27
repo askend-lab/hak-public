@@ -48,7 +48,7 @@ describe("usePhoneticPanel", () => {
   it("initializes with panel closed", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      usePhoneticPanel({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     expect(result.current.showPhoneticPanel).toBe(false);
@@ -58,7 +58,7 @@ describe("usePhoneticPanel", () => {
   it("handleExplorePhonetic opens panel", async () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      usePhoneticPanel({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     await act(async () => {
@@ -72,7 +72,7 @@ describe("usePhoneticPanel", () => {
   it("handleExplorePhonetic does nothing for missing entry", async () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      usePhoneticPanel({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     await act(async () => {
@@ -89,13 +89,7 @@ describe("usePhoneticPanel", () => {
     });
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel(
-        [entryNoStressed],
-        setEntries,
-        mockTask,
-        "u1",
-        onMenuClose,
-      ),
+      usePhoneticPanel({ entries: [entryNoStressed], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     await act(async () => {
@@ -113,13 +107,7 @@ describe("usePhoneticPanel", () => {
     );
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel(
-        [entryNoStressed],
-        setEntries,
-        mockTask,
-        "u1",
-        onMenuClose,
-      ),
+      usePhoneticPanel({ entries: [entryNoStressed], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     await act(async () => {
@@ -132,7 +120,7 @@ describe("usePhoneticPanel", () => {
   it("handleClosePhoneticPanel closes panel", async () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      usePhoneticPanel({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     await act(async () => {
@@ -153,13 +141,7 @@ describe("usePhoneticPanel", () => {
       }) as unknown as React.Dispatch<React.SetStateAction<TaskEntry[]>>;
 
     const { result } = renderHook(() =>
-      usePhoneticPanel(
-        [mockEntry],
-        invokingSetEntries,
-        mockTask,
-        "u1",
-        onMenuClose,
-      ),
+      usePhoneticPanel({ entries: [mockEntry], setEntries: invokingSetEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
 
@@ -178,7 +160,7 @@ describe("usePhoneticPanel", () => {
   it("handlePhoneticApply closes panel when no selection", async () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      usePhoneticPanel({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     await act(async () => {
@@ -193,7 +175,7 @@ describe("usePhoneticPanel", () => {
     mockUpdateTaskEntry.mockRejectedValueOnce(new Error("save fail"));
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
-      usePhoneticPanel([mockEntry], setEntries, mockTask, "u1", onMenuClose),
+      usePhoneticPanel({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1", onMenuClose }),
       { wrapper: dsWrapper },
     );
     await act(async () => {

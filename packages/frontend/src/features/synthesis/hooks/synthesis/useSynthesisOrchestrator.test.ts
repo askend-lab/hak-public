@@ -166,8 +166,7 @@ describe("useSynthesisOrchestrator", () => {
 
       expect(mockSynthesisAPI.synthesizeWithCache).toHaveBeenCalledWith(
         "Hello",
-        null,
-        null,
+        undefined,
       );
       expect(mockSentenceState.updateSentence).toHaveBeenCalledWith("test-1", {
         audioUrl: "https://example.com/audio.mp3",

@@ -56,19 +56,19 @@ interface ZipProgress {
 const BATCH_SIZE = 4;
 const MAX_TOTAL_ZIP_BYTES = 500 * 1024 * 1024;
 
-function createZipFolder(zip: JSZip, task: Task): { folder: JSZip; audioFolder: JSZip; folderName: string } {
+function buildManifest(task: Task): string {
+  return JSON.stringify({ name: task.name, description: task.description ?? null, createdAt: task.createdAt, exportedAt: new Date().toISOString(), entryCount: task.entries.length }, null, 2);
+}
+
+function createZipFolder(zip: JSZip, task: Task): { audioFolder: JSZip; folderName: string } {
   const folderName = sanitizeFilename(task.name) || "task";
   const folder = zip.folder(folderName);
   if (!folder) {throw new Error("Failed to create ZIP folder");}
   const audioFolder = folder.folder("audio");
   if (!audioFolder) {throw new Error("Failed to create audio folder");}
-  folder.file("manifest.json", JSON.stringify({
-    name: task.name, description: task.description ?? null,
-    createdAt: task.createdAt, exportedAt: new Date().toISOString(), entryCount: task.entries.length,
-  }, null, 2));
-  const textsContent = task.entries.map((e, i) => `${String(i + 1).padStart(3, "0")}. ${e.text}`).join("\n");
-  folder.file("texts.txt", textsContent);
-  return { folder, audioFolder, folderName };
+  folder.file("manifest.json", buildManifest(task));
+  folder.file("texts.txt", task.entries.map((e, i) => `${String(i + 1).padStart(3, "0")}. ${e.text}`).join("\n"));
+  return { audioFolder, folderName };
 }
 
 async function addAudioToZip(
@@ -92,12 +92,15 @@ async function addAudioToZip(
   }
 }
 
+function buildZipFilename(folderName: string): string {
+  return `${folderName}_${formatDateTime(new Date()).replace(/[,\s:]/g, "-")}.zip`;
+}
+
 export async function downloadTaskAsZip(
   task: Task, onProgress?: (progress: ZipProgress) => void,
 ): Promise<void> {
   const zip = new JSZip();
   const { audioFolder, folderName } = createZipFolder(zip, task);
   await addAudioToZip(task.entries, audioFolder, onProgress);
-  const zipBlob = await zip.generateAsync({ type: "blob" });
-  triggerBlobDownload(zipBlob, `${folderName}_${formatDateTime(new Date()).replace(/[,\s:]/g, "-")}.zip`);
+  triggerBlobDownload(await zip.generateAsync({ type: "blob" }), buildZipFilename(folderName));
 }

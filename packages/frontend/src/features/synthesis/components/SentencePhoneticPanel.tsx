@@ -86,55 +86,50 @@ function usePhoneticAudio() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const stopAudio = () => {
-    if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; audioRef.current = null; }
-  };
   const reset = () => { audioRef.current = null; setIsPlaying(false); setIsLoading(false); };
 
   useEffect(() => () => { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } }, []);
 
+  const startPlayback = async (text: string) => {
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    setIsLoading(true); setIsPlaying(false);
+    const url = await synthesizeAuto(transformToVabamorf(text) || "");
+    const { audio } = createAudioPlayer(url, { onLoaded: () => { setIsLoading(false); setIsPlaying(true); }, onEnded: reset, onError: reset });
+    audioRef.current = audio; // eslint-disable-line require-atomic-updates -- ref is only accessed from UI thread
+    await audio.play();
+  };
+
   const play = async (text: string) => {
     if (!text.trim()) {return;}
-    if (isPlaying) { stopAudio(); setIsPlaying(false); return; }
-    stopAudio(); setIsLoading(true); setIsPlaying(false);
-    try {
-      const url = await synthesizeAuto(transformToVabamorf(text) || "");
-      const { audio } = createAudioPlayer(url, {
-        onLoaded: () => { setIsLoading(false); setIsPlaying(true); },
-        onEnded: reset, onError: reset,
-      });
-      audioRef.current = audio;
-      await audio.play();
-    } catch (e) { logger.error("Failed to play:", e); reset(); }
+    if (isPlaying) { reset(); return; }
+    try { await startPlayback(text); }
+    catch (e) { logger.error("Failed to play:", e); reset(); }
   };
 
   return { isPlaying, isLoading, play, stopAudio: reset };
 }
 
-export default function SentencePhoneticPanel({
-  sentenceText,
-  phoneticText,
-  isOpen,
-  onClose,
-  onApply,
-}: SentencePhoneticPanelProps) {
-  const [editedText, setEditedText] = useState("");
-  const [showGuide, setShowGuide] = useState(false);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const audio = usePhoneticAudio();
+function PlayButton({ audio, text }: { audio: ReturnType<typeof usePhoneticAudio>; text: string }) {
+  const icon = audio.isLoading ? <div className="loader-spinner"></div> : audio.isPlaying ? <PauseIcon size="2xl" /> : <PlayIcon size="2xl" />;
+  return (
+    <button
+      onClick={() => { void audio.play(text); }}
+      disabled={!text.trim() || audio.isLoading}
+      className={`button button--primary ${audio.isLoading ? "loading" : ""} ${audio.isPlaying ? "playing" : ""}`}
+      title={audio.isLoading ? "Laen..." : audio.isPlaying ? "Mängib" : "Kuula"}
+    >
+      {icon} Kuula
+    </button>
+  );
+}
 
-  useEffect(() => {
-    if (!isOpen) {return;}
-    if (phoneticText) { setEditedText(transformToUI(phoneticText) || ""); }
-    else if (sentenceText) { setEditedText(sentenceText); }
-    if (inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);
-    }
-  }, [isOpen, phoneticText, sentenceText]);
-
-  const insertMarkerAtCursor = (marker: string) => {
+function EditSection({ editedText, setEditedText, inputRef, audio, onApply, onShowGuide }: {
+  editedText: string; setEditedText: (v: string) => void;
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  audio: ReturnType<typeof usePhoneticAudio>;
+  onApply: () => void; onShowGuide: () => void;
+}) {
+  const insertMarker = (marker: string) => {
     const ta = inputRef.current;
     if (!ta) {return;}
     const s = ta.selectionStart || 0;
@@ -143,87 +138,59 @@ export default function SentencePhoneticPanel({
     setTimeout(() => { ta.focus(); ta.setSelectionRange(s + marker.length, s + marker.length); }, 0);
   };
 
-  const handleApply = () => {
-    if (!editedText.trim()) {return;}
-    onApply(transformToVabamorf(editedText) || "");
-    onClose();
-  };
+  return (
+    <div className="sentence-phonetic-panel__edit-section">
+      <p className="sentence-phonetic-panel__description">Sisesta hääldusmärgid, et täpsustada lause hääldust.</p>
+      <div className="sentence-phonetic-panel__input-container">
+        <textarea ref={inputRef} value={editedText} onChange={(e) => setEditedText(e.target.value)}
+          className="sentence-phonetic-panel__textarea" aria-label="Häälduskuju" placeholder="Kirjuta oma hääldusvariant" rows={4} maxLength={100} />
+      </div>
+      <MarkersGuideBox onInsertMarker={insertMarker} onShowGuide={onShowGuide} className="sentence-phonetic-panel__markers-guide-box" />
+      <div className="sentence-phonetic-panel__actions">
+        <PlayButton audio={audio} text={editedText} />
+        <button onClick={onApply} disabled={!editedText.trim()} className="button button--secondary">Rakenda</button>
+      </div>
+    </div>
+  );
+}
+
+function PanelHeader({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="sentence-phonetic-panel__header">
+      <div className="sentence-phonetic-panel__title-section">
+        <h3 className="sentence-phonetic-panel__title">Muuda häälduskuju</h3>
+      </div>
+      <div className="sentence-phonetic-panel__header-actions">
+        <button onClick={onClose} className="sentence-phonetic-panel__close" aria-label="Sulge"><CloseIcon size="2xl" /></button>
+      </div>
+    </div>
+  );
+}
+
+export default function SentencePhoneticPanel({ sentenceText, phoneticText, isOpen, onClose, onApply }: SentencePhoneticPanelProps) {
+  const [editedText, setEditedText] = useState("");
+  const [showGuide, setShowGuide] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const audio = usePhoneticAudio();
+
+  useEffect(() => {
+    if (!isOpen) {return;}
+    setEditedText(phoneticText ? (transformToUI(phoneticText) || "") : sentenceText || "");
+    if (inputRef.current) { inputRef.current.focus(); inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length); }
+  }, [isOpen, phoneticText, sentenceText]);
 
   const handleClose = () => { audio.stopAudio(); onClose(); };
+  const handleApply = () => { if (editedText.trim()) { onApply(transformToVabamorf(editedText) || ""); onClose(); } };
 
   if (!isOpen) {return null;}
 
   return (
     <div className="sentence-phonetic-panel">
-      {!showGuide && (
-        <div className="sentence-phonetic-panel__header">
-          <div className="sentence-phonetic-panel__title-section">
-            <h3 className="sentence-phonetic-panel__title">
-              Muuda häälduskuju
-            </h3>
-          </div>
-          <div className="sentence-phonetic-panel__header-actions">
-            <button
-              onClick={handleClose}
-              className="sentence-phonetic-panel__close"
-              aria-label="Sulge"
-            >
-              <CloseIcon size="2xl" />
-            </button>
-          </div>
-        </div>
-      )}
+      {!showGuide && <PanelHeader onClose={handleClose} />}
       <div className="sentence-phonetic-panel__content">
-        {showGuide ? (
-          <GuideView onBack={() => setShowGuide(false)} onClose={handleClose} />
-        ) : (
-          <div className="sentence-phonetic-panel__edit-section">
-            <p className="sentence-phonetic-panel__description">
-              Sisesta hääldusmärgid, et täpsustada lause hääldust.
-            </p>
-            <div className="sentence-phonetic-panel__input-container">
-              <textarea
-                ref={inputRef}
-                value={editedText}
-                onChange={(e) => setEditedText(e.target.value)}
-                className="sentence-phonetic-panel__textarea"
-                aria-label="Häälduskuju"
-                placeholder="Kirjuta oma hääldusvariant"
-                rows={4}
-                maxLength={100}
-              />
-            </div>
-            <MarkersGuideBox
-              onInsertMarker={insertMarkerAtCursor}
-              onShowGuide={() => setShowGuide(true)}
-              className="sentence-phonetic-panel__markers-guide-box"
-            />
-            <div className="sentence-phonetic-panel__actions">
-              <button
-                onClick={() => { void audio.play(editedText); }}
-                disabled={!editedText.trim() || audio.isLoading}
-                className={`button button--primary ${audio.isLoading ? "loading" : ""} ${audio.isPlaying ? "playing" : ""}`}
-                title={audio.isLoading ? "Laen..." : audio.isPlaying ? "Mängib" : "Kuula"}
-              >
-                {audio.isLoading ? (
-                  <div className="loader-spinner"></div>
-                ) : audio.isPlaying ? (
-                  <PauseIcon size="2xl" />
-                ) : (
-                  <PlayIcon size="2xl" />
-                )}
-                Kuula
-              </button>
-              <button
-                onClick={handleApply}
-                disabled={!editedText.trim()}
-                className="button button--secondary"
-              >
-                Rakenda
-              </button>
-            </div>
-          </div>
-        )}
+        {showGuide
+          ? <GuideView onBack={() => setShowGuide(false)} onClose={handleClose} />
+          : <EditSection editedText={editedText} setEditedText={setEditedText} inputRef={inputRef} audio={audio} onApply={handleApply} onShowGuide={() => setShowGuide(true)} />}
       </div>
     </div>
   );

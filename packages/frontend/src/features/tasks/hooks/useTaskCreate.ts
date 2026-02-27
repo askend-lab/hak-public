@@ -22,90 +22,39 @@ interface UseTaskCreateDeps {
   viewTaskAction: (taskId: string) => { label: string; onClick: () => void };
 }
 
+function buildEntries(sentences: SentenceState[], pendingSentenceId: string | null, isFromTasksView: boolean) {
+  if (isFromTasksView) {return [];}
+  const src = pendingSentenceId ? sentences.filter((s) => s.id === pendingSentenceId && s.text.trim()) : filterNonEmptySentences(sentences);
+  return src.map((s) => ({ text: s.text, stressedText: s.phoneticText || s.text }));
+}
+
 export function useTaskCreate(deps: UseTaskCreateDeps) {
   const { user } = useAuth();
   const { showNotification } = useNotification();
   const dataService = useDataService();
-  const {
-    sentences,
-    setSelectedTaskId,
-    setShowAddTaskModal,
-    setTaskRefreshTrigger,
-    setPendingSentenceId,
-    setIsTaskCreationFromTasksView,
-    isTaskCreationFromTasksView,
-    pendingSentenceId,
-    requireAuth,
-    viewTaskAction,
-  } = deps;
+  const { sentences, setSelectedTaskId, setShowAddTaskModal, setTaskRefreshTrigger, setPendingSentenceId, setIsTaskCreationFromTasksView, isTaskCreationFromTasksView, pendingSentenceId, requireAuth, viewTaskAction } = deps;
 
-  const handleCreateNewTaskFromMenu = useCallback(
-    (sentenceId: string) => {
-      if (requireAuth()) {return;}
-      setPendingSentenceId(sentenceId);
-      setShowAddTaskModal(true);
-    },
-    [requireAuth],
-  );
-
-  const handleCreateTask = useCallback(() => {
-    if (requireAuth()) {return;}
-    setIsTaskCreationFromTasksView(true);
-    setShowAddTaskModal(true);
+  const handleCreateNewTaskFromMenu = useCallback((sentenceId: string) => {
+    if (requireAuth()) {return;} setPendingSentenceId(sentenceId); setShowAddTaskModal(true);
   }, [requireAuth]);
 
-  const handleAddTask = useCallback(
-    async (title: string, description: string) => {
-      if (!user) {return;}
-      try {
-        const entriesToAdd = isTaskCreationFromTasksView
-          ? []
-          : pendingSentenceId
-            ? sentences.filter(
-                (s) => s.id === pendingSentenceId && s.text.trim(),
-              )
-            : filterNonEmptySentences(sentences);
-        const playlistEntries = entriesToAdd.map((s) => ({
-          text: s.text,
-          stressedText: s.phoneticText || s.text,
-        }));
-        const newTask = await dataService.createTask(user.id, {
-          name: title,
-          description: description || null,
-          speechSequences: playlistEntries.map((e) => e.text),
-          speechEntries: playlistEntries.length > 0 ? playlistEntries : null,
-        });
-        setShowAddTaskModal(false);
-        setPendingSentenceId(null);
-        setIsTaskCreationFromTasksView(false);
-        setTaskRefreshTrigger((prev) => prev + 1);
-        if (playlistEntries.length > 0) {
-          showNotification({
-            type: "success",
-            message: TASK_STRINGS.TASK_CREATED,
-            description: TASK_STRINGS.TASK_CREATED_DETAIL(title),
-            action: viewTaskAction(newTask.id),
-          });
-        }
-        setSelectedTaskId(newTask.id);
-      } catch (error) {
-        logger.error("Failed to create task:", error);
-        throw error;
-      }
-    },
-    [
-      user,
-      sentences,
-      pendingSentenceId,
-      isTaskCreationFromTasksView,
-      showNotification,
-      setSelectedTaskId,
-    ],
-  );
+  const handleCreateTask = useCallback(() => {
+    if (requireAuth()) {return;} setIsTaskCreationFromTasksView(true); setShowAddTaskModal(true);
+  }, [requireAuth]);
 
-  return {
-    handleCreateNewTaskFromMenu,
-    handleCreateTask,
-    handleAddTask,
-  };
+  const handleAddTask = useCallback(async (title: string, description: string) => {
+    if (!user) {return;}
+    try {
+      const entries = buildEntries(sentences, pendingSentenceId, isTaskCreationFromTasksView);
+      const newTask = await dataService.createTask(user.id, {
+        name: title, description: description || null,
+        speechSequences: entries.map((e) => e.text), speechEntries: entries.length > 0 ? entries : null,
+      });
+      setShowAddTaskModal(false); setPendingSentenceId(null); setIsTaskCreationFromTasksView(false); setTaskRefreshTrigger((prev) => prev + 1);
+      if (entries.length > 0) { showNotification({ type: "success", message: TASK_STRINGS.TASK_CREATED, description: TASK_STRINGS.TASK_CREATED_DETAIL(title), action: viewTaskAction(newTask.id) }); }
+      setSelectedTaskId(newTask.id);
+    } catch (error) { logger.error("Failed to create task:", error); throw error; }
+  }, [user, sentences, pendingSentenceId, isTaskCreationFromTasksView, showNotification, setSelectedTaskId]);
+
+  return { handleCreateNewTaskFromMenu, handleCreateTask, handleAddTask };
 }

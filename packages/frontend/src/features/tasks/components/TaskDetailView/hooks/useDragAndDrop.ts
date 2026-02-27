@@ -4,6 +4,16 @@
 import { useState, useCallback } from "react";
 import { TaskEntry } from "@/types/task";
 
+function reorderEntries(prev: TaskEntry[], dragId: string, targetId: string): TaskEntry[] {
+  const di = prev.findIndex((e) => e.id === dragId);
+  const ti = prev.findIndex((e) => e.id === targetId);
+  if (di === -1 || ti === -1) {return prev;}
+  const next = [...prev];
+  const [item] = next.splice(di, 1);
+  if (item) {next.splice(ti, 0, item);}
+  return next;
+}
+
 interface UseDragAndDropReturn {
   draggedId: string | null;
   dragOverId: string | null;
@@ -51,16 +61,7 @@ export function useDragAndDrop(
       e.preventDefault();
       if (!draggedId || draggedId === targetId) {return;}
 
-      setEntries((prev) => {
-        const draggedIndex = prev.findIndex((entry) => entry.id === draggedId);
-        const targetIndex = prev.findIndex((entry) => entry.id === targetId);
-        if (draggedIndex === -1 || targetIndex === -1) {return prev;}
-
-        const newEntries = [...prev];
-        const [draggedItem] = newEntries.splice(draggedIndex, 1);
-        if (draggedItem) {newEntries.splice(targetIndex, 0, draggedItem);}
-        return newEntries;
-      });
+      setEntries((prev) => reorderEntries(prev, draggedId, targetId));
 
       setDraggedId(null);
       setDragOverId(null);

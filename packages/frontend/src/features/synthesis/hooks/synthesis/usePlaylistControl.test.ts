@@ -31,12 +31,7 @@ describe("usePlaylistControl", () => {
 
   it("initializes with idle state", () => {
     const { result } = renderHook(() =>
-      usePlaylistControl(
-        sentences,
-        mockPlaySingle,
-        mockStopAudio,
-        mockUpdateAll,
-      ),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     expect(result.current.isPlayingAll).toBe(false);
     expect(result.current.isLoadingPlayAll).toBe(false);
@@ -44,7 +39,7 @@ describe("usePlaylistControl", () => {
 
   it("does nothing with empty sentences", async () => {
     const { result } = renderHook(() =>
-      usePlaylistControl([], mockPlaySingle, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences: [], playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -54,12 +49,7 @@ describe("usePlaylistControl", () => {
 
   it("plays all sentences sequentially", async () => {
     const { result } = renderHook(() =>
-      usePlaylistControl(
-        sentences,
-        mockPlaySingle,
-        mockStopAudio,
-        mockUpdateAll,
-      ),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -76,7 +66,7 @@ describe("usePlaylistControl", () => {
           new Promise((r) => setTimeout(() => r(true), 50)),
       );
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: slowPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
 
     act(() => {
@@ -94,12 +84,7 @@ describe("usePlaylistControl", () => {
   it("stops when playSingle returns false", async () => {
     mockPlaySingle.mockResolvedValueOnce(false);
     const { result } = renderHook(() =>
-      usePlaylistControl(
-        sentences,
-        mockPlaySingle,
-        mockStopAudio,
-        mockUpdateAll,
-      ),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -110,7 +95,7 @@ describe("usePlaylistControl", () => {
   it("skips sentences with empty text", async () => {
     const mixed = [makeSentence("1", "hello"), makeSentence("2", "  ")];
     const { result } = renderHook(() =>
-      usePlaylistControl(mixed, mockPlaySingle, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences: mixed, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -120,12 +105,7 @@ describe("usePlaylistControl", () => {
 
   it("calls playSingle with sentence id and abort signal", async () => {
     const { result } = renderHook(() =>
-      usePlaylistControl(
-        sentences,
-        mockPlaySingle,
-        mockStopAudio,
-        mockUpdateAll,
-      ),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -139,7 +119,7 @@ describe("usePlaylistControl", () => {
       (): Promise<boolean> => new Promise((r) => setTimeout(() => r(true), 50)),
     );
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: slowPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     act(() => { void result.current.handlePlayAll(); });
     await act(async () => {
@@ -153,12 +133,7 @@ describe("usePlaylistControl", () => {
 
   it("resets all state after successful complete playback", async () => {
     const { result } = renderHook(() =>
-      usePlaylistControl(
-        sentences,
-        mockPlaySingle,
-        mockStopAudio,
-        mockUpdateAll,
-      ),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -172,7 +147,7 @@ describe("usePlaylistControl", () => {
       return true;
     });
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, trackingPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: trackingPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -187,7 +162,7 @@ describe("usePlaylistControl", () => {
   it("does not transition to playing when first entry fails", async () => {
     mockPlaySingle.mockResolvedValue(false);
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, mockPlaySingle, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -202,7 +177,7 @@ describe("usePlaylistControl", () => {
       makeSentence("3", "valid"),
     ];
     const { result } = renderHook(() =>
-      usePlaylistControl(mixed, mockPlaySingle, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences: mixed, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => {
       await result.current.handlePlayAll();
@@ -216,7 +191,7 @@ describe("usePlaylistControl", () => {
       (): Promise<boolean> => new Promise((r) => setTimeout(() => r(true), 50)),
     );
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: slowPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     act(() => { void result.current.handlePlayAll(); });
     await act(async () => { await result.current.handlePlayAll(); });
@@ -241,7 +216,7 @@ describe("usePlaylistControl mutation kills", () => {
       () => new Promise<boolean>((r) => setTimeout(() => r(true), 100)),
     );
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: slowPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
 
     act(() => { void result.current.handlePlayAll(); });
@@ -261,7 +236,7 @@ describe("usePlaylistControl mutation kills", () => {
       () => new Promise<boolean>((r) => setTimeout(() => r(true), 100)),
     );
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, slowPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: slowPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
 
     act(() => { void result.current.handlePlayAll(); });
@@ -275,7 +250,7 @@ describe("usePlaylistControl mutation kills", () => {
   it("does nothing when all sentences have empty text", async () => {
     const empty = [makeSentence("1", ""), makeSentence("2", "   ")];
     const { result } = renderHook(() =>
-      usePlaylistControl(empty, mockPlaySingle, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences: empty, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => { await result.current.handlePlayAll(); });
     expect(mockPlaySingle).not.toHaveBeenCalled();
@@ -285,7 +260,7 @@ describe("usePlaylistControl mutation kills", () => {
   it("sets isLoadingPlayAll true at start", () => {
     const neverResolve = vi.fn().mockReturnValue(new Promise<boolean>(() => {}));
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, neverResolve, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: neverResolve, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     act(() => { void result.current.handlePlayAll(); });
     expect(result.current.isLoadingPlayAll).toBe(true);
@@ -305,7 +280,7 @@ describe("usePlaylistControl mutation kills", () => {
       return Promise.resolve(true);
     });
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, abortingPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: abortingPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => { await result.current.handlePlayAll(); });
     // After abort, playback should end
@@ -323,7 +298,7 @@ describe("usePlaylistControl mutation kills", () => {
     });
 
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, controlledPlay, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: controlledPlay, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
 
     act(() => { void result.current.handlePlayAll(); });
@@ -342,7 +317,7 @@ describe("usePlaylistControl mutation kills", () => {
   it("does not transition to playing when first play fails", async () => {
     mockPlaySingle.mockResolvedValueOnce(false);
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, mockPlaySingle, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => { await result.current.handlePlayAll(); });
     expect(result.current.isPlayingAll).toBe(false);
@@ -352,7 +327,7 @@ describe("usePlaylistControl mutation kills", () => {
   // L55-57: final cleanup after loop
   it("resets all state after full playback", async () => {
     const { result } = renderHook(() =>
-      usePlaylistControl(sentences, mockPlaySingle, mockStopAudio, mockUpdateAll),
+      usePlaylistControl({ sentences, playSingle: mockPlaySingle, stopAudio: mockStopAudio, updateAllSentences: mockUpdateAll }),
     );
     await act(async () => { await result.current.handlePlayAll(); });
     expect(result.current.isPlayingAll).toBe(false);

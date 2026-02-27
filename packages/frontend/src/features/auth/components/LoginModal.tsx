@@ -67,106 +67,39 @@ const TaraIcon = () => (
   </svg>
 );
 
+const dividerStyle = { display: "flex", alignItems: "center", gap: "1rem", margin: "0.5rem 0" } as const;
+const hrStyle = { flex: 1, border: "none", borderTop: "1px solid var(--color-border, #e0e0e0)" } as const;
+const spanStyle = { color: "var(--color-text-secondary, #666)", fontSize: "0.875rem" } as const;
+
+function LoginButtons({ isLoading, onTara, onGoogle }: { isLoading: boolean; onTara: () => void; onGoogle: () => void }) {
+  return (
+    <div className="login-modal__actions">
+      <button type="button" onClick={onTara} className="button button--primary login-modal__tara-button" disabled={isLoading} style={{ marginBottom: "0.75rem" }}>
+        <TaraIcon />{isLoading ? "Suunan..." : "Logi sisse TARA-ga"}
+      </button>
+      <div className="login-modal__divider" style={dividerStyle}><hr style={hrStyle} /><span style={spanStyle}>või</span><hr style={hrStyle} /></div>
+      <button type="button" onClick={onGoogle} className="button button--secondary login-modal__google-button login-modal__google-button--flex" disabled={isLoading}>
+        <GoogleIcon />{isLoading ? "Suunan..." : "Jätka Google'iga"}
+      </button>
+    </div>
+  );
+}
+
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login, loginWithTara } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleGoogleLogin = async () => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      await login();
-    } catch (err) {
-      setError(
-        getErrorMessage(err, "Sisselogimine ebaõnnestus"),
-      );
-      setIsLoading(false);
-    }
-  };
-
-  const handleTaraLogin = () => {
-    setError(null);
-    setIsLoading(true);
-    loginWithTara();
-  };
-
-  const handleClose = () => {
-    if (!isLoading) {
-      setError(null);
-      onClose();
-    }
-  };
-
+  const handleGoogle = async () => { setError(null); setIsLoading(true); try { await login(); } catch (err) { setError(getErrorMessage(err, "Sisselogimine ebaõnnestus")); setIsLoading(false); } };
+  const handleTara = () => { setError(null); setIsLoading(true); loginWithTara(); };
+  const handleClose = () => { if (!isLoading) { setError(null); onClose(); } };
   if (!isOpen) {return null;}
-
   return (
-    <BaseModal
-      isOpen={isOpen}
-      onClose={handleClose}
-      showCloseButton={true}
-      size="medium"
-      className="login-modal"
-    >
+    <BaseModal isOpen={isOpen} onClose={handleClose} showCloseButton={true} size="medium" className="login-modal">
       <LoginIntro />
       <div className="login-modal__form">
         {error && <ErrorDisplay error={error} />}
-        <div className="login-modal__actions">
-          <button
-            type="button"
-            onClick={handleTaraLogin}
-            className="button button--primary login-modal__tara-button"
-            disabled={isLoading}
-            style={{ marginBottom: "0.75rem" }}
-          >
-            <TaraIcon />
-            {isLoading ? "Suunan..." : "Logi sisse TARA-ga"}
-          </button>
-          <div
-            className="login-modal__divider"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "1rem",
-              margin: "0.5rem 0",
-            }}
-          >
-            <hr
-              style={{
-                flex: 1,
-                border: "none",
-                borderTop: "1px solid var(--color-border, #e0e0e0)",
-              }}
-            />
-            <span
-              style={{
-                color: "var(--color-text-secondary, #666)",
-                fontSize: "0.875rem",
-              }}
-            >
-              või
-            </span>
-            <hr
-              style={{
-                flex: 1,
-                border: "none",
-                borderTop: "1px solid var(--color-border, #e0e0e0)",
-              }}
-            />
-          </div>
-          <button
-            type="button"
-            onClick={() => { void handleGoogleLogin(); }}
-            className="button button--secondary login-modal__google-button login-modal__google-button--flex"
-            disabled={isLoading}
-          >
-            <GoogleIcon />
-            {isLoading ? "Suunan..." : "Jätka Google'iga"}
-          </button>
-        </div>
-        <p className="login-modal__privacy">
-          Sisselogimisel nõustud meie kasutustingimustega
-        </p>
+        <LoginButtons isLoading={isLoading} onTara={handleTara} onGoogle={() => { void handleGoogle(); }} />
+        <p className="login-modal__privacy">Sisselogimisel nõustud meie kasutustingimustega</p>
       </div>
     </BaseModal>
   );

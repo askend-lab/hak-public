@@ -70,70 +70,41 @@ export class TaskRepository {
     return this.storage.getTask(taskId);
   }
 
+  private validateTaskName(name: string): string {
+    const trimmed = name.trim();
+    if (!trimmed) { throw new Error("Task name is required"); }
+    if (trimmed.length > MAX_TASK_NAME_LENGTH) { throw new Error(`Task name exceeds ${MAX_TASK_NAME_LENGTH} characters`); }
+    return trimmed;
+  }
+
+  private validateDescription(desc?: string | null): string | null {
+    const trimmed = desc?.trim() ?? null;
+    if (trimmed && trimmed.length > MAX_TASK_DESCRIPTION_LENGTH) { throw new Error(`Task description exceeds ${MAX_TASK_DESCRIPTION_LENGTH} characters`); }
+    return trimmed;
+  }
+
+  private buildEntries(taskData: CreateTaskRequest, taskId: string): TaskEntry[] {
+    if (taskData.speechEntries) {
+      return taskData.speechEntries.map((entry, i) => ({ id: generateId("entry"), taskId, text: entry.text, stressedText: entry.stressedText, audioUrl: null, audioBlob: null, order: i + 1, createdAt: new Date() }));
+    }
+    return taskData.speechSequences?.map((text, i) => ({ id: generateId("entry"), taskId, text, stressedText: text, audioUrl: null, audioBlob: null, order: i + 1, createdAt: new Date() })) ?? [];
+  }
+
   async createTask(userId: string, taskData: CreateTaskRequest): Promise<Task> {
-    const trimmedName = taskData.name.trim();
-    if (!trimmedName) {
-      throw new Error("Task name is required");
-    }
-    if (trimmedName.length > MAX_TASK_NAME_LENGTH) {
-      throw new Error(`Task name exceeds ${MAX_TASK_NAME_LENGTH} characters`);
-    }
-    const description = taskData.description?.trim() ?? null;
-    if (description && description.length > MAX_TASK_DESCRIPTION_LENGTH) {
-      throw new Error(`Task description exceeds ${MAX_TASK_DESCRIPTION_LENGTH} characters`);
-    }
+    const name = this.validateTaskName(taskData.name);
     const taskId = generateId("task");
     const newTask: Task = {
-      id: taskId,
-      userId,
-      name: trimmedName,
-      description,
-      speechSequences: taskData.speechSequences ?? [],
-      entries:
-        taskData.speechEntries?.map((entry, index) => ({
-          id: generateId("entry"),
-          taskId,
-          text: entry.text,
-          stressedText: entry.stressedText,
-          audioUrl: null,
-          audioBlob: null,
-          order: index + 1,
-          createdAt: new Date(),
-        })) ??
-        taskData.speechSequences?.map((text, index) => ({
-          id: generateId("entry"),
-          taskId,
-          text,
-          stressedText: text,
-          audioUrl: null,
-          audioBlob: null,
-          order: index + 1,
-          createdAt: new Date(),
-        })) ??
-        [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      shareToken: this.shareService.generateShareToken(),
+      id: taskId, userId, name, description: this.validateDescription(taskData.description),
+      speechSequences: taskData.speechSequences ?? [], entries: this.buildEntries(taskData, taskId),
+      createdAt: new Date(), updatedAt: new Date(), shareToken: this.shareService.generateShareToken(),
     };
-
     await this.storage.saveTask(newTask);
-
-    // Also save as unlisted for anonymous access via shareToken
     await this.storage.saveTaskAsUnlisted(newTask);
-
     return newTask;
   }
 
-  async updateTask(
-    taskId: string,
-    updates: Partial<Task>,
-  ): Promise<Task | null> {
-    const existingTask = await this.storage.getTask(taskId);
-    if (!existingTask) {
-      throw new Error(TASK_NOT_FOUND);
-    }
-
-    return this.applyTaskUpdate(existingTask, updates);
+  async updateTask(taskId: string, updates: Partial<Task>): Promise<Task | null> {
+    return this.applyTaskUpdate(await this.getTaskOrThrow(taskId), updates);
   }
 
   private async applyTaskUpdate(
@@ -154,75 +125,55 @@ export class TaskRepository {
   }
 
   async deleteTask(taskId: string): Promise<boolean> {
-    const existingTask = await this.storage.getTask(taskId);
-    if (!existingTask) {
-      throw new Error(TASK_NOT_FOUND);
-    }
-
+    const task = await this.getTaskOrThrow(taskId);
     await this.storage.deleteTask(taskId);
-
-    // Also delete the unlisted copy if it was shared
-    if (existingTask.shareToken) {
-      await this.storage.deleteUnlistedTask(existingTask.shareToken);
-    }
-
+    if (task.shareToken) { await this.storage.deleteUnlistedTask(task.shareToken); }
     return true;
   }
 
-  async addTextEntriesToTask(
-    taskId: string,
-    textEntries: string[] | Array<{ text: string; stressedText: string }>,
-    mode: "append" | "replace" = "append",
-  ): Promise<TaskEntry[]> {
+  private async getTaskOrThrow(taskId: string): Promise<Task> {
     const task = await this.storage.getTask(taskId);
-    if (!task) {
-      throw new Error(TASK_NOT_FOUND);
-    }
+    if (!task) { throw new Error(TASK_NOT_FOUND); }
+    return task;
+  }
 
-    const currentCount = mode === "replace" ? 0 : (task.entries?.length ?? 0);
-    if (currentCount + textEntries.length > MAX_ENTRIES_PER_TASK) {
-      throw new Error(`Cannot exceed ${MAX_ENTRIES_PER_TASK} entries per task`);
-    }
+  private validateEntryCount(task: Task, count: number, isReplace: boolean): void {
+    const current = isReplace ? 0 : (task.entries?.length ?? 0);
+    if (current + count > MAX_ENTRIES_PER_TASK) { throw new Error(`Cannot exceed ${MAX_ENTRIES_PER_TASK} entries per task`); }
+  }
 
+  private mergeEntries(task: Task, newEntries: TaskEntry[], isReplace: boolean): Partial<Task> {
+    const current = task.entries ?? [];
+    const newTexts = newEntries.map((e) => e.text);
+    return {
+      entries: isReplace ? newEntries : [...current, ...newEntries],
+      speechSequences: isReplace ? newTexts : [...(task.speechSequences ?? []), ...newTexts],
+    };
+  }
+
+  async addTextEntriesToTask(taskId: string, textEntries: TextEntryInput[], mode: "append" | "replace" = "append"): Promise<TaskEntry[]> {
+    const task = await this.getTaskOrThrow(taskId);
     const isReplace = mode === "replace";
-    const currentEntries = task.entries ?? [];
-    const startOrder = getStartOrder(currentEntries, isReplace);
-    const newEntries = buildNewEntries(taskId, textEntries, startOrder);
-    const newTexts = newEntries.map((entry) => entry.text);
-
-    const updatedEntries = isReplace ? newEntries : [...currentEntries, ...newEntries];
-    const updatedSequences = isReplace ? newTexts : [...(task.speechSequences ?? []), ...newTexts];
-    await this.applyTaskUpdate(task, { entries: updatedEntries, speechSequences: updatedSequences });
+    this.validateEntryCount(task, textEntries.length, isReplace);
+    const newEntries = buildNewEntries(taskId, textEntries, getStartOrder(task.entries ?? [], isReplace));
+    await this.applyTaskUpdate(task, this.mergeEntries(task, newEntries, isReplace));
     return newEntries;
   }
 
-  async updateTaskEntry(
-    taskId: string,
-    entryId: string,
-    updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>,
-  ): Promise<TaskEntry | null> {
-    const task = await this.storage.getTask(taskId);
-    if (!task) {
-      throw new Error(TASK_NOT_FOUND);
-    }
+  private findEntry(task: Task, entryId: string): { entry: TaskEntry; index: number } {
+    const index = task.entries?.findIndex((e) => e.id === entryId) ?? -1;
+    const entry = index >= 0 ? task.entries?.[index] : undefined;
+    if (!entry) { throw new Error("Entry not found"); }
+    return { entry, index };
+  }
 
-    const entryIndex = task.entries?.findIndex((entry) => entry.id === entryId);
-    if (entryIndex === undefined || entryIndex === -1) {
-      throw new Error("Entry not found");
-    }
-
-    const existingEntry = task.entries?.[entryIndex];
-    if (!existingEntry) {throw new Error("Entry not found");}
-    const updatedEntry: TaskEntry = {
-      ...existingEntry,
-      ...updates,
-    };
-
+  async updateTaskEntry(taskId: string, entryId: string, updates: Partial<Omit<TaskEntry, "id" | "taskId" | "createdAt">>): Promise<TaskEntry | null> {
+    const task = await this.getTaskOrThrow(taskId);
+    const { entry, index } = this.findEntry(task, entryId);
+    const updatedEntry: TaskEntry = { ...entry, ...updates };
     const updatedEntries = [...(task.entries ?? [])];
-    updatedEntries[entryIndex] = updatedEntry;
-
+    updatedEntries[index] = updatedEntry;
     await this.applyTaskUpdate(task, { entries: updatedEntries });
-
     return updatedEntry;
   }
 }

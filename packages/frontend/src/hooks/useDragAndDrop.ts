@@ -4,6 +4,16 @@
 import { useState, useCallback } from "react";
 import { SentenceState } from "@/types/synthesis";
 
+function reorderItems(prev: SentenceState[], dragId: string, targetId: string): SentenceState[] {
+  const di = prev.findIndex((s) => s.id === dragId);
+  const ti = prev.findIndex((s) => s.id === targetId);
+  if (di === -1 || ti === -1) {return prev;}
+  const next = [...prev];
+  const [item] = next.splice(di, 1);
+  if (item) {next.splice(ti, 0, item);}
+  return next;
+}
+
 export function useDragAndDrop(
   setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>,
 ): {
@@ -49,16 +59,7 @@ export function useDragAndDrop(
       e.preventDefault();
       if (!draggedId || draggedId === targetId) {return;}
 
-      setSentences((prev) => {
-        const draggedIndex = prev.findIndex((s) => s.id === draggedId);
-        const targetIndex = prev.findIndex((s) => s.id === targetId);
-        if (draggedIndex === -1 || targetIndex === -1) {return prev;}
-
-        const newSentences = [...prev];
-        const [draggedItem] = newSentences.splice(draggedIndex, 1);
-        if (draggedItem) {newSentences.splice(targetIndex, 0, draggedItem);}
-        return newSentences;
-      });
+      setSentences((prev) => reorderItems(prev, draggedId, targetId));
 
       setDraggedId(null);
       setDragOverId(null);

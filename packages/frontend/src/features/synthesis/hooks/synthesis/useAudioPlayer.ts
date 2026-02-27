@@ -3,157 +3,50 @@
 
 import { useState, useCallback } from "react";
 
-export function useAudioPlayer(): {
-  currentAudio: HTMLAudioElement | null;
-  stopCurrentAudio: () => void;
-  playAudio: (
-    audioUrl: string,
-    callbacks?: {
-      onLoadStart?: () => void;
-      onLoadComplete?: () => void;
-      onEnded?: () => void;
-      onError?: () => void;
-    },
-  ) => Promise<boolean>;
-  playWithAbort: (
-    audioUrl: string,
-    abortSignal: AbortSignal,
-    callbacks?: {
-      onStart?: () => void;
-      onEnded?: () => void;
-      onError?: () => void;
-    },
-  ) => Promise<boolean>;
-} {
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
-    null,
-  );
+interface PlayCallbacks { onLoadStart?: () => void; onLoadComplete?: () => void; onEnded?: () => void; onError?: () => void; }
+interface AbortCallbacks { onStart?: () => void; onEnded?: () => void; onError?: () => void; }
+
+function createPlayPromise(setAudio: (a: HTMLAudioElement | null) => void, audioUrl: string, cb: PlayCallbacks): Promise<boolean> {
+  return new Promise((resolve): void => {
+    const audio = new Audio(audioUrl); setAudio(audio);
+    cb.onLoadStart?.();
+    audio.onloadeddata = () => { cb.onLoadComplete?.(); };
+    audio.onended = () => { setAudio(null); cb.onEnded?.(); resolve(true); };
+    audio.onerror = () => { setAudio(null); cb.onError?.(); resolve(false); };
+    audio.play().catch(() => { setAudio(null); cb.onError?.(); resolve(false); });
+  });
+}
+
+function createAbortPlayPromise(opts: { setAudio: (a: HTMLAudioElement | null) => void; audioUrl: string; signal: AbortSignal; cb: AbortCallbacks }): Promise<boolean> {
+  if (opts.signal.aborted) {return Promise.resolve(false);}
+  const { setAudio, audioUrl, signal, cb } = opts;
+  return new Promise((resolve): void => {
+    const audio = new Audio(audioUrl); setAudio(audio); cb.onStart?.();
+    const cleanup = () => { setAudio(null); signal.removeEventListener("abort", onAbort); };
+    const onAbort = () => { audio.pause(); cleanup(); resolve(false); };
+    audio.onended = () => { cleanup(); cb.onEnded?.(); resolve(true); };
+    audio.onerror = () => { cleanup(); cb.onError?.(); resolve(false); };
+    signal.addEventListener("abort", onAbort);
+    audio.play().catch(() => { cleanup(); cb.onError?.(); resolve(false); });
+  });
+}
+
+export type AudioAPI = ReturnType<typeof useAudioPlayer>;
+
+export function useAudioPlayer() {
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
   const stopCurrentAudio = useCallback(() => {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.src = "";
-      setCurrentAudio(null);
-    }
+    if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; setCurrentAudio(null); }
   }, [currentAudio]);
 
-  const playAudio = useCallback(
-    (
-      audioUrl: string,
-      callbacks: {
-        onLoadStart?: () => void;
-        onLoadComplete?: () => void;
-        onEnded?: () => void;
-        onError?: () => void;
-      } = {},
-    ): Promise<boolean> => {
-      return new Promise((resolve): void => {
-        const audio = new Audio(audioUrl);
-        setCurrentAudio(audio);
+  const playAudio = useCallback((audioUrl: string, callbacks: PlayCallbacks = {}): Promise<boolean> => {
+    return createPlayPromise(setCurrentAudio, audioUrl, callbacks);
+  }, []);
 
-        if (callbacks.onLoadStart) {
-          callbacks.onLoadStart();
-        }
+  const playWithAbort = useCallback((audioUrl: string, abortSignal: AbortSignal, callbacks: AbortCallbacks = {}): Promise<boolean> => {
+    return createAbortPlayPromise({ setAudio: setCurrentAudio, audioUrl, signal: abortSignal, cb: callbacks });
+  }, []);
 
-        audio.onloadeddata = (): void => {
-          if (callbacks.onLoadComplete) {
-            callbacks.onLoadComplete();
-          }
-        };
-
-        audio.onended = (): void => {
-          setCurrentAudio(null);
-          if (callbacks.onEnded) {
-            callbacks.onEnded();
-          }
-          resolve(true);
-        };
-
-        audio.onerror = (): void => {
-          setCurrentAudio(null);
-          if (callbacks.onError) {
-            callbacks.onError();
-          }
-          resolve(false);
-        };
-
-        audio.play().catch((): void => {
-          setCurrentAudio(null);
-          if (callbacks.onError) {
-            callbacks.onError();
-          }
-          resolve(false);
-        });
-      });
-    },
-    [],
-  );
-
-  const playWithAbort = useCallback(
-    (
-      audioUrl: string,
-      abortSignal: AbortSignal,
-      callbacks: {
-        onStart?: () => void;
-        onEnded?: () => void;
-        onError?: () => void;
-      } = {},
-    ): Promise<boolean> => {
-      if (abortSignal.aborted) {return Promise.resolve(false);}
-
-      return new Promise((resolve): void => {
-        const audio = new Audio(audioUrl);
-        setCurrentAudio(audio);
-
-        if (callbacks.onStart) {
-          callbacks.onStart();
-        }
-
-        const cleanup = (): void => {
-          setCurrentAudio(null);
-          abortSignal.removeEventListener("abort", onAbort);
-        };
-
-        const onAbort = (): void => {
-          audio.pause();
-          cleanup();
-          resolve(false);
-        };
-
-        audio.onended = (): void => {
-          cleanup();
-          if (callbacks.onEnded) {
-            callbacks.onEnded();
-          }
-          resolve(true);
-        };
-
-        audio.onerror = (): void => {
-          cleanup();
-          if (callbacks.onError) {
-            callbacks.onError();
-          }
-          resolve(false);
-        };
-
-        abortSignal.addEventListener("abort", onAbort);
-
-        audio.play().catch((): void => {
-          cleanup();
-          if (callbacks.onError) {
-            callbacks.onError();
-          }
-          resolve(false);
-        });
-      });
-    },
-    [],
-  );
-
-  return {
-    currentAudio,
-    stopCurrentAudio,
-    playAudio,
-    playWithAbort,
-  };
+  return { currentAudio, stopCurrentAudio, playAudio, playWithAbort };
 }

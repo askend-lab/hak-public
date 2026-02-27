@@ -23,53 +23,35 @@ interface VariantItemProps {
   onUse: (variant: Variant) => void;
 }
 
-export function VariantItem({
-  variant,
-  isSelected,
-  isPlaying,
-  isLoading,
-  onPlay,
-  onUse,
-}: VariantItemProps): React.ReactElement {
+function getPlayTitle(isLoading: boolean, isPlaying: boolean): string {
+  if (isLoading) {return "Laen...";}
+  return isPlaying ? "Mängib" : "Mängi";
+}
+
+function PlayStateIcon({ isLoading, isPlaying }: { isLoading: boolean; isPlaying: boolean }) {
+  if (isLoading) {return <div className="loader-spinner"></div>;}
+  return isPlaying ? <PauseIcon size="2xl" /> : <PlayIcon size="2xl" />;
+}
+
+export function VariantItem({ variant, isSelected, isPlaying, isLoading, onPlay, onUse }: VariantItemProps): React.ReactElement {
   const displayText = transformToUI(variant.text ?? "");
   const markers = parsePhoneticMarkers(variant.text ?? "");
+  const cls = `button button--primary button--icon-only button--circular ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`;
 
   return (
-    <div
-      className={`pronunciation-variants__item ${isSelected ? "pronunciation-variants__item--selected" : ""}`}
-    >
+    <div className={`pronunciation-variants__item ${isSelected ? "pronunciation-variants__item--selected" : ""}`}>
       <div className="pronunciation-variants__item-header">
         <div className="pronunciation-variants__item-info">
           <div className="pronunciation-variants__item-text">{displayText}</div>
           <div className="pronunciation-variants__item-tags">
-            {markers.map((tagObj) => (
-              <span key={tagObj.tag} className="pronunciation-variants__item-tag">
-                {tagObj.tag}
-              </span>
-            ))}
+            {markers.map((tagObj) => <span key={tagObj.tag} className="pronunciation-variants__item-tag">{tagObj.tag}</span>)}
           </div>
         </div>
         <div className="pronunciation-variants__item-actions">
-          <button
-            onClick={() => onPlay(variant)}
-            disabled={isLoading}
-            className={`button button--primary button--icon-only button--circular ${isLoading ? "loading" : ""} ${isPlaying ? "playing" : ""}`}
-            title={isLoading ? "Laen..." : isPlaying ? "Mängib" : "Mängi"}
-          >
-            {isLoading ? (
-              <div className="loader-spinner"></div>
-            ) : isPlaying ? (
-              <PauseIcon size="2xl" />
-            ) : (
-              <PlayIcon size="2xl" />
-            )}
+          <button onClick={() => onPlay(variant)} disabled={isLoading} className={cls} title={getPlayTitle(isLoading, isPlaying)}>
+            <PlayStateIcon isLoading={isLoading} isPlaying={isPlaying} />
           </button>
-          <button
-            onClick={() => onUse(variant)}
-            className="button button--secondary"
-          >
-            Kasuta
-          </button>
+          <button onClick={() => onUse(variant)} className="button button--secondary">Kasuta</button>
         </div>
       </div>
     </div>
