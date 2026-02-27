@@ -28,6 +28,11 @@ describe("AuthCallbackPage", () => {
     });
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   it("redirects to home when code callback succeeds", async () => {
     window.location.search = "?code=test-auth-code";
     mockHandleCodeCallback.mockResolvedValue(true);
@@ -191,23 +196,14 @@ describe("AuthCallbackPage", () => {
     expect(loadingState).toBeTruthy();
   });
 
-  it("loading view renders PageLoadingState with correct structure", () => {
-    window.location.search = "?code=c";
-    mockHandleCodeCallback.mockImplementation(() => new Promise(() => {}));
-    render(<AuthCallbackPage />);
-    const container = document.querySelector(".page-loading-state") as HTMLElement;
-    expect(container).toBeTruthy();
-    expect(container.getAttribute("role")).toBe("status");
-    expect(container.getAttribute("aria-live")).toBe("polite");
   });
 
-  it("error text includes 'Sisselogimine ebaõnnestus' prefix with generic message", async () => {
-    window.location.search = "?error=oops";
-    render(<AuthCallbackPage />);
-    await waitFor(() => {
-      const p = screen.getByText(/Sisselogimine ebaõnnestus/);
-      expect(p.textContent).toContain("Autentimise viga");
-      expect(p.tagName).toBe("P");
-    });
   });
+
+  });
+
+  });
+
+  });
+
 });

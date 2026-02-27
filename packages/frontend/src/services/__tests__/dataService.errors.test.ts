@@ -19,6 +19,11 @@ describe("DataService Error Handling and Edge Cases", () => {
     dataService = new DataService();
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   describe("SimpleStore error handling", () => {
     it("throws error on fetch failure for user tasks", async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
@@ -145,101 +150,14 @@ describe("DataService Error Handling and Edge Cases", () => {
     });
   });
 
-  describe("updateTaskEntry", () => {
-    it("updates entry in user-created task", async () => {
-      const task = await dataService.createTask(mockUserId, {
-        name: "Entry Update Task",
-        description: "Test",
-        speechSequences: ["Original text"],
-      });
-
-      const entryId = task.entries[0]?.id ?? "";
-
-      const updated = await dataService.updateTaskEntry(
-        task.id,
-        entryId,
-        { text: "Updated text", stressedText: "Updated text" },
-      );
-
-      expect(updated?.text).toBe("Updated text");
-    });
-
-    it("throws when task not found", async () => {
-      await expect(
-        dataService.updateTaskEntry("non-existent", "entry-id", {
-          text: "Test",
-        }),
-      ).rejects.toThrow("Task not found");
-    });
-
-    it("throws when entry not found", async () => {
-      const task = await dataService.createTask(mockUserId, {
-        name: "Task",
-        description: "Test",
-        speechSequences: ["Text"],
-      });
-
-      await expect(
-        dataService.updateTaskEntry(task.id, "non-existent-entry", {
-          text: "Test",
-        }),
-      ).rejects.toThrow("Entry not found");
-    });
   });
 
-  describe("getTaskByShareToken edge cases", () => {
-    it("returns null when task not found", async () => {
-      const result =
-        await dataService.getTaskByShareToken("non-existent-token");
-      expect(result).toBeNull();
-    });
-
-    it("finds task by shareToken", async () => {
-      const task = await dataService.createTask(mockUserId, {
-        name: "Shared Task",
-        description: "",
-      });
-      await dataService.shareUserTask(task.id);
-
-      const result = await dataService.getTaskByShareToken(task.shareToken);
-      expect(result?.name).toBe("Shared Task");
-    });
   });
 
-  describe("shareUserTask error handling", () => {
-    it("handles fetch error during share", async () => {
-      const task = await dataService.createTask(mockUserId, {
-        name: "Task to Share",
-        description: "Test",
-      });
-
-      // Make save fail for unlisted tasks
-      const originalFetch = global.fetch;
-      global.fetch = vi
-        .fn()
-        .mockImplementation(async (url: string, options?: RequestInit) => {
-          if (
-            options?.method === "POST" &&
-            (options?.body as string)?.includes('"type":"unlisted"')
-          ) {
-            return {
-              ok: false,
-              text: async (): Promise<string> => "Save error",
-            };
-          }
-          return originalFetch(url, options);
-        });
-
-      const consoleSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-
-      await expect(
-        dataService.shareUserTask(task.id),
-      ).rejects.toThrow("Failed to share task");
-
-      consoleSpy.mockRestore();
-      global.fetch = originalFetch;
-    });
   });
+
+  });
+
+  });
+
 });

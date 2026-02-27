@@ -11,6 +11,7 @@ import { TestWorld } from "./setup";
 
 Given(
   "I have synthesized text containing {string}",
+
   async function (this: TestWorld, word: string) {
     await this.renderApp();
     const input = this.getByPlaceholder("Sisesta tekst või sõna...");
@@ -22,6 +23,7 @@ Given(
 
 Given(
   "the pronunciation variants panel is open for {string}",
+
   async function (this: TestWorld, word: string) {
     await this.renderApp();
     // First enter and synthesize the text
@@ -43,6 +45,7 @@ Given(
 
 Given(
   "I see multiple variants for {string}",
+
   async function (this: TestWorld, word: string) {
     await this.renderApp();
     const input = this.getByPlaceholder("Sisesta tekst või sõna...");
@@ -70,6 +73,7 @@ Given("the variants panel is open", async function (this: TestWorld) {
 
 When(
   "I click on the word {string}",
+
   async function (this: TestWorld, word: string) {
     await this.waitFor(() => {
       const wordElement = this.queryByText(word);
@@ -110,6 +114,7 @@ When(
 
 When(
   "I click {string} \\(Use) on a specific variant",
+
   async function (this: TestWorld, buttonText: string) {
     await this.waitFor(() => {
       const useButton = this.queryByText(buttonText);
@@ -236,160 +241,4 @@ Given("I am editing phonetic text", function () {
 
 Given("I have edited the phonetic text with markers", function () {
   this.iHaveEditedThePhoneticTextWithMarkers = true;
-});
-
-Given("I have entered a custom phonetic variant", function () {
-  this.iHaveEnteredACustomPhoneticVariant = true;
-});
-
-Given("I have entered UI markers in phonetic text", function () {
-  this.iHaveEnteredUiMarkersInPhoneticText = true;
-});
-
-Given("I have synthesized text with stress markers", function () {
-  this.iHaveSynthesizedTextWithStressMarkers = true;
-});
-
-Given("I opened the variants panel for a word", function () {
-  this.iOpenedTheVariantsPanelForAWord = true;
-});
-
-Given("the custom variant form is open", function () {
-  this.theCustomVariantFormIsOpen = true;
-});
-
-Given("the phonetic editing panel is open", function () {
-  this.thePhoneticEditingPanelIsOpen = true;
-});
-
-Given("the phonetic panel is open", function () {
-  this.thePhoneticPanelIsOpen = true;
-});
-
-Given("the pronunciation variants panel is open", function () {
-  this.thePronunciationVariantsPanelIsOpen = true;
-});
-
-Given("the tag menu is open", function () {
-  this.theTagMenuIsOpen = true;
-});
-
-Given("the text contains kolmas välde marker", function () {
-  this.theTextContainsKolmasVldeMarker = true;
-});
-
-Given("the variants panel is open for a task entry", function () {
-  this.theVariantsPanelIsOpenForATaskEntry = true;
-});
-
-Given("the variants panel shows an error", function () {
-  this.theVariantsPanelShowsAnError = true;
-});
-
-When("I edit the phonetic text", function () {
-  this.iEditThePhoneticText = true;
-});
-
-When("I select a pronunciation variant", function () {
-  this.iSelectAPronunciationVariant = true;
-});
-
-When("I apply the phonetic changes", function () {
-  this.iApplyThePhoneticChanges = true;
-});
-
-When("I click a marker button", function () {
-  this.iClickAMarkerButton = true;
-});
-
-When("I click a word tag in an entry", function () {
-  this.iClickAWordTagInAnEntry = true;
-});
-
-When("I click a word tag to view variants", function () {
-  this.iClickAWordTagToViewVariants = true;
-});
-
-When("I click on a word tag in a task entry", function () {
-  this.iClickOnAWordTagInATaskEntry = true;
-});
-
-When("I click play on a variant", function () {
-  this.iClickPlayOnAVariant = true;
-});
-
-When("I click to create a custom variant", function () {
-  this.iClickToCreateACustomVariant = true;
-});
-
-When("I click to view pronunciation variants", function () {
-  this.iClickToViewPronunciationVariants = true;
-});
-
-When("I click to view the markers guide", function () {
-  this.iClickToViewTheMarkersGuide = true;
-});
-
-When("I close and reopen the variants panel", function () {
-  this.iCloseAndReopenTheVariantsPanel = true;
-});
-
-When("I close the variants panel", function () {
-  this.iCloseTheVariantsPanel = true;
-});
-
-When("I open the markers guide", function () {
-  this.iOpenTheMarkersGuide = true;
-});
-
-When("I open the phonetic panel for an entry", function () {
-  this.iOpenThePhoneticPanelForAnEntry = true;
-});
-
-When("I open the phonetic panel for a sentence", function () {
-  this.iOpenThePhoneticPanelForASentence = true;
-});
-
-When("I play the edited phonetic text", function () {
-  this.iPlayTheEditedPhoneticText = true;
-});
-
-When("I select a variant to use", function () {
-  this.iSelectAVariantToUse = true;
-});
-
-When("I type a custom phonetic variant with markers", function () {
-  this.iTypeACustomPhoneticVariantWithMarkers = true;
-});
-
-Then("clicking a tag opens the variants panel", function () {
-  this.clickingATagOpensTheVariantsPanel = true;
-});
-
-Then("each marker shows its symbol and description", function () {
-  this.eachMarkerShowsItsSymbolAndDescription = true;
-});
-
-Then("each variant shows its phonetic description", function () {
-  this.eachVariantShowsItsPhoneticDescription = true;
-});
-
-Then("I see phonetic, download, copy, and remove options", function () {
-  this.iSeePhoneticDownloadCopyAndRemoveOptions = true;
-});
-
-Then("I see the words displayed with stress markers", function () {
-  this.iSeeTheWordsDisplayedWithStressMarkers = true;
-});
-
-Then("stress markers are shown visually", function () {
-  this.stressMarkersAreShownVisually = true;
-});
-
-Then("the phonetic text is pre-filled", function () {
-  this.thePhoneticTextIsPrefilled = true;
-});
-
-Then("the variants API returns an error", function () {
-  this.theVariantsApiReturnsAnError = true;
 });

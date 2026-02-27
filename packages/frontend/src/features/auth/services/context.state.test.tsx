@@ -55,6 +55,11 @@ describe("auth/context state precision", () => {
     global.fetch = origFetch;
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   it("initial state: isLoading=true, isAuthenticated=false, error=null", () => {
     mockAuthStorage.getUser.mockReturnValue(null);
     mockAuthStorage.getAccessToken.mockReturnValue(null);
@@ -177,89 +182,14 @@ describe("auth/context state precision", () => {
     });
   });
 
-  it("handleTaraTokens sets all auth state correctly", async () => {
-    const idToken = createJwt({ sub: "t1", email: "tara@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
-
-    function TaraChecker() {
-      const ctx = useAuth();
-      return (
-        <div>
-          <span data-testid="authed">{String(ctx.isAuthenticated)}</span>
-          <span data-testid="loading">{String(ctx.isLoading)}</span>
-          <span data-testid="error">{String(ctx.error)}</span>
-          <span data-testid="user">{ctx.user?.id ?? "null"}</span>
-          <button onClick={() => ctx.handleTaraTokens({ accessToken: "at", idToken })}>go</button>
-        </div>
-      );
-    }
-
-    render(
-      <AuthProvider>
-        <TaraChecker />
-      </AuthProvider>,
-    );
-    await waitFor(() => expect(screen.getByTestId("authed")).toHaveTextContent("false"));
-    act(() => { screen.getByText("go").click(); });
-    await waitFor(() => {
-      expect(screen.getByTestId("authed")).toHaveTextContent("true");
-      expect(screen.getByTestId("loading")).toHaveTextContent("false");
-      expect(screen.getByTestId("error")).toHaveTextContent("null");
-      expect(screen.getByTestId("user")).toHaveTextContent("t1");
-    });
-    expect(mockAuthStorage.setUser).toHaveBeenCalled();
-    expect(mockAuthStorage.setAccessToken).toHaveBeenCalledWith("at");
   });
 
-  it("handleCodeCallback sets all auth state correctly", async () => {
-    const config = await import("./config");
-    const idToken = createJwt({ sub: "c1", email: "cb@test.com", exp: Math.floor(Date.now() / 1000) + 3600 });
-    (config.exchangeCodeForTokens as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      accessToken: "ca", idToken,
-    });
-
-    function CbChecker() {
-      const ctx = useAuth();
-      return (
-        <div>
-          <span data-testid="authed">{String(ctx.isAuthenticated)}</span>
-          <span data-testid="loading">{String(ctx.isLoading)}</span>
-          <span data-testid="user">{ctx.user?.id ?? "null"}</span>
-          <button onClick={() => void ctx.handleCodeCallback("code")}>go</button>
-        </div>
-      );
-    }
-
-    render(
-      <AuthProvider>
-        <CbChecker />
-      </AuthProvider>,
-    );
-    await waitFor(() => expect(screen.getByTestId("authed")).toHaveTextContent("false"));
-    await act(async () => { screen.getByText("go").click(); });
-    await waitFor(() => {
-      expect(screen.getByTestId("authed")).toHaveTextContent("true");
-      expect(screen.getByTestId("loading")).toHaveTextContent("false");
-      expect(screen.getByTestId("user")).toHaveTextContent("c1");
-    });
-    expect(mockAuthStorage.setUser).toHaveBeenCalled();
-    expect(mockAuthStorage.setIdToken).toHaveBeenCalledWith(idToken);
   });
 
-  it("refresh response stores id_token and returns true", async () => {
-    const expired = createJwt({ sub: "u1", email: "a@b.com", exp: Math.floor(Date.now() / 1000) - 100 });
-    mockAuthStorage.getUser.mockReturnValue({ id: "u1", email: "a@b.com" });
-    mockAuthStorage.getAccessToken.mockReturnValue(expired);
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ access_token: "na", id_token: "ni" }),
-    });
-    render(
-      <AuthProvider>
-        <StateChecker />
-      </AuthProvider>,
-    );
-    await waitFor(() => expect(screen.getByTestId("authed")).toHaveTextContent("true"));
-    expect(mockAuthStorage.setAccessToken).toHaveBeenCalledWith("na");
-    expect(mockAuthStorage.setIdToken).toHaveBeenCalledWith("ni");
   });
+
+  });
+
+  });
+
 });

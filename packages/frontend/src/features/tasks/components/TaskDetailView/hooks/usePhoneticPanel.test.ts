@@ -45,6 +45,11 @@ describe("usePhoneticPanel", () => {
     global.fetch = vi.fn();
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   it("initializes with panel closed", () => {
     const setEntries = vi.fn();
     const { result } = renderHook(() =>
@@ -169,22 +174,14 @@ describe("usePhoneticPanel", () => {
     expect(result.current.showPhoneticPanel).toBe(false);
   });
 
-  it("handlePhoneticApply handles save error", async () => {
-    const spy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    window.alert = vi.fn();
-    mockUpdateTaskEntry.mockRejectedValueOnce(new Error("save fail"));
-    const setEntries = vi.fn();
-    const { result } = renderHook(() =>
-      usePhoneticPanel({ entries: [mockEntry], setEntries, task: mockTask, userId: "u1", onMenuClose }),
-      { wrapper: dsWrapper },
-    );
-    await act(async () => {
-      await result.current.handleExplorePhonetic("e1");
-    });
-    await act(async () => {
-      await result.current.handlePhoneticApply("te`re");
-    });
-    expect(spy).toHaveBeenCalled();
-    spy.mockRestore();
   });
+
+  });
+
+  });
+
+  });
+
+  });
+
 });

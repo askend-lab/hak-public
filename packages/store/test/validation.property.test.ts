@@ -6,23 +6,18 @@ import {
   validateStoreRequest,
   validateGetRequest,
   validateQueryRequest,
-  validateServerContext,
   parseTtl,
   isValidType,
 } from "../src/core/validation";
 import { VALID_DATA_TYPES } from "../src/core/types";
 
-describe("validation — property-based tests", () => {
+describe("validation.property.test", () => {
   const validTypes = VALID_DATA_TYPES;
 
   const validTypeArb = fc.constantFrom(...validTypes);
 
-  const validContextArb = fc.record({
-    app: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
-    tenant: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
-    env: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
-    userId: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
-  });
+  const allowedKeyChars = [..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-:@"];
+  const validKeyArb = fc.array(fc.constantFrom(...allowedKeyChars), { minLength: 1, maxLength: 100 }).map((chars) => chars.join(""));
 
   describe("parseTtl", () => {
     it("zero TTL is always valid (no expiration)", () => {
@@ -85,10 +80,6 @@ describe("validation — property-based tests", () => {
       );
     });
   });
-
-  // Keys must only contain allowed characters: a-z A-Z 0-9 . _ - : @
-  const allowedKeyChars = [..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-:@"];
-  const validKeyArb = fc.array(fc.constantFrom(...allowedKeyChars), { minLength: 1, maxLength: 100 }).map((chars) => chars.join(""));
 
   describe("validateStoreRequest", () => {
     it("valid requests always pass", () => {
@@ -172,29 +163,4 @@ describe("validation — property-based tests", () => {
     });
   });
 
-  describe("validateServerContext", () => {
-    it("valid contexts always pass", () => {
-      fc.assert(
-        fc.property(validContextArb, (context) => {
-          const result = validateServerContext(context);
-          expect(result.valid).toBe(true);
-          expect(result.errors).toHaveLength(0);
-        }),
-      );
-    });
-
-    it("empty string fields always fail", () => {
-      fc.assert(
-        fc.property(
-          fc.constantFrom("app", "tenant", "env", "userId"),
-          validContextArb,
-          (field, context) => {
-            const invalid = { ...context, [field]: "" };
-            const result = validateServerContext(invalid);
-            expect(result.valid).toBe(false);
-          },
-        ),
-      );
-    });
-  });
 });

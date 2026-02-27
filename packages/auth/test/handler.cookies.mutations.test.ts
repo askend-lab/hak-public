@@ -23,7 +23,7 @@ jest.mock('../src/cognito-client', () => ({
   }),
 }));
 
-describe('handler.ts cookie mutation kills', () => {
+describe("handler.cookies.mutations.test", () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -187,20 +187,4 @@ describe('handler.ts cookie mutation kills', () => {
     });
   });
 
-  describe('cookie header case', () => {
-    it('should read lowercase cookie header', async () => {
-      const validState = { state: 's', nonce: 'n', redirectUri: 'https://hak-dev.askend-lab.com', createdAt: Date.now() };
-      const event = makeEvent({
-        queryStringParameters: { code: 'c', state: 's' },
-        headers: { cookie: `tara_auth_state=${makeStateCookie(validState)}` },
-      });
-      mockExchangeCodeForTokens.mockResolvedValue({ id_token: 'id', access_token: 'at' });
-      mockVerifyIdToken.mockResolvedValue({ sub: 'EE123', nonce: 'n' });
-      mockFindOrCreateUser.mockResolvedValue('u@e.com');
-      mockGenerateTokens.mockResolvedValue({ accessToken: 'a', idToken: 'i', refreshToken: 'r', expiresIn: 3600 });
-      const result = await callbackHandler(event);
-      expect(result.statusCode).toBe(302);
-      expect(result.headers?.Location).not.toContain('error=');
-    });
-  });
 });

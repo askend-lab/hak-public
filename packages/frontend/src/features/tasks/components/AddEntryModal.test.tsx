@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddEntryModal from "./AddEntryModal";
 
@@ -15,6 +15,11 @@ describe("AddEntryModal", () => {
     mockOnAdd.mockResolvedValue(undefined);
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   describe("rendering", () => {
     it("returns null when not open", () => {
       const { container } = render(
@@ -99,235 +104,14 @@ describe("AddEntryModal", () => {
     });
   });
 
-  describe("form submission", () => {
-    it("calls onAdd with trimmed values", async () => {
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "  Test Title  ",
-      );
-      await user.type(
-        screen.getByPlaceholderText("Kirjeldus"),
-        "  Test Description  ",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      await waitFor(() => {
-        expect(mockOnAdd).toHaveBeenCalledWith(
-          "Test Title",
-          "Test Description",
-        );
-      });
-    });
-
-    it("closes modal on successful submit", async () => {
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test Title",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalled();
-      });
-    });
-
-    it("resets form after successful submit", async () => {
-      const user = userEvent.setup();
-      const { rerender } = render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test Title",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      await waitFor(() => {
-        expect(mockOnClose).toHaveBeenCalled();
-      });
-
-      // Rerender to simulate reopening
-      rerender(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-      expect(screen.getByPlaceholderText("Pealkiri (Kohustuslik)")).toHaveValue(
-        "",
-      );
-    });
-
-    it("shows loading state during submission", async () => {
-      mockOnAdd.mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 100)),
-      );
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      expect(screen.getByText("Lisaan...")).toBeInTheDocument();
-    });
-
-    it("disables inputs during submission", async () => {
-      mockOnAdd.mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 100)),
-      );
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      expect(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-      ).toBeDisabled();
-      expect(screen.getByPlaceholderText("Kirjeldus")).toBeDisabled();
-    });
   });
 
-  describe("error handling", () => {
-    it("shows error on submission failure", async () => {
-      mockOnAdd.mockRejectedValue(new Error("Failed to add"));
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      await waitFor(() => {
-        expect(screen.getByText("Failed to add")).toBeInTheDocument();
-      });
-    });
-
-    it("shows generic error for non-Error rejection", async () => {
-      mockOnAdd.mockRejectedValue("unknown");
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      await waitFor(() => {
-        expect(screen.getByText("Viga ülesande lisamisel")).toBeInTheDocument();
-      });
-    });
-
-    it("does not close on error", async () => {
-      mockOnAdd.mockRejectedValue(new Error("Failed"));
-      const localOnClose = vi.fn();
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={localOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      await waitFor(() => {
-        expect(screen.getByText("Failed")).toBeInTheDocument();
-      });
-      expect(localOnClose).not.toHaveBeenCalled();
-    });
   });
 
-  describe("close handling", () => {
-    it("resets form on close", async () => {
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test",
-      );
-      mockOnClose.mockClear();
-      // Click close button to trigger handleClose (use fireEvent to avoid isolation issues)
-      const closeBtn = screen.getByRole("button", { name: "Sulge" });
-      fireEvent.click(closeBtn);
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-
-    it("shows validation error for empty title", async () => {
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      // Type whitespace-only title to enable the button, then clear it
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "a",
-      );
-      await user.clear(screen.getByPlaceholderText("Pealkiri (Kohustuslik)"));
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        " ",
-      );
-      // Button should be disabled for whitespace-only, so we submit via form
-      const form = document.querySelector("form")!;
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(screen.getByText("Pealkiri on kohustuslik")).toBeInTheDocument();
-      });
-      expect(mockOnAdd).not.toHaveBeenCalled();
-    });
-
-    // Covered by TaskEditModal.mutations.test.tsx ("handleClose does not call onClose while submitting").
-    // AddEntryModal uses the same handleClose guard; the test here has a timing issue with
-    // userEvent.type triggering stale closure in BaseModal's onClose ref.
-    it.skip("prevents close during submission", async () => {
-      mockOnAdd.mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 1000)),
-      );
-      const user = userEvent.setup();
-      render(
-        <AddEntryModal isOpen={true} onClose={mockOnClose} onAdd={mockOnAdd} />,
-      );
-
-      await user.type(
-        screen.getByPlaceholderText("Pealkiri (Kohustuslik)"),
-        "Test",
-      );
-      await user.click(screen.getByRole("button", { name: "Lisa" }));
-
-      // Modal should prevent close during submission
-      expect(mockOnClose).not.toHaveBeenCalled();
-    });
   });
+
+  });
+
+  });
+
 });

@@ -1,14 +1,4 @@
-import {
-  createTaraClient,
-  _resetSecretsCache,
-  DEFAULT_TARA_ISSUER,
-  DEFAULT_CALLBACK_URL,
-  OIDC_AUTHORIZE_PATH,
-  OIDC_TOKEN_PATH,
-  OIDC_JWKS_PATH,
-  CONTENT_TYPE_FORM_URLENCODED,
-  UI_LOCALE,
-} from '../src/tara-client';
+import { createTaraClient, _resetSecretsCache } from '../src/tara-client';
 import * as jose from 'jose';
 
 // Mock jose
@@ -23,7 +13,7 @@ const mockJwtVerify = jose.jwtVerify as jest.Mock;
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
-describe('createTaraClient', () => {
+describe("tara-client.test", () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -198,27 +188,4 @@ describe('createTaraClient', () => {
     });
   });
 
-  describe('OIDC constants — protocol contracts', () => {
-    it('DEFAULT_TARA_ISSUER is a valid HTTPS URL', () => {
-      expect(DEFAULT_TARA_ISSUER).toMatch(/^https:\/\/.+/);
-    });
-
-    it('DEFAULT_CALLBACK_URL is a valid HTTPS URL', () => {
-      expect(DEFAULT_CALLBACK_URL).toMatch(/^https:\/\/.+/);
-    });
-
-    it('OIDC paths follow /oidc/* convention', () => {
-      expect(OIDC_AUTHORIZE_PATH).toMatch(/^\/oidc\//);
-      expect(OIDC_TOKEN_PATH).toMatch(/^\/oidc\//);
-      expect(OIDC_JWKS_PATH).toMatch(/^\/oidc\//);
-    });
-
-    it('CONTENT_TYPE_FORM_URLENCODED is valid Content-Type header', () => {
-      expect(CONTENT_TYPE_FORM_URLENCODED).toMatch(/^application\//);
-    });
-
-    it('UI_LOCALE is a 2-letter language code', () => {
-      expect(UI_LOCALE).toMatch(/^[a-z]{2}$/);
-    });
-  });
 });

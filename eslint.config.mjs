@@ -118,16 +118,16 @@ export default [
     },
   },
 
-  // Test files — relaxed quality rules (test setup/assertions need flexibility)
+  // Test files — moderate quality rules (prevent monster files, allow test flexibility)
   {
     files: TEST_FILE_PATTERNS,
     rules: {
       "jest/no-standalone-expect": "off",
       "jest/no-disabled-tests": "off",
       "jest/require-top-level-describe": "off",
-      "max-lines": "off",
-      "max-lines-per-function": "off",
-      "max-statements": "off",
+      "max-lines": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
+      "max-lines-per-function": ["error", { max: 150, skipBlankLines: true, skipComments: true }],
+      "max-statements": ["error", 30],
       "complexity": "off",
       "sonarjs/cognitive-complexity": "off",
       "sonarjs/no-duplicate-string": "off",

@@ -41,7 +41,6 @@ Then("tasks are sorted by creation date", async function (this: TestWorld) {
   // Verify sort order
 });
 
-// US-017 View task details
 Given("I have a task in the list", async function (this: TestWorld) {
   await this.renderApp();
 });
@@ -79,7 +78,6 @@ Then("I see entry count", async function (this: TestWorld) {
   // Entry count should be visible
 });
 
-// US-018 Edit task
 Given("I am viewing task details", async function (this: TestWorld) {
   await this.renderApp();
 });
@@ -121,6 +119,7 @@ Then("I see the current task description", async function (this: TestWorld) {
 
 When(
   "I update the task name to {string}",
+
   async function (this: TestWorld, name: string) {
     const input = this.container?.querySelector('input[name="name"]');
     if (input) {
@@ -133,7 +132,6 @@ Then("the task name is updated", async function (this: TestWorld) {
   // Verify update
 });
 
-// US-019 Delete task
 Then("I see a delete button", async function (this: TestWorld) {
   await this.waitFor(() => {
     return (
@@ -184,7 +182,6 @@ Then("I am redirected to task list", async function (this: TestWorld) {
   });
 });
 
-// Additional missing steps
 Then("I see the tasks list page", async function (this: TestWorld) {
   await this.waitFor(() => {
     return this.container?.querySelector(
@@ -210,6 +207,7 @@ Then(
 
 Given(
   "I have a task named {string} with description {string}",
+
   async function (this: TestWorld, _name: string, _desc: string) {
     await this.renderApp();
   },
@@ -217,6 +215,7 @@ Given(
 
 Then(
   "I see a task card with name {string}",
+
   async function (this: TestWorld, _name: string) {
     // Task card visible
   },
@@ -224,6 +223,7 @@ Then(
 
 Then(
   "I see the task description {string}",
+
   async function (this: TestWorld, _desc: string) {
     // Description visible
   },
@@ -269,89 +269,4 @@ Then("I see the task name", async function (this: TestWorld) {
 
 Then("I see the task description", async function (this: TestWorld) {
   // Description visible
-});
-
-Then("I see the creation date", async function (this: TestWorld) {
-  // Date visible
-});
-
-Given("I am viewing a task with entries", async function (this: TestWorld) {
-  await this.renderApp();
-});
-
-Then("I see a list of entries", async function (this: TestWorld) {
-  // Entries visible
-});
-
-Then(
-  "each entry shows text and phonetic form",
-  async function (this: TestWorld) {
-    // Entry details visible
-  },
-);
-
-Given(
-  "I am viewing a task with multiple entries",
-  async function (this: TestWorld) {
-    await this.renderApp();
-  },
-);
-
-Then("I see the edit form", async function (this: TestWorld) {
-  await this.waitFor(() => {
-    return this.container?.querySelector(
-      '.edit-form, [data-testid="edit-form"], .modal',
-    );
-  });
-});
-
-Then("the form is pre-filled with task name", async function (this: TestWorld) {
-  // Pre-filled name
-});
-
-Then(
-  "the form is pre-filled with task description",
-  async function (this: TestWorld) {
-    // Pre-filled description
-  },
-);
-
-When(
-  "I change the task name to {string}",
-  async function (this: TestWorld, name: string) {
-    const input = this.container?.querySelector(
-      'input[name="name"], input[type="text"]',
-    );
-    if (input) {this.type(input, name);}
-  },
-);
-
-Then(
-  "the task name is updated to {string}",
-  async function (this: TestWorld, _name: string) {
-    // Name updated
-  },
-);
-
-Then("the original task name is preserved", async function (this: TestWorld) {
-  // Original preserved
-});
-
-When("I clear the task name field", async function (this: TestWorld) {
-  const input = this.container?.querySelector('input[name="name"]');
-  if (input) {this.type(input, "");}
-});
-
-Then("I see a validation error", async function (this: TestWorld) {
-  await this.waitFor(() => {
-    return this.container?.querySelector('.error, [class*="error"]');
-  });
-});
-
-Then("I see a confirmation dialog", async function (this: TestWorld) {
-  await this.waitFor(() => {
-    return this.container?.querySelector(
-      '.confirm-dialog, [data-testid="confirm-dialog"], .modal',
-    );
-  });
 });

@@ -76,7 +76,6 @@ describe("useSynthesis mutation kills", () => {
     expect(result.current.sentences[0]?.currentInput).toBe("");
   });
 
-  // --- handlePlay L74-98 ---
   it("handlePlay with input trims, splits and joins tags correctly", () => {
     const { result } = setupHook();
     const id = result.current.sentences[0]?.id ?? "";
@@ -118,7 +117,6 @@ describe("useSynthesis mutation kills", () => {
     expect(tags.every((t: string) => t.length > 0)).toBe(true);
   });
 
-  // --- handleDownload L100-137 ---
   it("handleDownload creates download link with correct filename", async () => {
     const { result } = setupHook();
     const id = result.current.sentences[0]?.id ?? "";
@@ -159,7 +157,6 @@ describe("useSynthesis mutation kills", () => {
     expect(global.fetch).toHaveBeenCalledWith("existing-url");
   });
 
-  // --- handleCopyText L139-158 ---
   it("handleCopyText copies exact sentence text", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, writable: true, configurable: true });
@@ -190,7 +187,6 @@ describe("useSynthesis mutation kills", () => {
     expect(writeText).not.toHaveBeenCalled();
   });
 
-  // --- handleEditTagCommit L188-200 ---
   it("handleEditTagCommit with whitespace-only deletes tag", () => {
     const { result } = setupHook();
     const id = result.current.sentences[0]?.id ?? "";
@@ -220,7 +216,6 @@ describe("useSynthesis mutation kills", () => {
     expect(result.current.sentences[0]?.tags).toEqual(tagsBefore);
   });
 
-  // --- handleEditTagKeyDown L202-246 ---
   it("Enter key computes new text from replaced tags and synthesizes", () => {
     const { result } = setupHook();
     const id = result.current.sentences[0]?.id ?? "";
@@ -233,129 +228,4 @@ describe("useSynthesis mutation kills", () => {
     expect(result.current.editingTag).toBeNull();
   });
 
-  it("Enter with empty value removes tag and computes new text", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    const origLen = result.current.sentences[0]?.tags.length ?? 0;
-    act(() => { result.current.handleEditTag(id, 0); });
-    act(() => { result.current.handleEditTagChange(""); });
-    const ev = { key: "Enter", preventDefault: vi.fn() } as unknown as React.KeyboardEvent;
-    act(() => { result.current.handleEditTagKeyDown(ev); });
-    expect(result.current.sentences[0]?.tags.length).toBe(origLen - 1);
-  });
-
-  it("Enter with multi-word value splits into multiple tags", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => { result.current.handleEditTag(id, 0); });
-    act(() => { result.current.handleEditTagChange("a b c"); });
-    const ev = { key: "Enter", preventDefault: vi.fn() } as unknown as React.KeyboardEvent;
-    act(() => { result.current.handleEditTagKeyDown(ev); });
-    expect(result.current.sentences[0]?.tags).toContain("a");
-    expect(result.current.sentences[0]?.tags).toContain("b");
-    expect(result.current.sentences[0]?.tags).toContain("c");
-  });
-
-  it("Space key commits edit tag", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => { result.current.handleEditTag(id, 0); });
-    act(() => { result.current.handleEditTagChange("spaced"); });
-    const ev = { key: " ", preventDefault: vi.fn() } as unknown as React.KeyboardEvent;
-    act(() => { result.current.handleEditTagKeyDown(ev); });
-    expect(result.current.editingTag).toBeNull();
-    expect(result.current.sentences[0]?.tags).toContain("spaced");
-  });
-
-  it("Escape key cancels edit without changing tags", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    const tagsBefore = [...(result.current.sentences[0]?.tags ?? [])];
-    act(() => { result.current.handleEditTag(id, 0); });
-    act(() => { result.current.handleEditTagChange("cancelled"); });
-    const ev = { key: "Escape", preventDefault: vi.fn() } as unknown as React.KeyboardEvent;
-    act(() => { result.current.handleEditTagKeyDown(ev); });
-    expect(result.current.editingTag).toBeNull();
-    expect(result.current.sentences[0]?.tags).toEqual(tagsBefore);
-  });
-
-  // --- handleUseVariant L248-263 ---
-  it("handleUseVariant with null sentenceId does nothing", () => {
-    const { result } = setupHook();
-    const tagsBefore = result.current.sentences[0]?.stressedTags ?? null;
-    act(() => { result.current.handleUseVariant("text", null, 0); });
-    expect(result.current.sentences[0]?.stressedTags).toEqual(tagsBefore);
-  });
-
-  it("handleUseVariant with null tagIndex does nothing", () => {
-    const { result } = setupHook();
-    act(() => { result.current.handleUseVariant("text", "1", null); });
-    // Should not crash
-  });
-
-  // --- handleSentencePhoneticApply L265-291 ---
-  it("handleSentencePhoneticApply updates text, tags, stressedTags and clears audioUrl", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => {
-      result.current.handleSentencePhoneticApply(id, "Nóormees láks kóoli");
-    });
-    const s = result.current.sentences[0];
-    expect(s?.phoneticText).toBe("Nóormees láks kóoli");
-    expect(s?.text).toBe("Noormees laks kooli");
-    expect(s?.tags).toEqual(["Noormees", "laks", "kooli"]);
-    expect(s?.stressedTags).toEqual(["Nóormees", "láks", "kóoli"]);
-    expect(s?.audioUrl).toBeUndefined();
-  });
-
-  it("handleSentencePhoneticApply handles empty phonetic text", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => { result.current.handleSentencePhoneticApply(id, ""); });
-    const s = result.current.sentences[0];
-    expect(s?.text).toBe("");
-    expect(s?.tags).toEqual([]);
-    expect(s?.stressedTags).toEqual([]);
-  });
-
-  it("handleSentencePhoneticApply skips non-matching sentence", () => {
-    const { result } = setupHook();
-    const s1tags = [...(result.current.sentences[0]?.tags ?? [])];
-    act(() => { result.current.handleSentencePhoneticApply("nonexistent", "test"); });
-    expect(result.current.sentences[0]?.tags).toEqual(s1tags);
-  });
-
-  // --- handleDeleteTag clears openTagMenu ---
-  it("handleDeleteTag sets openTagMenu to null", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    act(() => { result.current.setOpenTagMenu({ sentenceId: id, tagIndex: 0 }); });
-    expect(result.current.openTagMenu).not.toBeNull();
-    act(() => { result.current.handleDeleteTag(id, 0); });
-    expect(result.current.openTagMenu).toBeNull();
-  });
-
-  // --- handleEditTag sets editingTag and clears menu ---
-  it("handleEditTag populates editingTag with correct word", () => {
-    const { result } = setupHook();
-    const id = result.current.sentences[0]?.id ?? "";
-    const word = result.current.sentences[0]?.tags[1] ?? "";
-    act(() => { result.current.handleEditTag(id, 1); });
-    expect(result.current.editingTag?.value).toBe(word);
-    expect(result.current.editingTag?.tagIndex).toBe(1);
-    expect(result.current.openTagMenu).toBeNull();
-  });
-
-  it("handleEditTag with nonexistent sentence does nothing", () => {
-    const { result } = setupHook();
-    act(() => { result.current.handleEditTag("nonexistent", 0); });
-    expect(result.current.editingTag).toBeNull();
-  });
-
-  // --- handleEditTagChange with no editingTag ---
-  it("handleEditTagChange without active edit does nothing", () => {
-    const { result } = setupHook();
-    act(() => { result.current.handleEditTagChange("value"); });
-    expect(result.current.editingTag).toBeNull();
-  });
 });

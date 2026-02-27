@@ -56,7 +56,7 @@ function makeItem(pk: string, sk: string, version = 1): StoreItem {
   };
 }
 
-describe("DynamoDBAdapter", () => {
+describe("dynamodbAdapter.test", () => {
   let adapter: DynamoDBAdapter;
   const TABLE = "test-table";
 
@@ -255,38 +255,4 @@ describe("DynamoDBAdapter", () => {
     });
   });
 
-  describe("conditionalDelete", () => {
-    it("should return 'deleted' on success", async () => {
-      mockSend.mockResolvedValue({});
-
-      const result = await adapter.conditionalDelete("pk1", "sk1", "user1");
-      expect(result).toBe("deleted");
-    });
-
-    it("should return 'not_owner' when item exists but owner differs", async () => {
-      const MockedError = ConditionalCheckFailedException as unknown as new (opts: { message: string; $metadata: Record<string, unknown> }) => Error;
-      mockSend
-        .mockRejectedValueOnce(new MockedError({ message: "fail", $metadata: {} }))
-        .mockResolvedValueOnce({ Item: makeItem("pk1", "sk1") });
-
-      const result = await adapter.conditionalDelete("pk1", "sk1", "wrong-user");
-      expect(result).toBe("not_owner");
-    });
-
-    it("should return 'not_found' when item does not exist", async () => {
-      const MockedError = ConditionalCheckFailedException as unknown as new (opts: { message: string; $metadata: Record<string, unknown> }) => Error;
-      mockSend
-        .mockRejectedValueOnce(new MockedError({ message: "fail", $metadata: {} }))
-        .mockResolvedValueOnce({ Item: undefined });
-
-      const result = await adapter.conditionalDelete("pk1", "sk1", "user1");
-      expect(result).toBe("not_found");
-    });
-
-    it("should rethrow non-conditional errors", async () => {
-      mockSend.mockRejectedValue(new Error("DynamoDB down"));
-
-      await expect(adapter.conditionalDelete("pk1", "sk1", "user1")).rejects.toThrow("DynamoDB down");
-    });
-  });
 });

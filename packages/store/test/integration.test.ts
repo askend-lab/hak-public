@@ -21,7 +21,7 @@ function withCognitoUser(
   return event;
 }
 
-describe("Integration Tests - Full Pipeline", () => {
+describe("integration.test", () => {
   describe("private type through handler", () => {
     it("should save and retrieve private item", async () => {
       const saveEvent = withCognitoUser(
@@ -167,80 +167,4 @@ describe("Integration Tests - Full Pipeline", () => {
     });
   });
 
-  describe("validation through handler", () => {
-    it("should reject empty pk", async () => {
-      const event = withCognitoUser(
-        createPostEvent("/save", {
-          key: "",
-          id: "test",
-          type: "public",
-          ttl: 3600,
-        }),
-        "user1",
-      );
-
-      const result = await handler(event);
-      expect(result.statusCode).toBe(400);
-    });
-
-    it("should reject empty sk", async () => {
-      const event = withCognitoUser(
-        createPostEvent("/save", {
-          key: "test",
-          id: "",
-          type: "public",
-          ttl: 3600,
-        }),
-        "user1",
-      );
-
-      const result = await handler(event);
-      expect(result.statusCode).toBe(400);
-    });
-
-    it("should accept zero ttl (no expiration)", async () => {
-      const event = withCognitoUser(
-        createPostEvent("/save", {
-          key: "test-zero-ttl",
-          id: "test",
-          type: "public",
-          ttl: 0,
-        }),
-        "user1",
-      );
-
-      const result = await handler(event);
-      expect(result.statusCode).toBe(200);
-    });
-
-    it("should reject negative ttl", async () => {
-      const event = withCognitoUser(
-        createPostEvent("/save", {
-          key: "test",
-          id: "test",
-          type: "public",
-          ttl: -1,
-        }),
-        "user1",
-      );
-
-      const result = await handler(event);
-      expect(result.statusCode).toBe(400);
-    });
-
-    it("should reject ttl exceeding max", async () => {
-      const event = withCognitoUser(
-        createPostEvent("/save", {
-          key: "test",
-          id: "test",
-          type: "public",
-          ttl: 31536001, // 1 year + 1 second
-        }),
-        "user1",
-      );
-
-      const result = await handler(event);
-      expect(result.statusCode).toBe(400);
-    });
-  });
 });

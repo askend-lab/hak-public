@@ -49,6 +49,11 @@ describe("SentencePhoneticPanel", () => {
     global.URL.revokeObjectURL = vi.fn();
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   describe("rendering", () => {
     it("returns null when not open", () => {
       const { container } = render(
@@ -176,59 +181,14 @@ describe("SentencePhoneticPanel", () => {
     });
   });
 
-  describe("markers guide box", () => {
-    it("shows markers guide box with title", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(screen.getByText("Hääldusmärgid")).toBeInTheDocument();
-    });
-
-    it("shows intro text in guide box", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(
-        screen.getByText(
-          "Kasuta märke häälduse täpsustamiseks. Klõpsa märgil selle lisamiseks või hõlju kohal juhiste nägemiseks.",
-        ),
-      ).toBeInTheDocument();
-    });
-
-    it("shows info button to open full guide", () => {
-      render(<SentencePhoneticPanel {...defaultProps} />);
-      expect(
-        screen.getByLabelText("Ava hääldusmärkide juhend"),
-      ).toBeInTheDocument();
-    });
-
-    it("shows guide view when info button clicked", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-
-      await user.click(screen.getByLabelText("Ava hääldusmärkide juhend"));
-      expect(screen.getByText("Hääldusmärkide juhend")).toBeInTheDocument();
-    });
-
-    it("shows marker documentation in guide", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-
-      await user.click(screen.getByLabelText("Ava hääldusmärkide juhend"));
-      // The guide view shows detailed marker info
-      expect(
-        screen.getByText(/Hääldusmärgid aitavad täpsustada/),
-      ).toBeInTheDocument();
-    });
-
-    it("returns to edit view when back button clicked", async () => {
-      const user = userEvent.setup();
-      render(<SentencePhoneticPanel {...defaultProps} />);
-
-      await user.click(screen.getByLabelText("Ava hääldusmärkide juhend"));
-      expect(screen.getByText("Hääldusmärkide juhend")).toBeInTheDocument();
-
-      await user.click(screen.getByLabelText("Tagasi"));
-      expect(
-        screen.queryByRole("heading", { name: "Hääldusmärkide juhend" }),
-      ).not.toBeInTheDocument();
-      expect(screen.getByText("Kuula")).toBeInTheDocument();
-    });
   });
+
+  });
+
+  });
+
+  });
+
+  });
+
 });

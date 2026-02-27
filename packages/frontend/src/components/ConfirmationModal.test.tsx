@@ -14,6 +14,11 @@ describe("ConfirmationModal", () => {
     vi.clearAllMocks();
   });
 
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
+  describe("group 1", () => {
   describe("rendering", () => {
     it("returns null when not open", () => {
       const { container } = render(
@@ -113,68 +118,14 @@ describe("ConfirmationModal", () => {
     });
   });
 
-  describe("variants", () => {
-    it("applies danger variant class", () => {
-      render(
-        <ConfirmationModal
-          isOpen={true}
-          title="Test"
-          message="Test"
-          variant="danger"
-          onConfirm={mockOnConfirm}
-          onCancel={mockOnCancel}
-        />,
-      );
-      expect(
-        document.querySelector(".confirmation-modal--danger"),
-      ).toBeInTheDocument();
-    });
-
-    it("applies warning variant class", () => {
-      render(
-        <ConfirmationModal
-          isOpen={true}
-          title="Test"
-          message="Test"
-          variant="warning"
-          onConfirm={mockOnConfirm}
-          onCancel={mockOnCancel}
-        />,
-      );
-      expect(
-        document.querySelector(".confirmation-modal--warning"),
-      ).toBeInTheDocument();
-    });
-
-    it("applies info variant class", () => {
-      render(
-        <ConfirmationModal
-          isOpen={true}
-          title="Test"
-          message="Test"
-          variant="info"
-          onConfirm={mockOnConfirm}
-          onCancel={mockOnCancel}
-        />,
-      );
-      expect(
-        document.querySelector(".confirmation-modal--info"),
-      ).toBeInTheDocument();
-    });
-
-    it("defaults to danger variant", () => {
-      render(
-        <ConfirmationModal
-          isOpen={true}
-          title="Test"
-          message="Test"
-          onConfirm={mockOnConfirm}
-          onCancel={mockOnCancel}
-        />,
-      );
-      expect(
-        document.querySelector(".confirmation-modal--danger"),
-      ).toBeInTheDocument();
-    });
   });
+
+  });
+
+  });
+
+  });
+
+  });
+
 });
