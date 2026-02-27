@@ -4,6 +4,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { logger } from "@hak/shared";
 import { analyzeText, analyzeTextOrThrow } from "./analyzeApi";
+import { reportApiError } from "@/utils/reportApiError";
+
+vi.mock("@/utils/reportApiError", () => ({
+  reportApiError: vi.fn(),
+}));
 
 describe("analyzeApi", () => {
   const mockFetch = vi.fn();
@@ -36,10 +41,16 @@ describe("analyzeApi", () => {
     it("should return null if response not ok", async () => {
       mockFetch.mockResolvedValue({
         ok: false,
+        status: 500,
       });
 
       const result = await analyzeText("test");
       expect(result).toBeNull();
+      expect(reportApiError).toHaveBeenCalledWith({
+        context: "Analyze failed",
+        status: 500,
+        url: "/api/analyze",
+      });
     });
 
     it("should return null if fetch throws", async () => {
@@ -81,11 +92,17 @@ describe("analyzeApi", () => {
     it("should throw error if response not ok", async () => {
       mockFetch.mockResolvedValue({
         ok: false,
+        status: 422,
       });
 
       await expect(analyzeTextOrThrow("test")).rejects.toThrow(
         "Analysis failed",
       );
+      expect(reportApiError).toHaveBeenCalledWith({
+        context: "Analysis failed",
+        status: 422,
+        url: "/api/analyze",
+      });
     });
 
     it("should return original text if stressedText is empty", async () => {

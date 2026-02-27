@@ -54,7 +54,9 @@ describe("reportApiError", () => {
   it("formats message consistently: 'API error: {context} — {status} {url}'", () => {
     reportApiError({ context: "Synthesis timeout", status: 504, url: "/api/synthesize" });
 
-    const errorArg = vi.mocked(Sentry.captureException).mock.calls[0][0] as Error;
+    const calls = vi.mocked(Sentry.captureException).mock.calls;
+    expect(calls).toHaveLength(1);
+    const errorArg = calls[0]?.[0] as Error;
     expect(errorArg.message).toBe("API error: Synthesis timeout — 504 /api/synthesize");
   });
 });

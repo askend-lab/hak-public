@@ -3,6 +3,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { synthesizeWithPolling } from "./synthesize";
+import { reportApiError } from "@/utils/reportApiError";
+
+vi.mock("@/utils/reportApiError", () => ({
+  reportApiError: vi.fn(),
+}));
 
 describe("synthesize - part 2", () => {
   beforeEach(() => {
@@ -28,11 +33,17 @@ describe("synthesize - part 2", () => {
         })
         .mockResolvedValueOnce({
           ok: false,
+          status: 502,
         });
 
       await expect(synthesizeWithPolling("hello", "efm_l")).rejects.toThrow(
         "Status check failed",
       );
+      expect(reportApiError).toHaveBeenCalledWith({
+        context: "Status check failed",
+        status: 502,
+        url: "/api/status/test-key",
+      });
     });
 
     it("throws error when synthesis returns error status", async () => {
@@ -115,6 +126,12 @@ describe("synthesize - part 2", () => {
       await safePromise;
 
       await expect(promise).rejects.toThrow("Synthesis timed out");
+      expect(reportApiError).toHaveBeenCalledWith({
+        context: "Synthesis timed out",
+        status: 0,
+        url: "/api/synthesize",
+        body: "cacheKey=k, attempts=30",
+      });
       vi.useRealTimers();
     });
 

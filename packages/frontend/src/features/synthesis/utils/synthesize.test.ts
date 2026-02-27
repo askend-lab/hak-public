@@ -3,6 +3,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { synthesizeWithPolling } from "./synthesize";
+import { reportApiError } from "@/utils/reportApiError";
+
+vi.mock("@/utils/reportApiError", () => ({
+  reportApiError: vi.fn(),
+}));
 
 describe("synthesize", () => {
   beforeEach(() => {
@@ -48,11 +53,17 @@ describe("synthesize", () => {
     it("throws error when synthesis request fails", async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
+        status: 500,
       });
 
       await expect(synthesizeWithPolling("hello", "efm_l")).rejects.toThrow(
         "Synthesis request failed",
       );
+      expect(reportApiError).toHaveBeenCalledWith({
+        context: "Synthesis request failed",
+        status: 500,
+        url: "/api/synthesize",
+      });
     });
 
     it("polls for audio when status is processing", async () => {
