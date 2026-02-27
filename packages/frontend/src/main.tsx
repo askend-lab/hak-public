@@ -18,17 +18,15 @@ import { CopiedEntriesProvider } from "./contexts/CopiedEntriesContext";
 import { initActivityListeners } from "./features/synthesis/utils/warmAudioWorker";
 import "./styles/main.scss";
 
-try {
-  Sentry.init({
-    dsn: import.meta.env.VITE_SENTRY_DSN ?? "",
-    environment: import.meta.env.MODE,
-    enabled: import.meta.env.PROD && hasTrackingConsent(),
-    replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 0,
-  });
-} catch {
-  // Sentry init failure must not block app startup
-}
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN ?? "",
+  environment: import.meta.env.MODE,
+  enabled: import.meta.env.PROD && hasTrackingConsent(),
+  integrations: [Sentry.replayIntegration()],
+  replaysSessionSampleRate: 0,
+  replaysOnErrorSampleRate: 1.0,
+  tracesSampleRate: 0.1,
+});
 const AuthCallbackPage = lazy(() => import("./features/auth/pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
 const SharedTaskPage = lazy(() => import("./features/sharing/pages/SharedTaskPage").then(m => ({ default: m.SharedTaskPage })));
 const SynthesisRoute = lazy(() => import("./routes/SynthesisRoute"));

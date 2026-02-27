@@ -102,9 +102,12 @@ describe("SimpleStoreAdapter mutation kills", () => {
 
   it("save error includes exact message prefix", async () => {
     const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    mockFetch.mockResolvedValueOnce({ ok: false, text: async () => "bad" });
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, text: async () => "bad" });
     await expect(adapter.saveTask(mkTask("t1"))).rejects.toThrow("Failed to save: bad");
-    expect(logSpy).toHaveBeenCalledWith("SimpleStore save failed:", "bad");
+    expect(logSpy).toHaveBeenCalledWith(
+      "API error: SimpleStore save failed — 500 /api/save",
+      expect.objectContaining({ status: 500, url: "/api/save", body: "bad" }),
+    );
     logSpy.mockRestore();
   });
 
@@ -112,7 +115,10 @@ describe("SimpleStoreAdapter mutation kills", () => {
     const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
     mockFetch.mockResolvedValueOnce({ ok: false, status: 500, text: async () => "err" });
     await expect(adapter.getTask("t1")).rejects.toThrow("Failed to get: err");
-    expect(logSpy).toHaveBeenCalledWith("SimpleStore get failed:", "err");
+    expect(logSpy).toHaveBeenCalledWith(
+      "API error: SimpleStore get failed — 500 /api/get",
+      expect.objectContaining({ status: 500, url: "/api/get", body: "err" }),
+    );
     logSpy.mockRestore();
   });
 

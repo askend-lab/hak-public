@@ -4,6 +4,7 @@
 import { postJSON } from "./analyzeApi";
 import { getVoiceModel } from "@/types/synthesis";
 import { AuthStorage } from "@/features/auth/services/storage";
+import { reportApiError } from "@/utils/reportApiError";
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 30;
@@ -35,7 +36,10 @@ function wait(ms: number): Promise<void> {
 
 async function fetchStatus(cacheKey: string, signal?: AbortSignal): Promise<StatusResponse | null> {
   const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
-  if (!response.ok) {throw new Error("Status check failed");}
+  if (!response.ok) {
+    reportApiError({ context: "Status check failed", status: response.status, url: `${STATUS_API_PATH}/${cacheKey}` });
+    throw new Error("Status check failed");
+  }
   return response.json();
 }
 
@@ -62,7 +66,9 @@ async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<str
     if (url) {return url;}
     await wait(getPollingDelay(i)); // eslint-disable-line no-await-in-loop -- sequential polling delay
   }
-  throw new Error("Synthesis timed out");
+  const err = new Error("Synthesis timed out");
+  reportApiError({ context: "Synthesis timed out", status: 0, url: SYNTHESIZE_API_PATH, body: `cacheKey=${cacheKey}, attempts=${MAX_POLL_ATTEMPTS}` });
+  throw err;
 }
 
 /**
@@ -87,7 +93,10 @@ function isReady(data: SynthesizeResponse): data is SynthesizeResponse & { audio
 
 export async function synthesizeWithPolling(text: string, voice: string, signal?: AbortSignal): Promise<string> {
   const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, buildSynthOpts(signal));
-  if (!response.ok) {throw new Error("Synthesis request failed");}
+  if (!response.ok) {
+    reportApiError({ context: "Synthesis request failed", status: response.status, url: SYNTHESIZE_API_PATH });
+    throw new Error("Synthesis request failed");
+  }
   const data: SynthesizeResponse = await response.json();
   if (isReady(data)) {return data.audioUrl;}
   return pollForAudio(data.cacheKey, signal);

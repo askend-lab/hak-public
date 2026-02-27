@@ -3,6 +3,7 @@
 
 import { convertTextToTags, CACHE_INVALIDATION, type SentenceState } from "@/types/synthesis";
 import { logger } from "@hak/shared";
+import * as Sentry from "@sentry/react";
 import type { useSynthesisAPI } from "./useSynthesisAPI";
 import type { useAudioPlayer } from "./useAudioPlayer";
 
@@ -49,7 +50,7 @@ async function resolveAudioUrl(deps: OrchestratorDeps, opts: ResolveOpts): Promi
   if (opts.sentence.audioUrl) {return opts.sentence.audioUrl;}
   if (opts.abortSignal?.aborted) {return null;}
   try { return await fetchAndStore(deps, opts); }
-  catch (error) { logger.error("Failed to synthesize audio:", error); return null; }
+  catch (error) { logger.error("Failed to synthesize audio:", error); Sentry.captureException(error, { tags: { synthesis: "resolve" } }); return null; }
 }
 
 async function fetchAndStore(deps: OrchestratorDeps, opts: ResolveOpts): Promise<string | null> {
@@ -168,7 +169,7 @@ async function synthesizeFromScratch(deps: OrchestratorDeps, sentence: SentenceS
   const { id, text, phoneticText } = sentence;
   deps.updateSentence(id, { tags: convertTextToTags(text), isLoading: true, isPlaying: false });
   try { await freshSynthesize(deps, { id, text, phoneticHint: phoneticText || undefined }); }
-  catch (error) { logger.error("Failed to synthesize:", error); deps.updateSentence(id, { isLoading: false, isPlaying: false }); }
+  catch (error) { logger.error("Failed to synthesize:", error); Sentry.captureException(error, { tags: { synthesis: "fresh" } }); deps.updateSentence(id, { isLoading: false, isPlaying: false }); }
 }
 
 export async function doSynthesizeAndPlay(deps: OrchestratorDeps, id: string, retryCount = 0): Promise<void> {
@@ -203,5 +204,5 @@ export async function doSynthesizeWithText(deps: OrchestratorDeps, opts: SynthTe
   const sentence = deps.getSentence(id);
   deps.updateSentence(id, { isLoading: true, isPlaying: false });
   try { await freshSynthesize(deps, { id, text, phoneticHint: sentence?.phoneticText || undefined }); }
-  catch (error) { logger.error("Failed to synthesize:", error); deps.updateSentence(id, { isLoading: false, isPlaying: false }); }
+  catch (error) { logger.error("Failed to synthesize:", error); Sentry.captureException(error, { tags: { synthesis: "withText" } }); deps.updateSentence(id, { isLoading: false, isPlaying: false }); }
 }

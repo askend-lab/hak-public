@@ -5,6 +5,7 @@ import { Task } from "@/types/task";
 import { AuthStorage } from "@/features/auth/services/storage";
 import { CONTENT_TYPE_JSON } from "@/config/constants";
 import { logger, STORE_KEYS } from "@hak/shared";
+import { reportApiError } from "@/utils/reportApiError";
 
 /** Serialize a Task to a plain JSON-safe record for storage. */
 function taskToRecord(task: Task): Record<string, unknown> {
@@ -65,7 +66,7 @@ export class SimpleStoreAdapter {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ key: opts.key, id: opts.id, type: opts.type, ttl: opts.ttl ?? this.ttl, data: opts.data }),
     });
-    if (!response.ok) { const error = await response.text(); logger.error("SimpleStore save failed:", error); throw new Error(`Failed to save: ${error}`); }
+    if (!response.ok) { const error = await response.text(); reportApiError({ context: "SimpleStore save failed", status: response.status, url: `${this.baseUrl}/save`, body: error }); throw new Error(`Failed to save: ${error}`); }
   }
 
   private getEndpoint(type: string): { endpoint: string; headers: Record<string, string> } {
@@ -78,7 +79,7 @@ export class SimpleStoreAdapter {
 
   private async handleGetError(response: Response): Promise<null> {
     if (response.status === 404) {return null;}
-    const error = await response.text(); logger.error("SimpleStore get failed:", error); throw new Error(`Failed to get: ${error}`);
+    const error = await response.text(); reportApiError({ context: "SimpleStore get failed", status: response.status, url: `${this.baseUrl}/get`, body: error }); throw new Error(`Failed to get: ${error}`);
   }
 
   private async get(key: string, id: string, type: string): Promise<Record<string, unknown> | null> {
@@ -112,7 +113,7 @@ export class SimpleStoreAdapter {
 
     if (!response.ok) {
       const error = await response.text();
-      logger.error("SimpleStore delete failed:", error);
+      reportApiError({ context: "SimpleStore delete failed", status: response.status, url: `${this.baseUrl}/delete`, body: error });
       throw new Error(`Failed to delete: ${error}`);
     }
   }
@@ -129,7 +130,7 @@ export class SimpleStoreAdapter {
     if (!response.ok) {
       if (response.status === 404) {return [];}
       const error = await response.text();
-      logger.error("SimpleStore query failed:", error);
+      reportApiError({ context: "SimpleStore query failed", status: response.status, url: `${this.baseUrl}/query`, body: error });
       throw new Error(`Failed to query: ${error}`);
     }
 
