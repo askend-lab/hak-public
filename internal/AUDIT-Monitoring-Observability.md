@@ -311,8 +311,8 @@ Dashboard `hak-activity-{env}` показывает:
 ### Фаза 0: Верификация текущей инфраструктуры
 
 - [x] Добавить Terraform validation: `slack_webhook_url` обязателен (не может быть пустым), система не деплоится без него
-- [ ] Добавить проверку в Slack notifier Lambda: если webhook возвращает ошибку → alarm (сейчас ошибка глотается)
-- [ ] Добавить validation в frontend build: `VITE_SENTRY_DSN` обязателен для production build (fail build если пустой)
+- [x] Добавить проверку в Slack notifier Lambda: raise RuntimeError при ошибке webhook + dedicated alarm для notifier
+- [x] Добавить validation в frontend build: `VITE_SENTRY_DSN` обязателен для production build (fail build на main)
 
 ### Фаза 1: Все 500-ки → алерт
 
@@ -380,25 +380,25 @@ Dashboard `hak-activity-{env}` показывает:
 ### Фаза 4: Uptime и CI/CD
 
 **4.1 Uptime**
-- [x] Route53 health check на `https://{domain}/` → alarm (CloudWatch, cross-region SNS relay нужен для Slack)
-- [x] Route53 health check на `/api/health` (merlin-api) → alarm (CloudWatch)
-- [ ] Cross-region SNS relay для Slack уведомлений о health check failures (Phase 5)
+- [x] Route53 health check на `https://{domain}/` → alarm → Slack (через us-east-1 Lambda relay)
+- [x] Route53 health check на `/api/health` (merlin-api) → alarm → Slack
+- [x] Cross-region SNS relay: SNS topic + Slack notifier Lambda в us-east-1
 
 **4.2 CI/CD**
 - [x] Slack notification в `build.yml` при failure
 - [x] Slack notification в `deploy.yml` при failure и при успешном деплое
-- [ ] Smoke tests: добавить Slack notification при failure (keep `continue-on-error` но алертить)
+- [x] Smoke tests: Slack notification при failure (orange warning, keep `continue-on-error`)
 
 **4.3 Security**
 - [x] GuardDuty — уже включен для всего аккаунта через dev env (оба env на одном AWS account, дублировать нельзя)
 
 ### Фаза 5: Зрелость
 
-- [ ] X-Ray tracing для morphology-api API Gateway
-- [ ] Correlation ID (X-Request-Id) от CloudFront до Lambda
-- [ ] CloudWatch Logs Insights saved queries
-- [ ] Runbooks для каждого alarm
-- [ ] Cross-region SNS relay (us-east-1 → eu-west-1) для Route53 health check → Slack
+- [x] X-Ray tracing: Lambda tracing enabled на всех сервисах + IAM permissions для morphology-api (HTTP API v2 не поддерживает API Gateway-level X-Ray)
+- [x] Correlation ID (X-Request-Id) от CloudFront до Lambda через CloudFront Function + header forwarding
+- [x] CloudWatch Logs Insights: 6 saved queries (Lambda errors, synthesis flow, slow lambdas, worker errors, by request ID, notifier errors)
+- [x] Runbooks для каждого alarm (docs/runbooks/README.md — 14 alarm runbooks)
+- [x] Cross-region SNS relay (us-east-1 → Slack) для Route53 health check alerts
 
 ### Решение по 400 vs 500
 
