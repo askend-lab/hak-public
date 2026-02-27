@@ -23,7 +23,7 @@
     "lint": "eslint --cache --ext .js,.ts,.tsx . --max-warnings=0 && npx gherkin-lint 'packages/specifications/**/*.feature' && npx stylelint 'packages/frontend/src/styles/**/*.scss' && (cd packages/tts-worker && (test -x .venv/bin/mypy && .venv/bin/mypy worker.py tests/ --ignore-missing-imports || echo 'SKIP: mypy not installed (no .venv)'))",
     "check": "pnpm lint && pnpm typecheck && pnpm test:all",
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
-    "kill-ports": "lsof -ti:5181 | xargs -r kill -9 2>/dev/null; sleep 0.5; true",
+    "kill-ports": "fuser -k 5181/tcp 2>/dev/null; sleep 0.5; true",
     "start:frontend": "pnpm --filter @hak/frontend dev",
     "start:backend": "pnpm exec tsc --noEmit && pnpm --filter @hak/store dev",
     "start": "pnpm run kill-ports && pnpm run start:frontend"
