@@ -52,8 +52,12 @@ variable "monthly_budget_limit" {
 }
 
 variable "slack_webhook_url" {
-  description = "Slack webhook URL for CloudWatch alerts (create at https://api.slack.com/apps)"
+  description = "Slack webhook URL for CloudWatch alerts (create at https://api.slack.com/apps). Required — system cannot operate without alerting."
   type        = string
-  default     = ""
   sensitive   = true
+
+  validation {
+    condition     = length(var.slack_webhook_url) > 0
+    error_message = "slack_webhook_url is required. The system must not deploy without alerting configured."
+  }
 }

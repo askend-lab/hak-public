@@ -10,6 +10,7 @@
  */
 import { logger } from "@hak/shared";
 import { CONTENT_TYPE_JSON } from "@/config/constants";
+import { reportApiError } from "@/utils/reportApiError";
 
 export const ANALYZE_API_PATH = "/api/analyze";
 export const VARIANTS_API_PATH = "/api/variants";
@@ -46,7 +47,7 @@ export async function analyzeText(text: string): Promise<string | null> {
     const response = await postJSON(ANALYZE_API_PATH, { text });
 
     if (!response.ok) {
-      logger.error(`[Analyze] HTTP ${response.status} for text: "${text.slice(0, 50)}"`);
+      reportApiError({ context: "Analyze failed", status: response.status, url: ANALYZE_API_PATH });
       return null;
     }
 
@@ -66,6 +67,7 @@ export async function analyzeTextOrThrow(text: string): Promise<string> {
   const response = await postJSON(ANALYZE_API_PATH, { text });
 
   if (!response.ok) {
+    reportApiError({ context: "Analysis failed", status: response.status, url: ANALYZE_API_PATH });
     throw new Error("Analysis failed");
   }
 

@@ -51,6 +51,9 @@ module.exports = {
     "/node_modules/",
     SIMPLESTORE_PATH,
     "/packages/frontend/", // Frontend uses Vitest now
+    "/packages/store/", // Store uses Vitest now (vitest.config.ts)
+    "/packages/shared/", // Shared uses Vitest now (vitest.config.ts)
+    "\\.smoke\\.test\\.", // Smoke tests require real AWS environment
   ],
   modulePathIgnorePatterns: [SIMPLESTORE_PATH],
   transform: {

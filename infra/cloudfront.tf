@@ -39,6 +39,8 @@ resource "aws_cloudfront_function" "api_rewrite" {
   code    = <<-EOF
     function handler(event) {
       var request = event.request;
+      // Add correlation ID for end-to-end request tracing
+      request.headers['x-request-id'] = { value: crypto.randomUUID() };
       // Strip path prefix before forwarding to API Gateway origins
       if (request.uri.startsWith('/api/')) {
         request.uri = request.uri.substring(4);  // /api/save -> /save
@@ -135,9 +137,9 @@ resource "aws_cloudfront_distribution" "website" {
       forwarded_values {
         query_string = ordered_cache_behavior.value.query_string
         headers = ordered_cache_behavior.value.auth ? [
-          "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization"
+          "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Authorization", "x-request-id"
           ] : [
-          "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"
+          "Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method", "x-request-id"
         ]
         cookies {
           forward = ordered_cache_behavior.value.cookies

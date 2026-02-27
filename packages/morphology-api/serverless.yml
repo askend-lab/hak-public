@@ -38,6 +38,15 @@ provider:
     PORT: 8080
     ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}}
 
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: "*"
+
   ecr:
     images:
       vabamorf:

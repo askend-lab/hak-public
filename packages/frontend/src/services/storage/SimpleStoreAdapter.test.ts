@@ -74,6 +74,9 @@ describe("SimpleStoreAdapter", () => {
 });
 
 // --- Merged from SimpleStoreAdapter.mutations.test.ts ---
+vi.mock("@/utils/reportApiError", () => ({
+  reportApiError: vi.fn(),
+}));
 vi.mock("@/features/auth/services/storage", () => ({
   AuthStorage: { getIdToken: vi.fn(() => "test-token") },
 }));
@@ -100,20 +103,28 @@ describe("SimpleStoreAdapter mutation kills", () => {
     expect(url).toBe("/api/save");
   });
 
-  it("save error includes exact message prefix", async () => {
-    const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    mockFetch.mockResolvedValueOnce({ ok: false, text: async () => "bad" });
+  it("save error calls reportApiError and throws", async () => {
+    const { reportApiError } = await import("@/utils/reportApiError");
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, text: async () => "bad" });
     await expect(adapter.saveTask(mkTask("t1"))).rejects.toThrow("Failed to save: bad");
-    expect(logSpy).toHaveBeenCalledWith("SimpleStore save failed:", "bad");
-    logSpy.mockRestore();
+    expect(reportApiError).toHaveBeenCalledWith({
+      context: "SimpleStore save failed",
+      status: 500,
+      url: "/api/save",
+      body: "bad",
+    });
   });
 
-  it("get error includes exact message prefix", async () => {
-    const logSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
+  it("get error calls reportApiError and throws", async () => {
+    const { reportApiError } = await import("@/utils/reportApiError");
     mockFetch.mockResolvedValueOnce({ ok: false, status: 500, text: async () => "err" });
     await expect(adapter.getTask("t1")).rejects.toThrow("Failed to get: err");
-    expect(logSpy).toHaveBeenCalledWith("SimpleStore get failed:", "err");
-    logSpy.mockRestore();
+    expect(reportApiError).toHaveBeenCalledWith({
+      context: "SimpleStore get failed",
+      status: 500,
+      url: "/api/get",
+      body: "err",
+    });
   });
 
   it("getTaskByShareToken uses unlisted type string", async () => {

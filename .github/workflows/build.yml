@@ -193,6 +193,14 @@ jobs:
         if: steps.detect.outputs.gherkin-parser == 'true'
         run: pnpm --filter @hak/gherkin-parser test:full
 
+      - name: Validate frontend secrets
+        if: steps.detect.outputs.frontend == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          if [ -z "${{ secrets.VITE_SENTRY_DSN }}" ]; then
+            echo "::error::VITE_SENTRY_DSN secret is not set. Frontend error tracking will be disabled in production."
+            exit 1
+          fi
+
       - name: Build frontend
         if: steps.detect.outputs.frontend == 'true'
         env:
@@ -340,6 +348,15 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "gh workflow run deploy.yml -f build_id=${{ steps.build.outputs.build_id }} -f environment=dev" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Slack (build failure)
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -s -X POST "$SLACK_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"attachments\":[{\"color\":\"#ff0000\",\"title\":\"🚨 Build FAILED\",\"text\":\"Branch: ${{ github.ref_name }}\nSHA: ${{ github.sha }}\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"footer\":\"HAK CI/CD\"}]}"
 
   deploy-dev:
     name: Deploy to Dev

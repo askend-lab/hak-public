@@ -356,12 +356,13 @@ jobs:
           done
 
       - name: Smoke test (bash)
+        id: smoke_bash
         continue-on-error: true
         run: |
           chmod +x scripts/smoke-test.sh
           ./scripts/smoke-test.sh ${{ inputs.environment }}
-
       - name: Smoke test (api-client)
+        id: smoke_api
         continue-on-error: true
         working-directory: packages/api-client
         env:
@@ -370,6 +371,10 @@ jobs:
           npx jest --no-coverage --testPathPatterns=smoke 2>&1
           echo "✅ API client smoke tests passed (${{ inputs.environment }})"
 
+      - name: Notify Slack (smoke test failure)
+        if: (steps.smoke_bash.outcome == 'failure' || steps.smoke_api.outcome == 'failure') && env.SLACK_WEBHOOK_URL != ''
+        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }
+        run: 'curl -s -X POST "$SLACK_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"attachments\":[{\"color\":\"#ffaa00\",\"title\":\"⚠️ Smoke tests failed (${{ inputs.environment }})\",\"text\":\"Deploy succeeded but smoke tests failed.\\nBuild: ${{ inputs.build_id }}\\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"footer\":\"HAK CI/CD\"}]}"'
       - name: Summary
         run: |
           ENV="${{ inputs.environment }}"
@@ -383,3 +388,12 @@ jobs:
           [ "${{ steps.state.outputs.deploy_tts_api }}" == "true" ] && echo "- ✅ tts-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ tts-api (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_morphology_api }}" == "true" ] && echo "- ✅ morphology-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ morphology-api (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_auth }}" == "true" ] && echo "- ✅ auth" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ auth (unchanged)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Slack (success)
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }
+        run: 'curl -s -X POST "$SLACK_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"attachments\":[{\"color\":\"#00ff00\",\"title\":\"✅ Deploy ${{ inputs.environment }} succeeded\",\"text\":\"Build: ${{ inputs.build_id }}\\nSHA: ${{ github.sha }}\",\"footer\":\"HAK CI/CD\"}]}"'
+      - name: Notify Slack (failure)
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }
+        run: 'curl -s -X POST "$SLACK_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"attachments\":[{\"color\":\"#ff0000\",\"title\":\"🚨 Deploy ${{ inputs.environment }} FAILED\",\"text\":\"Build: ${{ inputs.build_id }}\\nSHA: ${{ github.sha }}\\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"footer\":\"HAK CI/CD\"}]}"'

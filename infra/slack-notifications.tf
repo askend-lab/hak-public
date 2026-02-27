@@ -18,8 +18,7 @@ import os
 def handler(event, context):
     webhook_url = os.environ.get('SLACK_WEBHOOK_URL')
     if not webhook_url:
-        print("SLACK_WEBHOOK_URL not set")
-        return {'statusCode': 500, 'body': 'Webhook URL not configured'}
+        raise RuntimeError("SLACK_WEBHOOK_URL not set — alerting is broken")
     
     for record in event.get('Records', []):
         message = record.get('Sns', {}).get('Message', '')
@@ -56,11 +55,10 @@ def handler(event, context):
             headers={'Content-Type': 'application/json'}
         )
         
-        try:
-            urllib.request.urlopen(req)
-        except Exception as e:
-            print(f"Failed to send to Slack: {e}")
-            return {'statusCode': 500, 'body': str(e)}
+        # Raise on failure — Lambda error metric fires, SNS retries
+        response = urllib.request.urlopen(req)
+        if response.status != 200:
+            raise RuntimeError(f"Slack webhook returned {response.status}")
     
     return {'statusCode': 200, 'body': 'OK'}
 EOF
