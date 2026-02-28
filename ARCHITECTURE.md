@@ -6,7 +6,7 @@ HAK is an Estonian language learning platform. Teachers create lessons with text
 
 **Client:** React SPA (Vite + SCSS/BEM), served via CloudFront CDN from S3.
 
-**Backend:** Four Lambda functions behind API Gateway, plus one Docker service on ECS:
+**Backend:** Three Lambda functions behind API Gateway, plus one Docker service on ECS:
 
 - **store** — REST API for lessons, users, and progress. Reads/writes DynamoDB.
 - **tts-api** — TTS gateway. Accepts synthesis requests, sends them to SQS, checks results in S3.
@@ -59,26 +59,6 @@ pnpm workspaces monorepo. Packages and their dependencies:
 4. Frontend polls `GET /status/:cacheKey`. When tts-api finds the file in S3, it returns `{status: ready, url}`.
 5. Frontend plays the audio from the S3 URL.
 
-## Infrastructure
-
-All infrastructure is managed with Terraform in `infra/`.
-
-- **main.tf** — Provider and backend config
-- **variables.tf** — Input variables
-- **locals.tf** — Local values
-- **outputs.tf** — Output values
-- **terraform-state.tf** — Remote state backend (S3 + DynamoDB lock)
-- **api-gateway.tf** — API Gateway routes for all Lambda APIs
-- **dynamodb.tf** — DynamoDB tables
-- **website.tf** — S3 + CloudFront for frontend hosting
-- **audio.tf** — S3 audio bucket, SQS queue, IAM roles
-- **ecr.tf** — ECR repository for Docker images
-- **cloudfront.tf** — CDN distribution
-- **route53.tf** — DNS records
-- **cloudwatch-alarms.tf** — Monitoring alarms
-- **cloudwatch-dashboard.tf** — Monitoring dashboard
-- **slack-notifications.tf** — Alert notifications to Slack
-- **merlin/** — Merlin-specific infra: ECS cluster, Fargate service, SQS queue, S3 bucket, IAM roles, auto-scaling
 
 ## CI/CD & Deployment
 
@@ -158,21 +138,12 @@ Frontend → TARA/Cognito → auth Lambda → Cognito User Pool → Frontend (/a
 
 ## Quality System
 
-Pre-commit hooks (DevBox) enforce quality on every commit. The commit is rejected if any check fails.
+Quality checks run in CI on every pull request. The PR is blocked if any check fails.
 
-| Hook | What it checks |
-|------|----------------|
-| **TYPE** | TypeScript strict compilation (`tsc --noEmit`) across all packages |
-| **RUN-LINT** | ESLint zero-warnings policy on changed files |
-| **DEAD-CODE** | Unused exports detection (knip) |
-| **PLAYWRIGHT** | E2E browser tests |
-| **SECURITY** | `pnpm audit` — 0 known CVEs |
-| **DEPS** | Unused/missing dependency detection |
-| **CIRCULAR-DEPS** | Circular import detection (madge) |
-| **JSCPD** | Copy-paste detection (≤5% threshold) |
-| **SRC-SIZE** | Source file size limit (≤400 lines) |
-| **MD-SIZE** | Markdown file size limit (≤200 lines) |
-| **SECRET** | Secret/credential scanning (gitleaks) |
-| **LANG** | Language consistency checking |
+| Check | What it runs |
+|-------|--------------|
+| **Lint** | ESLint zero-warnings policy |
+| **Typecheck** | TypeScript strict compilation (`tsc --noEmit`) — frontend + shared |
+| **Tests** | Unit + integration tests across all packages |
 
 Lint metrics enforced: complexity ≤10, function length ≤50L, nesting depth ≤4, no console statements, no magic numbers.

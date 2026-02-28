@@ -1,78 +1,97 @@
 # HAK — Estonian Language Learning Platform
 
+[![Build & Test](https://github.com/askend-lab/hak-public/actions/workflows/build.yml/badge.svg)](https://github.com/askend-lab/hak-public/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220.svg)](https://pnpm.io/)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-A serverless language learning platform where teachers create interactive
-Estonian lessons and students complete them. Built with React, TypeScript,
-and AWS Lambda.
+An open-source language learning platform where teachers create interactive
+Estonian lessons with text-to-speech audio, and students complete them.
+Built with React and TypeScript.
 
 ## Quick Start
 
-**Prerequisites:** Node.js 20+ (see `.nvmrc`), pnpm 10+
+**Prerequisites:** [Node.js](https://nodejs.org/) 20+, [pnpm](https://pnpm.io/) 10+, [Git](https://git-scm.com/)
 
 ```bash
-git clone https://github.com/askend-lab/hak.git
-cd hak
+git clone https://github.com/askend-lab/hak-public.git
+cd hak-public
 pnpm install
-pnpm test          # Run all tests
-pnpm run dx        # Full quality check: tests + hooks
-pnpm start         # Start dev server (http://localhost:5181)
+pnpm start              # Dev server at http://localhost:5181
 ```
 
-**tts-worker** (Python TTS engine) requires additional setup:
+No Docker, AWS CLI, or environment variables needed — the dev server proxies API calls to deployed services.
 
-```bash
-cd packages/tts-worker
-python3 -m venv .venv
-.venv/bin/pip install -r requirements-test.txt
-.venv/bin/pytest tests/ -v    # Run Python tests
-```
+## Project Structure
+
+| Package | Description |
+|---------|-------------|
+| `packages/frontend` | React SPA — Vite, SCSS/BEM, React Router |
+| `packages/shared` | Shared types and utilities |
+| `packages/simplestore` | REST API for lessons, users, progress (DynamoDB) |
+| `packages/merlin-api` | TTS gateway — synthesis requests, caching (Lambda) |
+| `packages/merlin-worker` | Estonian speech synthesis engine — Merlin TTS (Docker/ECS) |
+| `packages/vabamorf-api` | Estonian morphological analysis — stress, variants (Lambda) |
+| `packages/specifications` | Gherkin BDD specifications |
+| `packages/gherkin-parser` | Gherkin-to-test mapping |
 
 ## Architecture
 
-**Monorepo** (`pnpm` workspaces) with serverless backend on AWS — React frontend, Lambda APIs, DynamoDB, S3 audio, Docker-based TTS engine.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for a system overview.
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for monorepo structure, package dependencies, data flows, infrastructure, and quality system.
+**Frontend** → React SPA served via CDN.
+**Backend** → Serverless Lambda functions + Docker-based TTS engine.
+**Storage** → DynamoDB for data, S3 for audio files.
+
+## Features
+
+- **Interactive lessons** — Teachers create text-based lessons with audio
+- **Text-to-speech** — Estonian speech synthesis (Merlin TTS engine)
+- **Morphological analysis** — Word stress and pronunciation variants (Vabamorf)
+- **Audio pipeline** — Synthesis queue, caching, playback
+- **Responsive design** — Works on desktop and mobile
+- **Accessibility** — WCAG-compliant UI components
 
 ## Development
 
-```bash
-pnpm run dx        # Full DevBox quality check (tests + hooks)
-pnpm lint          # ESLint
-pnpm test          # All tests
-pnpm test -- --full    # Full suite with coverage
-```
+### Available Commands
 
-Tests use **Jest** (backend packages) and **Vitest** (frontend).
-Frontend packages use **co-located tests** (`*.test.ts` next to source files).
-Backend packages use **separated tests** (`test/` directory).
+| Command | Description |
+|---------|-------------|
+| `pnpm start` | Start frontend dev server (port 5181) |
+| `pnpm check` | Run all checks: lint + typecheck + tests |
+| `pnpm lint` | ESLint with zero warnings policy |
+| `pnpm typecheck` | TypeScript type checking (frontend + shared) |
+| `pnpm test:all` | Run all tests across all packages |
+
+### Code Quality
+
+- **TypeScript** — strict mode, zero `any` types
+- **ESLint** — zero warnings policy
+- **Tests** — TDD enforced, coverage thresholds per module
+
 BDD specifications in Gherkin live in `packages/specifications/`.
+
+## API Documentation
+
+- [API Reference](docs/API.md) — all endpoint documentation
+- [Architecture Decisions](docs/adr/) — ADRs
 
 ## Contributing
 
 We welcome contributions! Please read:
 
-1. [Contributing Guide](CONTRIBUTING.md)
-2. [Code of Conduct](CODE_OF_CONDUCT.md)
+1. [Code of Conduct](CODE_OF_CONDUCT.md)
+2. [Contributing Guide](CONTRIBUTING.md)
+3. [Security Policy](SECURITY.md)
+4. [Support](SUPPORT.md)
 
 ```bash
-# Fork, clone, then:
 pnpm install
-pnpm test          # Make sure everything passes
+pnpm check          # Make sure everything passes
 # Create a branch, make changes, open a PR
 ```
-
-## Security Considerations
-
-Some aspects of HAK's architecture are **intentionally open by design** and should not be treated as vulnerabilities:
-
-- **Merlin API (TTS) and Vabamorf API (NLP) are public endpoints** — no authentication is required. These APIs serve the core learning experience and must be accessible without login. Protection is via API Gateway throttling and AWS WAF rate limiting only.
-- **S3 audio storage is publicly readable** — synthesized audio files are served directly via CloudFront/S3. Content is non-sensitive educational material. Access is by content-hash URL; there is no authorization layer by design.
-- **Serverless Framework v3** — we use Serverless Framework v3 (EOL) intentionally. v4 requires a commercial license. We will migrate to v4 (or CDK/SAM) when the project transitions to open source and qualifies for the free tier. This is a cost decision, not an oversight.
-
-For the full security audit and current findings, see `internal/SECURITY-AUDIT-2026-02.md`.
 
 ## Built With AI
 

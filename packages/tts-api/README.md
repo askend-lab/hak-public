@@ -48,7 +48,7 @@ All endpoints are public by design — protection is via AWS WAF rate limiting a
 
 ## Note on Shared Utilities
 
-tts-api inlines utility functions from `@hak/shared` (e.g., `getCorsOrigin`) because Lambda bundling does not support workspace package imports. This is an intentional trade-off documented in `internal/DESIGN-DECISIONS.md`.
+tts-api inlines utility functions from `@hak/shared` (e.g., `getCorsOrigin`) because Lambda bundling does not support workspace package imports.This is an intentional trade-off — see `docs/adr/` for architecture decisions.
 
 ## Testing
 

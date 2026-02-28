@@ -48,4 +48,4 @@ Feature: Text Input
 
 ## Testing
 
-Feature files are validated by the `gherkin-lint` DevBox hook and tested via Cucumber in the frontend package.
+Feature files are validated by CI lint checks and tested via Cucumber in the frontend package.

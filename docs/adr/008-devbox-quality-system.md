@@ -1,4 +1,4 @@
-# ADR 008: DevBox Quality System with Pre-Commit Hooks
+# ADR 008: Quality System with Pre-Commit Hooks
 
 **Status:** Accepted  
 **Date:** 2025-01
