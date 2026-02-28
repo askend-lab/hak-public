@@ -28,6 +28,6 @@
   },
   "dependencies": {
     "@hak/shared": "workspace:*",
-    "zod": "^3.25.76"
+    "zod": "^4.3.6"
   }
 }
