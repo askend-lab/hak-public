@@ -40,7 +40,14 @@ resource "aws_cloudfront_function" "api_rewrite" {
     function handler(event) {
       var request = event.request;
       // Add correlation ID for end-to-end request tracing
-      request.headers['x-request-id'] = { value: crypto.randomUUID() };
+      // crypto.randomUUID() is NOT available in CloudFront Functions runtime
+      var h = '0123456789abcdef';
+      var id = '';
+      for (var i = 0; i < 36; i++) {
+        if (i === 8 || i === 13 || i === 18 || i === 23) { id += '-'; }
+        else { id += h[Math.floor(Math.random() * 16)]; }
+      }
+      request.headers['x-request-id'] = { value: id };
       // Strip path prefix before forwarding to API Gateway origins
       if (request.uri.startsWith('/api/')) {
         request.uri = request.uri.substring(4);  // /api/save -> /save
