@@ -1,9 +1,29 @@
 # HAK Platform — Service Level Agreement (SLA)
 
-**Version:** 0.1 (draft)
+**Version:** 0.2 (draft)
 **Date:** 2026-03-06
 **Author:** Kate (Askend-lab Development Team)
 **Status:** Draft for client discussion
+
+---
+
+## Executive Summary
+
+**Platform availability:** 99.5% (max ~3.5 hours downtime/month).
+
+**Audio synthesis:** text → playable audio in under 15 seconds (single user). Up to 2 minutes under peak load (queue wait + worker scale-up).
+
+**All endpoints behind login:** synthesis, morphology, lessons — only for authenticated users via ID-card, Mobile-ID, Smart-ID, or email.
+
+**Per-user limits:** 10 synthesis requests/minute, 120/hour, 1000/day — sufficient for the most intensive lesson preparation.
+
+**Auto-scaling:** system automatically adds workers when load increases (trigger: 3 messages in queue), and removes them when idle. Max 3 concurrent workers.
+
+**Predictable cost:** ~$14/month base (1 worker 24/7). At full load (3 concurrent teachers): ~$42/month. Cost does not depend on number of generations within limits.
+
+**Data durability:** 99.999999999% (AWS DynamoDB + S3). Recovery time <4 hours.
+
+**24/7 monitoring:** 12 automated alarms notify the team in Slack on any issue.
 
 ---
 
@@ -86,25 +106,53 @@ Availability = (total minutes − downtime minutes) / total minutes × 100%
 
 ## 5. Capacity
 
-### 5.1 Current Limits
+### 5.1 Per-User Rate Limits (post-auth)
+
+All limits are per authenticated user (tied to JWT token, not IP).
+
+| Operation | Per Minute | Per Hour | Per Day |
+|-----------|-----------|----------|----------|
+| Synthesis (/synthesize) | **10** | **120** | **1000** |
+| Morphology (/analyze, /variants) | **20** | **300** | **2000** |
+| Status polling (/status) | **30** | **600** | — |
+
+**Rationale:** A teacher preparing lessons generates 3–5 synthesis requests/minute in bursts. 10/min provides 2–3x headroom. 1000/day covers 5 intensive sessions of 200 requests each.
+
+### 5.2 System Limits
 
 | Resource | Limit | Notes |
 |----------|-------|-------|
 | TTS text input | 100 characters per request | Zod-validated |
-| TTS concurrent workers | 2 (ECS max_capacity) | Auto-scales from 0–2 |
+| TTS concurrent workers | 3 (ECS max_capacity) | Auto-scales from 1–3 |
 | SQS queue depth cap | 50 messages → 503 | Application-level |
 | WAF rate limit (general) | 2000 req/5min per IP | CloudFront WAF |
 | WAF rate limit (/synthesize) | 200 req/5min per IP | Path-specific rule |
 | WAF geo-blocking (/synthesize) | Baltic/Nordic region only | EE, LV, LT, FI, SE, DE, PL, NO, DK |
 | DynamoDB | On-demand (auto-scaling) | No pre-provisioned capacity |
 
-### 5.2 Expected Load (post-auth)
+### 5.3 Auto-Scaling
 
-Once endpoints are behind authentication, expected load profile:
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Trigger | 3 messages in SQS | Scale out when queue depth ≥3 per worker |
+| Scale-out cooldown | 30 seconds | Time before adding another worker |
+| Scale-in cooldown | 600 seconds (10 min) | Time before removing idle worker |
+| Min workers (prod) | 1 | Always-on baseline |
+| Max workers | 3 | Hard cap to control cost |
+
+**Capacity per worker:** ~12 generations/minute (1 generation = ~5 seconds, single-threaded model).
+
+| Workers | Capacity (gen/min) | Concurrent Teachers |
+|---------|-------------------|---------------------|
+| 1 | 12 | 1–2 |
+| 2 | 24 | 2–4 |
+| 3 | 36 | 4–6 |
+
+### 5.4 Expected Load (post-auth)
 
 | Metric | Expected | Peak |
 |--------|----------|------|
-| Concurrent users | 10–50 | 200 |
+| Concurrent teachers preparing lessons | 1–3 | 6 |
 | Synthesis requests/hour | 50–200 | 500 |
 | Store API requests/hour | 200–1000 | 3000 |
 
@@ -173,7 +221,7 @@ Once endpoints are behind authentication, expected load profile:
 | DynamoDB throttling | WARNING | >1 in 300s |
 | API high latency | WARNING | p99 >5s over 3 periods |
 | WAF blocked requests | WARNING | >100 in 300s |
-| ECS high tasks | WARNING | ≥2 (max capacity) |
+| ECS high tasks | WARNING | ≥3 (max capacity) |
 | API 4xx errors | WARNING | >10 in 300s |
 | Slack notifier errors | CRITICAL | >0 (meta-monitoring) |
 
@@ -205,11 +253,48 @@ CloudWatch Dashboard: `hak-activity-{env}` with real-time metrics for all servic
 
 ---
 
-## 11. Open Items for Discussion
+## 11. Cost Breakdown
+
+### 11.1 Base Cost (always-on)
+
+| Component | Monthly Cost | Notes |
+|-----------|-------------|-------|
+| 1 Fargate Spot worker (1 vCPU, 4 GB, 24/7) | ~$14 | Min capacity, runs even with 0 requests |
+| DynamoDB (on-demand) | ~$5–10 | Depends on read/write volume |
+| Lambda (all functions) | ~$1–3 | Free tier covers most |
+| S3 (audio storage) | ~$1–5 | Depends on cache size |
+| CloudFront | ~$1–5 | Depends on traffic |
+| **Total base** | **~$22–37** | |
+
+### 11.2 Per-Generation Cost
+
+| Resource | Per Generation | Notes |
+|----------|---------------|-------|
+| Worker time (5 sec Spot) | ~$0.003 | Marginal cost on top of 24/7 worker |
+| S3 storage (~1 MB WAV) | ~$0.00002 | |
+| SQS message | ~$0.0000004 | |
+| Lambda invocation | ~$0.0000002 | |
+| **Total per generation** | **~$0.003** | Effectively free on top of base cost |
+
+### 11.3 Scaling Scenarios
+
+| Scenario | Workers | Monthly Cost |
+|----------|---------|-------------|
+| Idle (no teachers) | 1 | ~$22–37 |
+| Normal (1–2 teachers, 500 gen/day) | 1 | ~$22–37 |
+| Busy (3–4 teachers, 2000 gen/day) | 1–2 | ~$36–51 |
+| Peak (5–6 teachers, 5000 gen/day) | 2–3 | ~$50–65 |
+
+Additional workers spin up automatically and shut down after 10 minutes of idle. Cost increase is ~$14/month per worker if active 24/7, proportionally less for burst usage.
+
+---
+
+## 12. Open Items for Discussion
 
 1. **Availability tier** — 99.5% vs 99.9%? Higher tiers require multi-region setup and significantly increase cost.
-2. **TTS end-to-end latency** — current 15s target depends on ECS cold start. Keeping ≥1 warm worker reduces to <5s but costs ~$30/month.
+2. **TTS end-to-end latency** — 15s target is for warm worker. Cold start (scale-up event) adds 30–60s. Acceptable?
 3. **DynamoDB PITR** — enable point-in-time recovery? Adds ~20% to DynamoDB cost.
 4. **RTO/RPO targets** — are 4h/1h acceptable or does the client need tighter guarantees?
-5. **Auth migration impact** — closing public endpoints (SEC-01) changes the usage pattern. Need to agree on per-user rate limits.
+5. **Per-user limits** — are 10/min, 120/hour, 1000/day appropriate for the expected teacher workflow?
 6. **SLA penalties** — does the client expect service credits for SLA breaches? If so, what structure?
+7. **Max workers** — 3 workers supports ~6 concurrent teachers. Is this sufficient for launch?
