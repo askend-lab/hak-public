@@ -5,7 +5,7 @@ import BuildInfo from "./BuildInfo";
 
 const FooterLogo = () => (
   <div className="footer-section footer__logo">
-    <img src="/icons/logo.png" alt="EKI Logo" className="footer__logo-image" />
+    <img src="/icons/logo.svg" alt="EKI Logo" className="footer__logo-image" />
     <div className="footer__contact">
       <p>
         Roosikrantsi 6, 10119 Tallinn

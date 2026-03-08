@@ -12,35 +12,34 @@
 // Uses BaseModal for structure, contains only content-specific styles
 // =========================================================================
 
-.login-modal {
-  // Structure provided by BaseModal
-}
-
-.login-modal__intro {
+.login-modal__header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: $spacing-6;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: $spacing-8;
 }
 
 .login-modal__intro-logo {
-  width: 48px;
-  height: 48px;
-  margin-bottom: $spacing-4;
+  height: auto;
+  max-height: 48px;
+  width: auto;
 }
 
-.login-modal__intro-title {
+.login-modal__body {
+  padding: 0 $spacing-8 $spacing-8;
+}
+
+.login-modal__title {
   margin: 0 0 $spacing-2 0;
   font-family: $font-body;
-  font-size: $font-size-xl;
-  font-weight: $font-weight-medium;
-  line-height: $line-height-normal;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-none;
   color: $color-primary;
 }
 
 .login-modal__intro-description {
-  margin: 0;
+  margin: 0 0 $spacing-6 0;
   font-family: $font-body;
   font-size: $font-size-sm;
   font-weight: $font-weight-regular;
@@ -211,19 +210,35 @@
 
 .login-modal__actions {
   display: flex;
-  justify-content: stretch;
+  flex-direction: column;
+  gap: $spacing-3;
   margin-top: $spacing-2;
 
   button {
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-3;
   }
 }
 
-.login-modal__google-button--flex {
+.login-modal__divider {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: $spacing-3;
+  gap: $spacing-4;
+}
+
+.login-modal__divider-line {
+  flex: 1;
+  border: none;
+  border-top: 1px solid $color-outlined-neutral;
+}
+
+.login-modal__divider-text {
+  color: $color-text-secondary;
+  font-family: $font-body;
+  font-size: $font-size-sm;
 }
 
 .login-modal__privacy {

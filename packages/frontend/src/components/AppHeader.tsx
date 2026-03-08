@@ -32,7 +32,7 @@ export default function AppHeader({
     <header className="page-layout__header">
       <div className="page-layout__header-content">
         <Link to="/synthesis" className="eki-logo">
-          <img src="/icons/logo.png" alt="EKI Logo" />
+          <img src="/icons/logo.svg" alt="EKI Logo" />
         </Link>
         <nav className="header-nav">
           <NavLink

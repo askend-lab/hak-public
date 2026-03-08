@@ -117,7 +117,22 @@ function useTaskDetailUI(opts: { setEntries: React.Dispatch<React.SetStateAction
   const audio = useAudioPlayback(entries);
   const variants = usePronunciationVariants({ entries, setEntries, task, userId });
   const phonetic = usePhoneticPanel({ entries, setEntries, task, userId, onMenuClose: handleMenuClose });
-  return { openMenuId, setOpenMenuId, handleMenuClose, dragDrop, audio, variants, phonetic };
+
+  const handleTagClick = useCallback((entryId: string, tagIndex: number, word: string) => {
+    phonetic.handleClosePhoneticPanel();
+    variants.handleTagClick(entryId, tagIndex, word);
+  }, [phonetic.handleClosePhoneticPanel, variants.handleTagClick]);
+
+  const handleExplorePhonetic = useCallback(async (entryId: string) => {
+    variants.handleCloseVariants();
+    await phonetic.handleExplorePhonetic(entryId);
+  }, [variants.handleCloseVariants, phonetic.handleExplorePhonetic]);
+
+  return {
+    openMenuId, setOpenMenuId, handleMenuClose, dragDrop, audio,
+    variants: { ...variants, handleTagClick },
+    phonetic: { ...phonetic, handleExplorePhonetic },
+  };
 }
 
 function buildRowMenuItems(phonetic: ReturnType<typeof usePhoneticPanel>, actions: ReturnType<typeof useTaskDetailActions>) {
