@@ -20,6 +20,13 @@ provider:
   tracing:
     lambda: true
   httpApi:
+    authorizers:
+      cognitoAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: https://cognito-idp.${self:provider.region}.amazonaws.com/${ssm:/hak/${self:provider.stage}/cognito-user-pool-id}
+        audience:
+          - ${ssm:/hak/${self:provider.stage}/cognito-client-id}
     cors:
       allowedOrigins:
         - ${self:custom.allowedOrigin.${self:provider.stage}}
@@ -63,9 +70,13 @@ functions:
       - httpApi:
           path: /analyze
           method: POST
+          authorizer:
+            name: cognitoAuthorizer
       - httpApi:
           path: /variants
           method: POST
+          authorizer:
+            name: cognitoAuthorizer
       - httpApi:
           path: /health
           method: GET

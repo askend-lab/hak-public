@@ -6,6 +6,19 @@ import { getVoiceModel } from "@/types/synthesis";
 import { AuthStorage } from "@/features/auth/services/storage";
 import { reportApiError } from "@/utils/reportApiError";
 
+export class AuthRequiredError extends Error {
+  constructor() {
+    super("Authentication required");
+    this.name = "AuthRequiredError";
+  }
+}
+
+function requireAuth(): string {
+  const token = AuthStorage.getAccessToken();
+  if (!token) {throw new AuthRequiredError();}
+  return token;
+}
+
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 30;
 const SYNTHESIZE_API_PATH = "/api/synthesize";
@@ -34,8 +47,16 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => { setTimeout(resolve, ms); });
 }
 
-async function fetchStatus(cacheKey: string, signal?: AbortSignal): Promise<StatusResponse | null> {
-  const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, signal ? { signal } : {});
+function buildStatusOpts(token: string, signal?: AbortSignal): RequestInit {
+  return {
+    ...(signal && { signal }),
+    headers: { Authorization: `Bearer ${token}` },
+  };
+}
+
+async function fetchStatus(cacheKey: string, token: string, signal?: AbortSignal): Promise<StatusResponse | null> {
+  const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, buildStatusOpts(token, signal));
+  if (response.status === 401) {throw new AuthRequiredError();}
   if (!response.ok) {
     reportApiError({ context: "Status check failed", status: response.status, url: `${STATUS_API_PATH}/${cacheKey}` });
     throw new Error("Status check failed");
@@ -43,8 +64,8 @@ async function fetchStatus(cacheKey: string, signal?: AbortSignal): Promise<Stat
   return response.json();
 }
 
-async function safeFetchStatus(cacheKey: string, signal?: AbortSignal): Promise<StatusResponse | null> {
-  try { return await fetchStatus(cacheKey, signal); }
+async function safeFetchStatus(cacheKey: string, token: string, signal?: AbortSignal): Promise<StatusResponse | null> {
+  try { return await fetchStatus(cacheKey, token, signal); }
   catch (err) { if (err instanceof TypeError) {return null;} throw err; }
 }
 
@@ -58,10 +79,10 @@ function handlePollResult(data: StatusResponse): string | null {
   return null;
 }
 
-async function pollForAudio(cacheKey: string, signal?: AbortSignal): Promise<string> {
+async function pollForAudio(cacheKey: string, token: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     checkAborted(signal);
-    const data = await safeFetchStatus(cacheKey, signal); // eslint-disable-line no-await-in-loop -- sequential polling
+    const data = await safeFetchStatus(cacheKey, token, signal); // eslint-disable-line no-await-in-loop -- sequential polling
     const url = data ? handlePollResult(data) : null;
     if (url) {return url;}
     await wait(getPollingDelay(i)); // eslint-disable-line no-await-in-loop -- sequential polling delay
@@ -91,13 +112,19 @@ function isReady(data: SynthesizeResponse): data is SynthesizeResponse & { audio
   return (data.status === "cached" || data.status === "ready") && data.audioUrl !== null;
 }
 
-export async function synthesizeWithPolling(text: string, voice: string, signal?: AbortSignal): Promise<string> {
-  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, buildSynthOpts(signal));
+function checkSynthResponse(response: Response): void {
+  if (response.status === 401) {throw new AuthRequiredError();}
   if (!response.ok) {
     reportApiError({ context: "Synthesis request failed", status: response.status, url: SYNTHESIZE_API_PATH });
     throw new Error("Synthesis request failed");
   }
+}
+
+export async function synthesizeWithPolling(text: string, voice: string, signal?: AbortSignal): Promise<string> {
+  const token = requireAuth();
+  const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, buildSynthOpts(signal));
+  checkSynthResponse(response);
   const data: SynthesizeResponse = await response.json();
   if (isReady(data)) {return data.audioUrl;}
-  return pollForAudio(data.cacheKey, signal);
+  return pollForAudio(data.cacheKey, token, signal);
 }

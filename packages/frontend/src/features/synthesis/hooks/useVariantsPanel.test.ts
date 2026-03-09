@@ -6,6 +6,10 @@ import { renderHook, act } from "@testing-library/react";
 import { useVariantsPanel } from "./useVariantsPanel";
 import { SentenceState } from "@/types/synthesis";
 
+vi.mock("@/features/auth/services/storage", () => ({
+  AuthStorage: { getAccessToken: vi.fn(() => "test-token") },
+}));
+
 describe("useVariantsPanel", () => {
   const createMockSentences = (): SentenceState[] => [
     {

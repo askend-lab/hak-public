@@ -47,13 +47,13 @@ locals {
 
   # CloudFront API route cache behaviors (used by dynamic block in cloudfront.tf)
   # rewrite: true = apply path prefix stripping (/api/* → /*, /auth/* → /*)
-  # auth: true = forward Authorization header (authenticated SimpleStore routes)
+  # auth: true = forward Authorization header (authenticated API routes)
   # cookies: "all" = forward cookies (needed for auth state), "none" = strip cookies
   api_routes = [
-    { path = "/api/analyze",    origin = "vabamorf-api",    rewrite = true, auth = false, query_string = true,  cookies = "none" },
-    { path = "/api/variants",   origin = "vabamorf-api",    rewrite = true, auth = false, query_string = true,  cookies = "none" },
-    { path = "/api/synthesize", origin = "merlin-api",      rewrite = true, auth = false, query_string = true,  cookies = "none" },
-    { path = "/api/status/*",   origin = "merlin-api",      rewrite = true, auth = false, query_string = true,  cookies = "none" },
+    { path = "/api/analyze",    origin = "vabamorf-api",    rewrite = true, auth = true,  query_string = true,  cookies = "none" },
+    { path = "/api/variants",   origin = "vabamorf-api",    rewrite = true, auth = true,  query_string = true,  cookies = "none" },
+    { path = "/api/synthesize", origin = "merlin-api",      rewrite = true, auth = true,  query_string = true,  cookies = "none" },
+    { path = "/api/status/*",   origin = "merlin-api",      rewrite = true, auth = true,  query_string = true,  cookies = "none" },
     { path = "/api/save",       origin = "simplestore-api", rewrite = true, auth = true,  query_string = true,  cookies = "none" },
     { path = "/api/get",        origin = "simplestore-api", rewrite = true, auth = true,  query_string = true,  cookies = "none" },
     { path = "/api/delete",     origin = "simplestore-api", rewrite = true, auth = true,  query_string = true,  cookies = "none" },
