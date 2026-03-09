@@ -7,6 +7,56 @@
 
 ---
 
+## 0. Implementation Checklist
+
+### Decisions (confirmed with Alex)
+- [x] UI stays exactly as-is — all pages and buttons remain accessible without login
+- [x] When user triggers synthesize/analyze/variants → redirect to login if not authenticated
+- [x] After login, resume the original request (synthesize continues)
+- [x] `/get-shared`, `/get-public` — stay open (sharing UX)
+- [x] S3 audio (MP3/WAV) — stays open (if you have cacheKey, you can play it)
+- [x] Demo synthesis in onboarding wizard — always from S3 cache, no login needed
+- [x] Health endpoints — stay open (monitoring)
+
+### Backend — API Gateway Auth
+- [ ] **B1.** `packages/tts-api/serverless.yml` — add JWT Authorizer (Cognito) to `/synthesize` and `/status/{cacheKey}`
+- [ ] **B2.** `packages/tts-api/serverless.yml` — remove `HttpApiRoutePostSynthesize` resource override (`AuthorizationType: NONE`)
+- [ ] **B3.** `packages/morphology-api/serverless.yml` — add JWT Authorizer (Cognito) to `/analyze` and `/variants`
+- [ ] **B4.** Both serverless.yml — add SSM references for `cognito-user-pool-id` and `cognito-client-id`
+
+### Infrastructure — CloudFront
+- [ ] **I1.** `infra/locals.tf` — set `auth = true` for `/api/analyze`, `/api/variants`, `/api/synthesize`, `/api/status/*` (forwards Authorization header)
+
+### Frontend — Auth-Gated Actions
+- [ ] **F1.** `synthesize.ts` — if no access token, trigger login redirect instead of calling API (return to synthesis after login)
+- [ ] **F2.** `analyzeApi.ts` — add `Authorization: Bearer <token>` header to `/api/analyze` and `/api/variants` calls
+- [ ] **F3.** `analyzeApi.ts` — if no access token, trigger login redirect before calling analyze/variants
+- [ ] **F4.** `synthesize.ts` — add auth header to `/api/status/{key}` polling calls
+- [ ] **F5.** Verify `buildSynthOpts()` already sends access token for `/api/synthesize` (it does — just confirm)
+- [ ] **F6.** Handle 401 response gracefully — show login modal, not error toast
+
+### Testing
+- [ ] **T1.** Test: unauthenticated `POST /synthesize` returns 401
+- [ ] **T2.** Test: unauthenticated `POST /analyze` returns 401
+- [ ] **T3.** Test: unauthenticated `POST /variants` returns 401
+- [ ] **T4.** Test: unauthenticated `GET /status/{key}` returns 401
+- [ ] **T5.** Test: authenticated requests work with valid JWT
+- [ ] **T6.** Test: `/health` endpoints remain open (200 without token)
+- [ ] **T7.** Test: `/get-shared`, `/get-public` remain open
+- [ ] **T8.** Test: S3 audio URLs remain accessible
+- [ ] **T9.** Test: demo synthesis in onboarding works without login
+- [ ] **T10.** Test: login redirect → return to synthesis flow
+
+### Deploy & Verify
+- [ ] **D1.** Deploy to dev (serverless deploy for TTS + Morphology)
+- [ ] **D2.** Apply Terraform (CloudFront header forwarding)
+- [ ] **D3.** Deploy frontend (build + S3 sync)
+- [ ] **D4.** Smoke test all flows on dev
+- [ ] **D5.** Deploy to prod
+- [ ] **D6.** Update SLA.md §7.1 — remove "(after SEC-01 fix)"
+
+---
+
 ## 1. Current State
 
 ### 1.1 Architecture Overview
