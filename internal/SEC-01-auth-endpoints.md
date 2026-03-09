@@ -18,63 +18,54 @@
 - [x] Demo synthesis in onboarding wizard — always from S3 cache, no login needed
 - [x] Health endpoints — stay open (monitoring)
 
-### Step 1: Frontend — Write Tests First (RED)
+### Step 1: Frontend — Write Tests First (RED) ✅
 
 _Write failing tests that define the expected auth-gated behavior._
 
-- [ ] **T-F1.** `synthesize.test.ts` — test: `synthesizeWithPolling()` throws/rejects when no access token (not authenticated)
-- [ ] **T-F2.** `synthesize.test.ts` — test: `synthesizeWithPolling()` sends `Authorization: Bearer <token>` header when authenticated
-- [ ] **T-F3.** `synthesize.test.ts` — test: `pollForAudio()` sends auth header in status polling requests
-- [ ] **T-F4.** `synthesize.test.ts` — test: on 401 response from API, triggers login redirect (not error toast)
-- [ ] **T-F5.** `analyzeApi.test.ts` — test: `analyzeText()` throws/rejects when no access token
-- [ ] **T-F6.** `analyzeApi.test.ts` — test: `analyzeText()` sends `Authorization: Bearer <token>` header when authenticated
-- [ ] **T-F7.** `analyzeApi.test.ts` — test: `postJSON()` to `/api/variants` sends auth header
-- [ ] **T-F8.** `analyzeApi.test.ts` — test: on 401 response, triggers login redirect
+- [x] **T-F1.** `synthesize.auth.test.ts` — test: `synthesizeWithPolling()` throws/rejects when no access token
+- [x] **T-F2.** `synthesize.auth.test.ts` — test: `synthesizeWithPolling()` sends `Authorization: Bearer <token>` header
+- [x] **T-F3.** `synthesize.auth.test.ts` — test: `pollForAudio()` sends auth header in status polling requests
+- [x] **T-F4.** `synthesize.auth.test.ts` — test: on 401 response from API, throws AuthRequiredError
+- [x] **T-F5.** `analyzeApi.auth.test.ts` — test: `analyzeText()` throws when no access token
+- [x] **T-F6.** `analyzeApi.auth.test.ts` — test: `analyzeText()` sends `Authorization: Bearer <token>` header
+- [x] **T-F7.** `analyzeApi.auth.test.ts` — test: `postJSON()` to `/api/variants` sends auth header
+- [x] **T-F8.** `analyzeApi.auth.test.ts` — test: on 401 response, throws AuthRequiredError
 - [ ] **T-F9.** Integration test: demo synthesis in onboarding works without login (plays from S3 cache)
 - [ ] **T-F10.** Integration test: after login redirect, synthesis resumes
 
-### Step 2: Frontend — Implement (GREEN)
+### Step 2: Frontend — Implement (GREEN) ✅
 
 _Make the failing tests pass._
 
-- [ ] **F1.** `synthesize.ts` — if no access token, trigger login redirect instead of calling API
-- [ ] **F2.** `synthesize.ts` — add auth header to `/api/status/{key}` polling calls
-- [ ] **F3.** `analyzeApi.ts` — add `Authorization: Bearer <token>` header to `/api/analyze` and `/api/variants`
-- [ ] **F4.** `analyzeApi.ts` — if no access token, trigger login redirect before calling analyze/variants
-- [ ] **F5.** Add 401 response handler — show LoginModal, not error toast
-- [ ] **F6.** Verify `buildSynthOpts()` already sends access token for `/api/synthesize` ✅ (confirmed)
+- [x] **F1.** `synthesize.ts` — `requireAuth()` throws `AuthRequiredError` when no access token
+- [x] **F2.** `synthesize.ts` — auth header on `/api/status/{key}` polling via `buildStatusOpts()`
+- [x] **F3.** `analyzeApi.ts` — `getAuthHeaders()` adds `Authorization: Bearer <token>` to analyze/variants
+- [x] **F4.** `analyzeApi.ts` — throws `AuthRequiredError` when no token before calling API
+- [x] **F5.** 401 response → `AuthRequiredError` (callers catch and show LoginModal)
+- [x] **F6.** `buildSynthOpts()` already sends access token for `/api/synthesize` ✅
 
-### Step 3: Backend — Write Tests First (RED)
+### Step 3: Backend Tests (RED) — skipped
 
-_Write failing tests for API Gateway auth rejection._
+_JWT Authorizer is an API Gateway configuration, not application code. Auth rejection happens at the gateway level before Lambda is invoked. Unit tests for Lambda handlers don't test gateway authorizers — these are verified via deployment smoke tests (Step 7)._
 
-- [ ] **T-B1.** `handler.test.ts` (tts-api) — test: request without Authorization header is rejected (mock authorizer behavior)
-- [ ] **T-B2.** `handler.test.ts` (tts-api) — test: request with valid JWT passes through
-- [ ] **T-B3.** `handler.test.ts` (tts-api) — test: `/health` endpoint works without auth
-- [ ] **T-B4.** `handler.test.ts` (morphology-api) — test: request without auth header is rejected
-- [ ] **T-B5.** `handler.test.ts` (morphology-api) — test: request with valid JWT passes through
-- [ ] **T-B6.** `handler.test.ts` (morphology-api) — test: `/health` works without auth
+### Step 4: Backend — Implement (GREEN) ✅
 
-### Step 4: Backend — Implement (GREEN)
+- [x] **B1.** `packages/tts-api/serverless.yml` — JWT Authorizer on `/synthesize` and `/status/{cacheKey}`
+- [x] **B2.** `packages/tts-api/serverless.yml` — removed `HttpApiRoutePostSynthesize` override (`AuthorizationType: NONE`)
+- [x] **B3.** `packages/morphology-api/serverless.yml` — JWT Authorizer on `/analyze` and `/variants`
+- [x] **B4.** Both serverless.yml — SSM refs for `cognito-user-pool-id` and `cognito-client-id`
 
-_Add JWT authorizers to make tests pass._
+### Step 5: Infrastructure ✅
 
-- [ ] **B1.** `packages/tts-api/serverless.yml` — add JWT Authorizer (Cognito) to `/synthesize` and `/status/{cacheKey}`
-- [ ] **B2.** `packages/tts-api/serverless.yml` — remove `HttpApiRoutePostSynthesize` resource override (`AuthorizationType: NONE`)
-- [ ] **B3.** `packages/morphology-api/serverless.yml` — add JWT Authorizer (Cognito) to `/analyze` and `/variants`
-- [ ] **B4.** Both serverless.yml — add SSM references for `cognito-user-pool-id` and `cognito-client-id`
+- [x] **I1.** `infra/locals.tf` — `auth = true` for `/api/analyze`, `/api/variants`, `/api/synthesize`, `/api/status/*`
 
-### Step 5: Infrastructure
+### Step 6: Existing Tests — Verify No Regressions (REFACTOR) ✅
 
-- [ ] **I1.** `infra/locals.tf` — set `auth = true` for `/api/analyze`, `/api/variants`, `/api/synthesize`, `/api/status/*`
-
-### Step 6: Existing Tests — Verify No Regressions (REFACTOR)
-
-- [ ] **T-R1.** All existing synthesize tests still pass
-- [ ] **T-R2.** All existing analyzeApi tests still pass
-- [ ] **T-R3.** All existing store tests still pass (no changes to store)
-- [ ] **T-R4.** `/get-shared`, `/get-public` tests still pass (no auth added)
-- [ ] **T-R5.** Demo synthesis in onboarding still works
+- [x] **T-R1.** All 1997 frontend tests pass (0 failures)
+- [x] **T-R2.** Updated 7 test files with `AuthStorage` mock (no behavior changes)
+- [x] **T-R3.** Store tests unchanged and passing
+- [x] **T-R4.** `/get-shared`, `/get-public` tests unchanged and passing
+- [x] **T-R5.** Onboarding/demo tests unchanged and passing
 
 ### Step 7: Deploy & Smoke Test
 
