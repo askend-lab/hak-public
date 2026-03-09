@@ -391,7 +391,7 @@ resource "aws_appautoscaling_policy" "merlin_sqs_scaling" {
   service_namespace  = aws_appautoscaling_target.merlin_worker.service_namespace
 
   target_tracking_scaling_policy_configuration {
-    target_value = 5  # Target: 5 messages per worker
+    target_value = 3  # Target: 3 messages per worker (SLA: trigger scale-out early)
 
     customized_metric_specification {
       metric_name = "ApproximateNumberOfMessagesVisible"
@@ -404,8 +404,8 @@ resource "aws_appautoscaling_policy" "merlin_sqs_scaling" {
       }
     }
 
-    scale_in_cooldown  = 300  # 5 min before scaling down
-    scale_out_cooldown = 60   # 1 min before scaling up
+    scale_in_cooldown  = 600  # 10 min before scaling down (SLA: keep worker warm longer)
+    scale_out_cooldown = 30   # 30s before scaling up (SLA: faster reaction to load)
   }
 }
 

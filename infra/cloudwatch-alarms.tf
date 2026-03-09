@@ -428,8 +428,8 @@ resource "aws_cloudwatch_metric_alarm" "merlin_ecs_high_tasks" {
   namespace           = "ECS/ContainerInsights"
   period              = 300
   statistic           = "Maximum"
-  threshold           = 2
-  alarm_description   = "WARNING: Merlin ECS at max capacity — all workers busy"
+  threshold           = 3
+  alarm_description   = "WARNING: Merlin ECS at max capacity (3 workers) — all workers busy"
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
