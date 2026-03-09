@@ -1,11 +1,12 @@
 # Use Debian-based Node.js with Lambda Web Adapter
 FROM node:22-slim
 
-# Install Lambda Web Adapter and libjsoncpp
+# Install Lambda Web Adapter and libjsoncpp (runtime only)
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter
 RUN apt-get update && \
-    apt-get install -y libjsoncpp-dev && \
-    rm -rf /var/lib/apt/lists/* && \
+    apt-get install -y --no-install-recommends libjsoncpp25 && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /var/task
