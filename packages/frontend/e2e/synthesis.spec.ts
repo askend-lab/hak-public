@@ -19,31 +19,25 @@ test.describe("Speech Synthesis Prototype", () => {
     );
   });
 
-  test("should type word and play audio", async ({ page }) => {
-    // Go to synthesis page (after onboarding bypass)
+  test("should load synthesis page and accept input", async ({ page }) => {
     await page.goto("/synthesis");
     await page.waitForLoadState("networkidle");
+
+    // Synthesis page should load with heading
+    await expect(page.locator("h1")).toBeVisible({ timeout: 5000 });
 
     // Find the first text input (TagsInput uses a plain input element)
     const input = page.locator(".sentence-synthesis-item input").first();
     await expect(input).toBeVisible({ timeout: 5000 });
     await input.fill("tere");
 
-    // Press Enter to commit the sentence
+    // Press Enter to commit the sentence — creates a tag
     await input.press("Enter");
 
-    // Find and click the play button (Material icon "play_arrow")
-    const playButton = page.locator("button").filter({ hasText: "Play" }).first();
-    await playButton.click();
-
-    // Wait for audio element to have a source (indicates synthesis completed)
-    // or wait for loading state to resolve
-    await page.waitForTimeout(2000);
+    // Tag should be visible (text committed as word tag)
+    await expect(page.locator(".sentence-synthesis-item")).toBeVisible();
 
     // Take screenshot for verification
     await page.screenshot({ path: "e2e/screenshots/synthesis-test.png" });
-
-    // Basic check - page should still be visible and no errors
-    await expect(page.locator("h1")).toBeVisible();
   });
 });

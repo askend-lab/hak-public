@@ -5,9 +5,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesisAPI } from "./useSynthesisAPI";
 
-vi.mock("@/features/synthesis/utils/synthesize", () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
-  synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
+vi.mock("@/features/synthesis/utils/synthesize", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/features/synthesis/utils/synthesize")>();
+  return {
+    ...actual,
+    synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+    synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
+  };
+});
+
+vi.mock("@/features/auth/services/storage", () => ({
+  AuthStorage: { getAccessToken: vi.fn(() => "test-token") },
 }));
 
 vi.mock("@/types/synthesis", async (importOriginal) => {
@@ -157,7 +165,7 @@ describe("useSynthesisAPI", () => {
 
       expect(global.fetch).toHaveBeenCalledWith("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: "Bearer test-token" },
         body: JSON.stringify({ text: "tere" }),
       });
     });

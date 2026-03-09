@@ -3,8 +3,9 @@
 
 import { useCallback } from "react";
 import { convertTextToTags } from "@/types/synthesis";
-import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
+import { synthesizeAuto, AuthRequiredError } from "@/features/synthesis/utils/synthesize";
 import { postJSON, ANALYZE_API_PATH } from "@/features/synthesis/utils/analyzeApi";
+import { AuthStorage } from "@/features/auth/services/storage";
 
 interface SynthesisResult {
   audioUrl: string;
@@ -21,7 +22,10 @@ async function resolvePhonetic(analyzeText: (t: string) => Promise<{ stressedTex
 
 export function useSynthesisAPI() {
   const analyzeText = useCallback(async (text: string): Promise<{ stressedText: string }> => {
-    const response = await postJSON(ANALYZE_API_PATH, { text });
+    const token = AuthStorage.getAccessToken();
+    if (!token) {throw new AuthRequiredError();}
+    const response = await postJSON(ANALYZE_API_PATH, { text }, { headers: { Authorization: `Bearer ${token}` } });
+    if (response.status === 401) {throw new AuthRequiredError();}
     if (!response.ok) {throw new Error("Analysis failed");}
     return response.json();
   }, []);
