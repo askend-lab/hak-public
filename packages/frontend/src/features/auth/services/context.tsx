@@ -134,6 +134,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   useAuthInit(setState);
   const callbacks = useAuthCallbacks(setState);
+
+  useEffect(() => {
+    const handler = () => { setShowLoginModal(true); };
+    window.addEventListener("auth-required", handler);
+    return () => { window.removeEventListener("auth-required", handler); };
+  }, []);
+
   const value: AuthContextValue = { ...state, ...callbacks, showLoginModal, setShowLoginModal };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
