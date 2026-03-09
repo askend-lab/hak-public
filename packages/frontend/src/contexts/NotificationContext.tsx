@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { createContext, useContext, useRef, useCallback, useMemo, ReactNode } from "react";
+import { createContext, useContext, useRef, useCallback, useMemo, useEffect, ReactNode } from "react";
 import NotificationContainer, {
   NotificationRef,
   ShowNotificationOptions,
 } from "@/components/NotificationContainer";
+import { API_ERROR_EVENT, getApiErrorDetail } from "@/utils/apiErrorEvents";
 
 export type { ShowNotificationOptions };
 
@@ -22,6 +23,17 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const showNotification = useCallback((options: ShowNotificationOptions) => {
     notificationRef.current?.show(options);
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = getApiErrorDetail(event);
+      if (detail) {
+        notificationRef.current?.show({ type: "warning", message: detail.message, description: detail.description });
+      }
+    };
+    window.addEventListener(API_ERROR_EVENT, handler);
+    return () => { window.removeEventListener(API_ERROR_EVENT, handler); };
   }, []);
 
   const value = useMemo(() => ({ showNotification }), [showNotification]);

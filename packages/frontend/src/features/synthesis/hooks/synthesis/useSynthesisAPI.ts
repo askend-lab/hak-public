@@ -6,6 +6,7 @@ import { convertTextToTags } from "@/types/synthesis";
 import { synthesizeAuto, AuthRequiredError } from "@/features/synthesis/utils/synthesize";
 import { postJSON, ANALYZE_API_PATH } from "@/features/synthesis/utils/analyzeApi";
 import { AuthStorage } from "@/features/auth/services/storage";
+import { checkApiErrorStatus } from "@/utils/apiErrorEvents";
 
 interface SynthesisResult {
   audioUrl: string;
@@ -26,6 +27,7 @@ export function useSynthesisAPI() {
     if (!token) {throw new AuthRequiredError();}
     const response = await postJSON(ANALYZE_API_PATH, { text }, { headers: { Authorization: `Bearer ${token}` } });
     if (response.status === 401) {throw new AuthRequiredError();}
+    checkApiErrorStatus(response.status);
     if (!response.ok) {throw new Error("Analysis failed");}
     return response.json();
   }, []);

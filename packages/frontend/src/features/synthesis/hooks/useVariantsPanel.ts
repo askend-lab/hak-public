@@ -5,6 +5,7 @@ import { useState, useCallback } from "react";
 import { SentenceState, convertTextToTags, stripPunctuationForLookup } from "@/types/synthesis";
 import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 import { analyzeText, postJSON, VARIANTS_API_PATH } from "@/features/synthesis/utils/analyzeApi";
+import { checkApiErrorStatus } from "@/utils/apiErrorEvents";
 import { VARIANTS_STRINGS } from "@/config/ui-strings";
 
 const VARIANTS_API_TIMEOUT_MS = 10000;
@@ -77,6 +78,7 @@ function usePhoneticState(sentences: SentenceState[], setSentences: React.Dispat
 
 async function fetchAndCheckVariants(word: string, signal: AbortSignal): Promise<boolean> {
   const response = await postJSON(VARIANTS_API_PATH, { word: stripPunctuationForLookup(word) }, { signal });
+  checkApiErrorStatus(response.status);
   if (!response.ok) {throw new Error("API error");}
   const data = await response.json();
   return Boolean(data.variants?.length);
