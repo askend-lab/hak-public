@@ -36,6 +36,15 @@ export const SYNTHESIS_STRINGS = {
   TAG_MENU_DELETE: "Kustuta sõna",
 } as const;
 
+export const ERROR_STRINGS = {
+  RATE_LIMIT: "Liiga palju päringuid",
+  RATE_LIMIT_DESC: "Proovi mõne hetke pärast uuesti.",
+  SERVICE_BUSY: "Teenus on ajutiselt ülekoormatud",
+  SERVICE_BUSY_DESC: "Proovi mõne hetke pärast uuesti.",
+  SYNTHESIS_FAILED: "Kõnesüntees ebaõnnestus",
+  SYNTHESIS_FAILED_DESC: "Proovi uuesti.",
+} as const;
+
 export const MODAL_STRINGS = {
   PHONETIC_APPLIED: "Lause uus häälduskuju rakendatud",
   DELETE_TASK_TITLE: "Kustuta ülesanne",

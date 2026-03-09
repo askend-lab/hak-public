@@ -5,6 +5,7 @@ import { postJSON } from "./analyzeApi";
 import { getVoiceModel } from "@/types/synthesis";
 import { AuthStorage } from "@/features/auth/services/storage";
 import { reportApiError } from "@/utils/reportApiError";
+import { checkApiErrorStatus, dispatchApiError } from "@/utils/apiErrorEvents";
 
 export class AuthRequiredError extends Error {
   constructor() {
@@ -58,6 +59,7 @@ function buildStatusOpts(token: string, signal?: AbortSignal): RequestInit {
 async function fetchStatus(cacheKey: string, token: string, signal?: AbortSignal): Promise<StatusResponse | null> {
   const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, buildStatusOpts(token, signal));
   if (response.status === 401) {throw new AuthRequiredError();}
+  checkApiErrorStatus(response.status);
   if (!response.ok) {
     reportApiError({ context: "Status check failed", status: response.status, url: `${STATUS_API_PATH}/${cacheKey}` });
     throw new Error("Status check failed");
@@ -115,8 +117,10 @@ function isReady(data: SynthesizeResponse): data is SynthesizeResponse & { audio
 
 function checkSynthResponse(response: Response): void {
   if (response.status === 401) {throw new AuthRequiredError();}
+  checkApiErrorStatus(response.status);
   if (!response.ok) {
     reportApiError({ context: "Synthesis request failed", status: response.status, url: SYNTHESIZE_API_PATH });
+    dispatchApiError("synthesis-failed");
     throw new Error("Synthesis request failed");
   }
 }
