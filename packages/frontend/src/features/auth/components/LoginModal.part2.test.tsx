@@ -38,7 +38,7 @@ describe("LoginModal", () => {
       const user = userEvent.setup();
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
 
-      await user.click(screen.getByText(/Logi sisse TARA/));
+      await user.click(screen.getByText(/autentimisteenuse kaudu/));
 
       expect(mockLoginWithTara).toHaveBeenCalled();
     });
@@ -47,7 +47,7 @@ describe("LoginModal", () => {
       const user = userEvent.setup();
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
 
-      await user.click(screen.getByText(/Logi sisse TARA/));
+      await user.click(screen.getByText(/autentimisteenuse kaudu/));
 
       expect(screen.getAllByText("Suunan...").length).toBeGreaterThan(0);
     });

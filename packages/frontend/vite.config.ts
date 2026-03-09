@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
-/* eslint-disable no-console -- build config uses console for dev server output */
 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -38,7 +37,7 @@ function checkProxyTargets(proxy: Record<string, { target?: string }>): void {
   for (const [route, config] of Object.entries(proxy)) {
     const target = typeof config === "string" ? config : config?.target;
     if (target && /[-.]prod[.-]/.test(target)) {
-      console.warn(
+      console.warn( // eslint-disable-line no-console -- build config warning
         `\x1b[33m⚠ WARNING: Proxy "${route}" targets PRODUCTION: ${target}\x1b[0m`,
       );
     }
@@ -137,4 +136,3 @@ export default defineConfig({
     },
   },
 });
-/* eslint-enable no-console -- end build config */

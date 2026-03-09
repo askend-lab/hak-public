@@ -30,8 +30,8 @@ function useModalFocusTrap(isOpen: boolean, onClose: () => void) {
       const first = els[0];
       const last = els[els.length - 1];
       if (!first || !last) {return;}
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+      else if (document.activeElement === last) { e.preventDefault(); first.focus(); }
     };
     document.addEventListener("keydown", onEsc);
     document.addEventListener("keydown", onTab);
