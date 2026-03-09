@@ -41,6 +41,8 @@ export const ERROR_STRINGS = {
   RATE_LIMIT_DESC: "Proovi mõne hetke pärast uuesti.",
   SERVICE_BUSY: "Teenus on ajutiselt ülekoormatud",
   SERVICE_BUSY_DESC: "Proovi mõne hetke pärast uuesti.",
+  BLOCKED: "Ligipääs keelatud",
+  BLOCKED_DESC: "Päring blokeeriti.",
   SYNTHESIS_FAILED: "Kõnesüntees ebaõnnestus",
   SYNTHESIS_FAILED_DESC: "Proovi uuesti.",
 } as const;
