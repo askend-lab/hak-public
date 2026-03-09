@@ -17,6 +17,10 @@ vi.mock("@/features/synthesis/utils/phoneticMarkers", () => ({
   stripPhoneticMarkers: (text: string): string => text.replace(/[`~^]/g, ""),
 }));
 
+vi.mock("@/features/auth/services/storage", () => ({
+  AuthStorage: { getAccessToken: vi.fn(() => "test-token") },
+}));
+
 describe("usePhoneticPanel", () => {
   const mockEntry: TaskEntry = {
     id: "e1",
