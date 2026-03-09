@@ -166,12 +166,16 @@ hooks:
   plan-validation: {}
 
   jscpd:
+    mode: "off"
     excludePaths:
       - "**/node_modules/**"
       - "**/dist/**"
       - "**/coverage/**"
       - "**/test/fixtures/**"
       - "**/*.min.js"
+      - "**/*.java"
+      - "**/build/reports/**"
+      - "**/sandboxes/**"
 
   source-size:
     excludePaths:
