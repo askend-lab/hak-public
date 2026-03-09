@@ -15,6 +15,13 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     allow {}
   }
 
+  # Custom response body for rate-limit blocks (429 instead of default 403)
+  custom_response_body {
+    key          = "rate-limit"
+    content      = "{\"error\":\"RATE_LIMIT\",\"message\":\"Too many requests\"}"
+    content_type = "APPLICATION_JSON"
+  }
+
   # Rule 1: Per-IP general rate limiting (2000 req/5min)
   # Budget: ~200 submits + ~900 polls (15 in-flight × 12/min × 5min) + browsing
   # Real abuse protection is Rule 2 (synthesize-specific limit)
@@ -23,7 +30,12 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     priority = 1
 
     action {
-      block {}
+      block {
+        custom_response {
+          response_code            = 429
+          custom_response_body_key = "rate-limit"
+        }
+      }
     }
 
     statement {
@@ -47,7 +59,12 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     priority = 2
 
     action {
-      block {}
+      block {
+        custom_response {
+          response_code            = 429
+          custom_response_body_key = "rate-limit"
+        }
+      }
     }
 
     statement {
@@ -119,6 +136,185 @@ resource "aws_wafv2_web_acl" "cloudfront" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "${local.app_name}-${var.env}-geo-restrict-synthesize"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rule 5: Per-user synthesis rate limit (SLA §5.1)
+  # 10 req/2min per Authorization header = 5 req/min effective
+  rule {
+    name     = "rate-limit-per-user-synthesize"
+    priority = 5
+
+    action {
+      block {
+        custom_response {
+          response_code            = 429
+          custom_response_body_key = "rate-limit"
+        }
+      }
+    }
+
+    statement {
+      rate_based_statement {
+        limit                 = 10
+        evaluation_window_sec = 120
+        aggregate_key_type    = "CUSTOM_KEYS"
+
+        custom_key {
+          header {
+            name = "authorization"
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+
+        scope_down_statement {
+          byte_match_statement {
+            search_string         = "/api/synthesize"
+            positional_constraint = "STARTS_WITH"
+            field_to_match {
+              uri_path {}
+            }
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.app_name}-${var.env}-rate-limit-per-user-synthesize"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rule 6: Per-user morphology rate limit (SLA §5.1)
+  # 20 req/1min per Authorization header for /analyze and /variants
+  rule {
+    name     = "rate-limit-per-user-morphology"
+    priority = 6
+
+    action {
+      block {
+        custom_response {
+          response_code            = 429
+          custom_response_body_key = "rate-limit"
+        }
+      }
+    }
+
+    statement {
+      rate_based_statement {
+        limit                 = 20
+        evaluation_window_sec = 60
+        aggregate_key_type    = "CUSTOM_KEYS"
+
+        custom_key {
+          header {
+            name = "authorization"
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+
+        scope_down_statement {
+          or_statement {
+            statement {
+              byte_match_statement {
+                search_string         = "/api/analyze"
+                positional_constraint = "STARTS_WITH"
+                field_to_match {
+                  uri_path {}
+                }
+                text_transformation {
+                  priority = 0
+                  type     = "LOWERCASE"
+                }
+              }
+            }
+            statement {
+              byte_match_statement {
+                search_string         = "/api/variants"
+                positional_constraint = "STARTS_WITH"
+                field_to_match {
+                  uri_path {}
+                }
+                text_transformation {
+                  priority = 0
+                  type     = "LOWERCASE"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.app_name}-${var.env}-rate-limit-per-user-morphology"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rule 7: Per-user status polling rate limit (SLA §5.1)
+  # 100 req/1min per Authorization header for /status (lightweight polling, generous limit)
+  rule {
+    name     = "rate-limit-per-user-status"
+    priority = 7
+
+    action {
+      block {
+        custom_response {
+          response_code            = 429
+          custom_response_body_key = "rate-limit"
+        }
+      }
+    }
+
+    statement {
+      rate_based_statement {
+        limit                 = 100
+        evaluation_window_sec = 60
+        aggregate_key_type    = "CUSTOM_KEYS"
+
+        custom_key {
+          header {
+            name = "authorization"
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+
+        scope_down_statement {
+          byte_match_statement {
+            search_string         = "/api/status"
+            positional_constraint = "STARTS_WITH"
+            field_to_match {
+              uri_path {}
+            }
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.app_name}-${var.env}-rate-limit-per-user-status"
       sampled_requests_enabled   = true
     }
   }

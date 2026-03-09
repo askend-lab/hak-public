@@ -108,15 +108,17 @@ Availability = (total minutes − downtime minutes) / total minutes × 100%
 
 ### 5.1 Per-User Rate Limits (post-auth)
 
-All limits are per authenticated user (tied to JWT token, not IP).
+All limits are per authenticated user (tied to JWT `Authorization` header via AWS WAF custom aggregate keys).
 
-| Operation | Per Minute | Per Hour | Per Day |
-|-----------|-----------|----------|----------|
-| Synthesis (/synthesize) | **10** | **120** | **1000** |
-| Morphology (/analyze, /variants) | **20** | **300** | **2000** |
-| Status polling (/status) | **30** | **600** | — |
+| Operation | Per Minute | Enforcement | WAF Rule |
+|-----------|-----------|-------------|----------|
+| Synthesis (/synthesize) | **5** | 10 req / 2 min window | Rule 5 (`rate-limit-per-user-synthesize`) |
+| Morphology (/analyze, /variants) | **20** | 20 req / 1 min window | Rule 6 (`rate-limit-per-user-morphology`) |
+| Status polling (/status) | **100** | 100 req / 1 min window | Rule 7 (`rate-limit-per-user-status`) |
 
-**Rationale:** A teacher preparing lessons generates 3–5 synthesis requests/minute in bursts. 10/min provides 2–3x headroom. 1000/day covers 5 intensive sessions of 200 requests each.
+**Enforcement:** AWS WAF rate-based rules with `CUSTOM_KEYS` aggregate on `Authorization` header. When exceeded → HTTP 429 with JSON `{"error":"RATE_LIMIT","message":"Too many requests"}`.
+
+**Rationale:** A teacher preparing lessons generates 3–5 synthesis requests/minute in bursts. 5/min is sufficient for normal use. WAF minimum limit is 10 per evaluation window; synthesis uses 10 req/2min = 5/min effective.
 
 ### 5.2 System Limits
 

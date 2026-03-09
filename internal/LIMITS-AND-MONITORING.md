@@ -13,9 +13,12 @@ All WAF rules are in `infra/waf.tf`. Scope: CLOUDFRONT (us-east-1).
 
 | Rule | Priority | Type | Limit | Action | Metric Name |
 |------|----------|------|-------|--------|-------------|
-| Per-IP general | 1 | Rate-based (IP) | **2000 req / 5 min** | BLOCK | `hak-{env}-rate-limit` |
-| Per-IP /synthesize | 2 | Rate-based (IP) + path scope | **200 req / 5 min** | BLOCK | `hak-{env}-rate-limit-synthesize` |
-| Geo-block /synthesize | 3 | Geo-match + path scope | Baltic/Nordic only | BLOCK | `hak-{env}-geo-restrict-synthesize` |
+| Per-IP general | 1 | Rate-based (IP) | **2000 req / 5 min** | BLOCK → 429 | `hak-{env}-rate-limit` |
+| Per-IP /synthesize | 2 | Rate-based (IP) + path scope | **200 req / 5 min** | BLOCK → 429 | `hak-{env}-rate-limit-synthesize` |
+| Geo-block /synthesize | 3 | Geo-match + path scope | Baltic/Nordic only | BLOCK → 403 | `hak-{env}-geo-restrict-synthesize` |
+| Per-user /synthesize | 5 | Rate-based (Authorization header) | **10 req / 2 min** (5/min) | BLOCK → 429 | `hak-{env}-rate-limit-per-user-synthesize` |
+| Per-user /analyze, /variants | 6 | Rate-based (Authorization header) | **20 req / 1 min** | BLOCK → 429 | `hak-{env}-rate-limit-per-user-morphology` |
+| Per-user /status | 7 | Rate-based (Authorization header) | **100 req / 1 min** | BLOCK → 429 | `hak-{env}-rate-limit-per-user-status` |
 | AWS Managed Common Rules | 10 | Managed rule group | AWSManagedRulesCommonRuleSet | override: none | `hak-{env}-common-rules` |
 
 **Allowed countries (Rule 3):** EE, LV, LT, FI, SE, DE, PL, NO, DK
@@ -30,18 +33,18 @@ All WAF rules are in `infra/waf.tf`. Scope: CLOUDFRONT (us-east-1).
 
 ## 2. Per-User Rate Limits
 
-**⚠️ NOT IMPLEMENTED.** SLA §5.1 promises these limits but no code enforces them.
+**✅ IMPLEMENTED** via AWS WAF custom aggregate keys on `Authorization` header (`infra/waf.tf`).
 
-| Operation | Per Minute | Per Hour | Per Day | Source |
-|-----------|-----------|----------|---------|--------|
-| Synthesis (/synthesize) | 10 → **5** | 120 → **60** | 1000 → **300** | SLA §5.1 (→ Alex's updated values) |
-| Morphology (/analyze, /variants) | 20 | 300 | 2000 | SLA §5.1 |
-| Status polling (/status) | 30 | 600 | — | SLA §5.1 |
+| Operation | Limit | WAF Rule | Window | Effective | Source |
+|-----------|-------|----------|--------|-----------|--------|
+| Synthesis (/synthesize) | 10 req | Rule 5 (`rate-limit-per-user-synthesize`) | **2 min** | **5/min** | SLA §5.1 |
+| Morphology (/analyze, /variants) | 20 req | Rule 6 (`rate-limit-per-user-morphology`) | **1 min** | **20/min** | SLA §5.1 |
+| Status polling (/status) | 100 req | Rule 7 (`rate-limit-per-user-status`) | **1 min** | **100/min** | SLA §5.1 |
 
-**Implementation options:**
-1. Lambda middleware + DynamoDB counter (simplest, ~$0/month at our scale)
-2. API Gateway Usage Plans (REST API v1 only — store uses this; TTS/morphology use HTTP API v2, not supported)
-3. WAF custom header rule (requires extracting user ID from JWT at CloudFront level)
+**How it works:** WAF aggregates requests by the `Authorization` header value (JWT token). Each unique token = separate rate limit bucket. When exceeded → **429** with JSON body `{"error":"RATE_LIMIT","message":"Too many requests"}`.
+
+**Note:** WAF minimum rate limit is 10 per evaluation window. Synthesis uses 10 req/2min = 5/min effective.
+JWT refresh (~1hr) resets the bucket — acceptable for 1-minute windows.
 
 ---
 
@@ -282,8 +285,8 @@ From `infra/cloudfront.tf`.
 
 | # | Issue | Current | Recommended | Priority |
 |---|-------|---------|-------------|----------|
-| 1 | **Per-user rate limits not implemented** | None | 5/min, 60/hr, 300/day (synthesis) | 🔴 High |
+| 1 | ~~Per-user rate limits not implemented~~ | ✅ WAF Rules 5-7 | 5/min synth, 20/min morph, 100/min status | ✅ Done |
 | 2 | WAF general rate too high | 2000/5min (400/min) | Consider 500/5min (100/min) | 🟡 Medium |
 | 3 | WAF /synthesize rate too high | 200/5min (40/min) | Consider 50/5min (10/min) matches per-user | 🟡 Medium |
 | 4 | SQS queue depth cap too high | 50 | Consider 20 | 🟡 Medium |
-| 5 | SLA §5.1 values outdated | 10/min, 120/hr, 1000/day | Update to 5/min, 60/hr, 300/day | 🔴 High |
+| 5 | ~~SLA §5.1 values outdated~~ | ✅ WAF enforces 5/min | SLA values match WAF rules | ✅ Done |

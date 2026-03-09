@@ -3,7 +3,7 @@
 
 import { ERROR_STRINGS } from "@/config/ui-strings";
 
-export type ApiErrorType = "rate-limit" | "service-busy" | "synthesis-failed";
+export type ApiErrorType = "rate-limit" | "service-busy" | "blocked" | "synthesis-failed";
 
 interface ApiErrorDetail {
   type: ApiErrorType;
@@ -14,6 +14,7 @@ interface ApiErrorDetail {
 const ERROR_MAP: Record<ApiErrorType, { message: string; description: string }> = {
   "rate-limit": { message: ERROR_STRINGS.RATE_LIMIT, description: ERROR_STRINGS.RATE_LIMIT_DESC },
   "service-busy": { message: ERROR_STRINGS.SERVICE_BUSY, description: ERROR_STRINGS.SERVICE_BUSY_DESC },
+  "blocked": { message: ERROR_STRINGS.BLOCKED, description: ERROR_STRINGS.BLOCKED_DESC },
   "synthesis-failed": { message: ERROR_STRINGS.SYNTHESIS_FAILED, description: ERROR_STRINGS.SYNTHESIS_FAILED_DESC },
 };
 
@@ -32,6 +33,7 @@ export function getApiErrorDetail(event: Event): ApiErrorDetail | null {
 }
 
 export function checkApiErrorStatus(status: number): void {
+  if (status === 403) {dispatchApiError("blocked"); throw new Error("Request blocked");}
   if (status === 429) {dispatchApiError("rate-limit"); throw new Error("Rate limit exceeded");}
   if (status === 503) {dispatchApiError("service-busy"); throw new Error("Service unavailable");}
 }
