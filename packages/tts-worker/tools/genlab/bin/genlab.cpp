@@ -179,12 +179,12 @@ void do_label_files(CFSWString text, CFSAString OutDir, std::string check_wav_di
         
         wprintf(fname+L"\n");
         //wprintf(L"\n");
-        rida = DealWithText(rida);
+        //rida = DealWithText(rida);
         CFSArray<CFSWString> rres = do_utterances(rida);
         CFSArray<CFSWString> lab;
           //wprintf(rres[0]);
-          //wprintf(L"\t");
-
+          //wprintf(L"\n");
+        
         lab = do_all(rres[0], false, false);        
         std::string tulemus = "";
         for (INTPTR u = 0; u < lab.GetSize(); u++) {
@@ -204,6 +204,7 @@ void do_label_files(CFSWString text, CFSAString OutDir, std::string check_wav_di
 
 int main(int argc, char* argv[]) {
     
+    wprintf(L"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
     
     char* in_fname;
     
@@ -219,6 +220,11 @@ int main(int argc, char* argv[]) {
     std::string file_id_dir = "";
     std::string check_wav_dir = "";
     FSCInit();    
+    
+    
+    
+    
+    
     
 
     for (int i = 0; i < argc; i++) {
@@ -276,7 +282,7 @@ int main(int argc, char* argv[]) {
     ReadUTF8Text(text, in_fname);
 
     if (train) {
-       do_label_files(text, OutDir, check_wav_dir);
+       do_label_files(text, OutDir, check_wav_dir);       
        exit(0);
     }
     
