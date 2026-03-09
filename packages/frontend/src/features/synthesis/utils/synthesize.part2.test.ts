@@ -9,6 +9,12 @@ vi.mock("@/utils/reportApiError", () => ({
   reportApiError: vi.fn(),
 }));
 
+vi.mock("@/features/auth/services/storage", () => ({
+  AuthStorage: {
+    getAccessToken: vi.fn(() => "test-token"),
+  },
+}));
+
 describe("synthesize - part 2", () => {
   beforeEach(() => {
     vi.clearAllMocks();

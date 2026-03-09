@@ -10,6 +10,12 @@ vi.mock("@/utils/reportApiError", () => ({
   reportApiError: vi.fn(),
 }));
 
+vi.mock("@/features/auth/services/storage", () => ({
+  AuthStorage: {
+    getAccessToken: vi.fn(() => "test-token"),
+  },
+}));
+
 describe("analyzeApi", () => {
   const mockFetch = vi.fn();
 
@@ -33,7 +39,7 @@ describe("analyzeApi", () => {
       expect(result).toBe("ˈtɛst");
       expect(mockFetch).toHaveBeenCalledWith("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer test-token" },
         body: JSON.stringify({ text: "test" }),
       });
     });
@@ -134,7 +140,7 @@ describe("analyzeApi", () => {
       await analyzeTextOrThrow("hello world");
       expect(global.fetch).toHaveBeenCalledWith("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer test-token" },
         body: JSON.stringify({ text: "hello world" }),
       });
     });
