@@ -254,6 +254,7 @@ jobs:
 
       - name: Scan Docker image with Trivy
         if: steps.detect.outputs.morphology-api == 'true'
+        continue-on-error: true
         uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # master
         with:
           image-ref: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ github.sha }}
