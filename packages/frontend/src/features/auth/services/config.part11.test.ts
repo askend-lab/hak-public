@@ -16,7 +16,7 @@ describe("PKCE code verifier format", () => {
 
   it("should generate login URL starting with https and containing /login", async () => {
     const url = await getLoginUrl();
-    expect(url.startsWith(`https://${cognitoConfig.domain}/login?`)).toBe(true);
+    expect(url.startsWith(`https://${cognitoConfig.domain}/oauth2/authorize?`)).toBe(true);
   });
 
   it("should generate logout URL starting with https and containing /logout", () => {

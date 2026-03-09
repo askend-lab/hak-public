@@ -79,7 +79,7 @@ describe("AuthProvider", () => {
     });
 
     await waitFor(() => {
-      expect(window.location.href).toContain("/login");
+      expect(window.location.href).toContain("/oauth2/authorize");
     });
 
     Object.defineProperty(window, "location", {
