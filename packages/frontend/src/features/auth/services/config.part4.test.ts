@@ -10,7 +10,7 @@ describe("getLoginUrl", () => {
 
   it("should return a URL to Cognito hosted UI", async () => {
     const url = await getLoginUrl();
-    expect(url).toContain("/login");
+    expect(url).toContain("/oauth2/authorize");
     expect(url).toContain(`https://${cognitoConfig.domain}`);
   });
 
@@ -22,6 +22,11 @@ describe("getLoginUrl", () => {
     expect(url).toContain("code_challenge=");
     expect(url).toContain("code_challenge_method=S256");
     expect(url).toContain("scope=email+openid+profile");
+  });
+
+  it("should bypass Cognito Hosted UI with identity_provider=Google", async () => {
+    const url = await getLoginUrl();
+    expect(url).toContain("identity_provider=Google");
   });
 
   it("should store PKCE code verifier in sessionStorage", async () => {

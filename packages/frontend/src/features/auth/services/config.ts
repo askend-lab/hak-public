@@ -99,8 +99,9 @@ export async function getLoginUrl(): Promise<string> {
     redirect_uri: cognitoConfig.redirectUri,
     code_challenge: codeChallenge,
     code_challenge_method: "S256",
+    identity_provider: "Google",
   });
-  return `https://${cognitoConfig.domain}/login?${params.toString()}`;
+  return `https://${cognitoConfig.domain}/oauth2/authorize?${params.toString()}`;
 }
 
 export function getLogoutUrl(): string {

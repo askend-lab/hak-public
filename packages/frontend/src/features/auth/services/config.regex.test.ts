@@ -133,7 +133,7 @@ describe("PKCE regex replacement precision", () => {
   it("login URL uses exact cognito domain", async () => {
     const url = await getLoginUrl();
     expect(url).toBe(
-      `https://${cognitoConfig.domain}/login?` + url.split("?")[1],
+      `https://${cognitoConfig.domain}/oauth2/authorize?` + url.split("?")[1],
     );
   });
 });
