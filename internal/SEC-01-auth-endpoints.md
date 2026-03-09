@@ -7,7 +7,7 @@
 
 ---
 
-## 0. Implementation Checklist
+## 0. Implementation Checklist (TDD)
 
 ### Decisions (confirmed with Alex)
 - [x] UI stays exactly as-is — all pages and buttons remain accessible without login
@@ -18,40 +18,76 @@
 - [x] Demo synthesis in onboarding wizard — always from S3 cache, no login needed
 - [x] Health endpoints — stay open (monitoring)
 
-### Backend — API Gateway Auth
+### Step 1: Frontend — Write Tests First (RED)
+
+_Write failing tests that define the expected auth-gated behavior._
+
+- [ ] **T-F1.** `synthesize.test.ts` — test: `synthesizeWithPolling()` throws/rejects when no access token (not authenticated)
+- [ ] **T-F2.** `synthesize.test.ts` — test: `synthesizeWithPolling()` sends `Authorization: Bearer <token>` header when authenticated
+- [ ] **T-F3.** `synthesize.test.ts` — test: `pollForAudio()` sends auth header in status polling requests
+- [ ] **T-F4.** `synthesize.test.ts` — test: on 401 response from API, triggers login redirect (not error toast)
+- [ ] **T-F5.** `analyzeApi.test.ts` — test: `analyzeText()` throws/rejects when no access token
+- [ ] **T-F6.** `analyzeApi.test.ts` — test: `analyzeText()` sends `Authorization: Bearer <token>` header when authenticated
+- [ ] **T-F7.** `analyzeApi.test.ts` — test: `postJSON()` to `/api/variants` sends auth header
+- [ ] **T-F8.** `analyzeApi.test.ts` — test: on 401 response, triggers login redirect
+- [ ] **T-F9.** Integration test: demo synthesis in onboarding works without login (plays from S3 cache)
+- [ ] **T-F10.** Integration test: after login redirect, synthesis resumes
+
+### Step 2: Frontend — Implement (GREEN)
+
+_Make the failing tests pass._
+
+- [ ] **F1.** `synthesize.ts` — if no access token, trigger login redirect instead of calling API
+- [ ] **F2.** `synthesize.ts` — add auth header to `/api/status/{key}` polling calls
+- [ ] **F3.** `analyzeApi.ts` — add `Authorization: Bearer <token>` header to `/api/analyze` and `/api/variants`
+- [ ] **F4.** `analyzeApi.ts` — if no access token, trigger login redirect before calling analyze/variants
+- [ ] **F5.** Add 401 response handler — show LoginModal, not error toast
+- [ ] **F6.** Verify `buildSynthOpts()` already sends access token for `/api/synthesize` ✅ (confirmed)
+
+### Step 3: Backend — Write Tests First (RED)
+
+_Write failing tests for API Gateway auth rejection._
+
+- [ ] **T-B1.** `handler.test.ts` (tts-api) — test: request without Authorization header is rejected (mock authorizer behavior)
+- [ ] **T-B2.** `handler.test.ts` (tts-api) — test: request with valid JWT passes through
+- [ ] **T-B3.** `handler.test.ts` (tts-api) — test: `/health` endpoint works without auth
+- [ ] **T-B4.** `handler.test.ts` (morphology-api) — test: request without auth header is rejected
+- [ ] **T-B5.** `handler.test.ts` (morphology-api) — test: request with valid JWT passes through
+- [ ] **T-B6.** `handler.test.ts` (morphology-api) — test: `/health` works without auth
+
+### Step 4: Backend — Implement (GREEN)
+
+_Add JWT authorizers to make tests pass._
+
 - [ ] **B1.** `packages/tts-api/serverless.yml` — add JWT Authorizer (Cognito) to `/synthesize` and `/status/{cacheKey}`
 - [ ] **B2.** `packages/tts-api/serverless.yml` — remove `HttpApiRoutePostSynthesize` resource override (`AuthorizationType: NONE`)
 - [ ] **B3.** `packages/morphology-api/serverless.yml` — add JWT Authorizer (Cognito) to `/analyze` and `/variants`
 - [ ] **B4.** Both serverless.yml — add SSM references for `cognito-user-pool-id` and `cognito-client-id`
 
-### Infrastructure — CloudFront
-- [ ] **I1.** `infra/locals.tf` — set `auth = true` for `/api/analyze`, `/api/variants`, `/api/synthesize`, `/api/status/*` (forwards Authorization header)
+### Step 5: Infrastructure
 
-### Frontend — Auth-Gated Actions
-- [ ] **F1.** `synthesize.ts` — if no access token, trigger login redirect instead of calling API (return to synthesis after login)
-- [ ] **F2.** `analyzeApi.ts` — add `Authorization: Bearer <token>` header to `/api/analyze` and `/api/variants` calls
-- [ ] **F3.** `analyzeApi.ts` — if no access token, trigger login redirect before calling analyze/variants
-- [ ] **F4.** `synthesize.ts` — add auth header to `/api/status/{key}` polling calls
-- [ ] **F5.** Verify `buildSynthOpts()` already sends access token for `/api/synthesize` (it does — just confirm)
-- [ ] **F6.** Handle 401 response gracefully — show login modal, not error toast
+- [ ] **I1.** `infra/locals.tf` — set `auth = true` for `/api/analyze`, `/api/variants`, `/api/synthesize`, `/api/status/*`
 
-### Testing
-- [ ] **T1.** Test: unauthenticated `POST /synthesize` returns 401
-- [ ] **T2.** Test: unauthenticated `POST /analyze` returns 401
-- [ ] **T3.** Test: unauthenticated `POST /variants` returns 401
-- [ ] **T4.** Test: unauthenticated `GET /status/{key}` returns 401
-- [ ] **T5.** Test: authenticated requests work with valid JWT
-- [ ] **T6.** Test: `/health` endpoints remain open (200 without token)
-- [ ] **T7.** Test: `/get-shared`, `/get-public` remain open
-- [ ] **T8.** Test: S3 audio URLs remain accessible
-- [ ] **T9.** Test: demo synthesis in onboarding works without login
-- [ ] **T10.** Test: login redirect → return to synthesis flow
+### Step 6: Existing Tests — Verify No Regressions (REFACTOR)
 
-### Deploy & Verify
+- [ ] **T-R1.** All existing synthesize tests still pass
+- [ ] **T-R2.** All existing analyzeApi tests still pass
+- [ ] **T-R3.** All existing store tests still pass (no changes to store)
+- [ ] **T-R4.** `/get-shared`, `/get-public` tests still pass (no auth added)
+- [ ] **T-R5.** Demo synthesis in onboarding still works
+
+### Step 7: Deploy & Smoke Test
+
 - [ ] **D1.** Deploy to dev (serverless deploy for TTS + Morphology)
 - [ ] **D2.** Apply Terraform (CloudFront header forwarding)
 - [ ] **D3.** Deploy frontend (build + S3 sync)
-- [ ] **D4.** Smoke test all flows on dev
+- [ ] **D4.** Manual smoke test on dev:
+  - [ ] Unauthenticated user → try synthesize → redirected to login
+  - [ ] After login → synthesis works
+  - [ ] Cached audio plays without login
+  - [ ] `/health` endpoints return 200
+  - [ ] `/get-shared`, `/get-public` work without auth
+  - [ ] Demo onboarding works without login
 - [ ] **D5.** Deploy to prod
 - [ ] **D6.** Update SLA.md §7.1 — remove "(after SEC-01 fix)"
 
