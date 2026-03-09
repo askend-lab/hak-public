@@ -7,6 +7,8 @@
 #include "syls.h"
 #include "label.h"
 
+// nb, em, lyh tootlus efm-ile
+
 Printer P;
 
 CFSWString DealWithText(CFSWString text) {
@@ -278,19 +280,39 @@ bool IsNumberWithSeparator(CFSWString number, CFSWString sep) {
 	return true;
 }
 
+bool is_fm(CFSWString s) {
+
+        CFSWString c;
+
+        for (INTPTR i = 0; i < s.GetLength(); i++) {
+            c = s.GetAt(i);
+	    if (c == L"<" || c == L"]" || c == L"?" || c == L"_") return true;
+        }
+	return false;
+}
+
+
 CFSClassArray<TWord> TUtterance::DoNumbers(CFSClassArray<TWord> TWA) {
 	CFSClassArray<TWord> Result;
 	Result.Cleanup();
+        CFSWString s;
 
 
 	for (INTPTR i = 0; i < TWA.GetSize(); i++) {
 		// POS peab olema N või O
 
 		CFSWString Token = TWA[i].Token;
+
 //                P.prnn(L"\tDN_alg: " + Token);
+//                CFSWString sl = TWA[i].TWMInfo.m_cPOS;
+//                P.prnn(L"\tSonaliik: " + sl);
 
 		if (TWA[i].TWMInfo.m_cPOS == 'N' || TWA[i].TWMInfo.m_cPOS == 'O') {
 
+                        if(!is_digit(Token.GetAt(0))) {
+                            Result.AddItem(TWA[i]);
+                            continue;
+                        }
 
 			bool Ordinal;
 			if (TWA[i].TWMInfo.m_cPOS == 'N')
@@ -371,8 +393,8 @@ CFSClassArray<TWord> TUtterance::DoNumbers(CFSClassArray<TWord> TWA) {
 		{
 			Result.AddItem(TWA[i]);
 		}
- //       P.prnn(L"\tDN_lopp: " + TWA[i].Token);
-
+//       P.prnn(L"\tDN_s: " + s);
+//       P.prnn(L"\tDN_lopp: " + Result[i].Token);
 	}
 	return Result;
 
@@ -391,6 +413,7 @@ CFSClassArray<TWord> TUtterance::DoTokens(CFSClassArray<TWord> TWA) {
 	for (INTPTR i = 0; i < TWA.GetSize(); i++) {
 
 		CFSWString Token = TWA[i].Token;
+
 //                P.prnn(L"\tDT_alg: " + Token);
 
 		// Komad ära ja fraasibreigid paika.
@@ -416,20 +439,26 @@ CFSClassArray<TWord> TUtterance::DoTokens(CFSClassArray<TWord> TWA) {
 
                 // AINULT ÜKSIKSÕNADE JAOKS
 
-                if (true) {    // Indreku kummaline if-else konstruktsioon
+
+//                if (true) {    // Indreku kummaline if-else konstruktsioon
 
                     //Printer P;
                     //P.prnn(TWA[i].TWMInfo.m_szRoot);
 
 //                  TWA[i].TWMInfo.m_szRoot.Replace(L"?", L"<", 1);   // teisendus ? -> < sai välja jäetud
 
-                    TWA[i].TWMInfo.m_szRoot.Replace(L"=", L"", 1);
-                    Result.AddItem(TWA[i]);
-//                    P.prnn(L"\tDT_kesk: " + TWA[i].Token);
+                TWA[i].TWMInfo.m_szRoot.Replace(L"=", L"", 1);
 
+                if (is_fm(Token)) {
+                    Result.AddItem(TWA[i]);
+                    continue;
                 }
 
-                else {   // see peaks järgneva numbrite, märkide ja lühendite töötluse välja jätma
+//                    P.prnn(L"\tDT_kesk_if: " + TWA[i].Token);
+
+//                }
+
+//                else {   // see peaks järgneva numbrite, märkide ja lühendite töötluse välja jätma
 
 
 		// 1 TINGIMUS
@@ -458,9 +487,13 @@ CFSClassArray<TWord> TUtterance::DoTokens(CFSClassArray<TWord> TWA) {
 					Result.AddItem(TWA[i]);
 				}
 
+//                                P.prnn(L"\tRooma_nr: " + TWA[i].Token);
+
 			} else //Lihtne järgarv nt "12."
 				if (make_digit_string(s).GetLength() == s.GetLength()) {
 				Result.AddItem(TWA[i]);
+//                                P.prnn(L"\tLihtne_JA " + TWA[i].Token);
+
 			} else // Nii 10nda kui ka 12-nda juhtumid
 			{
 
@@ -784,7 +817,10 @@ CFSClassArray<TWord> TUtterance::DoTokens(CFSClassArray<TWord> TWA) {
 						}
 					}
 				}
-                        }   // väljajätva else'i lõpp
+
+//				P.prnn(L"\tDT_kesk_else: " + TWA[i].Token);
+
+//                        }   // väljajätva else'i lõpp
 		}
 	}
 	return Result;
@@ -854,7 +890,7 @@ CFSArray<CFSWString> do_all(CFSWString utt, bool print_label, bool print_utt) {
         INTPTR l;
 	TUtterance TU;
 
-        P.prnn(L"\t> " + utt);
+//        P.prnn(L"\t> " + utt);
 
 	explode(utt, L" ", TempA);
 
@@ -869,7 +905,7 @@ CFSArray<CFSWString> do_all(CFSWString utt, bool print_label, bool print_utt) {
                 }
 
                 PTW.AddItem(rs);
-//                P.prnn(L"\tA: " + rs);
+//               P.prnn(L"\tA: " + rs);
 	}
 
 	CFSArray<CMorphInfos> MRs = Disambiguator.Disambiguate(Linguistic.AnalyzeSentense(PTW));

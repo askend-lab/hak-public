@@ -2,6 +2,7 @@
 #include "../etana/proof.h"
 #include "util.h"
 
+// nb em ly
 
 bool print_syls = false;
 
@@ -583,33 +584,34 @@ CFSWString word_to_syls(CFSWString word) {
     int i;
 
     // varasema chars_to_phones_part_I asendus;
+//    wprintf(L"\nSISEND_sona pikkus - %i sona: ", word.GetLength());
+//    for(i=0; i < word.GetLength(); i++) wprintf(L"%c", word.GetAt(i));
     s = sona_foneetiliseks(word);
-//    wprintf(L"\nFON_sona pikkus - %i IJ_sona: ", s.GetLength());
+//    wprintf(L"\nFON_sona pikkus - %i sona: ", s.GetLength());
 //    for(i=0; i < s.GetLength(); i++) wprintf(L"%c", s.GetAt(i));
 
     s = sona_palataliseeri(s);
-//    wprintf(L"\nPALAT_sona pikkus - %i IJ_sona: ", s.GetLength());
+//    wprintf(L"\nPALAT_sona pikkus - %i sona: ", s.GetLength());
 //    for(i=0; i < s.GetLength(); i++) wprintf(L"%c", s.GetAt(i));
 
     // varasema the_shift asendus
     s = sona_valtesta(s);
-//    wprintf(L"\nVALDE_sona pikkus - %i IJ_sona: ", s.GetLength());
+//    wprintf(L"\nVALDE_sona pikkus - %i sona: ", s.GetLength());
 //    for(i=0; i < s.GetLength(); i++) wprintf(L"%c", s.GetAt(i));
 
     // osade pikkade foneemide teisendus
     s = pikad_foneemid(s);
-//    wprintf(L"\nPIKFON_sona pikkus - %i IJ_sona: ", s.GetLength());
+//    wprintf(L"\nPIKFON_sona pikkus - %i sona: ", s.GetLength());
 //    for(i=0; i < s.GetLength(); i++) wprintf(L"%c", s.GetAt(i));
 
     // sõnade silbitus
     s = sona_silbita(s);
-//    wprintf(L"\nSILP_sona pikkus - %i IJ_sona: ", s.GetLength());
+//    wprintf(L"\nSILP_sona pikkus - %i sona: ", s.GetLength());
 //    for(i=0; i < s.GetLength(); i++) wprintf(L"%c", s.GetAt(i));
 
     // ij-eelne palatalisatsioon lisatud
     s = ij_palataliseeri(s);
-
-//    wprintf(L"\nIJ_sona pikkus - %i IJ_sona: ", s.GetLength());
+//    wprintf(L"\nIJ_sona pikkus - %i sona: ", s.GetLength());
 //    for(i=0; i < s.GetLength(); i++) wprintf(L"%c", s.GetAt(i));
 //    wprintf(L"\n");
 
@@ -628,6 +630,9 @@ void TUtterance::DoSyls(TWord& TW) {
     CFSClassArray<TSyl> TSA_temp;
 
     INTPTR k, klas, slpp;
+
+    CFSWString sb = TW.TWMInfo.m_szRoot;
+//    PP.prnn(L"Syls_sis0: " + sb);
 
     //Kuna siin tulevad DLNST märgentitena siis:
     TW.TWMInfo.m_szRoot = TW.TWMInfo.m_szRoot.ToLower();
