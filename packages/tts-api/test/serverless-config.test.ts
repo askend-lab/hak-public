@@ -20,12 +20,11 @@ const cfSchema = yaml.DEFAULT_SCHEMA.extend(
 /**
  * Regression tests for serverless.yml configuration.
  *
- * These tests prevent accidental re-introduction of API Gateway authorizers
- * on merlin-api endpoints. Audio synthesis is a public feature — no auth required.
+ * SEC-01: All data/compute endpoints require JWT auth (Cognito).
+ * Only /health remains public (monitoring).
  *
- * Background: PR #592 (security audit) incorrectly added a Cognito JWT authorizer
- * to /synthesize and /warmup. This broke the frontend (403 Unauthorized) and
- * corrupted the CloudFormation stack (PRs #603–#608 to fix).
+ * History: PR #592 incorrectly added auth and broke the stack (PRs #603–#608).
+ * PR #755 (SEC-01) adds auth properly with JWT Authorizer on HTTP API v2.
  */
 
 interface ServerlessRoute {
@@ -64,19 +63,20 @@ function loadServerlessConfig(): ServerlessConfig {
   return yaml.load(content, { schema: cfSchema }) as ServerlessConfig;
 }
 
-describe("serverless.yml — public endpoint guarantees", () => {
+describe("serverless.yml — SEC-01 auth configuration", () => {
   let config: ServerlessConfig;
 
   beforeAll(() => {
     config = loadServerlessConfig();
   });
 
-  it("should not define any authorizers in httpApi", () => {
+  it("should define a Cognito JWT authorizer", () => {
     const authorizers = config.provider.httpApi?.authorizers;
-    expect(authorizers).toBeUndefined();
+    expect(authorizers).toBeDefined();
+    expect(authorizers?.cognitoAuthorizer).toBeDefined();
   });
 
-  it("should not have authorizer on POST /synthesize route", () => {
+  it("should have authorizer on POST /synthesize route", () => {
     const fn = config.functions.synthesize;
     expect(fn).toBeDefined();
 
@@ -84,19 +84,19 @@ describe("serverless.yml — public endpoint guarantees", () => {
     expect(httpEvent).toBeDefined();
     expect(httpEvent?.httpApi?.path).toBe("/synthesize");
     expect(httpEvent?.httpApi?.method).toBe("POST");
-    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
+    expect(httpEvent?.httpApi?.authorizer).toBeDefined();
   });
 
-  it("should not have authorizer on GET /status/{cacheKey} route", () => {
+  it("should have authorizer on GET /status/{cacheKey} route", () => {
     const fn = config.functions.status;
     expect(fn).toBeDefined();
 
     const httpEvent = fn?.events?.find((e) => e.httpApi);
     expect(httpEvent).toBeDefined();
-    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
+    expect(httpEvent?.httpApi?.authorizer).toBeDefined();
   });
 
-  it("should not have authorizer on GET /health route", () => {
+  it("should NOT have authorizer on GET /health route", () => {
     const fn = config.functions.health;
     expect(fn).toBeDefined();
 
@@ -105,35 +105,25 @@ describe("serverless.yml — public endpoint guarantees", () => {
     expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
-  it("should not have authorizer on any route", () => {
-    for (const [name, fn] of Object.entries(config.functions)) {
+  it("should require auth on all routes except /health", () => {
+    for (const [_name, fn] of Object.entries(config.functions)) {
       for (const event of fn.events ?? []) {
-        expect(
-          event.httpApi?.authorizer,
-        ).toBeUndefined();
-        if (event.httpApi?.authorizer) {
-          throw new Error(
-            `Function "${name}" route ${event.httpApi.method} ${event.httpApi.path} ` +
-              `has an authorizer. All merlin-api endpoints must be public.`,
-          );
-        }
+        const isHealth = event.httpApi?.path === "/health";
+        const hasAuth = Boolean(event.httpApi?.authorizer);
+        if (isHealth) { expect(hasAuth).toBe(false); }
+        else if (event.httpApi) { expect(hasAuth).toBe(true); }
       }
     }
   });
 
-  it("should have explicit AuthorizationType NONE override for synthesize route", () => {
+  it("should not have AuthorizationType NONE override (removed in SEC-01)", () => {
     const resources = config.resources?.Resources;
-    expect(resources).toBeDefined();
-
     const synthRoute = resources?.["HttpApiRoutePostSynthesize"];
-    expect(synthRoute).toBeDefined();
-    expect(synthRoute?.Properties?.AuthorizationType).toBe("NONE");
+    expect(synthRoute).toBeUndefined();
   });
 
-  it("should not include Authorization in CORS allowedHeaders", () => {
+  it("should include Authorization in CORS allowedHeaders", () => {
     const headers = config.provider.httpApi?.cors as { allowedHeaders?: string[] } | undefined;
-    if (headers?.allowedHeaders) {
-      expect(headers.allowedHeaders).not.toContain("Authorization");
-    }
+    expect(headers?.allowedHeaders).toContain("Authorization");
   });
 });
