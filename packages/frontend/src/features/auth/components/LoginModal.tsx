@@ -98,9 +98,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   return (
     <>
       <div className="base-modal__backdrop" onClick={onBackdrop} aria-hidden="true" />
-      <div ref={modalRef} className="base-modal base-modal--medium login-modal" role="dialog" aria-modal="true" aria-label="Logi sisse">
+      <div ref={modalRef} className="base-modal base-modal--small login-modal" role="dialog" aria-modal="true" aria-label="Logi sisse">
         <div className="login-modal__header">
-          <img src="/icons/logo.svg" alt="EKI Logo" className="login-modal__intro-logo" />
+          <img src="/icons/logo.png" alt="EKI Logo" className="login-modal__intro-logo" />
           <button onClick={handleClose} className="base-modal__close" aria-label="Sulge" type="button">
             <CloseIcon size="2xl" />
           </button>

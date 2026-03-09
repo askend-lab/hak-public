@@ -16,17 +16,17 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: $spacing-8;
+  padding: $spacing-6;
 }
 
 .login-modal__intro-logo {
   height: auto;
-  max-height: 48px;
+  max-height: 36px;
   width: auto;
 }
 
 .login-modal__body {
-  padding: 0 $spacing-8 $spacing-8;
+  padding: 0 $spacing-6 $spacing-6;
 }
 
 .login-modal__title {

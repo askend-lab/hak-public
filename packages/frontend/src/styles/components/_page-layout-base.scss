@@ -39,24 +39,24 @@
   box-sizing: border-box;
 
   // Mobile: 320px - 639px
-  padding: 0 $spacing-4;
+  padding: $spacing-2 $spacing-4;
   height: 56px;
 
   // Mobile landscape: 640px+
   @include mobile-landscape {
-    padding: 0 $spacing-5;
+    padding: $spacing-2 $spacing-5;
     height: 60px;
   }
 
   // Tablet: 768px+
   @include tablet {
-    padding: 0 $spacing-6;
+    padding: $spacing-2 $spacing-6;
     height: 60px;
   }
 
   // Desktop: 1024px+
   @include desktop {
-    padding: 0 $spacing-8;
+    padding: $spacing-2 $spacing-8;
   }
 
   .page-layout__header-content {

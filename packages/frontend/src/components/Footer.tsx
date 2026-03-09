@@ -5,7 +5,7 @@ import BuildInfo from "./BuildInfo";
 
 const FooterLogo = () => (
   <div className="footer-section footer__logo">
-    <img src="/icons/logo.svg" alt="EKI Logo" className="footer__logo-image" />
+    <img src="/icons/logo.png" alt="EKI Logo" className="footer__logo-image" />
     <div className="footer__contact">
       <p>
         Roosikrantsi 6, 10119 Tallinn
@@ -92,7 +92,7 @@ const FeedbackSection = () => (
         Iga arvamus loeb ja aitab Hääldusabilist paremaks teha! Saada meile oma
         mõtted ja ettepanekud.
       </p>
-      <a href="mailto:eki@eki.ee" className="footer__feedback-link">
+      <a href="mailto:kristjan.suluste@eki.ee" className="footer__feedback-link">
         <svg
           className="footer__feedback-icon"
           viewBox="0 0 24 24"
@@ -101,7 +101,7 @@ const FeedbackSection = () => (
         >
           <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
         </svg>
-        <span>eki@eki.ee</span>
+        <span>kristjan.suluste@eki.ee</span>
       </a>
     </div>
   </div>
