@@ -51,14 +51,14 @@ describe("LoginModal", () => {
       expect(screen.getByText(/Jätka Google/)).toBeInTheDocument();
     });
 
-    it("renders description for Google login", () => {
+    it("renders intro description", () => {
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
-      expect(screen.getByText(/Sisene oma Google kontoga/)).toBeInTheDocument();
+      expect(screen.getByText(/luua ja hallata ülesandeid/)).toBeInTheDocument();
     });
 
     it("renders TARA button with correct classes", () => {
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
-      const taraBtn = screen.getByText(/Logi sisse TARA/);
+      const taraBtn = screen.getByText(/autentimisteenuse kaudu/);
       expect(taraBtn.className).toContain("button--primary");
       expect(taraBtn.className).toContain("login-modal__tara-button");
     });
@@ -84,12 +84,12 @@ describe("LoginModal", () => {
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
       const logo = document.querySelector(".login-modal__intro-logo") as HTMLImageElement;
       expect(logo).toBeTruthy();
-      expect(logo?.alt).toBe("Logo");
+      expect(logo?.alt).toBe("EKI Logo");
     });
 
     it("buttons are not disabled initially", () => {
       render(<LoginModal isOpen={true} onClose={mockOnClose} />);
-      const taraBtn = screen.getByText(/Logi sisse TARA/);
+      const taraBtn = screen.getByText(/autentimisteenuse kaudu/);
       const googleBtn = screen.getByText(/Jätka Google/);
       expect(taraBtn).not.toBeDisabled();
       expect(googleBtn).not.toBeDisabled();

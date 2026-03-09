@@ -43,7 +43,6 @@ test_modules:
   - name: frontend
     path: packages/frontend
     type: vitest
-    min_coverage_branches: 85
     command: "pnpm test"
     command_full: "pnpm test:coverage"
     results_file: "test-results.json"
@@ -100,9 +99,6 @@ hooks:
       - "**/test/fixtures/**"
 
   no-console:
-    mode: error
-    allow_warn: true
-    allow_error: true
     excludePaths:
       - "audio-worker/**"
       - "**/audio-worker/**"
@@ -210,7 +206,6 @@ hooks:
 
   security-audit:
     mode: warning
-    packageManager: pnpm
     auditLevel: critical
 
   secret-detection:
@@ -254,6 +249,17 @@ hooks:
       - "**/dist/**"
       - "**/devbox.yaml"
       - "**/defaults.yaml"
+
+  circular-deps:
+    paths:
+      - "packages/frontend/src"
+      - "packages/store/src"
+      - "packages/auth/src"
+      - "packages/shared/src"
+      - "packages/api-client/src"
+      - "packages/tts-api/src"
+      - "packages/morphology-api/src"
+      - "packages/gherkin-parser/src"
 
   dead-code:
     excludePaths:

@@ -96,6 +96,7 @@ export function useVariantsPanel(
   const ps = usePhoneticState(sentences, setSentences);
 
   const handleTagClick = useCallback(async (sentenceId: string, tagIndex: number, word: string) => {
+    ps.close();
     const sentence = sentences.find((s) => s.id === sentenceId);
     if (sentence?.stressedTags) { vs.openPanel({ sentenceId, tagIndex, word, phonetic: sentence.stressedTags[tagIndex] }); return; }
     const stressed = await analyzeText(sentence?.tags.join(" ") || "");
@@ -103,7 +104,7 @@ export function useVariantsPanel(
     const words = convertTextToTags(stressed);
     setSentences((prev) => prev.map(mapStressed(sentenceId, words)));
     vs.openPanel({ sentenceId, tagIndex, word, phonetic: words.length === sentence?.tags.length ? words[tagIndex] : null });
-  }, [sentences, setSentences, vs.openPanel]);
+  }, [sentences, setSentences, vs.openPanel, ps.close]);
 
   const handleOpenVariantsFromMenu = useCallback(async (sentenceId: string, tagIndex: number, word: string) => {
     vs.setLoadingVariantsTag({ sentenceId, tagIndex });
@@ -124,7 +125,7 @@ export function useVariantsPanel(
     isVariantsPanelOpen: vs.isVariantsPanelOpen, selectedSentenceId: vs.selectedSentenceId, selectedTagIndex: vs.selectedTagIndex,
     showSentencePhoneticPanel: ps.showPanel, sentencePhoneticId: ps.phoneticId, loadingVariantsTag: vs.loadingVariantsTag,
     handleTagClick, handleCloseVariants: vs.closePanel, handleOpenVariantsFromMenu,
-    handleExplorePhonetic: (...args: Parameters<typeof ps.explore>) => { void ps.explore(...args); },
+    handleExplorePhonetic: (...args: Parameters<typeof ps.explore>) => { vs.closePanel(); void ps.explore(...args); },
     handleCloseSentencePhonetic: ps.close,
   };
 }
