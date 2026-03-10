@@ -6,7 +6,7 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { createApiResponse, HTTP_STATUS } from "@hak/shared";
+import { createApiResponse, HTTP_STATUS, logger } from "@hak/shared";
 
 import {
   Store,
@@ -106,12 +106,14 @@ function buildStoreRequest(body: Record<string, unknown>): StoreRequest {
   };
 }
 
+// eslint-disable-next-line max-statements -- LOG-7: logging adds necessary statements
 export async function handleSave(
   event: APIGatewayProxyEvent,
   store: Store,
 ): Promise<APIGatewayProxyResult> {
   const body = parseBody(event);
   if (!body) {
+    logger.warn("[Store] Save: invalid JSON body");
     return createResponse(HTTP_STATUS.BAD_REQUEST, {
       error: HTTP_ERRORS.INVALID_JSON,
     });
@@ -124,8 +126,10 @@ export async function handleSave(
 
   const result = await store.save(buildStoreRequest(body));
   if (!result.success || !result.item) {
+    logger.warn("[Store] Save failed", { error: result.error });
     return createErrorResponse(result.error, HTTP_STATUS.BAD_REQUEST);
   }
+  logger.info("[Store] Save OK", { key: (body.key as string), type: (body.type as string) });
   return createResponse(HTTP_STATUS.OK, { item: toClientItem(result.item) });
 }
 
@@ -167,6 +171,9 @@ export async function handleDelete(
     id as string,
     type as DataType,
   );
+  if (!result.success) {
+    logger.warn("[Store] Delete failed", { key, id, type, error: result.error });
+  }
   return result.success
     ? createResponse(HTTP_STATUS.OK, { success: true })
     : createErrorResponse(result.error, HTTP_STATUS.NOT_FOUND);
@@ -182,6 +189,9 @@ export async function handleQuery(
   if (validationError) {return validationError;}
 
   const result = await store.query(prefix as string, type as DataType);
+  if (!result.success) {
+    logger.warn("[Store] Query failed", { prefix, type, error: result.error });
+  }
   return result.success
     ? createResponse(HTTP_STATUS.OK, { items: (result.items ?? []).map(toClientItem) })
     : createErrorResponse(result.error, HTTP_STATUS.INTERNAL_SERVER_ERROR);

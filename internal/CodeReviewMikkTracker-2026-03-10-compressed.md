@@ -3,7 +3,7 @@
 Only items that are **NOT fully resolved**. All items with four ✅ are omitted.
 
 Re-verified 2026-03-10: checked every "Fixed, not Closed" item against actual code.
-Result: **25 items closed**, **21 items remain open**.
+Result: **26 items closed**, **20 items remain open**.
 
 ---
 
@@ -11,10 +11,6 @@ Result: **25 items closed**, **21 items remain open**.
 
 - **12.4** (Medium) `shell=True` in `generate.py:73` — external `merlin/` lib, excluded from ruff
 - **12.5** (Medium) `pickle.load` in `run_merlin.py:99` — external `merlin/` lib, no checksum
-
-## ⚠️ Deferred Fix
-
-- **LOG-7** (MEDIUM) Store routes logging — zero logger calls in `routes.ts`. Blocked by ESM transform issue in store tests.
 
 ## 🧪 Needs Penetration Testing
 
@@ -51,34 +47,16 @@ Code verified present, but needs live testing to confirm behavior under load/att
 - **TEST-5** (HIGH) Budget limit testing ($0.01 test budget)
 - **TEST-6** (HIGH) SQS queue depth testing (60+ burst → 503 + recovery)
 
----
-
-## What was closed today (2026-03-10)
-
-Verified by code inspection and closed:
-
-- **LAURI-P1** — `toClientItem()` strips PK/SK/version/owner/ttl
-- **LAURI-P2** — Zod schemas in `validation.ts` for all endpoints
-- **LAURI-1** — `createApiResponse` from `@hak/shared` in store, tts-api, morphology-api
-- **LAURI-2** — Atomic upsert (single DynamoDB call, `if_not_exists` + version++)
-- **LAURI-5** — No `X-User-Id`; uses `Cognito claims.sub` exclusively
-- **PUB-5** — All 3 synthesis inputs have `maxLength={100}`
-- **LOG-1..6, LOG-8..14** — All logger code verified in place (13 items)
-- **ERR-1..6** — All error handling code verified in place (6 items)
-
----
 
 ## Summary
 
 | Category | Count | Items |
 |----------|-------|-------|
 | ⚠️ Known risks (external lib) | 2 | 12.4, 12.5 |
-| ⚠️ Deferred fix | 1 | LOG-7 |
 | 🧪 Needs pen testing | 5 | PUB-1, 2, 4, 6, 10 |
 | ❓ Separate infra repo | 2 | PUB-14, 15 |
 | ❌ Reverted (by design) | 1 | PUB-3 |
 | ⏸️ Deferred features | 4 | PUB-7, 8, 11, 12 |
 | ⏸️ Pen tests pending | 6 | TEST-1..6 |
-| **Total open** | **21** | |
-| **Closed today** | **25** | LAURI ×5, PUB-5, LOG ×13, ERR ×6 |
-| **Previously resolved** | **~80** | All with four ✅ |
+| **Total open** | **20** | |
+| **Closed today** | **26** | LAURI ×5, PUB-5, LOG ×14, ERR ×6 |

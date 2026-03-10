@@ -392,7 +392,7 @@ Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
 - ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-4** (CRITICAL) Logging in tts-api — *03-10: logger + extractErrorMessage in tts-api/handler.ts. ✅ Closed.*
 - ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-5** (HIGH) Store handler silent catch — *03-10: logger.error at handler.ts:174 with requestId + extractErrorMessage. ✅ Closed.*
 - ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-6** (HIGH) Auth Cognito trigger logging — *03-10: 5 logger calls in cognito-triggers.ts. ✅ Closed.*
-- ✅ Accept  [⚠️] Deferred  [ ] Closed  [⚠️] 03-10 — **LOG-7** (MEDIUM) Store routes logging — *03-10: Still deferred (ESM transform issue).*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-7** (MEDIUM) Store routes logging — *03-10: Added logger.warn/info to save, delete, query in routes.ts. ESM blocker gone (vitest). ✅ Closed.*
 - ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-8** (MEDIUM) Auth module logging — *03-10: logger.warn in cognito-client.ts:59,77 + tara-client 3 calls. ✅ Closed.*
 
 ### Phase 3: Infrastructure & Observability
