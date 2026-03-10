@@ -51,16 +51,16 @@ test_modules:
   #   path: packages/frontend
   #   type: cucumber
 
-# Per-file coverage — lowered to match current state after enabling all 8 modules
-# TODO: ratchet up as coverage improves (target: 95% lines, 85% branches)
+# Per-file coverage — ratcheted to current state (was 40/25 after enabling all 8 modules)
+# TODO: ratchet up further (target: 95% lines, 85% branches)
 per_file_coverage:
-  min_lines: 40
-  min_branches: 25
+  min_lines: 75
+  min_branches: 50
   allowlist:
-    - packages/store/src/index.ts
-    - packages/store/src/adapters/index.ts
-    - packages/store/src/core/index.ts
-    - packages/store/src/lambda/index.ts
+    - LoginModal.tsx
+    - SynthesisView.tsx
+    - useDragAndDrop.ts
+    - TasksRoute.tsx
 
 # Global coverage settings
 coverage:
