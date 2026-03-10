@@ -252,7 +252,7 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` now requi
 - ✅ Accept  [✅] Fixed  [🧪] Closed  [✅] 03-10 — **PUB-2** (CRITICAL) ECS max_capacity — *03-10: infra/merlin/main.tf max_capacity still present. Still holds. 🧪 TEST-2 still pending.*
 - ✅ Accept  [❌] Reverted  [✅] Closed  [✅] 03-10 — **PUB-3** (CRITICAL) Lambda concurrency limits — *03-10: Still reverted. Protection via WAF + geo-blocking + SQS cap. Same status.*
 - ✅ Accept  [✅] Fixed  [🧪] Closed  [✅] 03-10 — **PUB-4** (HIGH) SQS queue depth cap — *03-10: sqs.ts checkQueueDepth still present. Still holds. 🧪 TEST-6 still pending.*
-- ✅ Accept  [✅] Fixed  [⚠️] Closed  [⚠️] 03-10 — **PUB-5** (HIGH) MAX_TEXT_LENGTH — *03-10: Backend enforced (100). Same ⚠️: frontend maxLength attribute still missing on some inputs.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **PUB-5** (HIGH) MAX_TEXT_LENGTH — *03-10: Backend 100 + all 3 synthesis inputs have maxLength={100} (TagsInput, CustomVariantForm, SentencePhoneticPanel). Other inputs are task mgmt/search — don't go to TTS. ✅ Closed.*
 
 ### Monitoring & Detection
 
@@ -287,20 +287,20 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 ### Previously Tracked (from earlier review)
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LAURI-P1** (Medium) Store API leaks DynamoDB terminology — *03-10: Code fix still in place. Still needs staging verification.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LAURI-P2** (Medium) Store API input validation — *03-10: Code fix still in place. Still needs staging verification.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-P1** (Medium) Store API leaks DynamoDB terminology — *03-10: toClientItem() strips PK/SK/version/owner/ttl. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-P2** (Medium) Store API input validation — *03-10: Zod schemas in validation.ts for all endpoints. ✅ Closed.*
 
 ### Full Code Review Findings (12 items)
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LAURI-1** (High) No architecture pattern — *03-10: All packages use createApiResponse from @hak/shared. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-1** (High) No architecture pattern — *03-10: createApiResponse from @hak/shared in store, tts-api, morphology-api. ✅ Closed.*
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LAURI-2** (High) Write skew on first insert — *03-10: Code fix still in place. Still needs staging verification.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-2** (High) Write skew on first insert — *03-10: Atomic upsert (single DynamoDB call, if_not_exists + version++). ✅ Closed.*
 
 - ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-3** (Medium) Inconsistent error handling — *03-10: extractErrorMessage used in store + auth. Still holds.*
 
 - ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-4** (Medium) Missing logging — *03-10: Structured logger from shared used across packages. Still holds.*
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LAURI-5** (High) Risky authentication — *03-10: No X-User-Id in store handler. Still needs staging verification.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-5** (High) Risky authentication — *03-10: No X-User-Id; uses Cognito claims.sub exclusively. ✅ Closed.*
 
 - ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LAURI-6** (Medium) Broken tests — *03-10: No contains(200,500) pattern in codebase. Still holds.*
 
@@ -383,29 +383,29 @@ Ref: `internal/LOGGING-ANALYSIS.md` | Analysis of all 7 packages
 
 ### Phase 1: Structured JSON Logging (foundation)
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-1** (CRITICAL) Structured logger — *03-10: shared/src/logger.ts has JSON + plain text modes. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-2** (CRITICAL) withContext(fields) — *03-10: Code still in place. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-3** (HIGH) Request correlation — *03-10: Code still in place. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-1** (CRITICAL) Structured logger — *03-10: logger.ts:106 isLambdaEnv()→JSON, else plain text. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-2** (CRITICAL) withContext(fields) — *03-10: logger.ts:113. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-3** (HIGH) Request correlation — *03-10: requestId in withContext in tts-api:122,146 + auth handlers. ✅ Closed.*
 
 ### Phase 2: Add Logging to Silent Handlers
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-4** (CRITICAL) Logging in tts-api — *03-10: tts-api imports logger from @hak/shared. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-5** (HIGH) Store handler silent catch — *03-10: Code still in place. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-6** (HIGH) Auth Cognito trigger logging — *03-10: Code still in place. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-4** (CRITICAL) Logging in tts-api — *03-10: logger + extractErrorMessage in tts-api/handler.ts. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-5** (HIGH) Store handler silent catch — *03-10: logger.error at handler.ts:174 with requestId + extractErrorMessage. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-6** (HIGH) Auth Cognito trigger logging — *03-10: 5 logger calls in cognito-triggers.ts. ✅ Closed.*
 - ✅ Accept  [⚠️] Deferred  [ ] Closed  [⚠️] 03-10 — **LOG-7** (MEDIUM) Store routes logging — *03-10: Still deferred (ESM transform issue).*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-8** (MEDIUM) Auth module logging — *03-10: Code still in place. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-8** (MEDIUM) Auth module logging — *03-10: logger.warn in cognito-client.ts:59,77 + tara-client 3 calls. ✅ Closed.*
 
 ### Phase 3: Infrastructure & Observability
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-9** (HIGH) logRetentionInDays: 30 — *03-10: Code still in place. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-10** (MEDIUM) CloudWatch Insights queries — *03-10: Documented. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-11** (MEDIUM) Standardize error logging — *03-10: Code still in place. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-9** (HIGH) logRetentionInDays: 30 — *03-10: Present in all 4 serverless.yml. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-10** (MEDIUM) CloudWatch Insights queries — *03-10: LOGGING-ANALYSIS.md exists. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-11** (MEDIUM) Standardize error logging — *03-10: extractErrorMessage used consistently. ✅ Closed.*
 
 ### Phase 4: Business Observability
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-12** (MEDIUM) Business event logging — *03-10: Code still in place. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-13** (LOW) Debug-level logging — *03-10: Code still in place. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **LOG-14** (LOW) tts-api → tts-worker correlation — *03-10: cacheKey in logs. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-12** (MEDIUM) Business event logging — *03-10: info-level in tts-api + auth. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-13** (LOW) Debug-level logging — *03-10: debug in cognito-triggers + tts-api. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **LOG-14** (LOW) tts-api → tts-worker correlation — *03-10: cacheKey in handler.ts synthesize/status logs. ✅ Closed.*
 
 ### Statistics
 
@@ -430,15 +430,15 @@ Ref: `internal/ERROR-HANDLING-ANALYSIS.md` | Analysis of all backend packages + 
 
 ### Quick Wins
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **ERR-1** (HIGH) extractErrorMessage() everywhere — *03-10: Used in store + auth. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **ERR-4** (HIGH) Silent catches in cognito-client — *03-10: Code still in place. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **ERR-5** (MEDIUM) Error re-wrapping with cause — *03-10: Code still in place. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **ERR-1** (HIGH) extractErrorMessage() everywhere — *03-10: Used in all 4 backend packages (34 matches). ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **ERR-4** (HIGH) Silent catches in cognito-client — *03-10: logger.warn at cognito-client.ts:59,77. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **ERR-5** (MEDIUM) Error re-wrapping with cause — *03-10: error.cause at cognito-client.ts:175. ✅ Closed.*
 
 ### Structural Improvements
 
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **ERR-2** (MEDIUM) AppError hierarchy — *03-10: 7 error classes in shared. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **ERR-6** (MEDIUM) morphology-api shared response — *03-10: HTTP_STATUS imported from @hak/shared via validation.ts. Still holds.*
-- ✅ Accept  [✅] Fixed  [ ] Closed  [✅] 03-10 — **ERR-3** (LARGER) wrapLambdaHandler() — *03-10: Available in shared. Still holds.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **ERR-2** (MEDIUM) AppError hierarchy — *03-10: 7 classes in shared/src/errors.ts + 42 tests. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **ERR-6** (MEDIUM) morphology-api shared response — *03-10: HTTP_STATUS from @hak/shared in validation.ts:6. ✅ Closed.*
+- ✅ Accept  [✅] Fixed  [✅] Closed  [✅] 03-10 — **ERR-3** (LARGER) wrapLambdaHandler() — *03-10: handler-wrapper.ts with AppError-aware catch. ✅ Closed.*
 
 ### Statistics
 
