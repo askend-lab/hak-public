@@ -30,7 +30,7 @@ export default defineConfig({
       "src/services/audio/synthesis.integration.test.ts",
     ],
     reporters: ["default", "json"],
-    outputFile: "test-results.json",
+    outputFile: "jest-results.json",
     forceRerunTriggers: ["**/vitest.config.*"],
     coverage: {
       provider: "v8",

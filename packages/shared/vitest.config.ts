@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     include: ["src/**/*.test.ts"],
     reporters: ["default", "json"],
-    outputFile: "test-results.json",
+    outputFile: "jest-results.json",
     coverage: {
       provider: "v8",
       reporter: ["json-summary", "text", "lcov"],
