@@ -13,7 +13,7 @@ export const SynthesizeRequestSchema = z
       .string()
       .min(2, "Text must be at least 2 characters")
       .max(MAX_TEXT_LENGTH, `Text must be at most ${MAX_TEXT_LENGTH} characters`),
-    voice: z.string().optional(),
+    voice: z.string().regex(/^[a-z0-9_]{2,20}$/, "Voice must be 2-20 lowercase alphanumeric/underscore characters").optional(),
     speed: z
       .number()
       .min(SPEED_RANGE.min, `Speed must be at least ${SPEED_RANGE.min}`)

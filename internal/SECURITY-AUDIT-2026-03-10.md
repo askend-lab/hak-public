@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-0 CRITICAL findings (previous SEC-01 resolved). 2 new MEDIUM findings. 3 previously accepted risks unchanged. Significant security improvements since last audit: JWT authentication enforced on all API endpoints, per-user WAF rate limits deployed, in-memory token storage on frontend, PKCE auth flow added. Dependency vulnerabilities increased (24 total, mostly transitive devDeps).
+0 CRITICAL findings (previous SEC-01 resolved). 2 new MEDIUM findings. 2 new LOW findings. Significant security improvements since last audit: JWT authentication enforced on all API endpoints, per-user WAF rate limits deployed, in-memory token storage on frontend, PKCE auth flow added. Dependency vulnerabilities increased (24 total, mostly transitive devDeps).
 
 ---
 
@@ -36,12 +36,12 @@
 | SEC-11 | Trivy container scan non-blocking | MEDIUM | **New** |
 | SEC-12 | 24 npm dependency vulnerabilities | MEDIUM | **New** |
 | SEC-13 | `voice` parameter not validated against allowlist | LOW | **New** |
-| SEC-14 | No Dependabot / automated dependency updates | LOW | **New** |
+| SEC-14 | ~~No Dependabot~~ — **FALSE POSITIVE** (already configured) | — | Closed |
 | SEC-15 | `pickle.load` without integrity verification | LOW | Accepted (external code) |
 | SEC-16 | `shell=True` in merlin `generate.py` | LOW | Accepted (external code) |
 | SEC-17 | Store `/get-shared` endpoint has no auth | LOW | By design |
 
-**Resolved since last audit:** SEC-01 (public API endpoints — now require JWT auth).
+**Resolved since last audit:** SEC-01 (public API endpoints — now require JWT auth), SEC-14 (Dependabot already configured).
 
 ---
 
@@ -87,13 +87,9 @@ The `voice` parameter accepts any string value. It is passed to the Merlin TTS w
 
 ---
 
-## SEC-14: No Dependabot / Automated Dependency Updates [LOW — New]
+## SEC-14: ~~No Dependabot~~ — FALSE POSITIVE [Closed]
 
-**Location:** `.github/` — no `dependabot.yml`
-
-No Dependabot or Renovate configuration exists. Dependency vulnerability alerts rely on manual `pnpm audit` runs in CI.
-
-**Recommendation:** Add `.github/dependabot.yml` with npm and GitHub Actions ecosystems. This is free, requires zero maintenance, and provides automated PRs for security fixes.
+Dependabot is already configured at `.github/dependabot.yml` with npm, github-actions, and docker ecosystems. Weekly schedule, grouped updates for AWS SDK, testing, and build dependencies.
 
 ---
 
@@ -224,6 +220,7 @@ All rate-based rules return HTTP 429 with JSON body `{"error":"RATE_LIMIT","mess
 | Terraform state locking (DynamoDB) | ✅ | Stale lock detection in CI |
 | Build artifacts encrypted (SSE AES256) | ✅ | `deploy.yml` — `--sse AES256` |
 | Deployment state tracking | ✅ | `{env}.json` manifest in S3 |
+| Dependabot (npm, actions, docker) | ✅ | `.github/dependabot.yml` — weekly, grouped |
 
 ### IAM & Access Control
 
@@ -264,18 +261,7 @@ All rate-based rules return HTTP 429 with JSON body `{"error":"RATE_LIMIT","mess
 
 3. **SEC-13** — Add voice parameter validation: `z.string().regex(/^[a-z0-9_]{2,20}$/).optional()` or use `.enum()` with known voices.
 
-4. **SEC-14** — Add `.github/dependabot.yml`:
-   ```yaml
-   version: 2
-   updates:
-     - package-ecosystem: npm
-       directory: "/"
-       schedule: { interval: weekly }
-       open-pull-requests-limit: 5
-     - package-ecosystem: github-actions
-       directory: "/"
-       schedule: { interval: weekly }
-   ```
+4. ~~**SEC-14**~~ — False positive. Dependabot already configured.
 
 5. **DynamoDB encryption** — SimpleStore table uses default AWS encryption. Consider explicit CMK if storing sensitive user data in future.
 
