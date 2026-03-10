@@ -95,8 +95,8 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 
 ## 12. Security
 
-- ❌ Reject (by design)  —  — **12.1** (High) No auth on /synthesize, /warmup — BY DESIGN, documented in README
-- ✅ Accept  [ ] Fixed  [ ] Closed — **12.2** (Medium) Shared throttling — DEFERRED, requires client decision on authentication first
+- ✅ Accept  [✅] Fixed  [✅] Closed — **12.1** (High) No auth on /synthesize, /warmup — *Fixed: All API endpoints (`/synthesize`, `/analyze`, `/variants`, `/status`) now require Cognito JWT auth (HTTP 401 without token). `/warmup` removed entirely (see 15.1). Verified via automated tests on dev 2026-03-10 (see `internal/REPORT-waf-rate-limits.md`). PR #759.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **12.2** (Medium) Shared throttling — *Fixed: Per-user WAF rate limits implemented via `Authorization` header aggregate keys. Synthesis: 10 req/2min, Morphology: 20 req/1min, Status polling: 100 req/1min. Returns HTTP 429 with JSON `{"error":"RATE_LIMIT","message":"Too many requests"}`. Tested on dev 2026-03-10 — all limits confirmed working. PR #759.*
 - ✅ Accept  [✅] Fixed  [✅] Closed — **12.3** (Medium) CORS behavior unified — *Verified: Same as 4.2. `getCorsOrigin()` in `@hak/shared` returns `"null"` when ALLOWED_ORIGIN unset. All packages use it.*
 - ✅ Accept  [🛡️] Fixed  [⚠️] Closed — **12.4** (Medium) OS Command Injection via shell=True — *Verified: Ruff S602 enabled in `ruff.toml`. TDD tests exist in `test_safe_subprocess.py`. BUT ⚠️ `generate.py:73` still uses `shell=True` in `subprocess.Popen()`. Fix NOT applied to production code — only tests written. Needs actual fix.*
 - ✅ Accept  [🛡️] Fixed  [⚠️] Closed — **12.5** (Medium) pickle.load — Ruff S301 — *Verified: Ruff S301 (pickle) enabled in `ruff.toml`. BUT ⚠️ `run_merlin.py:100` still uses `pickle.load()` without checksum verification, AND file is in `merlin/` dir which is excluded from ALL ruff rules (`per-file-ignores: "merlin/**" = ["ALL"]`). Rule doesn't protect this file. No SHA-256 verification added.*
@@ -117,7 +117,7 @@ Legend: ✅ Accept (will fix) | ❌ Reject (won't fix) | [ ] Fixed — code chan
 - ✅ Accept  [✅] Fixed  [✅] Closed — **15.1** (Medium) Removed /warmup endpoint entirely — *Verified: No `warmup` in `tts-api/src/`, `serverless.yml`, or `README.md`. Handler, config, and docs all clean.*
 - ✅ Accept  [✅] Fixed  [✅] Closed — **15.2** (Medium) merlin-api README says "Cognito JWT" auth but code has AuthorizationType: NONE — *Verified: `tts-api/README.md` now says "Auth: None" for all endpoints + "All endpoints are public by design". No Cognito/JWT references.*
 - ✅ Accept  [✅] Fixed  [✅] Closed — **15.3** (Low) Applied shell injection fix in run_merlin.py — *Verified: `run_merlin.py` lines 337/351 use `subprocess.run(args, check=True)` with argument lists (safe). `run_process` import not found at line 53 (removed or tracker error). `generate.py:73` shell=True is in external `merlin/` library — excluded from ruff, not our code to modify.*
-- ✅ Accept  [ ] Fixed  [ ] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — DEFERRED permanently, frontend depends on this endpoint
+- ✅ Accept  [✅] Fixed  [✅] Closed — **15.4** (Medium) Remove /status/{cacheKey} from public access — *Fixed: `/status/{cacheKey}` now requires Cognito JWT auth (returns 401 without token). Per-user rate limit of 100 req/1min applied via WAF Rule 7. Tested on dev 2026-03-10. PR #759.*
 - ✅ Accept  [✅] Fixed  [✅] Closed — **15.5** (Medium) Reduce MAX_TEXT_LENGTH from 1000 to 100 chars — *Verified: `tts-api/src/schemas.ts:6` has `MAX_TEXT_LENGTH = 100` with Zod `.max()`. `worker.py:77` has `MAX_TEXT_LENGTH = 100`. Frontend: `maxLength={100}` on TagsInput, SentencePhoneticPanel textarea, and CustomVariantForm input.*
 
 ---
@@ -244,7 +244,7 @@ Local SonarQube scan found **6 code smells + 9 security hotspots**. Root cause: 
 
 Ref: `internal/PROPOSAL-Auth-Public-Endpoints.md`
 
-Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are public. Authentication proposal sent to client (pending decision). Below: what we must do regardless to harden the public setup.
+Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` now require Cognito JWT authentication (PR #759, 2026-03-10). Per-user WAF rate limits enforced. Below: hardening measures implemented.
 
 ### Cost & Scaling Limits
 
@@ -263,7 +263,7 @@ Endpoints `/synthesize`, `/status/{cacheKey}`, `/analyze`, `/variants` are publi
 
 ### Attack Surface Reduction
 
-- ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — *Verified: `infra/waf.tf` rule "rate-limit-synthesize" (priority 2): `rate_based_statement` limit=20, `scope_down_statement` on `/api/synthesize`. Code matches. 🧪 Needs penetration test TEST-1: 100+ req/min from single IP, verify WAF blocks after 20.*
+- ✅ Accept  [✅] Fixed  [✅] Closed — **PUB-9** (HIGH) Per-path WAF rate limit for `/synthesize` — *Verified: `infra/waf.tf` rule "rate-limit-synthesize" (priority 2): `rate_based_statement` limit=200/5min per IP, `scope_down_statement` on `/api/synthesize`. Additionally, per-user limit of 10 req/2min (Rule 5). Tested on dev 2026-03-10: per-user 429 confirmed. See `internal/REPORT-waf-rate-limits.md`.*
 - ✅ Accept  [✅] Fixed  [🧪] Closed — **PUB-10** (MEDIUM) Geo-blocking — *Verified: `infra/waf.tf` rule "geo-restrict-synthesize" (priority 3): `geo_match_statement` allows only EE, LV, LT, FI, SE, DE, PL, NO, DK for `/api/synthesize`. Code matches. 🧪 Needs penetration test: request from non-allowed country (VPN), verify block.*
 
 ### Storage
@@ -304,7 +304,7 @@ Legend: [ ] Accept/Reject — [ ] Fixed — [ ] Closed
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-6** (Medium) Broken tests — `contains(200, 500)` pattern. *Fixed 2026-02-25:* Last remaining instance at `store/test/integration.test.ts:131` replaced with `expect(result.statusCode).toBe(200)`. Zero instances of multi-status assertions remain in codebase.*
 
-- ✅ Accept  [⚠️] Partially fixed  [ ] Closed — **LAURI-7** (High) Merlin prone to resource starvation and DDoS. *Verified 2026-02-25:* WAF rate limits (PUB-9: 200/5min for synthesize ✅), SQS queue depth cap (PUB-4: 50 messages ✅), ECS max capacity (PUB-2 ✅), geo-blocking (PUB-10 ✅). **Still missing:** per-user rate limiting (requires auth — see SEC-H4, pending client decision).
+- ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-7** (High) Merlin prone to resource starvation and DDoS. *Fixed 2026-03-10:* WAF rate limits (PUB-9: 200/5min per-IP for synthesize ✅), SQS queue depth cap (PUB-4: 50 messages ✅), ECS max capacity (PUB-2 ✅), geo-blocking (PUB-10 ✅), **per-user rate limits now implemented** via WAF Rules 5-7 (synthesis 10/2min, morphology 20/1min, status 100/1min). All endpoints require Cognito JWT auth. Tested on dev 2026-03-10 — all limits confirmed with HTTP 429 responses. PR #759.*
 
 - ✅ Accept  [✅] Fixed  [✅] Closed — **LAURI-8** (Medium) DynamoDB incorrectly mocked in tests — *Fixed 2026-02-25:* Removed `InMemoryDynamoDB` from `mockDynamoDB.ts`. All tests now use production `InMemoryAdapter` from `src/adapters/memory.ts`. Only `FailingDynamoDB` remains for error simulation. Version conflict test added for InMemoryAdapter.*
 
