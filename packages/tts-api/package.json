@@ -7,6 +7,7 @@
     "build": "tsc",
     "test": "jest",
     "test:full": "jest --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
     "generate:openapi": "ts-node src/openapi.ts > openapi.yaml",
     "deploy": "serverless deploy",
     "deploy:dev": "serverless deploy --stage dev",

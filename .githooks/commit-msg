@@ -1,8 +1,4 @@
 #!/bin/sh
-# DevBox commit-msg hook
 set -e
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$PROJECT_ROOT"
-
-# Pass commit message file path to the hooks system
-node "/home/alex/users/boxer/devbox/packages/hooks/src/cli/index.js" run commit-msg "$1"
+cd "$(git rev-parse --show-toplevel)"
+exec dx hooks run commit-msg "$(cat "$1")"

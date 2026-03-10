@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "test": "echo 'Python package — run pytest tests/ -v'",
-    "test:full": "if [ -f .venv/bin/pytest ]; then .venv/bin/pytest tests/ -v --tb=short; else echo 'FATAL: .venv not set up (run: python3 -m venv .venv && .venv/bin/pip install -r requirements-test.txt)' >&2 && exit 1; fi"
+    "test:full": "if [ -f .venv/bin/pytest ]; then .venv/bin/pytest tests/ -v --tb=short; else echo 'FATAL: .venv not set up (run: python3 -m venv .venv && .venv/bin/pip install -r requirements-test.txt)' >&2 && exit 1; fi",
+    "test:coverage": "if [ -f .venv/bin/pytest ]; then .venv/bin/pytest tests/ -v --json-report --json-report-file=pytest-results.json --cov=worker --cov-report=json:coverage.json --cov-branch; else echo 'FATAL: .venv not set up' >&2 && exit 1; fi"
   }
 }

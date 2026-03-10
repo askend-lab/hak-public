@@ -1,19 +1,29 @@
 #!/usr/bin/env node
-// DevBox wrapper - use local devbox in dev, npm package in CI
+// DevBox wrapper — resolves devbox CLI in priority order:
+// 1. DEVBOX env var (local dev override)
+// 2. Global dx CLI (npm install -g @askend-lab/devbox)
+// 3. npx @askend-lab/devbox (fallback for CI)
 
-const { spawnSync } = require('child_process');
+const { spawnSync, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const args = process.argv.slice(2);
 
-// Local development path
-const localDevbox = '/home/alex/users/boxer/devbox/cli.js';
+function findDevbox() {
+  // 1. DEVBOX env var — local development override
+  if (process.env.DEVBOX) {
+    const p = path.join(process.env.DEVBOX, 'cli.js');
+    if (fs.existsSync(p)) return ['node', p];
+  }
+  // 2. Global dx CLI
+  try {
+    execSync('dx --version', { stdio: 'pipe' });
+    return ['dx'];
+  } catch { /* not installed globally */ }
+  // 3. npx fallback (CI)
+  return ['npx', '@askend-lab/devbox'];
+}
 
-// npm package path
-const npmDevbox = path.join(__dirname, 'node_modules/@askend-lab/devbox/cli.js');
-
-// Use local if exists, otherwise npm package (for CI)
-const devboxPath = fs.existsSync(localDevbox) ? localDevbox : npmDevbox;
-
-const result = spawnSync('node', [devboxPath, ...args], { stdio: 'inherit' });
+const [cmd, ...prefix] = findDevbox();
+const result = spawnSync(cmd, [...prefix, ...args], { stdio: 'inherit' });
 process.exit(result.status || 0);
