@@ -4,19 +4,13 @@ extends: '@askend-lab/devbox/defaults.yaml'
 project:
   name: "HAK"
 
-# Always run full test suite with coverage (prevents coverage gaps on pre-commit)
 test_mode: full
 
-# Global excludes (merged with defaults)
-global_excludes:
-  - '**/.venv/**'
-
-# Test modules with coverage requirements
+# Test modules — only non-auto-discoverable overrides needed
 test_modules:
   - name: store
     path: packages/store
     type: vitest
-    results_file: "test-results.json"
   - name: tts-worker
     path: packages/tts-worker
     type: pytest
@@ -39,20 +33,13 @@ test_modules:
   - name: shared
     path: packages/shared
     type: vitest
-    results_file: "test-results.json"
   - name: frontend
     path: packages/frontend
     type: vitest
     command: "pnpm test"
     command_full: "pnpm test:coverage"
-    results_file: "test-results.json"
-  # cucumber excluded from coverage — runs separately via pnpm test:cucumber
-  # - name: cucumber
-  #   path: packages/frontend
-  #   type: cucumber
 
-# Per-file coverage — ratcheted to current state (was 40/25 after enabling all 8 modules)
-# TODO: ratchet up further (target: 95% lines, 85% branches)
+# Per-file coverage — ratcheted (target: 95/85)
 per_file_coverage:
   min_lines: 75
   min_branches: 50
@@ -62,153 +49,78 @@ per_file_coverage:
     - useDragAndDrop.ts
     - TasksRoute.tsx
 
-# Global coverage settings
 coverage:
   min_total: 90
 
-# Task Channel - Slack-based agent communication
 task_channel:
   channel_name: "hak"
 
-# Hooks configuration - ALL parameters required
+# Hooks — only project-specific overrides (generic excludes are in defaults)
 hooks:
   markdown-size:
     max_lines: 200
     excludePaths:
-      - "docs/work/**"
-      - "docs/vision/**"
-      - "packages/frontend/src/styles/eki/**"
-      - "docs/hub/**"
-      - "docs/patterns/**"
-      - "docs/plans/**"
-      - "docs/templates/**"
-      - "**/test/fixtures/**"
-      - "docs/DAILY_ITERATIONS.md"
-      - "docs/open-source/MASTER_PLAN.md"
-      - "CodeReview_*.md"
-      - "GHERKIN_PLAN.md"
-      - "docs/CUCUMBER_STEPS_CHECKLIST.md"
-      - "**/AUDIT_FINDINGS.md"
-      - "**/WCAG_AUDIT_REPORT.md"
-      - "**/DESIGN_SYSTEM_COMPLIANCE_REPORT.md"
-      - "**/ACCESSIBILITY_REMEDIATION_BACKLOG.md"
-      - "docs/internal/design-system/07-Quality-Standards.md"
+      - "docs/**"
       - "audits/**"
       - "internal/**"
+      - "CodeReview_*.md"
+      - "GHERKIN_PLAN.md"
+      - "packages/frontend/src/styles/eki/**"
 
   language-check:
     excludePaths:
       - "**/drafts/**"
-      - "**/test/fixtures/**"
-      - "**/node_modules/**"
       - "docs/**"
       - ".project/**"
       - "**/*.md"
-
-  broken-links:
-    excludePaths:
-      - "**/test/fixtures/**"
 
   no-console:
     excludePaths:
       - "audio-worker/**"
       - "**/audio-worker/**"
       - "cli/**"
-      - "**/dist/**"
-      - "**/build/**"
-      - "**/coverage/**"
       - "**/logger.ts"
       - "**/local-server.ts"
       - "**/a11y-dev.ts"
-      - "**/*.test.ts"
-      - "**/*.test.tsx"
-      - "**/*.spec.ts"
-      - "**/*.spec.tsx"
-      - "**/test/**"
-      - "**/e2e/**"
-      - "**/vendor/**"
-      - "**/__mocks__/**"
-      - "**/stories/**"
-      - "**/scripts/**"
 
   prettier-check:
     mode: off
 
   test-required:
-    tdd: true # Enable strict TDD enforcement for feat/fix commits
+    tdd: true
     excludePaths:
-      - "jest.setup.ts"
-      - "*.config.ts"
-      - "*.config.js"
       - "**/steps-ts/**"
       - "*.steps.ts"
       - "**/specs/**"
       - "SpecsPage.tsx"
       - "**/services/specs/**"
-      - "App.tsx"
       - "AppHeader.tsx"
-      - "**/merlin/*.py" # Legacy TTS Python code
-      - "main.tsx" # Entry point configuration
-      - "DebugPage.tsx" # Debug utility
-      - "**/debug/**" # Debug endpoints
-      - "handler.ts" # Lambda handler (infrastructure)
-      - "routes.ts" # Lambda routes (infrastructure)
-
-  metrics-required: {}
+      - "**/merlin/*.py"
+      - "DebugPage.tsx"
+      - "**/debug/**"
+      - "handler.ts"
+      - "routes.ts"
 
   run-lint:
-    command: "pnpm lint"
     excludePaths:
       - "**/e2e/accessibility.spec.ts"
-
-  run-typecheck:
-    command: "pnpm -r exec tsc --noEmit"
-
-  test-coverage:
-    mode: error
-
-  run-tests:
-    command: "node devbox test"
 
   run-build:
     mode: error
     command: "pnpm --filter @hak/frontend build"
 
-  plan-validation: {}
-
   jscpd:
     mode: "off"
-    excludePaths:
-      - "**/node_modules/**"
-      - "**/dist/**"
-      - "**/coverage/**"
-      - "**/test/fixtures/**"
-      - "**/*.min.js"
-      - "**/*.java"
-      - "**/build/reports/**"
-      - "**/sandboxes/**"
 
   source-size:
     excludePaths:
-      # Build artifacts and reports
       - "**/eslint.base.config.mjs"
-      - "**/*.generated.ts"
-      - "**/.stryker-tmp/**"
       - "**/.old-frontend/**"
-      - "**/.esbuild/**"
-      - "**/.serverless/**"
-      - "**/audit-results.json"
-      - "**/jscpd-report.json"
-      - "**/cucumber-results.json"
-      - "**/coverage-summary.json"
-      - "**/.nyc_output/**"
-      - "**/cucumber-report.json"
       - "**/tts-worker/**/*.py"
       - "**/tts-worker/tools/**/*"
       - "**/tts-worker/merlin/**/*"
       - "**/styles/**/*.scss"
       - "**/styles/*.scss"
-      # Test files still over 400L (TODO: split these)
       - "**/useSynthesis.test.ts"
       - "**/SentenceSynthesisItem.test.tsx"
       - "**/useSynthesisOrchestrator.test.ts"
@@ -223,47 +135,14 @@ hooks:
     mode: warning
     auditLevel: critical
 
-  secret-detection:
-    required: true
-
-  dependency-check: {}
-
-  import-order: {}
-
-  no-any: {}
-
-  no-floating-promises: {}
-
   license-check:
     mode: error
 
   bundle-size:
     mode: off
 
-  docker-lint:
-    excludePaths:
-      - "**/node_modules/**"
-
-  iac-security:
-    excludePaths:
-      - "**/node_modules/**"
-
   no-hardcoded-env:
     mode: off
-    domains:
-      - "askend-lab.com"
-    checkAwsAccountId: true
-    excludePaths:
-      - ".github/workflows/**"
-      - "**/node_modules/**"
-      - "**/*.test.*"
-      - "**/*.spec.*"
-      - "**/test/**"
-      - "**/__tests__/**"
-      - "**/coverage/**"
-      - "**/dist/**"
-      - "**/devbox.yaml"
-      - "**/defaults.yaml"
 
   circular-deps:
     paths:
@@ -275,11 +154,3 @@ hooks:
       - "packages/tts-api/src"
       - "packages/morphology-api/src"
       - "packages/gherkin-parser/src"
-
-  dead-code:
-    excludePaths:
-      - "**/node_modules/**"
-      - "**/*.test.ts"
-      - "**/*.spec.ts"
-
-# final
