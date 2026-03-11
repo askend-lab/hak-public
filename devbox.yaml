@@ -75,13 +75,7 @@ hooks:
       - "**/*.md"
 
   no-console:
-    excludePaths:
-      - "audio-worker/**"
-      - "**/audio-worker/**"
-      - "cli/**"
-      - "**/logger.ts"
-      - "**/local-server.ts"
-      - "**/a11y-dev.ts"
+    mode: off  # Already enforced by eslint.base.config.mjs (no-console: error)
 
   prettier-check:
     mode: off
@@ -140,6 +134,9 @@ hooks:
 
   bundle-size:
     mode: off
+
+  playwright:
+    mode: off  # 0 E2E tests — saves ~12s startup overhead
 
   no-hardcoded-env:
     mode: off
