@@ -41,7 +41,8 @@
     "noImplicitThis": true,
     "useUnknownInCatchVariables": true,
     "allowUnreachableCode": false,
-    "allowUnusedLabels": false
+    "allowUnusedLabels": false,
+    "incremental": true
   },
   "include": ["src", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test"],
   "exclude": []

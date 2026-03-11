@@ -19,7 +19,7 @@
     "test:full": "node devbox test --full",
     "test:all": "pnpm -r --workspace-concurrency=4 run test:full",
     "test:coverage": "jest --coverage --json --outputFile=tmp/jest-results.json",
-    "typecheck": "pnpm -r exec tsc --noEmit",
+    "typecheck": "pnpm -r --parallel exec tsc --noEmit",
     "lint": "eslint --cache --ext .js,.ts,.tsx . --max-warnings=0 && npx gherkin-lint 'packages/specifications/**/*.feature' && npx stylelint 'packages/frontend/src/styles/**/*.scss' && (cd packages/tts-worker && (test -x .venv/bin/mypy && .venv/bin/mypy worker.py tests/ --ignore-missing-imports || echo 'SKIP: mypy not installed (no .venv)'))",
     "check": "pnpm lint && pnpm typecheck && pnpm test:all",
     "postinstall": "git config core.hooksPath .githooks 2>/dev/null || true",
