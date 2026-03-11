@@ -19,8 +19,8 @@ export default defineConfig({
     globals: true,
     poolOptions: {
       threads: {
-        maxThreads: 10,
-        minThreads: 4,
+        maxThreads: 16,
+        minThreads: 8,
       },
     },
     setupFiles: ["./src/test/setup.ts"],
