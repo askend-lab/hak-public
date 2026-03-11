@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 cd "$(git rev-parse --show-toplevel)"
-exec dx hooks run pre-commit
+exec devbox hooks run pre-commit

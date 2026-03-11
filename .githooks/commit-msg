@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 cd "$(git rev-parse --show-toplevel)"
-exec dx hooks run commit-msg "$(cat "$1")"
+exec devbox hooks run commit-msg "$(cat "$1")"

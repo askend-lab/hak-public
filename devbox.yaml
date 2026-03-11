@@ -1,5 +1,5 @@
-# DevBox Configuration - extends defaults
-extends: '@askend-lab/devbox/defaults.yaml'
+# DevBox Configuration — extends Node.js layer
+extends: '@askend-lab/devbox/layers/node.yaml'
 
 project:
   name: "HAK"
