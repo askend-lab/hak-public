@@ -160,7 +160,7 @@ describe("useSynthesis", () => {
 
   it("should handle download fetch error", async () => {
     const consoleSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
-    vi.mocked(synthesizeWithPolling).mockResolvedValueOnce("mock-audio-url");
+    vi.mocked(synthesizeWithPolling).mockResolvedValueOnce({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" });
     global.fetch = vi.fn().mockRejectedValueOnce(new Error("fetch fail"));
 
     const { result } = renderHook(() => useSynthesis());

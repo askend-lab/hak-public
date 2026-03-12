@@ -82,8 +82,8 @@ describe("SentencePhoneticPanel", () => {
 
   it("plays audio on play button click", async () => {
     vi.mock("@/features/synthesis/utils/synthesize", () => ({
-      synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
-      synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
+      synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
+      synthesizeAuto: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
     }));
     class MockAudio {
       src = "";
@@ -110,8 +110,8 @@ describe("SentencePhoneticPanel", () => {
 
   it("handles audio onerror callback", async () => {
     vi.mock("@/features/synthesis/utils/synthesize", () => ({
-      synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
-      synthesizeAuto: vi.fn().mockResolvedValue("mock-audio-url"),
+      synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
+      synthesizeAuto: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
     }));
     class ErrorAudio {
       src = "";

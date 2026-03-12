@@ -18,7 +18,7 @@ vi.mock("@/features/synthesis/utils/phoneticMarkers", () => ({
   stripPhoneticMarkers: (text: string): string => text.replace(/[·`´]/g, ""),
 }));
 
-const mockSynthesize = vi.fn().mockResolvedValue("mock-audio-url");
+const mockSynthesize = vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" });
 vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: (): Promise<string> => mockSynthesize(),
 }));
@@ -27,7 +27,7 @@ describe("useSynthesis playback", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    mockSynthesize.mockResolvedValue("mock-audio-url");
+    mockSynthesize.mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" });
     class MockAudio {
       src = "";
       onended: (() => void) | null = null;

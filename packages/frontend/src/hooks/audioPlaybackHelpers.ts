@@ -39,9 +39,9 @@ async function doSynthesize(input: SynthesizeInput): Promise<void> {
   const { entry, id, logPrefix, dispatch } = input;
   dispatch({ type: "SET_LOADING", id });
   try {
-    const audioUrl = await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text));
-    const audio = new Audio(audioUrl);
-    attachSynthHandlers(audio, { audioUrl, id, logPrefix, dispatch });
+    const result = await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text));
+    const audio = new Audio(result.audioUrl);
+    attachSynthHandlers(audio, { audioUrl: result.audioUrl, id, logPrefix, dispatch });
     await audio.play();
   } catch (error) {
     logger.warn(`${logPrefix} playback failed:`, error);
@@ -70,9 +70,9 @@ export function synthesizeAndCreateAudio(input: SynthesizeInput): void {
 async function fetchAudioUrl(entry: TaskEntry, abortSignal: AbortSignal, dispatch: Dispatch): Promise<string | null> {
   dispatch({ type: "SET_LOADING", id: entry.id });
   try {
-    const url = await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text));
+    const result = await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text));
     if (abortSignal.aborted) { dispatch({ type: "CLEAR_LOADING" }); return null; }
-    return url;
+    return result.audioUrl;
   } catch (error) {
     logger.warn("Synthesis polling failed:", error);
     dispatch({ type: "CLEAR_LOADING" });

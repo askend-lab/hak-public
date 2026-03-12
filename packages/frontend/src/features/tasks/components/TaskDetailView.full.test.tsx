@@ -22,7 +22,7 @@ vi.mock("@/contexts/CopiedEntriesContext", () => ({
 }));
 
 vi.mock("@/features/synthesis/utils/synthesize", () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+  synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
 }));
 
 const mockTask = {

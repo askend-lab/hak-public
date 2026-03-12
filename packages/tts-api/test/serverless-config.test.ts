@@ -87,13 +87,13 @@ describe("serverless.yml — SEC-01 auth configuration", () => {
     expect(httpEvent?.httpApi?.authorizer).toBeDefined();
   });
 
-  it("should have authorizer on GET /status/{cacheKey} route", () => {
+  it("should NOT have authorizer on GET /status/{cacheKey} route (cached audio is public)", () => {
     const fn = config.functions.status;
     expect(fn).toBeDefined();
 
     const httpEvent = fn?.events?.find((e) => e.httpApi);
     expect(httpEvent).toBeDefined();
-    expect(httpEvent?.httpApi?.authorizer).toBeDefined();
+    expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
   it("should NOT have authorizer on GET /health route", () => {
@@ -105,12 +105,13 @@ describe("serverless.yml — SEC-01 auth configuration", () => {
     expect(httpEvent?.httpApi?.authorizer).toBeUndefined();
   });
 
-  it("should require auth on all routes except /health", () => {
+  it("should require auth on all routes except /health and /status/{cacheKey}", () => {
+    const publicPaths = ["/health", "/status/{cacheKey}"];
     for (const [_name, fn] of Object.entries(config.functions)) {
       for (const event of fn.events ?? []) {
-        const isHealth = event.httpApi?.path === "/health";
+        const isPublic = publicPaths.includes(event.httpApi?.path ?? "");
         const hasAuth = Boolean(event.httpApi?.authorizer);
-        if (isHealth) { expect(hasAuth).toBe(false); }
+        if (isPublic) { expect(hasAuth).toBe(false); }
         else if (event.httpApi) { expect(hasAuth).toBe(true); }
       }
     }

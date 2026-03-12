@@ -19,8 +19,8 @@ vi.mock("jszip", () => {
 });
 
 vi.mock("@/features/synthesis/utils/synthesize", () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
-  synthesizeAuto: vi.fn().mockResolvedValue("https://example.com/synthesized.wav"),
+  synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "https://example.com/synthesized.wav", cacheKey: "mock-cache-key" }),
+  synthesizeAuto: vi.fn().mockResolvedValue({ audioUrl: "https://example.com/synthesized.wav", cacheKey: "mock-cache-key" }),
 }));
 
 vi.mock("@/types/synthesis", () => ({

@@ -7,7 +7,7 @@ import { useSharedTaskAudio } from "./useSharedTaskAudio";
 import { TaskEntry } from "@/types/task";
 
 vi.mock("@/features/synthesis/utils/synthesize", () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue("mock-audio-url"),
+  synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
 }));
 
 vi.mock("@/types/synthesis", () => ({

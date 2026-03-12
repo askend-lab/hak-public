@@ -108,8 +108,6 @@ functions:
       - httpApi:
           path: /status/{cacheKey}
           method: GET
-          authorizer:
-            name: cognitoAuthorizer
 
   health:
     handler: src/handler.health

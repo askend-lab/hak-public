@@ -17,7 +17,7 @@ async function resolveAudioUrl(entry: TaskEntry): Promise<string | null> {
   if (entry.audioBlob && entry.audioBlob.size > 0) {return null;} // handled separately
   const existing = hasAudioSource(entry) ? entry.audioUrl : null;
   if (existing) {return existing;}
-  try { return await synthesizeAuto(entry.stressedText || entry.text); }
+  try { const result = await synthesizeAuto(entry.stressedText || entry.text); return result.audioUrl; }
   catch (err) { logger.warn("[ZIP] Synthesis failed for entry, skipping:", err); return null; }
 }
 
