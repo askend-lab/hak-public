@@ -141,6 +141,17 @@ export async function synthesizeWithPolling(text: string, voice: string, signal?
 }
 
 /**
+ * Compute a cache key client-side, mirroring the backend's generateCacheKey.
+ * Formula: SHA-256 of "text|voice|speed|pitch" with default speed=1, pitch=0.
+ */
+export async function computeCacheKey(text: string, voice: string): Promise<string> {
+  const input = `${text}|${voice}|1|0`;
+  const buffer = new TextEncoder().encode(input);
+  const hash = await crypto.subtle.digest("SHA-256", buffer);
+  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/**
  * Check if audio is already cached and return URL without requiring auth.
  * Returns null if not cached (caller should then require login for synthesis).
  */
