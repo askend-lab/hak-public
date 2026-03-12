@@ -38,7 +38,7 @@ describe("synthesize", () => {
       });
 
       const result = await synthesizeWithPolling("hello", "efm_l");
-      expect(result).toBe("http://example.com/audio.wav");
+      expect(result).toEqual({ audioUrl: "http://example.com/audio.wav", cacheKey: "test-key" });
     });
 
     it("returns audioUrl when status is ready", async () => {
@@ -53,7 +53,7 @@ describe("synthesize", () => {
       });
 
       const result = await synthesizeWithPolling("hello", "efm_l");
-      expect(result).toBe("http://example.com/audio.wav");
+      expect(result).toEqual({ audioUrl: "http://example.com/audio.wav", cacheKey: "test-key" });
     });
 
     it("throws error when synthesis request fails", async () => {
@@ -99,7 +99,7 @@ describe("synthesize", () => {
       await vi.advanceTimersByTimeAsync(2000);
 
       const result = await promise;
-      expect(result).toBe("http://example.com/audio.wav");
+      expect(result).toEqual({ audioUrl: "http://example.com/audio.wav", cacheKey: "test-key" });
 
       vi.useRealTimers();
     });
@@ -134,7 +134,7 @@ describe("synthesize", () => {
       await vi.advanceTimersByTimeAsync(2000);
       await vi.advanceTimersByTimeAsync(2000);
       const result = await promise;
-      expect(result).toBe("http://example.com/audio.wav");
+      expect(result).toEqual({ audioUrl: "http://example.com/audio.wav", cacheKey: "test-key" });
 
       vi.useRealTimers();
     });

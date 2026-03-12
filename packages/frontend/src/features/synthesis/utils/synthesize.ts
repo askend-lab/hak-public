@@ -49,14 +49,14 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => { setTimeout(resolve, ms); });
 }
 
-function buildStatusOpts(token: string, signal?: AbortSignal): RequestInit {
+function buildStatusOpts(token?: string, signal?: AbortSignal): RequestInit {
   return {
     ...(signal && { signal }),
-    headers: { Authorization: `Bearer ${token}` },
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   };
 }
 
-async function fetchStatus(cacheKey: string, token: string, signal?: AbortSignal): Promise<StatusResponse | null> {
+async function fetchStatus(cacheKey: string, token?: string, signal?: AbortSignal): Promise<StatusResponse | null> {
   const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, buildStatusOpts(token, signal));
   if (response.status === 401) {throw new AuthRequiredError();}
   checkApiErrorStatus(response.status);
@@ -67,7 +67,7 @@ async function fetchStatus(cacheKey: string, token: string, signal?: AbortSignal
   return response.json();
 }
 
-async function safeFetchStatus(cacheKey: string, token: string, signal?: AbortSignal): Promise<StatusResponse | null> {
+async function safeFetchStatus(cacheKey: string, token?: string, signal?: AbortSignal): Promise<StatusResponse | null> {
   try { return await fetchStatus(cacheKey, token, signal); }
   catch (err) { if (err instanceof TypeError) {return null;} throw err; }
 }
@@ -82,7 +82,7 @@ function handlePollResult(data: StatusResponse): string | null {
   return null;
 }
 
-async function pollForAudio(cacheKey: string, token: string, signal?: AbortSignal): Promise<string> {
+async function pollForAudio(cacheKey: string, token?: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     checkAborted(signal);
     const data = await safeFetchStatus(cacheKey, token, signal); // eslint-disable-line no-await-in-loop -- sequential polling
@@ -99,7 +99,12 @@ async function pollForAudio(cacheKey: string, token: string, signal?: AbortSigna
  * Synthesize with automatic voice model selection.
  * Combines synthesizeWithPolling + getVoiceModel to avoid repeated pattern.
  */
-export async function synthesizeAuto(text: string, signal?: AbortSignal): Promise<string> {
+interface SynthesizeResult {
+  audioUrl: string;
+  cacheKey: string;
+}
+
+export async function synthesizeAuto(text: string, signal?: AbortSignal): Promise<SynthesizeResult> {
   return synthesizeWithPolling(text, getVoiceModel(text), signal);
 }
 
@@ -125,11 +130,23 @@ function checkSynthResponse(response: Response): void {
   }
 }
 
-export async function synthesizeWithPolling(text: string, voice: string, signal?: AbortSignal): Promise<string> {
+export async function synthesizeWithPolling(text: string, voice: string, signal?: AbortSignal): Promise<SynthesizeResult> {
   const token = requireAuth();
   const response = await postJSON(SYNTHESIZE_API_PATH, { text, voice }, buildSynthOpts(signal));
   checkSynthResponse(response);
   const data: SynthesizeResponse = await response.json();
-  if (isReady(data)) {return data.audioUrl;}
-  return pollForAudio(data.cacheKey, token, signal);
+  if (isReady(data)) {return { audioUrl: data.audioUrl, cacheKey: data.cacheKey };}
+  const audioUrl = await pollForAudio(data.cacheKey, token, signal);
+  return { audioUrl, cacheKey: data.cacheKey };
+}
+
+/**
+ * Check if audio is already cached and return URL without requiring auth.
+ * Returns null if not cached (caller should then require login for synthesis).
+ */
+export async function checkCachedAudio(cacheKey: string, signal?: AbortSignal): Promise<string | null> {
+  const token = AuthStorage.getAccessToken() ?? undefined;
+  const data = await safeFetchStatus(cacheKey, token, signal);
+  if (data?.status === "ready" && data.audioUrl) {return data.audioUrl;}
+  return null;
 }

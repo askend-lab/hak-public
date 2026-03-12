@@ -57,7 +57,7 @@ function useVariantAudio() {
     if (playingVariant === variant.text) { stopCurrentAudio(); setPlayingVariant(null); return; }
     stopCurrentAudio(); setIsCustomPlaying(false); setLoadingVariant(variant.text); setPlayingVariant(null);
     try {
-      const audioUrl = await synthesizeAuto(variant.text);
+      const { audioUrl } = await synthesizeAuto(variant.text);
       const { audio } = createAudioPlayer(audioUrl, {
         onLoaded: () => { setLoadingVariant(null); setPlayingVariant(variant.text); },
         onEnded: resetVariant, onError: resetVariant,
@@ -68,7 +68,7 @@ function useVariantAudio() {
   };
 
   const doPlayCustom = async (text: string) => {
-    const audioUrl = await synthesizeAuto(text);
+    const { audioUrl } = await synthesizeAuto(text);
     const { audio } = createAudioPlayer(audioUrl, {
       onLoaded: () => { setIsCustomLoading(false); setIsCustomPlaying(true); },
       onEnded: resetCustom, onError: resetCustom,

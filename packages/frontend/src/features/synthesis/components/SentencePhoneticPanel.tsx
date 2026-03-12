@@ -93,7 +93,7 @@ function usePhoneticAudio() {
   const startPlayback = async (text: string) => {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     setIsLoading(true); setIsPlaying(false);
-    const url = await synthesizeAuto(transformToVabamorf(text) || "");
+    const { audioUrl: url } = await synthesizeAuto(transformToVabamorf(text) || "");
     const { audio } = createAudioPlayer(url, { onLoaded: () => { setIsLoading(false); setIsPlaying(true); }, onEnded: reset, onError: reset });
     audioRef.current = audio; // eslint-disable-line require-atomic-updates -- ref is only accessed from UI thread
     await audio.play();
