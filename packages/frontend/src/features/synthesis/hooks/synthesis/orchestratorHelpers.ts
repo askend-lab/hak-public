@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { convertTextToTags, CACHE_INVALIDATION, type SentenceState } from "@/types/synthesis";
+import { convertTextToTags, CACHE_INVALIDATION, getVoiceModel, type SentenceState } from "@/types/synthesis";
 import { logger } from "@hak/shared";
 import * as Sentry from "@sentry/react";
-import { checkCachedAudio } from "@/features/synthesis/utils/synthesize";
+import { checkCachedAudio, computeCacheKey } from "@/features/synthesis/utils/synthesize";
 import type { useSynthesisAPI } from "./useSynthesisAPI";
 import type { useAudioPlayer } from "./useAudioPlayer";
 
@@ -42,9 +42,17 @@ interface ResolveOpts {
   readonly abortSignal?: AbortSignal | undefined;
 }
 
+async function resolveCacheKey(sentence: SentenceState): Promise<string | null> {
+  if (sentence.cacheKey) {return sentence.cacheKey;}
+  if (!sentence.text.trim()) {return null;}
+  try { return await computeCacheKey(sentence.text, getVoiceModel(sentence.text)); }
+  catch { return null; }
+}
+
 async function tryBackendCache(sentence: SentenceState): Promise<string | null> {
-  if (!sentence.cacheKey) {return null;}
-  try { return await checkCachedAudio(sentence.cacheKey); }
+  const cacheKey = await resolveCacheKey(sentence);
+  if (!cacheKey) {return null;}
+  try { return await checkCachedAudio(cacheKey); }
   catch { return null; }
 }
 
@@ -186,6 +194,12 @@ export async function doSynthesizeAndPlay(deps: OrchestratorDeps, id: string, re
   if (!sentence?.text.trim()) {return;}
   deps.stopCurrentAudio();
   if (await tryPlayFromCache(deps, { id, sentence, retryCount })) {return;}
+  const cachedUrl = await tryBackendCache(sentence);
+  if (cachedUrl) {
+    deps.updateSentence(id, { tags: convertTextToTags(sentence.text), audioUrl: cachedUrl });
+    await tryCachedPlayback(deps, { id, audioUrl: cachedUrl, retryCount, retrySelf: () => { void doSynthesizeAndPlay(deps, id, retryCount + 1); } });
+    return;
+  }
   await synthesizeFromScratch(deps, sentence);
 }
 
