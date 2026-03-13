@@ -154,10 +154,14 @@ export async function computeCacheKey(text: string, voice: string): Promise<stri
 /**
  * Check if audio is already cached and return URL without requiring auth.
  * Returns null if not cached (caller should then require login for synthesis).
+ * IMPORTANT: Never throws AuthRequiredError — treats 401 as cache miss.
  */
 export async function checkCachedAudio(cacheKey: string, signal?: AbortSignal): Promise<string | null> {
-  const token = AuthStorage.getAccessToken() ?? undefined;
-  const data = await safeFetchStatus(cacheKey, token, signal);
-  if (data?.status === "ready" && data.audioUrl) {return data.audioUrl;}
-  return null;
+  try {
+    const response = await fetch(`${STATUS_API_PATH}/${cacheKey}`, { ...(signal && { signal }) });
+    if (!response.ok) {return null;}
+    const data: StatusResponse = await response.json();
+    if (data?.status === "ready" && data.audioUrl) {return data.audioUrl;}
+    return null;
+  } catch { return null; }
 }
