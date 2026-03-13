@@ -117,10 +117,18 @@ describe("serverless.yml — SEC-01 auth configuration", () => {
     }
   });
 
-  it("should not have AuthorizationType NONE override (removed in SEC-01)", () => {
+  it("should not have AuthorizationType NONE override for /synthesize (removed in SEC-01)", () => {
     const resources = config.resources?.Resources;
     const synthRoute = resources?.["HttpApiRoutePostSynthesize"];
     expect(synthRoute).toBeUndefined();
+  });
+
+  it("should have explicit CFN override forcing AuthorizationType NONE on /status route", () => {
+    const resources = config.resources?.Resources;
+    const statusRoute = resources?.["HttpApiRouteGetStatusCachekeyVar"];
+    expect(statusRoute).toBeDefined();
+    expect(statusRoute?.Type).toBe("AWS::ApiGatewayV2::Route");
+    expect(statusRoute?.Properties?.AuthorizationType).toBe("NONE");
   });
 
   it("should include Authorization in CORS allowedHeaders", () => {
