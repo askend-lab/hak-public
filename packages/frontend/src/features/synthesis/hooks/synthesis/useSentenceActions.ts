@@ -68,7 +68,7 @@ export function useSentenceActions(deps: UseSentenceActionsDeps) {
     if (!sentence) {return;}
     let audioUrl = sentence.audioUrl;
     if (!audioUrl) {
-      try { const result = await synthesizeAuto(sentence.text); audioUrl = result.audioUrl; deps.updateSentence(id, { audioUrl, cacheKey: result.cacheKey }); }
+      try { const result = await synthesizeAuto(sentence.text); audioUrl = result.audioUrl; deps.updateSentence(id, { audioUrl }); }
       catch (error) { logger.error("Failed to generate audio:", error); return; }
     }
     if (audioUrl) { try { await downloadAudioBlob(audioUrl, sentence.text); } catch (error) { logger.error("Failed to download audio:", error); } }

@@ -19,7 +19,7 @@ vi.mock("@/features/synthesis/utils/synthesize", async (importOriginal) => {
 
 describe("orchestratorHelpers incognito scenario", () => {
   let mockSentenceState: {
-    sentences: { id: string; text: string; tags: string[]; audioUrl?: string | null; phoneticText?: string | null; cacheKey?: string | null }[];
+    sentences: { id: string; text: string; tags: string[]; audioUrl?: string | null; phoneticText?: string | null }[];
     updateSentence: Mock; getSentence: Mock;
   };
   let mockAudioPlayer: { currentAudio: HTMLAudioElement | null; stopCurrentAudio: Mock; playAudio: Mock; playWithAbort: Mock };
@@ -28,7 +28,7 @@ describe("orchestratorHelpers incognito scenario", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     mockSentenceState = {
-      sentences: [{ id: "s1", text: "läks", tags: ["läks"], audioUrl: null, phoneticText: null, cacheKey: null }],
+      sentences: [{ id: "s1", text: "läks", tags: ["läks"], audioUrl: null, phoneticText: null }],
       updateSentence: vi.fn(),
       getSentence: vi.fn((id: string) => mockSentenceState.sentences.find((s) => s.id === id)),
     };

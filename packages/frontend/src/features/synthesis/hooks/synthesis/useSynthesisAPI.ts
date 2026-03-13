@@ -11,7 +11,6 @@ import { checkApiErrorStatus } from "@/utils/apiErrorEvents";
 interface SynthesisResult {
   audioUrl: string;
   phoneticText: string;
-  cacheKey?: string | undefined;
   stressedTags?: string[] | undefined;
 }
 
@@ -36,7 +35,7 @@ export function useSynthesisAPI() {
   const synthesizeText = useCallback(async (text: string, phoneticText?: string): Promise<SynthesisResult> => {
     const { actualPhoneticText, stressedTags } = await resolvePhonetic(analyzeText, text, phoneticText);
     const result = await synthesizeAuto(actualPhoneticText);
-    return { audioUrl: result.audioUrl, cacheKey: result.cacheKey, phoneticText: actualPhoneticText, stressedTags };
+    return { audioUrl: result.audioUrl, phoneticText: actualPhoneticText, stressedTags };
   }, [analyzeText]);
 
   const synthesizeWithCache = useCallback(async (text: string, cachedPhonetic?: string | null, cachedAudio?: string | null): Promise<SynthesisResult> => {

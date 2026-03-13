@@ -10,7 +10,6 @@ export type SentenceState = {
   currentInput: string;
   phoneticText?: string | null | undefined;
   audioUrl?: string | null | undefined;
-  cacheKey?: string | null | undefined;
   stressedTags?: string[] | null | undefined;
 };
 
@@ -113,8 +112,7 @@ export function filterNonEmptySentences<T extends { text: string }>(
  * Standard updates to invalidate cached synthesis results.
  * Used when text/tags change and audio needs re-synthesis.
  */
-export const CACHE_INVALIDATION: Pick<SentenceState, "phoneticText" | "audioUrl" | "cacheKey"> = {
+export const CACHE_INVALIDATION: Pick<SentenceState, "phoneticText" | "audioUrl"> = {
   phoneticText: undefined,
   audioUrl: undefined,
-  cacheKey: undefined,
 };

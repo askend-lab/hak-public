@@ -19,7 +19,6 @@ const ensureSentenceState = (
   ...sentence,
   phoneticText: sentence.phoneticText ?? null,
   audioUrl: sentence.audioUrl ?? null,
-  cacheKey: sentence.cacheKey ?? null,
   stressedTags: sentence.stressedTags ?? null,
 });
 
@@ -32,7 +31,6 @@ const createEmptySentence = (id: string): SentenceState => ({
   currentInput: "",
   phoneticText: null,
   audioUrl: null,
-  cacheKey: null,
   stressedTags: null,
 });
 
@@ -49,7 +47,6 @@ const sanitizeForStorage = (
     currentInput: s.currentInput,
     phoneticText: s.phoneticText,
     audioUrl: s.audioUrl,
-    cacheKey: s.cacheKey,
     stressedTags: s.stressedTags,
     // Intentionally omit isPlaying and isLoading - these are transient UI state
   }));
@@ -98,7 +95,6 @@ const restoreFromStorage = (
       currentInput: s.currentInput || "",
       phoneticText: s.phoneticText,
       audioUrl: s.audioUrl,
-      cacheKey: s.cacheKey,
       stressedTags: s.stressedTags,
     }),
   );
@@ -122,7 +118,7 @@ const loadInitialState = (): SentenceState[] => {
 
 type SetSentences = React.Dispatch<React.SetStateAction<SentenceState[]>>;
 
-const CLEARED: Partial<SentenceState> = { tags: [], currentInput: "", text: "", stressedTags: null, phoneticText: null, audioUrl: null, cacheKey: null };
+const CLEARED: Partial<SentenceState> = { tags: [], currentInput: "", text: "", stressedTags: null, phoneticText: null, audioUrl: null };
 const mapInput = (id: string, v: string) => (s: SentenceState) => s.id === id ? { ...s, currentInput: v } : s;
 const mapClear = (id: string) => (s: SentenceState) => s.id === id ? { ...s, ...CLEARED } : s;
 const mapUpdate = (id: string, u: Partial<SentenceState>) => (s: SentenceState) => s.id === id ? { ...s, ...u } : s;
