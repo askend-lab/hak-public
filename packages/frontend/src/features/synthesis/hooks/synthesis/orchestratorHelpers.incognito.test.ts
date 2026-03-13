@@ -65,6 +65,25 @@ describe("orchestratorHelpers incognito scenario", () => {
     expect(mockAudioPlayer.playAudio).toHaveBeenCalledWith("http://cached-audio.wav", expect.any(Object));
   });
 
+  it("synthesizeWithText should check backend cache before requiring auth (incognito: typed cached word)", async () => {
+    // Simulate incognito: user types a word that IS cached on backend, clicks play
+    // playWithInput calls synthesizeWithText → doSynthesizeWithText
+    // Bug: doSynthesizeWithText skips backend cache → goes to freshSynthesize → requireAuth → login dialog
+    mockCheckCachedAudio.mockResolvedValueOnce("http://cached-audio.wav");
+
+    const { result } = renderHook(() => useSynthesisOrchestrator());
+    await act(async () => { await result.current.synthesizeWithText("s1", "läks"); });
+
+    // checkCachedAudio should have been called with a computed cacheKey
+    expect(mockCheckCachedAudio).toHaveBeenCalled();
+    const calledKey = mockCheckCachedAudio.mock.calls[0]?.[0];
+    expect(calledKey).toMatch(/^[a-f0-9]{64}$/);
+
+    // Should play the cached audio WITHOUT calling synthesizeText (which requires auth)
+    expect(mockSynthesisAPI.synthesizeText).not.toHaveBeenCalled();
+    expect(mockAudioPlayer.playAudio).toHaveBeenCalledWith("http://cached-audio.wav", expect.any(Object));
+  });
+
   it("synthesizeAndPlay should fall through to synthesis when backend cache misses", async () => {
     // Backend cache returns null (not cached)
     mockCheckCachedAudio.mockResolvedValueOnce(null);
