@@ -51,6 +51,10 @@ function getAuthHeaders(): Record<string, string> {
   return { Authorization: `Bearer ${token}` };
 }
 
+export function authPostJSON(url: string, body: Record<string, unknown>, options?: RequestInit): Promise<Response> {
+  return postJSON(url, body, { ...options, headers: { ...getAuthHeaders(), ...options?.headers as Record<string, string> } });
+}
+
 async function parseAnalyzeResponse(response: Response): Promise<string | null> {
   if (response.status === 401) {throw new AuthRequiredError();}
   checkApiErrorStatus(response.status);

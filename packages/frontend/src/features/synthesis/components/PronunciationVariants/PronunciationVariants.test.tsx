@@ -10,6 +10,10 @@ import PronunciationVariants from "./PronunciationVariants";
 vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
   synthesizeAuto: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
+  AuthRequiredError: class AuthRequiredError extends Error { constructor() { super("Authentication required"); this.name = "AuthRequiredError"; } },
+}));
+vi.mock("@/features/auth/services/storage", () => ({
+  AuthStorage: { getAccessToken: vi.fn().mockReturnValue("test-token") },
 }));
 vi.mock("@/features/synthesis/utils/audioPlayer", () => ({
   createAudioPlayer: vi.fn(() => ({
