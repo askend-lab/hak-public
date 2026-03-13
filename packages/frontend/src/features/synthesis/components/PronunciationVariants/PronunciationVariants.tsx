@@ -8,7 +8,7 @@ import { synthesizeAuto } from "@/features/synthesis/utils/synthesize";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { createAudioPlayer } from "@/features/synthesis/utils/audioPlayer";
 import { logger } from "@hak/shared";
-import { postJSON, VARIANTS_API_PATH } from "@/features/synthesis/utils/analyzeApi";
+import { authPostJSON, VARIANTS_API_PATH } from "@/features/synthesis/utils/analyzeApi";
 import { checkApiErrorStatus } from "@/utils/apiErrorEvents";
 import { CloseIcon } from "@/components/ui/Icons";
 import PhoneticGuide from "./PhoneticGuide";
@@ -95,7 +95,7 @@ function useVariantsFetch(word: string | null, isOpen: boolean) {
   useEffect(() => {
     if (!word || !isOpen) {return;}
     setIsLoading(true); setError(null);
-    postJSON(VARIANTS_API_PATH, { word })
+    authPostJSON(VARIANTS_API_PATH, { word })
       .then(async (response) => {
         checkApiErrorStatus(response.status);
         if (!response.ok) {throw new Error("Failed to fetch variants");}

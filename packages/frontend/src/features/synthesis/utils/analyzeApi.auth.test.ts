@@ -82,6 +82,28 @@ describe("analyzeApi — auth gating (SEC-01)", () => {
     });
   });
 
+  describe("T-F7b: authPostJSON sends auth header automatically", () => {
+    it("includes Authorization header without manual header passing", async () => {
+      const { authPostJSON } = await import("./analyzeApi");
+      vi.mocked(AuthStorage.getAccessToken).mockReturnValue("auto-token");
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ variants: [] }),
+      });
+
+      await authPostJSON("/api/variants", { word: "test" });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        "/api/variants",
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: "Bearer auto-token",
+          }),
+        }),
+      );
+    });
+  });
+
   describe("T-F8: 401 response triggers auth error", () => {
     it("throws AuthRequiredError on 401 from analyze endpoint", async () => {
       vi.mocked(AuthStorage.getAccessToken).mockReturnValue("expired-token");
