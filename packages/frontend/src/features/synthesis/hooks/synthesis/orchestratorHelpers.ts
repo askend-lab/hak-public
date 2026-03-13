@@ -42,25 +42,19 @@ interface ResolveOpts {
   readonly abortSignal?: AbortSignal | undefined;
 }
 
-async function resolveCacheKey(sentence: SentenceState): Promise<string | null> {
-  if (sentence.cacheKey) {return sentence.cacheKey;}
-  if (!sentence.text.trim()) {return null;}
-  try { return await computeCacheKey(sentence.text, getVoiceModel(sentence.text)); }
-  catch { return null; }
-}
-
 async function tryBackendCache(sentence: SentenceState): Promise<string | null> {
-  const cacheKey = await resolveCacheKey(sentence);
-  if (!cacheKey) {return null;}
-  try { return await checkCachedAudio(cacheKey); }
-  catch { return null; }
+  if (!sentence.text.trim()) {return null;}
+  try {
+    const cacheKey = await computeCacheKey(sentence.text, getVoiceModel(sentence.text));
+    return await checkCachedAudio(cacheKey);
+  } catch { return null; }
 }
 
-async function fetchAudioUrl(deps: OrchestratorDeps, sentence: SentenceState): Promise<{ audioUrl: string; cacheKey?: string | undefined }> {
+async function fetchAudioUrl(deps: OrchestratorDeps, sentence: SentenceState): Promise<string> {
   const cached = await tryBackendCache(sentence);
-  if (cached) {return { audioUrl: cached, cacheKey: sentence.cacheKey ?? undefined };}
+  if (cached) {return cached;}
   const r = await deps.synthesisAPI.synthesizeWithCache(sentence.text, sentence.phoneticText ?? undefined);
-  return { audioUrl: r.audioUrl, cacheKey: r.cacheKey };
+  return r.audioUrl;
 }
 
 async function resolveAudioUrl(deps: OrchestratorDeps, opts: ResolveOpts): Promise<string | null> {
@@ -71,10 +65,10 @@ async function resolveAudioUrl(deps: OrchestratorDeps, opts: ResolveOpts): Promi
 }
 
 async function fetchAndStore(deps: OrchestratorDeps, opts: ResolveOpts): Promise<string | null> {
-  const result = await fetchAudioUrl(deps, opts.sentence);
+  const audioUrl = await fetchAudioUrl(deps, opts.sentence);
   if (opts.abortSignal?.aborted) {return null;}
-  deps.updateSentence(opts.id, { audioUrl: result.audioUrl, cacheKey: result.cacheKey });
-  return result.audioUrl;
+  deps.updateSentence(opts.id, { audioUrl });
+  return audioUrl;
 }
 
 interface PlaybackRetryOpts {
@@ -147,8 +141,8 @@ async function tryCachedPlayback(deps: OrchestratorDeps, opts: CacheOpts): Promi
   }
 }
 
-function buildSynthUpdates(tags: string[], result: { audioUrl: string; cacheKey?: string | undefined; phoneticText: string; stressedTags?: string[] | undefined }): Partial<SentenceState> {
-  const u: Partial<SentenceState> = { isLoading: false, isPlaying: true, phoneticText: result.phoneticText, audioUrl: result.audioUrl, cacheKey: result.cacheKey };
+function buildSynthUpdates(tags: string[], result: { audioUrl: string; phoneticText: string; stressedTags?: string[] | undefined }): Partial<SentenceState> {
+  const u: Partial<SentenceState> = { isLoading: false, isPlaying: true, phoneticText: result.phoneticText, audioUrl: result.audioUrl };
   if (result.stressedTags?.length === tags.length) { u.stressedTags = result.stressedTags; }
   return u;
 }
