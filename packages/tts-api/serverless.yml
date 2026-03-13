@@ -120,6 +120,12 @@ functions:
 
 
 resources:
+  Resources:
+    # Force-remove JWT authorizer from status route (CFN doesn't remove omitted auth properties)
+    HttpApiRouteGetStatusCachekeyVar:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        AuthorizationType: NONE
   Outputs:
     ApiEndpoint:
       Description: Merlin API Gateway endpoint URL
