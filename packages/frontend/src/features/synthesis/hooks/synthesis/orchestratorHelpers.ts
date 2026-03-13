@@ -42,16 +42,16 @@ interface ResolveOpts {
   readonly abortSignal?: AbortSignal | undefined;
 }
 
-async function tryBackendCache(sentence: SentenceState): Promise<string | null> {
-  if (!sentence.text.trim()) {return null;}
+async function tryBackendCache(text: string): Promise<string | null> {
+  if (!text.trim()) {return null;}
   try {
-    const cacheKey = await computeCacheKey(sentence.text, getVoiceModel(sentence.text));
+    const cacheKey = await computeCacheKey(text, getVoiceModel(text));
     return await checkCachedAudio(cacheKey);
   } catch { return null; }
 }
 
 async function fetchAudioUrl(deps: OrchestratorDeps, sentence: SentenceState): Promise<string> {
-  const cached = await tryBackendCache(sentence);
+  const cached = await tryBackendCache(sentence.text);
   if (cached) {return cached;}
   const r = await deps.synthesisAPI.synthesizeWithCache(sentence.text, sentence.phoneticText ?? undefined);
   return r.audioUrl;
@@ -183,17 +183,22 @@ async function synthesizeFromScratch(deps: OrchestratorDeps, sentence: SentenceS
   catch (error) { logger.error("Failed to synthesize:", error); Sentry.captureException(error, { tags: { synthesis: "fresh" } }); deps.updateSentence(id, { isLoading: false, isPlaying: false }); }
 }
 
+interface BackendCacheOpts { readonly id: string; readonly text: string; readonly retryCount: number; readonly retrySelf: () => void }
+
+async function tryPlayFromBackendCache(deps: OrchestratorDeps, opts: BackendCacheOpts): Promise<boolean> {
+  const cachedUrl = await tryBackendCache(opts.text);
+  if (!cachedUrl) {return false;}
+  deps.updateSentence(opts.id, { tags: convertTextToTags(opts.text), audioUrl: cachedUrl });
+  await tryCachedPlayback(deps, { id: opts.id, audioUrl: cachedUrl, retryCount: opts.retryCount, retrySelf: opts.retrySelf });
+  return true;
+}
+
 export async function doSynthesizeAndPlay(deps: OrchestratorDeps, id: string, retryCount = 0): Promise<void> {
   const sentence = deps.sentencesRef.current.find((s) => s.id === id);
   if (!sentence?.text.trim()) {return;}
   deps.stopCurrentAudio();
   if (await tryPlayFromCache(deps, { id, sentence, retryCount })) {return;}
-  const cachedUrl = await tryBackendCache(sentence);
-  if (cachedUrl) {
-    deps.updateSentence(id, { tags: convertTextToTags(sentence.text), audioUrl: cachedUrl });
-    await tryCachedPlayback(deps, { id, audioUrl: cachedUrl, retryCount, retrySelf: () => { void doSynthesizeAndPlay(deps, id, retryCount + 1); } });
-    return;
-  }
+  if (await tryPlayFromBackendCache(deps, { id, text: sentence.text, retryCount, retrySelf: () => { void doSynthesizeAndPlay(deps, id, retryCount + 1); } })) {return;}
   await synthesizeFromScratch(deps, sentence);
 }
 
@@ -215,9 +220,10 @@ async function tryCachedText(deps: OrchestratorDeps, opts: SynthTextOpts): Promi
 }
 
 export async function doSynthesizeWithText(deps: OrchestratorDeps, opts: SynthTextOpts): Promise<void> {
-  const { id, text } = opts;
+  const { id, text, retryCount = 0 } = opts;
   deps.stopCurrentAudio();
   if (await tryCachedText(deps, opts)) {return;}
+  if (await tryPlayFromBackendCache(deps, { id, text, retryCount, retrySelf: () => { void doSynthesizeWithText(deps, opts); } })) {return;}
   const sentence = deps.getSentence(id);
   deps.updateSentence(id, { isLoading: true, isPlaying: false });
   try { await freshSynthesize(deps, { id, text, phoneticHint: sentence?.phoneticText || undefined }); }
