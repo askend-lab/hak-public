@@ -14,6 +14,26 @@ const mockShowNotification = vi.fn();
 const mockSetCopiedEntries = vi.fn();
 const mockDS = createMockDataService({ getTaskByShareToken: mockGetTaskByShareToken });
 
+let mockIsAuthenticated = false;
+const mockSetShowLoginModal = vi.fn();
+vi.mock("@/features/auth/services", () => ({
+  useAuth: vi.fn(() => ({
+    isAuthenticated: mockIsAuthenticated,
+    user: mockIsAuthenticated ? { id: "1", name: "Test", email: "t@t.com" } : null,
+    showLoginModal: false,
+    setShowLoginModal: mockSetShowLoginModal,
+  })),
+}));
+
+vi.mock("@/features/auth/services/storage", () => ({
+  saveReturnUrl: vi.fn(),
+}));
+
+vi.mock("@/features/auth/components/LoginModal", () => ({
+  default: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? <div data-testid="login-modal">LoginModal</div> : null,
+}));
+
 vi.mock("@/contexts/CopiedEntriesContext", () => ({
   useCopiedEntries: () => ({
     copiedEntries: null,
@@ -99,6 +119,7 @@ vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
 describe("SharedTaskPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockIsAuthenticated = false;
   });
 
   const renderWithRouter = (token: string) => {
@@ -112,7 +133,8 @@ describe("SharedTaskPage", () => {
     );
   };
 
-  it("sets copied entries via context when Kopeeri button clicked", async () => {
+  it("sets copied entries via context when Kopeeri button clicked (authenticated)", async () => {
+    mockIsAuthenticated = true;
     const user = userEvent.setup();
     const mockTask = {
       id: "task-1",

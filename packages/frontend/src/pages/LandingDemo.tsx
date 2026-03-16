@@ -55,23 +55,70 @@ function useTypingEffect(active: boolean, text: string, speed: number): string {
   return displayed;
 }
 
-export default function LandingDemo() {
+function DemoSentence({ typedText, showTags, showTagSelected, showPlayPulse }: {
+  typedText: string; showTags: boolean; showTagSelected: boolean; showPlayPulse: boolean;
+}) {
+  return (
+    <div className="landing-demo__sentence">
+      {!showTags && (
+        <div className="landing-demo__input">
+          <span className="landing-demo__typed-text">{typedText}</span>
+          <span className="landing-demo__cursor" />
+        </div>
+      )}
+      {showTags && (
+        <div className="landing-demo__tags">
+          {DEMO_TAGS.map((tag, i) => (
+            <span key={tag}
+              className={`landing-demo__tag ${showTagSelected && i === VARIANT_TAG_INDEX ? "landing-demo__tag--selected" : ""}`}
+              style={{ animationDelay: `${i * 80}ms` }}>{tag}</span>
+          ))}
+        </div>
+      )}
+      <div className={`landing-demo__play-btn ${showPlayPulse ? "landing-demo__play-btn--pulse" : ""}`}>
+        <PlayIcon size="2xl" />
+      </div>
+    </div>
+  );
+}
+
+function DemoWave() {
+  return (
+    <div className="landing-demo__wave">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <span key={`wave-${i}`} className="landing-demo__wave-bar" style={{ animationDelay: `${i * 120}ms` }} />
+      ))}
+    </div>
+  );
+}
+
+function DemoVariants() {
+  return (
+    <div className="landing-demo__variants">
+      <div className="landing-demo__variants-label">Hääldusvariandid:</div>
+      <div className="landing-demo__variants-list">
+        {DEMO_VARIANTS.map((v, i) => (
+          <span key={v}
+            className={`landing-demo__variant ${i === 0 ? "landing-demo__variant--active" : ""}`}
+            style={{ animationDelay: `${i * 100}ms` }}>{v}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function useDemoPhase() {
   const [phase, setPhase] = useState<Phase>(Phase.TYPING);
   const [visible, setVisible] = useState(true);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
   const typedText = useTypingEffect(phase === Phase.TYPING, DEMO_TEXT, 65);
   const typingComplete = typedText.length === DEMO_TEXT.length;
 
   const resetCycle = useCallback(() => {
     setVisible(false);
-    setTimeout(() => {
-      setPhase(Phase.TYPING);
-      setVisible(true);
-    }, 600);
+    setTimeout(() => { setPhase(Phase.TYPING); setVisible(true); }, 600);
   }, []);
 
-  // Advance from TYPING to TAGS_APPEAR once typing finishes
   useEffect(() => {
     if (phase === Phase.TYPING && typingComplete) {
       timeoutRef.current = setTimeout(() => setPhase(Phase.TAGS_APPEAR), 500);
@@ -80,78 +127,29 @@ export default function LandingDemo() {
     return undefined;
   }, [phase, typingComplete]);
 
-  // Advance through remaining phases on timers
   useEffect(() => {
-    if (phase === Phase.TYPING) return;
-
+    if (phase === Phase.TYPING) { return; }
     const duration = PHASE_DURATIONS[phase];
-    if (phase === Phase.FADE_OUT) {
-      timeoutRef.current = setTimeout(resetCycle, duration);
-    } else {
-      timeoutRef.current = setTimeout(() => setPhase(phase + 1), duration);
-    }
+    timeoutRef.current = setTimeout(
+      phase === Phase.FADE_OUT ? resetCycle : () => setPhase(phase + 1), duration,
+    );
     return () => clearTimeout(timeoutRef.current);
   }, [phase, resetCycle]);
 
+  return { phase, visible, typedText };
+}
+
+export default function LandingDemo() {
+  const { phase, visible, typedText } = useDemoPhase();
   const showTags = phase >= Phase.TAGS_APPEAR;
   const showPlayPulse = phase >= Phase.PLAY_PULSE && phase <= Phase.VARIANTS_SHOW;
-  const showTagSelected = phase >= Phase.TAG_SELECT;
-  const showVariants = phase >= Phase.VARIANTS_SHOW;
 
   return (
     <div className={`landing-demo ${visible ? "landing-demo--visible" : "landing-demo--hidden"}`}>
       <div className="landing-demo__card">
-        <div className="landing-demo__sentence">
-          {!showTags && (
-            <div className="landing-demo__input">
-              <span className="landing-demo__typed-text">{typedText}</span>
-              <span className="landing-demo__cursor" />
-            </div>
-          )}
-          {showTags && (
-            <div className="landing-demo__tags">
-              {DEMO_TAGS.map((tag, i) => (
-                <span
-                  key={tag}
-                  className={`landing-demo__tag ${
-                    showTagSelected && i === VARIANT_TAG_INDEX ? "landing-demo__tag--selected" : ""
-                  }`}
-                  style={{ animationDelay: `${i * 80}ms` }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-          <div className={`landing-demo__play-btn ${showPlayPulse ? "landing-demo__play-btn--pulse" : ""}`}>
-            <PlayIcon size="2xl" />
-          </div>
-        </div>
-
-        {showPlayPulse && !showVariants && (
-          <div className="landing-demo__wave">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className="landing-demo__wave-bar" style={{ animationDelay: `${i * 120}ms` }} />
-            ))}
-          </div>
-        )}
-
-        {showVariants && (
-          <div className="landing-demo__variants">
-            <div className="landing-demo__variants-label">Hääldusvariandid:</div>
-            <div className="landing-demo__variants-list">
-              {DEMO_VARIANTS.map((v, i) => (
-                <span
-                  key={v}
-                  className={`landing-demo__variant ${i === 0 ? "landing-demo__variant--active" : ""}`}
-                  style={{ animationDelay: `${i * 100}ms` }}
-                >
-                  {v}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        <DemoSentence typedText={typedText} showTags={showTags} showTagSelected={phase >= Phase.TAG_SELECT} showPlayPulse={showPlayPulse} />
+        {showPlayPulse && phase < Phase.VARIANTS_SHOW && <DemoWave />}
+        {phase >= Phase.VARIANTS_SHOW && <DemoVariants />}
       </div>
     </div>
   );

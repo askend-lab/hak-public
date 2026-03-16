@@ -42,7 +42,7 @@ describe("AppHeader", () => {
       const user = userEvent.setup();
       render(
         <MemoryRouter>
-          <AppHeader {...defaultProps} />
+          <AppHeader {...defaultProps} isAuthenticated={true} user={{ id: "123", name: "Test User", email: "test@test.com" }} />
         </MemoryRouter>,
       );
 

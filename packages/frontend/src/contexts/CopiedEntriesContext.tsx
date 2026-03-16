@@ -22,7 +22,7 @@ const STORAGE_KEY = "eki_copied_entries";
 function loadFromSession(): RawEntry[] | null {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    if (!raw) { return null; }
     const parsed = JSON.parse(raw) as RawEntry[];
     return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
   } catch {

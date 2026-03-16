@@ -72,7 +72,7 @@ function useSharedPageActions(task: Task | null) {
   const onPlayEntry = useCallback((id: string) => { audio.handlePlayEntry(id, entries); }, [audio.handlePlayEntry, entries]);
   const onPlayAll = useCallback(async () => { await audio.handlePlayAll(entries); }, [audio.handlePlayAll, entries]);
   const handleCopy = (): void => {
-    if (!task?.entries) return;
+    if (!task?.entries) { return; }
     if (!isAuthenticated) { saveReturnUrl(); setShowLoginModal(true); return; }
     setCopiedEntries(task.entries);
     showNotification({ type: "success", message: "Laused kopeeritud!" });

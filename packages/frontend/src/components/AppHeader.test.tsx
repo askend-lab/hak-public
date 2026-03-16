@@ -21,16 +21,13 @@ describe("AppHeader", () => {
   const mockOnLoginClick = vi.fn();
 
   const defaultProps = {
-    isAuthenticated: false,
-    user: null,
-    onTasksClick: mockOnTasksClick,
-    onHelpClick: mockOnHelpClick,
-    onLoginClick: mockOnLoginClick,
+    isAuthenticated: false, user: null,
+    onTasksClick: mockOnTasksClick, onHelpClick: mockOnHelpClick, onLoginClick: mockOnLoginClick,
   };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  const renderHeader = (props = {}, initialEntries = ["/"]) => render(
+    <MemoryRouter initialEntries={initialEntries}><AppHeader {...defaultProps} {...props} /></MemoryRouter>,
+  );
+  beforeEach(() => { vi.clearAllMocks(); });
 
   describe("group 1", () => {
   describe("group 1", () => {
@@ -39,135 +36,68 @@ describe("AppHeader", () => {
   describe("group 1", () => {
   describe("rendering", () => {
     it("renders logo", () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
+      renderHeader();
       expect(screen.getByAltText("EKI Logo")).toBeInTheDocument();
     });
-
     it("renders all navigation links", () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
+      renderHeader();
       expect(screen.getByText("Tekst kõneks")).toBeInTheDocument();
       expect(screen.getByText("Ülesanded")).toBeInTheDocument();
     });
-
-    it("renders help button", () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
+    it("renders help button when authenticated", () => {
+      renderHeader({ isAuthenticated: true, user: { id: "123", name: "Test User", email: "test@test.com" } });
       expect(screen.getByTitle("Näita juhendeid")).toBeInTheDocument();
     });
-
+    it("does not render help button when not authenticated", () => {
+      renderHeader();
+      expect(screen.queryByTitle("Näita juhendeid")).not.toBeInTheDocument();
+    });
     it("renders login button when not authenticated", () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
+      renderHeader();
       expect(screen.getByText("Logi sisse")).toBeInTheDocument();
     });
-
     it("renders user profile when authenticated", () => {
-      render(
-        <MemoryRouter>
-          <AppHeader
-            {...defaultProps}
-            isAuthenticated={true}
-            user={{ id: "123", name: "Test User", email: "test@test.com" }}
-          />
-        </MemoryRouter>,
-      );
+      renderHeader({ isAuthenticated: true, user: { id: "123", name: "Test User", email: "test@test.com" } });
       expect(screen.queryByText("Logi sisse")).not.toBeInTheDocument();
     });
   });
 
   describe("navigation links", () => {
     it("Tekst kõneks link navigates to /synthesis", () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-      const link = screen.getByText("Tekst kõneks");
-      expect(link).toHaveAttribute("href", "/synthesis");
+      renderHeader();
+      expect(screen.getByText("Tekst kõneks")).toHaveAttribute("href", "/synthesis");
     });
-
     it("Ülesanded link navigates to /tasks", () => {
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-      const link = screen.getByText("Ülesanded");
-      expect(link).toHaveAttribute("href", "/tasks");
+      renderHeader();
+      expect(screen.getByText("Ülesanded")).toHaveAttribute("href", "/tasks");
     });
   });
 
   describe("active state", () => {
     it("marks synthesis link as active on /synthesis", () => {
-      render(
-        <MemoryRouter initialEntries={["/synthesis"]}>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-      const link = screen.getByText("Tekst kõneks");
-      expect(link).toHaveClass("active");
+      renderHeader({}, ["/synthesis"]);
+      expect(screen.getByText("Tekst kõneks")).toHaveClass("active");
     });
-
     it("marks tasks link as active on /tasks", () => {
-      render(
-        <MemoryRouter initialEntries={["/tasks"]}>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-      const link = screen.getByText("Ülesanded");
-      expect(link).toHaveClass("active");
+      renderHeader({}, ["/tasks"]);
+      expect(screen.getByText("Ülesanded")).toHaveClass("active");
     });
-
     it("marks tasks link as active on /tasks/:id", () => {
-      render(
-        <MemoryRouter initialEntries={["/tasks/123"]}>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-      const link = screen.getByText("Ülesanded");
-      expect(link).toHaveClass("active");
+      renderHeader({}, ["/tasks/123"]);
+      expect(screen.getByText("Ülesanded")).toHaveClass("active");
     });
   });
 
   describe("authentication-gated navigation", () => {
     it("calls onTasksClick when clicking tasks link while not authenticated", async () => {
       const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <AppHeader {...defaultProps} />
-        </MemoryRouter>,
-      );
-
+      renderHeader();
       await user.click(screen.getByText("Ülesanded"));
       expect(mockOnTasksClick).toHaveBeenCalled();
     });
-
     it("allows navigation to tasks when authenticated", async () => {
       const user = userEvent.setup();
-      render(
-        <MemoryRouter>
-          <AppHeader
-            {...defaultProps}
-            isAuthenticated={true}
-            user={{ id: "123", name: "Test User", email: "test@test.com" }}
-          />
-        </MemoryRouter>,
-      );
-
+      renderHeader({ isAuthenticated: true, user: { id: "123", name: "Test User", email: "test@test.com" } });
       await user.click(screen.getByText("Ülesanded"));
       expect(mockOnTasksClick).not.toHaveBeenCalled();
     });

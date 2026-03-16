@@ -20,6 +20,9 @@ import {
 import SynthesisRoute from "./routes/SynthesisRoute";
 import TasksRoute from "./routes/TasksRoute";
 
+vi.mock("./pages/LandingPage", () => ({
+  default: ({ onLogin }: { onLogin: () => void }) => <div data-testid="landing-page"><button onClick={onLogin}>Login from landing</button></div>,
+}));
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/CopiedEntriesContext", () => ({
   useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
@@ -68,30 +71,15 @@ vi.mock("./features/tasks/components/TaskDetailView", () => ({
 vi.mock("./features/tasks/components/TaskEditModal", () => ({ default: () => null }));
 vi.mock("./features/tasks/components/AddEntryModal", () => ({ default: () => null }));
 vi.mock("./features/sharing/components/ShareTaskModal", () => ({ default: () => null }));
-vi.mock("@/features/auth/components/LoginModal", () => ({
-  default: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="login-modal">LoginModal</div> : null,
-}));
-vi.mock("./components/UserProfile", () => ({
-  default: ({ user }: { user: { name: string } }) => (
-    <div data-testid="user-profile">{user.name}</div>
-  ),
-}));
+vi.mock("@/features/auth/components/LoginModal", () => ({ default: ({ isOpen }: { isOpen: boolean }) => isOpen ? <div data-testid="login-modal">LoginModal</div> : null }));
+vi.mock("./components/UserProfile", () => ({ default: ({ user }: { user: { name: string } }) => <div data-testid="user-profile">{user.name}</div> }));
 vi.mock("./components/ConfirmationModal", () => ({ default: () => null }));
 vi.mock("./features/tasks/components/AddToTaskDropdown", () => ({ default: () => null }));
 vi.mock("./features/synthesis/components/SentencePhoneticPanel", () => ({ default: () => null }));
-vi.mock("./features/synthesis/components/SentenceSynthesisItem", () => ({
-  default: ({ id }: { id: string }) => (
-    <div data-testid={`sentence-item-${id}`}>SentenceItem</div>
-  ),
-}));
+vi.mock("./features/synthesis/components/SentenceSynthesisItem", () => ({ default: ({ id }: { id: string }) => <div data-testid={`sentence-item-${id}`}>SentenceItem</div> }));
 vi.mock("./features/onboarding/components", () => ({
-  RoleSelectionContent: () => (
-    <div data-testid="role-selection">RoleSelection</div>
-  ),
-  OnboardingWizard: () => (
-    <div data-testid="onboarding-wizard">OnboardingWizard</div>
-  ),
+  RoleSelectionContent: () => <div data-testid="role-selection">RoleSelection</div>,
+  OnboardingWizard: () => <div data-testid="onboarding-wizard">OnboardingWizard</div>,
 }));
 
 function AppWrapper({ children }: { children: React.ReactNode }) {
@@ -123,21 +111,7 @@ describe("App (Home)", () => {
   describe("authenticated user", () => {
     it("shows user profile when authenticated", async () => {
       const { useAuth } = await import("./features/auth/services");
-      vi.mocked(useAuth).mockReturnValue({
-        user: { id: "123", name: "Test User", email: "test@test.com" },
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        login: vi.fn(),
-        logout: vi.fn(),
-        showLoginModal: false,
-        setShowLoginModal: vi.fn(),
-        refreshSession: vi.fn(),
-        handleCodeCallback: vi.fn(),
-        loginWithTara: vi.fn(),
-        handleTaraTokens: vi.fn(),
-      });
-
+      vi.mocked(useAuth).mockReturnValue({ ...mockAuthContext(), isAuthenticated: true, user: { id: "123", name: "Test User", email: "test@test.com" } } as ReturnType<typeof useAuth>);
       renderWithRoutes();
       expect(screen.getByTestId("user-profile")).toBeInTheDocument();
     });
@@ -153,24 +127,9 @@ describe("App (Home)", () => {
     it("clicking tasks link when not authenticated shows login modal", async () => {
       const setShowLoginModal = vi.fn();
       const { useAuth } = await import("./features/auth/services");
-      vi.mocked(useAuth).mockReturnValue({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-        login: vi.fn(),
-        logout: vi.fn(),
-        showLoginModal: false,
-        setShowLoginModal,
-        refreshSession: vi.fn(),
-        handleCodeCallback: vi.fn(),
-        loginWithTara: vi.fn(),
-        handleTaraTokens: vi.fn(),
-      });
-
+      vi.mocked(useAuth).mockReturnValue({ ...mockAuthContext(), setShowLoginModal } as ReturnType<typeof useAuth>);
       const user = userEvent.setup();
       renderWithRoutes();
-
       await user.click(screen.getByText("Ülesanded"));
       expect(setShowLoginModal).toHaveBeenCalledWith(true);
     });
@@ -178,24 +137,14 @@ describe("App (Home)", () => {
 
   describe("synthesis view", () => {
     beforeEach(async () => {
-      // Ensure onboarding is completed so synthesis view is shown
+      const { useAuth } = await import("./features/auth/services");
+      vi.mocked(useAuth).mockReturnValue({ ...mockAuthContext(), isAuthenticated: true, user: { id: "1", name: "Test", email: "t@t.com" } } as ReturnType<typeof useAuth>);
       const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
-        state: {
-          completed: true,
-          selectedRole: "teacher",
-          currentStep: 0,
-          skipped: false,
-        },
-        isWizardActive: false,
-        resetOnboarding: vi.fn(),
-        isLoading: false,
-        nextStep: vi.fn(),
-        prevStep: vi.fn(),
-        skipWizard: vi.fn(),
-        selectRole: vi.fn(),
-        completeWizard: vi.fn(),
-        currentSteps: [],
+        state: { completed: true, selectedRole: "teacher", currentStep: 0, skipped: false },
+        isWizardActive: false, resetOnboarding: vi.fn(), isLoading: false,
+        nextStep: vi.fn(), prevStep: vi.fn(), skipWizard: vi.fn(),
+        selectRole: vi.fn(), completeWizard: vi.fn(), currentSteps: [],
       });
     });
 

@@ -87,9 +87,9 @@ describe("ShareTaskModal mutation kills", () => {
     spy.mockRestore();
   });
 
-  it("shows expiration notice", () => {
+  it("does not show expiration notice", () => {
     render(<ShareTaskModal isOpen={true} shareToken="tok" taskName="T" onClose={mockOnClose} />);
-    expect(screen.getByText(/90 päeva/)).toBeInTheDocument();
+    expect(screen.queryByText(/90 päeva/)).not.toBeInTheDocument();
   });
 
   it("shows revoke button when onRevoke provided", () => {

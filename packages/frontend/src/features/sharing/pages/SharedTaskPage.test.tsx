@@ -13,84 +13,26 @@ const mockShowNotification = vi.fn();
 const mockSetCopiedEntries = vi.fn();
 const mockDS = createMockDataService({ getTaskByShareToken: mockGetTaskByShareToken });
 
-vi.mock("@/contexts/CopiedEntriesContext", () => ({
-  useCopiedEntries: () => ({
-    copiedEntries: null,
-    setCopiedEntries: mockSetCopiedEntries,
-    consumeCopiedEntries: vi.fn().mockReturnValue(null),
-    hasCopiedEntries: false,
-  }),
-}));
-
-vi.mock("@/contexts/NotificationContext", () => ({
-  useNotification: vi.fn(() => ({
-    showNotification: mockShowNotification,
-  })),
-}));
-
-vi.mock("@/features/synthesis/utils/synthesize", () => ({
-  synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }),
-}));
-
-vi.mock("@/types/synthesis", () => ({
-  getVoiceModel: vi.fn().mockReturnValue("default"),
-}));
-
-vi.mock("@/components/Footer", () => ({
-  default: () => <div data-testid="footer">Footer</div>,
-}));
-
-vi.mock("@/components/AppHeader", () => ({
-  default: () => <div data-testid="app-header">AppHeader</div>,
-}));
-
+vi.mock("@/features/auth/services", () => ({ useAuth: vi.fn(() => ({ isAuthenticated: false, user: null, showLoginModal: false, setShowLoginModal: vi.fn() })) }));
+vi.mock("@/features/auth/services/storage", () => ({ saveReturnUrl: vi.fn() }));
+vi.mock("@/features/auth/components/LoginModal", () => ({ default: ({ isOpen }: { isOpen: boolean }) => isOpen ? <div data-testid="login-modal">LoginModal</div> : null }));
+vi.mock("@/contexts/CopiedEntriesContext", () => ({ useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: mockSetCopiedEntries, consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }) }));
+vi.mock("@/contexts/NotificationContext", () => ({ useNotification: vi.fn(() => ({ showNotification: mockShowNotification })) }));
+vi.mock("@/features/synthesis/utils/synthesize", () => ({ synthesizeWithPolling: vi.fn().mockResolvedValue({ audioUrl: "mock-audio-url", cacheKey: "mock-cache-key" }) }));
+vi.mock("@/types/synthesis", () => ({ getVoiceModel: vi.fn().mockReturnValue("default") }));
+vi.mock("@/components/Footer", () => ({ default: () => <div data-testid="footer">Footer</div> }));
+vi.mock("@/components/AppHeader", () => ({ default: () => <div data-testid="app-header">AppHeader</div> }));
 vi.mock("@/components/ui/PlayAllButton", () => ({
-  PlayAllButton: ({
-    isPlaying,
-    isLoading,
-    disabled,
-    onClick,
-  }: {
-    isPlaying: boolean;
-    isLoading: boolean;
-    disabled?: boolean;
-    onClick: () => void;
-  }) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      data-is-playing={isPlaying}
-      data-is-loading={isLoading}
-    >
+  PlayAllButton: ({ isPlaying, isLoading, disabled, onClick }: { isPlaying: boolean; isLoading: boolean; disabled?: boolean; onClick: () => void }) => (
+    <button onClick={onClick} disabled={disabled} data-is-playing={isPlaying} data-is-loading={isLoading}>
       {isLoading ? "Laadimine" : isPlaying ? "Peata" : "Mängi kõik"}
     </button>
   ),
 }));
-
 vi.mock("@/features/synthesis/components/SentenceSynthesisItem", () => ({
-  default: ({
-    id,
-    text,
-    mode,
-    onPlay,
-    isPlaying,
-    isLoading,
-  }: {
-    id: string;
-    text: string;
-    mode: string;
-    onPlay: (id: string) => void;
-    isPlaying: boolean;
-    isLoading: boolean;
-  }) => (
-    <div
-      data-testid={`sentence-item-${id}`}
-      data-mode={mode}
-      data-is-playing={isPlaying}
-      data-is-loading={isLoading}
-    >
-      <span>{text}</span>
-      <button onClick={() => onPlay(id)}>Play</button>
+  default: ({ id, text, mode, onPlay, isPlaying, isLoading }: { id: string; text: string; mode: string; onPlay: (id: string) => void; isPlaying: boolean; isLoading: boolean }) => (
+    <div data-testid={`sentence-item-${id}`} data-mode={mode} data-is-playing={isPlaying} data-is-loading={isLoading}>
+      <span>{text}</span><button onClick={() => onPlay(id)}>Play</button>
     </div>
   ),
 }));
@@ -113,29 +55,14 @@ describe("SharedTaskPage", () => {
 
   it("renders loading state initially", () => {
     mockGetTaskByShareToken.mockImplementation(() => new Promise(() => {}));
-
     renderWithRouter("abc123");
-
     expect(screen.getByText(/Laadimine/i)).toBeInTheDocument();
   });
 
   it("renders page with task name and description", async () => {
-    const mockTask = {
-      id: "task-123",
-      name: "Test Task Name",
-      description: "Test Task Description",
-      shareToken: "abc123",
-      entries: [],
-    };
-
-    mockGetTaskByShareToken.mockResolvedValue(mockTask);
-
+    mockGetTaskByShareToken.mockResolvedValue({ id: "task-123", name: "Test Task Name", description: "Test Task Description", shareToken: "abc123", entries: [] });
     renderWithRouter("abc123");
-
-    await waitFor(() => {
-      expect(screen.getByTestId("app-header")).toBeInTheDocument();
-    });
-
+    await waitFor(() => { expect(screen.getByTestId("app-header")).toBeInTheDocument(); });
     expect(screen.getByText("Test Task Name")).toBeInTheDocument();
     expect(screen.getByText("Test Task Description")).toBeInTheDocument();
     expect(screen.getByText("Jagatud ülesanne")).toBeInTheDocument();
@@ -143,11 +70,7 @@ describe("SharedTaskPage", () => {
   });
 
   it("renders entries using SentenceSynthesisItem with readonly mode", async () => {
-    const mockTask = {
-      id: "task-123",
-      name: "Test Task",
-      shareToken: "abc123",
-      entries: [
+    const mockTask = { id: "task-123", name: "Test Task", shareToken: "abc123", entries: [
         { id: "e1", text: "First sentence", stressedText: "First sentence" },
         { id: "e2", text: "Second sentence", stressedText: "Second sentence" },
       ],

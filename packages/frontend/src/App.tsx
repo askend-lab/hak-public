@@ -22,6 +22,27 @@ import type { AppLayoutContext } from "./routes/types";
 
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 
+function UnauthenticatedLayout({ mainRef, showLoginModal, setShowLoginModal, taskHandlers }: {
+  mainRef: React.RefObject<HTMLElement | null>; showLoginModal: boolean;
+  setShowLoginModal: (v: boolean) => void; taskHandlers: ReturnType<typeof useTaskHandlers>;
+}) {
+  const openLogin = () => { saveReturnUrl(); setShowLoginModal(true); };
+  return (
+    <div className="page-layout">
+      <a href="#main-content" className="skip-link">Liigu põhisisu juurde</a>
+      <AppHeader isAuthenticated={false} user={null} onTasksClick={openLogin} onHelpClick={openLogin} onLoginClick={openLogin} />
+      <main ref={mainRef} id="main-content" tabIndex={-1} className="page-layout__main">
+        <Suspense fallback={<PageLoadingState />}>
+          <LandingPage onLogin={openLogin} />
+        </Suspense>
+      </main>
+      <footer className="page-layout__footer page-footer--full"><Footer /></footer>
+      <AppModals showLoginModal={showLoginModal} setShowLoginModal={setShowLoginModal} isWizardActive={false} taskHandlers={taskHandlers} />
+      <CookieConsent />
+    </div>
+  );
+}
+
 function useFocusOnNavigate(pathname: string): React.RefObject<HTMLElement | null> {
   const mainRef = useRef<HTMLElement>(null);
   const prevPathnameRef = useRef(pathname);
@@ -74,35 +95,7 @@ export default function AppLayout() {
   const isPublicPage = pathname === "/accessibility" || pathname === "/privacy";
 
   if (!isAuthenticated && !isPublicPage) {
-    return (
-      <div className="page-layout">
-        <a href="#main-content" className="skip-link">
-          Liigu põhisisu juurde
-        </a>
-        <AppHeader
-          isAuthenticated={false}
-          user={null}
-          onTasksClick={() => { saveReturnUrl(); setShowLoginModal(true); }}
-          onHelpClick={() => { saveReturnUrl(); setShowLoginModal(true); }}
-          onLoginClick={() => { saveReturnUrl(); setShowLoginModal(true); }}
-        />
-        <main ref={mainRef} id="main-content" tabIndex={-1} className="page-layout__main">
-          <Suspense fallback={<PageLoadingState />}>
-            <LandingPage onLogin={() => { saveReturnUrl(); setShowLoginModal(true); }} />
-          </Suspense>
-        </main>
-        <footer className="page-layout__footer page-footer--full">
-          <Footer />
-        </footer>
-        <AppModals
-          showLoginModal={showLoginModal}
-          setShowLoginModal={setShowLoginModal}
-          isWizardActive={false}
-          taskHandlers={taskHandlers}
-        />
-        <CookieConsent />
-      </div>
-    );
+    return <UnauthenticatedLayout mainRef={mainRef} showLoginModal={showLoginModal} setShowLoginModal={setShowLoginModal} taskHandlers={taskHandlers} />;
   }
 
   const isRoleSelection = pathname === "/role-selection";

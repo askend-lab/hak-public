@@ -14,27 +14,15 @@ interface AppHeaderProps {
   onLoginClick: () => void;
 }
 
-export default function AppHeader({
-  isAuthenticated,
-  user,
-  onTasksClick,
-  onHelpClick,
-  onLoginClick,
-}: AppHeaderProps) {
-  const handleNavClick = (e: React.MouseEvent) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      onLoginClick();
-    }
-  };
+function navClassName({ isActive }: { isActive: boolean }) {
+  return `header-nav-link ${isActive ? "active" : ""}`;
+}
 
-  const handleTasksNavClick = (e: React.MouseEvent) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      onTasksClick();
-    }
-  };
+function gatedClick(isAuth: boolean, handler: () => void) {
+  return (e: React.MouseEvent) => { if (!isAuth) { e.preventDefault(); handler(); } };
+}
 
+export default function AppHeader({ isAuthenticated, user, onTasksClick, onHelpClick, onLoginClick }: AppHeaderProps) {
   return (
     <header className="page-layout__header">
       <div className="page-layout__header-content">
@@ -42,43 +30,23 @@ export default function AppHeader({
           <img src="/icons/logo.png" alt="EKI Logo" />
         </Link>
         <nav className="header-nav">
-          <NavLink
-            to="/synthesis"
-            className={({ isActive }) =>
-              `header-nav-link ${isActive ? "active" : ""}`
-            }
-            onClick={handleNavClick}
-          >
+          <NavLink to="/synthesis" className={navClassName} onClick={gatedClick(isAuthenticated, onLoginClick)}>
             Tekst kõneks
           </NavLink>
-          <NavLink
-            to="/tasks"
-            className={({ isActive }) =>
-              `header-nav-link ${isActive ? "active" : ""}`
-            }
-            data-nav="tasks"
-            onClick={handleTasksNavClick}
-          >
+          <NavLink to="/tasks" className={navClassName} data-nav="tasks" onClick={gatedClick(isAuthenticated, onTasksClick)}>
             Ülesanded
           </NavLink>
         </nav>
         <div className="header-functions">
           {isAuthenticated && (
-            <button
-              className="header-help-button"
-              onClick={onHelpClick}
-              aria-label="Abi ja juhend"
-              title="Näita juhendeid"
-            >
+            <button className="header-help-button" onClick={onHelpClick} aria-label="Abi ja juhend" title="Näita juhendeid">
               <HelpIcon size="2xl" />
             </button>
           )}
           {isAuthenticated && user ? (
             <UserProfile user={user} />
           ) : (
-            <button className="button button--primary" onClick={onLoginClick}>
-              Logi sisse
-            </button>
+            <button className="button button--primary" onClick={onLoginClick}>Logi sisse</button>
           )}
         </div>
       </div>
