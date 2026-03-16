@@ -160,11 +160,11 @@ function useLegacyMigration(setSentences: SetSentences): void {
 }
 
 function useCopiedEntriesEffect(setSentences: SetSentences): void {
-  const { consumeCopiedEntries } = useCopiedEntries();
+  const { consumeCopiedEntries, hasCopiedEntries } = useCopiedEntries();
   useEffect(() => {
     const entries = consumeCopiedEntries();
     if (entries && entries.length > 0) { setSentences((prev) => mergeCopiedEntries(prev, entries)); }
-  }, [consumeCopiedEntries, setSentences]);
+  }, [consumeCopiedEntries, setSentences, hasCopiedEntries]);
 }
 
 const DEMO: SentenceState[] = [

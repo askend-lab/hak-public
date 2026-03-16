@@ -47,6 +47,7 @@ export function CopiedEntriesProvider({ children }: { children: ReactNode }) {
   const consumeCopiedEntries = useCallback((): RawEntry[] | null => {
     const entries = entriesRef.current;
     if (entries) {
+      entriesRef.current = null;
       setEntries(null);
       try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
     }
