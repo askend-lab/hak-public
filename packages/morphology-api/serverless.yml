@@ -3,10 +3,6 @@ service: vabamorf-api
 frameworkVersion: "3"
 
 custom:
-  concurrency:
-    prod:
-      api: 25
-
   allowedOrigin:
     dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
     prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
@@ -64,7 +60,6 @@ functions:
     image:
       name: vabamorf
     timeout: 30
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.api, null}
     memorySize: 1024
     events:
       - httpApi:

@@ -14,11 +14,6 @@ custom:
     platform: 'node'
     target: 'node20'
     packager: 'pnpm'
-    
-  concurrency:
-    prod:
-      func: 10
-      health: 5
 
   taraConfig:
     dev:
@@ -86,7 +81,6 @@ provider:
 functions:
   taraStart:
     handler: src/handler.startHandler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.func, null}
     events:
       - http:
           path: /tara/start
@@ -95,7 +89,6 @@ functions:
 
   taraCallback:
     handler: src/handler.callbackHandler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.func, null}
     events:
       - http:
           path: /tara/callback
@@ -104,7 +97,6 @@ functions:
 
   tokenRefresh:
     handler: src/handler.refreshHandler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.func, null}
     events:
       - http:
           path: /tara/refresh
@@ -117,7 +109,6 @@ functions:
 
   health:
     handler: src/handler.healthHandler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.health, null}
     events:
       - http:
           path: /tara/health
@@ -126,7 +117,6 @@ functions:
 
   tokenExchange:
     handler: src/handler.exchangeCodeHandler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.func, null}
     events:
       - http:
           path: /tara/exchange-code
@@ -139,7 +129,6 @@ functions:
 
   cognitoTriggers:
     handler: src/cognito-triggers.handler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.func, null}
     description: Cognito Custom Auth triggers for TARA authentication
     # No VPC needed - only processes Cognito events
     vpc: ~
