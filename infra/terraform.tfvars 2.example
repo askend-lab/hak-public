@@ -1,0 +1,24 @@
+# Terraform Variables Example
+# Copy this file to terraform.tfvars and fill in your values
+
+# Environment (dev or prod)
+env = "dev"
+
+# Domain configuration
+domain_name = "example.com"
+
+# ACM wildcard certificate ARN for *.domain_name
+wildcard_cert_arn = "arn:aws:acm:eu-west-1:ACCOUNT_ID:certificate/CERTIFICATE_ID"
+
+# S3 bucket for build artifacts (must exist)
+artifacts_bucket = "your-artifacts-bucket"
+
+# Terraform state backend (used in -backend-config and remote_state data source)
+terraform_state_bucket = "your-terraform-state-bucket"
+terraform_locks_table  = "your-terraform-locks"
+
+# Merlin: use prod TTS for dev environment (optional)
+use_prod_merlin = false
+
+# Slack alerts (optional)
+slack_webhook_url = ""

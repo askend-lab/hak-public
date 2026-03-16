@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+import PatternBg from "@/components/ui/PatternBg";
+
 function PrivacyIntro() {
   return (
     <>
@@ -113,7 +115,7 @@ function PrivacyFooter() {
 export default function PrivacyPage() {
   return (
     <div className="content-page">
-      <div className="content-page__banner"><h1 className="content-page__banner-title">Privaatsuspoliitika</h1></div>
+      <div className="content-page__banner"><PatternBg className="landing-pattern--compact" /><h1 className="content-page__banner-title">Privaatsuspoliitika</h1></div>
       <div className="content-page__body">
         <PrivacyIntro />
         <PrivacyDataProcessing />

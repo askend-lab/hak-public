@@ -17,23 +17,38 @@ interface CopiedEntriesContextValue {
   hasCopiedEntries: boolean;
 }
 
+const STORAGE_KEY = "eki_copied_entries";
+
+function loadFromSession(): RawEntry[] | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as RawEntry[];
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 const CopiedEntriesContext = createContext<CopiedEntriesContextValue | undefined>(
   undefined,
 );
 
 export function CopiedEntriesProvider({ children }: { children: ReactNode }) {
-  const [copiedEntries, setEntries] = useState<RawEntry[] | null>(null);
+  const [copiedEntries, setEntries] = useState<RawEntry[] | null>(loadFromSession);
   const entriesRef = useRef(copiedEntries);
   entriesRef.current = copiedEntries;
 
   const setCopiedEntries = useCallback((entries: RawEntry[]) => {
     setEntries(entries);
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); } catch { /* quota exceeded */ }
   }, []);
 
   const consumeCopiedEntries = useCallback((): RawEntry[] | null => {
     const entries = entriesRef.current;
     if (entries) {
       setEntries(null);
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
     }
     return entries;
   }, []);

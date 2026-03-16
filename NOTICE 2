@@ -1,0 +1,33 @@
+HAK — Estonian Language Learning Platform
+Copyright (c) 2024-2026 Askend Lab
+
+This product includes software developed by third parties.
+
+## Third-Party Dependencies
+
+### Apache-2.0
+
+- @aws-sdk/client-cognito-identity-provider — https://github.com/aws/aws-sdk-js-v3
+- @aws-sdk/client-dynamodb — https://github.com/aws/aws-sdk-js-v3
+- @aws-sdk/client-ecs — https://github.com/aws/aws-sdk-js-v3
+- @aws-sdk/client-s3 — https://github.com/aws/aws-sdk-js-v3
+- @aws-sdk/client-secrets-manager — https://github.com/aws/aws-sdk-js-v3
+- @aws-sdk/client-sqs — https://github.com/aws/aws-sdk-js-v3
+- @aws-sdk/lib-dynamodb — https://github.com/aws/aws-sdk-js-v3
+
+### MIT
+
+- @dnd-kit/core — https://github.com/clauderic/dnd-kit
+- @dnd-kit/sortable — https://github.com/clauderic/dnd-kit
+- @dnd-kit/utilities — https://github.com/clauderic/dnd-kit
+- @tanstack/react-query — https://github.com/TanStack/query
+- i18next-http-backend — https://github.com/i18next/i18next-http-backend
+- react — https://github.com/facebook/react
+- react-dom — https://github.com/facebook/react
+- react-router-dom — https://github.com/remix-run/react-router
+- zod — https://github.com/colinhacks/zod
+- jose — https://github.com/panva/jose
+- zustand — https://github.com/pmndrs/zustand
+
+For the full list of transitive dependencies and their licenses, run:
+  npx license-checker --production

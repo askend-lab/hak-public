@@ -42,8 +42,10 @@ export function useAppRedirects() {
     // Only check on initial app load, not on subsequent navigation
     if (!hasCheckedInitialRedirect.current) {
       hasCheckedInitialRedirect.current = true;
-      // Skip role selection if user has copied entries from shared task
+      // Only redirect authenticated users who haven't selected a role yet.
+      // Unauthenticated users see the landing page instead.
       if (
+        isAuthenticated &&
         !hasCopiedEntries &&
         !onboardingState.completed &&
         !onboardingState.selectedRole &&

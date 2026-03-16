@@ -1,0 +1,44 @@
+{
+  "name": "@hak/tara-auth",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && serverless offline --httpPort 4001 --host 0.0.0.0",
+    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
+    "test:full": "jest --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
+    "test:mutation": "npx stryker run",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "^9.5.1",
+    "@stryker-mutator/jest-runner": "^9.5.1",
+    "@types/aws-lambda": "^8.10.160",
+    "@types/jest": "^30.0.0",
+    "@types/nock": "^11.1.0",
+    "@types/node": "^20.0.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "esbuild": "^0.27.3",
+    "jest": "^30.2.0",
+    "nock": "^14.0.10",
+    "serverless": "^4.32.0",
+    "serverless-domain-manager": "^9.1.0",
+    "serverless-esbuild": "^1.57.0",
+    "serverless-offline": "^14.4.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.990.0",
+    "@aws-sdk/client-secrets-manager": "^3.990.0",
+    "@hak/shared": "workspace:*",
+    "jose": "^5.0.0"
+  }
+}

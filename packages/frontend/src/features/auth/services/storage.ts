@@ -23,6 +23,22 @@ const COGNITO_PROVIDER_PREFIX = "CognitoIdentityServiceProvider";
 let memoryAccessToken: string | null = null;
 let memoryIdToken: string | null = null;
 
+const RETURN_URL_KEY = "eki_auth_return_url";
+
+export function saveReturnUrl(): void {
+  try { sessionStorage.setItem(RETURN_URL_KEY, window.location.pathname + window.location.search); } catch { /* quota exceeded */ }
+}
+
+export function consumeReturnUrl(): string {
+  try {
+    const url = sessionStorage.getItem(RETURN_URL_KEY);
+    sessionStorage.removeItem(RETURN_URL_KEY);
+    return url || "/";
+  } catch {
+    return "/";
+  }
+}
+
 export const AuthStorage = {
   getUser(): User | null {
     const stored = localStorage.getItem(STORAGE_KEYS.USER);

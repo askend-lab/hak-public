@@ -1,0 +1,118 @@
+service: merlin-api
+
+frameworkVersion: "3"
+
+custom:
+  allowedOrigin:
+    dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
+    prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+  stage: ${opt:stage, 'dev'}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
+        - https://hak.${env:DOMAIN_NAME, 'example.com'}
+      allowedMethods:
+        - GET
+        - POST
+        - OPTIONS
+      allowedHeaders:
+        - Content-Type
+    throttle:
+      rateLimit: 2
+      burstLimit: 4
+
+  environment:
+    SQS_QUEUE_URL: https://sqs.${self:provider.region}.amazonaws.com/${env:AWS_ACCOUNT_ID, '000000000000'}/hak-merlin-${self:provider.stage}-queue
+    S3_BUCKET: hak-merlin-${self:provider.stage}-audio
+    ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:GetQueueUrl
+          Resource: arn:aws:sqs:${self:provider.region}:${env:AWS_ACCOUNT_ID, '000000000000'}:hak-merlin-${self:provider.stage}-queue
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:HeadObject
+          Resource: arn:aws:s3:::hak-merlin-${self:provider.stage}-audio/*
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource: arn:aws:s3:::hak-merlin-${self:provider.stage}-audio
+        - Effect: Allow
+          Action:
+            - ecs:UpdateService
+            - ecs:DescribeServices
+          Resource: arn:aws:ecs:${self:provider.region}:${env:AWS_ACCOUNT_ID, '000000000000'}:service/hak-merlin-${self:provider.stage}/merlin-worker
+
+functions:
+  synthesize:
+    handler: dist/handler.synthesize
+    timeout: 30
+    events:
+      - httpApi:
+          path: /synthesize
+          method: POST
+
+  status:
+    handler: dist/handler.status
+    timeout: 10
+    events:
+      - httpApi:
+          path: /status/{cacheKey}
+          method: GET
+
+  health:
+    handler: dist/handler.health
+    timeout: 5
+    events:
+      - httpApi:
+          path: /health
+          method: GET
+
+  warmup:
+    handler: dist/handler.warmup
+    timeout: 10
+    environment:
+      ECS_CLUSTER: hak-merlin-${self:provider.stage}
+      ECS_SERVICE: merlin-worker
+    events:
+      - httpApi:
+          path: /warmup
+          method: POST
+
+resources:
+  Resources:
+    HttpApiRoutePostSynthesize:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        AuthorizationType: NONE
+    HttpApiRoutePostWarmup:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        AuthorizationType: NONE
+  Outputs:
+    ApiEndpoint:
+      Description: Merlin API Gateway endpoint URL
+      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+    HttpApiId:
+      Description: HTTP API ID (used by Terraform for CloudFront origin)
+      Value: !Ref HttpApi
+
+package:
+  individually: true
+  patterns:
+    - "!node_modules/**"
+    - "!src/**"
+    - "!test/**"
+    - "dist/**"

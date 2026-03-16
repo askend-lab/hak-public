@@ -1,0 +1,104 @@
+name: Cleanup Orphaned Resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'DELETE' to confirm orphaned resource cleanup"
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  cleanup:
+    name: Remove orphaned Serverless stacks and AWS resources
+    runs-on: ubuntu-latest
+    if: inputs.confirm == 'DELETE'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+
+      - name: Install Serverless
+        run: npm install -g serverless@3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Remove audio-api-dev stack
+        run: |
+          aws cloudformation delete-stack --stack-name audio-api-dev --region eu-west-1
+          echo "⏳ Waiting for audio-api-dev deletion..."
+          aws cloudformation wait stack-delete-complete --stack-name audio-api-dev --region eu-west-1 || echo "⚠️ Stack may already be deleted"
+          echo "✅ audio-api-dev removed"
+        continue-on-error: true
+
+      - name: Remove audio-api-prod stack
+        run: |
+          aws cloudformation delete-stack --stack-name audio-api-prod --region eu-west-1
+          echo "⏳ Waiting for audio-api-prod deletion..."
+          aws cloudformation wait stack-delete-complete --stack-name audio-api-prod --region eu-west-1 || echo "⚠️ Stack may already be deleted"
+          echo "✅ audio-api-prod removed"
+        continue-on-error: true
+
+      - name: Remove single-table-lambda-dev stack
+        run: |
+          aws cloudformation delete-stack --stack-name single-table-lambda-dev --region eu-west-1
+          echo "⏳ Waiting for single-table-lambda-dev deletion..."
+          aws cloudformation wait stack-delete-complete --stack-name single-table-lambda-dev --region eu-west-1 || echo "⚠️ Stack may already be deleted"
+          echo "✅ single-table-lambda-dev removed"
+        continue-on-error: true
+
+      - name: Remove exams-backend-dev stack
+        run: |
+          aws cloudformation delete-stack --stack-name exams-backend-dev --region eu-west-1
+          echo "⏳ Waiting for exams-backend-dev deletion..."
+          aws cloudformation wait stack-delete-complete --stack-name exams-backend-dev --region eu-west-1 || echo "⚠️ Stack may already be deleted"
+          echo "✅ exams-backend-dev removed"
+        continue-on-error: true
+
+      - name: Remove empty S3 buckets
+        run: |
+          for BUCKET in hak-audio-dev hak-audio-prod; do
+            echo "Deleting $BUCKET..."
+            aws s3 rb s3://$BUCKET --force 2>/dev/null || echo "⚠️ $BUCKET may not exist or not empty"
+          done
+          echo "✅ Empty S3 buckets removed"
+        continue-on-error: true
+
+      - name: Remove orphaned Cognito pool
+        run: |
+          aws cognito-idp delete-user-pool --user-pool-id eu-west-1_yhmr3xEvo --region eu-west-1 2>/dev/null || echo "⚠️ Pool may already be deleted"
+          echo "✅ single-table-lambda-dev-users Cognito pool removed"
+        continue-on-error: true
+
+      - name: Remove legacy ECR repositories
+        run: |
+          for REPO in eki/merlin eki/vabamorf; do
+            echo "Deleting ECR repo $REPO..."
+            aws ecr delete-repository --repository-name "$REPO" --force --region eu-west-1 2>/dev/null || echo "⚠️ $REPO may not exist"
+          done
+          echo "✅ Legacy ECR repositories removed"
+        continue-on-error: true
+
+      - name: Summary
+        run: |
+          echo "## Cleanup Complete" >> $GITHUB_STEP_SUMMARY
+          echo "Removed orphaned resources identified in infrastructure audit (2026-02-15):" >> $GITHUB_STEP_SUMMARY
+          echo "- audio-api-dev/prod CloudFormation stacks (Lambdas, API GW, SQS)" >> $GITHUB_STEP_SUMMARY
+          echo "- single-table-lambda-dev CloudFormation stack" >> $GITHUB_STEP_SUMMARY
+          echo "- exams-backend-dev CloudFormation stack" >> $GITHUB_STEP_SUMMARY
+          echo "- hak-audio-dev/prod S3 buckets" >> $GITHUB_STEP_SUMMARY
+          echo "- single-table-lambda-dev-users Cognito pool" >> $GITHUB_STEP_SUMMARY
+          echo "- eki/merlin, eki/vabamorf ECR repositories" >> $GITHUB_STEP_SUMMARY

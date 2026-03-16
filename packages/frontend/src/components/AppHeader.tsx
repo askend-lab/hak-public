@@ -21,7 +21,14 @@ export default function AppHeader({
   onHelpClick,
   onLoginClick,
 }: AppHeaderProps) {
-  const handleTasksClick = (e: React.MouseEvent) => {
+  const handleNavClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      onLoginClick();
+    }
+  };
+
+  const handleTasksNavClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {
       e.preventDefault();
       onTasksClick();
@@ -31,7 +38,7 @@ export default function AppHeader({
   return (
     <header className="page-layout__header">
       <div className="page-layout__header-content">
-        <Link to="/synthesis" className="eki-logo">
+        <Link to="/" className="eki-logo">
           <img src="/icons/logo.png" alt="EKI Logo" />
         </Link>
         <nav className="header-nav">
@@ -40,6 +47,7 @@ export default function AppHeader({
             className={({ isActive }) =>
               `header-nav-link ${isActive ? "active" : ""}`
             }
+            onClick={handleNavClick}
           >
             Tekst kõneks
           </NavLink>
@@ -49,20 +57,22 @@ export default function AppHeader({
               `header-nav-link ${isActive ? "active" : ""}`
             }
             data-nav="tasks"
-            onClick={handleTasksClick}
+            onClick={handleTasksNavClick}
           >
             Ülesanded
           </NavLink>
         </nav>
         <div className="header-functions">
-          <button
-            className="header-help-button"
-            onClick={onHelpClick}
-            aria-label="Abi ja juhend"
-            title="Näita juhendeid"
-          >
-            <HelpIcon size="2xl" />
-          </button>
+          {isAuthenticated && (
+            <button
+              className="header-help-button"
+              onClick={onHelpClick}
+              aria-label="Abi ja juhend"
+              title="Näita juhendeid"
+            >
+              <HelpIcon size="2xl" />
+            </button>
+          )}
           {isAuthenticated && user ? (
             <UserProfile user={user} />
           ) : (
