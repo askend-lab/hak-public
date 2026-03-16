@@ -23,8 +23,8 @@
     "@types/nock": "^11.1.0",
     "@types/node": "^20.0.0",
     "aws-sdk-client-mock": "^4.1.0",
-    "esbuild": "^0.27.3",
-    "jest": "^30.2.0",
+    "esbuild": "^0.27.4",
+    "jest": "^30.3.0",
     "nock": "^14.0.10",
     "serverless": "^4.32.0",
     "serverless-domain-manager": "^9.1.0",
@@ -34,8 +34,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.990.0",
-    "@aws-sdk/client-secrets-manager": "^3.990.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1009.0",
+    "@aws-sdk/client-secrets-manager": "^3.1009.0",
     "@hak/shared": "workspace:*",
     "jose": "^5.0.0"
   }
