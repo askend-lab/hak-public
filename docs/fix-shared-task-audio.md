@@ -20,33 +20,21 @@
 
 ## План изменений
 
-### Шаг 1: Тесты для doSynthesize() — S3 кэш
-- [ ] Написать failing тесты в `audioPlaybackHelpers.test.ts`:
+### Шаг 1+2: Тесты + реализация doSynthesize() и fetchAudioUrl() — S3 кэш
+- [x] Написать тесты в `audioPlaybackHelpers.test.ts` (6 тестов):
   - doSynthesize() проверяет S3 кэш (computeCacheKey + checkCachedAudio) перед synthesizeWithPolling()
   - doSynthesize() играет из кэша без вызова synthesizeWithPolling()
   - doSynthesize() fallback на synthesizeWithPolling() когда S3 кэш пуст
-- [ ] **КОММИТ**: `test: add failing tests for doSynthesize S3 cache check`
-
-### Шаг 2: Реализация doSynthesize() — S3 кэш
-- [ ] Изменить `audioPlaybackHelpers.ts: doSynthesize()` — добавить проверку S3 кэша через `computeCacheKey()` + `checkCachedAudio()` перед вызовом `synthesizeWithPolling()`
-- [ ] Все тесты из Шага 1 проходят
-- [ ] **КОММИТ**: `fix: doSynthesize checks S3 cache before requiring auth`
-
-### Шаг 3: Тесты для fetchAudioUrl() — S3 кэш
-- [ ] Написать failing тесты в `audioPlaybackHelpers.test.ts`:
   - fetchAudioUrl() проверяет S3 кэш перед synthesizeWithPolling()
   - fetchAudioUrl() возвращает cached URL без synthesizeWithPolling()
   - fetchAudioUrl() fallback на synthesizeWithPolling() когда S3 кэш пуст
-- [ ] **КОММИТ**: `test: add failing tests for fetchAudioUrl S3 cache check`
+- [x] Изменить `audioPlaybackHelpers.ts`: добавить `tryBackendCache()` (computeCacheKey + checkCachedAudio) в `doSynthesize()` и `fetchAudioUrl()` перед `synthesizeWithPolling()`
+- [x] Все 6 тестов проходят
+- [x] **КОММИТ**: `fix: add S3 cache check before auth in audioPlaybackHelpers`
 
-### Шаг 4: Реализация fetchAudioUrl() — S3 кэш
-- [ ] Изменить `audioPlaybackHelpers.ts: fetchAudioUrl()` — добавить проверку S3 кэша перед synthesizeWithPolling()
-- [ ] Все тесты из Шага 3 проходят
-- [ ] **КОММИТ**: `fix: fetchAudioUrl checks S3 cache before requiring auth`
-
-### Шаг 5: Проверка
-- [ ] Существующие тесты orchestratorHelpers проходят (не затронуты)
-- [ ] Существующие тесты useAudioPlaybackCore проходят
-- [ ] Существующие тесты useSharedTaskAudio проходят
-- [ ] Полный test suite проходит без ошибок
-- [ ] **КОММИТ**: `test: verify all existing tests pass with S3 cache changes`
+### Шаг 3: Проверка
+- [x] Существующие тесты orchestratorHelpers проходят (3/3)
+- [x] Существующие тесты useAudioPlaybackCore проходят (10/10)
+- [x] Существующие тесты useSharedTaskAudio проходят (8/8)
+- [x] Полный test suite проходит: 275 файлов, 2034 тестов, 0 ошибок
+- [x] **КОММИТ**: `docs: mark plan steps as complete`
