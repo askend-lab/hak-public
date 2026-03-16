@@ -127,7 +127,7 @@ function TagsInputField({ id, tags, currentInput, placeholder, onInputChange, on
         <input type="text" className="sentence-synthesis-item__input" aria-label="Sisesta lause"
           placeholder={tags.length === 0 ? (placeholder || "Kirjuta sõna või lause ja vajuta Enter") : ""}
           value={currentInput} onChange={(e) => onInputChange(id, e.target.value)} onKeyDown={onInputKeyDown}
-          onBlur={() => onInputBlur?.(id)} maxLength={100} spellCheck={false} />
+          onBlur={() => onInputBlur?.(id)} maxLength={200} spellCheck={false} />
       )}
       {(tags.length > 0 || currentInput) && onClear && (
         <button onClick={() => onClear(id)} className="sentence-synthesis-item__clear-button" aria-label="Tühjenda kõik"><CloseIcon size="sm" /></button>

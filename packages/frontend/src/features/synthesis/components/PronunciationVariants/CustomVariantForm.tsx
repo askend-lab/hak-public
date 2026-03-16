@@ -46,7 +46,7 @@ export function CustomVariantForm({ value, onChange, onPlay, onUse, onClose, onS
         <div className="pronunciation-variants__input-container">
           <div className="input-wrapper">
             <input ref={inputRef} type="text" value={value} onChange={(e) => onChange(e.target.value)}
-              placeholder="Kirjuta oma hääldusmärkidega variant" aria-label="Kohandatud hääldusvariant" className="pronunciation-variants__input" maxLength={100} />
+              placeholder="Kirjuta oma hääldusmärkidega variant" aria-label="Kohandatud hääldusvariant" className="pronunciation-variants__input" maxLength={200} />
             {value && <button onClick={() => onChange("")} className="pronunciation-variants__input-clear" aria-label="Tühjenda sisend"><CloseIcon size="sm" /></button>}
           </div>
           <div className="pronunciation-variants__input-actions">

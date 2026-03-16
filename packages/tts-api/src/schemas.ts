@@ -3,7 +3,7 @@
 
 import { z } from "zod";
 
-export const MAX_TEXT_LENGTH = 100;
+export const MAX_TEXT_LENGTH = 200;
 export const SPEED_RANGE = { min: 0.5, max: 2.0 } as const;
 export const PITCH_RANGE = { min: -500, max: 500 } as const;
 
