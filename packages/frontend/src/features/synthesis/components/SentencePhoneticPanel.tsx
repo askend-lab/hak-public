@@ -143,7 +143,7 @@ function EditSection({ editedText, setEditedText, inputRef, audio, onApply, onSh
       <p className="sentence-phonetic-panel__description">Sisesta hääldusmärgid, et täpsustada lause hääldust.</p>
       <div className="sentence-phonetic-panel__input-container">
         <textarea ref={inputRef} value={editedText} onChange={(e) => setEditedText(e.target.value)}
-          className="sentence-phonetic-panel__textarea" aria-label="Häälduskuju" placeholder="Kirjuta oma hääldusvariant" rows={4} maxLength={100} />
+          className="sentence-phonetic-panel__textarea" aria-label="Häälduskuju" placeholder="Kirjuta oma hääldusvariant" rows={4} maxLength={200} />
       </div>
       <MarkersGuideBox onInsertMarker={insertMarker} onShowGuide={onShowGuide} className="sentence-phonetic-panel__markers-guide-box" />
       <div className="sentence-phonetic-panel__actions">

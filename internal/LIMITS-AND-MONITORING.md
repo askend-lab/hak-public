@@ -136,7 +136,7 @@ From `packages/tts-api/src/schemas.ts` and `packages/tts-api/src/handler.ts`.
 
 | Parameter | Value | Source |
 |-----------|-------|--------|
-| **Max text length** | **100 characters** | `schemas.ts:6` (`MAX_TEXT_LENGTH`) |
+| **Max text length** | **200 characters** | `schemas.ts:6` (`MAX_TEXT_LENGTH`) |
 | Min text length | 2 characters | `schemas.ts:14` |
 | **Max request body** | **10 KB** (10,240 bytes) | `handler.ts:51` (`MAX_BODY_SIZE`) |
 | Speed range | 0.5 – 2.0 | `schemas.ts:7` (`SPEED_RANGE`) |

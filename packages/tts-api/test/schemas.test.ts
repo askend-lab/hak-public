@@ -13,6 +13,10 @@ import {
 } from "../src/schemas";
 
 describe("SynthesizeRequestSchema", () => {
+  it("should have MAX_TEXT_LENGTH of 200", () => {
+    expect(MAX_TEXT_LENGTH).toBe(200);
+  });
+
   it("should accept valid minimal request (text only)", () => {
     const result = SynthesizeRequestSchema.safeParse({ text: "hello" });
     expect(result.success).toBe(true);
