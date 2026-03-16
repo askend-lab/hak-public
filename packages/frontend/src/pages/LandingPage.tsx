@@ -14,7 +14,7 @@ const LANDING_EXERCISES = [
     title: "Välted",
     subtitle: "II VÄLTES või III VÄLTES",
     entries: [
-      { id: "valted-1", text: "Mari võttis tassi", stressedText: "Mari v<õt]t+is t<as]si" },
+      { id: "valted-1", text: "Mari võttis tassi", stressedText: "Mari v<õt]t+is tas]si" },
       { id: "valted-2", text: "Ta valas mahla tassi", stressedText: "ta vala+s m<ahla t<as]si" },
     ],
   },
