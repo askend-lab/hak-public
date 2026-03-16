@@ -35,31 +35,20 @@ export function useAppRedirects() {
     }
   }, [isAuthenticated, pendingTasksViewAccess, navigate]);
 
+  const needsRoleSelection = isAuthenticated && !hasCopiedEntries &&
+    !onboardingState.completed && !onboardingState.selectedRole &&
+    (pathname === "/" || pathname === "/synthesis");
+
   // Redirect first-time users to role selection on initial app load only
   useEffect(() => {
-    if (isOnboardingLoading) {return;}
-
-    // Only check on initial app load, not on subsequent navigation
+    if (isOnboardingLoading) { return; }
     if (!hasCheckedInitialRedirect.current) {
       hasCheckedInitialRedirect.current = true;
-      // Skip role selection if user has copied entries from shared task
-      if (
-        !hasCopiedEntries &&
-        !onboardingState.completed &&
-        !onboardingState.selectedRole &&
-        (pathname === "/" || pathname === "/synthesis")
-      ) {
+      if (needsRoleSelection) {
         void navigate("/role-selection", { replace: true });
       }
     }
-  }, [
-    isOnboardingLoading,
-    onboardingState.completed,
-    onboardingState.selectedRole,
-    pathname,
-    navigate,
-    hasCopiedEntries,
-  ]);
+  }, [isOnboardingLoading, needsRoleSelection, navigate]);
 
   const handleTasksClick = () => {
     if (!isAuthenticated) {

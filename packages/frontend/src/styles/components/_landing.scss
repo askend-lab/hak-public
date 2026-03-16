@@ -1,0 +1,637 @@
+// =========================================================================
+// Landing Page Component
+// =========================================================================
+// BEM: .landing, .landing__*, .landing-demo, .landing-exercise-card
+// Marketing landing page for unauthenticated users
+// =========================================================================
+
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+
+// =========================================================================
+// Landing Page Container
+// =========================================================================
+
+.landing {
+  width: 100%;
+}
+
+// =========================================================================
+// Section shared styles
+// =========================================================================
+
+.landing__section-title {
+  font-family: $font-body;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-2xl;
+  line-height: $line-height-tight;
+  color: $color-primary;
+  margin: 0 0 $spacing-8 0;
+  text-align: center;
+}
+
+// =========================================================================
+// Decorative Pattern Background (for blue sections)
+// =========================================================================
+// Moderately sized vector shapes, one per quadrant for balanced distribution.
+// Mirrored between hero and roles sections.
+// =========================================================================
+
+.landing-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.landing-pattern__el {
+  position: absolute;
+  filter: brightness(1.12);
+  opacity: 0.4;
+
+  // Slash — top-left quadrant
+  &--slash {
+    width: 180px;
+    top: 8%;
+    left: 4%;
+
+    @include desktop {
+      width: 240px;
+      left: 6%;
+    }
+  }
+
+  // Chevron — right edge, upper area
+  &--chevron {
+    width: 80px;
+    top: 20%;
+    right: -20px;
+
+    @include desktop {
+      width: 100px;
+      right: -10px;
+    }
+  }
+
+  // Wave — bottom-center-left
+  &--wave {
+    width: 220px;
+    bottom: 6%;
+    left: 18%;
+
+    @include desktop {
+      width: 280px;
+      left: 15%;
+    }
+  }
+
+  // Squares — bottom-right, shifted left for spacing from chevron
+  &--squares {
+    width: 45px;
+    bottom: 12%;
+    right: 22%;
+
+    @include desktop {
+      width: 55px;
+      right: 25%;
+    }
+  }
+}
+
+// Roles section: same layout as hero but flipped for variety
+.landing__roles > .landing-pattern {
+  .landing-pattern__el--slash {
+    transform: scaleX(-1);
+  }
+
+  .landing-pattern__el--wave {
+    transform: scaleY(-1);
+  }
+
+  .landing-pattern__el--chevron {
+    transform: scaleX(-1);
+  }
+}
+
+// Compact variant for shorter containers (content page banners).
+// Elements spread evenly across the full width for a short, wide banner.
+.landing-pattern--compact {
+  .landing-pattern__el {
+    opacity: 0.3;
+
+    // Far left, vertically centered
+    &--wave {
+      width: 140px;
+      bottom: auto;
+      left: -30px;
+      right: auto;
+      top: 50%;
+      transform: translateY(-50%);
+
+      @include desktop {
+        width: 180px;
+        left: -20px;
+      }
+    }
+
+    // Center-left, near top
+    &--slash {
+      width: 120px;
+      top: -15px;
+      left: 25%;
+      right: auto;
+      bottom: auto;
+
+      @include desktop {
+        width: 160px;
+        left: 28%;
+      }
+    }
+
+    // Center-right, near bottom
+    &--squares {
+      width: 30px;
+      top: auto;
+      left: auto;
+      bottom: 15%;
+      right: 28%;
+
+      @include desktop {
+        width: 38px;
+        right: 30%;
+      }
+    }
+
+    // Far right, vertically centered
+    &--chevron {
+      width: 55px;
+      top: 50%;
+      right: -15px;
+      left: auto;
+      bottom: auto;
+      transform: translateY(-50%);
+
+      @include desktop {
+        width: 70px;
+        right: -10px;
+      }
+    }
+  }
+}
+
+// Hide pattern on very small screens
+@include respond-below($breakpoint-mobile) {
+  .landing-pattern {
+    display: none;
+  }
+}
+
+// =========================================================================
+// Hero Section
+// =========================================================================
+
+.landing__hero {
+  background-color: $color-secondary;
+  position: relative;
+  overflow: hidden;
+  padding: $spacing-12 $spacing-4 $spacing-16;
+
+  @include tablet {
+    padding: $spacing-12 $spacing-6 $spacing-16;
+  }
+
+  @include desktop {
+    padding: $spacing-16 $spacing-8;
+  }
+}
+
+.landing__hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: $content-default;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: $spacing-6;
+}
+
+.landing__hero-title {
+  font-family: $font-body;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-3xl;
+  line-height: $line-height-tight;
+  color: $color-primary;
+  margin: 0;
+  max-width: 640px;
+
+  @include tablet {
+    font-size: $font-size-4xl;
+  }
+
+  @include desktop {
+    font-size: $font-size-5xl;
+  }
+}
+
+.landing__hero-description {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+  color: $color-trietary;
+  margin: 0;
+  max-width: 520px;
+
+  @include tablet {
+    font-size: $font-size-lg;
+  }
+}
+
+.landing__hero-cta {
+  height: 44px;
+  padding: $spacing-3 $spacing-8;
+  font-size: $font-size-md;
+}
+
+.landing__hero-demo {
+  width: 100%;
+  max-width: 520px;
+  margin-top: $spacing-4;
+}
+
+// =========================================================================
+// Landing Demo (Animated Hero)
+// =========================================================================
+
+.landing-demo {
+  transition: opacity 0.5s ease;
+
+  &--visible {
+    opacity: 1;
+  }
+
+  &--hidden {
+    opacity: 0;
+  }
+}
+
+.landing-demo__card {
+  background: $color-white;
+  border: 1px solid $color-border-light;
+  border-radius: $border-radius-xl;
+  padding: $spacing-5;
+  box-shadow: 0 4px 20px $color-shadow-primary-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.landing-demo__sentence {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+}
+
+.landing-demo__input {
+  flex: 1;
+  min-height: 42px;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $border-radius-sm;
+  border: 1px solid $color-primary;
+  background-color: $color-white;
+  display: flex;
+  align-items: center;
+}
+
+.landing-demo__typed-text {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.landing-demo__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background-color: $color-primary;
+  margin-left: 1px;
+  animation: demoCursorBlink 0.8s step-end infinite;
+}
+
+@keyframes demoCursorBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.landing-demo__tags {
+  flex: 1;
+  min-height: 42px;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $border-radius-sm;
+  border: 1px solid $color-primary;
+  background-color: $color-white;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  align-items: center;
+}
+
+.landing-demo__tag {
+  height: 22px;
+  padding: 0 $spacing-3;
+  border-radius: $border-radius-sm;
+  border: 1px solid $color-tag-border;
+  background-color: $color-tag-bg;
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  white-space: nowrap;
+  animation: demoTagAppear 0.3s ease forwards;
+  opacity: 0;
+  transform: scale(0.8);
+
+  &--selected {
+    background: $color-tag-selected-bg;
+    border-color: $color-tag-selected-border;
+    color: $color-tag-selected-text;
+    transition: all 0.3s ease;
+  }
+}
+
+@keyframes demoTagAppear {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.landing-demo__play-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: $border-radius-round;
+  border: 2px solid $color-primary;
+  background: $color-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-primary;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+
+  &--pulse {
+    background: $color-primary;
+    color: $color-white;
+    border-color: $color-primary;
+    animation: demoPlayPulse 1.2s ease infinite;
+  }
+}
+
+@keyframes demoPlayPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 $color-shadow-primary-md;
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+// Sound wave bars
+.landing-demo__wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 24px;
+  padding: $spacing-2 0;
+}
+
+.landing-demo__wave-bar {
+  width: 3px;
+  border-radius: 2px;
+  background-color: $color-primary;
+  animation: demoWave 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes demoWave {
+  0% {
+    height: 4px;
+  }
+  100% {
+    height: 20px;
+  }
+}
+
+// Variants panel
+.landing-demo__variants {
+  padding: $spacing-3 $spacing-4;
+  background-color: $color-soft-neutral-bg;
+  border-radius: $border-radius;
+  animation: demoVariantsSlide 0.3s ease forwards;
+}
+
+.landing-demo__variants-label {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-xs;
+  color: $color-gray;
+  margin-bottom: $spacing-2;
+  text-align: left;
+}
+
+.landing-demo__variants-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.landing-demo__variant {
+  height: 26px;
+  padding: 0 $spacing-3;
+  border-radius: $border-radius-sm;
+  border: 1px solid $color-tag-border;
+  background-color: $color-white;
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  animation: demoTagAppear 0.25s ease forwards;
+  opacity: 0;
+  transform: scale(0.8);
+  cursor: default;
+
+  &--active {
+    background: $color-soft-primary-bg;
+    border-color: $color-outlined-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+@keyframes demoVariantsSlide {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding: 0 $spacing-4;
+  }
+  to {
+    opacity: 1;
+    max-height: 100px;
+    padding: $spacing-3 $spacing-4;
+  }
+}
+
+// =========================================================================
+// Exercises Section
+// =========================================================================
+
+.landing__exercises {
+  background-color: $color-surface-bg;
+  padding: $spacing-12 $spacing-4;
+
+  @include tablet {
+    padding: $spacing-12 $spacing-6;
+  }
+
+  @include desktop {
+    padding: $spacing-16 $spacing-8;
+  }
+}
+
+.landing__exercises-inner {
+  max-width: $content-default;
+  margin: 0 auto;
+}
+
+.landing__exercise-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-6;
+
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// =========================================================================
+// Exercise Card
+// =========================================================================
+
+.landing-exercise-card {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-xl;
+  padding: $spacing-5;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.landing-exercise-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-4;
+}
+
+.landing-exercise-card__header-text {
+  min-width: 0;
+}
+
+.landing-exercise-card__title {
+  font-family: $font-body;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-lg;
+  line-height: $line-height-tight;
+  color: $color-primary;
+  margin: 0 0 $spacing-1 0;
+}
+
+.landing-exercise-card__subtitle {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  color: $color-trietary;
+  margin: 0;
+}
+
+.landing-exercise-card__entries {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+// =========================================================================
+// Roles Section
+// =========================================================================
+
+.landing__roles {
+  background-color: $color-secondary;
+  position: relative;
+  overflow: hidden;
+  padding: $spacing-12 $spacing-4;
+
+  @include tablet {
+    padding: $spacing-12 $spacing-6;
+  }
+
+  @include desktop {
+    padding: $spacing-16 $spacing-8;
+  }
+}
+
+.landing__roles-inner {
+  position: relative;
+  z-index: 1;
+  max-width: $content-default;
+  margin: 0 auto;
+}
+
+.landing__role-cards {
+  display: flex;
+  gap: $spacing-6;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+// Role card variant for landing page (no CTA button)
+.role-card--landing {
+  cursor: default;
+}
+
+// =========================================================================
+// Responsive
+// =========================================================================
+
+@include respond-below($breakpoint-sm) {
+  .landing__hero-title {
+    font-size: $font-size-2xl;
+  }
+
+  .landing__section-title {
+    font-size: $font-size-xl;
+  }
+
+  .landing__role-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-4;
+  }
+}

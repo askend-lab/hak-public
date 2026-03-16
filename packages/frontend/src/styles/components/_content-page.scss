@@ -32,6 +32,8 @@
 .content-page__banner {
   width: 100%;
   background-color: $color-secondary;
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,6 +57,8 @@
 }
 
 .content-page__banner-title {
+  position: relative;
+  z-index: 1;
   font-family: $font-body;
   font-weight: $font-weight-regular;
   line-height: $line-height-none;

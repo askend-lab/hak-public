@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
+import PatternBg from "@/components/ui/PatternBg";
+
 function AccessibilityBody() {
   return (
     <div className="content-page__body">
@@ -61,7 +63,7 @@ function AccessibilityFooter() {
 export default function AccessibilityPage() {
   return (
     <div className="content-page">
-      <div className="content-page__banner"><h1 className="content-page__banner-title">Ligipääsetavuse teatis</h1></div>
+      <div className="content-page__banner"><PatternBg className="landing-pattern--compact" /><h1 className="content-page__banner-title">Ligipääsetavuse teatis</h1></div>
       <AccessibilityBody />
       <AccessibilityFooter />
     </div>

@@ -4,6 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../services";
+import { consumeReturnUrl } from "../services/storage";
 import { logger } from "@hak/shared";
 import { PageLoadingState } from "@/components/ui/PageLoadingState";
 
@@ -29,13 +30,13 @@ function tryTaraAuth(handleTaraTokens: ReturnType<typeof useAuth>["handleTaraTok
 interface CallbackDeps { handleCodeCallback: (code: string) => Promise<boolean>; handleTaraTokens: ReturnType<typeof useAuth>["handleTaraTokens"]; navigate: ReturnType<typeof useNavigate> }
 
 function handleTara(deps: CallbackDeps): string | null {
-  if (tryTaraAuth(deps.handleTaraTokens)) { void deps.navigate("/", { replace: true }); return null; }
+  if (tryTaraAuth(deps.handleTaraTokens)) { void deps.navigate(consumeReturnUrl(), { replace: true }); return null; }
   return "TARA autentimise viga. Palun proovi uuesti.";
 }
 
 async function handleCodeFlow(deps: CallbackDeps, code: string): Promise<string | null> {
   const ok = await deps.handleCodeCallback(code);
-  if (ok) { void deps.navigate("/", { replace: true }); return null; }
+  if (ok) { void deps.navigate(consumeReturnUrl(), { replace: true }); return null; }
   return "Autentimise viga. Palun proovi uuesti.";
 }
 
@@ -48,7 +49,7 @@ async function processAuthCallback(deps: CallbackDeps): Promise<string | null> {
     logger.error("Auth callback error:", params.get("error"), params.get("error_description"));
     return "Autentimise viga. Palun proovi uuesti.";
   }
-  void deps.navigate("/", { replace: true });
+  void deps.navigate(consumeReturnUrl(), { replace: true });
   return null;
 }
 

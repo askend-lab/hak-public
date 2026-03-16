@@ -20,6 +20,9 @@ import SynthesisRoute from "./routes/SynthesisRoute";
 import TasksRoute from "./routes/TasksRoute";
 import SpecsRoute from "./routes/SpecsRoute";
 
+vi.mock("./pages/LandingPage", () => ({
+  default: ({ onLogin }: { onLogin: () => void }) => <div data-testid="landing-page"><button onClick={onLogin}>Login from landing</button></div>,
+}));
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/CopiedEntriesContext", () => ({
   useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
@@ -124,7 +127,9 @@ describe("App Routing", () => {
   });
 
   describe("authentication-based routing", () => {
-    it("shows role selection when onboarding not completed", async () => {
+    it("shows role selection when onboarding not completed and authenticated", async () => {
+      const { useAuth } = await import("./features/auth/services");
+      vi.mocked(useAuth).mockReturnValue({ ...mockAuthContext(), isAuthenticated: true, user: { id: "1", name: "Test", email: "t@t.com" } } as ReturnType<typeof useAuth>);
       const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {

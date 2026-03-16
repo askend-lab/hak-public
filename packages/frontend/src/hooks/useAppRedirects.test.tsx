@@ -99,11 +99,20 @@ describe("useAppRedirects", () => {
   });
 
   describe("onboarding redirect", () => {
-    it("redirects to role-selection when onboarding not completed", () => {
+    it("redirects to role-selection when onboarding not completed and authenticated", () => {
+      mockIsAuthenticated = true;
       mockOnboardingState = { completed: false, selectedRole: null };
       renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
 
       expect(mockNavigate).toHaveBeenCalledWith("/role-selection", { replace: true });
+    });
+
+    it("does not redirect to role-selection when not authenticated", () => {
+      mockIsAuthenticated = false;
+      mockOnboardingState = { completed: false, selectedRole: null };
+      renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
+
+      expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it("does not redirect when onboarding is completed", () => {
@@ -137,6 +146,7 @@ describe("useAppRedirects", () => {
     });
 
     it("only checks redirect once (initial load)", () => {
+      mockIsAuthenticated = true;
       mockOnboardingState = { completed: false, selectedRole: null };
       const { rerender } = renderHook(() => useAppRedirects(), { wrapper: createWrapper("/synthesis") });
 

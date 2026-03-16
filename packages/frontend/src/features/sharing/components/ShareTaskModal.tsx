@@ -49,7 +49,6 @@ export default function ShareTaskModal({ isOpen, shareToken, taskName, onClose, 
         <label htmlFor="share-url" className="share-task-modal__label">Jagamislink</label>
         <input id="share-url" type="text" value={shareUrl} readOnly className="share-task-modal__input" />
       </div>
-      <p className="share-task-modal__expiry">Jagamislink kehtib 90 päeva.</p>
       <ShareActions shareUrl={shareUrl} onRevoke={onRevoke} onClose={onClose} />
     </BaseModal>
   );

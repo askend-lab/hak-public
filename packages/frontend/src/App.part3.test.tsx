@@ -20,6 +20,9 @@ import {
 import SynthesisRoute from "./routes/SynthesisRoute";
 import TasksRoute from "./routes/TasksRoute";
 
+vi.mock("./pages/LandingPage", () => ({
+  default: ({ onLogin }: { onLogin: () => void }) => <div data-testid="landing-page"><button onClick={onLogin}>Login from landing</button></div>,
+}));
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/CopiedEntriesContext", () => ({
   useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
@@ -121,7 +124,9 @@ describe("App (Home)", () => {
   });
 
   describe("help button", () => {
-    it("renders help button", async () => {
+    it("renders help button when authenticated", async () => {
+      const { useAuth } = await import("./features/auth/services");
+      vi.mocked(useAuth).mockReturnValue({ ...mockAuthContext(), isAuthenticated: true, user: { id: "1", name: "Test", email: "t@t.com" } } as ReturnType<typeof useAuth>);
       const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {
@@ -148,6 +153,8 @@ describe("App (Home)", () => {
 
   describe("onboarding wizard", () => {
     it("shows wizard when active", async () => {
+      const { useAuth } = await import("./features/auth/services");
+      vi.mocked(useAuth).mockReturnValue({ ...mockAuthContext(), isAuthenticated: true, user: { id: "1", name: "Test", email: "t@t.com" } } as ReturnType<typeof useAuth>);
       const { useOnboarding } = await import("./features/onboarding/contexts/OnboardingContext");
       vi.mocked(useOnboarding).mockReturnValue({
         state: {

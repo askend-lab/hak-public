@@ -20,6 +20,9 @@ import {
 import SynthesisRoute from "./routes/SynthesisRoute";
 import TasksRoute from "./routes/TasksRoute";
 
+vi.mock("./pages/LandingPage", () => ({
+  default: ({ onLogin }: { onLogin: () => void }) => <div data-testid="landing-page"><button onClick={onLogin}>Login from landing</button></div>,
+}));
 vi.mock("./features/auth/services", () => ({ useAuth: vi.fn(() => mockAuthContext()) }));
 vi.mock("./contexts/CopiedEntriesContext", () => ({
   useCopiedEntries: () => ({ copiedEntries: null, setCopiedEntries: vi.fn(), consumeCopiedEntries: vi.fn().mockReturnValue(null), hasCopiedEntries: false }),
@@ -122,6 +125,8 @@ describe("App (Home)", () => {
 
   describe("add sentence button", () => {
     it("calls handleAddSentence when clicked", async () => {
+      const { useAuth } = await import("./features/auth/services");
+      vi.mocked(useAuth).mockReturnValue({ ...mockAuthContext(), isAuthenticated: true, user: { id: "1", name: "Test", email: "t@t.com" } } as ReturnType<typeof useAuth>);
       const handleAddSentence = vi.fn();
       const { useSynthesis } = await import("./hooks");
       vi.mocked(useSynthesis).mockReturnValue({
