@@ -10,6 +10,7 @@ import type { TaskEntry } from "@/types/task";
 interface ExerciseEntry {
   readonly id: string;
   readonly text: string;
+  readonly stressedText: string;
 }
 
 interface LandingExerciseCardProps {
@@ -23,7 +24,7 @@ function toTaskEntries(entries: readonly ExerciseEntry[]): TaskEntry[] {
     id: e.id,
     text: e.text,
     taskId: "",
-    stressedText: "",
+    stressedText: e.stressedText,
     audioUrl: null,
     audioBlob: null,
     order: 0,

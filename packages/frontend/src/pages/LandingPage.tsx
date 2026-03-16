@@ -14,8 +14,8 @@ const LANDING_EXERCISES = [
     title: "Välted",
     subtitle: "II VÄLTES või III VÄLTES",
     entries: [
-      { id: "valted-1", text: "Mari võttis tassi" },
-      { id: "valted-2", text: "Ta valas mahla tassi" },
+      { id: "valted-1", text: "Mari võttis tassi", stressedText: "Mari v<õt]t+is t<as]si" },
+      { id: "valted-2", text: "Ta valas mahla tassi", stressedText: "ta vala+s m<ahla t<as]si" },
     ],
   },
   {
@@ -23,8 +23,8 @@ const LANDING_EXERCISES = [
     title: "Peenendus",
     subtitle: "Harjuta n ja n'",
     entries: [
-      { id: "peenendus-1", text: "tonn" },
-      { id: "peenendus-2", text: "pani" },
+      { id: "peenendus-1", text: "tonn", stressedText: "t<on]n" },
+      { id: "peenendus-2", text: "pani", stressedText: "pan+i" },
     ],
   },
 ] as const;
