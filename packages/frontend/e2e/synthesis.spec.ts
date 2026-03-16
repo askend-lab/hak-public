@@ -19,25 +19,29 @@ test.describe("Speech Synthesis Prototype", () => {
     );
   });
 
-  test("should load synthesis page and accept input", async ({ page }) => {
+  test("unauthenticated user sees landing page with CTA", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    // Landing page should load with hero heading
+    await expect(page.locator("h1")).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("h1")).toContainText("häälduse");
+
+    // CTA button should be visible
+    const cta = page.locator("button").filter({ hasText: /Hakka harjutama/i });
+    await expect(cta).toBeVisible({ timeout: 5000 });
+
+    // Take screenshot for verification
+    await page.screenshot({ path: "e2e/screenshots/landing-page-test.png" });
+  });
+
+  test("unauthenticated user redirected from /synthesis to landing", async ({ page }) => {
     await page.goto("/synthesis");
     await page.waitForLoadState("networkidle");
 
-    // Synthesis page should load with heading
+    // Should see landing page content, not synthesis input
     await expect(page.locator("h1")).toBeVisible({ timeout: 5000 });
-
-    // Find the first text input (TagsInput uses a plain input element)
     const input = page.locator(".sentence-synthesis-item input").first();
-    await expect(input).toBeVisible({ timeout: 5000 });
-    await input.fill("tere");
-
-    // Press Enter to commit the sentence — creates a tag
-    await input.press("Enter");
-
-    // Tag should be visible (text committed as word tag)
-    await expect(page.locator(".sentence-synthesis-item")).toBeVisible();
-
-    // Take screenshot for verification
-    await page.screenshot({ path: "e2e/screenshots/synthesis-test.png" });
+    await expect(input).not.toBeVisible({ timeout: 2000 });
   });
 });
