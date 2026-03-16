@@ -15,9 +15,6 @@ custom:
     target: "node20"
     packager: "pnpm"
 
-  concurrency:
-    prod:
-      api: 50
 
   allowedOrigin:
     dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
@@ -62,7 +59,6 @@ provider:
 functions:
   api:
     handler: src/lambda/handler.handler
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.api, null}
     events:
       - http:
           path: /save

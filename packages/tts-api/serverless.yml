@@ -16,12 +16,6 @@ custom:
     external:
       - "@aws-sdk/*"
 
-  concurrency:
-    prod:
-      synthesize: 25
-      status: 25
-      health: 5
-
   allowedOrigin:
     dev: https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
     prod: https://hak.${env:DOMAIN_NAME, 'example.com'}
@@ -92,7 +86,6 @@ functions:
   synthesize:
     handler: src/handler.synthesize
     timeout: 30
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.synthesize, null}
     events:
       - httpApi:
           path: /synthesize
@@ -103,7 +96,6 @@ functions:
   status:
     handler: src/handler.status
     timeout: 10
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.status, null}
     events:
       - httpApi:
           path: /status/{cacheKey}
@@ -112,7 +104,6 @@ functions:
   health:
     handler: src/handler.health
     timeout: 5
-    reservedConcurrency: ${self:custom.concurrency.${self:provider.stage}.health, null}
     events:
       - httpApi:
           path: /health
