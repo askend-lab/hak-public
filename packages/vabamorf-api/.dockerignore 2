@@ -1,7 +1,0 @@
-node_modules
-test
-*.test.ts
-*.test.js
-tsconfig.json
-.eslintrc*
-README.md
