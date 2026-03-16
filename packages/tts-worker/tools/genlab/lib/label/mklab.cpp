@@ -7,8 +7,6 @@
 #include "syls.h"
 #include "label.h"
 
-// nb, em, lyh tootlus efm-ile
-
 Printer P;
 
 CFSWString DealWithText(CFSWString text) {
@@ -291,6 +289,10 @@ bool is_fm(CFSWString s) {
 	return false;
 }
 
+bool is_pluss(CFSWString c) {
+    if (c.FindOneOf(L"+") > -1) return true;
+    return false;
+}
 
 CFSClassArray<TWord> TUtterance::DoNumbers(CFSClassArray<TWord> TWA) {
 	CFSClassArray<TWord> Result;
@@ -431,7 +433,21 @@ CFSClassArray<TWord> TUtterance::DoTokens(CFSClassArray<TWord> TWA) {
 
 			Token.Delete(Token.GetLength() - 1, 1);
 			TWA[i].Token = Token;
+                }
+
+ //               P.prnn(L"\tDT_alg+: " + Token);
+
+                // plussmärgid muutelopu tahisena valja
+                for (INTPTR j = 0; j < Token.GetLength() - 1; j++) {
+                    if (Token.GetAt(j) == L'+') {
+                        if (j == 0 || is_digit(Token.GetAt(j+1))) break;
+                        Token.Replace(L"+", L"", 1);
+                        TWA[i].Token = Token;
+                    }
 		}
+
+//                P.prnn(L"\tDT_alg++: " + Token);
+
 		// Sidesõnad fraasipiiriks
 		if (is_conju(TWA[i].TWMInfo.m_szRoot))
 			TWA[i].PhrBreakAfter = 1;
