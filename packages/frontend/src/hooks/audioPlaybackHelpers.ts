@@ -3,7 +3,7 @@
 
 import { logger } from "@hak/shared";
 import { TaskEntry, getEntryPlayUrl } from "@/types/task";
-import { synthesizeWithPolling } from "@/features/synthesis/utils/synthesize";
+import { synthesizeWithPolling, computeCacheKey, checkCachedAudio } from "@/features/synthesis/utils/synthesize";
 import { getVoiceModel } from "@/types/synthesis";
 import type { AudioAction } from "./useAudioPlaybackState";
 
@@ -35,13 +35,22 @@ function attachSynthHandlers(audio: HTMLAudioElement, opts: { audioUrl: string; 
   });
 }
 
+async function tryBackendCache(text: string): Promise<string | null> {
+  if (!text.trim()) {return null;}
+  try {
+    const cacheKey = await computeCacheKey(text, getVoiceModel(text));
+    return await checkCachedAudio(cacheKey);
+  } catch { return null; }
+}
+
 async function doSynthesize(input: SynthesizeInput): Promise<void> {
   const { entry, id, logPrefix, dispatch } = input;
   dispatch({ type: "SET_LOADING", id });
   try {
-    const result = await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text));
-    const audio = new Audio(result.audioUrl);
-    attachSynthHandlers(audio, { audioUrl: result.audioUrl, id, logPrefix, dispatch });
+    const cached = await tryBackendCache(entry.stressedText);
+    const audioUrl = cached ?? (await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text))).audioUrl;
+    const audio = new Audio(audioUrl);
+    attachSynthHandlers(audio, { audioUrl, id, logPrefix, dispatch });
     await audio.play();
   } catch (error) {
     logger.warn(`${logPrefix} playback failed:`, error);
@@ -67,16 +76,20 @@ export function synthesizeAndCreateAudio(input: SynthesizeInput): void {
   }
 }
 
+function clearLoading(dispatch: Dispatch): null { dispatch({ type: "CLEAR_LOADING" }); return null; }
+
 async function fetchAudioUrl(entry: TaskEntry, abortSignal: AbortSignal, dispatch: Dispatch): Promise<string | null> {
   dispatch({ type: "SET_LOADING", id: entry.id });
   try {
+    const cached = await tryBackendCache(entry.stressedText);
+    if (cached) {return cached;}
+    if (abortSignal.aborted) {return clearLoading(dispatch);}
     const result = await synthesizeWithPolling(entry.stressedText, getVoiceModel(entry.text));
-    if (abortSignal.aborted) { dispatch({ type: "CLEAR_LOADING" }); return null; }
+    if (abortSignal.aborted) {return clearLoading(dispatch);}
     return result.audioUrl;
   } catch (error) {
     logger.warn("Synthesis polling failed:", error);
-    dispatch({ type: "CLEAR_LOADING" });
-    return null;
+    return clearLoading(dispatch);
   }
 }
 
