@@ -9,8 +9,8 @@ Connect `haaldusabiline.eki.ee` (owned by EKI) to HAK prod environment (`hak.ask
 | Item | Dev | Prod |
 |------|-----|------|
 | Primary domain | `hak-dev.askend-lab.com` | `hak.askend-lab.com` |
-| `custom_domain` in tfvars | `haaldusabiline.eki.ee` | **not set** |
-| ACM cert for custom domain | created (pending validation) | **not created** |
+| `custom_domain` in tfvars | ~~`haaldusabiline.eki.ee`~~ removed | `haaldusabiline.eki.ee` (Phase 1) |
+| ACM cert for custom domain | will be destroyed (unused) | will be created (Phase 1) |
 | CloudFront alias | `hak-dev.askend-lab.com` only | `hak.askend-lab.com` only |
 
 ## CI/CD Context
@@ -78,12 +78,11 @@ After ACM cert status = "Issued":
 
 ## Safety Notes
 
-- Phase 1 only creates an ACM cert — no impact on existing CloudFront/domains
+- Phase 1 only creates an ACM cert for prod + destroys unused cert in dev — no impact on existing CloudFront/domains
 - Phase 3 changes CloudFront aliases — this is the critical step. The cert MUST be validated before this, otherwise CloudFront will reject the config
-- Dev environment already has `custom_domain` set but CloudFront alias not yet added — same Phase 3 change will enable it for dev too
-- Consider: should dev also serve `haaldusabiline.eki.ee`? Probably not — one domain can only CNAME to one CloudFront. May want to remove `custom_domain` from dev.tfvars after prod is live.
+- `custom_domain` removed from dev.tfvars to avoid alias conflict (one domain → one CloudFront)
 
-## Questions for Alex
+## Decisions Made
 
-1. Should we remove `custom_domain` from `dev.tfvars` before Phase 3? (Two CloudFront distributions can't share the same alias)
-2. Is Tatjana handling communication with EKI, or should we prepare the email text?
+1. `custom_domain` removed from `dev.tfvars` — only prod gets the custom domain (avoids alias conflict)
+2. `hak.askend-lab.com` stays as primary alias — `haaldusabiline.eki.ee` is added alongside it
