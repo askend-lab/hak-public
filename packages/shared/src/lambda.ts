@@ -16,16 +16,23 @@ export interface LambdaResponse {
 
 /**
  * Returns the allowed CORS origin from ALLOWED_ORIGIN env var.
+ * Supports comma-separated list of allowed origins (for multi-domain setups).
+ * When requestOrigin is provided and matches an allowed origin, reflects it back.
  * Returns "null" (restrictive) when not set to prevent accidental wildcard CORS.
  */
-export function getCorsOrigin(): string {
+export function getCorsOrigin(requestOrigin?: string): string {
   // eslint-disable-next-line no-restricted-globals -- Lambda-only: safe in Node.js runtime
   const origin = typeof process !== "undefined" ? process.env?.ALLOWED_ORIGIN : undefined;
   if (!origin) {
     logger.warn("ALLOWED_ORIGIN not set — defaulting to restrictive 'null' origin");
     return "null";
   }
-  return origin;
+  if (requestOrigin && origin.includes(",")) {
+    const allowed = origin.split(",").map((o: string) => o.trim());
+    if (allowed.includes(requestOrigin)) {return requestOrigin;}
+  }
+  const first = origin.split(",")[0];
+  return first ? first.trim() : origin;
 }
 
 /**
