@@ -242,7 +242,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
 
       - name: Deploy Morphology API
+        id: deploy-morphology
         if: steps.state.outputs.deploy_morphology_api == 'true'
+        continue-on-error: true
         working-directory: packages/morphology-api
         env:
           VABAMORF_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ steps.state.outputs.morphology_sha }}
@@ -386,7 +388,15 @@ jobs:
           [ "${{ steps.state.outputs.deploy_frontend }}" == "true" ] && echo "- ✅ frontend" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ frontend (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_store }}" == "true" ] && echo "- ✅ store" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ store (unchanged)" >> $GITHUB_STEP_SUMMARY
           [ "${{ steps.state.outputs.deploy_tts_api }}" == "true" ] && echo "- ✅ tts-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ tts-api (unchanged)" >> $GITHUB_STEP_SUMMARY
-          [ "${{ steps.state.outputs.deploy_morphology_api }}" == "true" ] && echo "- ✅ morphology-api" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ morphology-api (unchanged)" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.state.outputs.deploy_morphology_api }}" == "true" ]; then
+            if [ "${{ steps.deploy-morphology.outcome }}" == "failure" ]; then
+              echo "- ❌ morphology-api (deploy failed — stack needs recovery)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ✅ morphology-api" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "- ⏭️ morphology-api (unchanged)" >> $GITHUB_STEP_SUMMARY
+          fi
           [ "${{ steps.state.outputs.deploy_auth }}" == "true" ] && echo "- ✅ auth" >> $GITHUB_STEP_SUMMARY || echo "- ⏭️ auth (unchanged)" >> $GITHUB_STEP_SUMMARY
 
       - name: Notify Slack (success)
