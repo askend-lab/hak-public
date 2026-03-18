@@ -8,10 +8,6 @@ import { checkCachedAudio, computeCacheKey } from "@/features/synthesis/utils/sy
 import type { useSynthesisAPI } from "./useSynthesisAPI";
 import type { useAudioPlayer } from "./useAudioPlayer";
 
-// #region agent log
-const _dbg = (loc: string, msg: string, data: Record<string, unknown>, hyp: string) => { const p = {sessionId:'48623f',location:loc,message:msg,data,timestamp:Date.now(),hypothesisId:hyp}; console.warn('[DBG]',msg,data); fetch('/debug-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}).catch(()=>{}); };
-// #endregion
-
 const MAX_RETRY_COUNT = 1;
 const RETRY_DELAY_MS = 100;
 
@@ -50,11 +46,7 @@ async function tryBackendCache(text: string): Promise<string | null> {
   if (!text.trim()) {return null;}
   try {
     const cacheKey = await computeCacheKey(text, getVoiceModel(text));
-    const result = await checkCachedAudio(cacheKey);
-    // #region agent log
-    _dbg('orchestratorHelpers.ts:tryBackendCache','Backend cache lookup',{textUsedForKey:text,voice:getVoiceModel(text),cacheKey,hit:!!result},'A');
-    // #endregion
-    return result;
+    return await checkCachedAudio(cacheKey);
   } catch { return null; }
 }
 
@@ -162,9 +154,6 @@ interface FreshSynthOpts {
 }
 
 async function freshSynthesize(deps: OrchestratorDeps, opts: FreshSynthOpts): Promise<void> {
-  // #region agent log
-  _dbg('orchestratorHelpers.ts:freshSynthesize','Synthesizing from scratch',{id:opts.id,text:opts.text,phoneticHint:opts.phoneticHint},'C');
-  // #endregion
   const result = await deps.synthesisAPI.synthesizeText(opts.text, opts.phoneticHint);
   const tags = convertTextToTags(opts.text);
   await deps.playAudio(result.audioUrl, {
@@ -199,10 +188,6 @@ interface BackendCacheOpts { readonly id: string; readonly text: string; readonl
 async function tryPlayFromBackendCache(deps: OrchestratorDeps, opts: BackendCacheOpts): Promise<boolean> {
   const cachedUrl = await tryBackendCache(opts.lookupText || opts.text);
   if (!cachedUrl) {return false;}
-  // #region agent log
-  const sentBefore = deps.getSentence(opts.id);
-  _dbg('orchestratorHelpers.ts:tryPlayFromBackendCache','Backend cache HIT',{id:opts.id,text:opts.text,cachedUrl,phoneticTextBefore:sentBefore?.phoneticText,stressedTagsBefore:sentBefore?.stressedTags},'B');
-  // #endregion
   const sentence = deps.getSentence(opts.id);
   const phoneticText = sentence?.phoneticText || opts.text;
   const stressedTags = sentence?.stressedTags || convertTextToTags(phoneticText);
@@ -224,9 +209,6 @@ async function tryPlayFromBackendCache(deps: OrchestratorDeps, opts: BackendCach
 export async function doSynthesizeAndPlay(deps: OrchestratorDeps, id: string, retryCount = 0): Promise<void> {
   const sentence = deps.sentencesRef.current.find((s) => s.id === id);
   if (!sentence?.text.trim()) {return;}
-  // #region agent log
-  _dbg('orchestratorHelpers.ts:doSynthesizeAndPlay','Entry',{id,text:sentence.text,phoneticText:sentence.phoneticText,audioUrl:sentence.audioUrl?'exists':null,stressedTags:sentence.stressedTags,tags:sentence.tags,retryCount},'C,D');
-  // #endregion
   deps.stopCurrentAudio();
   if (await tryPlayFromCache(deps, { id, sentence, retryCount })) {return;}
   if (await tryPlayFromBackendCache(deps, { id, text: sentence.text, lookupText: sentence.phoneticText || undefined, retryCount, retrySelf: () => { void doSynthesizeAndPlay(deps, id, retryCount + 1); } })) {return;}
@@ -252,10 +234,6 @@ async function tryCachedText(deps: OrchestratorDeps, opts: SynthTextOpts): Promi
 
 export async function doSynthesizeWithText(deps: OrchestratorDeps, opts: SynthTextOpts): Promise<void> {
   const { id, text, retryCount = 0 } = opts;
-  // #region agent log
-  const sentEntry = deps.getSentence(id);
-  _dbg('orchestratorHelpers.ts:doSynthesizeWithText','Entry',{id,textArg:text,sentText:sentEntry?.text,phoneticText:sentEntry?.phoneticText,audioUrl:sentEntry?.audioUrl?'exists':null,stressedTags:sentEntry?.stressedTags},'C,E');
-  // #endregion
   deps.stopCurrentAudio();
   if (await tryCachedText(deps, opts)) {return;}
   if (await tryPlayFromBackendCache(deps, { id, text, retryCount, retrySelf: () => { void doSynthesizeWithText(deps, opts); } })) {return;}

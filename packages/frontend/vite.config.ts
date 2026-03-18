@@ -5,7 +5,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { execSync } from "child_process";
-import fs from "fs";
 
 function getGitInfo(): {
   commitHash: string;
@@ -56,20 +55,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    {
-      name: "debug-log-writer",
-      configureServer(server) {
-        server.middlewares.use("/debug-log", (req, res) => {
-          let body = "";
-          req.on("data", (c: Buffer) => { body += c.toString(); });
-          req.on("end", () => {
-            try { fs.appendFileSync(path.resolve(__dirname, "../../.cursor/debug-48623f.log"), body + "\n"); } catch {}
-            res.writeHead(204);
-            res.end();
-          });
-        });
-      },
-    },
     {
       name: "proxy-prod-warning",
       configResolved(config): void {
