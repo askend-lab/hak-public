@@ -26,7 +26,11 @@ function buildReplaceResult(s: SentenceState, tagIndex: number, newWords: string
 function buildStressedResult(s: SentenceState, tagIndex: number, variantText: string): Partial<SentenceState> {
   const newStressed = s.stressedTags ? [...s.stressedTags] : [...s.tags];
   newStressed[tagIndex] = variantText;
-  return { stressedTags: newStressed, phoneticText: newStressed.join(" "), audioUrl: undefined };
+  const result = { stressedTags: newStressed, phoneticText: newStressed.join(" "), audioUrl: undefined };
+  // #region agent log
+  const _p={sessionId:'48623f',location:'useTagUpdater.ts:buildStressedResult',message:'Variant applied (Kasuta)',data:{tagIndex,variantText,oldStressedTags:s.stressedTags,oldPhoneticText:s.phoneticText,newStressedTags:result.stressedTags,newPhoneticText:result.phoneticText,sentenceText:s.text,sentenceTags:s.tags},timestamp:Date.now(),hypothesisId:'C'};console.warn('[DBG]',_p.message,_p.data);fetch('/debug-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(_p)}).catch(()=>{});
+  // #endregion
+  return result;
 }
 
 /**

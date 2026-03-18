@@ -100,6 +100,9 @@ export function useVariantsPanel(
   const handleTagClick = useCallback(async (sentenceId: string, tagIndex: number, word: string) => {
     ps.close();
     const sentence = sentences.find((s) => s.id === sentenceId);
+    // #region agent log
+    const _p={sessionId:'48623f',location:'useVariantsPanel.ts:handleTagClick',message:'Opening variants panel',data:{sentenceId,tagIndex,word,hasStressedTags:!!sentence?.stressedTags,stressedTags:sentence?.stressedTags,phoneticText:sentence?.phoneticText,tags:sentence?.tags,phoneticWillShow:sentence?.stressedTags?sentence.stressedTags[tagIndex]:null},timestamp:Date.now(),hypothesisId:'B,E'};console.warn('[DBG]',_p.message,_p.data);fetch('/debug-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(_p)}).catch(()=>{});
+    // #endregion
     if (sentence?.stressedTags) { vs.openPanel({ sentenceId, tagIndex, word, phonetic: sentence.stressedTags[tagIndex] }); return; }
     const stressed = await analyzeText(sentence?.tags.join(" ") || "");
     if (!stressed) { vs.openPanel({ sentenceId, tagIndex, word }); return; }

@@ -48,6 +48,9 @@ function stopPlayback(deps: UseSentenceActionsDeps, id: string): void {
 function playWithInput(deps: UseSentenceActionsDeps, id: string, sentence: SentenceState): void {
   const allTags = normalizeTags([...sentence.tags, ...convertTextToTags(sentence.currentInput)]);
   const fullText = allTags.join(" ");
+  // #region agent log
+  const _p={sessionId:'48623f',location:'useSentenceActions.ts:playWithInput',message:'playWithInput merging tags',data:{id,existingTags:sentence.tags,currentInput:sentence.currentInput,mergedTags:allTags,fullText,existingPhoneticText:sentence.phoneticText,existingStressedTags:sentence.stressedTags,existingAudioUrl:sentence.audioUrl?'exists':null},timestamp:Date.now(),hypothesisId:'E'};console.warn('[DBG]',_p.message,_p.data);fetch('/debug-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(_p)}).catch(()=>{});
+  // #endregion
   deps.updateSentence(id, { tags: allTags, currentInput: "", text: fullText, ...CACHE_INVALIDATION });
   deps.synthesizeWithText(id, fullText);
 }
