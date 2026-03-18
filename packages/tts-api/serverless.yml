@@ -40,6 +40,7 @@ provider:
       allowedOrigins:
         - https://hak-dev.${env:DOMAIN_NAME, 'example.com'}
         - https://hak.${env:DOMAIN_NAME, 'example.com'}
+        - https://haaldusabiline.eki.ee
       allowedMethods:
         - GET
         - POST
