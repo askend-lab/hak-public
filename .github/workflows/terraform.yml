@@ -178,6 +178,21 @@ jobs:
               terraform state rm "$resource" 2>/dev/null || true
             fi
           done
+
+          # Remove FAILED ACM certificates from state so Terraform recreates them.
+          # ACM certs stuck in FAILED status (e.g. CAA_ERROR) can't recover — must be deleted and re-requested.
+          for cert_resource in $(terraform state list 2>/dev/null | grep 'aws_acm_certificate\.' || true); do
+            CERT_ARN=$(terraform state show "$cert_resource" 2>/dev/null | grep '^\s*arn\s' | awk -F'"' '{print $2}' || true)
+            if [ -n "$CERT_ARN" ]; then
+              REGION=$(echo "$CERT_ARN" | cut -d: -f4)
+              STATUS=$(aws acm describe-certificate --certificate-arn "$CERT_ARN" --region "$REGION" --query 'Certificate.Status' --output text 2>/dev/null || true)
+              if [ "$STATUS" == "FAILED" ]; then
+                echo "⚠️ Removing FAILED certificate from state: $cert_resource ($CERT_ARN)"
+                aws acm delete-certificate --certificate-arn "$CERT_ARN" --region "$REGION" 2>/dev/null || true
+                terraform state rm "$cert_resource" 2>/dev/null || true
+              fi
+            fi
+          done
           echo "✅ Orphaned resources removed from state"
         continue-on-error: true
 
