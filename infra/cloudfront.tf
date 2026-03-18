@@ -74,7 +74,7 @@ resource "aws_cloudfront_distribution" "website" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  aliases             = [local.domain_name]
+  aliases             = var.custom_domain != "" ? [local.domain_name, var.custom_domain] : [local.domain_name]
 
   origin {
     domain_name              = aws_s3_bucket.website.bucket_regional_domain_name
@@ -209,7 +209,7 @@ resource "aws_cloudfront_distribution" "website" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.website.arn
+    acm_certificate_arn      = var.custom_domain != "" ? aws_acm_certificate_validation.custom_domain[0].certificate_arn : aws_acm_certificate.website.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -252,20 +252,47 @@ resource "aws_acm_certificate_validation" "website" {
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
-# ACM Certificate for custom domain (e.g. haaldusabiline.eki.ee)
-# Phase 1: cert is created and pending DNS validation
-# Phase 2: after domain owner adds CNAME, cert validates → add as CloudFront alias
+# ACM Certificate for custom domain setup
+# Multi-SAN cert covering both primary domain and custom domain.
+# CloudFront requires the cert to cover ALL aliases.
 resource "aws_acm_certificate" "custom_domain" {
-  count             = var.custom_domain != "" ? 1 : 0
-  provider          = aws.us_east_1
-  domain_name       = var.custom_domain
-  validation_method = "DNS"
+  count                     = var.custom_domain != "" ? 1 : 0
+  provider                  = aws.us_east_1
+  domain_name               = local.domain_name
+  subject_alternative_names = [var.custom_domain]
+  validation_method         = "DNS"
 
   tags = merge(local.common_tags, {
-    Name = var.custom_domain
+    Name = "${local.domain_name}-${var.custom_domain}"
   })
 
   lifecycle {
     create_before_destroy = true
   }
+}
+
+# Route53 validation records for the custom domain cert (only for domains we manage in Route53).
+# The custom domain (e.g. haaldusabiline.eki.ee) is validated externally by the domain owner.
+resource "aws_route53_record" "custom_domain_cert_validation" {
+  for_each = var.custom_domain != "" ? {
+    for dvo in aws_acm_certificate.custom_domain[0].domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    } if endswith(dvo.domain_name, var.domain_name)
+  } : {}
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.terraform_remote_state.infra.outputs.route53_zone_id
+}
+
+# Wait for the custom domain cert to be fully validated (both domains)
+resource "aws_acm_certificate_validation" "custom_domain" {
+  count           = var.custom_domain != "" ? 1 : 0
+  provider        = aws.us_east_1
+  certificate_arn = aws_acm_certificate.custom_domain[0].arn
 }

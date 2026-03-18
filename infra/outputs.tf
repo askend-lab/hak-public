@@ -44,6 +44,6 @@ output "custom_domain_validation_records" {
     for dvo in aws_acm_certificate.custom_domain[0].domain_validation_options : dvo.domain_name => {
       cname_name  = dvo.resource_record_name
       cname_value = dvo.resource_record_value
-    }
+    } if !endswith(dvo.domain_name, var.domain_name)
   } : {}
 }
