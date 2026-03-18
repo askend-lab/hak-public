@@ -39,6 +39,26 @@ describe("lambda", () => {
       process.env.ALLOWED_ORIGIN = "https://example.com";
       expect(getCorsOrigin()).toBe("https://example.com");
     });
+
+    it("should reflect matching requestOrigin from comma-separated list", () => {
+      process.env.ALLOWED_ORIGIN = "https://primary.com,https://custom.com";
+      expect(getCorsOrigin("https://custom.com")).toBe("https://custom.com");
+    });
+
+    it("should return first origin when requestOrigin does not match", () => {
+      process.env.ALLOWED_ORIGIN = "https://primary.com,https://custom.com";
+      expect(getCorsOrigin("https://unknown.com")).toBe("https://primary.com");
+    });
+
+    it("should return first origin from comma-separated list when no requestOrigin", () => {
+      process.env.ALLOWED_ORIGIN = "https://primary.com,https://custom.com";
+      expect(getCorsOrigin()).toBe("https://primary.com");
+    });
+
+    it("should return single origin even with requestOrigin (no comma)", () => {
+      process.env.ALLOWED_ORIGIN = "https://example.com";
+      expect(getCorsOrigin("https://example.com")).toBe("https://example.com");
+    });
   });
 
   describe("createApiResponse", () => {

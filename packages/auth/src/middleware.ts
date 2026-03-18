@@ -4,7 +4,7 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { CORS_HEADERS, getCorsOrigin } from '@hak/shared';
 import * as crypto from 'crypto';
-import { getFrontendUrl } from './cookies';
+import { getAllowedFrontendUrls } from './cookies';
 
 export const AUTH_CALLBACK_PATH = '/auth/callback';
 export const RANDOM_STRING_LENGTH = 32;
@@ -14,19 +14,23 @@ export function generateRandomString(length: number): string {
   return crypto.randomBytes(length).toString('base64url').substring(0, length);
 }
 
-export function corsResponseHeaders(): Record<string, string> {
+export function getRequestOrigin(event: APIGatewayProxyEvent): string | undefined {
+  return event.headers.Origin || event.headers.origin;
+}
+
+export function corsResponseHeaders(requestOrigin?: string): Record<string, string> {
   return {
     ...CORS_HEADERS,
-    'Access-Control-Allow-Origin': getCorsOrigin(),
+    'Access-Control-Allow-Origin': getCorsOrigin(requestOrigin),
     'Access-Control-Allow-Credentials': 'true',
   };
 }
 
 export function validateCsrfOrigin(event: APIGatewayProxyEvent): boolean {
-  const origin = event.headers.Origin || event.headers.origin;
+  const origin = getRequestOrigin(event);
   if (!origin) {return false;}
-  const expected = getFrontendUrl();
-  return origin === expected;
+  const allowed = getAllowedFrontendUrls();
+  return allowed.includes(origin);
 }
 
 export function requireCognitoConfig(): { cognitoDomain: string; clientId: string } {

@@ -13,8 +13,8 @@ export const REFRESH_TOKEN_MAX_AGE_S = 30 * 24 * 60 * 60; // 30 days
 export const SHORT_TOKEN_MAX_AGE_S = 3600; // 1 hour
 export const TOKEN_COOKIE_OPTIONS = 'HttpOnly; Secure; SameSite=Lax; Path=/';
 
-export function getCookieDomain(): string {
-  const url = new URL(getFrontendUrl());
+export function getCookieDomain(requestOrigin?: string): string {
+  const url = new URL(getFrontendUrl(requestOrigin));
   return url.hostname;
 }
 
@@ -46,13 +46,13 @@ export function clearStateCookie(): string {
   return `${STATE_COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/`;
 }
 
-export function createRefreshCookie(refreshToken: string): string {
-  const domain = getCookieDomain();
+export function createRefreshCookie(refreshToken: string, requestOrigin?: string): string {
+  const domain = getCookieDomain(requestOrigin);
   return `${REFRESH_COOKIE_NAME}=${refreshToken}; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${REFRESH_TOKEN_MAX_AGE_S}`;
 }
 
-export function clearRefreshCookie(): string {
-  const domain = getCookieDomain();
+export function clearRefreshCookie(requestOrigin?: string): string {
+  const domain = getCookieDomain(requestOrigin);
   return `${REFRESH_COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=0`;
 }
 
@@ -65,26 +65,41 @@ export function parseRefreshCookie(cookieHeader: string | undefined): string | n
   return value || null;
 }
 
-export function createAccessTokenCookie(token: string): string {
-  const domain = getCookieDomain();
+export function createAccessTokenCookie(token: string, requestOrigin?: string): string {
+  const domain = getCookieDomain(requestOrigin);
   // Not HttpOnly — frontend needs to read for Authorization header.
   // Short-lived (1h); refresh_token stays HttpOnly.
   return `${ACCESS_TOKEN_COOKIE_NAME}=${token}; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${SHORT_TOKEN_MAX_AGE_S}`;
 }
 
-export function createIdTokenCookie(token: string): string {
-  const domain = getCookieDomain();
+export function createIdTokenCookie(token: string, requestOrigin?: string): string {
+  const domain = getCookieDomain(requestOrigin);
   // Not HttpOnly — frontend needs to read for user info extraction.
   // Short-lived (1h); refresh_token stays HttpOnly.
   return `${ID_TOKEN_COOKIE_NAME}=${token}; Secure; SameSite=Lax; Domain=${domain}; Path=/; Max-Age=${SHORT_TOKEN_MAX_AGE_S}`;
 }
 
 // Re-used by cookies and handlers — kept here to avoid circular deps
-export function getFrontendUrl(): string {
+function getDefaultFrontendUrl(): string {
   const stage = process.env.STAGE || 'dev';
   return stage === 'prod'
     ? process.env.FRONTEND_URL_PROD || DEFAULT_FRONTEND_URL_PROD
     : process.env.FRONTEND_URL_DEV || DEFAULT_FRONTEND_URL_DEV;
+}
+
+export function getAllowedFrontendUrls(): string[] {
+  const urls = [getDefaultFrontendUrl()];
+  const custom = process.env.CUSTOM_FRONTEND_URL;
+  if (custom) {urls.push(custom);}
+  return urls;
+}
+
+export function getFrontendUrl(requestOrigin?: string): string {
+  if (requestOrigin) {
+    const allowed = getAllowedFrontendUrls();
+    if (allowed.includes(requestOrigin)) {return requestOrigin;}
+  }
+  return getDefaultFrontendUrl();
 }
 
 export const DEFAULT_FRONTEND_URL_PROD = 'https://hak.askend-lab.com';

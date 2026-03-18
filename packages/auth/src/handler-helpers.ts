@@ -107,17 +107,18 @@ export function redirectToFrontendWithCookies(
   };
 }
 
-export function refreshFailedResponse(): APIGatewayProxyResult {
+export function refreshFailedResponse(requestOrigin?: string): APIGatewayProxyResult {
   return {
     statusCode: 401,
-    headers: corsResponseHeaders(),
-    multiValueHeaders: { 'Set-Cookie': [clearRefreshCookie()] },
+    headers: corsResponseHeaders(requestOrigin),
+    multiValueHeaders: { 'Set-Cookie': [clearRefreshCookie(requestOrigin)] },
     body: JSON.stringify({ error: 'Token refresh failed' }),
   };
 }
 
 export async function executeRefresh(
   refreshToken: string,
+  requestOrigin?: string,
 ): Promise<APIGatewayProxyResult> {
   const { cognitoDomain, clientId } = requireCognitoConfig();
   const response = await fetch(`https://${cognitoDomain}/oauth2/token`, {
@@ -125,17 +126,17 @@ export async function executeRefresh(
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ grant_type: 'refresh_token', client_id: clientId, refresh_token: refreshToken }),
   });
-  if (!response.ok) {return refreshFailedResponse();}
+  if (!response.ok) {return refreshFailedResponse(requestOrigin);}
   const data = await response.json() as Record<string, unknown>;
   return {
     statusCode: 200,
-    headers: corsResponseHeaders(),
+    headers: corsResponseHeaders(requestOrigin),
     body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token }),
   };
 }
 
-function badRequest(error: string): APIGatewayProxyResult {
-  return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error }, corsResponseHeaders());
+function badRequest(error: string, requestOrigin?: string): APIGatewayProxyResult {
+  return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error }, corsResponseHeaders(requestOrigin));
 }
 
 function safeParseJson(body: string): Record<string, string> | null {
@@ -145,22 +146,29 @@ function safeParseJson(body: string): Record<string, string> | null {
 
 export function parseExchangeBody(
   event: APIGatewayProxyEvent,
+  requestOrigin?: string,
 ): { code: string; code_verifier: string } | APIGatewayProxyResult {
-  if (!event.body) {return badRequest('Missing request body');}
-  if (event.body.length > MAX_BODY_SIZE) {return badRequest('Request body too large');}
+  if (!event.body) {return badRequest('Missing request body', requestOrigin);}
+  if (event.body.length > MAX_BODY_SIZE) {return badRequest('Request body too large', requestOrigin);}
   const parsed = safeParseJson(event.body);
-  if (!parsed) {return badRequest('Invalid JSON');}
-  if (!parsed.code || !parsed.code_verifier) {return badRequest('Missing code or code_verifier');}
+  if (!parsed) {return badRequest('Invalid JSON', requestOrigin);}
+  if (!parsed.code || !parsed.code_verifier) {return badRequest('Missing code or code_verifier', requestOrigin);}
   return { code: parsed.code, code_verifier: parsed.code_verifier };
 }
 
+interface CodeExchangeOptions {
+  code: string;
+  codeVerifier: string;
+  log: ReturnType<typeof logger.withContext>;
+  requestOrigin?: string;
+}
+
 export async function executeCodeExchange(
-  code: string,
-  codeVerifier: string,
-  log: ReturnType<typeof logger.withContext>,
+  options: CodeExchangeOptions,
 ): Promise<APIGatewayProxyResult> {
+  const { code, codeVerifier, log, requestOrigin } = options;
   const { cognitoDomain, clientId } = requireCognitoConfig();
-  const redirectUri = `${getFrontendUrl()}${AUTH_CALLBACK_PATH}`;
+  const redirectUri = `${getFrontendUrl(requestOrigin)}${AUTH_CALLBACK_PATH}`;
   const response = await fetch(`https://${cognitoDomain}/oauth2/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -168,16 +176,16 @@ export async function executeCodeExchange(
   });
   if (!response.ok) {
     log.error('Code exchange failed:', response.status);
-    return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Code exchange failed' }, corsResponseHeaders());
+    return createLambdaResponse(HTTP_STATUS.BAD_REQUEST, { error: 'Code exchange failed' }, corsResponseHeaders(requestOrigin));
   }
   const data = await response.json() as Record<string, unknown>;
   return {
     statusCode: 200,
-    headers: corsResponseHeaders(),
+    headers: corsResponseHeaders(requestOrigin),
     multiValueHeaders: { 'Set-Cookie': [
-      createRefreshCookie(data.refresh_token as string),
-      createAccessTokenCookie(data.access_token as string),
-      createIdTokenCookie(data.id_token as string),
+      createRefreshCookie(data.refresh_token as string, requestOrigin),
+      createAccessTokenCookie(data.access_token as string, requestOrigin),
+      createIdTokenCookie(data.id_token as string, requestOrigin),
     ] },
     body: JSON.stringify({ access_token: data.access_token, id_token: data.id_token, expires_in: data.expires_in }),
   };

@@ -21,6 +21,14 @@ custom:
     prod:
       issuer: https://tara.ria.ee
 
+  customFrontendUrl:
+    dev: ''
+    prod: 'https://haaldusabiline.eki.ee'
+
+  allowedOriginSuffix:
+    dev: ''
+    prod: ',https://haaldusabiline.eki.ee'
+
 provider:
   name: aws
   runtime: nodejs22.x
@@ -39,7 +47,8 @@ provider:
     FRONTEND_URL_DEV: ${ssm:/hak/dev/frontend-url}
     FRONTEND_URL_PROD: ${ssm:/hak/prod/frontend-url}
     STAGE: ${self:provider.stage}
-    ALLOWED_ORIGIN: ${ssm:/hak/${self:provider.stage}/frontend-url}
+    ALLOWED_ORIGIN: "${ssm:/hak/${self:provider.stage}/frontend-url}${self:custom.allowedOriginSuffix.${self:provider.stage}}"
+    CUSTOM_FRONTEND_URL: ${self:custom.customFrontendUrl.${self:provider.stage}}
     COGNITO_DOMAIN: ${ssm:/hak/shared/cognito-domain}
   
   vpc:

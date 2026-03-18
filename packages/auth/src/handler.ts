@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { CORS_HEADERS, HTTP_STATUS, createLambdaResponse, getCorsOrigin, logger, extractErrorMessage } from '@hak/shared';
 import { createTaraClient } from './tara-client';
 import { createStateCookie, getFrontendUrl, clearStateCookie, parseRefreshCookie } from './cookies';
-import { corsResponseHeaders, validateCsrfOrigin } from './middleware';
+import { corsResponseHeaders, validateCsrfOrigin, getRequestOrigin } from './middleware';
 
 import {
   buildAuthState,
@@ -83,11 +83,12 @@ export async function callbackHandler(
 }
 
 function checkCorsPrereqs(event: APIGatewayProxyEvent): APIGatewayProxyResult | null {
+  const origin = getRequestOrigin(event);
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: corsResponseHeaders(), body: '' };
+    return { statusCode: 200, headers: corsResponseHeaders(origin), body: '' };
   }
   if (!validateCsrfOrigin(event)) {
-    return createLambdaResponse(HTTP_STATUS.FORBIDDEN, { error: 'Invalid origin' }, corsResponseHeaders());
+    return createLambdaResponse(HTTP_STATUS.FORBIDDEN, { error: 'Invalid origin' }, corsResponseHeaders(origin));
   }
   return null;
 }
@@ -96,15 +97,16 @@ async function handleRefreshBody(
   event: APIGatewayProxyEvent,
   log: ReturnType<typeof logger.withContext>,
 ): Promise<APIGatewayProxyResult> {
+  const origin = getRequestOrigin(event);
   try {
     const token = parseRefreshCookie(event.headers.Cookie || event.headers.cookie);
     if (!token) {
-      return createLambdaResponse(HTTP_STATUS.UNAUTHORIZED, { error: 'No refresh token' }, corsResponseHeaders());
+      return createLambdaResponse(HTTP_STATUS.UNAUTHORIZED, { error: 'No refresh token' }, corsResponseHeaders(origin));
     }
-    return await executeRefresh(token);
+    return await executeRefresh(token, origin);
   } catch (error) {
     log.error('Refresh error:', extractErrorMessage(error));
-    return refreshFailedResponse();
+    return refreshFailedResponse(origin);
   }
 }
 
@@ -121,13 +123,14 @@ async function handleExchangeBody(
   event: APIGatewayProxyEvent,
   log: ReturnType<typeof logger.withContext>,
 ): Promise<APIGatewayProxyResult> {
+  const origin = getRequestOrigin(event);
   try {
-    const bodyResult = parseExchangeBody(event);
+    const bodyResult = parseExchangeBody(event, origin);
     if ('statusCode' in bodyResult) {return bodyResult;}
-    return await executeCodeExchange(bodyResult.code, bodyResult.code_verifier, log);
+    return await executeCodeExchange({ code: bodyResult.code, codeVerifier: bodyResult.code_verifier, log, requestOrigin: origin });
   } catch (error) {
     log.error('Exchange code error:', extractErrorMessage(error));
-    return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders());
+    return createLambdaResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: 'Token exchange failed' }, corsResponseHeaders(origin));
   }
 }
 
