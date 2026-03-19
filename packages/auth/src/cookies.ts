@@ -81,6 +81,8 @@ export function createIdTokenCookie(token: string, requestOrigin?: string): stri
 
 // Re-used by cookies and handlers — kept here to avoid circular deps
 function getDefaultFrontendUrl(): string {
+  const custom = process.env.CUSTOM_FRONTEND_URL;
+  if (custom) {return custom;}
   const stage = process.env.STAGE || 'dev';
   return stage === 'prod'
     ? process.env.FRONTEND_URL_PROD || DEFAULT_FRONTEND_URL_PROD
@@ -88,9 +90,13 @@ function getDefaultFrontendUrl(): string {
 }
 
 export function getAllowedFrontendUrls(): string[] {
-  const urls = [getDefaultFrontendUrl()];
+  const stage = process.env.STAGE || 'dev';
+  const stageUrl = stage === 'prod'
+    ? process.env.FRONTEND_URL_PROD || DEFAULT_FRONTEND_URL_PROD
+    : process.env.FRONTEND_URL_DEV || DEFAULT_FRONTEND_URL_DEV;
+  const urls = [stageUrl];
   const custom = process.env.CUSTOM_FRONTEND_URL;
-  if (custom) {urls.push(custom);}
+  if (custom && custom !== stageUrl) {urls.push(custom);}
   return urls;
 }
 
