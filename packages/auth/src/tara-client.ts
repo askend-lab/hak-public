@@ -28,14 +28,19 @@ interface TaraSecrets {
 // Cache secrets for Lambda container lifetime
 let cachedSecrets: TaraSecrets | null = null;
 
+function pickSecretValue(secret: Record<string, string>, ...keys: string[]): string {
+  for (const key of keys) { if (secret[key]) {return secret[key];} }
+  return '';
+}
+
 async function loadFromSecretsManager(arn: string): Promise<TaraSecrets> {
   const client = new SecretsManagerClient({ region: process.env.AWS_REGION || 'eu-west-1' });
   const result = await client.send(new GetSecretValueCommand({ SecretId: arn }));
   const secret = JSON.parse(result.SecretString || '{}') as Record<string, string>;
   return {
-    clientId: secret.TARA_CLIENT_ID || '',
-    clientSecret: secret.TARA_CLIENT_SECRET || '',
-    callbackUrl: secret.TARA_CALLBACK_URL || DEFAULT_CALLBACK_URL,
+    clientId: pickSecretValue(secret, 'TARA_CLIENT_ID', 'tara-client-id'),
+    clientSecret: pickSecretValue(secret, 'TARA_CLIENT_SECRET', 'tara-client-secret'),
+    callbackUrl: pickSecretValue(secret, 'TARA_CALLBACK_URL', 'tara-callback-url') || DEFAULT_CALLBACK_URL,
   };
 }
 
