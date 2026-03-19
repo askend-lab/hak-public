@@ -81,6 +81,7 @@ provider:
             - secretsmanager:GetSecretValue
           Resource:
             - !Sub arn:aws:secretsmanager:${self:provider.region}:${AWS::AccountId}:secret:hak/*
+            - !Sub arn:aws:secretsmanager:${self:provider.region}:${AWS::AccountId}:secret:askend-lab/*
         - Effect: Allow
           Action:
             - xray:PutTraceSegments
