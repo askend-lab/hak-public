@@ -62,12 +62,12 @@ describe('custom-domain multi-origin support', () => {
       expect(getFrontendUrl('https://hak.askend-lab.com')).toBe('https://hak.askend-lab.com');
     });
 
-    it('returns primary domain when requestOrigin is unknown', () => {
-      expect(getFrontendUrl('https://evil.com')).toBe('https://hak.askend-lab.com');
+    it('returns custom domain when requestOrigin is unknown', () => {
+      expect(getFrontendUrl('https://evil.com')).toBe('https://haaldusabiline.eki.ee');
     });
 
-    it('returns primary domain when requestOrigin is undefined', () => {
-      expect(getFrontendUrl()).toBe('https://hak.askend-lab.com');
+    it('returns custom domain when requestOrigin is undefined', () => {
+      expect(getFrontendUrl()).toBe('https://haaldusabiline.eki.ee');
     });
   });
 
@@ -80,8 +80,8 @@ describe('custom-domain multi-origin support', () => {
       expect(getCookieDomain('https://hak.askend-lab.com')).toBe('hak.askend-lab.com');
     });
 
-    it('returns primary hostname when no origin', () => {
-      expect(getCookieDomain()).toBe('hak.askend-lab.com');
+    it('returns custom hostname when no origin (CUSTOM_FRONTEND_URL is default)', () => {
+      expect(getCookieDomain()).toBe('haaldusabiline.eki.ee');
     });
   });
 
