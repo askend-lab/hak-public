@@ -11,20 +11,23 @@ export interface ApiUrls {
   frontend: string;
 }
 
+const CF_DEV = "https://hak-dev.askend-lab.com";
+const CF_PROD = "https://hak.askend-lab.com";
+
 const URLS: Record<Environment, ApiUrls> = {
   dev: {
-    merlin: "https://merlin-dev.askend-lab.com",
-    vabamorf: "https://vabamorf-dev.askend-lab.com",
-    simplestore: "https://hak-api-dev.askend-lab.com",
-    auth: "https://hak-api-dev.askend-lab.com",
-    frontend: "https://hak-dev.askend-lab.com",
+    merlin: `${CF_DEV}/api`,
+    vabamorf: CF_DEV,
+    simplestore: CF_DEV,
+    auth: CF_DEV,
+    frontend: CF_DEV,
   },
   prod: {
-    merlin: "https://merlin-prod.askend-lab.com",
-    vabamorf: "https://vabamorf.askend-lab.com",
-    simplestore: "https://hak-api.askend-lab.com",
-    auth: "https://hak-api.askend-lab.com",
-    frontend: "https://hak.askend-lab.com",
+    merlin: `${CF_PROD}/api`,
+    vabamorf: CF_PROD,
+    simplestore: CF_PROD,
+    auth: CF_PROD,
+    frontend: CF_PROD,
   },
 };
 

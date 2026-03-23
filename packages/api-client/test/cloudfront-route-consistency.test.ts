@@ -87,6 +87,9 @@ function applyRewrite(cfPath: string): string {
   if (cfPath.startsWith("/api/")) {
     return cfPath.substring(4); // /api/analyze → /analyze
   }
+  if (cfPath.startsWith("/authtara/")) {
+    return "/tara/" + cfPath.substring(10); // /authtara/callback → /tara/callback
+  }
   if (cfPath.startsWith("/auth/")) {
     return cfPath.substring(5); // /auth/tara/start → /tara/start
   }

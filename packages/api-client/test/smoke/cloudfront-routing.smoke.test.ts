@@ -25,14 +25,10 @@ describe("CloudFront API routing", () => {
       body: JSON.stringify({ text: "Tere", voice: "efm_l" }),
     });
 
+    // 401 (no JWT) or 200/202 (authenticated) — both prove CloudFront routes to API, not S3
     const contentType = res.headers.get("content-type") ?? "";
     expect(contentType).toMatch(/application\/json/);
     expect(contentType).not.toMatch(/text\/html/);
-
-    const body = await res.json();
-    expect(body).toHaveProperty("cacheKey");
-    expect(body).toHaveProperty("status");
-    expect(["ready", "processing"]).toContain(body.status);
   });
 
   it("POST /api/analyze — returns JSON, not HTML", async () => {
@@ -42,12 +38,10 @@ describe("CloudFront API routing", () => {
       body: JSON.stringify({ text: "Tere" }),
     });
 
+    // 401 (no JWT) or 200 (authenticated) — both prove CloudFront routes to API, not S3
     const contentType = res.headers.get("content-type") ?? "";
     expect(contentType).toMatch(/application\/json/);
     expect(contentType).not.toMatch(/text\/html/);
-
-    const body = await res.json();
-    expect(body).toHaveProperty("stressedText");
   });
 
   it("GET /api/status/{cacheKey} — returns JSON, not HTML", async () => {
@@ -69,13 +63,10 @@ describe("CloudFront API routing", () => {
       body: JSON.stringify({ word: "koer" }),
     });
 
+    // 401 (no JWT) or 200 (authenticated) — both prove CloudFront routes to API, not S3
     const contentType = res.headers.get("content-type") ?? "";
     expect(contentType).toMatch(/application\/json/);
     expect(contentType).not.toMatch(/text\/html/);
-
-    const body = await res.json();
-    expect(body).toHaveProperty("word");
-    expect(body).toHaveProperty("variants");
   });
 
   it("no API route returns text/html from S3", async () => {
