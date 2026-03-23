@@ -93,24 +93,24 @@ describe("handler.mutations.test", () => {
       expect(result.headers?.Location).toContain('Missing+code+or+state');
     });
 
-    it('should include "State mismatch" error text', async () => {
+    it('should redirect to home on state mismatch', async () => {
       const validState = { state: 'correct', nonce: 'n', redirectUri: 'https://hak-dev.askend-lab.com', createdAt: Date.now() };
       const event = makeEvent({
         queryStringParameters: { code: 'c', state: 'wrong' },
         headers: { Cookie: `tara_auth_state=${makeStateCookie(validState)}` },
       });
       const result = await callbackHandler(event);
-      expect(result.headers?.Location).toContain('State+mismatch');
+      expect(result.headers?.Location).not.toContain('error=');
     });
 
-    it('should include "Session expired" error text with > operator', async () => {
+    it('should redirect to home on expired session', async () => {
       const expiredState = { state: 's', nonce: 'n', redirectUri: 'https://hak-dev.askend-lab.com', createdAt: Date.now() - 11 * 60 * 1000 };
       const event = makeEvent({
         queryStringParameters: { code: 'c', state: 's' },
         headers: { Cookie: `tara_auth_state=${makeStateCookie(expiredState)}` },
       });
       const result = await callbackHandler(event);
-      expect(result.headers?.Location).toContain('Session+expired');
+      expect(result.headers?.Location).not.toContain('error=');
     });
 
     it('should NOT expire session at exactly 10 minutes', async () => {

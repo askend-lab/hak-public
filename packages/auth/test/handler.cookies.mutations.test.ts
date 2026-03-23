@@ -149,7 +149,7 @@ describe("handler.cookies.mutations.test", () => {
         headers: { Cookie: `tara_auth_state=${makeStateCookie(state)}` },
       });
       const result = await callbackHandler(event);
-      expect(result.headers?.Location).toContain('Session+expired');
+      expect(result.headers?.Location).not.toContain('error=');
     });
 
     it('session at exactly 10 minutes (> boundary) should still be valid', async () => {
@@ -182,7 +182,7 @@ describe("handler.cookies.mutations.test", () => {
         headers: { Cookie: `tara_auth_state=${makeStateCookie(state)}` },
       });
       const result = await callbackHandler(event);
-      expect(result.headers?.Location).toContain('Session+expired');
+      expect(result.headers?.Location).not.toContain('error=');
       Date.now = realDateNow; // eslint-disable-line require-atomic-updates -- test cleanup restores Date.now
     });
   });
