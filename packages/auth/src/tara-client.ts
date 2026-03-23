@@ -5,7 +5,7 @@ import { TaraIdToken, TaraTokens } from './types';
 import { getFrontendUrl } from './cookies';
 
 export const DEFAULT_TARA_ISSUER = 'https://tara-test.ria.ee';
-export const TARA_CALLBACK_PATH = '/auth/tara/callback';
+export const TARA_CALLBACK_PATH = '/authtara/callback';
 export const DEFAULT_CALLBACK_URL = `${getFrontendUrl()}${TARA_CALLBACK_PATH}`;
 export const OIDC_AUTHORIZE_PATH = '/oidc/authorize';
 export const OIDC_TOKEN_PATH = '/oidc/token';
