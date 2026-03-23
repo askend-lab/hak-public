@@ -61,6 +61,7 @@ locals {
     { path = "/api/get-shared", origin = "simplestore-api", rewrite = true, auth = false, query_string = true,  cookies = "none" },
     { path = "/api/get-public", origin = "simplestore-api", rewrite = true, auth = false, query_string = true,  cookies = "none" },
     { path = "/auth/tara/*",    origin = "auth-api",        rewrite = true, auth = false, query_string = true,  cookies = "all"  },
+    { path = "/authtara/*",     origin = "auth-api",        rewrite = true, auth = false, query_string = true,  cookies = "all"  },
     { path = "/api/health",    origin = "merlin-api",      rewrite = true, auth = false, query_string = false, cookies = "none" },
   ]
 }
