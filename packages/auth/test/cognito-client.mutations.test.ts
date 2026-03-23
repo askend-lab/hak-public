@@ -54,7 +54,7 @@ describe("cognito-client.mutations.test", () => {
       const { ListUsersCommand } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
       expect(ListUsersCommand).toHaveBeenCalledWith({
         UserPoolId: 'test-pool-id',
-        Filter: '"custom:personal_code" = "EE38001085718"',
+        Filter: 'custom:personal_code = "EE38001085718"',
         Limit: 1,
       });
     });

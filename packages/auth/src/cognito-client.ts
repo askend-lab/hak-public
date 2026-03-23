@@ -50,7 +50,7 @@ export class CognitoClient {
     try {
       const command = new ListUsersCommand({
         UserPoolId: this.config.userPoolId,
-        Filter: `"${PERSONAL_CODE_ATTR}" = "${personalCode}"`,
+        Filter: `${PERSONAL_CODE_ATTR} = "${personalCode}"`,
         Limit: 1,
       });
       const response = await this.client.send(command);
