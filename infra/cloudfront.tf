@@ -51,6 +51,8 @@ resource "aws_cloudfront_function" "api_rewrite" {
       // Strip path prefix before forwarding to API Gateway origins
       if (request.uri.startsWith('/api/')) {
         request.uri = request.uri.substring(4);  // /api/save -> /save
+      } else if (request.uri.startsWith('/authtara/')) {
+        request.uri = '/tara/' + request.uri.substring(10);  // /authtara/callback -> /tara/callback
       } else if (request.uri.startsWith('/auth/')) {
         request.uri = request.uri.substring(5);  // /auth/tara/start -> /tara/start
       }
