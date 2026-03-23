@@ -63,7 +63,8 @@ async function handleCallbackSuccess(
   if ('statusCode' in params) {return params;}
   const stateResult = validateCallbackState(event, params.state);
   if (typeof stateResult === 'string') {
-    return redirectToFrontend(frontendUrl, { error: stateResult });
+    log.warn('State validation failed, redirecting to home:', stateResult);
+    return redirectToFrontend(frontendUrl, {});
   }
   log.info('TARA authentication successful');
   return redirectToFrontendWithCookies(frontendUrl, await processCallback(params.code, stateResult));

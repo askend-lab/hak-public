@@ -144,25 +144,25 @@ describe("handler.test", () => {
     expect(result.headers?.Location).toContain('error=Missing+code+or+state');
   });
 
-  it('should redirect with error when no cookie/session', async () => {
+  it('should redirect to home when no cookie/session', async () => {
     const event = createEvent({
       headers: {},
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).toContain('error=Invalid+session');
+    expect(result.headers?.Location).not.toContain('error=');
   });
 
-  it('should redirect with error on state mismatch', async () => {
+  it('should redirect to home on state mismatch', async () => {
     const event = createEvent({
       queryStringParameters: { code: 'test-code', state: 'wrong-state' },
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).toContain('error=State+mismatch');
+    expect(result.headers?.Location).not.toContain('error=');
   });
 
-  it('should redirect with error on expired session', async () => {
+  it('should redirect to home on expired session', async () => {
     const expiredState = {
       state: 'test-state',
       nonce: 'test-nonce',
@@ -175,7 +175,7 @@ describe("handler.test", () => {
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).toContain('error=Session+expired');
+    expect(result.headers?.Location).not.toContain('error=');
   });
 
   it('should handle malformed state cookie gracefully', async () => {
@@ -184,7 +184,7 @@ describe("handler.test", () => {
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).toContain('error=');
+    expect(result.headers?.Location).not.toContain('error=');
   });
 
 });

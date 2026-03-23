@@ -173,7 +173,7 @@ describe("handler.mutations.test", () => {
       });
       const result = await callbackHandler(event);
       expect(result.statusCode).toBe(302);
-      expect(result.headers?.Location).toContain('error=Invalid+session');
+      expect(result.headers?.Location).not.toContain('error=');
     });
 
     it('should handle cookie header with semicolons correctly', async () => {
