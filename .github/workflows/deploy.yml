@@ -212,9 +212,17 @@ jobs:
           }
           EOF
 
-          aws s3 cp artifacts/frontend/ s3://${BUCKET}/ --recursive
+          # Upload hashed assets with long-term immutable cache (filenames contain content hash)
+          aws s3 sync artifacts/frontend/assets/ s3://${BUCKET}/assets/ \
+            --cache-control "public, max-age=31536000, immutable"
+
+          # Upload index.html and other root files with no-cache (browser must revalidate every time)
+          aws s3 cp artifacts/frontend/ s3://${BUCKET}/ --recursive \
+            --exclude "assets/*" \
+            --cache-control "no-cache, no-store, must-revalidate"
+
           aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*"
-          echo "✅ Frontend deployed to $BUCKET with build-info.json"
+          echo "✅ Frontend deployed to $BUCKET with cache headers"
 
       - name: Install Serverless
         if: steps.state.outputs.deploy_store == 'true' || steps.state.outputs.deploy_tts_api == 'true' || steps.state.outputs.deploy_morphology_api == 'true' || steps.state.outputs.deploy_auth == 'true'
