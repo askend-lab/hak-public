@@ -67,6 +67,21 @@ describe("parseIdToken", () => {
     expect(parseIdToken(token)?.name).toBe("alice");
   });
 
+  it("falls back to given_name + family_name when name is missing (TARA)", () => {
+    const token = createJwt({ sub: "u1", email: "EE37002232729@tara.ee", given_name: "MARI-LIIS", family_name: "MÄNNIK", exp: Math.floor(Date.now() / 1000) + 3600 });
+    expect(parseIdToken(token)?.name).toBe("MARI-LIIS MÄNNIK");
+  });
+
+  it("falls back to given_name only when family_name is missing", () => {
+    const token = createJwt({ sub: "u1", email: "EE37002232729@tara.ee", given_name: "MARI-LIIS", exp: Math.floor(Date.now() / 1000) + 3600 });
+    expect(parseIdToken(token)?.name).toBe("MARI-LIIS");
+  });
+
+  it("falls back to email prefix when no name claims at all (TARA fallback email)", () => {
+    const token = createJwt({ sub: "u1", email: "EE37002232729@tara.ee", exp: Math.floor(Date.now() / 1000) + 3600 });
+    expect(parseIdToken(token)?.name).toBe("EE37002232729");
+  });
+
   it("rejects token without email claim", () => {
     const token = createJwt({ sub: "u1", exp: Math.floor(Date.now() / 1000) + 3600 });
     expect(parseIdToken(token)).toBeNull();

@@ -58,6 +58,7 @@ describe("cognito-client.test", () => {
       expect(attributes).toContainEqual({ Name: 'email_verified', Value: 'true' });
       expect(attributes).toContainEqual({ Name: 'given_name', Value: 'John' });
       expect(attributes).toContainEqual({ Name: 'family_name', Value: 'Doe' });
+      expect(attributes).toContainEqual({ Name: 'name', Value: 'John Doe' });
       expect(attributes).toContainEqual({ Name: PERSONAL_CODE_ATTR, Value: 'EE38001085718' });
     });
 
@@ -74,6 +75,7 @@ describe("cognito-client.test", () => {
 
       expect(attributes).not.toContainEqual(expect.objectContaining({ Name: 'given_name' }));
       expect(attributes).toContainEqual({ Name: 'family_name', Value: 'Doe' });
+      expect(attributes).toContainEqual({ Name: 'name', Value: 'Doe' });
     });
 
     it('should exclude family_name when not provided', () => {
@@ -89,6 +91,7 @@ describe("cognito-client.test", () => {
 
       expect(attributes).toContainEqual({ Name: 'given_name', Value: 'John' });
       expect(attributes).not.toContainEqual(expect.objectContaining({ Name: 'family_name' }));
+      expect(attributes).toContainEqual({ Name: 'name', Value: 'John' });
     });
 
     it('should exclude both names when neither provided', () => {
@@ -103,6 +106,7 @@ describe("cognito-client.test", () => {
 
       expect(attributes).not.toContainEqual(expect.objectContaining({ Name: 'given_name' }));
       expect(attributes).not.toContainEqual(expect.objectContaining({ Name: 'family_name' }));
+      expect(attributes).not.toContainEqual(expect.objectContaining({ Name: 'name' }));
       expect(attributes).toContainEqual({ Name: 'email', Value: 'john@example.com' });
       expect(attributes).toContainEqual({ Name: PERSONAL_CODE_ATTR, Value: 'EE38001085718' });
     });
