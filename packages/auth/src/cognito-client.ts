@@ -12,6 +12,15 @@ import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLE
 
 export const DEFAULT_REGION = 'eu-west-1';
 
+function buildNameAttrs(t: TaraIdToken): Array<{ Name: string; Value: string }> {
+  const attrs: Array<{ Name: string; Value: string }> = [];
+  if (t.given_name) {attrs.push({ Name: 'given_name', Value: t.given_name });}
+  if (t.family_name) {attrs.push({ Name: 'family_name', Value: t.family_name });}
+  const name = [t.given_name, t.family_name].filter(Boolean).join(' ');
+  if (name) {attrs.push({ Name: 'name', Value: name });}
+  return attrs;
+}
+
 export class CognitoClient {
   private client: CognitoIdentityProviderClient;
   private config: CognitoConfig;
@@ -40,9 +49,15 @@ export class CognitoClient {
   async findOrCreateUser(taraIdToken: TaraIdToken): Promise<string> {
     this.validatePersonalCode(taraIdToken.sub);
     const byCode = await this.findUserByPersonalCode(taraIdToken.sub);
-    if (byCode) {return byCode;}
+    if (byCode) {
+      await this.syncNameAttributes(byCode, taraIdToken);
+      return byCode;
+    }
     const byEmail = await this.findByEmailAndLink(taraIdToken);
-    if (byEmail) {return byEmail;}
+    if (byEmail) {
+      await this.syncNameAttributes(byEmail, taraIdToken);
+      return byEmail;
+    }
     return this.createUser(taraIdToken);
   }
 
@@ -79,41 +94,33 @@ export class CognitoClient {
     }
   }
 
+  private async syncNameAttributes(username: string, taraIdToken: TaraIdToken): Promise<void> {
+    const attrs = buildNameAttrs(taraIdToken);
+    if (attrs.length === 0) {return;}
+    try {
+      await this.client.send(new AdminUpdateUserAttributesCommand({
+        UserPoolId: this.config.userPoolId, Username: username, UserAttributes: attrs,
+      }));
+    } catch (error) {
+      logger.warn('Cognito syncNameAttributes failed', extractErrorMessage(error));
+    }
+  }
+
   private async updatePersonalCode(username: string, personalCode: string): Promise<void> {
-    const command = new AdminUpdateUserAttributesCommand({
-      UserPoolId: this.config.userPoolId,
-      Username: username,
-      UserAttributes: [
-        { Name: PERSONAL_CODE_ATTR, Value: personalCode },
-      ],
-    });
-    await this.client.send(command);
+    await this.client.send(new AdminUpdateUserAttributesCommand({
+      UserPoolId: this.config.userPoolId, Username: username,
+      UserAttributes: [{ Name: PERSONAL_CODE_ATTR, Value: personalCode }],
+    }));
   }
 
   buildUserAttributes(taraIdToken: TaraIdToken): Array<{ Name: string; Value: string }> {
     const email = taraIdToken.email || buildFallbackEmail(taraIdToken.sub);
-    
-    const attributes: Array<{ Name: string; Value: string }> = [
+    return [
       { Name: 'email', Value: email },
       { Name: 'email_verified', Value: 'true' },
       { Name: PERSONAL_CODE_ATTR, Value: taraIdToken.sub },
+      ...buildNameAttrs(taraIdToken),
     ];
-
-    // Add optional attributes only if they have values
-    if (taraIdToken.given_name) {
-      attributes.push({ Name: 'given_name', Value: taraIdToken.given_name });
-    }
-    if (taraIdToken.family_name) {
-      attributes.push({ Name: 'family_name', Value: taraIdToken.family_name });
-    }
-
-    // Build display name from TARA given_name + family_name
-    const displayName = [taraIdToken.given_name, taraIdToken.family_name].filter(Boolean).join(' ');
-    if (displayName) {
-      attributes.push({ Name: 'name', Value: displayName });
-    }
-
-    return attributes;
   }
 
   private async createUser(taraIdToken: TaraIdToken): Promise<string> {
@@ -185,15 +192,8 @@ export class CognitoClient {
 }
 
 export function createCognitoClient(): CognitoClient {
-  const config: CognitoConfig = {
-    userPoolId: process.env.COGNITO_USER_POOL_ID || '',
-    clientId: process.env.COGNITO_CLIENT_ID || '',
-    region: process.env.AWS_REGION || DEFAULT_REGION,
-  };
-
-  if (!config.userPoolId || !config.clientId) {
-    throw new Error('COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID must be set');
-  }
-
-  return new CognitoClient(config);
+  const userPoolId = process.env.COGNITO_USER_POOL_ID || '';
+  const clientId = process.env.COGNITO_CLIENT_ID || '';
+  if (!userPoolId || !clientId) {throw new Error('COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID must be set');}
+  return new CognitoClient({ userPoolId, clientId, region: process.env.AWS_REGION || DEFAULT_REGION });
 }

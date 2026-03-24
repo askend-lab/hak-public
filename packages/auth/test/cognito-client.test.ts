@@ -124,4 +124,50 @@ describe("cognito-client.test", () => {
     });
   });
 
+  describe('syncNameAttributes on existing user login', () => {
+    it('should update name attributes when existing user found by personal code', async () => {
+      const { AdminUpdateUserAttributesCommand } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
+      AdminUpdateUserAttributesCommand.mockClear();
+
+      mockSend
+        .mockResolvedValueOnce({ Users: [{ Username: 'existing-user' }] }) // findByPersonalCode
+        .mockResolvedValueOnce({}); // syncNameAttributes
+
+      const client = new CognitoClient(mockConfig);
+      const result = await client.findOrCreateUser({
+        ...baseTaraToken,
+        sub: 'EE38001085718',
+        given_name: 'Mari-Liis',
+        family_name: 'Männik',
+        email: 'test@example.com',
+      });
+
+      expect(result).toBe('existing-user');
+      expect(AdminUpdateUserAttributesCommand).toHaveBeenCalledWith({
+        UserPoolId: 'test-pool-id',
+        Username: 'existing-user',
+        UserAttributes: expect.arrayContaining([
+          { Name: 'given_name', Value: 'Mari-Liis' },
+          { Name: 'family_name', Value: 'Männik' },
+          { Name: 'name', Value: 'Mari-Liis Männik' },
+        ]),
+      });
+    });
+
+    it('should not call syncNameAttributes when no name fields in token', async () => {
+      mockSend
+        .mockResolvedValueOnce({ Users: [{ Username: 'existing-user' }] }); // findByPersonalCode only
+
+      const client = new CognitoClient(mockConfig);
+      await client.findOrCreateUser({
+        ...baseTaraToken,
+        sub: 'EE38001085718',
+        email: 'test@example.com',
+      });
+
+      // Only 1 call (findByPersonalCode), no syncNameAttributes
+      expect(mockSend).toHaveBeenCalledTimes(1);
+    });
+  });
+
 });
