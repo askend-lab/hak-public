@@ -19,16 +19,27 @@ const read = (p: string) => fs.readFileSync(path.join(ROOT, p), "utf-8");
 const extractPaths = (content: string) => [...content.matchAll(/^\s+path:\s+(\/\S+)/gm)].map((m) => m[1]);
 
 interface RouteInfo { cfPath: string; rewritten: string; origin: string }
-const state = {
-  cfRoutes: [] as { path: string; origin: string; rewrite: boolean }[],
-  rewrittenRoutes: [] as RouteInfo[],
-  slsRoutesByOrigin: {} as Record<string, string[]>,
-  allRoutes: [] as { file: string; path: string }[],
-  authByRoute: {} as Record<string, string | null>,
+interface ArchState {
+  cfRoutes: { path: string; origin: string; rewrite: boolean }[];
+  rewrittenRoutes: RouteInfo[];
+  slsRoutesByOrigin: Record<string, string[]>;
+  allRoutes: { file: string; path: string }[];
+  authByRoute: Record<string, string | null>;
+  wafContent: string;
+  rateLimits: { limit: number }[];
+  alarmFns: string[];
+  lambdaFns: string[];
+}
+const state: ArchState = {
+  cfRoutes: [],
+  rewrittenRoutes: [],
+  slsRoutesByOrigin: {},
+  allRoutes: [],
+  authByRoute: {},
   wafContent: "",
-  rateLimits: [] as { limit: number }[],
-  alarmFns: [] as string[],
-  lambdaFns: [] as string[],
+  rateLimits: [],
+  alarmFns: [],
+  lambdaFns: [],
 };
 
 function applyRewrite(cfPath: string): string {
