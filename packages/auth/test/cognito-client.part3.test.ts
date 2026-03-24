@@ -51,26 +51,27 @@ describe("cognito-client.test", () => {
     };
 
     it('should return existing user found by personal code', async () => {
-      mockSend.mockResolvedValueOnce({
-        Users: [{ Username: 'existing-user' }],
-      });
+      mockSend
+        .mockResolvedValueOnce({ Users: [{ Username: 'existing-user' }] }) // findByPersonalCode
+        .mockResolvedValueOnce({}); // syncNameAttributes
 
       const client = new CognitoClient(mockConfig);
       const username = await client.findOrCreateUser(taraToken);
       expect(username).toBe('existing-user');
-      expect(mockSend).toHaveBeenCalledTimes(1);
+      expect(mockSend).toHaveBeenCalledTimes(2);
     });
 
     it('should find by email and update personal code when not found by personal code', async () => {
       mockSend
         .mockResolvedValueOnce({ Users: [] }) // findByPersonalCode returns empty
         .mockResolvedValueOnce({ Users: [{ Username: 'email-user' }] }) // findByEmail
-        .mockResolvedValueOnce({}); // updatePersonalCode
+        .mockResolvedValueOnce({}) // updatePersonalCode
+        .mockResolvedValueOnce({}); // syncNameAttributes
 
       const client = new CognitoClient(mockConfig);
       const username = await client.findOrCreateUser(taraToken);
       expect(username).toBe('email-user');
-      expect(mockSend).toHaveBeenCalledTimes(3);
+      expect(mockSend).toHaveBeenCalledTimes(4);
     });
 
     it('should create new user when not found by personal code or email', async () => {
@@ -99,7 +100,8 @@ describe("cognito-client.test", () => {
       mockSend
         .mockRejectedValueOnce(new Error('ListUsers failed')) // findByPersonalCode throws
         .mockResolvedValueOnce({ Users: [{ Username: 'email-user' }] }) // findByEmail
-        .mockResolvedValueOnce({}); // updatePersonalCode
+        .mockResolvedValueOnce({}) // updatePersonalCode
+        .mockResolvedValueOnce({}); // syncNameAttributes
 
       const client = new CognitoClient(mockConfig);
       const username = await client.findOrCreateUser(taraToken);
