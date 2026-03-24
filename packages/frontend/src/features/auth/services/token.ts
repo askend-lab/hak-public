@@ -27,6 +27,11 @@ interface ParseIdTokenOptions {
  *
  * When expectedIssuer/expectedAudience are provided, rejects tokens from other pools/apps.
  */
+function buildDisplayName(givenName: unknown, familyName: unknown): string | undefined {
+  const parts = [givenName, familyName].filter((p): p is string => typeof p === "string" && p.length > 0);
+  return parts.length > 0 ? parts.join(" ") : undefined;
+}
+
 function hasRequiredClaims(payload: Record<string, unknown>): boolean {
   if (!payload.sub || typeof payload.sub !== "string") {return false;}
   if (payload.exp && Date.now() / 1000 > (payload.exp as number)) {return false;}
@@ -43,10 +48,10 @@ export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): Us
   const payload = decodeJwtPayload(idToken);
   if (!payload || !hasRequiredClaims(payload) || !matchesExpected(payload, options)) {return null;}
   const email = payload.email as string;
-  return {
-    id: payload.sub as string, email,
-    name: typeof payload.name === "string" ? payload.name : (email.split("@")[0] ?? email),
-  };
+  const displayName = typeof payload.name === "string" ? payload.name
+    : buildDisplayName(payload.given_name, payload.family_name)
+    ?? (email.split("@")[0] ?? email);
+  return { id: payload.sub as string, email, name: displayName };
 }
 
 const TOKEN_EXPIRY_BUFFER_SECONDS = 300;

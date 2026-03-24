@@ -132,7 +132,7 @@ describe("cognito-client.mutations.test", () => {
   });
 
   describe('buildUserAttributes mutations', () => {
-    it('should return exactly 5 attributes when all fields provided', () => {
+    it('should return exactly 6 attributes when all fields provided', () => {
       const client = new CognitoClient(config);
       const attrs = client.buildUserAttributes({
         ...baseTaraToken,
@@ -141,13 +141,14 @@ describe("cognito-client.mutations.test", () => {
         given_name: 'John',
         family_name: 'Doe',
       });
-      expect(attrs).toHaveLength(5);
+      expect(attrs).toHaveLength(6);
       expect(attrs).toStrictEqual([
         { Name: 'email', Value: 'e@e.com' },
         { Name: 'email_verified', Value: 'true' },
         { Name: 'custom:personal_code', Value: 'EE49001011234' },
         { Name: 'given_name', Value: 'John' },
         { Name: 'family_name', Value: 'Doe' },
+        { Name: 'name', Value: 'John Doe' },
       ]);
     });
 
@@ -155,6 +156,7 @@ describe("cognito-client.mutations.test", () => {
       const client = new CognitoClient(config);
       const attrs = client.buildUserAttributes({ ...baseTaraToken, sub: 'EE49001011234', email: 'e@e.com' });
       expect(attrs).toHaveLength(3);
+      expect(attrs).not.toContainEqual(expect.objectContaining({ Name: 'name' }));
     });
 
     it('should use fallback email with @tara.ee suffix', () => {

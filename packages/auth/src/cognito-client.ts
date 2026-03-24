@@ -107,6 +107,12 @@ export class CognitoClient {
       attributes.push({ Name: 'family_name', Value: taraIdToken.family_name });
     }
 
+    // Build display name from TARA given_name + family_name
+    const displayName = [taraIdToken.given_name, taraIdToken.family_name].filter(Boolean).join(' ');
+    if (displayName) {
+      attributes.push({ Name: 'name', Value: displayName });
+    }
+
     return attributes;
   }
 
