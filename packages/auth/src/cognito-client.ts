@@ -30,7 +30,14 @@ export class CognitoClient {
     this.client = new CognitoIdentityProviderClient({ region: config.region });
   }
 
-  private validatePersonalCode(code: string): void {
+  private validatePersonalCode(code: string, taraIdToken?: TaraIdToken): void {
+    if (taraIdToken) {
+      logger.info('TARA token name fields', {
+        sub: taraIdToken.sub, given_name: taraIdToken.given_name ?? '(undefined)',
+        family_name: taraIdToken.family_name ?? '(undefined)',
+        email: taraIdToken.email ?? '(undefined)', keys: Object.keys(taraIdToken).join(','),
+      });
+    }
     if (!/^[A-Z]{2}\d{11}$/.test(code)) {
       logger.error('Invalid personal code format');
       throw new Error('Invalid personal code format');
@@ -47,7 +54,7 @@ export class CognitoClient {
   }
 
   async findOrCreateUser(taraIdToken: TaraIdToken): Promise<string> {
-    this.validatePersonalCode(taraIdToken.sub);
+    this.validatePersonalCode(taraIdToken.sub, taraIdToken);
     const byCode = await this.findUserByPersonalCode(taraIdToken.sub);
     if (byCode) {
       await this.syncNameAttributes(byCode, taraIdToken);
@@ -60,6 +67,7 @@ export class CognitoClient {
     }
     return this.createUser(taraIdToken);
   }
+
 
   private async findUserByPersonalCode(personalCode: string): Promise<string | null> {
     try {
