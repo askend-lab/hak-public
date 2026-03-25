@@ -5,11 +5,18 @@ export interface AuthState {
   createdAt: number;
 }
 
+export interface TaraProfileAttributes {
+  given_name?: string;
+  family_name?: string;
+  date_of_birth?: string;
+}
+
 export interface TaraIdToken {
   sub: string;
   given_name?: string;
   family_name?: string;
   email?: string;
+  profile_attributes?: TaraProfileAttributes;
   iss: string;
   aud: string;
   exp: number;

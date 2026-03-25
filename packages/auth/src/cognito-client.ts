@@ -12,11 +12,30 @@ import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLE
 
 export const DEFAULT_REGION = 'eu-west-1';
 
+const UNDEF = '(undefined)';
+
+function logTaraTokenFields(t: TaraIdToken): void {
+  const pa = t.profile_attributes;
+  logger.info('TARA token name fields', {
+    sub: t.sub, given_name: t.given_name ?? UNDEF,
+    family_name: t.family_name ?? UNDEF,
+    pa_given_name: pa?.given_name ?? UNDEF, pa_family_name: pa?.family_name ?? UNDEF,
+    email: t.email ?? UNDEF, keys: Object.keys(t).join(','),
+  });
+}
+
+function extractNames(t: TaraIdToken): { givenName?: string; familyName?: string } {
+  const givenName = t.given_name || t.profile_attributes?.given_name;
+  const familyName = t.family_name || t.profile_attributes?.family_name;
+  return { givenName, familyName };
+}
+
 function buildNameAttrs(t: TaraIdToken): Array<{ Name: string; Value: string }> {
+  const { givenName, familyName } = extractNames(t);
   const attrs: Array<{ Name: string; Value: string }> = [];
-  if (t.given_name) {attrs.push({ Name: 'given_name', Value: t.given_name });}
-  if (t.family_name) {attrs.push({ Name: 'family_name', Value: t.family_name });}
-  const name = [t.given_name, t.family_name].filter(Boolean).join(' ');
+  if (givenName) {attrs.push({ Name: 'given_name', Value: givenName });}
+  if (familyName) {attrs.push({ Name: 'family_name', Value: familyName });}
+  const name = [givenName, familyName].filter(Boolean).join(' ');
   if (name) {attrs.push({ Name: 'name', Value: name });}
   return attrs;
 }
@@ -31,13 +50,7 @@ export class CognitoClient {
   }
 
   private validatePersonalCode(code: string, taraIdToken?: TaraIdToken): void {
-    if (taraIdToken) {
-      logger.info('TARA token name fields', {
-        sub: taraIdToken.sub, given_name: taraIdToken.given_name ?? '(undefined)',
-        family_name: taraIdToken.family_name ?? '(undefined)',
-        email: taraIdToken.email ?? '(undefined)', keys: Object.keys(taraIdToken).join(','),
-      });
-    }
+    if (taraIdToken) {logTaraTokenFields(taraIdToken);}
     if (!/^[A-Z]{2}\d{11}$/.test(code)) {
       logger.error('Invalid personal code format');
       throw new Error('Invalid personal code format');
