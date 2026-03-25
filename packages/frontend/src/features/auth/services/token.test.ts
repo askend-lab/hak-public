@@ -4,9 +4,14 @@
 import { describe, it, expect } from "vitest";
 import { parseIdToken, isTokenExpired } from "./token";
 
+function utf8ToBase64(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  return btoa(String.fromCharCode(...bytes));
+}
+
 function createJwt(payload: Record<string, unknown>): string {
-  const h = btoa(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const b = btoa(JSON.stringify(payload));
+  const h = utf8ToBase64(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const b = utf8ToBase64(JSON.stringify(payload));
   return `${h}.${b}.sig`;
 }
 
@@ -77,9 +82,11 @@ describe("parseIdToken", () => {
     expect(parseIdToken(token)?.name).toBe("MARI-LIIS");
   });
 
-  it("falls back to email prefix when no name claims at all (TARA fallback email)", () => {
+  it("hides name and email for TARA fallback email with no name claims", () => {
     const token = createJwt({ sub: "u1", email: "EE37002232729@tara.ee", exp: Math.floor(Date.now() / 1000) + 3600 });
-    expect(parseIdToken(token)?.name).toBe("EE37002232729");
+    const user = parseIdToken(token);
+    expect(user?.name).toBeUndefined();
+    expect(user?.email).toBeUndefined();
   });
 
   it("rejects token without email claim", () => {

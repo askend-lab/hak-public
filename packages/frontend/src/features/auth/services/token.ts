@@ -8,7 +8,8 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3 || !parts[1]) {return null;}
-    return JSON.parse(atob(parts[1]));
+    const bytes = Uint8Array.from(atob(parts[1]), (c) => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
   } catch (error) {
     logger.warn("Failed to decode JWT payload:", error);
     return null;
@@ -44,14 +45,26 @@ function matchesExpected(payload: Record<string, unknown>, options?: ParseIdToke
   return true;
 }
 
+function resolveDisplayName(payload: Record<string, unknown>, email: string): string | undefined {
+  if (typeof payload.name === "string") {return payload.name;}
+  const composed = buildDisplayName(payload.given_name, payload.family_name);
+  if (composed) {return composed;}
+  return email.endsWith("@tara.ee") ? undefined : (email.split("@")[0] ?? email);
+}
+
+function buildUserFromPayload(payload: Record<string, unknown>): User {
+  const email = payload.email as string;
+  const user: User = { id: payload.sub as string };
+  const name = resolveDisplayName(payload, email);
+  if (name) {user.name = name;}
+  if (!email.endsWith("@tara.ee")) {user.email = email;}
+  return user;
+}
+
 export function parseIdToken(idToken: string, options?: ParseIdTokenOptions): User | null {
   const payload = decodeJwtPayload(idToken);
   if (!payload || !hasRequiredClaims(payload) || !matchesExpected(payload, options)) {return null;}
-  const email = payload.email as string;
-  const displayName = typeof payload.name === "string" ? payload.name
-    : buildDisplayName(payload.given_name, payload.family_name)
-    ?? (email.split("@")[0] ?? email);
-  return { id: payload.sub as string, email, name: displayName };
+  return buildUserFromPayload(payload);
 }
 
 const TOKEN_EXPIRY_BUFFER_SECONDS = 300;

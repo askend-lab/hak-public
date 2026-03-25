@@ -59,7 +59,7 @@ function ProfileDropdown({ user, dropdownRef, onLogout, onClose }: { user: User;
           <div className="user-profile__avatar user-profile__avatar--large">{getInitials(user)}</div>
           <div className="user-profile__details">
             <div className="user-profile__name--large">{getDisplayName(user)}</div>
-            <div className="user-profile__email">{user.email}</div>
+            {user.email && <div className="user-profile__email">{user.email}</div>}
           </div>
         </div>
         <div className="user-profile__actions">
