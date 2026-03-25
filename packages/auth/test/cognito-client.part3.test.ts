@@ -119,16 +119,27 @@ describe("cognito-client.test", () => {
       expect(username).toBe('john@example.com');
     });
 
-    it('should handle UsernameExistsException during createUser', async () => {
-      const { UsernameExistsException } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
+    it('should handle UsernameExistsException during createUser and sync name attrs', async () => {
+      const { UsernameExistsException, AdminUpdateUserAttributesCommand } = jest.requireMock('@aws-sdk/client-cognito-identity-provider');
+      AdminUpdateUserAttributesCommand.mockClear();
       mockSend
         .mockResolvedValueOnce({ Users: [] }) // findByPersonalCode
         .mockResolvedValueOnce({ Users: [] }) // findByEmail
-        .mockRejectedValueOnce(new UsernameExistsException('exists')); // createUser throws UsernameExistsException
+        .mockRejectedValueOnce(new UsernameExistsException('exists')) // createUser throws UsernameExistsException
+        .mockResolvedValueOnce({}); // syncNameAttributes
 
       const client = new CognitoClient(mockConfig);
       const username = await client.findOrCreateUser(taraToken);
       expect(username).toBe('john@example.com');
+      expect(AdminUpdateUserAttributesCommand).toHaveBeenCalledWith({
+        UserPoolId: 'test-pool-id',
+        Username: 'john@example.com',
+        UserAttributes: expect.arrayContaining([
+          { Name: 'given_name', Value: 'John' },
+          { Name: 'family_name', Value: 'Doe' },
+          { Name: 'name', Value: 'John Doe' },
+        ]),
+      });
     });
 
     it('should rethrow non-UsernameExistsException errors during createUser', async () => {
