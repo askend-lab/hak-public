@@ -141,7 +141,8 @@ export class CognitoClient {
         logger.error('Cognito createUser failed', extractErrorMessage(error));
         throw error;
       }
-      // User already exists, continue
+      // User already exists — sync name attributes that may be missing
+      await this.syncNameAttributes(username, taraIdToken);
     }
 
     return username;
