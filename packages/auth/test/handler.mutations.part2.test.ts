@@ -100,17 +100,17 @@ describe("handler.mutations.test", () => {
         headers: { Cookie: `tara_auth_state=${makeStateCookie(validState)}` },
       });
       const result = await callbackHandler(event);
-      expect(result.headers?.Location).not.toContain('error=');
+      expect(result.headers?.Location).toContain('error=');
     });
 
-    it('should redirect to home on expired session', async () => {
+    it('should redirect with error on expired session', async () => {
       const expiredState = { state: 's', nonce: 'n', redirectUri: 'https://hak-dev.askend-lab.com', createdAt: Date.now() - 11 * 60 * 1000 };
       const event = makeEvent({
         queryStringParameters: { code: 'c', state: 's' },
         headers: { Cookie: `tara_auth_state=${makeStateCookie(expiredState)}` },
       });
       const result = await callbackHandler(event);
-      expect(result.headers?.Location).not.toContain('error=');
+      expect(result.headers?.Location).toContain('error=');
     });
 
     it('should NOT expire session at exactly 10 minutes', async () => {

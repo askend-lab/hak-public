@@ -112,6 +112,12 @@ export function getLogoutUrl(): string {
   return `https://${cognitoConfig.domain}/logout?${params.toString()}`;
 }
 
+const TARA_ALLOWED_HOSTS = ["haaldusabiline.eki.ee", "localhost", "127.0.0.1"];
+
+export function isTaraEnabled(hostname: string = getHostname()): boolean {
+  return TARA_ALLOWED_HOSTS.includes(hostname);
+}
+
 export function getTaraLoginUrl(): string {
   return getTaraLoginUrlValue();
 }

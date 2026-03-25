@@ -88,9 +88,9 @@ describe("integration.test", () => {
       const event = createCallbackEvent('code', 'wrong-state', encodedCookie);
       const result = await callbackHandler(event);
 
-      // Handler redirects to frontend without error (graceful handling)
+      // Handler redirects to frontend with error (state mismatch)
       expect(result.statusCode).toBe(302);
-      expect(result.headers?.Location).not.toContain('error=');
+      expect(result.headers?.Location).toContain('error=');
     });
 
     it('should redirect with error when TARA token exchange fails', async () => {

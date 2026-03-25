@@ -150,19 +150,19 @@ describe("handler.test", () => {
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).not.toContain('error=');
+    expect(result.headers?.Location).toContain('error=');
   });
 
-  it('should redirect to home on state mismatch', async () => {
+  it('should redirect with error on state mismatch', async () => {
     const event = createEvent({
       queryStringParameters: { code: 'test-code', state: 'wrong-state' },
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).not.toContain('error=');
+    expect(result.headers?.Location).toContain('error=');
   });
 
-  it('should redirect to home on expired session', async () => {
+  it('should redirect with error on expired session', async () => {
     const expiredState = {
       state: 'test-state',
       nonce: 'test-nonce',
@@ -175,16 +175,16 @@ describe("handler.test", () => {
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).not.toContain('error=');
+    expect(result.headers?.Location).toContain('error=');
   });
 
-  it('should handle malformed state cookie gracefully', async () => {
+  it('should redirect with error on malformed state cookie', async () => {
     const event = createEvent({
       headers: { Cookie: 'tara_auth_state=not-valid-base64!!!' },
     });
     const result = await callbackHandler(event);
     expect(result.statusCode).toBe(302);
-    expect(result.headers?.Location).not.toContain('error=');
+    expect(result.headers?.Location).toContain('error=');
   });
 
 });
