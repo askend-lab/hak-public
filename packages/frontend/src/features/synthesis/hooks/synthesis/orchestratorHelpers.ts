@@ -71,12 +71,7 @@ async function fetchAndStore(deps: OrchestratorDeps, opts: ResolveOpts): Promise
   return audioUrl;
 }
 
-interface PlaybackRetryOpts {
-  readonly id: string;
-  readonly retryCount: number;
-  readonly cachedUrl: string | null | undefined;
-  readonly replayFn: () => void;
-}
+interface PlaybackRetryOpts { readonly id: string; readonly retryCount: number; readonly cachedUrl: string | null | undefined; readonly replayFn: () => void }
 
 function makePlaybackRetry(deps: OrchestratorDeps, opts: PlaybackRetryOpts): () => void {
   return () => {
@@ -147,11 +142,7 @@ function buildSynthUpdates(tags: string[], result: { audioUrl: string; phoneticT
   return u;
 }
 
-interface FreshSynthOpts {
-  readonly id: string;
-  readonly text: string;
-  readonly phoneticHint?: string | undefined;
-}
+interface FreshSynthOpts { readonly id: string; readonly text: string; readonly phoneticHint?: string | undefined }
 
 async function freshSynthesize(deps: OrchestratorDeps, opts: FreshSynthOpts): Promise<void> {
   const result = await deps.synthesisAPI.synthesizeText(opts.text, opts.phoneticHint);
@@ -163,11 +154,7 @@ async function freshSynthesize(deps: OrchestratorDeps, opts: FreshSynthOpts): Pr
   });
 }
 
-interface CacheAttemptOpts {
-  readonly id: string;
-  readonly sentence: SentenceState;
-  readonly retryCount: number;
-}
+interface CacheAttemptOpts { readonly id: string; readonly sentence: SentenceState; readonly retryCount: number }
 
 async function tryPlayFromCache(deps: OrchestratorDeps, opts: CacheAttemptOpts): Promise<boolean> {
   const { id, sentence, retryCount } = opts;
@@ -183,12 +170,29 @@ async function synthesizeFromScratch(deps: OrchestratorDeps, sentence: SentenceS
   catch (error) { logger.error("Failed to synthesize:", error); Sentry.captureException(error, { tags: { synthesis: "fresh" } }); deps.updateSentence(id, { isLoading: false, isPlaying: false }); }
 }
 
-interface BackendCacheOpts { readonly id: string; readonly text: string; readonly retryCount: number; readonly retrySelf: () => void }
+interface BackendCacheOpts { readonly id: string; readonly text: string; readonly lookupText?: string | undefined; readonly retryCount: number; readonly retrySelf: () => void }
+
+function lazyAnalyzePhonetics(deps: OrchestratorDeps, id: string, plainText: string): void {
+  void deps.synthesisAPI.analyzeText(plainText).then(({ stressedText }) => {
+    if (!stressedText) {return undefined;}
+    const sent = deps.getSentence(id);
+    if (sent && sent.phoneticText === plainText) { deps.updateSentence(id, { phoneticText: stressedText, stressedTags: convertTextToTags(stressedText).length === sent.tags.length ? convertTextToTags(stressedText) : undefined }); }
+    return undefined;
+  }).catch(() => {});
+}
+
+function buildCacheHitUpdate(deps: OrchestratorDeps, opts: { id: string; text: string; cachedUrl: string }): boolean {
+  const sentence = deps.getSentence(opts.id);
+  const phoneticText = sentence?.phoneticText ?? opts.text;
+  const stressedTags = sentence?.stressedTags ?? convertTextToTags(phoneticText);
+  deps.updateSentence(opts.id, { tags: convertTextToTags(opts.text), audioUrl: opts.cachedUrl, phoneticText, stressedTags });
+  return !sentence?.phoneticText;
+}
 
 async function tryPlayFromBackendCache(deps: OrchestratorDeps, opts: BackendCacheOpts): Promise<boolean> {
-  const cachedUrl = await tryBackendCache(opts.text);
+  const cachedUrl = await tryBackendCache(opts.lookupText ?? opts.text);
   if (!cachedUrl) {return false;}
-  deps.updateSentence(opts.id, { tags: convertTextToTags(opts.text), audioUrl: cachedUrl });
+  if (buildCacheHitUpdate(deps, { id: opts.id, text: opts.text, cachedUrl })) { lazyAnalyzePhonetics(deps, opts.id, opts.text); }
   await tryCachedPlayback(deps, { id: opts.id, audioUrl: cachedUrl, retryCount: opts.retryCount, retrySelf: opts.retrySelf });
   return true;
 }
@@ -198,15 +202,11 @@ export async function doSynthesizeAndPlay(deps: OrchestratorDeps, id: string, re
   if (!sentence?.text.trim()) {return;}
   deps.stopCurrentAudio();
   if (await tryPlayFromCache(deps, { id, sentence, retryCount })) {return;}
-  if (await tryPlayFromBackendCache(deps, { id, text: sentence.text, retryCount, retrySelf: () => { void doSynthesizeAndPlay(deps, id, retryCount + 1); } })) {return;}
+  if (await tryPlayFromBackendCache(deps, { id, text: sentence.text, lookupText: sentence.phoneticText || undefined, retryCount, retrySelf: () => { void doSynthesizeAndPlay(deps, id, retryCount + 1); } })) {return;}
   await synthesizeFromScratch(deps, sentence);
 }
 
-interface SynthTextOpts {
-  readonly id: string;
-  readonly text: string;
-  readonly retryCount?: number | undefined;
-}
+interface SynthTextOpts { readonly id: string; readonly text: string; readonly retryCount?: number | undefined }
 
 function hasCachedAudio(s: SentenceState | undefined, text: string): s is SentenceState & { audioUrl: string } {
   return Boolean(s?.audioUrl && s?.phoneticText && s.text === text);
