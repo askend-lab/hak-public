@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/features/auth/services";
+import { isTaraEnabled } from "@/features/auth/services/config";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { CloseIcon, ErrorIcon } from "@/components/ui/Icons";
 
@@ -68,17 +69,22 @@ const TaraIcon = () => (
 );
 
 function LoginButtons({ isLoading, onTara, onGoogle }: { isLoading: boolean; onTara: () => void; onGoogle: () => void }) {
+  const taraEnabled = isTaraEnabled();
   return (
     <div className="login-modal__actions">
-      <button type="button" onClick={onTara} className="button button--primary login-modal__tara-button" disabled={isLoading}>
-        <TaraIcon />{isLoading ? "Suunan..." : "Logi sisse autentimisteenuse kaudu"}
-      </button>
-      <div className="login-modal__divider">
-        <hr className="login-modal__divider-line" />
-        <span className="login-modal__divider-text">või</span>
-        <hr className="login-modal__divider-line" />
-      </div>
-      <button type="button" onClick={onGoogle} className="button button--secondary login-modal__google-button" disabled={isLoading}>
+      {taraEnabled && (
+        <>
+          <button type="button" onClick={onTara} className="button button--primary login-modal__tara-button" disabled={isLoading}>
+            <TaraIcon />{isLoading ? "Suunan..." : "Logi sisse autentimisteenuse kaudu"}
+          </button>
+          <div className="login-modal__divider">
+            <hr className="login-modal__divider-line" />
+            <span className="login-modal__divider-text">või</span>
+            <hr className="login-modal__divider-line" />
+          </div>
+        </>
+      )}
+      <button type="button" onClick={onGoogle} className={`button ${taraEnabled ? 'button--secondary' : 'button--primary'} login-modal__google-button`} disabled={isLoading}>
         <GoogleIcon />{isLoading ? "Suunan..." : "Jätka Google'iga"}
       </button>
     </div>
