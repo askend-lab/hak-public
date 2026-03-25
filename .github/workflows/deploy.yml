@@ -288,6 +288,44 @@ jobs:
           echo "✅ Deployment state updated:"
           cat /tmp/deployment-state.json
 
+      - name: Update build-info.json on S3
+        run: |
+          ENV="${{ inputs.environment }}"
+          BUILD_ID="${{ inputs.build_id }}"
+          BUCKET="hak-${ENV}-website"
+          [ "$ENV" == "prod" ] && BUCKET="hak-prod-website"
+          CF_DIST_ID="$( [ "$ENV" == "prod" ] && echo $CF_DIST_PROD || echo $CF_DIST_DEV )"
+
+          MANIFEST="/tmp/build-manifest.json"
+          GIT_SHA=$(jq -r '.git_sha' $MANIFEST)
+          BUILD_TIME=$(jq -r '.timestamp' $MANIFEST)
+          DEPLOY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          COMMIT_MSG=$(git log -1 --format=%s $GIT_SHA 2>/dev/null || echo "")
+          BRANCH=$(git branch --contains $GIT_SHA --format='%(refname:short)' 2>/dev/null | head -1 || echo "main")
+
+          cat > /tmp/build-info.json << EOF
+          {
+            "buildId": "$BUILD_ID",
+            "commitHash": "${GIT_SHA:0:7}",
+            "commitHashFull": "$GIT_SHA",
+            "branch": "$BRANCH",
+            "message": "$COMMIT_MSG",
+            "builtAt": "$BUILD_TIME",
+            "deployedAt": "$DEPLOY_TIME",
+            "environment": "$ENV"
+          }
+          EOF
+
+          aws s3 cp /tmp/build-info.json s3://${BUCKET}/build-info.json \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --content-type "application/json"
+
+          # Invalidate build-info.json in CloudFront if frontend wasn't deployed (which already invalidates /*)
+          if [ "${{ steps.state.outputs.deploy_frontend }}" != "true" ]; then
+            aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/build-info.json"
+          fi
+          echo "✅ build-info.json updated on $BUCKET"
+
       - name: Cleanup orphaned API Gateway custom domains
         run: |
           ENV="${{ inputs.environment }}"
