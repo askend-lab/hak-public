@@ -164,45 +164,45 @@ describe("cognito-client.test", () => {
     });
   });
 
-  describe('createCognitoClient', () => {
-    const originalEnv = process.env;
-    beforeEach(() => {
-      process.env = { ...originalEnv };
-    });
+});
 
-    afterEach(() => {
-      process.env = originalEnv;
-    });
-    it('should create client when env vars are set', () => {
-      process.env.COGNITO_USER_POOL_ID = 'pool-id';
-      process.env.COGNITO_CLIENT_ID = 'client-id';
-      process.env.AWS_REGION = 'eu-west-1';
-
-      const client = createCognitoClient();
-      expect(client).toBeInstanceOf(CognitoClient);
-    });
-    it('should throw when COGNITO_USER_POOL_ID is missing', () => {
-      process.env.COGNITO_USER_POOL_ID = '';
-      process.env.COGNITO_CLIENT_ID = 'client-id';
-
-      expect(() => createCognitoClient()).toThrow('COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID must be set');
-    });
-
-    it('should throw when COGNITO_CLIENT_ID is missing', () => {
-      process.env.COGNITO_USER_POOL_ID = 'pool-id';
-      process.env.COGNITO_CLIENT_ID = '';
-
-      expect(() => createCognitoClient()).toThrow('COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID must be set');
-    });
-
-    it('should default region to eu-west-1', () => {
-      process.env.COGNITO_USER_POOL_ID = 'pool-id';
-      process.env.COGNITO_CLIENT_ID = 'client-id';
-      delete process.env.AWS_REGION;
-
-      const client = createCognitoClient();
-      expect(client).toBeInstanceOf(CognitoClient);
-    });
+describe('createCognitoClient', () => {
+  const originalEnv = process.env;
+  beforeEach(() => {
+    process.env = { ...originalEnv };
   });
 
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+  it('should create client when env vars are set', () => {
+    process.env.COGNITO_USER_POOL_ID = 'pool-id';
+    process.env.COGNITO_CLIENT_ID = 'client-id';
+    process.env.AWS_REGION = 'eu-west-1';
+
+    const client = createCognitoClient();
+    expect(client).toBeInstanceOf(CognitoClient);
+  });
+  it('should throw when COGNITO_USER_POOL_ID is missing', () => {
+    process.env.COGNITO_USER_POOL_ID = '';
+    process.env.COGNITO_CLIENT_ID = 'client-id';
+
+    expect(() => createCognitoClient()).toThrow('COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID must be set');
+  });
+
+  it('should throw when COGNITO_CLIENT_ID is missing', () => {
+    process.env.COGNITO_USER_POOL_ID = 'pool-id';
+    process.env.COGNITO_CLIENT_ID = '';
+
+    expect(() => createCognitoClient()).toThrow('COGNITO_USER_POOL_ID and COGNITO_CLIENT_ID must be set');
+  });
+
+  it('should default region to eu-west-1', () => {
+    process.env.COGNITO_USER_POOL_ID = 'pool-id';
+    process.env.COGNITO_CLIENT_ID = 'client-id';
+    delete process.env.AWS_REGION;
+
+    const client = createCognitoClient();
+    expect(client).toBeInstanceOf(CognitoClient);
+  });
 });
