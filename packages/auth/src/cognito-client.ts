@@ -12,18 +12,6 @@ import { CognitoConfig, CognitoTokens, TaraIdToken, TARA_VERIFIED, CUSTOM_CHALLE
 
 export const DEFAULT_REGION = 'eu-west-1';
 
-const UNDEF = '(undefined)';
-
-function logTaraTokenFields(t: TaraIdToken): void {
-  const pa = t.profile_attributes;
-  logger.info('TARA token name fields', {
-    sub: t.sub, given_name: t.given_name ?? UNDEF,
-    family_name: t.family_name ?? UNDEF,
-    pa_given_name: pa?.given_name ?? UNDEF, pa_family_name: pa?.family_name ?? UNDEF,
-    email: t.email ?? UNDEF, keys: Object.keys(t).join(','),
-  });
-}
-
 function extractNames(t: TaraIdToken): { givenName?: string; familyName?: string } {
   const givenName = t.given_name || t.profile_attributes?.given_name;
   const familyName = t.family_name || t.profile_attributes?.family_name;
@@ -49,8 +37,7 @@ export class CognitoClient {
     this.client = new CognitoIdentityProviderClient({ region: config.region });
   }
 
-  private validatePersonalCode(code: string, taraIdToken?: TaraIdToken): void {
-    if (taraIdToken) {logTaraTokenFields(taraIdToken);}
+  private validatePersonalCode(code: string): void {
     if (!/^[A-Z]{2}\d{11}$/.test(code)) {
       logger.error('Invalid personal code format');
       throw new Error('Invalid personal code format');
@@ -67,7 +54,7 @@ export class CognitoClient {
   }
 
   async findOrCreateUser(taraIdToken: TaraIdToken): Promise<string> {
-    this.validatePersonalCode(taraIdToken.sub, taraIdToken);
+    this.validatePersonalCode(taraIdToken.sub);
     const byCode = await this.findUserByPersonalCode(taraIdToken.sub);
     if (byCode) {
       await this.syncNameAttributes(byCode, taraIdToken);
