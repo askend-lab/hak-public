@@ -222,10 +222,10 @@ jobs:
 
       - name: Build Store
         if: steps.detect.outputs.store == 'true'
+        working-directory: packages/store
         run: |
-          pnpm --filter @hak/store build
-          cd packages/store
-          npx esbuild src/lambda/handler.ts \
+          pnpm run build
+          pnpm exec esbuild src/lambda/handler.ts \
             --bundle --platform=node --target=node20 --sourcemap \
             --outfile=dist-lambda/src/lambda/handler.js
           echo "✅ Store Lambda bundle created"
