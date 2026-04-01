@@ -90,7 +90,8 @@ resource "aws_s3_bucket_cors_configuration" "merlin_audio" {
     allowed_methods = ["GET", "HEAD"]
     allowed_origins = [
       "https://hak-dev.askend-lab.com",
-      "https://hak.askend-lab.com"
+      "https://hak.askend-lab.com",
+      "https://haaldusabiline.eki.ee"
     ]
     expose_headers  = ["ETag"]
     max_age_seconds = 3600
@@ -374,7 +375,7 @@ resource "aws_ecs_service" "merlin_worker" {
 
 resource "aws_appautoscaling_target" "merlin_worker" {
   max_capacity       = var.env == "dev" ? 0 : var.ecs_max_capacity  # PUB-2: hard cap on workers
-  min_capacity       = var.env == "dev" ? 0 : 3  # Dev disabled, prod 3 parallel workers
+  min_capacity       = var.env == "dev" ? 0 : var.ecs_min_capacity  # Dev disabled, prod scales from min
   resource_id        = "service/${aws_ecs_cluster.merlin.name}/${aws_ecs_service.merlin_worker.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"

@@ -222,7 +222,13 @@ jobs:
 
       - name: Build Store
         if: steps.detect.outputs.store == 'true'
-        run: pnpm --filter @hak/store build
+        run: |
+          pnpm --filter @hak/store build
+          cd packages/store
+          npx esbuild src/lambda/handler.ts \
+            --bundle --platform=node --target=node20 --sourcemap \
+            --outfile=dist-lambda/src/lambda/handler.js
+          echo "✅ Store Lambda bundle created"
 
       - name: Build TTS API
         if: steps.detect.outputs.tts-api == 'true'
@@ -309,7 +315,7 @@ jobs:
           }
 
           upload_module "frontend" "packages/frontend/dist" "$FRONTEND_CHANGED"
-          upload_module "store" "packages/store/dist" "$STORE_CHANGED"
+          upload_module "store" "packages/store/dist-lambda" "$STORE_CHANGED"
           upload_module "tts-api" "packages/tts-api/dist" "$TTS_API_CHANGED"
           upload_module "morphology-api" "packages/morphology-api/dist" "$MORPHOLOGY_API_CHANGED"
 

@@ -225,16 +225,20 @@ jobs:
           echo "✅ Frontend deployed to $BUCKET with cache headers"
 
       - name: Install Serverless
-        if: steps.state.outputs.deploy_store == 'true' || steps.state.outputs.deploy_tts_api == 'true' || steps.state.outputs.deploy_morphology_api == 'true' || steps.state.outputs.deploy_auth == 'true'
+        if: steps.state.outputs.deploy_tts_api == 'true' || steps.state.outputs.deploy_morphology_api == 'true' || steps.state.outputs.deploy_auth == 'true'
         run: npm install -g serverless@3.40.0
 
       - name: Deploy Store
         if: steps.state.outputs.deploy_store == 'true'
-        working-directory: packages/store
         run: |
-          mkdir -p dist && cp -r ../../artifacts/store/* dist/ 2>/dev/null || true
-          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
-          echo "✅ Store deployed"
+          cd artifacts/store
+          zip -r function.zip src/
+          aws lambda update-function-code \
+            --function-name simplestore-${{ inputs.environment }}-api \
+            --zip-file fileb://function.zip \
+            --region eu-west-1 \
+            --publish
+          echo "✅ Store deployed via direct Lambda update"
 
       - name: Deploy TTS API
         if: steps.state.outputs.deploy_tts_api == 'true'
