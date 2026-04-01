@@ -22,6 +22,12 @@ variable "merlin_image_tag" {
   default     = "latest"
 }
 
+variable "ecs_min_capacity" {
+  description = "Minimum number of ECS workers in prod (autoscaling floor)"
+  type        = number
+  default     = 1
+}
+
 variable "ecs_max_capacity" {
   description = "Maximum number of ECS workers (PUB-2: hard cap to prevent runaway scaling)"
   type        = number
