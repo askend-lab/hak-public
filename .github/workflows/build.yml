@@ -232,7 +232,24 @@ jobs:
 
       - name: Build TTS API
         if: steps.detect.outputs.tts-api == 'true'
-        run: pnpm --filter @hak/tts-api build
+        working-directory: packages/tts-api
+        run: |
+          pnpm run build
+          pnpm exec esbuild src/handler.ts \
+            --bundle --platform=node --target=node20 --sourcemap \
+            --external:@aws-sdk/* \
+            --outfile=dist-lambda/src/handler.js
+          echo "✅ TTS API Lambda bundle created"
+
+      - name: Build Auth
+        if: steps.detect.outputs.auth == 'true'
+        working-directory: packages/auth
+        run: |
+          pnpm run build
+          pnpm exec esbuild src/handler.ts src/cognito-triggers.ts \
+            --bundle --platform=node --target=node20 --sourcemap \
+            --outdir=dist-lambda/src
+          echo "✅ Auth Lambda bundle created"
 
       - name: Build Morphology API
         if: steps.detect.outputs.morphology-api == 'true'
@@ -316,8 +333,9 @@ jobs:
 
           upload_module "frontend" "packages/frontend/dist" "$FRONTEND_CHANGED"
           upload_module "store" "packages/store/dist-lambda" "$STORE_CHANGED"
-          upload_module "tts-api" "packages/tts-api/dist" "$TTS_API_CHANGED"
+          upload_module "tts-api" "packages/tts-api/dist-lambda" "$TTS_API_CHANGED"
           upload_module "morphology-api" "packages/morphology-api/dist" "$MORPHOLOGY_API_CHANGED"
+          upload_module "auth" "packages/auth/dist-lambda" "$AUTH_CHANGED"
 
           # Build manifest using jq
           jq -n \
