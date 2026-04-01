@@ -177,6 +177,7 @@ jobs:
           [ "${{ steps.state.outputs.deploy_frontend }}" == "true" ] && aws s3 sync ${S3_BUILD}/frontend/ artifacts/frontend/
           [ "${{ steps.state.outputs.deploy_store }}" == "true" ] && aws s3 sync ${S3_BUILD}/store/ artifacts/store/
           [ "${{ steps.state.outputs.deploy_tts_api }}" == "true" ] && aws s3 sync ${S3_BUILD}/tts-api/ artifacts/tts-api/
+          [ "${{ steps.state.outputs.deploy_auth }}" == "true" ] && aws s3 sync ${S3_BUILD}/auth/ artifacts/auth/
 
           echo "✅ Downloaded artifacts"
 
@@ -224,10 +225,6 @@ jobs:
           aws cloudfront create-invalidation --distribution-id $CF_DIST_ID --paths "/*"
           echo "✅ Frontend deployed to $BUCKET with cache headers"
 
-      - name: Install Serverless
-        if: steps.state.outputs.deploy_tts_api == 'true' || steps.state.outputs.deploy_morphology_api == 'true' || steps.state.outputs.deploy_auth == 'true'
-        run: npm install -g serverless@3.40.0
-
       - name: Deploy Store
         if: steps.state.outputs.deploy_store == 'true'
         run: |
@@ -242,11 +239,19 @@ jobs:
 
       - name: Deploy TTS API
         if: steps.state.outputs.deploy_tts_api == 'true'
-        working-directory: packages/tts-api
         run: |
-          mkdir -p dist && cp -r ../../artifacts/tts-api/* dist/ 2>/dev/null || true
-          serverless deploy --stage ${{ inputs.environment }}
-          echo "✅ TTS API deployed"
+          ENV="${{ inputs.environment }}"
+          cd artifacts/tts-api
+          zip -r function.zip src/
+          for fn in synthesize status health; do
+            aws lambda update-function-code \
+              --function-name merlin-api-${ENV}-${fn} \
+              --zip-file fileb://function.zip \
+              --region eu-west-1 \
+              --publish
+            echo "  ✅ merlin-api-${ENV}-${fn} updated"
+          done
+          echo "✅ TTS API deployed via direct Lambda update"
 
       - name: Login to ECR
         if: steps.state.outputs.deploy_morphology_api == 'true'
@@ -257,21 +262,32 @@ jobs:
         id: deploy-morphology
         if: steps.state.outputs.deploy_morphology_api == 'true'
         continue-on-error: true
-        working-directory: packages/morphology-api
         env:
           VABAMORF_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/vabamorf-api:${{ steps.state.outputs.morphology_sha }}
-          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
         run: |
           echo "Using ECR image: $VABAMORF_IMAGE_URI"
-          serverless deploy --stage ${{ inputs.environment }}
-          echo "✅ Morphology API deployed"
+          aws lambda update-function-code \
+            --function-name vabamorf-api-${{ inputs.environment }}-api \
+            --image-uri $VABAMORF_IMAGE_URI \
+            --region eu-west-1 \
+            --publish
+          echo "✅ Morphology API deployed via direct Lambda update"
 
       - name: Deploy Auth
         if: steps.state.outputs.deploy_auth == 'true'
-        working-directory: packages/auth
         run: |
-          serverless deploy --stage ${{ inputs.environment }} --region eu-west-1
-          echo "✅ Auth deployed"
+          ENV="${{ inputs.environment }}"
+          cd artifacts/auth
+          zip -r function.zip src/
+          for fn in taraStart taraCallback tokenRefresh health tokenExchange cognitoTriggers; do
+            aws lambda update-function-code \
+              --function-name tara-auth-${ENV}-${fn} \
+              --zip-file fileb://function.zip \
+              --region eu-west-1 \
+              --publish
+            echo "  ✅ tara-auth-${ENV}-${fn} updated"
+          done
+          echo "✅ Auth deployed via direct Lambda update"
 
       - name: Update deployment state
         run: |
