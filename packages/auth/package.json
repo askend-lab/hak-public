@@ -4,13 +4,10 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "dev": "tsc && serverless offline --httpPort 4001 --host 0.0.0.0",
     "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
     "test:full": "jest --json --outputFile=jest-results.json",
     "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
-    "test:mutation": "npx stryker run",
-    "deploy:dev": "serverless deploy --stage dev",
-    "deploy:prod": "serverless deploy --stage prod"
+    "test:mutation": "npx stryker run"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -26,10 +23,6 @@
     "esbuild": "^0.27.3",
     "jest": "^30.2.0",
     "nock": "^14.0.10",
-    "serverless": "^4.32.0",
-    "serverless-domain-manager": "^9.1.0",
-    "serverless-esbuild": "^1.57.0",
-    "serverless-offline": "^14.4.0",
     "ts-jest": "^29.4.6",
     "typescript": "^5.0.0"
   },

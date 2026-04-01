@@ -7,7 +7,6 @@
   "types": "./src/index.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc && serverless offline --httpPort 4000 --host 0.0.0.0",
     "test": "vitest run --changed HEAD --reporter=json --outputFile=test-results.json",
     "test:full": "vitest run --reporter=json --outputFile=test-results.json",
     "test:coverage": "vitest run --coverage --reporter=json --outputFile=test-results.json"
@@ -20,10 +19,6 @@
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^4.0.16",
     "esbuild": "^0.27.1",
-    "serverless": "^4.32.0",
-    "serverless-domain-manager": "^9.1.0",
-    "serverless-esbuild": "^1.57.0",
-    "serverless-offline": "^14.4.0",
     "typescript": "^5.0.0",
     "vitest": "^4.0.16"
   },
