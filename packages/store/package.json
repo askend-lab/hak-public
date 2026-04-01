@@ -19,6 +19,7 @@
     "@types/aws-lambda": "^8.10.160",
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^4.0.16",
+    "esbuild": "^0.27.1",
     "serverless": "^4.32.0",
     "serverless-domain-manager": "^9.1.0",
     "serverless-esbuild": "^1.57.0",
