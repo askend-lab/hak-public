@@ -35,11 +35,11 @@ gh workflow run deploy.yml -f environment=prod -f build_id=<BUILD_ID>
 | Module | Target | Method |
 |--------|--------|--------|
 | `frontend` | S3 + CloudFront | Static files upload + cache invalidation |
-| `simplestore` | Lambda | Serverless Framework |
-| `audio-api` | Lambda | Serverless Framework |
-| `merlin-api` | Lambda | Serverless Framework |
+| `simplestore` | Lambda | `aws lambda update-function-code` (zip) |
+| `tts-api` | Lambda (×3) | `aws lambda update-function-code` (zip) |
+| `auth` | Lambda (×6) | `aws lambda update-function-code` (zip) |
 | `merlin-worker` | ECS (Docker) | ECR push + service update |
-| `vabamorf-api` | Lambda (Docker) | ECR push + Lambda update |
+| `vabamorf-api` | Lambda (Docker) | `aws lambda update-function-code` (image) |
 
 ## Infrastructure (Terraform)
 

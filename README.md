@@ -70,7 +70,7 @@ Some aspects of HAK's architecture are **intentionally open by design** and shou
 
 - **Merlin API (TTS) and Vabamorf API (NLP) are public endpoints** — no authentication is required. These APIs serve the core learning experience and must be accessible without login. Protection is via API Gateway throttling and AWS WAF rate limiting only.
 - **S3 audio storage is publicly readable** — synthesized audio files are served directly via CloudFront/S3. Content is non-sensitive educational material. Access is by content-hash URL; there is no authorization layer by design.
-- **Serverless Framework v3** — we use Serverless Framework v3 (EOL) intentionally. v4 requires a commercial license. We will migrate to v4 (or CDK/SAM) when the project transitions to open source and qualifies for the free tier. This is a cost decision, not an oversight.
+- **Lambda deployment** — Lambda functions are deployed via direct `aws lambda update-function-code` CLI calls. Infrastructure (IAM roles, env vars, API Gateway) is managed by Terraform. There is no Serverless Framework dependency.
 
 For the full security audit and current findings, see `internal/SECURITY-AUDIT-2026-02.md`.
 

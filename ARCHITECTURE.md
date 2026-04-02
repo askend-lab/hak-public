@@ -95,7 +95,7 @@ GitHub Actions workflows in `.github/workflows/`:
 | **build.public.yml** | Push/PR to main | Lint, typecheck, test (public repo CI) |
 | **codeql.yml** | Push/PR to main | CodeQL security analysis |
 
-**Deploy flow:** `build.yml` creates a build artifact per module → `deploy.yml` compares with current deployment state → deploys only changed modules (Serverless for Lambdas, S3 sync for frontend, CloudFront invalidation).
+**Deploy flow:** `build.yml` creates a build artifact per module → `deploy.yml` compares with current deployment state → deploys only changed modules (direct `aws lambda update-function-code` for Lambdas, S3 sync for frontend, CloudFront invalidation). Lambda infrastructure (IAM, env vars, config) is managed by Terraform.
 
 **Manual deploy:** `deploy.yml` can be triggered manually with a build ID and target environment (dev/prod).
 
