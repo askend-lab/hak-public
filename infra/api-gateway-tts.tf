@@ -1,6 +1,6 @@
 # =============================================================================
 # Merlin TTS API — HTTP API v2 (replaces Serverless CF stack API Gateway)
-# Routes: POST /synthesize, GET /status/{cachekey}, GET /health
+# Routes: POST /synthesize, GET /status/{cacheKey}, GET /health
 # =============================================================================
 
 resource "aws_apigatewayv2_api" "tts" {
@@ -74,7 +74,7 @@ resource "aws_apigatewayv2_route" "tts_synthesize" {
 
 resource "aws_apigatewayv2_route" "tts_status" {
   api_id    = aws_apigatewayv2_api.tts.id
-  route_key = "GET /status/{cachekey}"
+  route_key = "GET /status/{cacheKey}"
   target    = "integrations/${aws_apigatewayv2_integration.tts_status.id}"
 }
 
