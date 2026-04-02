@@ -266,6 +266,13 @@ resource "aws_api_gateway_deployment" "store" {
       aws_api_gateway_integration.store_get_shared_get.id,
       aws_api_gateway_integration.store_get_public_get.id,
       aws_api_gateway_integration.store_health_get.id,
+      aws_api_gateway_integration.store_save_post.uri,
+      aws_api_gateway_integration.store_get_get.uri,
+      aws_api_gateway_integration.store_delete_delete.uri,
+      aws_api_gateway_integration.store_query_get.uri,
+      aws_api_gateway_integration.store_get_shared_get.uri,
+      aws_api_gateway_integration.store_get_public_get.uri,
+      aws_api_gateway_integration.store_health_get.uri,
     ]))
   }
 

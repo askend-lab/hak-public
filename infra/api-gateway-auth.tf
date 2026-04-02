@@ -185,6 +185,7 @@ resource "aws_api_gateway_deployment" "auth" {
       aws_api_gateway_resource.auth_tara_refresh.id,
       aws_api_gateway_resource.auth_tara_health.id,
       aws_api_gateway_resource.auth_tara_exchange.id,
+      aws_api_gateway_resource.auth_tara_exchange.path_part,
       aws_api_gateway_method.auth_start_get.id,
       aws_api_gateway_method.auth_callback_get.id,
       aws_api_gateway_method.auth_refresh_post.id,
@@ -195,6 +196,11 @@ resource "aws_api_gateway_deployment" "auth" {
       aws_api_gateway_integration.auth_refresh_post.id,
       aws_api_gateway_integration.auth_health_get.id,
       aws_api_gateway_integration.auth_exchange_post.id,
+      aws_api_gateway_integration.auth_start_get.uri,
+      aws_api_gateway_integration.auth_callback_get.uri,
+      aws_api_gateway_integration.auth_refresh_post.uri,
+      aws_api_gateway_integration.auth_health_get.uri,
+      aws_api_gateway_integration.auth_exchange_post.uri,
     ]))
   }
 
