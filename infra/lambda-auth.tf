@@ -90,10 +90,6 @@ resource "aws_iam_role_policy" "auth_lambda" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "auth_lambda_vpc" {
-  role       = aws_iam_role.auth_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
 
 # --- Lambda Functions ---
 # All auth functions share the same IAM role, VPC config, and env vars

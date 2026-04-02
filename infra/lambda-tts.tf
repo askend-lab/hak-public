@@ -91,10 +91,6 @@ resource "aws_iam_role_policy" "tts_lambda" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "tts_lambda_vpc" {
-  role       = aws_iam_role.tts_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
 
 # --- Lambda Functions ---
 

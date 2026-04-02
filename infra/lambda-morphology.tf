@@ -61,10 +61,6 @@ resource "aws_iam_role_policy" "morphology_lambda" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "morphology_lambda_vpc" {
-  role       = aws_iam_role.morphology_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
 
 resource "aws_lambda_function" "morphology_api" {
   function_name = "vabamorf-api-${var.env}-api"

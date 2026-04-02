@@ -74,10 +74,6 @@ resource "aws_iam_role_policy" "store_lambda" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "store_lambda_vpc" {
-  role       = aws_iam_role.store_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
 
 resource "aws_lambda_function" "store_api" {
   function_name = "simplestore-${var.env}-api"
