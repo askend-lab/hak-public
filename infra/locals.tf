@@ -1,20 +1,5 @@
-# Read API Gateway URLs from Serverless CloudFormation stacks
+# API Gateway domains — constructed from Terraform-managed API Gateway resources
 # These APIs have no public DNS — only reachable through CloudFront
-data "aws_cloudformation_stack" "merlin_api" {
-  name = "merlin-api-${var.env}"
-}
-
-data "aws_cloudformation_stack" "vabamorf_api" {
-  name = "vabamorf-api-${var.env}"
-}
-
-data "aws_cloudformation_stack" "simplestore_api" {
-  name = "simplestore-${var.env}"
-}
-
-data "aws_cloudformation_stack" "tara_auth_api" {
-  name = "tara-auth-${var.env}"
-}
 
 locals {
   app_name   = "hak"
@@ -24,15 +9,15 @@ locals {
   # Domain logic: dev → hak-dev.example.com, prod → hak.example.com
   domain_name = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
 
-  # API Gateway domains (no public DNS — extracted from CloudFormation outputs)
-  # HTTP APIs (v2): format https://{api-id}.execute-api.{region}.amazonaws.com (no stage path)
-  merlin_api_domain   = replace(data.aws_cloudformation_stack.merlin_api.outputs["ApiEndpoint"], "https://", "")
-  vabamorf_api_domain = replace(data.aws_cloudformation_stack.vabamorf_api.outputs["ApiEndpoint"], "https://", "")
+  # API Gateway domains (no public DNS — constructed from Terraform resources)
+  # HTTP APIs (v2): format {api-id}.execute-api.{region}.amazonaws.com
+  merlin_api_domain   = "${aws_apigatewayv2_api.tts.id}.execute-api.${local.region}.amazonaws.com"
+  vabamorf_api_domain = "${aws_apigatewayv2_api.morphology.id}.execute-api.${local.region}.amazonaws.com"
 
-  # REST APIs (v1): format https://{api-id}.execute-api.{region}.amazonaws.com/{stage}
-  # Extract hostname only (split on /, take first element); stage is handled via origin_path
-  simplestore_api_domain = split("/", replace(data.aws_cloudformation_stack.simplestore_api.outputs["ApiEndpoint"], "https://", ""))[0]
-  tara_auth_api_domain   = split("/", replace(data.aws_cloudformation_stack.tara_auth_api.outputs["TaraAuthEndpoint"], "https://", ""))[0]
+  # REST APIs (v1): format {api-id}.execute-api.{region}.amazonaws.com
+  # Stage path is handled via origin_path in CloudFront
+  simplestore_api_domain = "${aws_api_gateway_rest_api.store.id}.execute-api.${local.region}.amazonaws.com"
+  tara_auth_api_domain   = "${aws_api_gateway_rest_api.auth.id}.execute-api.${local.region}.amazonaws.com"
 
   # Lambda environment: allowed CORS origins
   frontend_url    = "https://${local.domain_name}"
