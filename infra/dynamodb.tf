@@ -1,5 +1,5 @@
 # IAM policy for agent to access DynamoDB (read-only)
-# Note: simplestore-* tables are managed by Serverless (packages/simplestore/serverless.yml)
+# Note: simplestore-* tables are now managed by Terraform (lambda-store.tf)
 resource "aws_iam_user_policy" "agent_dynamodb_access" {
   name = "hak-dynamodb-${var.env}-access"
   user = "agent-readonly"
