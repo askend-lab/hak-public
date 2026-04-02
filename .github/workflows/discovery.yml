@@ -1,0 +1,88 @@
+name: Discovery — API Gateway Resources
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/discovery.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  discover:
+    name: Discover API Gateway Resources
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Dump all CF stack resources and API Gateway details
+        run: |
+          OUT() { echo "$@" | tee -a $GITHUB_STEP_SUMMARY; }
+
+          OUT "# API Gateway Discovery"
+
+          STACKS=("merlin-api-dev" "merlin-api-prod" "vabamorf-api-dev" "vabamorf-api-prod" "simplestore-dev" "simplestore-prod" "tara-auth-dev" "tara-auth-prod")
+
+          for STACK in "${STACKS[@]}"; do
+            OUT "## Stack: $STACK"
+            OUT "### CF Resources"
+            aws cloudformation list-stack-resources --stack-name "$STACK" \
+              --query 'StackResourceSummaries[].{Type:ResourceType,LogicalId:LogicalResourceId,PhysicalId:PhysicalResourceId}' \
+              --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+            OUT ""
+          done
+
+          OUT "## HTTP API v2 Details"
+          for STACK in merlin-api-dev merlin-api-prod vabamorf-api-dev vabamorf-api-prod; do
+            API_ID=$(aws cloudformation describe-stack-resource --stack-name "$STACK" \
+              --logical-resource-id "HttpApi" --query 'StackResourceDetail.PhysicalResourceId' --output text 2>/dev/null || echo "NONE")
+            OUT "### $STACK — API=$API_ID"
+            if [ "$API_ID" != "NONE" ]; then
+              OUT "Routes:"
+              aws apigatewayv2 get-routes --api-id "$API_ID" \
+                --query 'Items[].{RouteId:RouteId,RouteKey:RouteKey,Target:Target}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+              OUT "Integrations:"
+              aws apigatewayv2 get-integrations --api-id "$API_ID" \
+                --query 'Items[].{IntegrationId:IntegrationId,IntegrationType:IntegrationType,IntegrationUri:IntegrationUri}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+              OUT "Stages:"
+              aws apigatewayv2 get-stages --api-id "$API_ID" \
+                --query 'Items[].{StageName:StageName,AutoDeploy:AutoDeploy}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+              OUT "Authorizers:"
+              aws apigatewayv2 get-authorizers --api-id "$API_ID" \
+                --query 'Items[].{AuthorizerId:AuthorizerId,Name:Name,AuthorizerType:AuthorizerType}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+          OUT "## REST API v1 Details"
+          for STACK in simplestore-dev simplestore-prod tara-auth-dev tara-auth-prod; do
+            API_ID=$(aws cloudformation describe-stack-resource --stack-name "$STACK" \
+              --logical-resource-id "ApiGatewayRestApi" --query 'StackResourceDetail.PhysicalResourceId' --output text 2>/dev/null || echo "NONE")
+            OUT "### $STACK — API=$API_ID"
+            if [ "$API_ID" != "NONE" ]; then
+              OUT "Resources:"
+              aws apigateway get-resources --rest-api-id "$API_ID" \
+                --query 'items[].{id:id,path:path,methods:join(`, `, keys(resourceMethods || `{}`))}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+              OUT "Stages:"
+              aws apigateway get-stages --rest-api-id "$API_ID" \
+                --query 'item[].{stageName:stageName,deploymentId:deploymentId}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+              OUT "Authorizers:"
+              aws apigateway get-authorizers --rest-api-id "$API_ID" \
+                --query 'items[].{id:id,name:name,type:type}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+              OUT "Deployments:"
+              aws apigateway get-deployments --rest-api-id "$API_ID" \
+                --query 'items[].{id:id,createdDate:createdDate}' --output table 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+          OUT "## Lambda Permissions"
+          for FUNC in simplestore-dev-api simplestore-prod-api merlin-api-dev-synthesize merlin-api-prod-synthesize vabamorf-api-dev-api vabamorf-api-prod-api tara-auth-dev-taraStart tara-auth-prod-taraStart; do
+            OUT "### $FUNC"
+            aws lambda get-policy --function-name "$FUNC" --query 'Policy' --output text 2>&1 | tee -a $GITHUB_STEP_SUMMARY || OUT "no policy"
+          done
