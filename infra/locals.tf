@@ -17,8 +17,9 @@ data "aws_cloudformation_stack" "tara_auth_api" {
 }
 
 locals {
-  app_name = "hak"
-  region   = "eu-west-1"
+  app_name   = "hak"
+  region     = "eu-west-1"
+  account_id = data.aws_caller_identity.current.account_id
 
   # Domain logic: dev → hak-dev.example.com, prod → hak.example.com
   domain_name = var.env == "prod" ? "${local.app_name}.${var.domain_name}" : "${local.app_name}-${var.env}.${var.domain_name}"
@@ -32,6 +33,14 @@ locals {
   # Extract hostname only (split on /, take first element); stage is handled via origin_path
   simplestore_api_domain = split("/", replace(data.aws_cloudformation_stack.simplestore_api.outputs["ApiEndpoint"], "https://", ""))[0]
   tara_auth_api_domain   = split("/", replace(data.aws_cloudformation_stack.tara_auth_api.outputs["TaraAuthEndpoint"], "https://", ""))[0]
+
+  # Lambda environment: allowed CORS origins
+  frontend_url    = "https://${local.domain_name}"
+  allowed_origin  = var.env == "prod" ? "${local.frontend_url},https://haaldusabiline.eki.ee" : local.frontend_url
+  custom_frontend = var.env == "prod" ? "https://haaldusabiline.eki.ee" : ""
+
+  # TARA authentication issuer
+  tara_issuer = var.env == "prod" ? "https://tara.ria.ee" : "https://tara-test.ria.ee"
 
   # Resource naming
   website_bucket_name     = "${local.app_name}-${var.env}-website"
