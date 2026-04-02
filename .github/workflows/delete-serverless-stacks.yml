@@ -109,8 +109,9 @@ jobs:
                 if [ "$FINAL_STATUS" = "DELETE_FAILED" ]; then
                   echo "🔄 Retrying with --retain-resources for failed resources..."
                   FAILED=$(aws cloudformation describe-stack-events --stack-name "$STACK" \
-                    --query 'StackEvents[?ResourceStatus==`DELETE_FAILED`].LogicalResourceId' --output text)
-                  echo "Failed resources: $FAILED"
+                    --query 'StackEvents[?ResourceStatus==`DELETE_FAILED`].LogicalResourceId' --output text \
+                    | tr '\t' '\n' | sort -u | tr '\n' ' ')
+                  echo "Failed resources (deduplicated): $FAILED"
                   aws cloudformation delete-stack --stack-name "$STACK" --retain-resources $FAILED
                   aws cloudformation wait stack-delete-complete --stack-name "$STACK" || echo "❌ Second delete attempt also failed"
                 fi
