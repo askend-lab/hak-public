@@ -69,8 +69,8 @@ resource "aws_lambda_function" "morphology_api" {
   memory_size   = 1024
   timeout       = 30
 
-  # Placeholder — image is deployed by CI/CD (aws lambda update-function-code --image-uri)
-  image_uri = "${local.account_id}.dkr.ecr.${local.region}.amazonaws.com/vabamorf-api:placeholder"
+  # Initial image — CI/CD updates via `aws lambda update-function-code --image-uri`
+  image_uri = "${local.account_id}.dkr.ecr.${local.region}.amazonaws.com/vabamorf-api:7cdfbd6f2bee20bff81bf7c71b4a293bc28eedfe"
 
   environment {
     variables = {
