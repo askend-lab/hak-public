@@ -23,7 +23,7 @@ resource "aws_iam_role" "auth_lambda" {
 }
 
 resource "aws_iam_role_policy" "auth_lambda" {
-  name = "${var.env}-tara-auth-lambda"
+  name = "tara-auth-${var.env}-lambda"
   role = aws_iam_role.auth_lambda.id
 
   policy = jsonencode({
@@ -151,14 +151,10 @@ resource "aws_lambda_function" "auth_tara_start" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
@@ -192,14 +188,10 @@ resource "aws_lambda_function" "auth_tara_callback" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
@@ -233,14 +225,10 @@ resource "aws_lambda_function" "auth_token_refresh" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
@@ -274,14 +262,10 @@ resource "aws_lambda_function" "auth_health" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
@@ -315,14 +299,10 @@ resource "aws_lambda_function" "auth_token_exchange" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
@@ -352,14 +332,10 @@ resource "aws_lambda_function" "auth_cognito_triggers" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }

@@ -23,7 +23,7 @@ resource "aws_iam_role" "store_lambda" {
 }
 
 resource "aws_iam_role_policy" "store_lambda" {
-  name = "${var.env}-simplestore-lambda"
+  name = "simplestore-${var.env}-lambda"
   role = aws_iam_role.store_lambda.id
 
   policy = jsonencode({
@@ -110,14 +110,10 @@ resource "aws_lambda_function" "store_api" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }

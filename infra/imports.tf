@@ -12,7 +12,7 @@ import {
 
 import {
   to = aws_iam_role_policy.store_lambda
-  id = "simplestore-${var.env}-${local.region}-lambdaRole:${var.env}-simplestore-lambda"
+  id = "simplestore-${var.env}-${local.region}-lambdaRole:simplestore-${var.env}-lambda"
 }
 
 import {
@@ -39,7 +39,7 @@ import {
 
 import {
   to = aws_iam_role_policy.tts_lambda
-  id = "merlin-api-${var.env}-${local.region}-lambdaRole:${var.env}-merlin-api-lambda"
+  id = "merlin-api-${var.env}-${local.region}-lambdaRole:merlin-api-${var.env}-lambda"
 }
 
 import {
@@ -81,7 +81,7 @@ import {
 
 import {
   to = aws_iam_role_policy.auth_lambda
-  id = "tara-auth-${var.env}-${local.region}-lambdaRole:${var.env}-tara-auth-lambda"
+  id = "tara-auth-${var.env}-${local.region}-lambdaRole:tara-auth-${var.env}-lambda"
 }
 
 import {
@@ -153,7 +153,7 @@ import {
 
 import {
   to = aws_iam_role_policy.morphology_lambda
-  id = "vabamorf-api-${var.env}-${local.region}-lambdaRole:${var.env}-vabamorf-api-lambda"
+  id = "vabamorf-api-${var.env}-${local.region}-lambdaRole:vabamorf-api-${var.env}-lambda"
 }
 
 import {

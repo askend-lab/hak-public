@@ -23,7 +23,7 @@ resource "aws_iam_role" "morphology_lambda" {
 }
 
 resource "aws_iam_role_policy" "morphology_lambda" {
-  name = "${var.env}-vabamorf-api-lambda"
+  name = "vabamorf-api-${var.env}-lambda"
   role = aws_iam_role.morphology_lambda.id
 
   policy = jsonencode({
@@ -96,15 +96,10 @@ resource "aws_lambda_function" "morphology_api" {
     ignore_changes = [
       image_uri,
       source_code_hash,
-      last_modified,
       filename,
       s3_bucket,
       s3_key,
       s3_object_version,
-      publish,
-      qualified_arn,
-      version,
-      image_config,
     ]
   }
 }

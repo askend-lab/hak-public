@@ -23,7 +23,7 @@ resource "aws_iam_role" "tts_lambda" {
 }
 
 resource "aws_iam_role_policy" "tts_lambda" {
-  name = "${var.env}-merlin-api-lambda"
+  name = "merlin-api-${var.env}-lambda"
   role = aws_iam_role.tts_lambda.id
 
   policy = jsonencode({
@@ -126,14 +126,10 @@ resource "aws_lambda_function" "tts_synthesize" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
@@ -166,14 +162,10 @@ resource "aws_lambda_function" "tts_status" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
@@ -206,14 +198,10 @@ resource "aws_lambda_function" "tts_health" {
     ignore_changes = [
       filename,
       source_code_hash,
-      last_modified,
       s3_bucket,
       s3_key,
       s3_object_version,
       image_uri,
-      publish,
-      qualified_arn,
-      version,
     ]
   }
 }
