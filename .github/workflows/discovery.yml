@@ -1,0 +1,129 @@
+name: Discovery — CloudFormation Stack Resources
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  discover:
+    name: Discover CF Stack Resources
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Dump all CF stack resources
+        run: |
+          STACKS=(
+            "merlin-api-dev"
+            "merlin-api-prod"
+            "vabamorf-api-dev"
+            "vabamorf-api-prod"
+            "simplestore-dev"
+            "simplestore-prod"
+            "tara-auth-dev"
+            "tara-auth-prod"
+          )
+
+          echo "# CloudFormation Stack Discovery" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          for STACK in "${STACKS[@]}"; do
+            echo "## Stack: $STACK" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Stack outputs
+            echo "### Outputs" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            aws cloudformation describe-stacks --stack-name "$STACK" \
+              --query 'Stacks[0].Outputs' --output json 2>&1 >> $GITHUB_STEP_SUMMARY || echo "Stack not found" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Stack resources
+            echo "### Resources" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            aws cloudformation list-stack-resources --stack-name "$STACK" \
+              --query 'StackResourceSummaries[].{Type:ResourceType,LogicalId:LogicalResourceId,PhysicalId:PhysicalResourceId,Status:ResourceStatus}' \
+              --output table 2>&1 >> $GITHUB_STEP_SUMMARY || echo "Stack not found" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Lambda function details (env vars, runtime, handler, role)
+            echo "### Lambda Function Details" >> $GITHUB_STEP_SUMMARY
+            LAMBDA_ARNS=$(aws cloudformation list-stack-resources --stack-name "$STACK" \
+              --query 'StackResourceSummaries[?ResourceType==`AWS::Lambda::Function`].PhysicalResourceId' \
+              --output text 2>/dev/null || echo "")
+
+            for FUNC in $LAMBDA_ARNS; do
+              echo "#### $FUNC" >> $GITHUB_STEP_SUMMARY
+              echo '```json' >> $GITHUB_STEP_SUMMARY
+              aws lambda get-function-configuration --function-name "$FUNC" \
+                --query '{Runtime:Runtime,Handler:Handler,MemorySize:MemorySize,Timeout:Timeout,Role:Role,Environment:Environment.Variables,VpcConfig:VpcConfig,PackageType:PackageType,Architectures:Architectures,EphemeralStorage:EphemeralStorage}' \
+                --output json 2>&1 >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            done
+
+            # API Gateway details
+            echo "### API Gateway Details" >> $GITHUB_STEP_SUMMARY
+            APIGW_IDS=$(aws cloudformation list-stack-resources --stack-name "$STACK" \
+              --query 'StackResourceSummaries[?ResourceType==`AWS::ApiGatewayV2::Api` || ResourceType==`AWS::ApiGateway::RestApi`].PhysicalResourceId' \
+              --output text 2>/dev/null || echo "")
+
+            for API_ID in $APIGW_IDS; do
+              # Try HTTP API (v2) first, then REST API (v1)
+              echo "#### API: $API_ID" >> $GITHUB_STEP_SUMMARY
+              echo '```json' >> $GITHUB_STEP_SUMMARY
+              aws apigatewayv2 get-api --api-id "$API_ID" --output json 2>&1 >> $GITHUB_STEP_SUMMARY || \
+              aws apigateway get-rest-api --rest-api-id "$API_ID" --output json 2>&1 >> $GITHUB_STEP_SUMMARY || \
+              echo "Could not fetch API details" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            done
+
+            # IAM Role details
+            echo "### IAM Role Details" >> $GITHUB_STEP_SUMMARY
+            ROLE_NAMES=$(aws cloudformation list-stack-resources --stack-name "$STACK" \
+              --query 'StackResourceSummaries[?ResourceType==`AWS::IAM::Role`].PhysicalResourceId' \
+              --output text 2>/dev/null || echo "")
+
+            for ROLE in $ROLE_NAMES; do
+              echo "#### Role: $ROLE" >> $GITHUB_STEP_SUMMARY
+              echo "**Assume Role Policy:**" >> $GITHUB_STEP_SUMMARY
+              echo '```json' >> $GITHUB_STEP_SUMMARY
+              aws iam get-role --role-name "$ROLE" \
+                --query 'Role.{Arn:Arn,AssumeRolePolicyDocument:AssumeRolePolicyDocument}' \
+                --output json 2>&1 >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+
+              echo "**Inline Policies:**" >> $GITHUB_STEP_SUMMARY
+              POLICY_NAMES=$(aws iam list-role-policies --role-name "$ROLE" \
+                --query 'PolicyNames' --output text 2>/dev/null || echo "")
+              for POLICY in $POLICY_NAMES; do
+                echo '```json' >> $GITHUB_STEP_SUMMARY
+                aws iam get-role-policy --role-name "$ROLE" --policy-name "$POLICY" \
+                  --output json 2>&1 >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+              done
+
+              echo "**Attached Policies:**" >> $GITHUB_STEP_SUMMARY
+              echo '```json' >> $GITHUB_STEP_SUMMARY
+              aws iam list-attached-role-policies --role-name "$ROLE" \
+                --query 'AttachedPolicies' --output json 2>&1 >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            done
+
+            echo "---" >> $GITHUB_STEP_SUMMARY
+          done
+
+          echo "✅ Discovery complete" >> $GITHUB_STEP_SUMMARY
