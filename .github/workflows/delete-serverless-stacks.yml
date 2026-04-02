@@ -1,0 +1,164 @@
+name: Delete Serverless CF Stacks
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'DELETE' to confirm deletion of all 8 Serverless CF stacks"
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  delete-stacks:
+    name: Delete Serverless CF Stacks (retain Terraform-managed resources)
+    runs-on: ubuntu-latest
+    if: inputs.confirm == 'DELETE'
+    timeout-minutes: 30
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Set DeletionPolicy Retain and delete stacks
+        run: |
+          set -euo pipefail
+
+          # Resources managed by Terraform that MUST be retained (by logical ID)
+          declare -A RETAIN_MAP
+          RETAIN_MAP["merlin-api"]="SynthesizeLambdaFunction,StatusLambdaFunction,HealthLambdaFunction,IamRoleLambdaExecution,SynthesizeLogGroup,StatusLogGroup,HealthLogGroup"
+          RETAIN_MAP["vabamorf-api"]="ApiLambdaFunction,IamRoleLambdaExecution,ApiLogGroup"
+          RETAIN_MAP["simplestore"]="ApiLambdaFunction,IamRoleLambdaExecution,ApiLogGroup,DynamoDBTable"
+          RETAIN_MAP["tara-auth"]="TaraStartLambdaFunction,TaraCallbackLambdaFunction,TokenRefreshLambdaFunction,HealthLambdaFunction,TokenExchangeLambdaFunction,CognitoTriggersLambdaFunction,IamRoleLambdaExecution,TaraStartLogGroup,TaraCallbackLogGroup,TokenRefreshLogGroup,HealthLogGroup,TokenExchangeLogGroup,CognitoTriggersLogGroup"
+
+          SERVICES=("merlin-api" "vabamorf-api" "simplestore" "tara-auth")
+          ENVS=("dev" "prod")
+
+          for SERVICE in "${SERVICES[@]}"; do
+            for ENV in "${ENVS[@]}"; do
+              STACK="${SERVICE}-${ENV}"
+              echo "========================================="
+              echo "Processing stack: $STACK"
+              echo "========================================="
+
+              # Check if stack exists
+              STACK_STATUS=$(aws cloudformation describe-stacks --stack-name "$STACK" --query 'Stacks[0].StackStatus' --output text 2>/dev/null || echo "NOT_FOUND")
+              if [ "$STACK_STATUS" = "NOT_FOUND" ]; then
+                echo "⏭️ Stack $STACK does not exist, skipping"
+                continue
+              fi
+              echo "Stack status: $STACK_STATUS"
+
+              # Step 1: Get template and add DeletionPolicy: Retain to Terraform-managed resources
+              echo "📥 Downloading template..."
+              aws cloudformation get-template --stack-name "$STACK" --template-stage Original \
+                --query TemplateBody --output json > /tmp/template.json
+
+              RETAIN_LIST="${RETAIN_MAP[$SERVICE]}"
+              echo "🔒 Adding DeletionPolicy: Retain to: $RETAIN_LIST"
+
+              IFS=',' read -ra RESOURCES <<< "$RETAIN_LIST"
+              for RESOURCE in "${RESOURCES[@]}"; do
+                if jq -e ".Resources.\"$RESOURCE\"" /tmp/template.json > /dev/null 2>&1; then
+                  jq ".Resources.\"$RESOURCE\".DeletionPolicy = \"Retain\"" /tmp/template.json > /tmp/template_updated.json
+                  mv /tmp/template_updated.json /tmp/template.json
+                  echo "  ✅ $RESOURCE → Retain"
+                else
+                  echo "  ⚠️ $RESOURCE not found in template, skipping"
+                fi
+              done
+
+              # Step 2: Update stack with DeletionPolicy changes
+              echo "📤 Updating stack with DeletionPolicy: Retain..."
+              if aws cloudformation update-stack \
+                --stack-name "$STACK" \
+                --template-body "file:///tmp/template.json" \
+                --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM 2>&1; then
+
+                echo "⏳ Waiting for update to complete..."
+                aws cloudformation wait stack-update-complete --stack-name "$STACK" || {
+                  echo "❌ Stack update failed for $STACK"
+                  aws cloudformation describe-stack-events --stack-name "$STACK" \
+                    --query 'StackEvents[?ResourceStatus==`UPDATE_FAILED`].[LogicalResourceId,ResourceStatusReason]' \
+                    --output table | head -20
+                  continue
+                }
+                echo "✅ Stack updated with DeletionPolicy: Retain"
+              else
+                echo "⚠️ No updates needed (template unchanged) or update failed, attempting delete anyway"
+              fi
+
+              # Step 3: Delete the stack (retained resources will be kept)
+              echo "🗑️ Deleting stack $STACK..."
+              aws cloudformation delete-stack --stack-name "$STACK"
+
+              echo "⏳ Waiting for deletion..."
+              if aws cloudformation wait stack-delete-complete --stack-name "$STACK"; then
+                echo "✅ Stack $STACK deleted successfully"
+              else
+                echo "⚠️ Stack $STACK deletion may have failed, checking status..."
+                FINAL_STATUS=$(aws cloudformation describe-stacks --stack-name "$STACK" --query 'Stacks[0].StackStatus' --output text 2>/dev/null || echo "DELETED")
+                echo "Final status: $FINAL_STATUS"
+
+                if [ "$FINAL_STATUS" = "DELETE_FAILED" ]; then
+                  echo "🔄 Retrying with --retain-resources for failed resources..."
+                  FAILED=$(aws cloudformation describe-stack-events --stack-name "$STACK" \
+                    --query 'StackEvents[?ResourceStatus==`DELETE_FAILED`].LogicalResourceId' --output text)
+                  echo "Failed resources: $FAILED"
+                  aws cloudformation delete-stack --stack-name "$STACK" --retain-resources $FAILED
+                  aws cloudformation wait stack-delete-complete --stack-name "$STACK" || echo "❌ Second delete attempt also failed"
+                fi
+              fi
+
+              echo ""
+            done
+          done
+
+      - name: Verify cleanup
+        run: |
+          echo "## Stack Deletion Results" >> $GITHUB_STEP_SUMMARY
+
+          STACKS=("merlin-api-dev" "merlin-api-prod" "vabamorf-api-dev" "vabamorf-api-prod" "simplestore-dev" "simplestore-prod" "tara-auth-dev" "tara-auth-prod")
+
+          ALL_DELETED=true
+          for STACK in "${STACKS[@]}"; do
+            STATUS=$(aws cloudformation describe-stacks --stack-name "$STACK" --query 'Stacks[0].StackStatus' --output text 2>/dev/null || echo "DELETED")
+            if [ "$STATUS" = "DELETED" ]; then
+              echo "✅ $STACK — deleted" | tee -a $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ $STACK — $STATUS" | tee -a $GITHUB_STEP_SUMMARY
+              ALL_DELETED=false
+            fi
+          done
+
+          if [ "$ALL_DELETED" = true ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🎉 All Serverless CF stacks successfully deleted!" >> $GITHUB_STEP_SUMMARY
+            echo "Terraform-managed resources (Lambdas, IAM roles, Log Groups, DynamoDB) were retained." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Verify Terraform-managed resources still exist
+        run: |
+          echo "## Terraform Resource Verification" >> $GITHUB_STEP_SUMMARY
+
+          FUNCTIONS=(
+            "simplestore-dev-api" "simplestore-prod-api"
+            "merlin-api-dev-synthesize" "merlin-api-prod-synthesize"
+            "vabamorf-api-dev-api" "vabamorf-api-prod-api"
+            "tara-auth-dev-taraStart" "tara-auth-prod-taraStart"
+          )
+
+          for FUNC in "${FUNCTIONS[@]}"; do
+            STATE=$(aws lambda get-function --function-name "$FUNC" --query 'Configuration.State' --output text 2>/dev/null || echo "MISSING")
+            if [ "$STATE" = "Active" ]; then
+              echo "✅ Lambda $FUNC — Active" | tee -a $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ Lambda $FUNC — $STATE" | tee -a $GITHUB_STEP_SUMMARY
+            fi
+          done
