@@ -55,6 +55,19 @@ jobs:
               fi
               echo "Stack status: $STACK_STATUS"
 
+              # Handle stacks already in DELETE_FAILED (from previous run)
+              if [ "$STACK_STATUS" = "DELETE_FAILED" ]; then
+                echo "🔄 Stack already in DELETE_FAILED, retrying with --retain-resources..."
+                # Get resources that are NOT yet deleted
+                REMAINING=$(aws cloudformation list-stack-resources --stack-name "$STACK" \
+                  --query 'StackResourceSummaries[?ResourceStatus!=`DELETE_COMPLETE`].LogicalResourceId' --output text \
+                  | tr '\t' '\n' | sort -u | tr '\n' ' ')
+                echo "Retaining remaining resources: $REMAINING"
+                aws cloudformation delete-stack --stack-name "$STACK" --retain-resources $REMAINING
+                aws cloudformation wait stack-delete-complete --stack-name "$STACK" && echo "✅ Stack $STACK deleted" || echo "❌ Delete failed for $STACK"
+                continue
+              fi
+
               # Step 1: Get template and add DeletionPolicy: Retain to Terraform-managed resources
               echo "📥 Downloading template..."
               aws cloudformation get-template --stack-name "$STACK" --template-stage Original \
@@ -107,12 +120,12 @@ jobs:
                 echo "Final status: $FINAL_STATUS"
 
                 if [ "$FINAL_STATUS" = "DELETE_FAILED" ]; then
-                  echo "🔄 Retrying with --retain-resources for failed resources..."
-                  FAILED=$(aws cloudformation describe-stack-events --stack-name "$STACK" \
-                    --query 'StackEvents[?ResourceStatus==`DELETE_FAILED`].LogicalResourceId' --output text \
+                  echo "🔄 Retrying with --retain-resources..."
+                  REMAINING=$(aws cloudformation list-stack-resources --stack-name "$STACK" \
+                    --query 'StackResourceSummaries[?ResourceStatus!=`DELETE_COMPLETE`].LogicalResourceId' --output text \
                     | tr '\t' '\n' | sort -u | tr '\n' ' ')
-                  echo "Failed resources (deduplicated): $FAILED"
-                  aws cloudformation delete-stack --stack-name "$STACK" --retain-resources $FAILED
+                  echo "Retaining remaining resources: $REMAINING"
+                  aws cloudformation delete-stack --stack-name "$STACK" --retain-resources $REMAINING
                   aws cloudformation wait stack-delete-complete --stack-name "$STACK" || echo "❌ Second delete attempt also failed"
                 fi
               fi
