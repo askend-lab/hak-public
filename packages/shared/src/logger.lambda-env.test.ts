@@ -2,7 +2,7 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 
-describe("logger.test", () => {
+describe("logger: Lambda and env", () => {
   const mockConsole = {
     debug: vi.spyOn(console, "debug").mockImplementation(() => {}),
     info: vi.spyOn(console, "info").mockImplementation(() => {}),
