@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("parseRequestBody", () => {
   it("should parse valid JSON body", () => {
     const result = parseRequestBody(JSON.stringify({ text: "hello" }));
     expect(result.ok).toBe(true);
