@@ -19,8 +19,6 @@ export default function SynthesisRoute() {
     <Suspense fallback={<PageLoadingState />}>
       <ErrorBoundary>
         <SynthesisPageProvider
-          sentences={synthesis.sentences}
-          setSentences={synthesis.setSentences}
           synthesis={synthesis}
           taskHandlers={taskHandlers}
           showNotification={showNotification}

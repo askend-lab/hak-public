@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { SentenceState } from "@/types/synthesis";
+import { useSentenceStore } from "@/features/synthesis/hooks/synthesis/useSentenceState";
 
 function reorderItems(prev: SentenceState[], dragId: string, targetId: string): SentenceState[] {
   const di = prev.findIndex((s) => s.id === dragId);
@@ -15,7 +16,7 @@ function reorderItems(prev: SentenceState[], dragId: string, targetId: string): 
 }
 
 export function useDragAndDrop(
-  setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>,
+  setSentences?: React.Dispatch<React.SetStateAction<SentenceState[]>>,
 ): {
   draggedId: string | null;
   dragOverId: string | null;
@@ -27,6 +28,8 @@ export function useDragAndDrop(
 } {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const storeSetter = useSentenceStore((s) => s.setSentences);
+  const actualSetSentences = setSentences ?? storeSetter;
 
   const handleDragStart = useCallback((e: React.DragEvent, id: string) => {
     setDraggedId(id);
@@ -59,12 +62,12 @@ export function useDragAndDrop(
       e.preventDefault();
       if (!draggedId || draggedId === targetId) {return;}
 
-      setSentences((prev) => reorderItems(prev, draggedId, targetId));
+      actualSetSentences((prev) => reorderItems(prev, draggedId, targetId));
 
       setDraggedId(null);
       setDragOverId(null);
     },
-    [draggedId, setSentences],
+    [draggedId, actualSetSentences],
   );
 
   return {

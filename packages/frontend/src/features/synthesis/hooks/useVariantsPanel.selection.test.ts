@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useVariantsPanel } from "./useVariantsPanel";
 import { SentenceState } from "@/types/synthesis";
+import { useSentenceStore } from "./synthesis/useSentenceState";
 
 vi.mock("@/features/auth/services/storage", () => ({
   AuthStorage: { getAccessToken: vi.fn(() => "test-token") },
@@ -34,12 +35,13 @@ describe("useVariantsPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     global.fetch = vi.fn();
+    localStorage.clear();
+    useSentenceStore.getState()._reset();
   });
 
   it("should show error notification on API failure", async () => {
     vi.useFakeTimers();
-    const sentences = createMockSentences();
-    const setSentences = vi.fn();
+    useSentenceStore.getState().setSentences(createMockSentences());
     const showNotification = vi.fn();
 
     (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
@@ -47,7 +49,7 @@ describe("useVariantsPanel", () => {
     );
 
     const { result } = renderHook(() =>
-      useVariantsPanel(sentences, setSentences, showNotification),
+      useVariantsPanel(undefined, undefined, showNotification),
     );
 
     await act(async () => {
@@ -67,8 +69,7 @@ describe("useVariantsPanel", () => {
 
   it("should set and clear loadingVariantsTag during fetch", async () => {
     vi.useFakeTimers();
-    const sentences = createMockSentences();
-    const setSentences = vi.fn();
+    useSentenceStore.getState().setSentences(createMockSentences());
     const showNotification = vi.fn();
 
     let resolvePromise: (value: unknown) => void;
@@ -81,7 +82,7 @@ describe("useVariantsPanel", () => {
     );
 
     const { result } = renderHook(() =>
-      useVariantsPanel(sentences, setSentences, showNotification),
+      useVariantsPanel(undefined, undefined, showNotification),
     );
 
     // Start the fetch
@@ -114,8 +115,7 @@ describe("useVariantsPanel", () => {
   });
 
   it("should open sentence phonetic panel", async () => {
-    const sentences = createMockSentences();
-    const setSentences = vi.fn();
+    useSentenceStore.getState().setSentences(createMockSentences());
 
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
@@ -123,7 +123,7 @@ describe("useVariantsPanel", () => {
     });
 
     const { result } = renderHook(() =>
-      useVariantsPanel(sentences, setSentences),
+      useVariantsPanel(),
     );
 
     await act(async () => {
@@ -135,10 +135,9 @@ describe("useVariantsPanel", () => {
   });
 
   it("should close sentence phonetic panel", async () => {
-    const sentences = createMockSentences();
-    const setSentences = vi.fn();
+    useSentenceStore.getState().setSentences(createMockSentences());
     const { result } = renderHook(() =>
-      useVariantsPanel(sentences, setSentences),
+      useVariantsPanel(),
     );
 
     await act(async () => {
@@ -164,9 +163,9 @@ describe("useVariantsPanel", () => {
         currentInput: "",
       },
     ];
-    const setSentences = vi.fn();
+    useSentenceStore.getState().setSentences(sentences);
     const { result } = renderHook(() =>
-      useVariantsPanel(sentences, setSentences),
+      useVariantsPanel(),
     );
 
     await act(async () => {
