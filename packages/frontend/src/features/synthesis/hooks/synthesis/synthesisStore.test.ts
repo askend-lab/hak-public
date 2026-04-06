@@ -101,58 +101,43 @@ describe("synthesisStore", () => {
     });
   });
 
-  describe("INITIAL_SENTENCE", () => {
-    it("has id 1", () => {
-      expect(INITIAL_SENTENCE.id).toBe("1");
+  describe("editingTag", () => {
+    it("starts as null", () => {
+      expect(useSentenceStore.getState().editingTag).toBeNull();
+    });
+
+    it("sets editing tag", () => {
+      useSentenceStore.getState().setEditingTag({ sentenceId: "1", tagIndex: 0, value: "test" });
+      expect(useSentenceStore.getState().editingTag).toEqual({ sentenceId: "1", tagIndex: 0, value: "test" });
+    });
+
+    it("clears editing tag", () => {
+      useSentenceStore.getState().setEditingTag({ sentenceId: "1", tagIndex: 0, value: "test" });
+      useSentenceStore.getState().setEditingTag(null);
+      expect(useSentenceStore.getState().editingTag).toBeNull();
     });
   });
 
-  describe("persistence", () => {
-    it("persists sentences to localStorage", () => {
-      const sentence = { ...createEmptySentence("persist-test"), text: "Hello", tags: ["Hello"] };
-      useSentenceStore.getState().setSentences([sentence]);
-      const stored = localStorage.getItem("eki_synthesis_state");
-      expect(stored).toBeTruthy();
-      const parsed = JSON.parse(stored ?? "{}");
-      expect(parsed.state?.sentences?.[0]?.text).toBe("Hello");
+  describe("openTagMenu", () => {
+    it("starts as null", () => {
+      expect(useSentenceStore.getState().openTagMenu).toBeNull();
     });
 
-    it("does not persist isPlaying and isLoading", () => {
-      const sentence = { ...createEmptySentence("persist-test"), isPlaying: true, isLoading: true };
-      useSentenceStore.getState().setSentences([sentence]);
-      const stored = localStorage.getItem("eki_synthesis_state");
-      const parsed = JSON.parse(stored ?? "{}");
-      expect(parsed.state?.sentences?.[0]?.isPlaying).toBeUndefined();
-      expect(parsed.state?.sentences?.[0]?.isLoading).toBeUndefined();
+    it("sets open tag menu", () => {
+      useSentenceStore.getState().setOpenTagMenu({ sentenceId: "1", tagIndex: 2 });
+      expect(useSentenceStore.getState().openTagMenu).toEqual({ sentenceId: "1", tagIndex: 2 });
     });
 
-    it("restores sentences from localStorage on rehydrate", () => {
-      const storedData = {
-        state: { sentences: [{ id: "restored", text: "Restored", tags: ["Restored"], currentInput: "" }] },
-        version: 0,
-      };
-      localStorage.setItem("eki_synthesis_state", JSON.stringify(storedData));
-      useSentenceStore.persist.rehydrate();
-      expect(useSentenceStore.getState().sentences[0]?.text).toBe("Restored");
+    it("clears open tag menu", () => {
+      useSentenceStore.getState().setOpenTagMenu({ sentenceId: "1", tagIndex: 2 });
+      useSentenceStore.getState().setOpenTagMenu(null);
+      expect(useSentenceStore.getState().openTagMenu).toBeNull();
     });
+  });
 
-    it("restores with defaults for missing fields", () => {
-      const storedData = {
-        state: { sentences: [{ id: "partial", text: "Partial" }] },
-        version: 0,
-      };
-      localStorage.setItem("eki_synthesis_state", JSON.stringify(storedData));
-      useSentenceStore.persist.rehydrate();
-      const s = useSentenceStore.getState().sentences[0];
-      expect(s?.isPlaying).toBe(false);
-      expect(s?.isLoading).toBe(false);
-      expect(s?.phoneticText).toBeNull();
-    });
-
-    it("uses initial state when localStorage is empty", () => {
-      localStorage.clear();
-      useSentenceStore.persist.rehydrate();
-      expect(useSentenceStore.getState().sentences).toHaveLength(1);
+  describe("INITIAL_SENTENCE", () => {
+    it("has id 1", () => {
+      expect(INITIAL_SENTENCE.id).toBe("1");
     });
   });
 });

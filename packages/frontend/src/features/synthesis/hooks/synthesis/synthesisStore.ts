@@ -3,7 +3,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { SentenceState } from "@/types/synthesis";
+import { SentenceState, EditingTag, OpenTagMenu } from "@/types/synthesis";
 import { logger } from "@hak/shared";
 
 const STORAGE_KEY = "eki_synthesis_state";
@@ -56,9 +56,13 @@ export interface SentenceStore {
   sentences: SentenceState[];
   isPlayingAll: boolean;
   isLoadingPlayAll: boolean;
+  editingTag: EditingTag;
+  openTagMenu: OpenTagMenu;
   setSentences: (updater: SentenceState[] | ((prev: SentenceState[]) => SentenceState[])) => void;
   setIsPlayingAll: (value: boolean) => void;
   setIsLoadingPlayAll: (value: boolean) => void;
+  setEditingTag: (tag: EditingTag) => void;
+  setOpenTagMenu: (menu: OpenTagMenu) => void;
   _reset: () => void;
 }
 
@@ -68,12 +72,16 @@ export const useSentenceStore = create<SentenceStore>()(
       sentences: loadInitialState(),
       isPlayingAll: false,
       isLoadingPlayAll: false,
+      editingTag: null,
+      openTagMenu: null,
       setSentences: (updater): void => {
         set((state) => ({ sentences: typeof updater === "function" ? updater(state.sentences) : updater }));
       },
       setIsPlayingAll: (value: boolean): void => { set({ isPlayingAll: value }); },
       setIsLoadingPlayAll: (value: boolean): void => { set({ isLoadingPlayAll: value }); },
-      _reset: (): void => { set({ sentences: [INITIAL_SENTENCE], isPlayingAll: false, isLoadingPlayAll: false }); },
+      setEditingTag: (tag: EditingTag): void => { set({ editingTag: tag }); },
+      setOpenTagMenu: (menu: OpenTagMenu): void => { set({ openTagMenu: menu }); },
+      _reset: (): void => { set({ sentences: [INITIAL_SENTENCE], isPlayingAll: false, isLoadingPlayAll: false, editingTag: null, openTagMenu: null }); },
     }),
     {
       name: STORAGE_KEY,
