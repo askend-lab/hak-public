@@ -21,7 +21,7 @@ function withCognitoUser(
   return event;
 }
 
-describe("integration.test", () => {
+describe("integration: validation", () => {
   describe("validation through handler", () => {
     it("should reject empty pk", async () => {
       const event = withCognitoUser(

@@ -62,7 +62,7 @@ function createMockEvent(
   };
 }
 
-describe("routes.test", () => {
+describe("routes: save and get", () => {
   let store: Store;
 
   beforeEach(() => {

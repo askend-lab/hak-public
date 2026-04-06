@@ -14,7 +14,7 @@ import { Store } from "../src/core/store";
 import { ServerContext, DataType } from "../src/core/types";
 import { InMemoryAdapter } from "../src/adapters/memory";
 
-describe("ownership.save.test", () => {
+describe("ownership: shared and private", () => {
   let db: InMemoryAdapter;
 
   const ownerContext: ServerContext = {

@@ -62,7 +62,7 @@ function createMockEvent(
   };
 }
 
-describe("routes.test", () => {
+describe("routes: delete", () => {
   let store: Store;
 
   beforeEach(() => {
