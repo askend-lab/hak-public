@@ -10,7 +10,7 @@ import { ServerContext } from "../src/core/types";
 import { validateServerContext } from "../src/core/validation";
 import { InMemoryAdapter } from "../src/adapters/memory";
 
-describe("boundary.test", () => {
+describe("boundary: context and data", () => {
   let db: InMemoryAdapter;
   const context: ServerContext = {
     app: "testapp",
