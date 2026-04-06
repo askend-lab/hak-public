@@ -2,21 +2,18 @@
 // Copyright (c) 2024-2026 Askend Lab
 
 import { useEffect, useCallback } from "react";
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 import { SentenceState, convertTextToTags } from "@/types/synthesis";
 import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
 import { logger } from "@hak/shared";
+import { useSentenceStore, createEmptySentence, INITIAL_SENTENCE } from "./synthesisStore";
 
-const STORAGE_KEY = "eki_synthesis_state";
+export { useSentenceStore } from "./synthesisStore";
+
 const LEGACY_PLAYLIST_KEY = "eki_playlist_entries";
 
 const ensureSentenceState = (
   sentence: Partial<SentenceState> &
-    Pick<
-      SentenceState,
-      "id" | "text" | "tags" | "isPlaying" | "isLoading" | "currentInput"
-    >,
+    Pick<SentenceState, "id" | "text" | "tags" | "isPlaying" | "isLoading" | "currentInput">,
 ): SentenceState => ({
   ...sentence,
   phoneticText: sentence.phoneticText ?? null,
@@ -24,37 +21,6 @@ const ensureSentenceState = (
   stressedTags: sentence.stressedTags ?? null,
 });
 
-const createEmptySentence = (id: string): SentenceState => ({
-  id,
-  text: "",
-  tags: [],
-  isPlaying: false,
-  isLoading: false,
-  currentInput: "",
-  phoneticText: null,
-  audioUrl: null,
-  stressedTags: null,
-});
-
-const INITIAL_SENTENCE: SentenceState = createEmptySentence("1");
-
-// Helper to sanitize sentences for storage (strip transient UI state)
-const sanitizeForStorage = (
-  sentences: SentenceState[],
-): Partial<SentenceState>[] => {
-  return sentences.map((s) => ({
-    id: s.id,
-    text: s.text,
-    tags: s.tags,
-    currentInput: s.currentInput,
-    phoneticText: s.phoneticText,
-    audioUrl: s.audioUrl,
-    stressedTags: s.stressedTags,
-    // Intentionally omit isPlaying and isLoading - these are transient UI state
-  }));
-};
-
-// Helper to transform a raw entry (from legacy storage or shared task) into SentenceState
 interface RawEntry {
   id?: string;
   text: string;
@@ -64,9 +30,7 @@ interface RawEntry {
 
 const transformEntryToSentence = (entry: RawEntry): SentenceState => {
   const words = convertTextToTags(entry.text);
-  const stressedWords = entry.stressedText
-    ? convertTextToTags(entry.stressedText)
-    : [];
+  const stressedWords = entry.stressedText ? convertTextToTags(entry.stressedText) : [];
   return ensureSentenceState({
     id: entry.id || `entry_${crypto.randomUUID()}`,
     text: entry.text,
@@ -74,48 +38,10 @@ const transformEntryToSentence = (entry: RawEntry): SentenceState => {
     isPlaying: false,
     isLoading: false,
     currentInput: "",
-    stressedTags:
-      stressedWords.length === words.length
-        ? stressedWords
-        : undefined,
+    stressedTags: stressedWords.length === words.length ? stressedWords : undefined,
     audioUrl: entry.audioUrl,
     phoneticText: entry.stressedText,
   });
-};
-
-// Helper to restore sentences from storage
-const restoreFromStorage = (
-  stored: Partial<SentenceState>[],
-): SentenceState[] => {
-  return stored.map((s) =>
-    ensureSentenceState({
-      id: s.id || `entry_${crypto.randomUUID()}`,
-      text: s.text || "",
-      tags: s.tags || [],
-      isPlaying: false,
-      isLoading: false,
-      currentInput: s.currentInput || "",
-      phoneticText: s.phoneticText,
-      audioUrl: s.audioUrl,
-      stressedTags: s.stressedTags,
-    }),
-  );
-};
-
-// Helper to load initial state from localStorage
-const loadInitialState = (): SentenceState[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return restoreFromStorage(parsed);
-      }
-    }
-  } catch (error) {
-    logger.error("Failed to load synthesis state from localStorage:", error);
-  }
-  return [INITIAL_SENTENCE];
 };
 
 type SetSentences = React.Dispatch<React.SetStateAction<SentenceState[]>>;
@@ -157,38 +83,6 @@ const DEMO: SentenceState[] = [
   { id: "demo-1", text: "Noormees läks kooli", tags: ["Noormees", "läks", "kooli"], isPlaying: false, isLoading: false, currentInput: "", phoneticText: null, audioUrl: null, stressedTags: null },
   createEmptySentence("demo-2"),
 ];
-
-interface SentenceStore {
-  sentences: SentenceState[];
-  setSentences: (updater: SentenceState[] | ((prev: SentenceState[]) => SentenceState[])) => void;
-  _reset: () => void;
-}
-
-export const useSentenceStore = create<SentenceStore>()(
-  persist(
-    (set) => ({
-      sentences: loadInitialState(),
-      setSentences: (updater): void => {
-        set((state) => ({
-          sentences: typeof updater === "function" ? updater(state.sentences) : updater,
-        }));
-      },
-      _reset: (): void => { set({ sentences: [INITIAL_SENTENCE] }); },
-    }),
-    {
-      name: STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ sentences: sanitizeForStorage(state.sentences) }),
-      merge: (persisted, current) => {
-        const p = persisted as { sentences?: Partial<SentenceState>[] } | undefined;
-        if (p?.sentences && p.sentences.length > 0) {
-          return { ...current, sentences: restoreFromStorage(p.sentences) };
-        }
-        return current;
-      },
-    },
-  ),
-);
 
 export function useSentenceState(): {
   sentences: SentenceState[];
