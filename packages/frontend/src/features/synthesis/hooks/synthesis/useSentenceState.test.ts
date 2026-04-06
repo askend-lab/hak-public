@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
-import { useSentenceState } from "./useSentenceState";
+import { useSentenceState, useSentenceStore } from "./useSentenceState";
 
 let mockConsumeResult: unknown[] | null = null;
 vi.mock("@/contexts/CopiedEntriesContext", () => ({
@@ -25,6 +25,7 @@ describe("useSentenceState", () => {
     vi.clearAllMocks();
     localStorage.clear();
     mockConsumeResult = null;
+    useSentenceStore.getState()._reset();
   });
 
   it("initializes with default sentence", () => {
@@ -33,14 +34,13 @@ describe("useSentenceState", () => {
     expect(result.current.sentences[0]?.text).toBe("");
   });
 
-  it("loads from localStorage", () => {
-    localStorage.setItem(
-      "eki_synthesis_state",
-      JSON.stringify([
-        { id: "s1", text: "Hello", tags: ["Hello"], currentInput: "" },
-      ]),
-    );
+  it("loads from localStorage via setSentences", () => {
     const { result } = renderHook(() => useSentenceState());
+    act(() => {
+      result.current.setSentences([
+        { id: "s1", text: "Hello", tags: ["Hello"], currentInput: "", isPlaying: false, isLoading: false, phoneticText: null, audioUrl: null, stressedTags: null },
+      ]);
+    });
     expect(result.current.sentences[0]?.text).toBe("Hello");
     expect(result.current.sentences[0]?.isPlaying).toBe(false);
   });

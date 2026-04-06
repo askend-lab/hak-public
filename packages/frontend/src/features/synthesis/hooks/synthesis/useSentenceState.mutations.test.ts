@@ -3,7 +3,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useSentenceState } from "./useSentenceState";
+import { useSentenceState, useSentenceStore } from "./useSentenceState";
 
 let mockConsumeResult: unknown[] | null = null;
 vi.mock("@/contexts/CopiedEntriesContext", () => ({
@@ -24,6 +24,7 @@ describe("useSentenceState", () => {
     vi.clearAllMocks();
     localStorage.clear();
     mockConsumeResult = null;
+    useSentenceStore.getState()._reset();
   });
 
   it("persists to localStorage on change", () => {
@@ -33,10 +34,11 @@ describe("useSentenceState", () => {
     });
     const stored = localStorage.getItem("eki_synthesis_state");
     expect(stored).toBeTruthy();
-    const parsed = JSON.parse(stored ?? "[]");
-    expect(parsed[0].text).toBe("Noormees läks kooli");
-    expect(parsed[0].isPlaying).toBeUndefined();
-    expect(parsed[0].isLoading).toBeUndefined();
+    const parsed = JSON.parse(stored ?? "{}");
+    const sentences = parsed.state?.sentences ?? parsed.sentences ?? [];
+    expect(sentences[0]?.text).toBe("Noormees läks kooli");
+    expect(sentences[0]?.isPlaying).toBeUndefined();
+    expect(sentences[0]?.isLoading).toBeUndefined();
   });
 
   it("handleClearSentence resets all fields including phonetic and audio", () => {
