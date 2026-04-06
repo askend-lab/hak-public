@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
+// Test reorganization: rules, datatable, docstring, background, errors, edge-cases
 
 export type {
   ParsedStep,

@@ -3,7 +3,7 @@
 
 import { parseFeatureContent } from "./index";
 
-describe("parser-advanced.test", () => {
+describe("parser-advanced: background", () => {
   it("should attach data table to background step", () => {
     const content = `
 Feature: Test

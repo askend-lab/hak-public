@@ -3,7 +3,7 @@
 
 import { parseFeatureContent } from "./index";
 
-describe("parser-advanced.test", () => {
+describe("parser-advanced: edge cases", () => {
   it("should return null for content without Feature:", () => {
     const result = parseFeatureContent("just some text\nno feature here");
     expect(result).toBeNull();

@@ -3,7 +3,7 @@
 
 import { parseFeatureContent } from "./index";
 
-describe("parser-advanced.test", () => {
+describe("parser-advanced: rules", () => {
   it("should parse rules with scenarios", () => {
     const content = `
 Feature: Account

@@ -3,7 +3,7 @@
 
 import { parseFeatureContent } from "./index";
 
-describe("parser-advanced.test", () => {
+describe("parser-advanced: errors", () => {
   it("should report duplicate Feature:", () => {
     const content = `
 Feature: First

@@ -3,7 +3,7 @@
 
 import { parseFeatureContent } from "./index";
 
-describe("parser-advanced.test", () => {
+describe("parser-advanced: docstrings", () => {
   it("should attach docstring to step", () => {
     const content = `Feature: Test
   Scenario: API
