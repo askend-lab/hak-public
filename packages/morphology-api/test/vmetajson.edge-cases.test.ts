@@ -30,7 +30,7 @@ function createMockProcess(): MockProcess {
   }) as MockProcess;
 }
 
-describe("vmetajson.test", () => {
+describe("vmetajson: edge cases", () => {
   let mockProcess: MockProcess;
 
   beforeEach(() => {

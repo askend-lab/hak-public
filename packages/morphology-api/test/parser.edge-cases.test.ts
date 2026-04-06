@@ -4,7 +4,7 @@
 import { extractStressedText, extractVariants } from "../src/parser";
 import { VmetajsonResponse } from "../src/types";
 
-describe("parser.test", () => {
+describe("parser: edge cases", () => {
   it("should handle token without mrf", () => {
     const response: VmetajsonResponse = {
       annotations: {

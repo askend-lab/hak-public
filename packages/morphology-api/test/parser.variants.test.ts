@@ -4,7 +4,7 @@
 import { extractVariants } from "../src/parser";
 import { VmetajsonResponse } from "../src/types";
 
-describe("parser.test", () => {
+describe("parser: variants", () => {
   it("should extract all morphological variants", () => {
     const response: VmetajsonResponse = {
       annotations: {
