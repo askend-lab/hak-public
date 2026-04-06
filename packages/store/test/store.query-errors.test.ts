@@ -9,7 +9,7 @@ import { FailingDynamoDB } from "./mockDynamoDB";
 
 const ONE_HOUR = 3600;
 
-describe("store.test", () => {
+describe("store: query and errors", () => {
   let db: InMemoryAdapter;
   let store: Store;
   const context: ServerContext = {

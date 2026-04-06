@@ -4,7 +4,7 @@
 import { validateStoreRequest, validateServerContext, parseTtl } from "../src/core/validation";
 import type { StoreRequest } from "../src/core/types";
 
-describe("validation.test", () => {
+describe("validation: parseTtl", () => {
   describe("validateRequiredString edge cases", () => {
     it.each([
       ["number pk", { key: 123, id: "sort1" }, "key"],

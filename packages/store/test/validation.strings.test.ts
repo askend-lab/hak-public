@@ -4,7 +4,7 @@
 import { validateStoreRequest, validateGetRequest } from "../src/core/validation";
 import type { DataType } from "../src/core/types";
 
-describe("validation.test", () => {
+describe("validation: strings", () => {
   describe("string validation edge cases", () => {
     it("should reject null pk", () => {
       const result = validateStoreRequest({

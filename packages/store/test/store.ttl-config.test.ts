@@ -8,7 +8,7 @@ import { InMemoryAdapter } from "../src/adapters/memory";
 
 const ONE_HOUR = 3600;
 
-describe("store.test", () => {
+describe("store: TTL and config", () => {
   let db: InMemoryAdapter;
   let store: Store;
   const context: ServerContext = {

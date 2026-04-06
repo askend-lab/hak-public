@@ -4,7 +4,7 @@
 import fc from "fast-check";
 import { validateServerContext } from "../src/core/validation";
 
-describe("validation.property.test", () => {
+describe("validation.property: edge cases", () => {
   const validContextArb = fc.record({
     app: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
     tenant: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),

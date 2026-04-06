@@ -3,7 +3,7 @@
 
 import { validateStoreRequest, validateGetRequest } from "../src/core/validation";
 
-describe("validation.test", () => {
+describe("validation: dataType", () => {
   describe("string validation edge cases continued", () => {
     it("should accept ttl of exactly 0", () => {
       const result = validateStoreRequest({
