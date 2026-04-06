@@ -3,7 +3,7 @@
 
 import { ERROR_STRINGS } from "@/config/ui-strings";
 
-export type ApiErrorType = "rate-limit" | "service-busy" | "blocked" | "synthesis-failed";
+export type ApiErrorType = "rate-limit" | "service-busy" | "blocked" | "synthesis-failed" | "synthesis-timeout";
 
 interface ApiErrorDetail {
   type: ApiErrorType;
@@ -16,6 +16,7 @@ const ERROR_MAP: Record<ApiErrorType, { message: string; description: string }> 
   "service-busy": { message: ERROR_STRINGS.SERVICE_BUSY, description: ERROR_STRINGS.SERVICE_BUSY_DESC },
   "blocked": { message: ERROR_STRINGS.BLOCKED, description: ERROR_STRINGS.BLOCKED_DESC },
   "synthesis-failed": { message: ERROR_STRINGS.SYNTHESIS_FAILED, description: ERROR_STRINGS.SYNTHESIS_FAILED_DESC },
+  "synthesis-timeout": { message: ERROR_STRINGS.SYNTHESIS_TIMEOUT, description: ERROR_STRINGS.SYNTHESIS_TIMEOUT_DESC },
 };
 
 export const API_ERROR_EVENT = "api-error" as const;

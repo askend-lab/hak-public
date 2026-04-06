@@ -22,7 +22,7 @@ function requireAuth(): string {
 }
 
 const POLL_INTERVAL_MS = 2000;
-const MAX_POLL_ATTEMPTS = 30;
+const MAX_POLL_ATTEMPTS = 10;
 const SYNTHESIZE_API_PATH = "/api/synthesize";
 const STATUS_API_PATH = "/api/status";
 
@@ -82,6 +82,12 @@ function handlePollResult(data: StatusResponse): string | null {
   return null;
 }
 
+function throwPollTimeout(cacheKey: string): never {
+  reportApiError({ context: "Synthesis timed out", status: 0, url: SYNTHESIZE_API_PATH, body: `cacheKey=${cacheKey}, attempts=${MAX_POLL_ATTEMPTS}` });
+  dispatchApiError("synthesis-timeout");
+  throw new Error("Synthesis timed out");
+}
+
 async function pollForAudio(cacheKey: string, token?: string, signal?: AbortSignal): Promise<string> {
   for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
     checkAborted(signal);
@@ -90,9 +96,7 @@ async function pollForAudio(cacheKey: string, token?: string, signal?: AbortSign
     if (url) {return url;}
     await wait(getPollingDelay(i)); // eslint-disable-line no-await-in-loop -- sequential polling delay
   }
-  const err = new Error("Synthesis timed out");
-  reportApiError({ context: "Synthesis timed out", status: 0, url: SYNTHESIZE_API_PATH, body: `cacheKey=${cacheKey}, attempts=${MAX_POLL_ATTEMPTS}` });
-  throw err;
+  throwPollTimeout(cacheKey);
 }
 
 /**
