@@ -5,7 +5,7 @@ import { handler } from "../src/lambda/handler";
 
 import { createEvent, createGetEvent, createPostEvent } from "./setup";
 
-describe("handler.test", () => {
+describe("handler: endpoints", () => {
   describe("query endpoint success path", () => {
     it("should return 200 with valid params", async () => {
       const event = createGetEvent("/query", {

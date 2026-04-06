@@ -56,7 +56,7 @@ function makeItem(pk: string, sk: string, version = 1): StoreItem {
   };
 }
 
-describe("dynamodbAdapter.test", () => {
+describe("dynamodbAdapter: conditionalDelete", () => {
   let adapter: DynamoDBAdapter;
   const TABLE = "test-table";
 

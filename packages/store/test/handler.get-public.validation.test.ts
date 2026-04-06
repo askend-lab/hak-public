@@ -25,7 +25,7 @@ function createEvent(
   } as unknown as APIGatewayProxyEvent;
 }
 
-describe("handler.get-public.test", () => {
+describe("handler.get-public: validation", () => {
   beforeEach(() => {
     setAdapter(new InMemoryAdapter());
     process.env.IS_OFFLINE = "true";

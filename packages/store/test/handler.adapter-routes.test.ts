@@ -5,7 +5,7 @@ import { handler, setAdapter } from "../src/lambda/handler";
 
 import { createEvent, createPostEvent } from "./setup";
 
-describe("handler.test", () => {
+describe("handler: adapter and routes", () => {
   describe("adapter selection", () => {
     it("should use InMemory adapter when IS_OFFLINE is true", async () => {
       process.env.IS_OFFLINE = "true";
