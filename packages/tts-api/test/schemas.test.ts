@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
+// Updated: sync serverless-config.test.ts exclusion from public repo
 
 import {
   SynthesizeRequestSchema,

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
+// Voice validation: SEC-13 fix
 
 import { z } from "zod";
 

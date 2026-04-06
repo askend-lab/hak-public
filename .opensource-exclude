@@ -22,6 +22,9 @@ packages/task-channel/
 # --- E2E tests (depend on internal AWS infrastructure) ---
 packages/frontend/e2e/
 
+# --- Tests that depend on infra/ (excluded from public repo) ---
+packages/tts-api/test/serverless-config.test.ts
+
 # --- CI/CD workflows and automation (not for public repo) ---
 .github/workflows/codeql.yml
 .github/dependabot.yml
