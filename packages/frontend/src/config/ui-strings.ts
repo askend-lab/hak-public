@@ -45,6 +45,8 @@ export const ERROR_STRINGS = {
   BLOCKED_DESC: "Päring blokeeriti.",
   SYNTHESIS_FAILED: "Kõnesüntees ebaõnnestus",
   SYNTHESIS_FAILED_DESC: "Proovi uuesti.",
+  SYNTHESIS_TIMEOUT: "Kõnesüntees aegus",
+  SYNTHESIS_TIMEOUT_DESC: "Teksti ei õnnestunud töödelda. Proovi teistsugust teksti.",
 } as const;
 
 export const MODAL_STRINGS = {

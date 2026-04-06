@@ -112,7 +112,7 @@ describe("synthesize - part 2", () => {
             audioUrl: null,
           }),
       });
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 10; i++) {
         fetchMock.mockResolvedValueOnce({
           ok: true,
           json: () =>
@@ -126,7 +126,7 @@ describe("synthesize - part 2", () => {
 
       const promise = synthesizeWithPolling("test", "efm_l");
       const safePromise = promise.catch(() => {});
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 10; i++) {
         await vi.advanceTimersByTimeAsync(8000);
       }
       await safePromise;
@@ -136,7 +136,7 @@ describe("synthesize - part 2", () => {
         context: "Synthesis timed out",
         status: 0,
         url: "/api/synthesize",
-        body: "cacheKey=k, attempts=30",
+        body: "cacheKey=k, attempts=10",
       });
       vi.useRealTimers();
     });

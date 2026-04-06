@@ -64,6 +64,20 @@ describe("apiErrorEvents", () => {
     window.removeEventListener(API_ERROR_EVENT, handler);
   });
 
+  it("dispatches synthesis-timeout event with correct detail", () => {
+    const handler = vi.fn();
+    window.addEventListener(API_ERROR_EVENT, handler);
+    dispatchApiError("synthesis-timeout");
+    const event = handler.mock.calls[0]?.[0] as Event;
+    const detail = getApiErrorDetail(event);
+    expect(detail).toEqual({
+      type: "synthesis-timeout",
+      message: "Kõnesüntees aegus",
+      description: "Teksti ei õnnestunud töödelda. Proovi teistsugust teksti.",
+    });
+    window.removeEventListener(API_ERROR_EVENT, handler);
+  });
+
   it("getApiErrorDetail returns null for non-CustomEvent", () => {
     expect(getApiErrorDetail(new Event("click"))).toBeNull();
   });
