@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("buildCacheKey", () => {
   it("should return cache path with .wav extension", () => {
     expect(buildCacheKey("abc123")).toBe("cache/abc123.wav");
   });

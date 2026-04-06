@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("isNotFoundError", () => {
   it("should return true for NotFound error", () => {
     expect(isNotFoundError({ name: "NotFound" })).toBe(true);
   });

@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("isEcsConfigured", () => {
   it("should return false when both unset", () => {
     expect(isEcsConfigured()).toBe(false);
   });

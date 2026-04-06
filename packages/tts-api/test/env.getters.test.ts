@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("env getters", () => {
   it("getAwsRegion should return env value", () => {
     expect(getAwsRegion()).toBe(TEST_REGION);
   });
