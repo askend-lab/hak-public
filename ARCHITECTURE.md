@@ -37,7 +37,7 @@ pnpm workspaces monorepo. Packages and their dependencies:
 - **frontend** — React, Vite, SCSS/BEM, Vitest. Runs on S3 + CloudFront. Teacher and student UI.
 - **store** — TypeScript, DynamoDB SDK. Lambda. Lessons, users, progress CRUD.
 - **tts-api** — TypeScript, ECS SDK, S3 SDK, SQS SDK. Lambda. TTS request gateway.
-- **tts-worker** — Python, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis.
+- **tts-worker** — Python, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis. See [ADR 009](docs/adr/009-merlin-tts-engine.md) for why Merlin.
 - **morphology-api** — TypeScript, native binary (vmetajson). Lambda (Docker). Estonian morphological analysis.
 - **auth** — TypeScript, Cognito SDK, JOSE. Lambda. Estonian eID (TARA) authentication.
 - **shared** — TypeScript. Shared types, utilities, constants.
