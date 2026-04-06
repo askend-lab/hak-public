@@ -14,6 +14,7 @@ We document significant architectural decisions using ADRs.
 | 006 | [Public API design](./006-public-api-design.md) | Accepted | 2026-02 |
 | 007 | [Two-repo sync model](./007-two-repo-sync.md) | Accepted | 2025-06 |
 | 008 | [DevBox quality system](./008-devbox-quality-system.md) | Accepted | 2025-01 |
+| 009 | [Merlin TTS engine](./009-merlin-tts-engine.md) | Accepted | 2026-04 |
 
 ## Format
 
