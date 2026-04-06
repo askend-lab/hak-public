@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("VERSION constant", () => {
   it("should be a valid semver string", () => {
     expect(VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });

@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("createBadRequest", () => {
   it("should return 400 with error message", () => {
     const response = createBadRequest("test error");
     expect(response.statusCode).toBe(HTTP_STATUS.BAD_REQUEST);

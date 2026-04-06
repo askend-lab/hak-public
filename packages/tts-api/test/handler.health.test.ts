@@ -9,7 +9,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("health endpoint", () => {
   it("should return OK with version", async () => {
     const response = await health();
     expect(response.statusCode).toBe(HTTP_STATUS.OK);

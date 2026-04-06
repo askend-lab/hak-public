@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("SynthesizeRequest type", () => {
   it("should allow minimal request with just text", () => {
     const req: SynthesizeRequest = { text: "hello" };
     expect(req.text).toBe("hello");
