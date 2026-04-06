@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useCallback, useRef } from "react";
-import { EditingTag, OpenTagMenu, SentenceState, convertTextToTags, normalizeTags } from "@/types/synthesis";
+import { useCallback, useRef } from "react";
+import { EditingTag, SentenceState, convertTextToTags, normalizeTags } from "@/types/synthesis";
 import type { useTagUpdater } from "./useTagUpdater";
+import { useSentenceStore } from "./synthesisStore";
 
 function computeNewText(tags: string[], tagIndex: number, trimmedValue: string): string {
   if (trimmedValue === "") {
@@ -43,26 +44,28 @@ function useTagCommit(opts: { editingTag: EditingTag; tagUpdater: ReturnType<typ
 }
 
 export function useInlineTagEditor({ sentences, getSentence, tagUpdater, synthesizeWithText }: UseInlineTagEditorDeps) {
-  const [editingTag, setEditingTag] = useState<EditingTag>(null);
-  const [openTagMenu, setOpenTagMenu] = useState<OpenTagMenu>(null);
+  const editingTag = useSentenceStore((s) => s.editingTag);
+  const setEditingTag = useSentenceStore((s) => s.setEditingTag);
+  const openTagMenu = useSentenceStore((s) => s.openTagMenu);
+  const setOpenTagMenu = useSentenceStore((s) => s.setOpenTagMenu);
   const sentencesRef = useRef(sentences); sentencesRef.current = sentences;
 
-  const handleDeleteTag = useCallback((sid: string, idx: number) => { tagUpdater.deleteTag(sid, idx); setOpenTagMenu(null); }, [tagUpdater]);
+  const handleDeleteTag = useCallback((sid: string, idx: number) => { tagUpdater.deleteTag(sid, idx); setOpenTagMenu(null); }, [tagUpdater, setOpenTagMenu]);
   const handleEditTag = useCallback((sid: string, idx: number) => {
     const s = getSentence(sid); if (!s) {return;}
     setEditingTag({ sentenceId: sid, tagIndex: idx, value: s.tags[idx] ?? "" }); setOpenTagMenu(null);
-  }, [getSentence]);
-  const handleEditTagChange = useCallback((value: string) => { if (editingTag) {setEditingTag({ ...editingTag, value });} }, [editingTag]);
+  }, [getSentence, setEditingTag, setOpenTagMenu]);
+  const handleEditTagChange = useCallback((value: string) => { if (editingTag) {setEditingTag({ ...editingTag, value });} }, [editingTag, setEditingTag]);
 
   const { handleEditTagCommit, commitAndSynthesize } = useTagCommit({ editingTag, tagUpdater, sentencesRef, synthesizeWithText });
-  const commitAndClear = useCallback(() => { handleEditTagCommit(); setEditingTag(null); }, [handleEditTagCommit]);
-  const commitSynthAndClear = useCallback(() => { commitAndSynthesize(); setEditingTag(null); }, [commitAndSynthesize]);
+  const commitAndClear = useCallback(() => { handleEditTagCommit(); setEditingTag(null); }, [handleEditTagCommit, setEditingTag]);
+  const commitSynthAndClear = useCallback(() => { commitAndSynthesize(); setEditingTag(null); }, [commitAndSynthesize, setEditingTag]);
 
   const handleEditTagKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === "Enter") { e.preventDefault(); commitSynthAndClear(); }
     else if (e.key === " ") { e.preventDefault(); commitAndClear(); }
     else if (e.key === "Escape") { e.preventDefault(); setEditingTag(null); }
-  }, [commitSynthAndClear, commitAndClear]);
+  }, [commitSynthAndClear, commitAndClear, setEditingTag]);
 
   return { editingTag, openTagMenu, setOpenTagMenu, handleDeleteTag, handleEditTag, handleEditTagChange, handleEditTagCommit: commitAndClear, handleEditTagKeyDown };
 }

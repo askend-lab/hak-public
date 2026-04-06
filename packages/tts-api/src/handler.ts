@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
+// Test reorganization: parseBody, defaults, cacheKey, response, s3, health
 
 import { createHash } from "crypto";
 

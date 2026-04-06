@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { SentenceState, filterNonEmptySentences } from "@/types/synthesis";
+import { useSentenceStore } from "./useSentenceState";
 
 interface PlaylistDeps {
   sentences: SentenceState[];
@@ -17,19 +18,21 @@ export function usePlaylistControl(deps: PlaylistDeps): {
   handlePlayAll: () => Promise<void>;
 } {
   const { sentences, playSingle, stopAudio, updateAllSentences } = deps;
-  const [isPlayingAll, setIsPlayingAll] = useState(false);
-  const [isLoadingPlayAll, setIsLoadingPlayAll] = useState(false);
+  const isPlayingAll = useSentenceStore((s) => s.isPlayingAll);
+  const isLoadingPlayAll = useSentenceStore((s) => s.isLoadingPlayAll);
+  const setIsPlayingAll = useSentenceStore((s) => s.setIsPlayingAll);
+  const setIsLoadingPlayAll = useSentenceStore((s) => s.setIsLoadingPlayAll);
   const [abortCtrl, setAbortCtrl] = useState<AbortController | null>(null);
 
   const stopAll = useCallback(() => {
     abortCtrl?.abort(); setAbortCtrl(null);
     setIsPlayingAll(false); setIsLoadingPlayAll(false);
     stopAudio(); updateAllSentences({ isPlaying: false, isLoading: false });
-  }, [abortCtrl, stopAudio, updateAllSentences]);
+  }, [abortCtrl, stopAudio, updateAllSentences, setIsPlayingAll, setIsLoadingPlayAll]);
 
   const resetPlayState = useCallback(() => {
     setIsPlayingAll(false); setIsLoadingPlayAll(false); setAbortCtrl(null);
-  }, []);
+  }, [setIsPlayingAll, setIsLoadingPlayAll]);
 
   const playSequence = useCallback(async (items: SentenceState[]) => {
     const ctrl = new AbortController();
@@ -42,7 +45,7 @@ export function usePlaylistControl(deps: PlaylistDeps): {
       if (!ok) {break;}
     }
     resetPlayState();
-  }, [playSingle, resetPlayState]);
+  }, [playSingle, resetPlayState, setIsLoadingPlayAll, setIsPlayingAll]);
 
   const handlePlayAll = useCallback(async () => {
     if (isPlayingAll || isLoadingPlayAll) { stopAll(); return; }

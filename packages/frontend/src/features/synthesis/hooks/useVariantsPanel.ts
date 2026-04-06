@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from "react";
 import { SentenceState, convertTextToTags, stripPunctuationForLookup } from "@/types/synthesis";
+import { useSentenceStore } from "./synthesis/useSentenceState";
 import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 import { analyzeText, authPostJSON, VARIANTS_API_PATH } from "@/features/synthesis/utils/analyzeApi";
 import { checkApiErrorStatus } from "@/utils/apiErrorEvents";
@@ -57,9 +58,11 @@ function useVariantsState() {
   return { variantsWord, variantsCustomPhonetic, setVariantsCustomPhonetic, isVariantsPanelOpen, selectedSentenceId, selectedTagIndex, loadingVariantsTag, setLoadingVariantsTag, openPanel, closePanel };
 }
 
-function usePhoneticState(sentences: SentenceState[], setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>) {
+function usePhoneticState() {
   const [showPanel, setShowPanel] = useState(false);
   const [phoneticId, setPhoneticId] = useState<string | null>(null);
+  const sentences = useSentenceStore((s) => s.sentences);
+  const setSentences = useSentenceStore((s) => s.setSentences);
 
   const explore = useCallback(async (sentenceId: string) => {
     const sentence = sentences.find((s) => s.id === sentenceId);
@@ -90,12 +93,14 @@ function notifyVariantsError(error: unknown, notify?: (o: ShowNotificationOption
 }
 
 export function useVariantsPanel(
-  sentences: SentenceState[],
-  setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>,
+  _sentences?: SentenceState[],
+  _setSentences?: React.Dispatch<React.SetStateAction<SentenceState[]>>,
   showNotification?: (options: ShowNotificationOptions) => void,
 ): UseVariantsPanelReturn {
+  const sentences = useSentenceStore((s) => s.sentences);
+  const setSentences = useSentenceStore((s) => s.setSentences);
   const vs = useVariantsState();
-  const ps = usePhoneticState(sentences, setSentences);
+  const ps = usePhoneticState();
 
   const handleTagClick = useCallback(async (sentenceId: string, tagIndex: number, word: string) => {
     ps.close();

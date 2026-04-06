@@ -74,6 +74,12 @@ Some aspects of HAK's architecture are **intentionally open by design** and shou
 
 For the full security audit and current findings, see `internal/SECURITY-AUDIT-2026-02.md`.
 
+## Language
+
+The user interface is in **Estonian only**. This is intentional — HAK is designed for Estonian language learners and the Estonian education market. There are no plans for English or other language interfaces.
+
+UI strings are centralized in `packages/frontend/src/config/ui-strings.ts` for maintainability.
+
 ## Built With AI
 
 This project is developed using an AI-assisted methodology with automated

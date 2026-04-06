@@ -9,7 +9,6 @@ import {
   useVariantsPanel,
   useSentenceMenu,
 } from "@/hooks";
-import { SentenceState } from "@/types/synthesis";
 import type { ShowNotificationOptions } from "@/contexts/NotificationContext";
 
 type SynthesisHook = ReturnType<typeof useSynthesis>;
@@ -41,8 +40,6 @@ const SynthesisInteractionContext = createContext<SynthesisInteractionContextVal
 
 interface SynthesisPageProviderProps {
   children: ReactNode;
-  sentences: SentenceState[];
-  setSentences: React.Dispatch<React.SetStateAction<SentenceState[]>>;
   synthesis: SynthesisHook;
   taskHandlers: TaskHandlersHook;
   showNotification: (options: ShowNotificationOptions) => void;
@@ -52,16 +49,14 @@ interface SynthesisPageProviderProps {
 
 export function SynthesisPageProvider({
   children,
-  sentences,
-  setSentences,
   synthesis,
   taskHandlers,
   showNotification,
   isAuthenticated,
   onLogin,
 }: SynthesisPageProviderProps) {
-  const dragDrop = useDragAndDrop(setSentences);
-  const variants = useVariantsPanel(sentences, setSentences, showNotification);
+  const dragDrop = useDragAndDrop();
+  const variants = useVariantsPanel(undefined, undefined, showNotification);
   const menu = useSentenceMenu();
 
   const handleUseVariant = useCallback((variantText: string): void => {

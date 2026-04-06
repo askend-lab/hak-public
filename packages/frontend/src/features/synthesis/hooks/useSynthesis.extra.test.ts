@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesis } from "./useSynthesis";
+import { useSentenceStore } from "./synthesis/useSentenceState";
 
 vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: (): { showNotification: ReturnType<typeof vi.fn> } => ({
@@ -26,6 +27,7 @@ describe("useSynthesis extra coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    useSentenceStore.getState()._reset();
     class MockAudio {
       src = "";
       onended: (() => void) | null = null;

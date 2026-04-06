@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024-2026 Askend Lab
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback } from "react";
 import { SentenceState, convertTextToTags } from "@/types/synthesis";
 import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
 import { logger } from "@hak/shared";
+import { useSentenceStore, createEmptySentence, INITIAL_SENTENCE } from "./synthesisStore";
 
-const STORAGE_KEY = "eki_synthesis_state";
+export { useSentenceStore } from "./synthesisStore";
+
 const LEGACY_PLAYLIST_KEY = "eki_playlist_entries";
 
 const ensureSentenceState = (
   sentence: Partial<SentenceState> &
-    Pick<
-      SentenceState,
-      "id" | "text" | "tags" | "isPlaying" | "isLoading" | "currentInput"
-    >,
+    Pick<SentenceState, "id" | "text" | "tags" | "isPlaying" | "isLoading" | "currentInput">,
 ): SentenceState => ({
   ...sentence,
   phoneticText: sentence.phoneticText ?? null,
@@ -22,37 +21,6 @@ const ensureSentenceState = (
   stressedTags: sentence.stressedTags ?? null,
 });
 
-const createEmptySentence = (id: string): SentenceState => ({
-  id,
-  text: "",
-  tags: [],
-  isPlaying: false,
-  isLoading: false,
-  currentInput: "",
-  phoneticText: null,
-  audioUrl: null,
-  stressedTags: null,
-});
-
-const INITIAL_SENTENCE: SentenceState = createEmptySentence("1");
-
-// Helper to sanitize sentences for storage (strip transient UI state)
-const sanitizeForStorage = (
-  sentences: SentenceState[],
-): Partial<SentenceState>[] => {
-  return sentences.map((s) => ({
-    id: s.id,
-    text: s.text,
-    tags: s.tags,
-    currentInput: s.currentInput,
-    phoneticText: s.phoneticText,
-    audioUrl: s.audioUrl,
-    stressedTags: s.stressedTags,
-    // Intentionally omit isPlaying and isLoading - these are transient UI state
-  }));
-};
-
-// Helper to transform a raw entry (from legacy storage or shared task) into SentenceState
 interface RawEntry {
   id?: string;
   text: string;
@@ -62,9 +30,7 @@ interface RawEntry {
 
 const transformEntryToSentence = (entry: RawEntry): SentenceState => {
   const words = convertTextToTags(entry.text);
-  const stressedWords = entry.stressedText
-    ? convertTextToTags(entry.stressedText)
-    : [];
+  const stressedWords = entry.stressedText ? convertTextToTags(entry.stressedText) : [];
   return ensureSentenceState({
     id: entry.id || `entry_${crypto.randomUUID()}`,
     text: entry.text,
@@ -72,48 +38,10 @@ const transformEntryToSentence = (entry: RawEntry): SentenceState => {
     isPlaying: false,
     isLoading: false,
     currentInput: "",
-    stressedTags:
-      stressedWords.length === words.length
-        ? stressedWords
-        : undefined,
+    stressedTags: stressedWords.length === words.length ? stressedWords : undefined,
     audioUrl: entry.audioUrl,
     phoneticText: entry.stressedText,
   });
-};
-
-// Helper to restore sentences from storage
-const restoreFromStorage = (
-  stored: Partial<SentenceState>[],
-): SentenceState[] => {
-  return stored.map((s) =>
-    ensureSentenceState({
-      id: s.id || `entry_${crypto.randomUUID()}`,
-      text: s.text || "",
-      tags: s.tags || [],
-      isPlaying: false,
-      isLoading: false,
-      currentInput: s.currentInput || "",
-      phoneticText: s.phoneticText,
-      audioUrl: s.audioUrl,
-      stressedTags: s.stressedTags,
-    }),
-  );
-};
-
-// Helper to load initial state from localStorage
-const loadInitialState = (): SentenceState[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return restoreFromStorage(parsed);
-      }
-    }
-  } catch (error) {
-    logger.error("Failed to load synthesis state from localStorage:", error);
-  }
-  return [INITIAL_SENTENCE];
 };
 
 type SetSentences = React.Dispatch<React.SetStateAction<SentenceState[]>>;
@@ -124,15 +52,6 @@ const mapClear = (id: string) => (s: SentenceState) => s.id === id ? { ...s, ...
 const mapUpdate = (id: string, u: Partial<SentenceState>) => (s: SentenceState) => s.id === id ? { ...s, ...u } : s;
 const mapAll = (u: Partial<SentenceState>) => (s: SentenceState) => ({ ...s, ...u });
 
-function persistToStorage(sentences: SentenceState[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizeForStorage(sentences)));
-  } catch (error) {
-    const isQuota = error instanceof DOMException && (error.name === "QuotaExceededError" || error.code === 22);
-    if (isQuota) { logger.warn("[Synthesis] localStorage quota exceeded — state not saved"); }
-    else { logger.error("Failed to save synthesis state to localStorage:", error); }
-  }
-}
 
 function mergeCopiedEntries(prev: SentenceState[], raw: RawEntry[]): SentenceState[] {
   const isEmpty = prev.length === 1 && prev[0]?.text === "" && prev[0]?.tags.length === 0;
@@ -140,13 +59,6 @@ function mergeCopiedEntries(prev: SentenceState[], raw: RawEntry[]): SentenceSta
   return isEmpty ? transformed : [...prev, ...transformed];
 }
 
-function usePersistEffect(sentences: SentenceState[]): void {
-  const isInitial = useRef(true);
-  useEffect(() => {
-    if (isInitial.current) { isInitial.current = false; return; }
-    persistToStorage(sentences);
-  }, [sentences]);
-}
 
 function useLegacyMigration(setSentences: SetSentences): void {
   useEffect(() => {
@@ -172,25 +84,37 @@ const DEMO: SentenceState[] = [
   createEmptySentence("demo-2"),
 ];
 
-export function useSentenceState() {
-  const [sentences, setSentences] = useState<SentenceState[]>(loadInitialState);
-  usePersistEffect(sentences);
+export function useSentenceState(): {
+  sentences: SentenceState[];
+  setSentences: (updater: SentenceState[] | ((prev: SentenceState[]) => SentenceState[])) => void;
+  setDemoSentences: () => void;
+  handleTextChange: (id: string, v: string) => void;
+  handleClearSentence: (id: string) => void;
+  handleAddSentence: () => void;
+  handleRemoveSentence: (id: string, revokeUrl?: boolean) => void;
+  updateSentence: (id: string, u: Partial<SentenceState>) => void;
+  updateAllSentences: (u: Partial<SentenceState>) => void;
+  getSentence: (id: string) => SentenceState | undefined;
+} {
+  const sentences = useSentenceStore((s) => s.sentences);
+  const setSentences = useSentenceStore((s) => s.setSentences);
+
   useLegacyMigration(setSentences);
   useCopiedEntriesEffect(setSentences);
 
   return {
     sentences, setSentences,
-    setDemoSentences: useCallback(() => { setSentences(DEMO); }, []),
-    handleTextChange: useCallback((id: string, v: string) => { setSentences((p) => p.map(mapInput(id, v))); }, []),
-    handleClearSentence: useCallback((id: string) => { setSentences((p) => p.map(mapClear(id))); }, []),
-    handleAddSentence: useCallback(() => { setSentences((p) => [...p, createEmptySentence(crypto.randomUUID())]); }, []),
-    handleRemoveSentence: useCallback((id: string, revokeUrl?: boolean) => {
+    setDemoSentences: useCallback((): void => { setSentences(DEMO); }, [setSentences]),
+    handleTextChange: useCallback((id: string, v: string): void => { setSentences((p) => p.map(mapInput(id, v))); }, [setSentences]),
+    handleClearSentence: useCallback((id: string): void => { setSentences((p) => p.map(mapClear(id))); }, [setSentences]),
+    handleAddSentence: useCallback((): void => { setSentences((p) => [...p, createEmptySentence(crypto.randomUUID())]); }, [setSentences]),
+    handleRemoveSentence: useCallback((id: string, revokeUrl?: boolean): void => {
       const s = sentences.find((x) => x.id === id);
       if (revokeUrl && s?.audioUrl) { URL.revokeObjectURL(s.audioUrl); }
       setSentences(sentences.length === 1 ? [INITIAL_SENTENCE] : (p) => p.filter((x) => x.id !== id));
-    }, [sentences]),
-    updateSentence: useCallback((id: string, u: Partial<SentenceState>) => { setSentences((p) => p.map(mapUpdate(id, u))); }, []),
-    updateAllSentences: useCallback((u: Partial<SentenceState>) => { setSentences((p) => p.map(mapAll(u))); }, []),
-    getSentence: useCallback((id: string) => sentences.find((s) => s.id === id), [sentences]),
+    }, [sentences, setSentences]),
+    updateSentence: useCallback((id: string, u: Partial<SentenceState>): void => { setSentences((p) => p.map(mapUpdate(id, u))); }, [setSentences]),
+    updateAllSentences: useCallback((u: Partial<SentenceState>): void => { setSentences((p) => p.map(mapAll(u))); }, [setSentences]),
+    getSentence: useCallback((id: string): SentenceState | undefined => sentences.find((s) => s.id === id), [sentences]),
   };
 }
