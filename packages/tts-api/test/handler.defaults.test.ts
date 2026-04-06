@@ -9,7 +9,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("applySynthesizeDefaults", () => {
   it("should apply all defaults for minimal request", () => {
     const result = applySynthesizeDefaults({ text: "hello" });
     expect(result).toStrictEqual({
