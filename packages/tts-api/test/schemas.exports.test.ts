@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("schema exports", () => {
   it("should re-export schema constants from handler", () => {
     expect(MAX_TEXT_LENGTH).toBeGreaterThan(0);
     expect(SPEED_RANGE).toHaveProperty("min");

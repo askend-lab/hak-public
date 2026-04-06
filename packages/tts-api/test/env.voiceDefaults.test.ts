@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("VOICE_DEFAULTS", () => {
   it("should have expected default values", () => {
     expect(VOICE_DEFAULTS.voice).toBe(DEFAULT_VOICE);
     expect(VOICE_DEFAULTS.speed).toBe(DEFAULT_SPEED);
