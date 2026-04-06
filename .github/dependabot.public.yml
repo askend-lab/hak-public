@@ -15,7 +15,7 @@ updates:
       - dependencies
 
   - package-ecosystem: pip
-    directory: /packages/merlin-worker
+    directory: /packages/tts-worker
     schedule:
       interval: weekly
       day: monday
