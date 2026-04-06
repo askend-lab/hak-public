@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("buildAudioUrl", () => {
   it("should construct correct S3 URL with exact format", () => {
     const url = buildAudioUrl("abc123");
     expect(url).toBe(

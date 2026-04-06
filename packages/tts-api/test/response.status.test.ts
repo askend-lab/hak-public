@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("HTTP_STATUS", () => {
   it("should have all expected status codes", () => {
     expect(HTTP_STATUS.OK).toBe(200);
     expect(HTTP_STATUS.ACCEPTED).toBe(202);

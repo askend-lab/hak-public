@@ -9,7 +9,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("createInternalError", () => {
   it("should return 500 with generic error message", () => {
     const spy = jest.spyOn(logger, "error").mockImplementation();
     const response = createInternalError("Test context", new Error("fail"));

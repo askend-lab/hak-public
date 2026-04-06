@@ -8,7 +8,7 @@ beforeEach(() => {
   setupTestEnv();
 });
 
-describe("handler.test", () => {
+describe("createResponse", () => {
   it("should return response with CORS headers", () => {
     const response = createResponse(HTTP_STATUS.OK, { status: "ok" });
 
