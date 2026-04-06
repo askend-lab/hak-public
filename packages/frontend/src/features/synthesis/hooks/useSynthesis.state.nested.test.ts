@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesis } from "./useSynthesis";
+import { useSentenceStore } from "./synthesis/useSentenceState";
 
 vi.mock("@/features/synthesis/utils/synthesize", () => ({
   synthesizeWithPolling: vi.fn().mockResolvedValue("blob:mock"),
@@ -23,6 +24,7 @@ describe("useSynthesis", () => {
     vi.clearAllMocks();
     global.fetch = vi.fn();
     localStorage.clear();
+    useSentenceStore.getState()._reset();
 
     // Mock Audio
     class MockAudio {

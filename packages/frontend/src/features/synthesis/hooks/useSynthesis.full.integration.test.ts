@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { logger } from "@hak/shared";
 import { renderHook, act } from "@testing-library/react";
 import { useSynthesis } from "./useSynthesis";
+import { useSentenceStore } from "./synthesis/useSentenceState";
 
 vi.mock("@/contexts/NotificationContext", () => ({
   useNotification: (): { showNotification: ReturnType<typeof vi.fn> } => ({
@@ -48,6 +49,7 @@ describe("useSynthesis core", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    useSentenceStore.getState()._reset();
     setupMocks();
   });
 
