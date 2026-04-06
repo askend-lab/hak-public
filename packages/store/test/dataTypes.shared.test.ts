@@ -13,7 +13,7 @@ import { Store, ERRORS } from "../src/core/store";
 import { ServerContext, DataType } from "../src/core/types";
 import { InMemoryAdapter } from "../src/adapters/memory";
 
-describe("dataTypes.public.test", () => {
+describe("dataTypes: shared", () => {
   let db: InMemoryAdapter;
 
   const ownerContext: ServerContext = {
