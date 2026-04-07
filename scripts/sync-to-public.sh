@@ -263,6 +263,15 @@ if [[ -f ARCHITECTURE.md ]]; then
     c = c.replace(/Five Lambda functions|Four Lambda functions/g, 'Three Lambda functions');
     c = c.replace(/^\d+\..*audio-api\..*\n/gm, '');
     c = c.replace(/^- \*\*Infrastructure\*\* —.*\n/gm, '');
+    // Replace CI/CD section: keep only the public build.yml workflow
+    const sep = '|----------|---------|--------------|';
+    const publicCiCd = '## CI/CD\n\n'
+      + 'GitHub Actions workflow in `.github/workflows/`:\n\n'
+      + '| Workflow | Trigger | What it does |\n'
+      + sep + '\n'
+      + '| **build.yml** | Push/PR to main | Lint, typecheck, test all packages |\n\n'
+      + 'All checks must pass before a PR can be merged.\n';
+    c = c.replace(/## CI\/CD & Deployment\n[\s\S]*?(?=\n## )/, publicCiCd);
     c = c.replace(
       'Pre-commit hooks enforce quality on every commit. The commit is rejected if any check fails.',
       'Quality checks run in CI on every pull request. The PR is blocked if any check fails.'
