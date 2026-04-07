@@ -6,7 +6,7 @@ Thank you for your interest in contributing to HAK — the Estonian language lea
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 20+ (see `.nvmrc`)
+- [Node.js](https://nodejs.org/) 22+ (see `.nvmrc`)
 - [pnpm](https://pnpm.io/) 10+
 - [Git](https://git-scm.com/)
 
@@ -54,10 +54,12 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 packages/
   frontend/       - React frontend application
   shared/         - Shared utilities and types
-  simplestore/    - REST API for lessons, users, progress
-  merlin-api/     - TTS gateway (synthesis requests, caching)
-  merlin-worker/  - Estonian speech synthesis engine (Docker)
-  vabamorf-api/   - Estonian morphological analysis
+  store/          - REST API for lessons, users, progress
+  tts-api/        - TTS gateway (synthesis requests, caching)
+  tts-worker/     - Estonian speech synthesis engine (Docker)
+  morphology-api/ - Estonian morphological analysis
+  auth/           - Estonian eID (TARA) authentication
+  api-client/     - Shared API client configuration
   gherkin-parser/ - Gherkin specification parser
   specifications/ - BDD specifications
 

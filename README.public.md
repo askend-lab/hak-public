@@ -12,7 +12,7 @@ Built with React and TypeScript.
 
 ## Quick Start
 
-**Prerequisites:** [Node.js](https://nodejs.org/) 20+, [pnpm](https://pnpm.io/) 10+, [Git](https://git-scm.com/)
+**Prerequisites:** [Node.js](https://nodejs.org/) 22+, [pnpm](https://pnpm.io/) 10+, [Git](https://git-scm.com/)
 
 ```bash
 git clone https://github.com/askend-lab/hak-public.git
@@ -29,10 +29,12 @@ No Docker, AWS CLI, or environment variables needed — the dev server proxies A
 |---------|-------------|
 | `packages/frontend` | React SPA — Vite, SCSS/BEM, React Router |
 | `packages/shared` | Shared types and utilities |
-| `packages/simplestore` | REST API for lessons, users, progress (DynamoDB) |
-| `packages/merlin-api` | TTS gateway — synthesis requests, caching (Lambda) |
-| `packages/merlin-worker` | Estonian speech synthesis engine — Merlin TTS (Docker/ECS) |
-| `packages/vabamorf-api` | Estonian morphological analysis — stress, variants (Lambda) |
+| `packages/store` | REST API for lessons, users, progress (DynamoDB) |
+| `packages/tts-api` | TTS gateway — synthesis requests, caching (Lambda) |
+| `packages/tts-worker` | Estonian speech synthesis engine — Merlin TTS (Docker/ECS) |
+| `packages/morphology-api` | Estonian morphological analysis — stress, variants (Lambda) |
+| `packages/auth` | Estonian eID (TARA) authentication (Lambda) |
+| `packages/api-client` | Shared API client configuration |
 | `packages/specifications` | Gherkin BDD specifications |
 | `packages/gherkin-parser` | Gherkin-to-test mapping |
 

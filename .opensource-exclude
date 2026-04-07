@@ -68,3 +68,6 @@ docs/DEPLOYMENT.md
 
 # --- Internal planning docs (contain internal task assignments) ---
 docs/CUSTOM-DOMAIN-PLAN.md
+
+# --- Internal working docs (contain Russian text, agent branch names) ---
+docs/fix-shared-task-audio.md
