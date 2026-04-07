@@ -1,27 +1,24 @@
 # Contributing to HAK
 
-Thank you for your interest in contributing to HAK - the Estonian language learning platform!
+Thank you for your interest in contributing to HAK — the Estonian language learning platform!
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+
-- pnpm 10+
-- AWS CLI (for deployment)
+- [Node.js](https://nodejs.org/) 22+ (see `.nvmrc`)
+- [pnpm](https://pnpm.io/) 10+
+- [Git](https://git-scm.com/)
+
+No Docker, AWS CLI, or environment variables required. The dev server proxies API calls to deployed services.
 
 ### Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/askend-lab/hak.git
-cd hak
-
-# Install dependencies
+git clone https://github.com/askend-lab/hak-public.git
+cd hak-public
 pnpm install
-
-# Start the development server
-pnpm start
+pnpm start              # Dev server at http://localhost:5181
 ```
 
 ## Development Workflow
@@ -48,38 +45,43 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 1. Create a branch from `main`
 2. Make your changes
-3. Run tests: `pnpm test`
-4. Run linting: `pnpm lint`
-5. Open a PR with a clear description
-
-### Security Checklist
-
-Before submitting a PR, verify:
-
-- No secrets, API keys, or credentials in code or config
-- User input is validated and sanitized (length, type, range)
-- Error messages do not leak internal details (stack traces, file paths, bucket names)
-- No `shell=True` or string-interpolated shell commands
-- CORS origin is dynamic (`getCorsOrigin()`), not hardcoded `"*"`
-- Auth-required endpoints have authorizer configured
+3. Run checks: `pnpm check`
+4. Open a PR with a clear description
 
 ## Project Structure
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full monorepo structure, package dependencies, and data flows.
+```
+packages/
+  frontend/       - React frontend application
+  shared/         - Shared utilities and types
+  store/          - REST API for lessons, users, progress
+  tts-api/        - TTS gateway (synthesis requests, caching)
+  tts-worker/     - Estonian speech synthesis engine (Docker)
+  morphology-api/ - Estonian morphological analysis
+  auth/           - Estonian eID (TARA) authentication
+  api-client/     - Shared API client configuration
+  gherkin-parser/ - Gherkin specification parser
+  specifications/ - BDD specifications
+
+docs/             - Documentation and API reference
+```
 
 ## Code Style
 
-See the Quality System section in [ARCHITECTURE.md](ARCHITECTURE.md) for the full list of enforced checks.
+- TypeScript strict mode
+- ESLint with zero warnings policy
+- No `any` types without justification
+- Tests required for new functionality (TDD)
 
-## Testing
+## Available Commands
 
-```bash
-# Run all tests
-pnpm test
-
-# Run tests for a specific package
-pnpm --filter @hak/frontend test
-```
+| Command | Description |
+|---------|-------------|
+| `pnpm start` | Start frontend dev server (port 5181) |
+| `pnpm check` | Run all checks: lint + typecheck + tests |
+| `pnpm lint` | ESLint with zero warnings policy |
+| `pnpm typecheck` | TypeScript type checking (frontend + shared) |
+| `pnpm test:all` | Run all tests across all packages |
 
 ## Questions?
 

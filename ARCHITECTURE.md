@@ -6,7 +6,7 @@ HAK is an Estonian language learning platform. Teachers create lessons with text
 
 **Client:** React SPA (Vite + SCSS/BEM), served via CloudFront CDN from S3.
 
-**Backend:** Four Lambda functions behind API Gateway, plus one Docker service on ECS:
+**Backend:** Three Lambda functions behind API Gateway, plus one Docker service on ECS:
 
 - **store** — REST API for lessons, users, and progress. Reads/writes DynamoDB.
 - **tts-api** — TTS gateway. Accepts synthesis requests, sends them to SQS, checks results in S3.
@@ -59,47 +59,16 @@ pnpm workspaces monorepo. Packages and their dependencies:
 4. Frontend polls `GET /status/:cacheKey`. When tts-api finds the file in S3, it returns `{status: ready, url}`.
 5. Frontend plays the audio from the S3 URL.
 
-## Infrastructure
 
-All infrastructure is managed with Terraform in `infra/`.
+## CI/CD
 
-- **main.tf** — Provider and backend config
-- **variables.tf** — Input variables
-- **locals.tf** — Local values
-- **outputs.tf** — Output values
-- **terraform-state.tf** — Remote state backend (S3 + DynamoDB lock)
-- **api-gateway.tf** — API Gateway routes for all Lambda APIs
-- **dynamodb.tf** — DynamoDB tables
-- **website.tf** — S3 + CloudFront for frontend hosting
-- **audio.tf** — S3 audio bucket, SQS queue, IAM roles
-- **ecr.tf** — ECR repository for Docker images
-- **cloudfront.tf** — CDN distribution
-- **route53.tf** — DNS records
-- **cloudwatch-alarms.tf** — Monitoring alarms
-- **cloudwatch-dashboard.tf** — Monitoring dashboard
-- **slack-notifications.tf** — Alert notifications to Slack
-- **merlin/** — Merlin-specific infra: ECS cluster, Fargate service, SQS queue, S3 bucket, IAM roles, auto-scaling
-
-## CI/CD & Deployment
-
-GitHub Actions workflows in `.github/workflows/`:
+GitHub Actions workflow in `.github/workflows/`:
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| **build.yml** | Push/PR to main | Lint, typecheck, test per-package, build artifacts, upload to S3 |
-| **deploy.yml** | Called by build.yml or manual | Smart-diff deploy to dev/prod (only changed modules) |
-| **build-merlin-worker.yml** | Push to `packages/tts-worker/**` | Python tests, Docker build, push to ECR |
-| **terraform.yml** | Push to `infra/**` | Terraform plan (PR) / apply (main) |
-| **e2e.yml** | Push to `packages/frontend/**` | Playwright E2E browser tests |
-| **release.yml** | Manual | Version bump, changelog, GitHub release |
-| **build.public.yml** | Push/PR to main | Lint, typecheck, test (public repo CI) |
-| **codeql.yml** | Push/PR to main | CodeQL security analysis |
+| **build.yml** | Push/PR to main | Lint, typecheck, test all packages |
 
-**Deploy flow:** `build.yml` creates a build artifact per module → `deploy.yml` compares with current deployment state → deploys only changed modules (direct `aws lambda update-function-code` for Lambdas, S3 sync for frontend, CloudFront invalidation). Lambda infrastructure (IAM, env vars, config) is managed by Terraform.
-
-**Manual deploy:** `deploy.yml` can be triggered manually with a build ID and target environment (dev/prod).
-
-**There is no manual deployment process.** All deployments go through CI/CD pipelines. Engineers push code to branches, create PRs, and merges to `main` trigger automated builds and deployments. Infrastructure changes in `infra/` trigger Terraform plan/apply.
+All checks must pass before a PR can be merged.
 
 ## Authentication & Authorization
 
@@ -158,21 +127,12 @@ Frontend → TARA/Cognito → auth Lambda → Cognito User Pool → Frontend (/a
 
 ## Quality System
 
-Pre-commit hooks (DevBox) enforce quality on every commit. The commit is rejected if any check fails.
+Quality checks run in CI on every pull request. The PR is blocked if any check fails.
 
-| Hook | What it checks |
-|------|----------------|
-| **TYPE** | TypeScript strict compilation (`tsc --noEmit`) across all packages |
-| **RUN-LINT** | ESLint zero-warnings policy on changed files |
-| **DEAD-CODE** | Unused exports detection (knip) |
-| **PLAYWRIGHT** | E2E browser tests |
-| **SECURITY** | `pnpm audit` — 0 known CVEs |
-| **DEPS** | Unused/missing dependency detection |
-| **CIRCULAR-DEPS** | Circular import detection (madge) |
-| **JSCPD** | Copy-paste detection (≤5% threshold) |
-| **SRC-SIZE** | Source file size limit (≤400 lines) |
-| **MD-SIZE** | Markdown file size limit (≤200 lines) |
-| **SECRET** | Secret/credential scanning (gitleaks) |
-| **LANG** | Language consistency checking |
+| Check | What it runs |
+|-------|--------------|
+| **Lint** | ESLint zero-warnings policy |
+| **Typecheck** | TypeScript strict compilation (`tsc --noEmit`) — frontend + shared |
+| **Tests** | Unit + integration tests across all packages |
 
 Lint metrics enforced: complexity ≤10, function length ≤50L, nesting depth ≤4, no console statements, no magic numbers.
