@@ -140,7 +140,7 @@ if command -v node &>/dev/null; then
 
     // Replace devbox-dependent scripts with standalone equivalents
     pkg.scripts.prepare = 'husky';
-    const testCmd = "pnpm -r --filter '!@hak/tts-worker' --filter '!hak' --workspace-concurrency=4 run test:full";
+    const testCmd = 'pnpm -r --filter !@hak/tts-worker --filter !hak --workspace-concurrency=4 run test:full';
     pkg.scripts.test = testCmd;
     pkg.scripts['test:full'] = testCmd;
     pkg.scripts['test:all'] = testCmd;
