@@ -122,11 +122,7 @@ for pair in ".github/workflows/build.public.yml:.github/workflows/build.yml" \
   [[ -f "$src" ]] && mv "$src" "$dst" && echo "  $src → $dst"
 done
 
-# --- Clean up pnpm-workspace.yaml (still points to packages/*) ---
-# No change needed — pnpm ignores missing directories silently.
-
-# --- Clean up root package.json ---
-# Remove scripts that reference internal tools (devbox, kill-ports, backend)
+# --- Clean up root package.json (remove internal scripts, exclude tts-worker from tests) ---
 echo ">>> Cleaning package.json..."
 if command -v node &>/dev/null; then
   node -e "
@@ -144,8 +140,10 @@ if command -v node &>/dev/null; then
 
     // Replace devbox-dependent scripts with standalone equivalents
     pkg.scripts.prepare = 'husky';
-    pkg.scripts.test = 'pnpm -r --workspace-concurrency=4 run test:full';
-    pkg.scripts['test:full'] = pkg.scripts.test;
+    const testCmd = "pnpm -r --filter '!@hak/tts-worker' --filter '!hak' --workspace-concurrency=4 run test:full";
+    pkg.scripts.test = testCmd;
+    pkg.scripts['test:full'] = testCmd;
+    pkg.scripts['test:all'] = testCmd;
     pkg.scripts['test:coverage'] = 'pnpm -r --filter=@hak/frontend run test:coverage';
     pkg.scripts.start = 'pnpm --filter @hak/frontend dev';
     pkg.scripts.build = 'pnpm --filter @hak/frontend build';
