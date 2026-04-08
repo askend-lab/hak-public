@@ -1,0 +1,31 @@
+{
+  "name": "@hak/tts-api",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:full": "jest --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
+    "generate:openapi": "ts-node src/openapi.ts > openapi.yaml"
+  },
+  "devDependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@types/jest": "^30.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.6",
+    "esbuild": "^0.27.1",
+    "jest": "^30.2.0",
+    "js-yaml": "^4.1.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ecs": "^3.990.0",
+    "@aws-sdk/client-s3": "^3.990.0",
+    "@aws-sdk/client-sqs": "^3.990.0",
+    "@hak/shared": "workspace:*",
+    "zod": "^3.25.76"
+  }
+}

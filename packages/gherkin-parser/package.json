@@ -1,0 +1,22 @@
+{
+  "name": "@hak/gherkin-parser",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
+    "test:full": "jest --coverage --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  }
+}

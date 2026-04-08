@@ -1,0 +1,193 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import AddToTaskDropdown from "./AddToTaskDropdown";
+import { createMockDataService, DataServiceTestWrapper } from "@/test/dataServiceMock";
+
+const stableUser = {
+  id: "38001085718",
+  name: "Test User",
+  email: "test@test.ee",
+};
+vi.mock("@/features/auth/services", () => ({
+  useAuth: vi.fn(() => ({
+    user: stableUser,
+  })),
+}));
+
+const mockDS = createMockDataService({
+  getUserTasks: vi.fn().mockResolvedValue([
+    { id: "task-1", name: "Task One", description: "", entryCount: 0 },
+    { id: "task-2", name: "Task Two", description: "", entryCount: 0 },
+  ]),
+});
+const dsWrapper = ({ children }: { children: React.ReactNode }) => <DataServiceTestWrapper dataService={mockDS}>{children}</DataServiceTestWrapper>;
+
+describe("AddToTaskDropdown", () => {
+  const mockOnClose = vi.fn();
+  const mockOnSelectTask = vi.fn();
+  const mockOnCreateNew = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("rendering", () => {
+    it("returns null when not open", () => {
+      const { container } = render(
+        <AddToTaskDropdown
+          isOpen={false}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+      expect(container.firstChild).toBeNull();
+    });
+
+    it("renders when open", async () => {
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText("Otsi")).toBeInTheDocument();
+      });
+    });
+
+    it("renders search input", async () => {
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText("Otsi")).toBeInTheDocument();
+      });
+    });
+
+    it("renders create new button", async () => {
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("Loo uus ülesanne")).toBeInTheDocument();
+      });
+    });
+
+    it("renders task list after loading", async () => {
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("Task One")).toBeInTheDocument();
+        expect(screen.getByText("Task Two")).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("interactions", () => {
+    it("calls onClose when backdrop clicked", async () => {
+      const user = userEvent.setup();
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText("Otsi")).toBeInTheDocument();
+      });
+
+      const backdrop = document.querySelector(".add-to-task-backdrop");
+      if (backdrop) {
+        await user.click(backdrop);
+        expect(mockOnClose).toHaveBeenCalled();
+      }
+    });
+
+    it("calls onSelectTask with append mode when empty task clicked", async () => {
+      const user = userEvent.setup();
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("Task One")).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByText("Task One"));
+      expect(mockOnSelectTask).toHaveBeenCalledWith("task-1", "Task One", "append");
+      expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    it("calls onCreateNew when create button clicked", async () => {
+      const user = userEvent.setup();
+      render(
+        <AddToTaskDropdown
+          isOpen={true}
+          onClose={mockOnClose}
+          onSelectTask={mockOnSelectTask}
+          onCreateNew={mockOnCreateNew}
+          sentenceCount={3}
+        />,
+        { wrapper: dsWrapper },
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("Loo uus ülesanne")).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByText("Loo uus ülesanne"));
+      expect(mockOnCreateNew).toHaveBeenCalled();
+      expect(mockOnClose).toHaveBeenCalled();
+    });
+  });
+
+});

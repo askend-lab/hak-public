@@ -1,0 +1,160 @@
+// =========================================================================
+// Page Content Area
+// =========================================================================
+// Content container and empty state styling
+// =========================================================================
+
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+
+// =============================================================================
+// CONTENT AREA (Flexible, scrollable)
+// =============================================================================
+
+.page-content {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  // Mobile: 320px - 639px
+  padding: 0 $spacing-4 $spacing-6 $spacing-4;
+  max-width: 100%;
+
+  // Mobile landscape: 640px+
+  @include mobile-landscape {
+    padding: 0 $spacing-5 $spacing-8 $spacing-5;
+  }
+
+  // Tablet: 768px+
+  @include tablet {
+    padding: 0 $spacing-6 $spacing-8 $spacing-6;
+    max-width: $content-default;
+  }
+
+  // Desktop: 1024px+
+  @include desktop {
+    padding: 0 $spacing-8 $spacing-9 $spacing-8;
+  }
+
+  // Large desktop: Remove padding when max-width reached
+  @include respond-above($content-default + 64px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Empty State Variant
+// ---------------------------------------------------------------------------
+
+.page-content--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 300px;
+  padding: $spacing-8 $spacing-4;
+
+  @include tablet {
+    min-height: 400px;
+    padding: $spacing-12 $spacing-6;
+  }
+
+  @include desktop {
+    min-height: 500px;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: $spacing-4;
+    max-width: 100%;
+
+    @include tablet {
+      gap: $spacing-5;
+      max-width: 400px;
+    }
+
+    @include desktop {
+      gap: $spacing-6;
+      max-width: 480px;
+    }
+
+    // SVG icon style (muted, smaller)
+    .empty-state__icon {
+      display: block;
+
+      // For SVG icons: apply muted styling
+      &:not(img) {
+        color: $color-gray;
+        opacity: 0.5;
+      }
+
+      width: 60px;
+      height: 60px;
+
+      @include tablet {
+        width: 72px;
+        height: 72px;
+      }
+
+      @include desktop {
+        width: 80px;
+        height: 80px;
+      }
+
+      // For img elements: fixed illustration size
+      &[src] {
+        width: 213px;
+        height: 186px;
+        opacity: 1;
+      }
+    }
+
+    .empty-state__title {
+      font-family: $font-body;
+      font-weight: $font-weight-medium;
+      line-height: $heading-page-description-line;
+      color: $color-primary;
+      margin: 0;
+      font-size: $font-size-lg;
+
+      @include tablet {
+        font-size: $heading-page-title-size-mobile;
+      }
+    }
+
+    .empty-state__description {
+      font-family: $font-body;
+      font-weight: $heading-page-description-weight;
+      line-height: $heading-page-description-line;
+      color: var(--color-text-on-secondary);
+      margin: 0;
+      font-size: $heading-page-description-size-mobile;
+
+      @include tablet {
+        font-size: $heading-page-description-size;
+      }
+    }
+
+    .empty-state__action {
+      margin-top: $spacing-2;
+      width: 100%;
+
+      @include mobile-landscape {
+        width: auto;
+      }
+
+      @include tablet {
+        margin-top: $spacing-4;
+      }
+    }
+  }
+}

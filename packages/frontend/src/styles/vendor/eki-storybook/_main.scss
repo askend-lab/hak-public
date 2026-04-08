@@ -1,0 +1,11 @@
+@charset 'UTF-8';
+
+// -------------------------------------------------------------------------
+// This file contains all Storybook required Sass files.
+// -------------------------------------------------------------------------
+
+// 1. Configuration and helpers
+@import 'abstracts/variables';
+
+// 2. Base
+@import 'base/reset';
