@@ -1,0 +1,348 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/opacity";
+@import "../tokens/breakpoints";
+
+// Info Banner for Shared Task - Subtle notification about readonly status
+.shared-task-info-banner {
+  background: linear-gradient(
+    135deg,
+    $color-shadow-subtle 0%,
+    $color-shadow-focus 100%
+  );
+  border-bottom: 1px solid $color-shadow-subtle;
+  padding: 0 $spacing-6; // Match page horizontal padding
+
+  .shared-task-info-banner-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center; // Better vertical centering
+    gap: $spacing-2;
+    padding: $spacing-3 0; // More compact vertical padding
+  }
+
+  .shared-task-info-banner-icon {
+    flex-shrink: 0;
+    color: $color-primary;
+    opacity: 0.5; // More subtle
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+  }
+
+  .shared-task-info-banner-text {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: $spacing-2;
+    min-width: 0;
+    flex-wrap: wrap; // Allow wrapping on smaller screens
+  }
+
+  .shared-task-info-banner-title {
+    font-family: $font-body;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .shared-task-info-banner-description {
+    font-family: $font-body;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-regular;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    opacity: 0.85;
+
+    &::before {
+      content: "•";
+      margin-right: $spacing-2;
+      opacity: 0.4;
+    }
+  }
+
+  // Button now uses storybook .button.button--secondary
+
+  @include respond-below($breakpoint-md) {
+    padding: 0 $spacing-4;
+
+    .shared-task-info-banner-content {
+      gap: $spacing-2;
+      padding: $spacing-2 0;
+      align-items: flex-start; // Stack better on mobile
+    }
+
+    .shared-task-info-banner-icon {
+      margin-top: 1px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .shared-task-info-banner-text {
+      flex-direction: column;
+      gap: $spacing-1;
+      align-items: flex-start;
+    }
+
+    .shared-task-info-banner-title {
+      font-size: $font-size-xs;
+    }
+
+    .shared-task-info-banner-description {
+      font-size: $font-size-xs;
+
+      &::before {
+        display: none; // Remove bullet on mobile
+      }
+    }
+
+    // Button styling removed - uses storybook .button.button--secondary
+  }
+}
+
+// Inline variant - positioned inside content area under description
+.shared-task-info-banner--inline {
+  background: $color-input-bg-light;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-xl;
+  padding: $spacing-6;
+  margin-bottom: $spacing-4;
+
+  .shared-task-info-banner-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: 0;
+    max-width: none;
+  }
+
+  .shared-task-info-banner-icon {
+    display: none; // Hide icon in inline variant
+  }
+
+  .shared-task-info-banner-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2;
+    align-items: flex-start;
+  }
+
+  .shared-task-info-banner-title {
+    font-family: $font-body;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-lg;
+    line-height: $line-height-none;
+    letter-spacing: 0;
+    color: $color-primary;
+    white-space: normal;
+  }
+
+  .shared-task-info-banner-description {
+    font-family: $font-body;
+    font-weight: $font-weight-regular;
+    font-size: $font-size-sm;
+    line-height: $line-height-normal;
+    letter-spacing: 0;
+    color: $color-primary;
+    opacity: 1;
+
+    &::before {
+      display: none; // Remove bullet separator
+    }
+  }
+
+  // Button now uses storybook .button.button--secondary
+
+  @include respond-below($breakpoint-md) {
+    padding: $spacing-4;
+
+    .shared-task-info-banner-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .shared-task-info-banner-title {
+      font-size: $font-size-md;
+    }
+
+    // Button styling removed - uses storybook .button.button--secondary
+  }
+}
+
+// Shared Task View - New simple layout matching TaskDetailView
+.shared-task-view {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+// Entries section - matching TaskDetailView
+.shared-task-entries {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shared-entries-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-12 $spacing-6;
+  text-align: center;
+
+  .shared-entries-empty-icon {
+    margin-bottom: $spacing-6;
+    color: $color-gray;
+    opacity: 0.6;
+
+    svg {
+      display: block;
+    }
+  }
+
+  .shared-entries-empty-title {
+    margin: 0 0 $spacing-3 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+  }
+
+  .shared-entries-empty-description {
+    margin: 0;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    max-width: 320px;
+  }
+}
+
+.shared-entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  padding-right: $spacing-1; // Space for scrollbar
+
+  // Scroll styling
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-soft-neutral-bg;
+    border-radius: $border-radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+
+    &:hover {
+      background: $color-gray;
+    }
+  }
+
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: $color-outlined-neutral $color-soft-neutral-bg;
+}
+
+// Loading and Error States
+.shared-task-loading,
+.shared-task-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-16 $spacing-8;
+  text-align: center;
+  min-height: 400px;
+
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid $color-outlined-neutral;
+    border-top: 3px solid $color-primary;
+    border-radius: $border-radius-round;
+    animation: spin 1s linear infinite;
+    margin-bottom: $spacing-4;
+  }
+
+  p {
+    margin: 0;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+  }
+}
+
+.shared-task-error {
+  .error-icon {
+    margin-bottom: $spacing-6;
+    color: $color-soft-danger;
+
+    svg {
+      display: block;
+    }
+  }
+
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    margin: 0 0 $spacing-3 0;
+  }
+
+  p {
+    color: $color-soft-danger;
+    margin-bottom: $spacing-6;
+  }
+
+  .error-home-button {
+    padding: $spacing-3 $spacing-6;
+    background: $color-primary;
+    color: $color-white;
+    border: none;
+    border-radius: $border-radius-round;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $color-soft-primary;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Responsive design
+@include respond-below($breakpoint-md) {
+  .shared-task-view {
+    padding: $spacing-4;
+  }
+}

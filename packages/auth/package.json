@@ -1,0 +1,35 @@
+{
+  "name": "@hak/auth",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --changedSince=HEAD --json --outputFile=jest-results.json",
+    "test:full": "jest --json --outputFile=jest-results.json",
+    "test:coverage": "jest --coverage --json --outputFile=jest-results.json",
+    "test:mutation": "npx stryker run"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "^9.5.1",
+    "@stryker-mutator/jest-runner": "^9.5.1",
+    "@types/aws-lambda": "^8.10.160",
+    "@types/jest": "^30.0.0",
+    "@types/nock": "^11.1.0",
+    "@types/node": "^20.0.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "esbuild": "^0.27.3",
+    "jest": "^30.2.0",
+    "nock": "^14.0.10",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.990.0",
+    "@aws-sdk/client-secrets-manager": "^3.990.0",
+    "@hak/shared": "workspace:*",
+    "jose": "^5.0.0"
+  }
+}

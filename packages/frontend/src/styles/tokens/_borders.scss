@@ -1,0 +1,47 @@
+// =========================================================================
+// Border Design Tokens
+// =========================================================================
+// Single source of truth for all border values in the application.
+// Matches EKI Storybook border conventions.
+// Defines CSS custom properties in :root and SCSS variable aliases.
+// =========================================================================
+
+@import "colors";
+
+// ---------------------------------------------------------------------------
+// CSS Custom Properties (Runtime-changeable)
+// ---------------------------------------------------------------------------
+
+:root {
+  // Border radii (matching storybook)
+  --border-radius-sm: 6px;
+  --border-radius: 8px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-round: 10rem;
+  --border-radius-full: 9999px;
+
+  // Border widths
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 3px;
+}
+
+// ---------------------------------------------------------------------------
+// SCSS Variable Aliases (Compile-time, IDE autocomplete)
+// ---------------------------------------------------------------------------
+
+// Border radii
+$border-radius-sm: var(--border-radius-sm);
+$border-radius: var(--border-radius);
+$border-radius-md: var(--border-radius-md);
+$border-radius-lg: var(--border-radius-lg);
+$border-radius-xl: var(--border-radius-xl);
+$border-radius-round: var(--border-radius-round);
+$border-radius-full: var(--border-radius-full);
+
+// Border widths
+$border-width-thin: var(--border-width-thin);
+$border-width-medium: var(--border-width-medium);
+$border-width-thick: var(--border-width-thick);

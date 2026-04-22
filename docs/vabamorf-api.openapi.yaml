@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  title: Vabamorf API — Morphological Analysis
+  version: 0.1.0
+  description: Estonian morphological analysis API. Uses vmetajson binary for stress marking and word variant extraction.
+servers:
+  - url: https://hak.example.com
+    description: Production
+components:
+  schemas:
+    AnalyzeResponse:
+      type: object
+      properties:
+        stressedText:
+          type: string
+        originalText:
+          type: string
+      required:
+        - stressedText
+        - originalText
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    AnalyzeRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 10000
+      required:
+        - text
+    MorphologyInfo:
+      type: object
+      properties:
+        lemma:
+          type: string
+        pos:
+          type: string
+        fs:
+          type: string
+        stem:
+          type: string
+        ending:
+          type: string
+      required:
+        - lemma
+        - pos
+        - fs
+        - stem
+        - ending
+    Variant:
+      type: object
+      properties:
+        text:
+          type: string
+        description:
+          type: string
+        morphology:
+          $ref: '#/components/schemas/MorphologyInfo'
+      required:
+        - text
+        - description
+        - morphology
+    VariantsResponse:
+      type: object
+      properties:
+        word:
+          type: string
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variant'
+      required:
+        - word
+        - variants
+    VariantsRequest:
+      type: object
+      properties:
+        word:
+          type: string
+          minLength: 1
+      required:
+        - word
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+        version:
+          type: string
+      required:
+        - status
+        - version
+  parameters: {}
+paths:
+  /api/analyze:
+    post:
+      summary: Morphological analysis with stress marks
+      description: Analyze Estonian text and return it with stress marks added. Uses the vmetajson morphological analyzer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+      responses:
+        '200':
+          description: Analyzed text with stress marks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/variants:
+    post:
+      summary: Get phonetic variants for a word
+      description: Returns all morphological variants (lemma, part of speech, form) for an Estonian word.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantsRequest'
+      responses:
+        '200':
+          description: Word variants with morphological info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantsResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/health:
+    get:
+      summary: Health check
+      description: Returns API health status and version.
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'

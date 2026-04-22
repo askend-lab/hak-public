@@ -1,0 +1,157 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "panel";
+
+// =========================================================================
+// Base Modal Component
+// =========================================================================
+// Reusable modal structure for all modals in the application
+// BEM: .base-modal, .base-modal__*
+// =========================================================================
+
+// Modal Backdrop
+.base-modal__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-shadow-backdrop;
+  z-index: 1000;
+  animation: modalFadeIn 0.2s ease;
+}
+
+// Base Modal Container
+.base-modal {
+  position: fixed;
+  top: $spacing-15;
+  left: 50%;
+  transform: translateX(-50%);
+  background: $color-white;
+  border-radius: $border-radius-xl;
+  padding: 0;
+  box-shadow: 0 10px 40px $color-shadow-primary-md;
+  z-index: 1001;
+  max-height: calc(100vh - 120px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Size variants
+  &--small {
+    width: 400px;
+  }
+
+  &--medium {
+    width: 559px;
+  }
+
+  &--large {
+    width: 700px;
+  }
+}
+
+// Modal Header
+.base-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: $spacing-8 $spacing-8 0 $spacing-8;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.base-modal__title {
+  font-family: $font-body;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-none;
+  color: $color-primary;
+  margin: 0;
+  padding: 0;
+}
+
+.base-modal__close {
+  @include panel-close;
+  color: $color-primary;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Modal Content
+.base-modal__content {
+  padding: $spacing-6 $spacing-8 $spacing-8 $spacing-8;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  // Scrollbar styling
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-soft-neutral-bg;
+    border-radius: $border-radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+
+    &:hover {
+      background: $color-gray;
+    }
+  }
+}
+
+// Animations
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+// Responsive design
+@include respond-below($breakpoint-sm) {
+  .base-modal {
+    top: $spacing-4;
+    width: calc(100vw - 32px) !important; // Override size variants
+    max-width: none;
+    max-height: calc(100vh - 32px);
+  }
+
+  .base-modal__header {
+    padding: $spacing-5 $spacing-5 0 $spacing-5;
+
+    .base-modal__title {
+      font-size: $font-size-2xl;
+    }
+  }
+
+  .base-modal__content {
+    padding: $spacing-5;
+  }
+}

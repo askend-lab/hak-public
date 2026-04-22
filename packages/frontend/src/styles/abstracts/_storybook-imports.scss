@@ -1,0 +1,12 @@
+// -------------------------------------------------------------------------
+// Storybook-Specific Imports
+// -------------------------------------------------------------------------
+// Variables that reference EKI Storybook CSS custom properties
+// These are storybook-specific and not duplicated in app tokens
+// -------------------------------------------------------------------------
+
+/// Storybook brand colors (reference storybook CSS vars)
+$color-quaternary: var(--color-brand-quaternary);
+$color-accent: var(--color-brand-accent);
+$color-first-gradient: var(--color-brand-first-gradient);
+$color-second-gradient: var(--color-brand-second-gradient);

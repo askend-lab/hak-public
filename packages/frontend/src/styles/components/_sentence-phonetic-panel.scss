@@ -1,0 +1,430 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "../abstracts/mixins";
+
+// =========================================================================
+// Sentence Phonetic Panel Component
+// =========================================================================
+// BEM: .sentence-phonetic-panel, .sentence-phonetic-panel__*
+// Sliding panel for editing sentence phonetics
+// Uses: panel mixins (base component)
+// =========================================================================
+
+// Panel container - uses panel mixins
+.sentence-phonetic-panel {
+  @include panel-base;
+  @include panel-right;
+  @include panel-md;
+}
+
+// Panel header - uses panel header mixin with specific width
+.sentence-phonetic-panel__header {
+  @include panel-header;
+  width: 100%;
+  max-width: 518px;
+}
+
+// Title section - component-specific (multi-line with subtitle)
+.sentence-phonetic-panel__title-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  min-width: 0;
+  flex: 1;
+}
+
+.sentence-phonetic-panel__title {
+  @include panel-title;
+}
+
+.sentence-phonetic-panel__header-actions {
+  @include panel-header-actions;
+}
+
+.sentence-phonetic-panel__close {
+  @include panel-close;
+}
+
+// Panel content - uses panel content mixin
+.sentence-phonetic-panel__content {
+  @include panel-content;
+}
+
+// Phonetic edit section
+.sentence-phonetic-panel__edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.sentence-phonetic-panel__description {
+  margin: 0;
+  width: 100%;
+  max-width: 518px;
+  height: auto;
+  min-height: 44px;
+  font-family: $font-body;
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+  color: $color-primary;
+  line-height: 140%;
+  letter-spacing: 0;
+}
+
+.sentence-phonetic-panel__guide-link {
+  display: inline;
+  vertical-align: baseline;
+  background: none;
+  border: none;
+  color: $color-outlined-primary;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: $color-soft-primary;
+  }
+}
+
+.sentence-phonetic-panel__input-container {
+  position: relative;
+}
+
+.sentence-phonetic-panel__textarea {
+  width: 100%;
+  max-width: 518px;
+  height: 84px;
+  padding: $spacing-3;
+  border: 1px solid $color-primary;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  line-height: 150%;
+  letter-spacing: 0;
+  background: $color-white;
+  color: $color-primary;
+  box-sizing: border-box;
+  resize: none;
+
+  &:focus-visible {
+    outline: none;
+    border-color: $color-outlined-primary;
+    box-shadow: 0 0 0 2px $color-focus-ring-blue;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $color-gray;
+    font-weight: $font-weight-regular;
+  }
+}
+
+// Phonetic markers toolbar
+.sentence-phonetic-panel__markers-toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-1;
+  align-items: center;
+}
+
+.sentence-phonetic-panel__marker-button {
+  width: 28px;
+  height: 36px;
+  padding: 0;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  box-sizing: border-box;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-primary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-secondary;
+    transform: translateY(1px);
+  }
+}
+
+// Actions
+.sentence-phonetic-panel__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  padding: 0 $spacing-4;
+}
+
+// Guide view
+.sentence-phonetic-panel__guide-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sentence-phonetic-panel__guide-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-6;
+
+  h4 {
+    flex: 1;
+    font-family: $font-body;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-lg;
+    line-height: 28px;
+    color: $color-primary;
+    margin: 0;
+  }
+}
+
+.sentence-phonetic-panel__back-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  background: transparent;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-outlined-neutral;
+  }
+}
+
+.sentence-phonetic-panel__back-button--icon-only {
+  @include panel-close;
+}
+
+.sentence-phonetic-panel__guide-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: $spacing-2;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-soft-neutral-bg;
+    border-radius: $border-radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+
+    &:hover {
+      background: $color-gray;
+    }
+  }
+}
+
+.sentence-phonetic-panel__guide-intro {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  margin: 0 0 $spacing-4 0;
+}
+
+.sentence-phonetic-panel__marker-item {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  padding: $spacing-4;
+  margin-bottom: $spacing-4;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $color-gray;
+    box-shadow: 0 1px 3px $color-shadow-focus;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sentence-phonetic-panel__marker-symbol {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-3;
+
+  code {
+    @include phonetic-marker-badge;
+  }
+}
+
+.sentence-phonetic-panel__marker-name {
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.sentence-phonetic-panel__marker-rule {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  margin-bottom: $spacing-2;
+}
+
+.sentence-phonetic-panel__marker-description {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-3;
+}
+
+.sentence-phonetic-panel__marker-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  line-height: 20px;
+  color: $color-text-secondary;
+
+  strong {
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    width: 100%;
+  }
+
+  ul {
+    margin: $spacing-2 0 0 0;
+    padding-left: $spacing-5;
+    list-style-type: none;
+    width: 100%;
+
+    li {
+      margin-bottom: $spacing-1;
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+
+      &:before {
+        content: "•";
+        color: $color-gray;
+        font-size: $font-size-md;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      code {
+        display: inline;
+        padding: $spacing-1 $spacing-1;
+        background: $color-soft-neutral-bg;
+        border: 1px solid $color-outlined-neutral;
+        border-radius: $border-radius-sm;
+        font-family: $font-mono;
+        font-size: $font-size-xs;
+        color: $color-outlined-primary;
+      }
+    }
+  }
+}
+
+.sentence-phonetic-panel__marker-tag {
+  height: 22px;
+  background: $color-secondary;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  padding: 0 $spacing-1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  line-height: 100%;
+  letter-spacing: 0.4%;
+  text-align: center;
+  color: $color-primary;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Responsive Styles
+// ---------------------------------------------------------------------------
+
+@include respond-below($breakpoint-md) {
+  .sentence-phonetic-panel {
+    width: 100vw;
+    max-width: none;
+    padding: $spacing-4 $spacing-3;
+  }
+
+  .sentence-phonetic-panel__header,
+  .sentence-phonetic-panel__content {
+    width: 100%;
+    max-width: none;
+  }
+
+  .sentence-phonetic-panel__description,
+  .sentence-phonetic-panel__textarea {
+    max-width: none;
+  }
+
+  .sentence-phonetic-panel__title {
+    font-size: $font-size-md;
+  }
+}
+
+@include respond-below($breakpoint-sm) {
+  .sentence-phonetic-panel {
+    padding: $spacing-3 $spacing-2;
+  }
+
+  .sentence-phonetic-panel__actions {
+    padding: 0;
+  }
+}

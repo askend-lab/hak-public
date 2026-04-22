@@ -1,0 +1,73 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "input";
+
+// =========================================================================
+// Task Edit Modal Component
+// =========================================================================
+// BEM: .task-edit-modal__*
+// Modal for editing task details
+// Uses BaseModal for structure, contains only content-specific styles
+// =========================================================================
+
+.task-edit-modal {
+  // Structure provided by BaseModal
+}
+
+.task-edit-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.task-edit-modal__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.task-edit-modal__input {
+  @include input-base;
+  @include input-large;
+}
+
+.task-edit-modal__textarea {
+  @include textarea-base;
+
+  &::placeholder {
+    color: $color-text-placeholder;
+    opacity: 0.64;
+  }
+}
+
+.task-edit-modal__error {
+  padding: $spacing-3 $spacing-4;
+  background: $color-soft-danger-bg;
+  border: 1px solid $color-outlined-danger;
+  border-radius: $border-radius;
+
+  p {
+    margin: 0;
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    color: $color-soft-danger;
+  }
+}
+
+.task-edit-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  margin-top: $spacing-2;
+}
+
+// Responsive design
+@include respond-below($breakpoint-sm) {
+  .task-edit-modal__actions {
+    button {
+      width: 100%;
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@hak/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "generate:check": "node scripts/generate.mjs --check",
+    "build": "tsc",
+    "test": "jest --no-coverage",
+    "test:smoke": "jest --no-coverage --testPathPatterns=smoke",
+    "test:unit": "jest --no-coverage --testPathPatterns=unit"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.10.6",
+    "jest": "^30.2.0",
+    "openapi-typescript": "^7.13.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {}
+}

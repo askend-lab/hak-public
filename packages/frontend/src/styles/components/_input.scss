@@ -1,0 +1,163 @@
+@import "../tokens/colors";
+@import "../tokens/borders";
+@import "../tokens/opacity";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+
+// =========================================================================
+// Input Component
+// =========================================================================
+// Matches EKI Storybook input patterns.
+// =========================================================================
+
+// Base input mixin - use this for all text inputs across the app
+@mixin input-base {
+  width: 100%;
+  border: 1px solid $color-primary;
+  border-radius: $border-radius;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  background: $color-white;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  &::placeholder {
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-placeholder;
+  }
+
+  // Focus state with visible indicator for keyboard navigation (WCAG 2.4.7)
+  &:focus-visible {
+    outline: none;
+    border-color: $color-input-border-focus;
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
+  }
+
+  // Remove focus ring for mouse interactions
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:disabled {
+    background-color: $color-soft-neutral-bg;
+    color: $color-gray;
+    cursor: not-allowed;
+  }
+}
+
+// Size modifiers for input-base
+@mixin input-small {
+  height: 32px;
+  padding: 0 $spacing-3;
+}
+
+@mixin input-medium {
+  height: 40px;
+  padding: 0 $spacing-3;
+}
+
+@mixin input-large {
+  height: 48px;
+  padding: 0 $spacing-4;
+}
+
+// Search input variant - smaller height with icon space
+@mixin input-search {
+  height: 36px;
+  padding: $spacing-1-5 $spacing-2;
+  padding-right: 36px; // Extra padding for search icon
+}
+
+// Textarea base mixin - extends input-base with textarea-specific properties
+@mixin textarea-base {
+  @include input-base;
+  min-height: 120px;
+  padding: $spacing-3;
+  resize: vertical;
+  line-height: $line-height-normal;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+
+  svg {
+    position: absolute;
+    right: $spacing-4;
+  }
+
+  &.error {
+    .input {
+      border-color: $color-error;
+
+      &::placeholder {
+        color: $color-orange;
+        opacity: $opacity-placeholder;
+      }
+
+      &:focus {
+        border: 2px solid $color-error;
+        background-color: $color-light-orange;
+      }
+    }
+
+    svg {
+      color: $color-orange;
+    }
+  }
+}
+
+.input-label,
+.input-helper-text {
+  display: block;
+  font-size: $font-size-xs;
+}
+
+.input-label {
+  margin-bottom: $spacing-1-5;
+  color: $color-primary;
+}
+
+.input-helper-text {
+  margin-top: $spacing-1-5;
+  color: $color-tertiary;
+}
+
+.input {
+  @include input-base;
+  padding: $spacing-3 $spacing-11 $spacing-3 $spacing-4;
+
+  &--small {
+    @include input-small;
+  }
+
+  &--medium {
+    @include input-medium;
+  }
+
+  &--large {
+    @include input-large;
+  }
+}
+
+.disabled {
+  .input-label {
+    color: $color-overlay;
+  }
+
+  .input-helper-text {
+    color: $color-overlay;
+  }
+
+  svg {
+    opacity: 0.25;
+  }
+}

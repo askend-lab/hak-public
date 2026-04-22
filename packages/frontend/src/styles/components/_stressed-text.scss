@@ -1,0 +1,276 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+
+// =========================================================================
+// Stressed Text Display Component
+// =========================================================================
+// BEM: .stressed-text, .stressed-text__*, .stressed-text--*
+// Displays text with stress markers and word highlighting
+// =========================================================================
+
+.stressed-text {
+  margin: $spacing-8 0;
+  padding: $spacing-6;
+  background-color: $color-surface-bg;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+}
+
+.stressed-text__title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  margin: 0 0 $spacing-4 0;
+}
+
+.stressed-text__comparison {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.stressed-text__row {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+
+  @include tablet {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: $spacing-3;
+  }
+}
+
+.stressed-text__container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  flex: 1;
+
+  @include tablet {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.stressed-text__actions {
+  display: flex;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+}
+
+.stressed-text__action-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-2 $spacing-3;
+  border: none;
+  border-radius: $border-radius-round;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &--play {
+    background: $color-primary;
+    color: $color-white;
+
+    &:hover:not(:disabled) {
+      background: $color-soft-primary;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &--play-round {
+    width: 36px;
+    height: 36px;
+    border-radius: $border-radius-full;
+    padding: 0;
+    background: $color-primary;
+    color: $color-white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled) {
+      background: $color-soft-primary;
+      transform: scale(1.05);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &--add {
+    background: $color-white;
+    color: $color-primary;
+    border: 1px solid $color-outlined-primary;
+
+    &:hover:not(:disabled) {
+      background: $color-soft-primary-bg;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.stressed-text__label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  min-width: 140px;
+}
+
+.stressed-text__words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  flex: 1;
+}
+
+.stressed-text__word {
+  display: inline-block;
+  padding: $spacing-1 $spacing-2;
+  background: $color-soft-primary-bg;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-regular;
+  line-height: 140%;
+  color: $color-primary;
+  height: 22px;
+  box-sizing: border-box;
+  box-shadow: 0px 2px 6px 0px $color-shadow-medium;
+  transition: all 0.2s ease;
+
+  &--clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: $color-secondary;
+      border-color: $color-outlined-primary;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &--stressed {
+    font-weight: $font-weight-medium;
+    color: $color-primary;
+    background: $color-soft-primary-bg;
+    border: 1px solid $color-outlined-neutral;
+  }
+
+  &--selected {
+    background: $color-primary;
+    border: 1px solid $color-primary;
+    border-radius: $border-radius-sm;
+    color: $color-white;
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    line-height: 140%;
+    box-shadow: 0px 2px 6px 0px $color-shadow-medium;
+    letter-spacing: 0;
+
+    &:hover {
+      background: $color-soft-primary;
+      border-color: $color-soft-primary;
+    }
+  }
+}
+
+.stressed-text__value {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-family: $font-body;
+  background-color: $color-white;
+  padding: $spacing-3 $spacing-4;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  flex: 1;
+
+  &--stressed {
+    font-weight: $font-weight-regular;
+    color: $color-text-secondary;
+    background-color: $color-white;
+    border-color: $color-outlined-neutral;
+  }
+}
+
+// Legacy class aliases for backwards compatibility
+.stressed-text-display {
+  @extend .stressed-text;
+}
+.stressed-text-title {
+  @extend .stressed-text__title;
+}
+.text-comparison {
+  @extend .stressed-text__comparison;
+}
+.original-text {
+  @extend .stressed-text__row;
+}
+.stressed-text-row {
+  @extend .stressed-text__row;
+}
+.stressed-text-container {
+  @extend .stressed-text__container;
+}
+.stressed-text-actions {
+  @extend .stressed-text__actions;
+}
+.stressed-action-button {
+  @extend .stressed-text__action-button;
+}
+.play-button {
+  @extend .stressed-text__action-button--play;
+}
+.play-button-round {
+  @extend .stressed-text__action-button--play-round;
+}
+.add-button {
+  @extend .stressed-text__action-button--add;
+}
+.text-label {
+  @extend .stressed-text__label;
+}
+.text-words {
+  @extend .stressed-text__words;
+}
+.word-element {
+  @extend .stressed-text__word;
+}
+.text-value {
+  @extend .stressed-text__value;
+}
