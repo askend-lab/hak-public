@@ -30,6 +30,6 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.990.0",
     "@aws-sdk/client-secrets-manager": "^3.990.0",
     "@hak/shared": "workspace:*",
-    "jose": "^5.0.0"
+    "jose": "^6.2.3"
   }
 }
