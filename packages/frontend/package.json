@@ -54,7 +54,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.16",
     "axe-core": "^4.11.1",
-    "c8": "^10.1.3",
+    "c8": "^11.0.0",
     "eslint": "^9.15.0",
     "eslint-import-resolver-typescript": "^3.6.3",
     "eslint-plugin-import": "^2.31.0",
