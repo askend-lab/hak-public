@@ -1,0 +1,99 @@
+// =========================================================================
+// Page Footer
+// =========================================================================
+// Footer layout and responsive styling
+// =========================================================================
+
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/spacing";
+
+// =============================================================================
+// FOOTER (Always full width, below content)
+// =============================================================================
+
+.page-layout__footer {
+  margin-top: auto;
+  background-color: $color-white;
+  width: 100%;
+  border-top: 1px solid $color-shadow-focus;
+}
+
+.page-footer--full {
+  position: relative;
+
+  // Mobile
+  padding: $spacing-6 $spacing-4 $spacing-5 $spacing-4;
+
+  // Mobile landscape
+  @include mobile-landscape {
+    padding: $spacing-8 $spacing-5 $spacing-6 $spacing-5;
+  }
+
+  // Tablet
+  @include tablet {
+    padding: $spacing-8 $spacing-6 $spacing-8 $spacing-6;
+  }
+
+  // Desktop
+  @include desktop {
+    padding: $spacing-9 $spacing-8 $spacing-6 $spacing-8;
+  }
+
+  .page-footer__content {
+    max-width: $content-full;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: $spacing-8;
+    overflow: hidden;
+
+    @include tablet {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: $spacing-6;
+    }
+
+    @include desktop {
+      flex-wrap: nowrap;
+      gap: $spacing-10;
+    }
+  }
+
+  .footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-6;
+    width: 100%;
+    min-width: 0;
+
+    @include tablet {
+      width: calc(50% - 12px);
+      flex-shrink: 0;
+    }
+
+    @include desktop {
+      width: auto;
+      flex: 1 1 auto;
+      max-width: 305px;
+    }
+  }
+
+  // BuildInfo positioned separately
+  .footer__build-info {
+    position: absolute;
+    bottom: $spacing-2;
+    right: $spacing-4;
+
+    @include tablet {
+      right: $spacing-6;
+    }
+
+    @include desktop {
+      position: static;
+      align-self: flex-end;
+    }
+  }
+}

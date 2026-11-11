@@ -1,0 +1,270 @@
+// =========================================================================
+// Color Design Tokens
+// =========================================================================
+// Single source of truth for all color values in the application.
+// Defines CSS custom properties in :root and SCSS variable aliases.
+// Mirrors EKI Storybook color palette with app-specific additions.
+// =========================================================================
+
+// ---------------------------------------------------------------------------
+// CSS Custom Properties (Runtime-changeable)
+// ---------------------------------------------------------------------------
+
+:root {
+  // Brand colors
+  --color-primary: #173148;
+  --color-secondary: #d7e5f2;
+  --color-tertiary: rgba(23, 49, 72, 0.75);
+
+  // Text colors
+  --color-text-primary: #173148;
+  --color-text-secondary: #32383e;
+
+  // Neutral colors
+  --color-white: #fff;
+  --color-black: #000;
+  --color-gray: #636b74;
+  --color-overlay: rgba(23, 49, 72, 0.25);
+
+  // Surface/Background colors
+  --color-surface-bg: #fbfcfe;
+
+  // Status colors - Base
+  --color-error: #e70505;
+  --color-warning: #ef6c00;
+  --color-success: #2e7d32;
+  --color-red: #d32f2f;
+  --color-orange: #de6837;
+  --color-light-orange: #fff5f1;
+
+  // Soft variants - Primary
+  --color-soft-primary: #12467b;
+  --color-soft-primary-bg: #e3effb;
+
+  // Soft variants - Danger
+  --color-soft-danger: #7d1212;
+  --color-soft-danger-bg: #fce4e4;
+
+  // Soft variants - Success
+  --color-soft-success: #0a470a;
+  --color-soft-success-bg: #e3fbe3;
+
+  // Soft variants - Warning
+  --color-soft-warning: #492b08;
+  --color-soft-warning-bg: #fdf0e1;
+
+  // Soft variants - Neutral
+  --color-soft-neutral-bg: #f0f4f8;
+
+  // Outlined variants
+  --color-outlined-primary: #97c3f0;
+  --color-outlined-neutral: #a8c4ddbf;
+  --color-outlined-danger: #c41c1c;
+  --color-outlined-success: #1f7a1f;
+  --color-outlined-warning: #9a5b13;
+  --color-outlined-warning-border: #f3c896;
+
+  // Hover state colors (pre-computed darken/lighten variants)
+  --color-outlined-danger-hover: #a31717; // darken(#C41C1C, 5%)
+  --color-outlined-success-hover: #196619; // darken(#1F7A1F, 5%)
+  --color-outlined-warning-hover: #7a490f; // darken(#9A5B13, 5%)
+  --color-soft-danger-hover: #5f0e0e; // darken(#7D1212, 10%)
+  --color-soft-danger-bg-hover: #f8d4d4; // darken(#FCE4E4, 5%)
+  --color-success-hover: #246b27; // darken(#2E7D32, 10%)
+  --color-warning-hover: #cc5900; // darken(#EF6C00, 10%)
+  --color-orange-hover: #f28051; // lighten(#DE6837, 10%)
+  --color-secondary-hover: #c5d9ed; // darken(#D7E5F2, 8%)
+  --color-soft-primary-bg-hover: #edf5fc; // lighten(#E3EFFB, 3%)
+
+  // Border colors (for inputs, containers, dividers)
+  --color-border-light: #bed3e5; // Light blue border
+  --color-border-input: #e0e0e0; // Input field border
+  --color-border-neutral: #e8eaed; // Neutral gray border
+  --color-border-neutral-light: #c5cbd1; // Light gray border
+
+  // Input & Form colors
+  --color-input-bg-light: #f6fbff; // Light blue input background
+  --color-input-bg-soft: #fafcfe; // Very soft background
+  --color-input-border-focus: #4a90e2; // Input focus border
+
+  // Text colors - Extended
+  --color-text-placeholder: #636b74; // Placeholder text (WCAG AA ≥4.5:1 on white)
+  --color-text-on-secondary: #4e5964; // Gray text on secondary bg (WCAG AA ≥4.5:1 on #d7e5f2)
+  --color-text-disabled: #767676; // Disabled text (WCAG AA ≥4.54:1 on white)
+  --color-text-dark: #000000; // Pure black text (87% opacity typically applied)
+
+  // Menu & Dropdown colors
+  --color-menu-hover: rgba(0, 0, 0, 0.04); // Menu item hover background
+  --color-menu-active: rgba(0, 0, 0, 0.08); // Menu item active background
+  --color-menu-danger: #c74848de; // Danger menu item text
+  --color-menu-danger-bg: #f2d9d7; // Danger menu item background
+
+  // Tag colors (for word tags, labels)
+  --color-tag-bg: #f6fbff; // Tag background
+  --color-tag-border: #bed3e5; // Tag border
+  --color-tag-hover-bg: #e3f2ff; // Tag hover background
+  --color-tag-hover-border: #4a90e2; // Tag hover border
+  --color-tag-active-bg: #d0e8ff; // Tag active background
+  --color-tag-selected-bg: #173148; // Tag selected background (primary)
+  --color-tag-selected-border: #173148; // Tag selected border
+  --color-tag-selected-text: #ffffff; // Tag selected text
+
+  // Gradient colors (for backgrounds, headers)
+  --color-gradient-light-end: #f8fbff; // Light blue gradient end
+  --color-gradient-soft-bg: #fafbfc; // Soft gray gradient
+  --color-gradient-light-bg: #f8f9fa; // Light gray gradient
+
+  // Utility colors
+  --color-disabled-bg: #ccc; // Disabled element background
+  --color-spinner-primary: #008fd3; // Loading spinner color
+  --color-spinner-secondary: #4a90e2; // Secondary spinner color
+  --color-shadow-light: rgba(0, 0, 0, 0.12); // Light shadow
+  --color-shadow-medium: rgba(0, 51, 57, 0.25); // Medium shadow
+  --color-shadow-primary-xs: rgba(
+    23,
+    49,
+    72,
+    0.08
+  ); // Primary shadow extra small
+  --color-shadow-primary-sm: rgba(23, 49, 72, 0.15); // Primary shadow small
+  --color-shadow-primary-md: rgba(23, 49, 72, 0.2); // Primary shadow medium
+  --color-shadow-primary-lg: rgba(23, 49, 72, 0.25); // Primary shadow large
+  --color-shadow-focus: rgba(23, 49, 72, 0.1); // Focus ring shadow
+  --color-shadow-dropdown: rgba(23, 49, 72, 0.12); // Dropdown/elevated shadow
+  --color-shadow-subtle: rgba(0, 0, 0, 0.08); // Subtle shadow
+  --color-shadow-backdrop: rgba(0, 0, 0, 0.5); // Modal backdrop
+  --color-shadow-backdrop-light: rgba(0, 0, 0, 0.25); // Light backdrop
+  --color-focus-ring-blue: rgba(11, 107, 203, 0.1); // Blue focus ring
+
+  // Additional hover states
+  --color-primary-hover: #1a3a52; // Primary color hover (slightly lighter)
+  --color-secondary-active: #d6e9f7; // Secondary active state
+}
+
+// ---------------------------------------------------------------------------
+// SCSS Variable Aliases (Compile-time, IDE autocomplete)
+// ---------------------------------------------------------------------------
+
+// Brand colors
+$color-primary: var(--color-primary);
+$color-secondary: var(--color-secondary);
+$color-tertiary: var(--color-tertiary);
+$color-trietary: var(--color-tertiary); // Legacy alias (typo in original)
+
+// Text colors
+$color-text-primary: var(--color-text-primary);
+$color-text-secondary: var(--color-text-secondary);
+
+// Neutral colors
+$color-white: var(--color-white);
+$color-black: var(--color-black);
+$color-gray: var(--color-gray);
+$color-overlay: var(--color-overlay);
+
+// Surface/Background colors
+$color-surface-bg: var(--color-surface-bg);
+
+// Status colors - Base
+$color-error: var(--color-error);
+$color-warning: var(--color-warning);
+$color-success: var(--color-success);
+$color-red: var(--color-red);
+$color-orange: var(--color-orange);
+$color-light-orange: var(--color-light-orange);
+
+// Soft variants - Primary
+$color-soft-primary: var(--color-soft-primary);
+$color-soft-primary-bg: var(--color-soft-primary-bg);
+
+// Soft variants - Danger
+$color-soft-danger: var(--color-soft-danger);
+$color-soft-danger-bg: var(--color-soft-danger-bg);
+
+// Soft variants - Success
+$color-soft-success: var(--color-soft-success);
+$color-soft-success-bg: var(--color-soft-success-bg);
+
+// Soft variants - Warning
+$color-soft-warning: var(--color-soft-warning);
+$color-soft-warning-bg: var(--color-soft-warning-bg);
+
+// Soft variants - Neutral
+$color-soft-neutral-bg: var(--color-soft-neutral-bg);
+
+// Outlined variants
+$color-outlined-primary: var(--color-outlined-primary);
+$color-outlined-neutral: var(--color-outlined-neutral);
+$color-outlined-danger: var(--color-outlined-danger);
+$color-outlined-success: var(--color-outlined-success);
+$color-outlined-warning: var(--color-outlined-warning);
+$color-outlined-warning-border: var(--color-outlined-warning-border);
+
+// Hover state colors
+$color-outlined-danger-hover: var(--color-outlined-danger-hover);
+$color-outlined-success-hover: var(--color-outlined-success-hover);
+$color-outlined-warning-hover: var(--color-outlined-warning-hover);
+$color-soft-danger-hover: var(--color-soft-danger-hover);
+$color-soft-danger-bg-hover: var(--color-soft-danger-bg-hover);
+$color-success-hover: var(--color-success-hover);
+$color-warning-hover: var(--color-warning-hover);
+$color-orange-hover: var(--color-orange-hover);
+$color-secondary-hover: var(--color-secondary-hover);
+$color-soft-primary-bg-hover: var(--color-soft-primary-bg-hover);
+
+// Border colors
+$color-border-light: var(--color-border-light);
+$color-border-input: var(--color-border-input);
+$color-border-neutral: var(--color-border-neutral);
+$color-border-neutral-light: var(--color-border-neutral-light);
+
+// Input & Form colors
+$color-input-bg-light: var(--color-input-bg-light);
+$color-input-bg-soft: var(--color-input-bg-soft);
+$color-input-border-focus: var(--color-input-border-focus);
+
+// Text colors - Extended
+$color-text-placeholder: var(--color-text-placeholder);
+$color-text-disabled: var(--color-text-disabled);
+$color-text-dark: var(--color-text-dark);
+
+// Menu & Dropdown colors
+$color-menu-hover: var(--color-menu-hover);
+$color-menu-active: var(--color-menu-active);
+$color-menu-danger: var(--color-menu-danger);
+$color-menu-danger-bg: var(--color-menu-danger-bg);
+
+// Tag colors
+$color-tag-bg: var(--color-tag-bg);
+$color-tag-border: var(--color-tag-border);
+$color-tag-hover-bg: var(--color-tag-hover-bg);
+$color-tag-hover-border: var(--color-tag-hover-border);
+$color-tag-active-bg: var(--color-tag-active-bg);
+$color-tag-selected-bg: var(--color-tag-selected-bg);
+$color-tag-selected-border: var(--color-tag-selected-border);
+$color-tag-selected-text: var(--color-tag-selected-text);
+
+// Gradient colors
+$color-gradient-light-end: var(--color-gradient-light-end);
+$color-gradient-soft-bg: var(--color-gradient-soft-bg);
+$color-gradient-light-bg: var(--color-gradient-light-bg);
+
+// Utility colors
+$color-disabled-bg: var(--color-disabled-bg);
+$color-spinner-primary: var(--color-spinner-primary);
+$color-spinner-secondary: var(--color-spinner-secondary);
+$color-shadow-light: var(--color-shadow-light);
+$color-shadow-medium: var(--color-shadow-medium);
+$color-shadow-primary-xs: var(--color-shadow-primary-xs);
+$color-shadow-primary-sm: var(--color-shadow-primary-sm);
+$color-shadow-primary-md: var(--color-shadow-primary-md);
+$color-shadow-primary-lg: var(--color-shadow-primary-lg);
+$color-shadow-focus: var(--color-shadow-focus);
+$color-shadow-dropdown: var(--color-shadow-dropdown);
+$color-shadow-subtle: var(--color-shadow-subtle);
+$color-shadow-backdrop: var(--color-shadow-backdrop);
+$color-shadow-backdrop-light: var(--color-shadow-backdrop-light);
+$color-focus-ring-blue: var(--color-focus-ring-blue);
+
+// Additional hover states
+$color-primary-hover: var(--color-primary-hover);
+$color-secondary-active: var(--color-secondary-active);

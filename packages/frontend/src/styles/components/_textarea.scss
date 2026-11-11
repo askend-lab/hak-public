@@ -1,0 +1,90 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+
+.textarea-wrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+
+  &.error {
+    .textarea {
+      border-color: $color-error;
+
+      &::placeholder {
+        color: $color-orange;
+        opacity: 0.64;
+      }
+
+      &:focus {
+        border: 2px solid $color-error;
+        background-color: $color-light-orange;
+      }
+    }
+  }
+}
+
+.textarea-label,
+.textarea-helper-text {
+  display: block;
+  font-size: $font-size-xs;
+}
+
+.textarea-label {
+  margin-bottom: $spacing-1-5;
+  color: $color-primary;
+}
+
+.textarea-helper-text {
+  margin-top: $spacing-1-5;
+  color: $color-trietary;
+}
+
+.textarea {
+  width: 100%;
+  padding: $spacing-3 $spacing-4;
+  font-size: $font-size-sm;
+  font-family: $font-body;
+  border: 1px solid $color-primary;
+  border-radius: 0.5rem;
+  box-shadow: 0px 1px 2px 0px $color-shadow-subtle;
+  resize: vertical;
+  min-height: 120px;
+
+  &::placeholder {
+    font-size: $font-size-sm;
+    color: $color-trietary;
+  }
+
+  &:focus-visible {
+    background-color: $color-secondary;
+    border: 2px solid $color-input-border-focus;
+    outline: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:disabled {
+    border: none;
+    background-color: $color-outlined-neutral;
+    color: $color-overlay;
+
+    &::placeholder {
+      color: $color-overlay;
+    }
+  }
+}
+
+.disabled {
+  .textarea-label {
+    color: $color-overlay;
+  }
+
+  .textarea-helper-text {
+    color: $color-overlay;
+  }
+}

@@ -1,0 +1,1368 @@
+// Synthesis Results Component
+@import "../tokens/colors";
+@import "../tokens/spacing";
+@import "../tokens/typography";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "./panel";
+
+// Unified Synthesis Results Section
+.eki-synthesis-results {
+  background: $color-white;
+  border-radius: $border-radius-xl;
+  box-shadow: 0 2px 8px $color-shadow-primary-xs;
+  border: 1px solid $color-shadow-focus;
+  overflow: hidden;
+}
+
+.synthesis-results-header {
+  padding: $spacing-5 $spacing-6;
+  border-bottom: 1px solid $color-outlined-neutral;
+  background: linear-gradient(
+    to right,
+    $color-soft-primary-bg 0%,
+    $color-gradient-light-end 100%
+  );
+
+  .synthesis-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    margin: 0;
+  }
+}
+
+// Audio Section within Synthesis Results
+.synthesis-audio-section {
+  padding: $spacing-6;
+  border-bottom: 1px solid $color-outlined-neutral;
+  background: $color-gradient-soft-bg;
+
+  .section-label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: $color-gray;
+    margin-bottom: $spacing-4;
+    display: block;
+  }
+}
+
+// Phonetic Section within Synthesis Results
+.synthesis-phonetic-section {
+  padding: $spacing-8;
+
+  .phonetic-content {
+    .text-comparison {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-8;
+    }
+
+    .original-text,
+    .phonetic-text {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-3;
+    }
+
+    .original-text-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-4;
+
+      .interaction-hint {
+        font-size: $font-size-xs;
+        color: $color-gray;
+        font-weight: $font-weight-medium;
+        opacity: 0.8;
+
+        @include respond-below($breakpoint-md) {
+          display: none; // Hide on mobile to save space
+        }
+      }
+    }
+
+    .phonetic-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-4;
+    }
+
+    .text-label {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-text-secondary;
+    }
+
+    .text-words {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-3;
+
+      .word-element {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-2;
+        padding: $spacing-2 $spacing-4;
+        background: $color-soft-neutral-bg;
+        border: 1px solid $color-outlined-neutral;
+        border-radius: $border-radius-xl;
+        font-size: $font-size-md;
+        color: $color-primary;
+        transition: all 0.2s ease;
+
+        &.clickable {
+          cursor: pointer;
+          background: $color-white;
+          border-color: $color-outlined-primary;
+          box-shadow: 0 2px 4px $color-shadow-subtle;
+
+          // Elegant chevron indicating sidebar direction
+          &::after {
+            content: "›";
+            font-size: $font-size-md;
+            color: $color-primary;
+            opacity: 0.7;
+            margin-left: $spacing-1;
+            transition: all 0.2s ease;
+            font-weight: $font-weight-semibold;
+          }
+
+          &:hover {
+            background: $color-soft-primary-bg;
+            border-color: $color-primary;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px $color-shadow-primary-sm;
+
+            &::after {
+              opacity: 1;
+              transform: translateY(1px);
+            }
+          }
+
+          &:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px $color-shadow-primary-md;
+          }
+        }
+
+        // Non-clickable state (when in edit mode)
+        &:not(.clickable) {
+          opacity: 0.7;
+          background: $color-soft-neutral-bg;
+          border-color: $color-outlined-neutral;
+        }
+      }
+    }
+
+    .phonetic-text-container {
+      padding: $spacing-4 $spacing-5;
+      background: $color-gradient-light-end;
+      border: 1px solid $color-outlined-neutral;
+      border-radius: $border-radius;
+      margin-bottom: $spacing-4;
+
+      .phonetic-value {
+        font-family: var(
+          --font-family-mono,
+          "Monaco",
+          "Menlo",
+          "Ubuntu Mono",
+          monospace
+        );
+        font-size: $font-size-lg;
+        color: $color-text-secondary;
+        font-weight: $font-weight-medium;
+        letter-spacing: 0.25px;
+        display: block;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+    }
+
+    // Action buttons now outside text container
+    .phonetic-actions {
+      display: flex;
+      align-items: center;
+      gap: $spacing-4;
+      margin-top: $spacing-5;
+
+      @include respond-below($breakpoint-md) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: $spacing-2;
+      }
+
+      .phonetic-play-button {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        padding: $spacing-4 $spacing-6;
+        border-radius: $border-radius-full;
+        border: none;
+        background: $color-primary;
+        color: $color-white;
+        font-size: $font-size-md;
+        font-weight: $font-weight-semibold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px $color-shadow-primary-sm;
+
+        &:hover:not(:disabled) {
+          background: $color-soft-primary;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px $color-shadow-primary-lg;
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        svg {
+          flex-shrink: 0;
+        }
+      }
+
+      .phonetic-add-button {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        padding: $spacing-3-5 $spacing-5;
+        background: $color-white;
+        border: none;
+        box-shadow: inset 0 0 0 1px $color-primary;
+        border-radius: $border-radius-full;
+        color: $color-primary;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: $color-soft-primary-bg;
+          box-shadow:
+            inset 0 0 0 1px $color-soft-primary,
+            0 2px 8px $color-shadow-focus;
+          color: $color-soft-primary;
+          transform: translateY(-1px);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        svg {
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+}
+
+// Edit Mode Styles
+.phonetic-label-actions {
+  display: flex;
+  gap: $spacing-2;
+  align-items: center;
+}
+
+.edit-mode-button,
+.guide-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1-5 $spacing-3;
+  background: $color-white;
+  border: 1px solid $color-outlined-primary;
+  border-radius: $border-radius-sm;
+  color: $color-primary;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $color-soft-primary-bg;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px $color-shadow-focus;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.guide-button {
+  border-color: $color-outlined-neutral;
+  color: $color-text-secondary;
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-outlined-primary;
+    color: $color-primary;
+  }
+}
+
+.edit-mode-actions {
+  display: flex;
+  gap: $spacing-2;
+
+  .edit-save-button,
+  .edit-cancel-button {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-1-5 $spacing-3;
+    border: none;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .edit-save-button {
+    background: $color-success;
+    color: $color-white;
+
+    &:hover {
+      background: $color-success-hover;
+      transform: translateY(-1px);
+    }
+  }
+
+  .edit-cancel-button {
+    background: $color-soft-danger-bg;
+    color: $color-soft-danger;
+
+    &:hover {
+      background: $color-soft-danger-bg-hover;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Redesigned Phonetic Section with Better Information Hierarchy
+.phonetic-section-redesigned {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+
+  .phonetic-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-4 $spacing-5;
+    background: linear-gradient(
+      to right,
+      $color-soft-primary-bg 0%,
+      $color-gradient-light-end 100%
+    );
+    border-bottom: 1px solid $color-outlined-neutral;
+
+    .text-label {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-text-secondary;
+      margin: 0;
+    }
+  }
+
+  .edit-button-inline {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-2 $spacing-3-5;
+    background: $color-white;
+    border: 1px solid $color-outlined-primary;
+    border-radius: $border-radius-sm;
+    color: $color-primary;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $color-soft-primary-bg;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px $color-shadow-focus;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  // Save and Cancel buttons with proper color coding
+  .edit-save-button {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-2 $spacing-3-5;
+    border: none;
+    border-radius: $border-radius-sm;
+    background: $color-success;
+    color: $color-white;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $color-success-hover;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px $color-shadow-primary-lg;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .edit-cancel-button {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-2 $spacing-3-5;
+    border: none;
+    border-radius: $border-radius-sm;
+    background: $color-outlined-danger;
+    color: $color-white;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $color-outlined-danger-hover;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px $color-shadow-primary-lg;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  // Smooth transitioning edit controls in header
+  .edit-controls-area {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+
+    .edit-actions-inline {
+      display: flex;
+      gap: $spacing-2;
+      align-items: center;
+    }
+  }
+
+  .phonetic-edit-mode {
+    .phonetic-edit-area {
+      padding: $spacing-5;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-4;
+    }
+  }
+
+  .phonetic-content-card {
+    padding: $spacing-5;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+}
+
+// Integrated Actions in Content Card
+.phonetic-actions-integrated {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  @include respond-below($breakpoint-md) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-2;
+  }
+}
+
+.phonetic-play-button-primary {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-4 $spacing-6;
+  border-radius: $border-radius-full;
+  border: none;
+  background: $color-primary;
+  color: $color-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px $color-shadow-primary-sm;
+
+  &:hover:not(:disabled) {
+    background: $color-soft-primary;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px $color-shadow-primary-lg;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.phonetic-add-button-secondary {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-3-5 $spacing-5;
+  background: $color-white;
+  border: none;
+  box-shadow: inset 0 0 0 1px $color-primary; // Inside border to match button dimensions
+  border-radius: $border-radius-full;
+  color: $color-primary; // Primary color text to match border
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: $color-soft-primary-bg;
+    transform: translateY(-1px);
+    box-shadow: inset 0 0 0 1px $color-primary;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.phonetic-edit-input {
+  width: 100%;
+  padding: $spacing-4 $spacing-5;
+  background: $color-white;
+  border: 2px solid $color-outlined-primary;
+  border-radius: $border-radius-lg;
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
+  font-size: $font-size-lg;
+  color: $color-soft-primary;
+  font-weight: $font-weight-medium;
+  letter-spacing: 0.5px;
+  resize: vertical;
+  min-height: 80px;
+  transition: all 0.2s ease;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px $color-focus-ring-blue;
+    background: $color-soft-primary-bg-hover;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $color-gray;
+    font-weight: normal;
+  }
+}
+
+// Compact Inline Symbol Toolbar
+.phonetic-symbol-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-6;
+  padding: $spacing-4;
+  background: $color-soft-neutral-bg;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+
+  @include respond-below($breakpoint-md) {
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+}
+
+.symbol-toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  .toolbar-label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    white-space: nowrap;
+    min-width: 70px;
+  }
+
+  .symbol-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-1-5;
+  }
+
+  .symbol-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid $color-outlined-neutral;
+    background: $color-white;
+    border-radius: $border-radius-sm;
+    color: $color-primary;
+    font-family: var(
+      --font-family-mono,
+      "Monaco",
+      "Menlo",
+      "Ubuntu Mono",
+      monospace
+    );
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-md;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: $color-soft-primary-bg;
+      border-color: $color-outlined-primary;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px $color-shadow-focus;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .guide-toolbar-button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid $color-outlined-neutral;
+    background: $color-white;
+    border-radius: $border-radius-sm;
+    color: $color-gray;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: $color-soft-primary-bg;
+      border-color: $color-outlined-primary;
+      color: $color-primary;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px $color-shadow-focus;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Unified Symbol Palette - No More Redundancy
+.phonetic-symbol-palette {
+  background: $color-soft-neutral-bg;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  min-height: 120px; // Stable height
+
+  &.reference {
+    opacity: 0.7;
+    background: linear-gradient(
+      to bottom,
+      $color-gradient-light-bg,
+      $color-soft-neutral-bg
+    );
+  }
+
+  &.active {
+    opacity: 1;
+    background: $color-soft-neutral-bg;
+    border-color: $color-outlined-primary;
+    box-shadow: 0 0 0 1px $color-focus-ring-blue;
+  }
+
+  @include respond-below($breakpoint-lg) {
+    order: -1; // Show guide first on mobile
+  }
+}
+
+.guide-sidebar-header {
+  padding: $spacing-4 $spacing-5;
+  background: linear-gradient(
+    to right,
+    $color-soft-primary-bg,
+    $color-gradient-light-end
+  );
+  border-bottom: 1px solid $color-outlined-neutral;
+
+  h4 {
+    margin: 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+  }
+}
+
+.guide-sidebar-content {
+  padding: $spacing-4;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.guide-group {
+  margin-bottom: $spacing-5;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h5 {
+    margin: 0 0 $spacing-3 0;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.guide-items {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  span {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    line-height: 1.3;
+  }
+}
+
+.guide-symbol {
+  width: 24px;
+  height: 24px;
+  border: 1px solid $color-outlined-primary;
+  background: $color-white;
+  border-radius: $border-radius-sm;
+  color: $color-primary;
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    background: $color-soft-primary-bg;
+    transform: scale(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: $color-soft-neutral-bg;
+    border-color: $color-outlined-neutral;
+    color: $color-gray;
+  }
+}
+
+.guide-examples {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.example-btn {
+  padding: $spacing-2 $spacing-3;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  color: $color-primary;
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
+  font-size: $font-size-xs;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: $color-soft-primary-bg;
+    border-color: $color-outlined-primary;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: $color-soft-neutral-bg;
+    color: $color-gray;
+  }
+}
+
+// Responsive adjustments
+@include respond-below($breakpoint-md) {
+  .synthesis-results-header {
+    padding: $spacing-4 $spacing-5;
+  }
+
+  .synthesis-phonetic-section {
+    padding: $spacing-5;
+
+    .phonetic-text-container {
+      flex-direction: column;
+      align-items: stretch;
+
+      .phonetic-actions {
+        justify-content: center;
+      }
+    }
+  }
+}
+
+// Transition animations
+.synthesis-results-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.synthesis-results-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+// Symbol Palette Structure
+.palette-header {
+  padding: $spacing-4 $spacing-5;
+  background: linear-gradient(
+    to right,
+    $color-soft-primary-bg,
+    $color-gradient-light-end
+  );
+  border-bottom: 1px solid $color-outlined-neutral;
+
+  h4 {
+    margin: 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+  }
+
+  .palette-hint {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-gray;
+    font-weight: normal;
+    margin-top: $spacing-1;
+  }
+}
+
+.palette-content {
+  padding: $spacing-4;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.symbol-category {
+  margin-bottom: $spacing-5;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &.examples {
+    border-top: 1px solid $color-outlined-neutral;
+    padding-top: $spacing-4;
+    margin-top: $spacing-4;
+  }
+
+  h5 {
+    margin: 0 0 $spacing-3 0;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: $spacing-2;
+}
+
+.symbol-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-3 $spacing-2;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+
+  &:hover:not(:disabled) {
+    background: $color-soft-primary-bg;
+    border-color: $color-outlined-primary;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled,
+  &.reference-only {
+    cursor: default;
+    background: $color-soft-neutral-bg;
+    opacity: 0.7;
+
+    &:hover {
+      transform: none;
+      background: $color-soft-neutral-bg;
+      border-color: $color-outlined-neutral;
+    }
+  }
+
+  .symbol {
+    font-family: var(
+      --font-family-mono,
+      "Monaco",
+      "Menlo",
+      "Ubuntu Mono",
+      monospace
+    );
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    line-height: 1;
+  }
+
+  .description {
+    font-size: $font-size-2xs;
+    color: $color-text-secondary;
+    line-height: 1.2;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.example-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.example-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $spacing-1;
+  padding: $spacing-3;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: var(
+    --font-family-mono,
+    "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    monospace
+  );
+  font-size: $font-size-md;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+
+  &:hover:not(:disabled) {
+    background: $color-soft-primary-bg;
+    border-color: $color-outlined-primary;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .example-desc {
+    font-family: var(--font-family-body);
+    font-size: $font-size-2xs;
+    color: $color-text-secondary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+// Help Panel (Viewing Mode)
+.phonetic-help-panel {
+  background: $color-soft-neutral-bg;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+
+  .help-header {
+    padding: $spacing-4 $spacing-5;
+    background: linear-gradient(
+      to right,
+      $color-soft-primary-bg,
+      $color-gradient-light-end
+    );
+    border-bottom: 1px solid $color-outlined-neutral;
+
+    h4 {
+      margin: 0;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-primary;
+    }
+
+    .help-hint {
+      display: block;
+      font-size: $font-size-xs;
+      color: $color-gray;
+      font-weight: normal;
+      margin-top: $spacing-1;
+    }
+  }
+
+  .help-content {
+    padding: $spacing-4;
+  }
+
+  .help-section {
+    h5 {
+      margin: 0 0 $spacing-3 0;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: $color-text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .help-items {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2;
+    margin-bottom: $spacing-4;
+  }
+
+  .help-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+
+    .help-symbol {
+      width: 24px;
+      height: 24px;
+      background: $color-white;
+      border: 1px solid $color-outlined-neutral;
+      border-radius: $border-radius-sm;
+      color: $color-primary;
+      font-family: var(
+        --font-family-mono,
+        "Monaco",
+        "Menlo",
+        "Ubuntu Mono",
+        monospace
+      );
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-sm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .help-desc {
+      font-size: $font-size-xs;
+      color: $color-text-secondary;
+      line-height: 1.3;
+    }
+  }
+
+  .help-edit-prompt {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-3 $spacing-4;
+    background: $color-soft-primary-bg;
+    border: 1px solid $color-outlined-primary;
+    border-radius: $border-radius;
+    color: $color-primary;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
+
+    &:hover {
+      background: $color-soft-primary-bg-hover;
+      transform: translateY(-1px);
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    span {
+      flex: 1;
+    }
+  }
+}
+
+// Visual connection between sections
+.synthesis-audio-section + .synthesis-phonetic-section {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: $spacing-6;
+    right: $spacing-6;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      $color-outlined-neutral 20%,
+      $color-outlined-neutral 80%,
+      transparent
+    );
+  }
+}
+
+// ===========================================================================
+// Synthesis Dropdown Menus (uses Paper component)
+// ===========================================================================
+
+.synthesis__menu-container {
+  position: relative;
+}
+
+.synthesis__menu-button {
+  @include menu-button;
+}
+
+.synthesis__menu-backdrop {
+  @include paper-backdrop;
+}
+
+// Synthesis dropdowns now extend Paper component
+.synthesis__dropdown-menu {
+  @include paper-base;
+  @include paper-dropdown;
+  @include paper-sm;
+
+  &--with-search {
+    @include paper-md;
+  }
+
+  // Fixed positioning variant for scrollable containers
+  // Prevents clipping by overflow:auto/hidden containers
+  // Position is calculated dynamically in component using getBoundingClientRect()
+  &--fixed {
+    position: fixed;
+    top: auto;
+    right: auto;
+    // top and left set via inline styles from component
+  }
+}
+
+// Tag-specific dropdown (smaller, extends Paper)
+.synthesis__tag-dropdown {
+  @include paper-base;
+  @include paper-dropdown;
+  @include paper-xs;
+}
+
+// Menu items now use paper__item styles
+.synthesis__menu-item {
+  @include paper-item;
+
+  &--danger {
+    @include paper-item-danger;
+  }
+
+  &--loading {
+    cursor: wait;
+    opacity: 0.7;
+  }
+
+  &--create {
+    gap: $spacing-3;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.synthesis__menu-item-content {
+  @include paper-item-content;
+}
+
+.synthesis__menu-item-create-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: $color-primary;
+  border-radius: $border-radius-round;
+  flex-shrink: 0;
+  color: $color-white;
+}
+
+.synthesis__menu-search {
+  position: relative;
+  padding: $spacing-4 $spacing-4 $spacing-3 $spacing-4;
+}
+
+.synthesis__menu-search-input {
+  @include input-base;
+  @include input-search;
+}
+
+.synthesis__menu-search-icon {
+  position: absolute;
+  right: $spacing-6;
+  // Center within the 36px input (16px top padding + 18px half of input height)
+  top: calc(16px + 18px);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: $color-primary;
+}
+
+.synthesis__menu-task-list {
+  @include paper-scroll;
+  max-height: 200px;
+  padding: $spacing-1 0;
+}
+
+.synthesis__menu-create-section {
+  padding: $spacing-1 0;
+  border-top: 1px solid $color-outlined-neutral;
+}
+
+.synthesis__menu-divider {
+  @include paper-divider;
+}
+
+// ===========================================================================
+// Drill-down Menu (Nested Panel Support)
+// ===========================================================================
+
+// Menu item with submenu indicator (chevron on right)
+.synthesis__menu-item--submenu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Chevron icon for submenu items
+.synthesis__menu-item-chevron {
+  flex-shrink: 0;
+  color: $color-primary;
+  opacity: 0.6;
+  margin-left: $spacing-2;
+}
+
+// Sub-panel header (back button + title)
+.synthesis__menu-panel-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1-5 $spacing-4;
+}
+
+// Back button in sub-panel header
+.synthesis__menu-back-button {
+  @include panel-close-sm;
+  color: $color-primary;
+}
+
+// Sub-panel title
+.synthesis__menu-panel-title {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  margin: 0;
+  flex: 1;
+}

@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+// =========================================================================
+// Base Animations
+// =========================================================================
+// Reusable keyframe animations used across components
+// =========================================================================
+
+// Spinner rotation animation
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

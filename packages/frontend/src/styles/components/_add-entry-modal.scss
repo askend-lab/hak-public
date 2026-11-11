@@ -1,0 +1,73 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "input";
+
+// =========================================================================
+// Add Entry Modal Component
+// =========================================================================
+// BEM: .add-entry-modal__*
+// Modal for adding new entries
+// Uses BaseModal for structure, contains only content-specific styles
+// =========================================================================
+
+.add-entry-modal {
+  // Structure provided by BaseModal
+}
+
+.add-entry-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.add-entry-modal__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-entry-modal__input {
+  @include input-base;
+  @include input-large;
+}
+
+.add-entry-modal__textarea {
+  @include textarea-base;
+
+  &::placeholder {
+    color: $color-text-placeholder;
+    opacity: 0.64;
+  }
+}
+
+.add-entry-modal__error {
+  padding: $spacing-3 $spacing-4;
+  background: $color-soft-danger-bg;
+  border: 1px solid $color-outlined-danger;
+  border-radius: $border-radius;
+
+  p {
+    margin: 0;
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    color: $color-soft-danger;
+  }
+}
+
+.add-entry-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  margin-top: $spacing-2;
+}
+
+// Responsive design
+@include respond-below($breakpoint-sm) {
+  .add-entry-modal__actions {
+    button {
+      width: 100%;
+    }
+  }
+}

@@ -1,0 +1,151 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useAudioPlayer } from "./useAudioPlayer";
+
+interface MockAudioInstance {
+  src: string;
+  onloadeddata: (() => void) | null;
+  onended: (() => void) | null;
+  onerror: (() => void) | null;
+  pause: ReturnType<typeof vi.fn>;
+  play: ReturnType<typeof vi.fn>;
+}
+
+function getAudioAt(arr: (MockAudioInstance | null)[], i: number): MockAudioInstance {
+  const inst = arr[i];
+  if (!inst) {throw new Error(`audioInstances[${i}] is null/undefined`);}
+  return inst;
+}
+
+describe("useAudioPlayer", () => {
+  let audioInstances: (MockAudioInstance | null)[] = [];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    audioInstances = [];
+
+    class MockAudio {
+      src = "";
+      onloadeddata: (() => void) | null = null;
+      onended: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      pause = vi.fn();
+      play = vi.fn().mockResolvedValue(undefined);
+
+      constructor(url?: string) {
+        if (url) {this.src = url;}
+        audioInstances.push(this);
+      }
+    }
+
+    global.Audio = MockAudio as unknown as typeof Audio;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("playAudio", () => {
+    it("should play audio successfully", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+      const onLoadStart = vi.fn();
+      const onLoadComplete = vi.fn();
+      const onEnded = vi.fn();
+
+      const playPromise = act(async () => {
+        return result.current.playAudio("https://example.com/audio.mp3", {
+          onLoadStart,
+          onLoadComplete,
+          onEnded,
+        });
+      });
+
+      expect(onLoadStart).toHaveBeenCalled();
+      expect(getAudioAt(audioInstances, 0).play).toHaveBeenCalled();
+
+      act(() => {
+        getAudioAt(audioInstances, 0).onloadeddata?.();
+      });
+      expect(onLoadComplete).toHaveBeenCalled();
+
+      act(() => {
+        getAudioAt(audioInstances, 0).onended?.();
+      });
+
+      const playResult = await playPromise;
+      expect(playResult).toBe(true);
+      expect(onEnded).toHaveBeenCalled();
+      expect(result.current.currentAudio).toBeNull();
+    });
+
+    it("should handle audio error", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+      const onError = vi.fn();
+
+      const playPromise = act(async () => {
+        return result.current.playAudio("https://example.com/audio.mp3", {
+          onError,
+        });
+      });
+
+      act(() => {
+        getAudioAt(audioInstances, 0).onerror?.();
+      });
+
+      const playResult = await playPromise;
+      expect(playResult).toBe(false);
+      expect(onError).toHaveBeenCalled();
+      expect(result.current.currentAudio).toBeNull();
+    });
+
+    it("should handle play rejection", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+      const onError = vi.fn();
+
+      audioInstances[0] = null;
+      class MockAudioWithError {
+        src = "";
+        onloadeddata: (() => void) | null = null;
+        onended: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        pause = vi.fn();
+        play = vi.fn().mockRejectedValue(new Error("Play failed"));
+
+        constructor(url?: string) {
+          if (url) {this.src = url;}
+          audioInstances[0] = this;
+        }
+      }
+      global.Audio = MockAudioWithError as unknown as typeof Audio;
+
+      const playResult = await act(async () => {
+        return result.current.playAudio("https://example.com/audio.mp3", {
+          onError,
+        });
+      });
+
+      expect(playResult).toBe(false);
+      expect(onError).toHaveBeenCalled();
+      expect(result.current.currentAudio).toBeNull();
+    });
+
+    it("should work without callbacks", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+
+      const playPromise = act(async () => {
+        return result.current.playAudio("https://example.com/audio.mp3");
+      });
+
+      act(() => {
+        getAudioAt(audioInstances, 0).onended?.();
+      });
+
+      const playResult = await playPromise;
+      expect(playResult).toBe(true);
+    });
+  });
+
+});

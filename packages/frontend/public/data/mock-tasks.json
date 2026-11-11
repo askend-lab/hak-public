@@ -1,0 +1,139 @@
+{
+  "tasks": [
+    {
+      "id": "task-001",
+      "userId": "38001085718",
+      "name": "Eesti keele põhihääldus",
+      "description": "Põhilised eesti keele hääldusreeglid ja harjutused",
+      "entries": [
+        {
+          "id": "entry-001",
+          "text": "Tere, kuidas teil läheb?",
+          "stressedText": "tere kuidas t<e+il lähe+b",
+          "audioUrl": null,
+          "order": 1
+        },
+        {
+          "id": "entry-002",
+          "text": "Ma elan Tallinnas",
+          "stressedText": "ma ela+n T<al]linna+s",
+          "audioUrl": null,
+          "order": 2
+        }
+      ],
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-20T14:30:00Z",
+      "shareToken": "abc123def456"
+    },
+    {
+      "id": "task-002",
+      "userId": "38001085718",
+      "name": "Keerulised sõnad",
+      "description": "Raskesti hääldatavad eesti keele sõnad",
+      "entries": [
+        {
+          "id": "entry-003",
+          "text": "Jäääär",
+          "stressedText": "j<ää_<äär",
+          "audioUrl": null,
+          "order": 1
+        },
+        {
+          "id": "entry-004",
+          "text": "Öökull",
+          "stressedText": "<öö_k<ul]l",
+          "audioUrl": null,
+          "order": 2
+        },
+        {
+          "id": "entry-005",
+          "text": "Öötöö",
+          "stressedText": "<öö_t<öö",
+          "audioUrl": null,
+          "order": 3
+        }
+      ],
+      "createdAt": "2024-02-01T11:00:00Z",
+      "updatedAt": "2024-02-05T15:20:00Z",
+      "shareToken": "xyz789ghi012"
+    },
+    {
+      "id": "task-003",
+      "userId": "49203156512",
+      "name": "Presentatsiooni harjutused",
+      "description": "Laused ja fraasid presentatsioonide jaoks",
+      "entries": [
+        {
+          "id": "entry-006",
+          "text": "Head kolleegid, tere tulemast meie konverentsile",
+          "stressedText": "h<ea+d koll?eegi+d tere tule+mast meie k?onverentsi+le",
+          "audioUrl": null,
+          "order": 1
+        },
+        {
+          "id": "entry-007",
+          "text": "Tänan teid tähelepanu eest",
+          "stressedText": "täna+n t<e+id tähele_panu <ee+st",
+          "audioUrl": null,
+          "order": 2
+        }
+      ],
+      "createdAt": "2024-01-20T09:30:00Z",
+      "updatedAt": "2024-01-25T16:45:00Z",
+      "shareToken": "pqr345stu678"
+    },
+    {
+      "id": "task-004",
+      "userId": "47012093717",
+      "name": "Luuletused lastele",
+      "description": "Leelo Tungal - Küll on hea! hääldusharjutused",
+      "entries": [
+        {
+          "id": "entry-008",
+          "text": "Küll on hea, kui lumi maas, saab siis kelguga mäest alla.",
+          "stressedText": "k<üll <on h<ea kui lumi m<aa+s s<aa+b s<iis kelgu+ga m<äe+st <alla",
+          "audioUrl": null,
+          "order": 1
+        },
+        {
+          "id": "entry-009",
+          "text": "Küll on hea, kui kevad käes,saab siis porilompi kalla.",
+          "stressedText": "k<üll <on h<ea kui kevad k<äe+s s<aa+b s<iis pori_l<ompi k<alla",
+          "audioUrl": null,
+          "order": 2
+        },
+        {
+          "id": "entry-010",
+          "text": "Küll on hea, kui suvi soe, paljajalu joosta tohib.",
+          "stressedText": "k<üll <on h<ea kui suvi s<oe p<al]ja_jalu j<oos+ta tohi+b",
+          "audioUrl": null,
+          "order": 3
+        },
+        {
+          "id": "entry-011",
+          "text": "Küll on hea, kui sügis toob õunu, ploome, pirne, moosi!",
+          "stressedText": "k<üll <on h<ea kui sügis t<oo+b <õun+u pl<oom+e p<irn+e m<oos]i",
+          "audioUrl": null,
+          "order": 4
+        },
+        {
+          "id": "entry-012",
+          "text": "Küll on hea, et igal ajal midagi on toredat.",
+          "stressedText": "k<üll <on h<ea <et iga+l aja+l mi+dagi <on toreda+t",
+          "audioUrl": null,
+          "order": 5
+        },
+        {
+          "id": "entry-013",
+          "text": "Ole ainult rõõmus, laps, naera, hüppa, laula, karga!",
+          "stressedText": "ole ainu+lt r<õõmus l<aps naera h<üppa laula k<arga",
+          "audioUrl": null,
+          "order": 6
+        }
+      ],
+      "createdAt": "2023-12-10T13:00:00Z",
+      "updatedAt": "2023-12-15T10:30:00Z",
+      "shareToken": "mno901vwx234"
+    }
+  ]
+}

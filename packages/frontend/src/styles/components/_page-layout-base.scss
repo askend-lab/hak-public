@@ -1,0 +1,128 @@
+// =========================================================================
+// Page Layout Base Structure
+// =========================================================================
+// Core page layout: base container, header, main content area
+// =========================================================================
+
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+
+// =============================================================================
+// BASE PAGE STRUCTURE (Used by all pages)
+// =============================================================================
+
+.page-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $color-secondary;
+}
+
+.page-layout--centered {
+  align-items: center;
+  justify-content: center;
+}
+
+// =============================================================================
+// STICKY HEADER (Shared across all pages)
+// =============================================================================
+
+.page-layout__header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: $color-white;
+  border-bottom: 1px solid $color-shadow-focus;
+  box-sizing: border-box;
+
+  // Mobile: 320px - 639px
+  padding: 0 $spacing-4;
+  height: 56px;
+
+  // Mobile landscape: 640px+
+  @include mobile-landscape {
+    padding: 0 $spacing-5;
+    height: 60px;
+  }
+
+  // Tablet: 768px+
+  @include tablet {
+    padding: 0 $spacing-6;
+    height: 60px;
+  }
+
+  // Desktop: 1024px+
+  @include desktop {
+    padding: 0 $spacing-8;
+  }
+
+  .page-layout__header-content {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; // Left | Center (nav) | Right
+    align-items: center;
+    height: 100%;
+    max-width: $content-full;
+    margin: 0 auto;
+  }
+}
+
+// =============================================================================
+// MAIN CONTENT AREA (Scrollable, flexible)
+// =============================================================================
+
+.page-layout__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
+}
+
+// =============================================================================
+// TWO-COLUMN LAYOUT VARIANT (For synthesis page and similar)
+// =============================================================================
+// Use with .page-content--two-column for 2-column grid layouts
+
+.page-content--two-column {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: $spacing-8;
+  align-items: start;
+  min-height: 0; // Prevent grid overflow
+
+  @include respond-below($breakpoint-xl) {
+    grid-template-columns: 1.2fr 1fr;
+  }
+
+  @include respond-below($breakpoint-lg) {
+    grid-template-columns: 1fr;
+    gap: $spacing-6;
+  }
+}
+
+.page-content__primary {
+  min-width: 0; // Prevents grid overflow
+
+  @include respond-below($breakpoint-lg) {
+    order: 1; // Ensure primary content comes first on mobile
+  }
+}
+
+.page-content__secondary {
+  min-width: 0; // Prevents grid overflow
+  position: sticky;
+  top: $spacing-8;
+
+  @include respond-below($breakpoint-lg) {
+    order: 2; // Ensure secondary comes after primary on mobile
+    position: static;
+  }
+}
+
+.page-content__full {
+  min-width: 0; // Prevents grid overflow
+  grid-column: 1 / -1; // Spans the full width of the grid
+}

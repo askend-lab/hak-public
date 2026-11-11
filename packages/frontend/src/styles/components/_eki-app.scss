@@ -1,0 +1,542 @@
+// EKI App Layout - matching Figma design
+@import "../tokens/colors";
+@import "../tokens/spacing";
+@import "../tokens/typography";
+@import "../tokens/breakpoints";
+
+.eki-app {
+  min-height: 100vh;
+  background: linear-gradient(
+    to bottom,
+    $color-soft-primary-bg 0%,
+    $color-soft-neutral-bg 100%
+  );
+  font-family: $font-body;
+}
+
+.eki-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 $spacing-4;
+
+  @include respond-below($breakpoint-md) {
+    padding: 0 $spacing-3;
+  }
+}
+
+.eki-header {
+  padding: $spacing-6 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .eki-logo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background-color: $color-primary;
+      color: $color-white;
+      border-radius: $border-radius;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: $font-weight-bold;
+      font-size: $font-size-sm;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+
+      .logo-title {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+        color: $color-primary;
+        letter-spacing: 0.5px;
+      }
+
+      .logo-subtitle {
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        color: $color-primary;
+        letter-spacing: 0.25px;
+      }
+    }
+  }
+}
+
+// Header Actions
+.eki-header__actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-6;
+}
+
+// Navigation
+.eki-nav {
+  display: flex;
+  gap: $spacing-2;
+
+  .eki-nav__tab {
+    padding: $spacing-3 $spacing-6;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: $border-radius;
+    color: $color-gray;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $color-menu-hover;
+      color: $color-primary;
+    }
+
+    &.active {
+      background: $color-primary;
+      color: $color-white;
+      border-color: $color-primary;
+    }
+  }
+}
+
+.eki-main {
+  padding-bottom: $spacing-12;
+}
+
+.eki-app__hero {
+  text-align: center;
+  margin-bottom: $spacing-8;
+
+  @include respond-below($breakpoint-md) {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.eki-workspace {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: $spacing-8;
+  align-items: start;
+  min-height: 0; // Prevent grid overflow
+
+  @include respond-below($breakpoint-xl) {
+    grid-template-columns: 1.2fr 1fr;
+  }
+
+  @include respond-below($breakpoint-lg) {
+    grid-template-columns: 1fr;
+    gap: $spacing-6;
+  }
+}
+
+.eki-primary-column {
+  min-width: 0; // Prevents grid overflow
+
+  @include respond-below($breakpoint-lg) {
+    order: 1; // Ensure primary content comes first on mobile
+  }
+}
+
+.eki-secondary-column {
+  min-width: 0; // Prevents grid overflow
+
+  @include respond-below($breakpoint-lg) {
+    order: 2; // Ensure playlist comes after primary content on mobile
+  }
+}
+
+.eki-full-column {
+  min-width: 0; // Prevents grid overflow
+  grid-column: 1 / -1; // Spans the full width of the grid
+}
+
+.eki-input-section {
+  margin-bottom: $spacing-6;
+}
+
+.eki-results-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+
+  // Enhanced visual hierarchy and interaction design
+  .section-indicator {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-3;
+
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: $color-primary;
+      color: $color-white;
+      border-radius: $border-radius-round;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+    }
+
+    &.completed .step-number {
+      background: $color-success;
+    }
+
+    &.loading .step-number {
+      background: $color-warning;
+      animation: pulse 1.5s infinite;
+    }
+  }
+}
+
+.eki-playlist-section {
+  position: sticky;
+  top: $spacing-8;
+
+  @include respond-below($breakpoint-lg) {
+    position: static;
+  }
+}
+
+.eki-app__title {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  margin: 0 0 $spacing-2 0;
+  text-align: center;
+
+  @include respond-below($breakpoint-md) {
+    font-size: $font-size-3xl;
+  }
+}
+
+.eki-app__subtitle {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  margin: 0 0 $spacing-8 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.eki-input-card {
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  padding: 0;
+  box-shadow: 0 2px 8px $color-shadow-primary-xs;
+  margin-bottom: $spacing-6;
+  border: 1px solid $color-shadow-focus;
+  overflow: hidden;
+}
+
+.eki-text-input {
+  display: flex;
+  flex-direction: column;
+
+  .text-input-header {
+    padding: $spacing-5 $spacing-6;
+    border-bottom: 1px solid $color-outlined-neutral;
+    background: linear-gradient(
+      to right,
+      $color-soft-primary-bg 0%,
+      $color-gradient-light-end 100%
+    );
+
+    .text-input-title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-primary;
+      margin: 0;
+    }
+
+    @include respond-below($breakpoint-md) {
+      padding: $spacing-4 $spacing-5;
+    }
+  }
+
+  .input-section {
+    padding: $spacing-9 $spacing-6;
+    width: 100%;
+
+    @include respond-below($breakpoint-md) {
+      padding: $spacing-8 $spacing-5;
+    }
+
+    .input-label {
+      display: block;
+      font-size: $font-size-md;
+      font-weight: $font-weight-semibold;
+      color: $color-primary;
+      margin-bottom: $spacing-2;
+    }
+
+    .input-field {
+      width: 100%;
+      margin-bottom: $spacing-4;
+      position: relative;
+
+      .eki-input-field {
+        width: 100%;
+        padding: $spacing-5 3.5rem $spacing-5 $spacing-6;
+        border: 2px solid $color-outlined-neutral;
+        border-radius: $border-radius;
+        font-size: $font-size-md;
+        color: $color-primary;
+        background: $color-white;
+        transition: border-color 0.2s ease;
+
+        &::placeholder {
+          color: $color-gray;
+        }
+
+        &:focus-visible {
+          outline: none;
+          border-color: $color-outlined-primary;
+          box-shadow: 0 0 0 3px $color-focus-ring-blue;
+        }
+
+        &:focus:not(:focus-visible) {
+          outline: none;
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: $color-soft-neutral-bg;
+        }
+      }
+
+      .input-clear-button {
+        position: absolute;
+        right: $spacing-4;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: $color-gray;
+        cursor: pointer;
+        padding: $spacing-2;
+        border-radius: $border-radius-sm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        opacity: 0.6;
+
+        &:hover {
+          background: $color-soft-neutral-bg;
+          color: $color-primary;
+          opacity: 1;
+        }
+
+        &:active {
+          transform: translateY(-50%) scale(0.95);
+        }
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+
+    .input-guidance {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-3-5;
+
+      .input-example {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        font-size: $font-size-sm;
+
+        .example-label {
+          color: $color-text-secondary;
+          font-weight: $font-weight-medium;
+        }
+
+        .example-text {
+          color: $color-primary;
+          font-style: italic;
+          background: $color-soft-primary-bg;
+          padding: $spacing-1 $spacing-2;
+          border-radius: $border-radius-sm;
+        }
+      }
+
+      .input-hint {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+
+        svg {
+          color: $color-success;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+
+  .button-section {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-3;
+    flex-wrap: wrap;
+    padding: $spacing-2 $spacing-6 $spacing-9;
+
+    @include respond-below($breakpoint-md) {
+      padding: $spacing-2 $spacing-5 $spacing-8;
+    }
+
+    .eki-mangi-button {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      padding: $spacing-3 $spacing-6;
+      background: $color-primary;
+      color: $color-white;
+      border: none;
+      border-radius: $border-radius-full;
+      font-size: $font-size-md;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: $color-soft-primary;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px $color-shadow-primary-sm;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      svg {
+        flex-shrink: 0;
+      }
+
+      span {
+        white-space: nowrap;
+      }
+    }
+
+    .eki-lisa-button {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      padding: $spacing-3 $spacing-6;
+      background: $color-white;
+      color: $color-primary;
+      border: 2px solid $color-primary;
+      border-radius: $border-radius-full;
+      font-size: $font-size-md;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: $color-soft-primary-bg;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px $color-shadow-primary-sm;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      svg {
+        flex-shrink: 0;
+      }
+
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.eki-error-message {
+  background: $color-soft-danger-bg;
+  color: $color-soft-danger;
+  padding: $spacing-4;
+  border-radius: $border-radius;
+  margin-bottom: $spacing-6;
+  border: 1px solid $color-soft-danger;
+  font-size: $font-size-sm;
+}
+
+.eki-audio-section {
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-6;
+  box-shadow: 0 2px 8px $color-shadow-primary-xs;
+  border: 1px solid $color-shadow-focus;
+
+  .section-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    margin: 0 0 $spacing-4 0;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// Card hover effects
+.eki-input-card,
+.eki-audio-section,
+.eki-synthesis-results,
+.playlist-container {
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px $color-shadow-dropdown;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// DEPRECATED: EKI Layout Classes
+// ---------------------------------------------------------------------------
+// These classes are deprecated in favor of page layout system classes.
+// Use the new .page-content--two-column, .page-content__primary, etc.
+// See: _page-layout-base.scss for the new layout system
+// ---------------------------------------------------------------------------
+
+// Deprecated - use .page-content--two-column instead
+// .eki-workspace { @extend .page-content--two-column; }
+
+// Deprecated - use .page-content__primary instead
+// .eki-primary-column { @extend .page-content__primary; }
+
+// Deprecated - use .page-content__secondary instead
+// .eki-secondary-column { @extend .page-content__secondary; }
+
+// Deprecated - use .page-content__full instead
+// .eki-full-column { @extend .page-content__full; }

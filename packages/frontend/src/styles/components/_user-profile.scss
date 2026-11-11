@@ -1,0 +1,236 @@
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+
+// =========================================================================
+// User Profile Component
+// =========================================================================
+// BEM: .user-profile, .user-profile__*, .user-profile--*
+// =========================================================================
+
+.user-profile {
+  position: relative;
+}
+
+.user-profile__button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1 $spacing-2;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $color-soft-primary-bg;
+    border-color: $color-outlined-primary;
+  }
+}
+
+// Avatar styles - extends storybook .avatar pattern
+.user-profile__avatar {
+  width: 36px;
+  height: 36px;
+  background: $color-primary;
+  color: $color-white;
+  border-radius: $border-radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.user-profile__avatar--large {
+  width: 56px;
+  height: 56px;
+  font-size: $font-size-lg;
+}
+
+.user-profile__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 1px;
+  min-width: 11ch; // Minimum width of 11 characters
+  // Width is determined by content (the name)
+
+  // Cap max width on smaller screens to prevent header overflow
+  @include respond-below($breakpoint-lg) {
+    max-width: 150px;
+  }
+}
+
+.user-profile__name {
+  font-family: $font-body;
+  font-size: $font-size-sm; // 14px
+  font-weight: $font-weight-bold; // 700
+  line-height: $line-height-medium; // 150%
+  letter-spacing: $letter-spacing-subtle; // 0.15px
+  color: $color-primary;
+  white-space: nowrap;
+  // Name is never truncated - it determines the container width
+
+  // On mobile, allow truncation if max-width is hit on parent
+  @include respond-below($breakpoint-lg) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}
+
+.user-profile__id {
+  font-family: $font-body; // Inter (not mono)
+  font-size: $font-size-xs; // 12px
+  font-weight: $font-weight-regular; // 400
+  line-height: $line-height-medium; // 150%
+  letter-spacing: $letter-spacing-subtle; // 0.15px
+  color: $color-text-primary;
+
+  // Truncation: don't contribute to parent width, but fill it
+  width: 0;
+  min-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-profile__arrow {
+  color: $color-gray;
+  transition: transform 0.2s ease;
+
+  &--open {
+    transform: rotate(180deg);
+  }
+}
+
+// Profile Dropdown - uses Paper mixins
+.user-profile__backdrop {
+  @include paper-backdrop;
+  z-index: 1500; // Component-specific higher z-index
+}
+
+.user-profile__dropdown {
+  @include paper-base;
+  @include paper-dropdown;
+  @include paper-elevated;
+  @include paper-auto;
+  border-radius: $border-radius-lg;
+  z-index: 1501; // Above backdrop
+}
+
+.user-profile__header {
+  padding: $spacing-3;
+  background: $color-surface-bg;
+  border-bottom: 1px solid $color-outlined-neutral;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-3;
+}
+
+.user-profile__details {
+  flex: 1;
+  min-width: 11ch; // Minimum 11 characters
+  // Width determined by name
+}
+
+.user-profile__name--large {
+  font-family: $font-body;
+  font-size: $font-size-sm; // 14px
+  font-weight: $font-weight-bold; // 700
+  line-height: $line-height-medium; // 150%
+  letter-spacing: $letter-spacing-subtle; // 0.15px
+  color: $color-primary;
+  margin-bottom: $spacing-1;
+  white-space: nowrap;
+  // Name is never truncated - determines container width
+}
+
+.user-profile__email {
+  font-family: $font-body;
+  font-size: $font-size-xs; // 12px
+  font-weight: $font-weight-regular; // 400
+  line-height: $line-height-medium; // 150%
+  letter-spacing: $letter-spacing-subtle; // 0.15px
+  color: $color-text-primary;
+  margin-bottom: $spacing-1;
+
+  // Truncation: don't contribute to parent width, but fill it
+  width: 0;
+  min-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-profile__id--formatted {
+  font-family: $font-body; // Inter (not mono)
+  font-size: $font-size-xs; // 12px
+  font-weight: $font-weight-regular; // 400
+  line-height: $line-height-medium; // 150%
+  letter-spacing: $letter-spacing-subtle; // 0.15px
+  color: $color-text-primary;
+
+  // Truncation: don't contribute to parent width, but fill it
+  width: 0;
+  min-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-profile__actions {
+  padding: $spacing-1;
+}
+
+.user-profile__action-button {
+  @include paper-item;
+
+  // Danger variant (for logout button)
+  &--danger {
+    @include paper-item-danger;
+  }
+}
+
+.user-profile__action-button-content {
+  @include paper-item-content;
+}
+
+// Login Button
+.user-profile__login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  padding: 0 $spacing-5;
+  height: 40px;
+  background: $color-primary;
+  color: $color-white;
+  border: none;
+  border-radius: $border-radius-round;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-regular;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: $color-soft-primary;
+    transform: translateY(-1px);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// No legacy aliases - use BEM class names directly

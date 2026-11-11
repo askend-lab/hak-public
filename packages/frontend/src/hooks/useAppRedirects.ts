@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/features/auth/services";
+import { useOnboarding } from "@/features/onboarding/contexts/OnboardingContext";
+import { useCopiedEntries } from "@/contexts/CopiedEntriesContext";
+
+/**
+ * Manages app-level redirects:
+ * - Post-login redirect to tasks view
+ * - First-time user redirect to role selection
+ * - Auth guard for tasks view access
+ */
+export function useAppRedirects() {
+  const { isAuthenticated, setShowLoginModal } = useAuth();
+  const {
+    state: onboardingState,
+    isLoading: isOnboardingLoading,
+  } = useOnboarding();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const { hasCopiedEntries } = useCopiedEntries();
+
+  const [pendingTasksViewAccess, setPendingTasksViewAccess] = useState(false);
+  const hasCheckedInitialRedirect = useRef(false);
+
+  // Handle post-login redirect
+  useEffect(() => {
+    if (isAuthenticated && pendingTasksViewAccess) {
+      void navigate("/tasks");
+      setPendingTasksViewAccess(false);
+    }
+  }, [isAuthenticated, pendingTasksViewAccess, navigate]);
+
+  const needsRoleSelection = isAuthenticated && !hasCopiedEntries &&
+    !onboardingState.completed && !onboardingState.selectedRole &&
+    (pathname === "/" || pathname === "/synthesis");
+
+  // Redirect first-time users to role selection on initial app load only
+  useEffect(() => {
+    if (isOnboardingLoading) { return; }
+    if (!hasCheckedInitialRedirect.current) {
+      hasCheckedInitialRedirect.current = true;
+      if (needsRoleSelection) {
+        void navigate("/role-selection", { replace: true });
+      }
+    }
+  }, [isOnboardingLoading, needsRoleSelection, navigate]);
+
+  const handleTasksClick = () => {
+    if (!isAuthenticated) {
+      setPendingTasksViewAccess(true);
+      setShowLoginModal(true);
+    }
+  };
+
+  return { handleTasksClick };
+}

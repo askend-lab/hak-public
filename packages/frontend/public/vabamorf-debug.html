@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAK API Debug</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #93c5fd; }
+  h2 { font-size: 1.1rem; margin: 1.5rem 0 0.75rem; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 0.4rem; }
+  .input-row { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+  input, select { padding: 0.6rem 1rem; border: 1px solid #334155; border-radius: 6px; background: #1e293b; color: #e2e8f0; font-size: 1rem; outline: none; }
+  input { flex: 1; }
+  input:focus, select:focus { border-color: #60a5fa; }
+  select { font-size: 0.9rem; cursor: pointer; }
+  button { padding: 0.6rem 1.2rem; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; font-weight: 500; white-space: nowrap; }
+  button:hover { opacity: 0.9; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-analyze { background: #3b82f6; color: white; }
+  .btn-variants { background: #8b5cf6; color: white; }
+  .btn-both { background: #10b981; color: white; }
+  .btn-synth { background: #f59e0b; color: #1e293b; }
+  .btn-play { background: #22c55e; color: white; }
+  .btn-stop { background: #ef4444; color: white; }
+  .btn-clear { background: #475569; color: #e2e8f0; font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+  .token-row { margin-bottom: 1rem; }
+  .token-row input { font-size: 0.85rem; color: #94a3b8; }
+  .token-row label { font-size: 0.8rem; color: #64748b; margin-bottom: 0.3rem; display: block; }
+  .results { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem; }
+  .result-block { background: #1e293b; border: 1px solid #334155; border-radius: 8px; overflow: hidden; }
+  .result-header { padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+  .result-header.analyze { background: #1e3a5f; color: #93c5fd; }
+  .result-header.variants { background: #2e1065; color: #c4b5fd; }
+  .result-header.synth { background: #451a03; color: #fcd34d; }
+  .result-body { padding: 1rem; }
+  pre { font-size: 0.85rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: #cbd5e1; }
+  .status { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; }
+  .status-ok { background: #065f46; color: #6ee7b7; }
+  .status-err { background: #7f1d1d; color: #fca5a5; }
+  .status-poll { background: #713f12; color: #fde68a; }
+  .timing { font-size: 0.75rem; color: #64748b; }
+  .audio-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
+  .audio-row audio { flex: 1; height: 36px; }
+  .poll-status { font-size: 0.85rem; color: #fde68a; padding: 0.5rem 0; }
+  .section { margin-bottom: 0.5rem; }
+  .hint { font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+<h1>HAK API Debug</h1>
+
+<div class="token-row">
+  <label>Bearer Token (paste from app network tab if needed)</label>
+  <input id="token" type="text" placeholder="eyJ..." />
+</div>
+
+<h2>Morphology (Vabamorf)</h2>
+<div class="input-row">
+  <input id="word" type="text" placeholder="Enter a word, e.g. olen" autofocus />
+  <button class="btn-analyze" onclick="callAnalyze()">Analyze</button>
+  <button class="btn-variants" onclick="callVariants()">Variants</button>
+  <button class="btn-both" onclick="callBoth()">Both</button>
+</div>
+
+<h2>Synthesis (TTS)</h2>
+<div class="hint">Enter text exactly as it would be sent to the TTS engine (with phonetic markers if needed)</div>
+<div class="input-row">
+  <input id="synthText" type="text" placeholder="Text to synthesize, e.g. ole+n or olen" />
+  <select id="voice">
+    <option value="efm_s">efm_s (single word)</option>
+    <option value="efm_l">efm_l (multi word)</option>
+  </select>
+  <button class="btn-synth" onclick="callSynthesize()">Synthesize</button>
+</div>
+<div class="input-row">
+  <button class="btn-play" id="btnAnalyzeAndPlay" onclick="analyzeAndPlay()">Analyze + Play</button>
+  <span class="hint" style="align-self:center">Uses /api/analyze first, then synthesizes the stressedText result</span>
+</div>
+
+<div style="margin-top:1rem; display:flex; justify-content:flex-end;">
+  <button class="btn-clear" onclick="clearResults()">Clear Results</button>
+</div>
+
+<div class="results" id="results"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const getWord = () => $('word').value.trim();
+const getSynthText = () => $('synthText').value.trim();
+const getVoice = () => $('voice').value;
+
+const getHeaders = () => {
+  const h = { 'Content-Type': 'application/json' };
+  const t = $('token').value.trim();
+  if (t) h['Authorization'] = `Bearer ${t}`;
+  return h;
+};
+
+const getAuthHeaders = () => {
+  const h = {};
+  const t = $('token').value.trim();
+  if (t) h['Authorization'] = `Bearer ${t}`;
+  return h;
+};
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function apiCall(url, body) {
+  const t0 = performance.now();
+  const res = await fetch(url, { method: 'POST', headers: getHeaders(), body: JSON.stringify(body) });
+  const ms = Math.round(performance.now() - t0);
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); } catch { json = null; }
+  return { status: res.status, ok: res.ok, ms, raw: json ? JSON.stringify(json, null, 2) : text, json };
+}
+
+function addResult(label, type, { status, ok, ms, raw }, extra) {
+  const block = document.createElement('div');
+  block.className = 'result-block';
+  const statusCls = ok ? 'status-ok' : 'status-err';
+  block.innerHTML = `<div class="result-header ${type}">${escHtml(label)}<span class="status ${statusCls}">${status}</span><span class="timing">${ms}ms</span></div><div class="result-body"><pre>${escHtml(raw)}</pre>${extra || ''}</div>`;
+  $('results').prepend(block);
+  return block;
+}
+
+function clearResults() { $('results').innerHTML = ''; }
+
+// --- Morphology ---
+
+async function callAnalyze() {
+  const w = getWord(); if (!w) return;
+  const r = await apiCall('/api/analyze', { text: w });
+  addResult(`/api/analyze — "${w}"`, 'analyze', r);
+}
+
+async function callVariants() {
+  const w = getWord(); if (!w) return;
+  const r = await apiCall('/api/variants', { word: w });
+  addResult(`/api/variants — "${w}"`, 'variants', r);
+}
+
+async function callBoth() {
+  const w = getWord(); if (!w) return;
+  const [a, v] = await Promise.all([
+    apiCall('/api/analyze', { text: w }),
+    apiCall('/api/variants', { word: w }),
+  ]);
+  addResult(`/api/variants — "${w}"`, 'variants', v);
+  addResult(`/api/analyze — "${w}"`, 'analyze', a);
+}
+
+// --- Synthesis ---
+
+async function pollStatus(cacheKey, block) {
+  const bodyEl = block.querySelector('.result-body');
+  const maxAttempts = 30;
+  for (let i = 0; i < maxAttempts; i++) {
+    const delay = Math.min(2000 * Math.pow(2, Math.min(i, 3)), 8000);
+    await new Promise(r => setTimeout(r, delay));
+    const res = await fetch(`/api/status/${cacheKey}`, { headers: getAuthHeaders() });
+    const data = await res.json();
+    if (data.status === 'ready' && data.audioUrl) {
+      bodyEl.querySelector('.poll-status')?.remove();
+      bodyEl.querySelector('pre').textContent += '\n\n// --- Poll result ---\n' + JSON.stringify(data, null, 2);
+      addAudioPlayer(bodyEl, data.audioUrl);
+      return data.audioUrl;
+    }
+    if (data.status === 'error') {
+      const ps = bodyEl.querySelector('.poll-status');
+      if (ps) ps.textContent = `Error: ${data.error || 'Synthesis failed'}`;
+      bodyEl.querySelector('pre').textContent += '\n\n// --- Poll error ---\n' + JSON.stringify(data, null, 2);
+      return null;
+    }
+    const ps = bodyEl.querySelector('.poll-status');
+    if (ps) ps.textContent = `Polling... attempt ${i + 2}/${maxAttempts} (${data.status})`;
+  }
+  const ps = bodyEl.querySelector('.poll-status');
+  if (ps) ps.textContent = 'Timed out waiting for synthesis';
+  return null;
+}
+
+function addAudioPlayer(container, audioUrl) {
+  const row = document.createElement('div');
+  row.className = 'audio-row';
+  row.innerHTML = `<audio controls src="${escHtml(audioUrl)}"></audio>`;
+  container.appendChild(row);
+}
+
+function isAudioReady(json) {
+  return (json?.status === 'cached' || json?.status === 'ready') && json?.audioUrl;
+}
+
+async function callSynthesize() {
+  const text = getSynthText(); if (!text) return;
+  const voice = getVoice();
+  const r = await apiCall('/api/synthesize', { text, voice });
+  let extra = '';
+  if (isAudioReady(r.json)) {
+    extra = `<div class="audio-row"><audio controls src="${escHtml(r.json.audioUrl)}"></audio></div>`;
+  } else if (r.ok && r.json?.cacheKey) {
+    extra = `<div class="poll-status">Polling... attempt 1/30 (${r.json.status})</div>`;
+  }
+  const block = addResult(`/api/synthesize — "${text}" [${voice}]`, 'synth', r, extra);
+  if (r.ok && r.json?.cacheKey && !isAudioReady(r.json)) {
+    pollStatus(r.json.cacheKey, block);
+  }
+}
+
+async function analyzeAndPlay() {
+  const w = getWord() || getSynthText(); if (!w) return;
+  const ar = await apiCall('/api/analyze', { text: w });
+  addResult(`/api/analyze — "${w}"`, 'analyze', ar);
+  if (!ar.ok || !ar.json?.stressedText) return;
+  const stressed = ar.json.stressedText;
+  $('synthText').value = stressed;
+  const words = stressed.trim().split(/\s+/);
+  const voice = words.length === 1 ? 'efm_s' : 'efm_l';
+  $('voice').value = voice;
+  const sr = await apiCall('/api/synthesize', { text: stressed, voice });
+  let extra = '';
+  if (isAudioReady(sr.json)) {
+    extra = `<div class="audio-row"><audio controls src="${escHtml(sr.json.audioUrl)}" autoplay></audio></div>`;
+  } else if (sr.ok && sr.json?.cacheKey) {
+    extra = `<div class="poll-status">Polling... attempt 1/30 (${sr.json.status})</div>`;
+  }
+  const block = addResult(`/api/synthesize — "${stressed}" [${voice}] (from analyze)`, 'synth', sr, extra);
+  if (sr.ok && sr.json?.cacheKey && !isAudioReady(sr.json)) {
+    pollStatus(sr.json.cacheKey, block);
+  }
+}
+
+$('word').addEventListener('keydown', e => { if (e.key === 'Enter') callBoth(); });
+$('synthText').addEventListener('keydown', e => { if (e.key === 'Enter') callSynthesize(); });
+</script>
+</body>
+</html>

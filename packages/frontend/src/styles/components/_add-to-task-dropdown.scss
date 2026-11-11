@@ -1,0 +1,178 @@
+// Add to Task Dropdown - Searchable task selection dropdown
+// Uses: paper mixins (base component)
+
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "input";
+@import "panel";
+
+// Backdrop - uses Paper mixin
+.add-to-task-backdrop {
+  @include paper-backdrop;
+}
+
+// Dropdown container - uses Paper mixins
+.add-to-task-dropdown {
+  @include paper-base;
+  @include paper-dropdown;
+  width: 250px; // Fixed width from spec
+}
+
+// Search section
+.add-to-task-search {
+  position: relative;
+  padding: $spacing-4 $spacing-4 $spacing-3 $spacing-4;
+}
+
+// Search input - field spec from design
+.add-to-task-search-input {
+  @include input-base;
+  @include input-search;
+  width: 218px; // Fixed width from spec
+}
+
+.add-to-task-search-icon {
+  position: absolute;
+  right: $spacing-6;
+  // Center within the 36px input (16px top padding + 18px half of input height)
+  top: calc(16px + 18px);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: $color-primary;
+}
+
+// Task list - uses Paper scroll mixin
+.add-to-task-list {
+  @include paper-scroll;
+  padding: $spacing-2 0;
+}
+
+// Task item - uses Paper item mixin
+.add-to-task-item {
+  @include paper-item;
+  height: 33px; // Component-specific height
+  padding: 0 $spacing-4;
+
+  // Focus state with visible indicator (WCAG 2.4.7)
+  &:focus-visible {
+    outline: none;
+    background-color: $color-secondary;
+    box-shadow: inset 0 0 0 2px $color-input-border-focus;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+.add-to-task-item-name {
+  @include paper-item-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Loading state - uses Paper loading mixin
+.add-to-task-loading {
+  @include paper-loading;
+}
+
+// Empty state - uses Paper empty mixin
+.add-to-task-empty {
+  @include paper-empty;
+}
+
+// Create new task section
+.add-to-task-create {
+  @include paper-footer;
+  padding: $spacing-1 0;
+}
+
+.add-to-task-create-button {
+  @include paper-item;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-4;
+
+  // Focus state with visible indicator (WCAG 2.4.7)
+  &:focus-visible {
+    outline: none;
+    background-color: $color-secondary;
+    box-shadow: inset 0 0 0 2px $color-input-border-focus;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+.add-to-task-create-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; // From spec
+  height: 18px; // From spec
+  background-color: $color-primary;
+  border-radius: $border-radius-round; // From spec
+  flex-shrink: 0;
+  color: $color-white;
+}
+
+.add-to-task-create-text {
+  font-family: $font-body;
+  font-size: $font-size-sm; // From spec
+  font-weight: $font-weight-bold; // Bold
+  line-height: 150%; // From spec
+  letter-spacing: 0.15px; // From spec
+  color: $color-primary;
+}
+
+// Confirmation panel header (matches synthesis__menu-panel-header pattern)
+.add-to-task-confirm-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1-5 $spacing-4;
+}
+
+.add-to-task-confirm-back {
+  @include panel-close-sm;
+  color: $color-primary;
+}
+
+.add-to-task-confirm-title {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Confirmation panel body
+.add-to-task-confirm-body {
+  padding: $spacing-2 $spacing-4 $spacing-4;
+}
+
+.add-to-task-confirm-info {
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 150%;
+  margin: 0 0 $spacing-3;
+}
+
+.add-to-task-confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+// Container for button + dropdown positioning
+.add-to-task-container {
+  position: relative;
+  display: inline-flex;
+}

@@ -1,0 +1,216 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+/**
+ * Core Store - pure business logic, no AWS dependencies
+ */
+
+import { logger, extractErrorMessage } from "@hak/shared";
+import {
+  ServerContext,
+  StoreRequest,
+  StoreItem,
+  StoreResult,
+  DataType,
+  StorageAdapter,
+  StoreConfig,
+  DEFAULT_CONFIG,
+  MAX_QUERY_ITEMS,
+} from "./types";
+import { parseTtl } from "./validation";
+
+/** Error message constants */
+export const ERRORS = {
+  NOT_FOUND: "Item not found",
+  ACCESS_DENIED: "Access denied: not owner",
+  VERSION_CONFLICT: "Item was modified by another request",
+} as const;
+
+/**
+ * Builds partition key for context-based grouping
+ * Private type includes userId for user-level isolation
+ */
+function buildPartitionKey(
+  context: ServerContext,
+  type: DataType,
+  delimiter: string,
+): string {
+  const { app, tenant, env, userId } = context;
+  const base = [app, tenant, env, type].join(delimiter);
+  return type === "private" ? `${base}${delimiter}${userId}` : base;
+}
+
+/**
+ * Builds compound sort key from entity identifiers
+ */
+function buildSortKey(
+  entityPk: string,
+  entitySk: string,
+  delimiter: string,
+): string {
+  return `${entityPk}${delimiter}${entitySk}`;
+}
+
+/**
+ * Builds complete PK/SK pair for DynamoDB operations
+ */
+function buildKeys( // eslint-disable-line max-params -- mirrors DynamoDB key structure
+  context: ServerContext,
+  type: DataType,
+  entityPk: string,
+  entitySk: string,
+  delimiter: string,
+): { pk: string; sk: string } {
+  return {
+    pk: buildPartitionKey(context, type, delimiter),
+    sk: buildSortKey(entityPk, entitySk, delimiter),
+  };
+}
+
+/**
+ * Core store operations - clean business logic
+ * Can be used standalone without Lambda
+ */
+export class Store {
+  private readonly config: StoreConfig;
+
+  constructor(
+    private readonly adapter: StorageAdapter,
+    private readonly context: ServerContext,
+    config: Partial<StoreConfig> = {},
+  ) {
+    this.config = { ...DEFAULT_CONFIG, ...config };
+  }
+
+  /**
+   * Creates or updates an item in the store
+   * Uses atomic upsert — single adapter call, no read-before-write
+   */
+  async save(request: StoreRequest): Promise<StoreResult> {
+    const ttlResult = parseTtl(request.ttl, this.config);
+    if (!ttlResult.valid) {
+      return { success: false, error: ttlResult.error };
+    }
+
+    const keys = this.resolveKeys(request.type, request.key, request.id);
+
+    return this.wrapAsync(async () => {
+      if (request.type === "public" || request.type === "unlisted") {
+        const existing = await this.adapter.get(keys.pk, keys.sk);
+        if (existing && !this.isOwner(existing)) {
+          return { success: false, error: ERRORS.ACCESS_DENIED };
+        }
+      }
+
+      const fields: import("./types").UpsertFields = {
+        data: request.data ?? {},
+        owner: this.context.userId,
+        ...(request.ttl > 0 ? { ttl: this.calculateTtl(request.ttl) } : {}),
+      };
+      const item = await this.adapter.upsert(keys.pk, keys.sk, fields);
+      return { success: true, item };
+    });
+  }
+
+  /**
+   * Retrieves an item by key
+   */
+  async get(
+    entityPk: string,
+    entitySk: string,
+    type: DataType,
+  ): Promise<StoreResult> {
+    const keys = this.resolveKeys(type, entityPk, entitySk);
+
+    return this.wrapAsync(async () => {
+      const item = await this.adapter.get(keys.pk, keys.sk);
+      return item
+        ? { success: true, item }
+        : { success: false, error: ERRORS.NOT_FOUND };
+    });
+  }
+
+  /**
+   * Deletes an item (owner only for all data types)
+   */
+  async delete(
+    entityPk: string,
+    entitySk: string,
+    type: DataType,
+  ): Promise<StoreResult> {
+    const keys = this.resolveKeys(type, entityPk, entitySk);
+
+    return this.wrapAsync(async () => {
+      if (this.adapter.conditionalDelete) {
+        return this.handleConditionalDelete(keys);
+      }
+      return this.handleFallbackDelete(keys);
+    });
+  }
+
+  /**
+   * Queries items by sort key prefix
+   */
+  async query(entityPkPrefix: string, type: DataType): Promise<StoreResult> {
+    const pk = this.resolvePartitionKey(type);
+
+    return this.wrapAsync(async () => {
+      const items = await this.adapter.queryBySortKeyPrefix(pk, entityPkPrefix, MAX_QUERY_ITEMS);
+      return { success: true, items };
+    });
+  }
+
+  private resolvePartitionKey(type: DataType): string {
+    return buildPartitionKey(this.context, type, this.config.keyDelimiter);
+  }
+
+  private resolveKeys(
+    type: DataType,
+    entityPk: string,
+    entitySk: string,
+  ): { pk: string; sk: string } {
+    return buildKeys(this.context, type, entityPk, entitySk, this.config.keyDelimiter);
+  }
+
+  private async wrapAsync(
+    fn: () => Promise<StoreResult>,
+  ): Promise<StoreResult> {
+    try {
+      return await fn();
+    } catch (error) {
+      logger.error("[SimpleStore] Operation failed:", error);
+      return { success: false, error: extractErrorMessage(error, "Unknown error") };
+    }
+  }
+
+  private async handleConditionalDelete(
+    keys: { pk: string; sk: string },
+  ): Promise<StoreResult> {
+    if (!this.adapter.conditionalDelete) {throw new Error("conditionalDelete not available");}
+    const result = await this.adapter.conditionalDelete(keys.pk, keys.sk, this.context.userId);
+    if (result === "not_found") {return { success: false, error: ERRORS.NOT_FOUND };}
+    if (result === "not_owner") {return { success: false, error: ERRORS.ACCESS_DENIED };}
+    return { success: true };
+  }
+
+  private async handleFallbackDelete(
+    keys: { pk: string; sk: string },
+  ): Promise<StoreResult> {
+    const existing = await this.adapter.get(keys.pk, keys.sk);
+    if (!existing) {return { success: false, error: ERRORS.NOT_FOUND };}
+    if (!this.isOwner(existing)) {return { success: false, error: ERRORS.ACCESS_DENIED };}
+    await this.adapter.delete(keys.pk, keys.sk);
+    return { success: true };
+  }
+
+  private calculateTtl(ttlSeconds: number): number {
+    return Math.floor(Date.now() / 1000) + ttlSeconds;
+  }
+
+  private isOwner(item: StoreItem): boolean {
+    return item.owner === this.context.userId;
+  }
+}
+
+// Re-export key building functions for external use
+export { buildPartitionKey, buildSortKey, buildKeys };

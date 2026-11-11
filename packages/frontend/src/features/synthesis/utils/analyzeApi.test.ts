@@ -1,0 +1,148 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024-2026 Askend Lab
+
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@hak/shared";
+import { analyzeText, analyzeTextOrThrow } from "./analyzeApi";
+import { reportApiError } from "@/utils/reportApiError";
+
+vi.mock("@/utils/reportApiError", () => ({
+  reportApiError: vi.fn(),
+}));
+
+vi.mock("@/features/auth/services/storage", () => ({
+  AuthStorage: {
+    getAccessToken: vi.fn(() => "test-token"),
+  },
+}));
+
+describe("analyzeApi", () => {
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = mockFetch;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("analyzeText", () => {
+    it("should return stressed text on success", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: "ˈtɛst" }),
+      });
+
+      const result = await analyzeText("test");
+      expect(result).toBe("ˈtɛst");
+      expect(mockFetch).toHaveBeenCalledWith("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer test-token" },
+        body: JSON.stringify({ text: "test" }),
+      });
+    });
+
+    it("should return null if response not ok", async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+      });
+
+      const result = await analyzeText("test");
+      expect(result).toBeNull();
+      expect(reportApiError).toHaveBeenCalledWith({
+        context: "Analyze failed",
+        status: 500,
+        url: "/api/analyze",
+      });
+    });
+
+    it("should return null if fetch throws", async () => {
+      mockFetch.mockRejectedValue(
+        new Error("Network error"),
+      );
+      const consoleSpy = vi
+        .spyOn(logger, "error")
+        .mockImplementation(() => {});
+
+      const result = await analyzeText("test");
+      expect(result).toBeNull();
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it("should return null if stressedText is empty", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: "" }),
+      });
+
+      const result = await analyzeText("test");
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("analyzeTextOrThrow", () => {
+    it("should return stressed text on success", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: "ˈtɛst" }),
+      });
+
+      const result = await analyzeTextOrThrow("test");
+      expect(result).toBe("ˈtɛst");
+    });
+
+    it("should throw error if response not ok", async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 422,
+      });
+
+      await expect(analyzeTextOrThrow("test")).rejects.toThrow(
+        "Analysis failed",
+      );
+      expect(reportApiError).toHaveBeenCalledWith({
+        context: "Analysis failed",
+        status: 422,
+        url: "/api/analyze",
+      });
+    });
+
+    it("should return original text if stressedText is empty", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: "" }),
+      });
+
+      const result = await analyzeTextOrThrow("test");
+      expect(result).toBe("test");
+    });
+
+    it("should return original text if stressedText is null", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: null }),
+      } as unknown as Response);
+
+      const result = await analyzeTextOrThrow("fallback");
+      expect(result).toBe("fallback");
+    });
+
+    it("sends correct request parameters", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ stressedText: "result" }),
+      } as unknown as Response);
+
+      await analyzeTextOrThrow("hello world");
+      expect(global.fetch).toHaveBeenCalledWith("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer test-token" },
+        body: JSON.stringify({ text: "hello world" }),
+      });
+    });
+  });
+});

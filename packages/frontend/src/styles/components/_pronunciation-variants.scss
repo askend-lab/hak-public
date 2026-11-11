@@ -1,0 +1,640 @@
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/borders";
+@import "../tokens/breakpoints";
+@import "../abstracts/mixins";
+
+// =========================================================================
+// Pronunciation Variants Component
+// =========================================================================
+// BEM: .pronunciation-variants, .pronunciation-variants__*
+// Sliding panel displaying pronunciation variant options
+// Uses: panel mixins (base component)
+// =========================================================================
+
+// Sliding panel from right - uses panel mixins
+.pronunciation-variants__panel {
+  @include panel-base;
+  @include panel-right;
+  @include panel-md;
+}
+
+// Panel header - uses panel header mixin
+.pronunciation-variants__header {
+  @include panel-header;
+  width: 100%;
+  max-width: 518px;
+}
+
+.pronunciation-variants__title {
+  @include panel-title;
+}
+
+.pronunciation-variants__header-actions {
+  @include panel-header-actions;
+}
+
+.pronunciation-variants__close {
+  @include panel-close;
+}
+
+// Panel content - uses panel content mixin
+.pronunciation-variants__content {
+  @include panel-content;
+  width: 100%;
+  max-width: 518px;
+  gap: $spacing-2;
+}
+
+// Error state
+.pronunciation-variants__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-8;
+  text-align: center;
+  color: $color-soft-danger;
+}
+
+// Variants list
+.pronunciation-variants__list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+// Individual variant item - Figma block specs
+.pronunciation-variants__item {
+  width: 100%;
+  min-height: 72px;
+  height: auto;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-xl;
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: $color-outlined-primary;
+  }
+
+  &--selected {
+    background: $color-input-bg-light;
+    border-color: $color-outlined-primary;
+  }
+}
+
+.pronunciation-variants__item-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: $spacing-2;
+  width: 100%;
+}
+
+.pronunciation-variants__item-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: $spacing-1;
+}
+
+.pronunciation-variants__item-text {
+  font-family: $font-body;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-md;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-primary;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pronunciation-variants__item-tags {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $spacing-1;
+  height: 22px;
+  flex-wrap: wrap;
+}
+
+.pronunciation-variants__item-tag {
+  height: 22px;
+  background: $color-secondary;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  padding: 0 $spacing-1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  line-height: 100%;
+  letter-spacing: 0.4%;
+  text-align: center;
+  color: $color-primary;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pronunciation-variants__item-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-1;
+  width: 100%;
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-gray;
+}
+
+.pronunciation-variants__explanation-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: $color-gray;
+}
+
+.pronunciation-variants__item-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+// Custom variant form - content frame (Figma specs)
+.pronunciation-variants__form {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-xl;
+  padding: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.pronunciation-variants__form-title {
+  margin: 0;
+  font-family: $font-body;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  line-height: 100%;
+  letter-spacing: 0;
+  white-space: nowrap;
+  height: 18px;
+}
+
+.pronunciation-variants__form-description {
+  margin: 0;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-regular;
+  color: $color-primary;
+  line-height: 140%;
+  letter-spacing: 0;
+  width: 100%;
+  max-width: 486px;
+  min-height: 40px;
+}
+
+// Custom input container
+.pronunciation-variants__input-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-2;
+  align-items: center;
+  width: 100%;
+  max-width: 486px;
+  height: 42px;
+  border-radius: $border-radius-xl;
+
+  .input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.pronunciation-variants__input {
+  flex: 1;
+  width: 100%;
+  padding: $spacing-3 $spacing-3;
+  padding-right: $spacing-10;
+  border: 1px solid $color-primary;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: 140%;
+  letter-spacing: 0;
+  background: $color-white;
+  color: $color-primary;
+  box-sizing: border-box;
+  height: 42px;
+
+  &:focus-visible {
+    outline: none;
+    border-color: $color-outlined-primary;
+    box-shadow: 0 0 0 2px $color-focus-ring-blue;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $color-gray;
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.pronunciation-variants__input-clear {
+  position: absolute;
+  right: $spacing-3;
+  top: $spacing-3;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: $color-secondary;
+  border-radius: $border-radius-full;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $color-outlined-neutral;
+  }
+
+  img {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+}
+
+.pronunciation-variants__input-actions {
+  display: flex;
+  gap: $spacing-2;
+  align-items: center;
+}
+
+// Phonetic markers toolbar
+.pronunciation-variants__markers-toolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  align-items: center;
+  width: 100%;
+  max-width: 486px;
+  height: auto;
+}
+
+.pronunciation-variants__marker-button {
+  width: 28px;
+  height: 36px;
+  padding: 0;
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: $color-primary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-outlined-neutral;
+    transform: translateY(1px);
+  }
+}
+
+// Custom variant section
+.pronunciation-variants__custom-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-4;
+  margin-top: $spacing-2;
+}
+
+// Toggle links for custom variant
+.pronunciation-variants__toggle-link {
+  background: none;
+  border: none;
+  color: $color-outlined-primary;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-regular;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: $spacing-2 0;
+
+  &:hover {
+    color: $color-soft-primary;
+  }
+}
+
+// Inline guide link in description
+.pronunciation-variants__guide-link {
+  display: inline;
+  vertical-align: baseline;
+  background: none;
+  border: none;
+  color: $color-outlined-primary;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: $color-soft-primary;
+  }
+}
+
+// Guide View
+.pronunciation-variants__guide-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pronunciation-variants__guide-view-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-6;
+
+  h4 {
+    flex: 1;
+    font-family: $font-body;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-lg;
+    line-height: 28px;
+    color: $color-primary;
+    margin: 0;
+  }
+}
+
+.pronunciation-variants__back-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  background: transparent;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $color-soft-neutral-bg;
+    border-color: $color-gray;
+  }
+
+  &:active {
+    background: $color-outlined-neutral;
+  }
+}
+
+.pronunciation-variants__back-button--icon-only {
+  @include panel-close;
+}
+
+.pronunciation-variants__guide-view-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: $spacing-2;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $color-soft-neutral-bg;
+    border-radius: $border-radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-outlined-neutral;
+    border-radius: $border-radius-sm;
+
+    &:hover {
+      background: $color-gray;
+    }
+  }
+}
+
+.pronunciation-variants__guide-intro {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  margin: 0 0 $spacing-4 0;
+}
+
+.pronunciation-variants__marker-item {
+  background: $color-white;
+  border: 1px solid $color-outlined-neutral;
+  border-radius: $border-radius;
+  padding: $spacing-4;
+  margin-bottom: $spacing-4;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $color-gray;
+    box-shadow: 0 1px 3px $color-shadow-focus;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.pronunciation-variants__marker-symbol {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-3;
+
+  code {
+    @include phonetic-marker-badge;
+  }
+}
+
+.pronunciation-variants__marker-name {
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.pronunciation-variants__marker-rule {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  margin-bottom: $spacing-2;
+}
+
+.pronunciation-variants__marker-description {
+  font-family: $font-body;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-3;
+}
+
+.pronunciation-variants__marker-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  line-height: 20px;
+  color: $color-text-secondary;
+
+  strong {
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    width: 100%;
+  }
+
+  ul {
+    margin: $spacing-2 0 0 0;
+    padding-left: $spacing-5;
+    list-style-type: none;
+    width: 100%;
+
+    li {
+      margin-bottom: $spacing-1;
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+
+      &:before {
+        content: "•";
+        color: $color-gray;
+        font-size: $font-size-md;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      code {
+        display: inline;
+        padding: $spacing-1 $spacing-1;
+        background: $color-soft-neutral-bg;
+        border: 1px solid $color-outlined-neutral;
+        border-radius: $border-radius-sm;
+        font-family: $font-mono;
+        font-size: $font-size-xs;
+        color: $color-outlined-primary;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Responsive Styles
+// ---------------------------------------------------------------------------
+
+@include respond-below($breakpoint-md) {
+  .pronunciation-variants__panel {
+    width: 100vw;
+    max-width: none;
+    padding: $spacing-4 $spacing-3;
+  }
+
+  .pronunciation-variants__header,
+  .pronunciation-variants__content {
+    width: 100%;
+    max-width: none;
+  }
+
+  .pronunciation-variants__form-description,
+  .pronunciation-variants__input-container,
+  .pronunciation-variants__markers-toolbar {
+    max-width: none;
+  }
+
+  .pronunciation-variants__title {
+    font-size: $font-size-md;
+  }
+
+  .pronunciation-variants__form-title {
+    font-size: $font-size-md;
+  }
+
+  .pronunciation-variants__item {
+    padding: $spacing-3;
+  }
+}
+
+@include respond-below($breakpoint-sm) {
+  .pronunciation-variants__panel {
+    padding: $spacing-3 $spacing-2;
+  }
+
+  .pronunciation-variants__input-container {
+    flex-direction: column;
+    height: auto;
+    gap: $spacing-3;
+  }
+
+  .pronunciation-variants__input-actions {
+    width: 100%;
+    justify-content: stretch;
+
+    > button {
+      flex: 1;
+    }
+  }
+}

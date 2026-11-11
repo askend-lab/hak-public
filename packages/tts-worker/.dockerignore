@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.coverage
+coverage/
+tests/
+requirements-test.txt
+pytest.ini
+pytest-results.json
+.venv/
+.git
+.gitignore
+node_modules/
+*.md

@@ -1,0 +1,113 @@
+// =========================================================================
+// Breakpoint Design Tokens
+// =========================================================================
+// Industry-standard responsive breakpoints
+// Mobile-first approach
+// =========================================================================
+
+// ---------------------------------------------------------------------------
+// CSS Custom Properties (Runtime-changeable)
+// ---------------------------------------------------------------------------
+
+:root {
+  // Breakpoint values
+  --breakpoint-xs: 375px; // Small mobile (iPhone SE)
+  --breakpoint-mobile: 480px; // Mobile portrait max
+  --breakpoint-sm: 640px; // Mobile landscape / Small tablet
+  --breakpoint-md: 768px; // Tablet portrait
+  --breakpoint-lg: 1024px; // Tablet landscape / Small desktop
+  --breakpoint-xl: 1280px; // Desktop
+  --breakpoint-2xl: 1536px; // Large desktop
+
+  // Container max-widths per breakpoint
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+
+  // Content max-widths (semantic)
+  --content-narrow: 640px; // For text-heavy content
+  --content-default: 920px; // Default page content
+  --content-wide: 1280px; // Wide layouts
+  --content-full: 1536px; // Full-width layouts
+}
+
+// ---------------------------------------------------------------------------
+// SCSS Variable Aliases (Compile-time, IDE autocomplete)
+// ---------------------------------------------------------------------------
+
+$breakpoint-xs: 375px;
+$breakpoint-mobile: 480px;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1536px;
+
+$content-narrow: 640px;
+$content-default: 920px;
+$content-wide: 1280px;
+$content-full: 1536px;
+
+// ---------------------------------------------------------------------------
+// Responsive Mixins (Mobile-first)
+// ---------------------------------------------------------------------------
+
+// Min-width (mobile-first)
+@mixin respond-above($breakpoint) {
+  @media (min-width: $breakpoint) {
+    @content;
+  }
+}
+
+// Max-width (desktop-first, use sparingly)
+@mixin respond-below($breakpoint) {
+  @media (max-width: ($breakpoint - 1px)) {
+    @content;
+  }
+}
+
+// Between two breakpoints
+@mixin respond-between($min, $max) {
+  @media (min-width: $min) and (max-width: ($max - 1px)) {
+    @content;
+  }
+}
+
+// Semantic breakpoint helpers (mobile-first)
+@mixin mobile-landscape {
+  @include respond-above($breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @include respond-above($breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @include respond-above($breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin desktop-large {
+  @include respond-above($breakpoint-xl) {
+    @content;
+  }
+}
+
+@mixin desktop-xlarge {
+  @include respond-above($breakpoint-2xl) {
+    @content;
+  }
+}

@@ -1,0 +1,232 @@
+// =========================================================================
+// Footer Component Styles
+// =========================================================================
+// Component-specific styles for footer elements
+// Layout styles are in _page-layouts.scss (.page-footer--full)
+// BEM: .footer
+// =========================================================================
+
+@import "../tokens/breakpoints";
+@import "../tokens/colors";
+@import "../tokens/typography";
+@import "../tokens/spacing";
+@import "../tokens/opacity";
+@import "../tokens/borders";
+
+// Footer component-specific styles (used within .page-footer--full wrapper)
+
+.footer__logo {
+  position: relative;
+  padding-top: $spacing-12;
+
+  @include desktop {
+    width: 305px;
+  }
+}
+
+.footer__logo-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer__contact {
+  @include desktop {
+    width: 305px;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    line-height: $line-height-normal;
+    letter-spacing: $letter-spacing-normal;
+    color: $color-primary;
+    font-family: $font-body;
+  }
+}
+
+.footer__heading {
+  font-size: $heading-page-title-size-mobile;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-none;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  margin: 0;
+  font-family: $font-body;
+}
+
+.footer__links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  a {
+    color: $color-primary;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    line-height: $line-height-normal;
+    letter-spacing: $letter-spacing-normal;
+    transition: opacity 0.2s;
+    font-family: $font-body;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.footer__description {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  margin: 0;
+  font-family: $font-body;
+  max-width: 100%;
+  word-wrap: break-word;
+
+  @include desktop {
+    max-width: 305px;
+  }
+}
+
+.footer__social {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  width: auto;
+  height: auto;
+
+  li {
+    display: flex;
+    align-items: center;
+  }
+
+  a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: $spacing-2;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    width: auto;
+    height: 20px;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.footer__social-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.footer__social-label {
+  font-family: $font-body;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  letter-spacing: $letter-spacing-normal;
+  color: $color-primary;
+  width: 66px;
+  height: 20px;
+}
+
+.footer__feedback-link {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  color: $color-primary;
+  text-decoration: none;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  font-family: $font-body;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.7;
+
+    span {
+      text-decoration: underline;
+    }
+  }
+}
+
+.footer__feedback-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.footer__feedback-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+// =========================================================================
+// Sponsor Logos Strip
+// =========================================================================
+
+.footer-sponsors {
+  background: $color-white;
+  border-top: 1px solid $color-border-neutral-light;
+  padding: $spacing-4 0;
+  margin-top: $spacing-8;
+  width: 100%;
+}
+
+.footer-sponsors__content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-15;
+  padding: 0 $spacing-4;
+
+  @include respond-below($breakpoint-md) {
+    flex-direction: column;
+    gap: $spacing-8;
+  }
+
+  @include mobile-landscape {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $spacing-10;
+    justify-content: center;
+  }
+
+  @include desktop {
+    flex-wrap: nowrap;
+    gap: $spacing-15;
+  }
+}
+
+.footer-sponsors__logo {
+  height: auto;
+  max-height: 60px;
+  width: auto;
+  object-fit: contain;
+
+  @include respond-below($breakpoint-md) {
+    max-height: 48px;
+  }
+}

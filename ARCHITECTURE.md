@@ -1,0 +1,138 @@
+# Architecture
+
+## System Overview
+
+HAK is an Estonian language learning platform. Teachers create lessons with text-to-speech audio, students complete them. The system runs on AWS with a serverless backend and a React frontend.
+
+**Client:** React SPA (Vite + SCSS/BEM), served via CloudFront CDN from S3.
+
+**Backend:** Three Lambda functions behind API Gateway, plus one Docker service on ECS:
+
+- **store** — REST API for lessons, users, and progress. Reads/writes DynamoDB.
+- **tts-api** — TTS gateway. Accepts synthesis requests, sends them to SQS, checks results in S3.
+- **tts-worker** — Estonian speech synthesis engine (Merlin). Runs as a Docker container on ECS Fargate. Polls SQS for jobs, runs Merlin TTS, uploads WAV files to S3.
+- **morphology-api** — Estonian morphological analysis. Lambda with a native binary (vmetajson) in a Docker container.
+- **auth** — Estonian eID (TARA) authentication via Cognito.
+
+**Storage:** DynamoDB for application data, S3 for audio files and frontend assets.
+
+**Queuing:** SQS connects tts-api (producer) to tts-worker (consumer).
+
+## Monorepo Structure
+
+pnpm workspaces monorepo. Packages and their dependencies:
+
+- **frontend** — depends on `shared`, `specifications`, `store` (dev)
+- **store** — depends on `shared`
+- **tts-api** — standalone (inlines shared utilities for Lambda bundling)
+- **tts-worker** — standalone (Python, no npm dependencies)
+- **morphology-api** — standalone (inlines shared utilities for Docker Lambda bundling)
+- **auth** — standalone
+- **shared** — shared types, utilities, constants (no dependencies)
+- **specifications** — Gherkin BDD feature specs, depends on `gherkin-parser`
+- **gherkin-parser** — Gherkin-to-test mapping (no dependencies)
+
+## Packages
+
+- **frontend** — React, Vite, SCSS/BEM, Vitest. Runs on S3 + CloudFront. Teacher and student UI.
+- **store** — TypeScript, DynamoDB SDK. Lambda. Lessons, users, progress CRUD.
+- **tts-api** — TypeScript, ECS SDK, S3 SDK, SQS SDK. Lambda. TTS request gateway.
+- **tts-worker** — Python, Conda, Merlin engine. Docker on ECS Fargate. Estonian speech synthesis. See [ADR 009](docs/adr/009-merlin-tts-engine.md) for why Merlin.
+- **morphology-api** — TypeScript, native binary (vmetajson). Lambda (Docker). Estonian morphological analysis.
+- **auth** — TypeScript, Cognito SDK, JOSE. Lambda. Estonian eID (TARA) authentication.
+- **shared** — TypeScript. Shared types, utilities, constants.
+- **specifications** — Gherkin. BDD feature specifications.
+- **gherkin-parser** — TypeScript. Gherkin-to-test mapping.
+
+## Data Flow — Lesson Playback
+
+1. Student opens the app. CloudFront serves the React SPA from S3.
+2. Student navigates to a lesson. Frontend calls `GET /get?pk=...&sk=...&type=...` via API Gateway.
+3. API Gateway routes to store. Store queries DynamoDB, returns lesson JSON.
+4. Frontend renders the lesson. Audio files are served directly from S3 via content-hash URLs.
+
+## Data Flow — TTS Synthesis
+
+1. Teacher enters text and clicks synthesize. Frontend calls `POST /synthesize {text, voice}`.
+2. API Gateway routes to tts-api. tts-api sends a message to SQS and returns `202 Accepted` with a cache key.
+3. tts-worker picks up the message from SQS, runs Merlin TTS engine, uploads the resulting WAV to S3.
+4. Frontend polls `GET /status/:cacheKey`. When tts-api finds the file in S3, it returns `{status: ready, url}`.
+5. Frontend plays the audio from the S3 URL.
+
+
+## CI/CD
+
+GitHub Actions workflow in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| **build.yml** | Push/PR to main | Lint, typecheck, test all packages |
+
+All checks must pass before a PR can be merged.
+
+## Authentication & Authorization
+
+Two login methods via AWS Cognito: **TARA** (Estonian eID — ID-card, Mobile-ID, Smart-ID) and **Cognito Hosted UI** (email/password with PKCE). The `auth` Lambda handles TARA OAuth2 flow. Tokens are exchanged at `/auth/callback`, access tokens sent as `Authorization: Bearer`, refresh tokens stored in httpOnly cookies.
+
+**Public endpoints (no auth):** `/api/synthesize`, `/api/status/*`, `/api/analyze`, `/api/variants`, `/api/get-shared`, `/api/get-public`
+**Authenticated endpoints (Cognito JWT):** `/api/save`, `/api/get`, `/api/delete`, `/api/query`
+
+See `docs/AUTHENTICATION.md` for full details.
+
+## Security Model
+
+**Network layer:**
+
+- All traffic goes through **CloudFront** — API Gateways have no public DNS
+- **AWS WAF** on CloudFront with two rules:
+  - Per-IP rate limiting: 100 requests / 5 minutes → BLOCK
+  - AWS Managed Common Rules: SQL injection, XSS, and other attack protection
+- WAF logs (BLOCK + COUNT) stored in CloudWatch (90-day retention)
+- **CORS** restricts browser-origin requests to the configured domain
+
+**Application layer:**
+
+- **PKCE** on all OAuth2 flows — prevents authorization code interception
+- **httpOnly cookies** for refresh tokens — not accessible to JavaScript
+- **CSRF protection** on auth POST endpoints (Origin header validation)
+- **Input validation** — Zod schemas on API inputs, regex validation on cache keys (SHA-256 hex)
+- **No secrets on frontend** — all sensitive values are server-side environment variables
+- **Shell injection prevention** — Python worker uses `subprocess.run` with argument lists, no `shell=True`
+- **CodeQL** — GitHub security analysis runs on every push/PR
+
+**Data layer:**
+
+- S3 buckets are private, accessed via CloudFront signed URLs or IAM roles
+- DynamoDB access scoped to Lambda execution roles
+- Cognito client secrets stored in SSM/Secrets Manager
+
+## System Diagrams
+
+```
+Browser → CloudFront (WAF) → API Gateway → Lambda / ECS
+```
+
+### TTS Synthesis Pipeline
+
+```
+Frontend  POST /synthesize → tts-api → SQS → tts-worker (ECS Fargate)
+          GET /status/{key} → tts-api → S3 ← tts-worker (WAV upload)
+```
+
+### Authentication Flow
+
+```
+Frontend → TARA/Cognito → auth Lambda → Cognito User Pool → Frontend (/auth/callback)
+```
+
+## Quality System
+
+Quality checks run in CI on every pull request. The PR is blocked if any check fails.
+
+| Check | What it runs |
+|-------|--------------|
+| **Lint** | ESLint zero-warnings policy |
+| **Typecheck** | TypeScript strict compilation (`tsc --noEmit`) — frontend + shared |
+| **Tests** | Unit + integration tests across all packages |
+
+Lint metrics enforced: complexity ≤10, function length ≤50L, nesting depth ≤4, no console statements, no magic numbers.
